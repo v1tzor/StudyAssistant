@@ -30,10 +30,12 @@ import theme.tokens.LocalStudyAssistantElevations
 import theme.tokens.LocalStudyAssistantIcons
 import theme.tokens.LocalStudyAssistantLanguage
 import theme.tokens.LocalStudyAssistantStrings
+import theme.tokens.LocalWindowSize
 import theme.tokens.fetchAppElevations
 import theme.tokens.fetchAppLanguage
 import theme.tokens.fetchCoreIcons
 import theme.tokens.fetchCoreStrings
+import theme.tokens.rememberScreenSizeInfo
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
@@ -44,6 +46,7 @@ fun StudyAssistantTheme(
     languageType: LanguageUiType = LanguageUiType.DEFAULT,
     content: @Composable () -> Unit,
 ) {
+    val windowSize = rememberScreenSizeInfo()
     val colorsType = StudyAssistantColors(themeType.isDarkTheme())
     val appLanguage = fetchAppLanguage(languageType)
     val coreStrings = fetchCoreStrings(appLanguage)
@@ -61,6 +64,7 @@ fun StudyAssistantTheme(
             LocalStudyAssistantElevations provides appElevations,
             LocalStudyAssistantStrings provides coreStrings,
             LocalStudyAssistantIcons provides appIcons,
+            LocalWindowSize provides windowSize,
             content = content,
         )
     }

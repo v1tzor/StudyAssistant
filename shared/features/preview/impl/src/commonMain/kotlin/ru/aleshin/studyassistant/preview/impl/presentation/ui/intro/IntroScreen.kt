@@ -38,6 +38,8 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.Int
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroViewState
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.screenmodel.rememberIntroScreenModel
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.IntroPage
+import theme.tokens.LocalWindowSize
+import theme.tokens.WindowSize
 import views.ErrorSnackbar
 
 /**
@@ -53,6 +55,7 @@ internal class IntroScreen : Screen {
     ) { state ->
         PreviewTheme {
             val pagerState = rememberPagerState { IntroPage.entries.size }
+            val windowSize = LocalWindowSize.current
             val mainNavigator = LocalNavigator.currentOrThrow.parent
             val strings = PreviewThemeRes.strings
             val snackbarState = remember { SnackbarHostState() }
@@ -60,15 +63,26 @@ internal class IntroScreen : Screen {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 content = { paddingValues ->
-                    IntroContent(
-                        state = state,
-                        modifier = Modifier.padding(paddingValues),
-                        pagerState = pagerState,
-                        onBackClick = { dispatchEvent(IntroEvent.PreviousPage(pagerState.currentPage)) },
-                        onContinueClick = { dispatchEvent(IntroEvent.NextPage(pagerState.currentPage)) },
-                        onLoginClick = { dispatchEvent(IntroEvent.NavigateToLogin) },
-                        onRegisterClick = { dispatchEvent(IntroEvent.NavigateToRegister) },
-                    )
+                    when (windowSize.heightWindowType) {
+                        WindowSize.WindowType.COMPACT -> IntroContentCompact(
+                            state = state,
+                            modifier = Modifier.padding(paddingValues),
+                            pagerState = pagerState,
+                            onBackClick = { dispatchEvent(IntroEvent.PreviousPage(pagerState.currentPage)) },
+                            onContinueClick = { dispatchEvent(IntroEvent.NextPage(pagerState.currentPage)) },
+                            onLoginClick = { dispatchEvent(IntroEvent.NavigateToLogin) },
+                            onRegisterClick = { dispatchEvent(IntroEvent.NavigateToRegister) },
+                        )
+                        else -> IntroContent(
+                            state = state,
+                            modifier = Modifier.padding(paddingValues),
+                            pagerState = pagerState,
+                            onBackClick = { dispatchEvent(IntroEvent.PreviousPage(pagerState.currentPage)) },
+                            onContinueClick = { dispatchEvent(IntroEvent.NextPage(pagerState.currentPage)) },
+                            onLoginClick = { dispatchEvent(IntroEvent.NavigateToLogin) },
+                            onRegisterClick = { dispatchEvent(IntroEvent.NavigateToRegister) },
+                        )
+                    }
                 },
                 snackbarHost = {
                     SnackbarHost(

@@ -20,20 +20,14 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.material3.Button
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroViewState
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.AuthActionsSection
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.IntroPage
@@ -52,11 +45,11 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.NavAct
 import views.CircularStepsRow
 
 /**
- * @author Stanislav Aleshin on 14.04.2024.
+ * @author Stanislav Aleshin on 19.04.2024.
  */
 @Composable
 @OptIn(ExperimentalResourceApi::class, ExperimentalFoundationApi::class)
-internal fun IntroContent(
+internal fun IntroContentCompact(
     state: IntroViewState,
     modifier: Modifier,
     pagerState: PagerState,
@@ -71,14 +64,14 @@ internal fun IntroContent(
             state = pagerState
         ) { pageIndex ->
             val page = IntroPage.fetchByIndex(pageIndex) ?: IntroPage.entries.first()
-            InfoSection(
+            InfoSectionCompact(
                 illustration = painterResource(page.illustration),
                 headline = page.headline,
                 body = page.body,
             )
         }
         Column(
-            verticalArrangement = Arrangement.spacedBy(48.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CircularStepsRow(
@@ -108,26 +101,26 @@ internal fun IntroContent(
 
 @Composable
 @ExperimentalResourceApi
-internal fun InfoSection(
+internal fun InfoSectionCompact(
     modifier: Modifier = Modifier,
     illustration: Painter,
     headline: String,
     body: String,
 ) {
     Column(
-        modifier = modifier.fillMaxSize().padding(top = 32.dp),
-        verticalArrangement = Arrangement.spacedBy(32.dp),
+        modifier = modifier.fillMaxSize().padding(top = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            modifier = Modifier.padding(horizontal = 32.dp).weight(1f),
+            modifier = Modifier.padding(horizontal = 32.dp).weight(0.9f),
             painter = illustration,
             contentDescription = headline,
             contentScale = ContentScale.Fit,
             alignment = Alignment.BottomCenter,
         )
         Column(
-            modifier = Modifier.padding(horizontal = 24.dp).weight(1f),
+            modifier = Modifier.padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
@@ -144,5 +137,6 @@ internal fun InfoSection(
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
+        Spacer(modifier = Modifier.weight(0.1f))
     }
 }

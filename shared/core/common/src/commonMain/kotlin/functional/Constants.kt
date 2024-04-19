@@ -107,4 +107,8 @@ object Constants {
 
         const val SHIFT_MINUTE_VALUE = 5
     }
+
+    object Image {
+        const val ILLUSTRATION_HEIGHT_RATION = 0.82
+    }
 }

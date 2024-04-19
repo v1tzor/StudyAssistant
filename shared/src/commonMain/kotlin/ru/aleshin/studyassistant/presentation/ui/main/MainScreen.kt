@@ -17,6 +17,8 @@
 package ru.aleshin.studyassistant.presentation.ui.main
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalWindowInfo
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
@@ -47,11 +49,10 @@ fun MainScreen() = ScreenContent(
                 disposeSteps = true,
             ),
         ) { navigator ->
-            Logger.e { "Stack -> ${navigator.items}" }
             FadeTransition(navigator = navigator)
 
             handleEffect { effect ->
-                when(effect) {
+                when (effect) {
                     is MainEffect.ReplaceGlobalScreen -> navigator.replaceAll(effect.screen)
                     is MainEffect.ShowError -> TODO()
                 }
