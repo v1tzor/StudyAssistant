@@ -21,6 +21,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.impl.domain.common.AuthEitherWrapper
 import ru.aleshin.studyassistant.auth.impl.domain.common.AuthErrorHandler
+import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
@@ -28,4 +29,5 @@ import ru.aleshin.studyassistant.auth.impl.domain.common.AuthErrorHandler
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<AuthErrorHandler> { AuthErrorHandler.Base() }
     bindSingleton<AuthEitherWrapper> { AuthEitherWrapper.Base(instance()) }
+    bindSingleton<AuthInteractor> { AuthInteractor.Base(instance()) }
 }

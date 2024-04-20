@@ -22,7 +22,6 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.factory
 import org.kodein.di.instance
-import org.kodein.di.provider
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.navigation.AuthFeatureStarterImpl
@@ -30,14 +29,20 @@ import ru.aleshin.studyassistant.auth.impl.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.screenmodel.ForgotEffectCommunicator
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.screenmodel.ForgotScreenModel
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.screenmodel.ForgotStateCommunicator
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.screenmodel.ForgotWorkProcessor
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel.LoginEffectCommunicator
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel.LoginScreenModel
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel.LoginStateCommunicator
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel.LoginWorkProcessor
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.nav.NavScreenModel
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.nav.NavigationScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterEffectCommunicator
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterScreenModel
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterStateCommunicator
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterWorkProcessor
+import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
+import ru.aleshin.studyassistant.auth.impl.presentation.validation.UsernameValidator
+import ru.aleshin.studyassistant.auth.impl.presentation.validation.PasswordValidator
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 
 /**
@@ -50,15 +55,22 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<AuthFeatureStarter> { AuthFeatureStarterImpl(factory()) }
     bindProvider<FeatureScreenProvider> { FeatureScreenProvider.Base(instance<() -> PreviewFeatureStarter>()) }
 
+    bindSingleton<EmailValidator> { EmailValidator.Base() }
+    bindSingleton<PasswordValidator> { PasswordValidator.Base() }
+    bindSingleton<UsernameValidator> { UsernameValidator.Base() }
+
     bindProvider<LoginStateCommunicator> { LoginStateCommunicator.Base() }
     bindProvider<LoginEffectCommunicator> { LoginEffectCommunicator.Base() }
-    bindProvider<LoginScreenModel> { LoginScreenModel(instance(), instance(), instance()) }
+    bindProvider<LoginWorkProcessor> { LoginWorkProcessor.Base(instance(), instance()) }
+    bindProvider<LoginScreenModel> { LoginScreenModel(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<RegisterStateCommunicator> { RegisterStateCommunicator.Base() }
     bindProvider<RegisterEffectCommunicator> { RegisterEffectCommunicator.Base() }
-    bindProvider<RegisterScreenModel> { RegisterScreenModel(instance(), instance(), instance()) }
+    bindProvider<RegisterWorkProcessor> { RegisterWorkProcessor.Base(instance(), instance()) }
+    bindProvider<RegisterScreenModel> { RegisterScreenModel(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<ForgotStateCommunicator> { ForgotStateCommunicator.Base() }
     bindProvider<ForgotEffectCommunicator> { ForgotEffectCommunicator.Base() }
-    bindProvider<ForgotScreenModel> { ForgotScreenModel(instance(), instance(), instance()) }
+    bindProvider<ForgotWorkProcessor> { ForgotWorkProcessor.Base(instance(), instance()) }
+    bindProvider<ForgotScreenModel> { ForgotScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
 }

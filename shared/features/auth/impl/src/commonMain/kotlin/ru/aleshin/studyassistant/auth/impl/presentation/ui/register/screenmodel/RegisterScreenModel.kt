@@ -19,21 +19,32 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel
 import androidx.compose.runtime.Composable
 import architecture.screenmodel.BaseScreenModel
 import architecture.screenmodel.EmptyDeps
+import architecture.screenmodel.work.BackgroundWorkKey
 import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import managers.CoroutineManager
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
+import ru.aleshin.studyassistant.auth.impl.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEffect
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEvent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterViewState
+import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
+import ru.aleshin.studyassistant.auth.impl.presentation.validation.PasswordValidator
+import ru.aleshin.studyassistant.auth.impl.presentation.validation.UsernameValidator
+import validation.operateValidate
 
 /**
  * @author Stanislav Aleshin on 17.04.2024
  */
 internal class RegisterScreenModel(
+    private val screenProvider: FeatureScreenProvider,
+    private val workProcessor: RegisterWorkProcessor,
+    private val usernameValidator: UsernameValidator,
+    private val emailValidator: EmailValidator,
+    private val passwordValidator: PasswordValidator,
     stateCommunicator: RegisterStateCommunicator,
     effectCommunicator: RegisterEffectCommunicator,
     coroutineManager: CoroutineManager,
@@ -45,9 +56,35 @@ internal class RegisterScreenModel(
 
     override suspend fun WorkScope<RegisterViewState, RegisterAction, RegisterEffect>.handleEvent(
         event: RegisterEvent,
-    ) = when (event) {
-        is RegisterEvent.NavigateToLogin -> TODO()
-        is RegisterEvent.PressRegisterButton -> TODO()
+    ) {
+        when (event) {
+            is RegisterEvent.RegisterNewAccount -> launchBackgroundWork(RegisterWorkKey.REGISTER) {
+                val usernameValidResult = usernameValidator.validate(event.credentials.username)
+                val emailValidResult = emailValidator.validate(event.credentials.email)
+                val passwordValidResult = passwordValidator.validate(event.credentials.password)
+                operateValidate(
+                    isSuccess = {
+                        val command = RegisterWorkCommand.RegisterNewAccount(event.credentials)
+                        workProcessor.work(command).collectAndHandleWork()
+                    },
+                    isError = {
+                        val action = RegisterAction.UpdateValidErrors(
+                            username = usernameValidResult.validError,
+                            email = emailValidResult.validError,
+                            password = passwordValidResult.validError
+                        )
+                        sendAction(action)
+                    },
+                    usernameValidResult.isValid,
+                    emailValidResult.isValid,
+                    passwordValidResult.isValid,
+                )
+            }
+            is RegisterEvent.NavigateToLogin -> {
+                val screen = screenProvider.provideLoginScreen()
+                sendEffect(RegisterEffect.PushScreen(screen))
+            }
+        }
     }
 
     override suspend fun reduce(
@@ -56,11 +93,21 @@ internal class RegisterScreenModel(
     ) = when (action) {
         is RegisterAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
+            usernameValidError = null,
+            emailValidError = null,
+            passwordValidError = null,
         )
         is RegisterAction.UpdateValidErrors -> currentState.copy(
             isLoading = false,
+            usernameValidError = action.username,
+            emailValidError = action.email,
+            passwordValidError = action.password,
         )
     }
+}
+
+internal enum class RegisterWorkKey : BackgroundWorkKey {
+    REGISTER,
 }
 
 @Composable

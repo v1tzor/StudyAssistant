@@ -23,12 +23,12 @@ import platform.JavaSerializable
  * @author Stanislav Aleshin on 17.04.2024.
  */
 internal data class RegisterCredentialsUi(
-    val nickname: String = "",
+    val username: String = "",
     val email: String = "",
     val password: String = "",
 ) : JavaSerializable {
     fun mapToDomain() = AuthCredentials(
-        nickname = nickname,
+        nickname = username,
         email = email,
         password = password,
     )

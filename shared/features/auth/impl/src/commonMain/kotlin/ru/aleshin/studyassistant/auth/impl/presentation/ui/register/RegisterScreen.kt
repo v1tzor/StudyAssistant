@@ -26,18 +26,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.auth.impl.presentation.models.RegisterCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthTheme
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEffect
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEvent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterViewState
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.rememberRegisterScreenModel
+import theme.tokens.LocalWindowSize
 import views.ErrorSnackbar
 
 /**
  * @author Stanislav Aleshin on 16.04.2024
  */
-internal class RegisterScreen() : Screen {
+internal class RegisterScreen : Screen {
 
     @Composable
     override fun Content() = ScreenContent(
@@ -46,15 +51,24 @@ internal class RegisterScreen() : Screen {
     ) { state ->
         AuthTheme {
             val strings = AuthThemeRes.strings
+            val navigator = LocalNavigator.currentOrThrow
+            val windowSize = LocalWindowSize.current
             val snackbarState = remember { SnackbarHostState() }
 
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 content = { paddingValues ->
-                    RegisterContent(
-                        state = state,
-                        modifier = Modifier.padding(paddingValues),
-                    )
+                    when (windowSize.heightWindowType) {
+                        else -> RegisterContent(
+                            state = state,
+                            modifier = Modifier.padding(paddingValues),
+                            onAlreadyHaveAccountClick = { dispatchEvent(RegisterEvent.NavigateToLogin) },
+                            onRegisterClick = { name, email, password ->
+                                val credentials = RegisterCredentialsUi(name, email, password)
+                                dispatchEvent(RegisterEvent.RegisterNewAccount(credentials))
+                            },
+                        )
+                    }
                 },
                 snackbarHost = {
                     SnackbarHost(
@@ -66,8 +80,8 @@ internal class RegisterScreen() : Screen {
 
             handleEffect { effect ->
                 when (effect) {
-                    is RegisterEffect.PushGlobalScreen -> TODO()
-                    is RegisterEffect.PushScreen -> TODO()
+                    is RegisterEffect.ReplaceGlobalScreen -> navigator.parent?.replaceAll(effect.screen)
+                    is RegisterEffect.PushScreen -> navigator.push(effect.screen)
                     is RegisterEffect.ShowError -> {
                         snackbarState.showSnackbar(
                             message = effect.failures.mapToMessage(strings),

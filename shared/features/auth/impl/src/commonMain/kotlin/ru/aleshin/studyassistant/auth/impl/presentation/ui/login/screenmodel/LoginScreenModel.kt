@@ -19,21 +19,30 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel
 import androidx.compose.runtime.Composable
 import architecture.screenmodel.BaseScreenModel
 import architecture.screenmodel.EmptyDeps
+import architecture.screenmodel.work.BackgroundWorkKey
 import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import managers.CoroutineManager
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
+import ru.aleshin.studyassistant.auth.impl.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEffect
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEvent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginViewState
+import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
+import ru.aleshin.studyassistant.auth.impl.presentation.validation.PasswordValidator
+import validation.operateValidate
 
 /**
  * @author Stanislav Aleshin on 16.04.2024
  */
 internal class LoginScreenModel(
+    private val workProcessor: LoginWorkProcessor,
+    private val screenProvider: FeatureScreenProvider,
+    private val emailValidator: EmailValidator,
+    private val passwordValidator: PasswordValidator,
     stateCommunicator: LoginStateCommunicator,
     effectCommunicator: LoginEffectCommunicator,
     coroutineManager: CoroutineManager,
@@ -45,10 +54,40 @@ internal class LoginScreenModel(
 
     override suspend fun WorkScope<LoginViewState, LoginAction, LoginEffect>.handleEvent(
         event: LoginEvent,
-    ) = when (event) {
-        is LoginEvent.PressLoginButton -> TODO()
-        is LoginEvent.NavigateToForgot -> TODO()
-        is LoginEvent.NavigateToRegister -> TODO()
+    ) {
+        when (event) {
+            is LoginEvent.LoginWithEmail -> launchBackgroundWork(LoginWorkKey.LOGIN) {
+                val emailValidResult = emailValidator.validate(event.credentials.email)
+                val passwordValidResult = passwordValidator.validate(event.credentials.password)
+                operateValidate(
+                    isSuccess = {
+                        val command = LoginWorkCommand.LoginWithEmail(event.credentials)
+                        workProcessor.work(command).collectAndHandleWork()
+                    },
+                    isError = {
+                        val action = LoginAction.UpdateValidErrors(
+                            email = emailValidResult.validError,
+                            password = passwordValidResult.validError
+                        )
+                        sendAction(action)
+                    },
+                    emailValidResult.isValid,
+                    passwordValidResult.isValid,
+                )
+            }
+            is LoginEvent.LoginViaGoogle -> launchBackgroundWork(LoginWorkKey.LOGIN_VIA_GOOGLE) {
+                val command = LoginWorkCommand.LoginWithGoogle
+                workProcessor.work(command).collectAndHandleWork()
+            }
+            is LoginEvent.NavigateToForgot -> {
+                val forgotScreen = screenProvider.provideForgotScreen()
+                sendEffect(LoginEffect.PushScreen(forgotScreen))
+            }
+            is LoginEvent.NavigateToRegister -> {
+                val forgotScreen = screenProvider.provideRegisterScreen()
+                sendEffect(LoginEffect.PushScreen(forgotScreen))
+            }
+        }
     }
 
     override suspend fun reduce(
@@ -57,13 +96,19 @@ internal class LoginScreenModel(
     ) = when (action) {
         is LoginAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
+            emailValidError = null,
+            passwordValidError = null,
         )
-        is LoginAction.UpdateValidErrors ->  currentState.copy(
+        is LoginAction.UpdateValidErrors -> currentState.copy(
             isLoading = false,
             emailValidError = action.email,
             passwordValidError = action.password,
         )
     }
+}
+
+internal enum class LoginWorkKey : BackgroundWorkKey {
+    LOGIN, LOGIN_VIA_GOOGLE
 }
 
 @Composable

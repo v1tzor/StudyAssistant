@@ -21,9 +21,9 @@ import architecture.screenmodel.contract.BaseEvent
 import architecture.screenmodel.contract.BaseUiEffect
 import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
-import entities.AuthCredentials
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.auth.impl.presentation.models.EmailValidError
+import ru.aleshin.studyassistant.auth.impl.presentation.models.LoginCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.models.PasswordValidError
 
 /**
@@ -36,14 +36,15 @@ internal data class LoginViewState(
 ) : BaseViewState
 
 internal sealed class LoginEvent : BaseEvent {
-    data class PressLoginButton(val credential: AuthCredentials) : LoginEvent()
+    data class LoginWithEmail(val credentials: LoginCredentialsUi) : LoginEvent()
+    data object LoginViaGoogle : LoginEvent()
     data object NavigateToRegister : LoginEvent()
     data object NavigateToForgot : LoginEvent()
 }
 
 internal sealed class LoginEffect : BaseUiEffect {
     data class PushScreen(val screen: Screen) : LoginEffect()
-    data class PushGlobalScreen(val screen: Screen) : LoginEffect()
+    data class ReplaceGlobalScreen(val screen: Screen) : LoginEffect()
     data class ShowError(val failure: AuthFailures) : LoginEffect()
 }
 

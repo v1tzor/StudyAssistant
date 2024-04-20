@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.navigation.MainScreenProvider
 import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainEffectCommunicator
 import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainScreenModel
 import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainStateCommunicator
+import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainWorkProcessor
 import ru.aleshin.studyassistant.presentation.ui.tabs.screenmodel.TabsEffectCommunicator
 import ru.aleshin.studyassistant.presentation.ui.tabs.screenmodel.TabsScreenModel
 import ru.aleshin.studyassistant.presentation.ui.tabs.screenmodel.TabsStateCommunicator
@@ -37,7 +38,8 @@ val presentationModule = DI.Module("Presentation") {
 
     bindSingleton<MainStateCommunicator> { MainStateCommunicator.Base() }
     bindSingleton<MainEffectCommunicator> { MainEffectCommunicator.Base() }
-    bindSingleton<MainScreenModel> { MainScreenModel(instance(), instance(), instance(), instance()) }
+    bindSingleton<MainWorkProcessor> { MainWorkProcessor.Base(instance()) }
+    bindSingleton<MainScreenModel> { MainScreenModel(instance(), instance(), instance(), instance(), instance()) }
 
     bindSingleton<TabsStateCommunicator> { TabsStateCommunicator.Base() }
     bindSingleton<TabsEffectCommunicator> { TabsEffectCommunicator.Base() }

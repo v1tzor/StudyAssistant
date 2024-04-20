@@ -16,17 +16,63 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.AuthHeaderSection
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.EmailTextField
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotViewState
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.views.ForgotActionsSection
 
 /**
  * @author Stanislav Aleshin on 16.04.2024
  */
 @Composable
+@OptIn(ExperimentalResourceApi::class)
 internal fun ForgotContent(
     state: ForgotViewState,
-    modifier: Modifier
+    modifier: Modifier,
+    onSendEmailClick: (email: String) -> Unit,
+    onAlreadyHavePasswordClick: () -> Unit,
 ) {
+    var email by rememberSaveable { mutableStateOf("") }
 
+    Column(
+        modifier = modifier.padding(bottom = 16.dp, top = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        AuthHeaderSection(
+            modifier = Modifier.weight(1f),
+            text = AuthThemeRes.strings.forgotHeadline,
+            illustration = painterResource(AuthThemeRes.icons.forgotIllustration),
+            contentDescription = AuthThemeRes.strings.forgotDesc,
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            EmailTextField(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                enabled = !state.isLoading,
+                email = email,
+                onEmailChanged = { email = it },
+                isError = state.emailValidError != null,
+                errorText = state.emailValidError?.mapToMessage(),
+            )
+            ForgotActionsSection(
+                enabled = !state.isLoading && email.isNotEmpty(),
+                isLoading = state.isLoading,
+                onSendEmailClick = { onSendEmailClick(email) },
+                onAlreadyHavePasswordClick = onAlreadyHavePasswordClick,
+            )
+        }
+    }
 }

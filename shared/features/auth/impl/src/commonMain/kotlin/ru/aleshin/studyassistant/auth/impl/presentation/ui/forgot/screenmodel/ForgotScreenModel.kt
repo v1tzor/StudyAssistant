@@ -19,21 +19,30 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.screenmodel
 import androidx.compose.runtime.Composable
 import architecture.screenmodel.BaseScreenModel
 import architecture.screenmodel.EmptyDeps
+import architecture.screenmodel.work.BackgroundWorkKey
 import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import managers.CoroutineManager
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
+import ru.aleshin.studyassistant.auth.impl.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEffect
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEvent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotViewState
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterAction
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterWorkCommand
+import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
+import validation.operateValidate
 
 /**
  * @author Stanislav Aleshin on 17.04.2024
  */
 internal class ForgotScreenModel(
+    private val workProcessor: ForgotWorkProcessor,
+    private val screenProvider: FeatureScreenProvider,
+    private val emailValidator: EmailValidator,
     stateCommunicator: ForgotStateCommunicator,
     effectCommunicator: ForgotEffectCommunicator,
     coroutineManager: CoroutineManager,
@@ -45,9 +54,29 @@ internal class ForgotScreenModel(
 
     override suspend fun WorkScope<ForgotViewState, ForgotAction, ForgotEffect>.handleEvent(
         event: ForgotEvent,
-    ) = when (event) {
-        is ForgotEvent.NavigateToLogin -> TODO()
-        is ForgotEvent.PressSendEmailButton -> TODO()
+    ) {
+        when (event) {
+            is ForgotEvent.SendResetPasswordEmail -> launchBackgroundWork(ForgotWorkKey.RESET_PASSWORD) {
+                val emailValidResult = emailValidator.validate(event.credentials.email)
+                operateValidate(
+                    isSuccess = {
+                        val command = ForgotWorkCommand.SendResetPasswordEmail(event.credentials)
+                        workProcessor.work(command).collectAndHandleWork()
+                    },
+                    isError = {
+                        val action = ForgotAction.UpdateValidError(
+                            email = emailValidResult.validError,
+                        )
+                        sendAction(action)
+                    },
+                    emailValidResult.isValid,
+                )
+            }
+            is ForgotEvent.NavigateToLogin -> {
+                val screen = screenProvider.provideLoginScreen()
+                sendEffect(ForgotEffect.PushScreen(screen))
+            }
+        }
     }
 
     override suspend fun reduce(
@@ -56,12 +85,17 @@ internal class ForgotScreenModel(
     ) = when (action) {
         is ForgotAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
+            emailValidError = null,
         )
         is ForgotAction.UpdateValidError ->  currentState.copy(
             isLoading = false,
             emailValidError = action.email,
         )
     }
+}
+
+internal enum class ForgotWorkKey : BackgroundWorkKey {
+    RESET_PASSWORD
 }
 
 @Composable

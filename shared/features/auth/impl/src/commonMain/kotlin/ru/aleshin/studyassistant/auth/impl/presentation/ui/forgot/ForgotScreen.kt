@@ -24,14 +24,20 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalWindowInfo
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.auth.impl.presentation.models.ForgotCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthTheme
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEffect
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEvent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotViewState
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.screenmodel.rememberForgotScreenModel
+import theme.tokens.LocalWindowSize
 import views.ErrorSnackbar
 
 /**
@@ -46,15 +52,24 @@ internal class ForgotScreen : Screen {
     ) { state ->
         AuthTheme {
             val strings = AuthThemeRes.strings
+            val navigator = LocalNavigator.currentOrThrow
+            val windowSize = LocalWindowSize.current
             val snackbarState = remember { SnackbarHostState() }
 
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 content = { paddingValues ->
-                    ForgotContent(
-                        state = state,
-                        modifier = Modifier.padding(paddingValues),
-                    )
+                    when(windowSize.heightWindowType) {
+                        else -> ForgotContent(
+                            state = state,
+                            modifier = Modifier.padding(paddingValues),
+                            onAlreadyHavePasswordClick = { dispatchEvent(ForgotEvent.NavigateToLogin) },
+                            onSendEmailClick = { email ->
+                                val credentials = ForgotCredentialsUi(email)
+                                dispatchEvent(ForgotEvent.SendResetPasswordEmail(credentials))
+                            }
+                        )
+                    }
                 },
                 snackbarHost = {
                     SnackbarHost(
@@ -66,7 +81,7 @@ internal class ForgotScreen : Screen {
 
             handleEffect { effect ->
                 when (effect) {
-                    is ForgotEffect.PushScreen -> TODO()
+                    is ForgotEffect.PushScreen -> navigator.push(effect.screen)
                     is ForgotEffect.ShowError -> {
                         snackbarState.showSnackbar(
                             message = effect.failures.mapToMessage(strings),

@@ -17,20 +17,20 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.validation
 
 import functional.Constants
-import ru.aleshin.studyassistant.auth.impl.presentation.models.NicknameValidError
+import ru.aleshin.studyassistant.auth.impl.presentation.models.UsernameValidError
 import validation.ValidateResult
 import validation.Validator
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.
  */
-internal interface NicknameValidator : Validator<String, NicknameValidError> {
-    class Base : NicknameValidator {
-        override fun validate(data: String): ValidateResult<NicknameValidError> {
+internal interface UsernameValidator : Validator<String, UsernameValidError> {
+    class Base : UsernameValidator {
+        override fun validate(data: String): ValidateResult<UsernameValidError> {
             return if (data.length in 2..15 && data.matches(Regex(Constants.Regex.ONLY_TEXT))) {
                 ValidateResult(true, null)
             } else {
-                ValidateResult(false, NicknameValidError.LengthError)
+                ValidateResult(false, UsernameValidError.LengthError)
             }
         }
     }

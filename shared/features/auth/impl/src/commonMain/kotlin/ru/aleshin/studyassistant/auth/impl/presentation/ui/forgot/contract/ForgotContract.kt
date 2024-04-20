@@ -34,7 +34,7 @@ internal data class ForgotViewState(
 ) : BaseViewState
 
 internal sealed class ForgotEvent : BaseEvent {
-    data class PressSendEmailButton(val credentials: ForgotCredentialsUi) : ForgotEvent()
+    data class SendResetPasswordEmail(val credentials: ForgotCredentialsUi) : ForgotEvent()
     data object NavigateToLogin : ForgotEvent()
 }
 

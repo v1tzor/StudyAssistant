@@ -23,7 +23,7 @@ import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.auth.impl.presentation.models.EmailValidError
-import ru.aleshin.studyassistant.auth.impl.presentation.models.NicknameValidError
+import ru.aleshin.studyassistant.auth.impl.presentation.models.UsernameValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.models.PasswordValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.models.RegisterCredentialsUi
 
@@ -32,26 +32,26 @@ import ru.aleshin.studyassistant.auth.impl.presentation.models.RegisterCredentia
  */
 internal data class RegisterViewState(
     val isLoading: Boolean = false,
-    val nicknameValidError: NicknameValidError? = null,
+    val usernameValidError: UsernameValidError? = null,
     val emailValidError: EmailValidError? = null,
     val passwordValidError: PasswordValidError? = null,
 ) : BaseViewState
 
 internal sealed class RegisterEvent : BaseEvent {
-    data class PressRegisterButton(val credentials: RegisterCredentialsUi) : RegisterEvent()
+    data class RegisterNewAccount(val credentials: RegisterCredentialsUi) : RegisterEvent()
     data object NavigateToLogin : RegisterEvent()
 }
 
 internal sealed class RegisterEffect : BaseUiEffect {
     data class PushScreen(val screen: Screen) : RegisterEffect()
-    data class PushGlobalScreen(val screen: Screen) : RegisterEffect()
+    data class ReplaceGlobalScreen(val screen: Screen) : RegisterEffect()
     data class ShowError(val failures: AuthFailures) : RegisterEffect()
 }
 
 internal sealed class RegisterAction : BaseAction {
     data class UpdateLoading(val isLoading: Boolean) : RegisterAction()
     data class UpdateValidErrors(
-        val nickname: NicknameValidError?,
+        val username: UsernameValidError?,
         val email: EmailValidError?,
         val password: PasswordValidError?,
     ) : RegisterAction()

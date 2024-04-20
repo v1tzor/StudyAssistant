@@ -28,23 +28,22 @@ import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import co.touchlab.kermit.Logger
-import org.kodein.di.instance
-import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
-import ru.aleshin.studyassistant.auth.impl.navigation.FeatureScreenProvider
+import entities.AuthCredentials
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.auth.impl.presentation.models.LoginCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthTheme
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEffect
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEvent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginViewState
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel.rememberLoginScreenModel
-import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
+import theme.tokens.LocalWindowSize
 import views.ErrorSnackbar
 
 /**
  * @author Stanislav Aleshin on 16.04.2024
  */
-internal class LoginScreen() : Screen {
+internal class LoginScreen : Screen {
 
     @Composable
     override fun Content() = ScreenContent(
@@ -52,22 +51,27 @@ internal class LoginScreen() : Screen {
         initialState = LoginViewState(),
     ) { state ->
         AuthTheme {
-            val screenProvider = remember { AuthFeatureDIHolder.fetchDI().instance<FeatureScreenProvider>() }
             val navigator = LocalNavigator.currentOrThrow
+            val windowSize = LocalWindowSize.current
             val strings = AuthThemeRes.strings
             val snackbarState = remember { SnackbarHostState() }
 
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 content = { paddingValues ->
-                    LoginContent(
-                        state = state,
-                        modifier = Modifier.padding(paddingValues),
-                        navigate = {
-                            Logger.i { "Replace screen -> go to Preview Feature" }
-                            navigator.replaceAll(screenProvider.providePreviewScreen(PreviewScreen.Setup))
-                        }
-                    )
+                    when (windowSize.heightWindowType) {
+                        else -> LoginContent(
+                            state = state,
+                            modifier = Modifier.padding(paddingValues),
+                            onLoginViaGoogleClick = { dispatchEvent(LoginEvent.LoginViaGoogle) },
+                            onForgotPassword = { dispatchEvent(LoginEvent.NavigateToForgot) },
+                            onNotAccountClick = { dispatchEvent(LoginEvent.NavigateToRegister) },
+                            onLoginClick = { email, password ->
+                                val credentials = LoginCredentialsUi(email, password)
+                                dispatchEvent(LoginEvent.LoginWithEmail(credentials))
+                            },
+                        )
+                    }
                 },
                 snackbarHost = {
                     SnackbarHost(
@@ -79,8 +83,8 @@ internal class LoginScreen() : Screen {
 
             handleEffect { effect ->
                 when (effect) {
-                    is LoginEffect.PushGlobalScreen -> TODO()
-                    is LoginEffect.PushScreen -> TODO()
+                    is LoginEffect.ReplaceGlobalScreen -> navigator.parent?.replaceAll(effect.screen)
+                    is LoginEffect.PushScreen -> navigator.push(effect.screen)
                     is LoginEffect.ShowError -> {
                         snackbarState.showSnackbar(
                             message = effect.failure.mapToMessage(strings),

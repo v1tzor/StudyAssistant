@@ -14,13 +14,16 @@
  * imitations under the License.
  */
 
-package ru.aleshin.studyassistant.auth.impl.presentation.models
+package ru.aleshin.studyassistant.auth.impl.presentation.mappers
 
-import validation.ValidateError
+import androidx.compose.runtime.Composable
+import ru.aleshin.studyassistant.auth.impl.presentation.models.UsernameValidError
+import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 
 /**
- * @author Stanislav Aleshin on 17.04.2024.
+ * @author Stanislav Aleshin on 19.06.2023.
  */
-internal sealed class NicknameValidError : ValidateError {
-    object LengthError : NicknameValidError()
+@Composable
+internal fun UsernameValidError.mapToMessage() = when (this) {
+    UsernameValidError.LengthError -> AuthThemeRes.strings.usernameLengthError
 }

@@ -17,13 +17,10 @@
 package ru.aleshin.studyassistant.presentation.ui.main
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.LocalWindowInfo
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import cafe.adriel.voyager.transitions.FadeTransition
-import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainViewState
 import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.rememberMainScreenModel
@@ -54,7 +51,7 @@ fun MainScreen() = ScreenContent(
             handleEffect { effect ->
                 when (effect) {
                     is MainEffect.ReplaceGlobalScreen -> navigator.replaceAll(effect.screen)
-                    is MainEffect.ShowError -> TODO()
+                    is MainEffect.ShowError -> error(effect.failures)
                 }
             }
         }

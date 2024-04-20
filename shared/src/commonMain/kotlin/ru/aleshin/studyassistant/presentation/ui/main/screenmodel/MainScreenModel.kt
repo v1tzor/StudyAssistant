@@ -38,6 +38,7 @@ import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
  * @author Stanislav Aleshin on 27.01.2024
  */
 class MainScreenModel constructor(
+    private val workProcessor: MainWorkProcessor,
     private val screenProvider: MainScreenProvider,
     stateCommunicator: MainStateCommunicator,
     effectCommunicator: MainEffectCommunicator,
