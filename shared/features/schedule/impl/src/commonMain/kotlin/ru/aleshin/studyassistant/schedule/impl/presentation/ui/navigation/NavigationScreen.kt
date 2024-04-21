@@ -14,40 +14,40 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.auth.impl.presentation.ui.nav
+package ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.CurrentScreen
 import di.withDirectDI
 import navigation.NestedFeatureNavigator
 import navigation.rememberNavigatorManager
 import navigation.rememberScreenProvider
-import org.kodein.di.compose.withDI
-import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
-import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
-import ru.aleshin.studyassistant.auth.impl.navigation.AuthNavigatorManager
-import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
-import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthTheme
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
+import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
+import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleNavigatorManager
+import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleScreenProvider
+import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleTheme
+import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 
 /**
- * @author Stanislav Aleshin on 16.04.2024.
+ * @author Stanislav Aleshin on 21.04.2024.
  */
 internal class NavigationScreen : Screen {
 
     @Composable
-    override fun Content() = withDirectDI(directDI = { AuthFeatureDIHolder.fetchDI() }) {
-        val screenModel = rememberScreenModel { NavScreenModel() }
-        val screenProvider = rememberScreenProvider<AuthScreenProvider, AuthScreen>()
-        val navigatorManager = rememberNavigatorManager<AuthNavigatorManager, AuthScreen>()
+    override fun Content() = withDirectDI(directDI = { ScheduleFeatureDIHolder.fetchDI() }) {
+        val screenModel = rememberScreenModel { NavigationScreenModel() }
+        val screenProvider = rememberScreenProvider<ScheduleScreenProvider, ScheduleScreen>()
+        val navigatorManager = rememberNavigatorManager<ScheduleNavigatorManager, ScheduleScreen>()
 
         NestedFeatureNavigator(
             screenProvider = screenProvider,
             navigatorManager = navigatorManager,
         ) {
-            AuthTheme(content = { CurrentScreen() })
+            ScheduleTheme(content = { CurrentScreen() })
         }
     }
 }

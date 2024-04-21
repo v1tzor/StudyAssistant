@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
 import ru.aleshin.studyassistant.preview.impl.navigation.PreviewNavigatorManager
 import ru.aleshin.studyassistant.preview.impl.navigation.PreviewScreenProvider
+import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewTheme
 
 /**
  * @author Stanislav Aleshin on 07.04.2024.
@@ -47,7 +48,8 @@ internal class NavigationScreen : Screen {
         NestedFeatureNavigator(
             screenProvider = screenProvider,
             navigatorManager = navigatorManager,
-            content = { CurrentScreen() },
-        )
+        ) {
+            PreviewTheme(content = { CurrentScreen() })
+        }
     }
 }

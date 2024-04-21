@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
-package architecture.screen
+package ru.aleshin.studyassistant.schedule.impl.navigation
+
+import navigation.CommandBuffer
+import navigation.NavigatorManager
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
 
 /**
- * @author Stanislav Aleshin on 17.08.2023.
+ * @author Stanislav Aleshin on 21.04.2024.
  */
-interface MainScreen
+internal interface ScheduleNavigatorManager : NavigatorManager<ScheduleScreen> {
+    class Base(commandBuffer: CommandBuffer) : ScheduleNavigatorManager, NavigatorManager.Abstract<ScheduleScreen>(
+        commandBuffer = commandBuffer
+    )
+}

@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.navigation.impl.di
+package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details
 
-import inject.BaseFeatureDependencies
-import managers.CoroutineManager
-import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
+import androidx.compose.runtime.Composable
+import cafe.adriel.voyager.core.screen.Screen
 
 /**
- * @author Stanislav Aleshin on 20.04.2024.
+ * @author Stanislav Aleshin on 21.04.2024.
  */
-interface NavigationFeatureDependencies : BaseFeatureDependencies {
-    val scheduleFeatureStarter: () -> ScheduleFeatureStarter
-    val coroutineManager: CoroutineManager
+internal class DetailsScreen : Screen {
+
+    @Composable
+    override fun Content() {
+        // TODO Not yet implemented
+    }
 }

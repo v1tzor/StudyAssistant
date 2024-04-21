@@ -18,13 +18,15 @@ package ru.aleshin.studyassistant.navigation.impl.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
 import ru.aleshin.core.common.navigation.screens.EmptyScreen
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-internal interface ScreenProvider {
+internal interface NavigationScreenProvider {
 
-    fun provideScheduleScreen(): Screen
+    fun provideScheduleScreen(screen: ScheduleScreen): Screen
 
     fun provideTasksScreen(): Screen
 
@@ -32,11 +34,12 @@ internal interface ScreenProvider {
 
     fun provideProfileScreen(): Screen
 
-    class Base() : ScreenProvider {
+    class Base(
+        private val scheduleFeatureStarter: () -> ScheduleFeatureStarter
+    ) : NavigationScreenProvider {
 
-        override fun provideScheduleScreen(): Screen {
-            // TODO: Not yet implemented
-            return EmptyScreen
+        override fun provideScheduleScreen(screen: ScheduleScreen): Screen {
+            return scheduleFeatureStarter().fetchFeatureScreen(screen)
         }
 
         override fun provideTasksScreen(): Screen {

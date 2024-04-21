@@ -22,11 +22,12 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.navigation.impl.navigation.NavigationFeatureStarterImpl
-import ru.aleshin.studyassistant.navigation.impl.navigation.ScreenProvider
+import ru.aleshin.studyassistant.navigation.impl.navigation.NavigationScreenProvider
 import ru.aleshin.studyassistant.navigation.impl.ui.TabsScreen
 import ru.aleshin.studyassistant.navigation.impl.ui.screenmodel.TabsEffectCommunicator
 import ru.aleshin.studyassistant.navigation.impl.ui.screenmodel.TabsScreenModel
 import ru.aleshin.studyassistant.navigation.impl.ui.screenmodel.TabsStateCommunicator
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
@@ -35,7 +36,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<Screen> { TabsScreen() }
 
     bindSingleton<NavigationFeatureStarter> { NavigationFeatureStarterImpl(instance()) }
-    bindSingleton<ScreenProvider> { ScreenProvider.Base() }
+    bindSingleton<NavigationScreenProvider> { NavigationScreenProvider.Base(instance<() -> ScheduleFeatureStarter>()) }
 
     bindSingleton<TabsEffectCommunicator> { TabsEffectCommunicator.Base() }
     bindSingleton<TabsStateCommunicator> { TabsStateCommunicator.Base() }

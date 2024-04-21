@@ -46,39 +46,37 @@ internal class SetupScreen : Screen {
         dependencies = SetupDeps("test"),
         initialState = SetupViewState(),
     ) { state ->
-        PreviewTheme {
-            val strings = PreviewThemeRes.strings
-            val snackbarState = remember { SnackbarHostState() }
+        val strings = PreviewThemeRes.strings
+        val snackbarState = remember { SnackbarHostState() }
 
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                content = { paddingValues ->
-                    SetupContent(
-                        state = state,
-                        modifier = Modifier.padding(paddingValues),
-                    )
-                },
-                topBar = {},
-                bottomBar = {},
-                snackbarHost = {
-                    SnackbarHost(
-                        hostState = snackbarState,
-                        snackbar = { ErrorSnackbar(it) },
-                    )
-                },
-            )
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            content = { paddingValues ->
+                SetupContent(
+                    state = state,
+                    modifier = Modifier.padding(paddingValues),
+                )
+            },
+            topBar = {},
+            bottomBar = {},
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarState,
+                    snackbar = { ErrorSnackbar(it) },
+                )
+            },
+        )
 
-            handleEffect { effect ->
-                when (effect) {
-                    is SetupEffect.ShowError -> {
-                        snackbarState.showSnackbar(
-                            message = effect.failures.mapToString(strings),
-                            withDismissAction = true,
-                        )
-                    }
-                    is SetupEffect.ReplaceGlobalScreen -> TODO()
-                    is SetupEffect.ReplacePage -> TODO()
+        handleEffect { effect ->
+            when (effect) {
+                is SetupEffect.ShowError -> {
+                    snackbarState.showSnackbar(
+                        message = effect.failures.mapToString(strings),
+                        withDismissAction = true,
+                    )
                 }
+                is SetupEffect.ReplaceGlobalScreen -> TODO()
+                is SetupEffect.ReplacePage -> TODO()
             }
         }
     }

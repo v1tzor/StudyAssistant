@@ -49,45 +49,43 @@ internal class RegisterScreen : Screen {
         screenModel = rememberRegisterScreenModel(),
         initialState = RegisterViewState(),
     ) { state ->
-        AuthTheme {
-            val strings = AuthThemeRes.strings
-            val navigator = LocalNavigator.currentOrThrow
-            val windowSize = LocalWindowSize.current
-            val snackbarState = remember { SnackbarHostState() }
+        val strings = AuthThemeRes.strings
+        val navigator = LocalNavigator.currentOrThrow
+        val windowSize = LocalWindowSize.current
+        val snackbarState = remember { SnackbarHostState() }
 
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                content = { paddingValues ->
-                    when (windowSize.heightWindowType) {
-                        else -> RegisterContent(
-                            state = state,
-                            modifier = Modifier.padding(paddingValues),
-                            onAlreadyHaveAccountClick = { dispatchEvent(RegisterEvent.NavigateToLogin) },
-                            onRegisterClick = { name, email, password ->
-                                val credentials = RegisterCredentialsUi(name, email, password)
-                                dispatchEvent(RegisterEvent.RegisterNewAccount(credentials))
-                            },
-                        )
-                    }
-                },
-                snackbarHost = {
-                    SnackbarHost(
-                        hostState = snackbarState,
-                        snackbar = { ErrorSnackbar(it) },
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            content = { paddingValues ->
+                when (windowSize.heightWindowType) {
+                    else -> RegisterContent(
+                        state = state,
+                        modifier = Modifier.padding(paddingValues),
+                        onAlreadyHaveAccountClick = { dispatchEvent(RegisterEvent.NavigateToLogin) },
+                        onRegisterClick = { name, email, password ->
+                            val credentials = RegisterCredentialsUi(name, email, password)
+                            dispatchEvent(RegisterEvent.RegisterNewAccount(credentials))
+                        },
                     )
-                },
-            )
+                }
+            },
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarState,
+                    snackbar = { ErrorSnackbar(it) },
+                )
+            },
+        )
 
-            handleEffect { effect ->
-                when (effect) {
-                    is RegisterEffect.ReplaceGlobalScreen -> navigator.parent?.replaceAll(effect.screen)
-                    is RegisterEffect.PushScreen -> navigator.push(effect.screen)
-                    is RegisterEffect.ShowError -> {
-                        snackbarState.showSnackbar(
-                            message = effect.failures.mapToMessage(strings),
-                            withDismissAction = true,
-                        )
-                    }
+        handleEffect { effect ->
+            when (effect) {
+                is RegisterEffect.ReplaceGlobalScreen -> navigator.parent?.replaceAll(effect.screen)
+                is RegisterEffect.PushScreen -> navigator.push(effect.screen)
+                is RegisterEffect.ShowError -> {
+                    snackbarState.showSnackbar(
+                        message = effect.failures.mapToMessage(strings),
+                        withDismissAction = true,
+                    )
                 }
             }
         }

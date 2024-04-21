@@ -50,47 +50,45 @@ internal class LoginScreen : Screen {
         screenModel = rememberLoginScreenModel(),
         initialState = LoginViewState(),
     ) { state ->
-        AuthTheme {
-            val navigator = LocalNavigator.currentOrThrow
-            val windowSize = LocalWindowSize.current
-            val strings = AuthThemeRes.strings
-            val snackbarState = remember { SnackbarHostState() }
+        val navigator = LocalNavigator.currentOrThrow
+        val windowSize = LocalWindowSize.current
+        val strings = AuthThemeRes.strings
+        val snackbarState = remember { SnackbarHostState() }
 
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                content = { paddingValues ->
-                    when (windowSize.heightWindowType) {
-                        else -> LoginContent(
-                            state = state,
-                            modifier = Modifier.padding(paddingValues),
-                            onLoginViaGoogleClick = { dispatchEvent(LoginEvent.LoginViaGoogle) },
-                            onForgotPassword = { dispatchEvent(LoginEvent.NavigateToForgot) },
-                            onNotAccountClick = { dispatchEvent(LoginEvent.NavigateToRegister) },
-                            onLoginClick = { email, password ->
-                                val credentials = LoginCredentialsUi(email, password)
-                                dispatchEvent(LoginEvent.LoginWithEmail(credentials))
-                            },
-                        )
-                    }
-                },
-                snackbarHost = {
-                    SnackbarHost(
-                        hostState = snackbarState,
-                        snackbar = { ErrorSnackbar(it) },
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            content = { paddingValues ->
+                when (windowSize.heightWindowType) {
+                    else -> LoginContent(
+                        state = state,
+                        modifier = Modifier.padding(paddingValues),
+                        onLoginViaGoogleClick = { dispatchEvent(LoginEvent.LoginViaGoogle) },
+                        onForgotPassword = { dispatchEvent(LoginEvent.NavigateToForgot) },
+                        onNotAccountClick = { dispatchEvent(LoginEvent.NavigateToRegister) },
+                        onLoginClick = { email, password ->
+                            val credentials = LoginCredentialsUi(email, password)
+                            dispatchEvent(LoginEvent.LoginWithEmail(credentials))
+                        },
                     )
-                },
-            )
+                }
+            },
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarState,
+                    snackbar = { ErrorSnackbar(it) },
+                )
+            },
+        )
 
-            handleEffect { effect ->
-                when (effect) {
-                    is LoginEffect.ReplaceGlobalScreen -> navigator.parent?.replaceAll(effect.screen)
-                    is LoginEffect.PushScreen -> navigator.push(effect.screen)
-                    is LoginEffect.ShowError -> {
-                        snackbarState.showSnackbar(
-                            message = effect.failure.mapToMessage(strings),
-                            withDismissAction = true,
-                        )
-                    }
+        handleEffect { effect ->
+            when (effect) {
+                is LoginEffect.ReplaceGlobalScreen -> navigator.parent?.replaceAll(effect.screen)
+                is LoginEffect.PushScreen -> navigator.push(effect.screen)
+                is LoginEffect.ShowError -> {
+                    snackbarState.showSnackbar(
+                        message = effect.failure.mapToMessage(strings),
+                        withDismissAction = true,
+                    )
                 }
             }
         }

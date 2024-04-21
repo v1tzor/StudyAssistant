@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.schedule.impl.navigation
+package ru.aleshin.studyassistant.schedule.impl.domain.common
+
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
+import wrappers.EitherWrapper
 
 /**
- * @author Stanislav Aleshin on 21.04.2024.
+ * @author Stanislav Aleshin on 21.04.2024
  */
-class NavigatorManager {
+internal interface ScheduleEitherWrapper : EitherWrapper<ScheduleFailures> {
+
+    class Base(errorHandler: ScheduleErrorHandler) : ScheduleEitherWrapper,
+        EitherWrapper.Abstract<ScheduleFailures>(errorHandler)
 }

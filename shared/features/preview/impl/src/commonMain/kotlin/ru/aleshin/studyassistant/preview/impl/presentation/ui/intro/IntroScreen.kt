@@ -53,55 +53,54 @@ internal class IntroScreen : Screen {
         screenModel = rememberIntroScreenModel(),
         initialState = IntroViewState.Default,
     ) { state ->
-        PreviewTheme {
-            val pagerState = rememberPagerState { IntroPage.entries.size }
-            val windowSize = LocalWindowSize.current
-            val mainNavigator = LocalNavigator.currentOrThrow.parent
-            val strings = PreviewThemeRes.strings
-            val snackbarState = remember { SnackbarHostState() }
+        val pagerState = rememberPagerState { IntroPage.entries.size }
+        val windowSize = LocalWindowSize.current
+        val mainNavigator = LocalNavigator.currentOrThrow.parent
+        val strings = PreviewThemeRes.strings
+        val snackbarState = remember { SnackbarHostState() }
 
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                content = { paddingValues ->
-                    when (windowSize.heightWindowType) {
-                        WindowSize.WindowType.COMPACT -> IntroContentCompact(
-                            state = state,
-                            modifier = Modifier.padding(paddingValues),
-                            pagerState = pagerState,
-                            onBackClick = { dispatchEvent(IntroEvent.PreviousPage(pagerState.currentPage)) },
-                            onContinueClick = { dispatchEvent(IntroEvent.NextPage(pagerState.currentPage)) },
-                            onLoginClick = { dispatchEvent(IntroEvent.NavigateToLogin) },
-                            onRegisterClick = { dispatchEvent(IntroEvent.NavigateToRegister) },
-                        )
-                        else -> IntroContent(
-                            state = state,
-                            modifier = Modifier.padding(paddingValues),
-                            pagerState = pagerState,
-                            onBackClick = { dispatchEvent(IntroEvent.PreviousPage(pagerState.currentPage)) },
-                            onContinueClick = { dispatchEvent(IntroEvent.NextPage(pagerState.currentPage)) },
-                            onLoginClick = { dispatchEvent(IntroEvent.NavigateToLogin) },
-                            onRegisterClick = { dispatchEvent(IntroEvent.NavigateToRegister) },
-                        )
-                    }
-                },
-                snackbarHost = {
-                    SnackbarHost(
-                        hostState = snackbarState,
-                        snackbar = { ErrorSnackbar(it) },
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            content = { paddingValues ->
+                when (windowSize.heightWindowType) {
+                    WindowSize.WindowType.COMPACT -> IntroContentCompact(
+                        state = state,
+                        modifier = Modifier.padding(paddingValues),
+                        pagerState = pagerState,
+                        onBackClick = { dispatchEvent(IntroEvent.PreviousPage(pagerState.currentPage)) },
+                        onContinueClick = { dispatchEvent(IntroEvent.NextPage(pagerState.currentPage)) },
+                        onLoginClick = { dispatchEvent(IntroEvent.NavigateToLogin) },
+                        onRegisterClick = { dispatchEvent(IntroEvent.NavigateToRegister) },
                     )
-                },
-            )
 
-            handleEffect { effect ->
-                when (effect) {
-                    is IntroEffect.ReplaceGlobalScreen -> mainNavigator?.replaceAll(effect.screen)
-                    is IntroEffect.ScrollToPage -> pagerState.animateScrollToPage(effect.pageIndex)
-                    is IntroEffect.ShowError -> {
-                        snackbarState.showSnackbar(
-                            message = effect.failures.mapToString(strings),
-                            withDismissAction = true,
-                        )
-                    }
+                    else -> IntroContent(
+                        state = state,
+                        modifier = Modifier.padding(paddingValues),
+                        pagerState = pagerState,
+                        onBackClick = { dispatchEvent(IntroEvent.PreviousPage(pagerState.currentPage)) },
+                        onContinueClick = { dispatchEvent(IntroEvent.NextPage(pagerState.currentPage)) },
+                        onLoginClick = { dispatchEvent(IntroEvent.NavigateToLogin) },
+                        onRegisterClick = { dispatchEvent(IntroEvent.NavigateToRegister) },
+                    )
+                }
+            },
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarState,
+                    snackbar = { ErrorSnackbar(it) },
+                )
+            },
+        )
+
+        handleEffect { effect ->
+            when (effect) {
+                is IntroEffect.ReplaceGlobalScreen -> mainNavigator?.replaceAll(effect.screen)
+                is IntroEffect.ScrollToPage -> pagerState.animateScrollToPage(effect.pageIndex)
+                is IntroEffect.ShowError -> {
+                    snackbarState.showSnackbar(
+                        message = effect.failures.mapToString(strings),
+                        withDismissAction = true,
+                    )
                 }
             }
         }

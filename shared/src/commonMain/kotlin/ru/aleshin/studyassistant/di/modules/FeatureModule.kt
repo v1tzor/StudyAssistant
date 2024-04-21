@@ -31,6 +31,9 @@ import ru.aleshin.studyassistant.navigation.impl.di.holder.NavigationFeatureDIHo
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 import ru.aleshin.studyassistant.preview.impl.di.PreviewFeatureDependencies
 import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
+import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
+import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
@@ -38,6 +41,7 @@ import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
 val featureModule = DI.Module("Feature") {
     bindEagerSingleton<NavigationFeatureDependencies> {
         object : NavigationFeatureDependencies {
+            override val scheduleFeatureStarter = provider<ScheduleFeatureStarter>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }
@@ -71,6 +75,18 @@ val featureModule = DI.Module("Feature") {
     }
     bindProvider<AuthFeatureStarter> {
         with(AuthFeatureDIHolder) {
+            init(instance())
+            fetchApi().fetchStarter()
+        }
+    }
+
+    bindEagerSingleton<ScheduleFeatureDependencies> {
+        object : ScheduleFeatureDependencies {
+            override val coroutineManager = instance<CoroutineManager>()
+        }
+    }
+    bindProvider<ScheduleFeatureStarter> {
+        with(ScheduleFeatureDIHolder) {
             init(instance())
             fetchApi().fetchStarter()
         }

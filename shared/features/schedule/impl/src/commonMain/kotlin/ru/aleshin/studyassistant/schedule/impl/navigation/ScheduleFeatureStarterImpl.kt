@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.navigation.impl.di
+package ru.aleshin.studyassistant.schedule.impl.navigation
 
-import inject.BaseFeatureDependencies
-import managers.CoroutineManager
+import inject.FeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation.NavigationScreen
 
 /**
- * @author Stanislav Aleshin on 20.04.2024.
+ * @author Stanislav Aleshin on 21.04.2024.
  */
-interface NavigationFeatureDependencies : BaseFeatureDependencies {
-    val scheduleFeatureStarter: () -> ScheduleFeatureStarter
-    val coroutineManager: CoroutineManager
-}
+internal class ScheduleFeatureStarterImpl(
+    navScreen: NavigationScreen,
+    navigatorManager: ScheduleNavigatorManager,
+    screenProvider: ScheduleScreenProvider,
+) : ScheduleFeatureStarter, FeatureStarter.Navigation<ScheduleScreen>(
+    featureNavScreen = navScreen,
+    navigatorManager = navigatorManager,
+    screenProvider = screenProvider,
+)

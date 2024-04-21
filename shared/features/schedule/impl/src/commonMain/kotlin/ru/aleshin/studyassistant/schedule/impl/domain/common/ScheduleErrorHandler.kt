@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.navigation.impl.di
+package ru.aleshin.studyassistant.schedule.impl.domain.common
 
-import inject.BaseFeatureDependencies
-import managers.CoroutineManager
-import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
+import handlers.ErrorHandler
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 
 /**
- * @author Stanislav Aleshin on 20.04.2024.
+ * @author Stanislav Aleshin on 21.04.2024
  */
-interface NavigationFeatureDependencies : BaseFeatureDependencies {
-    val scheduleFeatureStarter: () -> ScheduleFeatureStarter
-    val coroutineManager: CoroutineManager
+internal interface ScheduleErrorHandler : ErrorHandler<ScheduleFailures> {
+
+    class Base : ScheduleErrorHandler {
+
+        override fun handle(throwable: Throwable) = when (throwable) {
+            else -> ScheduleFailures.OtherError(throwable)
+        }
+    }
 }

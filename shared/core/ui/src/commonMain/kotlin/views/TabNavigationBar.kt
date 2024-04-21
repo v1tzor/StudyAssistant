@@ -49,7 +49,7 @@ fun <Item : BottomBarItem> BottomNavigationBar(
         items.forEach { item ->
             NavigationBarItem(
                 selected = selectedItem == item,
-                onClick = { onItemSelected.invoke(item) },
+                onClick = { if (selectedItem != item) onItemSelected.invoke(item) },
                 icon = {
                     BottomBarIcon(
                         selected = selectedItem == item,

@@ -22,22 +22,22 @@ import architecture.screenmodel.EmptyDeps
 import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.kodein.rememberScreenModel
 import managers.CoroutineManager
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.navigation.impl.di.holder.NavigationFeatureDIHolder
-import ru.aleshin.studyassistant.navigation.impl.navigation.ScreenProvider
+import ru.aleshin.studyassistant.navigation.impl.navigation.NavigationScreenProvider
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsAction
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEffect
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEvent
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsViewState
 import ru.aleshin.studyassistant.navigation.impl.ui.views.TabsBottomBarItems
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
 
 /**
  * @author Stanislav Aleshin on 18.02.2023.
  */
 internal class TabsScreenModel(
-    private val screenProvider: ScreenProvider,
+    private val screenProvider: NavigationScreenProvider,
     stateCommunicator: TabsStateCommunicator,
     effectCommunicator: TabsEffectCommunicator,
     coroutineManager: CoroutineManager,
@@ -58,10 +58,10 @@ internal class TabsScreenModel(
         event: TabsEvent,
     ) = when (event) {
         TabsEvent.Init -> changeTabItem(TabsBottomBarItems.SCHEDULE) {
-            provideScheduleScreen()
+            provideScheduleScreen(ScheduleScreen.Overview)
         }
         TabsEvent.SelectedScheduleBottomItem -> changeTabItem(TabsBottomBarItems.SCHEDULE) {
-            provideScheduleScreen()
+            provideScheduleScreen(ScheduleScreen.Overview)
         }
         TabsEvent.SelectedTasksBottomItem -> changeTabItem(TabsBottomBarItems.TASKS) {
             provideTasksScreen()
@@ -85,7 +85,7 @@ internal class TabsScreenModel(
 
     private suspend fun WorkScope<TabsViewState, TabsAction, TabsEffect>.changeTabItem(
         bottomItem: TabsBottomBarItems,
-        onAction: ScreenProvider.() -> Screen,
+        onAction: NavigationScreenProvider.() -> Screen,
     ) = sendAction(TabsAction.ChangeNavItems(item = bottomItem)).apply {
         sendEffect(TabsEffect.ReplaceScreen(screen = screenProvider.let(onAction)))
     }

@@ -50,44 +50,42 @@ internal class ForgotScreen : Screen {
         screenModel = rememberForgotScreenModel(),
         initialState = ForgotViewState(),
     ) { state ->
-        AuthTheme {
-            val strings = AuthThemeRes.strings
-            val navigator = LocalNavigator.currentOrThrow
-            val windowSize = LocalWindowSize.current
-            val snackbarState = remember { SnackbarHostState() }
+        val strings = AuthThemeRes.strings
+        val navigator = LocalNavigator.currentOrThrow
+        val windowSize = LocalWindowSize.current
+        val snackbarState = remember { SnackbarHostState() }
 
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                content = { paddingValues ->
-                    when(windowSize.heightWindowType) {
-                        else -> ForgotContent(
-                            state = state,
-                            modifier = Modifier.padding(paddingValues),
-                            onAlreadyHavePasswordClick = { dispatchEvent(ForgotEvent.NavigateToLogin) },
-                            onSendEmailClick = { email ->
-                                val credentials = ForgotCredentialsUi(email)
-                                dispatchEvent(ForgotEvent.SendResetPasswordEmail(credentials))
-                            }
-                        )
-                    }
-                },
-                snackbarHost = {
-                    SnackbarHost(
-                        hostState = snackbarState,
-                        snackbar = { ErrorSnackbar(it) },
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            content = { paddingValues ->
+                when (windowSize.heightWindowType) {
+                    else -> ForgotContent(
+                        state = state,
+                        modifier = Modifier.padding(paddingValues),
+                        onAlreadyHavePasswordClick = { dispatchEvent(ForgotEvent.NavigateToLogin) },
+                        onSendEmailClick = { email ->
+                            val credentials = ForgotCredentialsUi(email)
+                            dispatchEvent(ForgotEvent.SendResetPasswordEmail(credentials))
+                        }
                     )
-                },
-            )
+                }
+            },
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarState,
+                    snackbar = { ErrorSnackbar(it) },
+                )
+            },
+        )
 
-            handleEffect { effect ->
-                when (effect) {
-                    is ForgotEffect.PushScreen -> navigator.push(effect.screen)
-                    is ForgotEffect.ShowError -> {
-                        snackbarState.showSnackbar(
-                            message = effect.failures.mapToMessage(strings),
-                            withDismissAction = true,
-                        )
-                    }
+        handleEffect { effect ->
+            when (effect) {
+                is ForgotEffect.PushScreen -> navigator.push(effect.screen)
+                is ForgotEffect.ShowError -> {
+                    snackbarState.showSnackbar(
+                        message = effect.failures.mapToMessage(strings),
+                        withDismissAction = true,
+                    )
                 }
             }
         }

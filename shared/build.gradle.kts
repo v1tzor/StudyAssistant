@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.libsDirectory
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
@@ -32,6 +34,8 @@ kotlin {
             implementation(project(":shared:features:preview:impl"))
             implementation(project(":shared:features:auth:api"))
             implementation(project(":shared:features:auth:impl"))
+            implementation(project(":shared:features:schedule:api"))
+            implementation(project(":shared:features:schedule:impl"))
 
             implementation(project(":shared:core:domain"))
             implementation(project(":shared:core:data"))

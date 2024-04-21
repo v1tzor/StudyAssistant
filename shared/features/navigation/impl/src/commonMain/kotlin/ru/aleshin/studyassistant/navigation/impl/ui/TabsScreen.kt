@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import cafe.adriel.voyager.transitions.FadeTransition
 import ru.aleshin.core.common.navigation.screens.EmptyScreen
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEffect
@@ -43,7 +44,10 @@ internal class TabsScreen : Screen {
         screenModel = rememberTabsScreenModel(),
         initialState = TabsViewState(),
     ) { state ->
-        Navigator(EmptyScreen) { navigator ->
+        Navigator(
+            screen = EmptyScreen,
+            disposeBehavior = NavigatorDisposeBehavior(false, false),
+        ) { navigator ->
             Scaffold(
                 content = { paddingValues ->
                     Box(modifier = Modifier.padding(paddingValues)) {

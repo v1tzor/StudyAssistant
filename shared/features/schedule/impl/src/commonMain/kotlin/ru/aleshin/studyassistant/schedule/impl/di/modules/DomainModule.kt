@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.navigation.impl.di
+package ru.aleshin.studyassistant.schedule.impl.di.modules
 
-import inject.BaseFeatureDependencies
-import managers.CoroutineManager
-import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
+import org.kodein.di.DI
+import org.kodein.di.bindSingleton
+import org.kodein.di.instance
+import org.kodein.di.singleton
+import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
+import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleErrorHandler
 
 /**
- * @author Stanislav Aleshin on 20.04.2024.
+ * @author Stanislav Aleshin on 21.04.2024.
  */
-interface NavigationFeatureDependencies : BaseFeatureDependencies {
-    val scheduleFeatureStarter: () -> ScheduleFeatureStarter
-    val coroutineManager: CoroutineManager
+internal val domainModule = DI.Module("Domain") {
+    bindSingleton<ScheduleErrorHandler> { ScheduleErrorHandler.Base() }
+    bindSingleton<ScheduleEitherWrapper> { ScheduleEitherWrapper.Base(instance()) }
 }

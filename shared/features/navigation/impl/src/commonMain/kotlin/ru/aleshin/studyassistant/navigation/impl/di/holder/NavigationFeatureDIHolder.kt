@@ -28,6 +28,7 @@ import ru.aleshin.studyassistant.navigation.api.di.NavigationFeatureApi
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.navigation.impl.di.NavigationFeatureDependencies
 import ru.aleshin.studyassistant.navigation.impl.di.modules.presentationModule
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
@@ -41,6 +42,7 @@ object NavigationFeatureDIHolder : BaseFeatureDIHolder<NavigationFeatureApi, Nav
             val di = DI {
                 importAll(presentationModule)
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
+                bindSingleton<() -> ScheduleFeatureStarter> { dependencies.scheduleFeatureStarter }
                 bindSingleton<NavigationFeatureApi> {
                     object : NavigationFeatureApi {
                         override fun fetchStarter() = instance<NavigationFeatureStarter>()
