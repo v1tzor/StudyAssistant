@@ -16,26 +16,20 @@
 
 package ru.aleshin.studyassistant.preview.impl.navigation
 
-import cafe.adriel.voyager.core.screen.Screen
-import org.kodein.di.DI
-import org.kodein.di.DIAware
-import org.kodein.di.bindFactory
-import org.kodein.di.bindProvider
-import org.kodein.di.factory
-import org.kodein.di.instance
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.nav.NavigationScreen
+import inject.FeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.nav.NavigationScreen
 
 /**
  * @author Stanislav Aleshin on 07.04.2024.
  */
 internal class PreviewFeatureStarterImpl(
-    private val localNavScreen: (PreviewScreen) -> NavigationScreen
-) : PreviewFeatureStarter {
-
-
-    override fun fetchPreviewScreen(screen: PreviewScreen): Screen {
-        return localNavScreen(screen)
-    }
-}
+    navScreen: NavigationScreen,
+    navigatorManager: PreviewNavigatorManager,
+    screenProvider: PreviewScreenProvider,
+) : PreviewFeatureStarter, FeatureStarter.Navigation<PreviewScreen>(
+    featureNavScreen = navScreen,
+    navigatorManager = navigatorManager,
+    screenProvider = screenProvider,
+)

@@ -25,14 +25,13 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import managers.CoroutineManager
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
-import ru.aleshin.studyassistant.auth.impl.navigation.FeatureScreenProvider
+import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEffect
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEvent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotViewState
-import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterAction
-import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterWorkCommand
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
 import validation.operateValidate
 
@@ -41,7 +40,7 @@ import validation.operateValidate
  */
 internal class ForgotScreenModel(
     private val workProcessor: ForgotWorkProcessor,
-    private val screenProvider: FeatureScreenProvider,
+    private val screenProvider: AuthScreenProvider,
     private val emailValidator: EmailValidator,
     stateCommunicator: ForgotStateCommunicator,
     effectCommunicator: ForgotEffectCommunicator,
@@ -73,7 +72,7 @@ internal class ForgotScreenModel(
                 )
             }
             is ForgotEvent.NavigateToLogin -> {
-                val screen = screenProvider.provideLoginScreen()
+                val screen = screenProvider.provideFeatureScreen(AuthScreen.Login)
                 sendEffect(ForgotEffect.PushScreen(screen))
             }
         }

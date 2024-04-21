@@ -25,8 +25,9 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import managers.CoroutineManager
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
-import ru.aleshin.studyassistant.auth.impl.navigation.FeatureScreenProvider
+import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEffect
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEvent
@@ -40,7 +41,7 @@ import validation.operateValidate
  * @author Stanislav Aleshin on 17.04.2024
  */
 internal class RegisterScreenModel(
-    private val screenProvider: FeatureScreenProvider,
+    private val screenProvider: AuthScreenProvider,
     private val workProcessor: RegisterWorkProcessor,
     private val usernameValidator: UsernameValidator,
     private val emailValidator: EmailValidator,
@@ -81,7 +82,7 @@ internal class RegisterScreenModel(
                 )
             }
             is RegisterEvent.NavigateToLogin -> {
-                val screen = screenProvider.provideLoginScreen()
+                val screen = screenProvider.provideFeatureScreen(AuthScreen.Login)
                 sendEffect(RegisterEffect.PushScreen(screen))
             }
         }

@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.auth.impl.navigation
 
-import cafe.adriel.voyager.core.screen.Screen
+import inject.FeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.nav.NavigationScreen
@@ -25,10 +25,11 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.nav.NavigationScreen
  * @author Stanislav Aleshin on 16.04.2024.
  */
 internal class AuthFeatureStarterImpl(
-    private val navigationScreen: (AuthScreen) -> NavigationScreen,
-) : AuthFeatureStarter {
-
-    override fun fetchAuthScreen(screen: AuthScreen): Screen {
-        return navigationScreen(screen)
-    }
-}
+    navScreen: NavigationScreen,
+    navigatorManager: AuthNavigatorManager,
+    screenProvider: AuthScreenProvider,
+) : AuthFeatureStarter, FeatureStarter.Navigation<AuthScreen>(
+    featureNavScreen = navScreen,
+    navigatorManager = navigatorManager,
+    screenProvider = screenProvider,
+)

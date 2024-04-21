@@ -17,11 +17,10 @@
 package ru.aleshin.studyassistant.presentation.ui.main.screenmodel
 
 import architecture.screenmodel.work.FlowWorkProcessor
-import architecture.screenmodel.work.FlowWorkResult
 import architecture.screenmodel.work.WorkCommand
 import architecture.screenmodel.work.WorkResult
 import kotlinx.coroutines.flow.flow
-import ru.aleshin.studyassistant.navigation.MainScreenProvider
+import ru.aleshin.studyassistant.navigation.GlobalScreenProvider
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 
@@ -31,7 +30,7 @@ import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, MainEffect> {
 
     class Base(
-        private val screenProvider: MainScreenProvider,
+        private val screenProvider: GlobalScreenProvider,
     ) : MainWorkProcessor {
 
         override suspend fun work(command: MainWorkCommand) = when(command) {

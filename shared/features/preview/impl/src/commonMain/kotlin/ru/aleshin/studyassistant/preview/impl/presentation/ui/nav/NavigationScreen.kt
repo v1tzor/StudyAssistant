@@ -19,37 +19,35 @@ package ru.aleshin.studyassistant.preview.impl.presentation.ui.nav
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.core.registry.ScreenProvider
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
+import di.withDirectDI
+import navigation.NavigatorManager
+import navigation.NestedFeatureNavigator
+import navigation.rememberNavigatorManager
+import navigation.rememberScreenProvider
+import org.kodein.di.compose.withDI
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.IntroScreen
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.SetupScreen
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
-import ru.aleshin.studyassistant.preview.impl.navigation.FeatureScreenProvider
+import ru.aleshin.studyassistant.preview.impl.navigation.PreviewNavigatorManager
+import ru.aleshin.studyassistant.preview.impl.navigation.PreviewScreenProvider
 
 /**
  * @author Stanislav Aleshin on 07.04.2024.
  */
-internal data class NavigationScreen(val initScreen: PreviewScreen) : Screen {
+internal class NavigationScreen : Screen {
 
     @Composable
-    override fun Content()  {
-        val screenProvider = remember { PreviewFeatureDIHolder.fetchDI().instance<FeatureScreenProvider>() }
+    override fun Content() = withDirectDI(directDI = { PreviewFeatureDIHolder.fetchDI() }) {
         val screenModel = rememberScreenModel { NavScreenModel() }
-        Navigator(
-            screen = when(initScreen) {
-                PreviewScreen.Intro -> screenProvider.provideIntroScreen()
-                PreviewScreen.Setup -> screenProvider.provideSetupScreen()
-            },
-            disposeBehavior = NavigatorDisposeBehavior(
-                disposeSteps = false
-            ),
-        ) {
-            CurrentScreen()
-        }
+        val screenProvider = rememberScreenProvider<PreviewScreenProvider, PreviewScreen>()
+        val navigatorManager = rememberNavigatorManager<PreviewNavigatorManager, PreviewScreen>()
+
+        NestedFeatureNavigator(
+            screenProvider = screenProvider,
+            navigatorManager = navigatorManager,
+            content = { CurrentScreen() },
+        )
     }
 }

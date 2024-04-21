@@ -25,6 +25,9 @@ import org.kodein.di.provider
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
+import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
+import ru.aleshin.studyassistant.navigation.impl.di.NavigationFeatureDependencies
+import ru.aleshin.studyassistant.navigation.impl.di.holder.NavigationFeatureDIHolder
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 import ru.aleshin.studyassistant.preview.impl.di.PreviewFeatureDependencies
 import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
@@ -33,8 +36,21 @@ import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
  * @author Stanislav Aleshin on 14.04.2024.
  */
 val featureModule = DI.Module("Feature") {
+    bindEagerSingleton<NavigationFeatureDependencies> {
+        object : NavigationFeatureDependencies {
+            override val coroutineManager = instance<CoroutineManager>()
+        }
+    }
+    bindProvider<NavigationFeatureStarter> {
+        with(NavigationFeatureDIHolder) {
+            init(instance())
+            fetchApi().fetchStarter()
+        }
+    }
+
     bindEagerSingleton<PreviewFeatureDependencies> {
         object : PreviewFeatureDependencies {
+            override val navigationFeatureStarter = provider<NavigationFeatureStarter>()
             override val authFeatureStarter = provider<AuthFeatureStarter>()
             override val coroutineManager = instance<CoroutineManager>()
         }
@@ -45,8 +61,10 @@ val featureModule = DI.Module("Feature") {
             fetchApi().fetchStarter()
         }
     }
+
     bindEagerSingleton<AuthFeatureDependencies> {
         object : AuthFeatureDependencies {
+            override val navigationFeatureStarter = provider<NavigationFeatureStarter>()
             override val previewFeatureStarter = provider<PreviewFeatureStarter>()
             override val coroutineManager = instance<CoroutineManager>()
         }

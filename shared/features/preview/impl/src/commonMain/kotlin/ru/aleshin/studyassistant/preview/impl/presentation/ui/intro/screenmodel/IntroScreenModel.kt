@@ -26,7 +26,7 @@ import managers.CoroutineManager
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
-import ru.aleshin.studyassistant.preview.impl.navigation.FeatureScreenProvider
+import ru.aleshin.studyassistant.preview.impl.navigation.PreviewScreenProvider
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroAction
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroEffect
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroEvent
@@ -35,8 +35,8 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.Int
 /**
  * @author Stanislav Aleshin on 14.04.2024
  */
-internal class IntroScreenModel constructor(
-    private val screenProvider: FeatureScreenProvider,
+internal class IntroScreenModel(
+    private val screenProvider: PreviewScreenProvider,
     stateCommunicator: IntroStateCommunicator,
     effectCommunicator: IntroEffectCommunicator,
     coroutineManager: CoroutineManager,

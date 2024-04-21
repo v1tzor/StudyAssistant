@@ -16,11 +16,9 @@
 
 package ru.aleshin.studyassistant.auth.api.navigation
 
-import cafe.adriel.voyager.core.screen.Screen
+import inject.FeatureStarter
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-interface AuthFeatureStarter {
-    fun fetchAuthScreen(screen: AuthScreen): Screen
-}
+interface AuthFeatureStarter : FeatureStarter<AuthScreen>

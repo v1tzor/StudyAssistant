@@ -16,11 +16,9 @@
 
 package ru.aleshin.studyassistant.preview.api.navigation
 
-import cafe.adriel.voyager.core.screen.Screen
+import inject.FeatureStarter
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
-interface PreviewFeatureStarter {
-    fun fetchPreviewScreen(screen: PreviewScreen): Screen
-}
+interface PreviewFeatureStarter : FeatureStarter<PreviewScreen>

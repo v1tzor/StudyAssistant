@@ -21,27 +21,20 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import org.kodein.di.provider
-import ru.aleshin.studyassistant.navigation.MainScreenProvider
+import ru.aleshin.studyassistant.navigation.GlobalScreenProvider
 import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainEffectCommunicator
 import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainScreenModel
 import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainStateCommunicator
 import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainWorkProcessor
-import ru.aleshin.studyassistant.presentation.ui.tabs.screenmodel.TabsEffectCommunicator
-import ru.aleshin.studyassistant.presentation.ui.tabs.screenmodel.TabsScreenModel
-import ru.aleshin.studyassistant.presentation.ui.tabs.screenmodel.TabsStateCommunicator
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 val presentationModule = DI.Module("Presentation") {
-    bindProvider<MainScreenProvider> { MainScreenProvider.Base(provider(), provider()) }
+    bindProvider<GlobalScreenProvider> { GlobalScreenProvider.Base(provider(), provider(), provider()) }
 
     bindSingleton<MainStateCommunicator> { MainStateCommunicator.Base() }
     bindSingleton<MainEffectCommunicator> { MainEffectCommunicator.Base() }
     bindSingleton<MainWorkProcessor> { MainWorkProcessor.Base(instance()) }
     bindSingleton<MainScreenModel> { MainScreenModel(instance(), instance(), instance(), instance(), instance()) }
-
-    bindSingleton<TabsStateCommunicator> { TabsStateCommunicator.Base() }
-    bindSingleton<TabsEffectCommunicator> { TabsEffectCommunicator.Base() }
-    bindSingleton<TabsScreenModel> { TabsScreenModel(instance(), instance(), instance(), instance()) }
 }

@@ -19,11 +19,13 @@ package ru.aleshin.studyassistant.preview.impl.di
 import inject.BaseFeatureDependencies
 import managers.CoroutineManager
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 interface PreviewFeatureDependencies : BaseFeatureDependencies {
+    val navigationFeatureStarter: () -> NavigationFeatureStarter
     val authFeatureStarter: () -> AuthFeatureStarter
     val coroutineManager: CoroutineManager
 }

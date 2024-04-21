@@ -16,13 +16,14 @@
 
 package ru.aleshin.studyassistant.auth.api.navigation
 
-import platform.JavaSerializable
+import architecture.screen.MainScreen
+import inject.FeatureScreen
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-sealed class AuthScreen : JavaSerializable {
-    data object Login : AuthScreen()
+sealed class AuthScreen : FeatureScreen {
+    data object Login : AuthScreen(), MainScreen
     data object Register : AuthScreen()
     data object Forgot : AuthScreen()
 }

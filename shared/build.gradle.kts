@@ -26,6 +26,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(project(":shared:features:navigation:api"))
+            implementation(project(":shared:features:navigation:impl"))
             implementation(project(":shared:features:preview:api"))
             implementation(project(":shared:features:preview:impl"))
             implementation(project(":shared:features:auth:api"))

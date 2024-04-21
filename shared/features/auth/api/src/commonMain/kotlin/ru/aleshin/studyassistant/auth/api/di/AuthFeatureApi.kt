@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.auth.api.di
 
 import inject.BaseFeatureApi
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.

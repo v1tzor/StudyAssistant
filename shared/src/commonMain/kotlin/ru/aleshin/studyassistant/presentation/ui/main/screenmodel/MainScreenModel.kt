@@ -27,7 +27,7 @@ import functional.Constants
 import kotlinx.coroutines.delay
 import managers.CoroutineManager
 import ru.aleshin.studyassistant.di.MainDependenciesGraph
-import ru.aleshin.studyassistant.navigation.MainScreenProvider
+import ru.aleshin.studyassistant.navigation.GlobalScreenProvider
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEvent
@@ -39,7 +39,7 @@ import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
  */
 class MainScreenModel constructor(
     private val workProcessor: MainWorkProcessor,
-    private val screenProvider: MainScreenProvider,
+    private val screenProvider: GlobalScreenProvider,
     stateCommunicator: MainStateCommunicator,
     effectCommunicator: MainEffectCommunicator,
     coroutineManager: CoroutineManager,

@@ -23,10 +23,11 @@ import architecture.screenmodel.work.WorkCommand
 import functional.handle
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
-import ru.aleshin.studyassistant.auth.impl.navigation.FeatureScreenProvider
+import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.models.RegisterCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEffect
+import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
@@ -34,7 +35,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.Reg
 internal interface RegisterWorkProcessor : FlowWorkProcessor<RegisterWorkCommand, RegisterAction, RegisterEffect> {
 
     class Base(
-        private val screenProvider: FeatureScreenProvider,
+        private val screenProvider: AuthScreenProvider,
         private val authInteractor: AuthInteractor,
     ) : RegisterWorkProcessor {
 
@@ -47,8 +48,8 @@ internal interface RegisterWorkProcessor : FlowWorkProcessor<RegisterWorkCommand
             authInteractor.registerNewAccount(credentials.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(RegisterEffect.ShowError(it))) },
                 onRightAction = {
-                    emit(ActionResult(RegisterAction.UpdateLoading(false)))
-                    // emit(EffectResult(RegisterEffect.ReplaceGlobalScreen()))
+                    val setupScreen = screenProvider.providePreviewScreen(PreviewScreen.Setup)
+                    emit(EffectResult(RegisterEffect.ReplaceGlobalScreen(setupScreen)))
                 },
             )
         }

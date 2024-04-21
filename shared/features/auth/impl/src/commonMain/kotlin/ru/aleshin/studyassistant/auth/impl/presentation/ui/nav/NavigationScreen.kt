@@ -21,33 +21,31 @@ import androidx.compose.runtime.remember
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
-import org.kodein.di.instance
+import di.withDirectDI
+import navigation.NestedFeatureNavigator
+import navigation.rememberNavigatorManager
+import navigation.rememberScreenProvider
+import org.kodein.di.compose.withDI
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
-import ru.aleshin.studyassistant.auth.impl.navigation.FeatureScreenProvider
+import ru.aleshin.studyassistant.auth.impl.navigation.AuthNavigatorManager
+import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-internal class NavigationScreen(private val initScreen: AuthScreen) : Screen {
+internal class NavigationScreen : Screen {
 
     @Composable
-    override fun Content() {
-        val screenProvider = remember { AuthFeatureDIHolder.fetchDI().instance<FeatureScreenProvider>() }
+    override fun Content() = withDirectDI(directDI = { AuthFeatureDIHolder.fetchDI() }) {
         val screenModel = rememberScreenModel { NavScreenModel() }
-        Navigator(
-            screen = when(initScreen) {
-                AuthScreen.Login -> screenProvider.provideLoginScreen()
-                AuthScreen.Register -> screenProvider.provideRegisterScreen()
-                AuthScreen.Forgot -> screenProvider.provideForgotScreen()
-            },
-            disposeBehavior = NavigatorDisposeBehavior(
-                disposeSteps = false,
-            ),
-        ) {
-            CurrentScreen()
-        }
+        val screenProvider = rememberScreenProvider<AuthScreenProvider, AuthScreen>()
+        val navigatorManager = rememberNavigatorManager<AuthNavigatorManager, AuthScreen>()
+
+        NestedFeatureNavigator(
+            screenProvider = screenProvider,
+            navigatorManager = navigatorManager,
+            content = { CurrentScreen() },
+        )
     }
 }

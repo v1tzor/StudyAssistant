@@ -17,15 +17,13 @@
 package ru.aleshin.studyassistant.preview.impl.di.modules
 
 import org.kodein.di.DI
-import org.kodein.di.bindFactory
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
-import org.kodein.di.factory
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
-import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
-import ru.aleshin.studyassistant.preview.impl.navigation.FeatureScreenProvider
+import ru.aleshin.studyassistant.preview.impl.navigation.PreviewScreenProvider
 import ru.aleshin.studyassistant.preview.impl.navigation.PreviewFeatureStarterImpl
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.screenmodel.IntroEffectCommunicator
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.screenmodel.IntroScreenModel
@@ -41,10 +39,10 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.
  */
 internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<NavScreenModel> { NavScreenModel() }
-    bindFactory<PreviewScreen, NavigationScreen> { initScreen: PreviewScreen -> NavigationScreen(initScreen) }
+    bindSingleton<NavigationScreen> { NavigationScreen() }
 
-    bindProvider<PreviewFeatureStarter> { PreviewFeatureStarterImpl(factory()) }
-    bindProvider<FeatureScreenProvider> { FeatureScreenProvider.Base(instance<() -> AuthFeatureStarter>()) }
+    bindProvider<PreviewFeatureStarter> { PreviewFeatureStarterImpl(instance(), instance(), instance()) }
+    bindProvider<PreviewScreenProvider> { PreviewScreenProvider.Base(instance<() -> NavigationFeatureStarter>(), instance<() -> AuthFeatureStarter>()) }
 
     bindProvider<IntroStateCommunicator> { IntroStateCommunicator.Base() }
     bindProvider<IntroEffectCommunicator> { IntroEffectCommunicator.Base() }

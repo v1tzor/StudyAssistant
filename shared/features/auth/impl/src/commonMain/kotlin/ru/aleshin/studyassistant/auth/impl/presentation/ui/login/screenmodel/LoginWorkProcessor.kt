@@ -21,15 +21,13 @@ import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
 import architecture.screenmodel.work.WorkResult
-import entities.AuthCredentials
 import functional.handle
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
-import ru.aleshin.studyassistant.auth.impl.navigation.FeatureScreenProvider
+import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.models.LoginCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEffect
-import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
@@ -38,7 +36,7 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
 
     class Base(
         private val authInteractor: AuthInteractor,
-        private val screenProvider: FeatureScreenProvider,
+        private val screenProvider: AuthScreenProvider,
     ) : LoginWorkProcessor {
 
         override suspend fun work(command: LoginWorkCommand) = when(command) {
@@ -51,8 +49,9 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
             authInteractor.loginWithEmail(credentials.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
                 onRightAction = {
+                    val tabScreen = screenProvider.provideTabNavigationScreen()
                     emit(ActionResult(LoginAction.UpdateLoading(false)))
-                    // emit(EffectResult(LoginEffect.ReplaceGlobalScreen()))
+                    emit(EffectResult(LoginEffect.ReplaceGlobalScreen(tabScreen)))
                 }
             )
         }

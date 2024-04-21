@@ -28,7 +28,9 @@ import ru.aleshin.studyassistant.auth.api.di.AuthFeatureApi
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
 import ru.aleshin.studyassistant.auth.impl.di.modules.domainModule
+import ru.aleshin.studyassistant.auth.impl.di.modules.navigationModule
 import ru.aleshin.studyassistant.auth.impl.di.modules.presentationModule
+import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 
 /**
@@ -41,8 +43,9 @@ object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeatureDepe
     override fun init(dependencies: AuthFeatureDependencies) {
         if (directDI == null) {
             val di = DI {
-                importAll(presentationModule, domainModule)
+                importAll(navigationModule, presentationModule, domainModule)
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
+                bindInstance<() -> NavigationFeatureStarter> { dependencies.navigationFeatureStarter }
                 bindInstance<() -> PreviewFeatureStarter> { dependencies.previewFeatureStarter }
                 bindSingleton<AuthFeatureApi> {
                     object : AuthFeatureApi {

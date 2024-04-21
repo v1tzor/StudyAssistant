@@ -25,10 +25,12 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.api.PreviewFeatureApi
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 import ru.aleshin.studyassistant.preview.impl.di.PreviewFeatureDependencies
 import ru.aleshin.studyassistant.preview.impl.di.modules.domainModule
+import ru.aleshin.studyassistant.preview.impl.di.modules.navigationModule
 import ru.aleshin.studyassistant.preview.impl.di.modules.presentationModule
 
 /**
@@ -41,9 +43,10 @@ object PreviewFeatureDIHolder : BaseFeatureDIHolder<PreviewFeatureApi, PreviewFe
     override fun init(dependencies: PreviewFeatureDependencies) {
         if (directDi == null) {
             val di = DI {
-                importAll(presentationModule, domainModule)
+                importAll(navigationModule, presentationModule, domainModule)
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindInstance<() -> AuthFeatureStarter> { dependencies.authFeatureStarter }
+                bindInstance<() -> NavigationFeatureStarter> { dependencies.navigationFeatureStarter }
                 bindSingleton<PreviewFeatureApi> {
                     object : PreviewFeatureApi {
                         override fun fetchStarter() = instance<PreviewFeatureStarter>()
