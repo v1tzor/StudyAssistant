@@ -37,7 +37,10 @@ interface FeatureStarter<S : FeatureScreen> {
             val isSetStartScreen = navigatorManager.setStartScreen(screen)
             if (!isSetStartScreen) {
                 val featureScreen = screenProvider.provideFeatureScreen(screen)
-                navigatorManager.executeNavigation { push(featureScreen) }
+                navigatorManager.executeNavigation {
+                    val lastScreen = lastItemOrNull
+                    if (lastScreen?.key != featureScreen.key) push(featureScreen)
+                }
             }
             return featureNavScreen
         }

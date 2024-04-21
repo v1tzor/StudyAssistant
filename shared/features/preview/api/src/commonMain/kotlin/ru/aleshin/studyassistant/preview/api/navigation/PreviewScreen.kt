@@ -16,16 +16,14 @@
 
 package ru.aleshin.studyassistant.preview.api.navigation
 
-import architecture.screen.MainScreen
 import inject.FeatureScreen
-import platform.JavaSerializable
 
 /**
  * @author Stanislav Aleshin on 07.04.2024.
  */
 sealed class PreviewScreen : FeatureScreen {
 
-    data object Intro : PreviewScreen(), MainScreen
+    data object Intro : PreviewScreen()
 
     data object Setup : PreviewScreen()
 }
