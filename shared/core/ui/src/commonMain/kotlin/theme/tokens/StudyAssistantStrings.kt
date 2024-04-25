@@ -51,6 +51,7 @@ data class StudyAssistantStrings(
     val tasksBottomItem: String,
     val infoBottomItem: String,
     val profileBottomItem: String,
+    val userCodeLabel: String,
 )
 
 internal val russianFamelString = StudyAssistantStrings(
@@ -84,6 +85,7 @@ internal val russianFamelString = StudyAssistantStrings(
     tasksBottomItem = "Задания",
     infoBottomItem = "Информация",
     profileBottomItem = "Профиль",
+    userCodeLabel = "Код: ",
 )
 
 internal val englishFamelString = StudyAssistantStrings(
@@ -117,6 +119,7 @@ internal val englishFamelString = StudyAssistantStrings(
     tasksBottomItem = "Tasks",
     infoBottomItem = "Info",
     profileBottomItem = "Profile",
+    userCodeLabel = "Code: ",
 )
 
 val LocalStudyAssistantStrings = staticCompositionLocalOf<StudyAssistantStrings> {

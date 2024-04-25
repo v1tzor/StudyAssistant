@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.models
 
-import entities.AuthCredentials
+import entities.auth.AuthCredentials
 import platform.JavaSerializable
 
 
@@ -28,7 +28,7 @@ internal data class LoginCredentialsUi(
     val password: String = "",
 ) : JavaSerializable {
     fun mapToDomain() = AuthCredentials(
-        nickname = null,
+        username = null,
         email = email,
         password = password,
     )

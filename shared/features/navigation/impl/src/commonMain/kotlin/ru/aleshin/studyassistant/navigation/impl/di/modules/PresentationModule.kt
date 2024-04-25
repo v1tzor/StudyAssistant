@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.navigation.impl.ui.TabsScreen
 import ru.aleshin.studyassistant.navigation.impl.ui.screenmodel.TabsEffectCommunicator
 import ru.aleshin.studyassistant.navigation.impl.ui.screenmodel.TabsScreenModel
 import ru.aleshin.studyassistant.navigation.impl.ui.screenmodel.TabsStateCommunicator
+import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 
 /**
@@ -36,7 +37,12 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<Screen> { TabsScreen() }
 
     bindSingleton<NavigationFeatureStarter> { NavigationFeatureStarterImpl(instance()) }
-    bindSingleton<NavigationScreenProvider> { NavigationScreenProvider.Base(instance<() -> ScheduleFeatureStarter>()) }
+    bindSingleton<NavigationScreenProvider> {
+        NavigationScreenProvider.Base(
+            scheduleFeatureStarter = instance<() -> ScheduleFeatureStarter>(),
+            profileFeatureStarter = instance<() -> ProfileFeatureStarter>()
+        )
+    }
 
     bindSingleton<TabsEffectCommunicator> { TabsEffectCommunicator.Base() }
     bindSingleton<TabsStateCommunicator> { TabsStateCommunicator.Base() }

@@ -36,6 +36,7 @@ kotlin {
             implementation(project(":shared:core:ui"))
 
             implementation(compose.components.resources)
+            implementation(libs.bundles.firebase)
             implementation(libs.logger)
         }
     }
@@ -56,13 +57,5 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
 }

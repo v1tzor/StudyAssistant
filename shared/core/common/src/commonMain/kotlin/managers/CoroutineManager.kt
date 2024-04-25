@@ -26,7 +26,7 @@ import kotlinx.coroutines.withContext
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
-interface CoroutineManager {
+interface CoroutineManager : WorkDispatchersProvider {
 
     fun runOnBackground(scope: CoroutineScope, block: CoroutineBlock): Job
 
@@ -35,8 +35,8 @@ interface CoroutineManager {
     suspend fun changeFlow(coroutineFlow: CoroutineFlow, block: CoroutineBlock)
 
     abstract class Abstract(
-        private val backgroundDispatcher: CoroutineDispatcher,
-        private val uiDispatcher: CoroutineDispatcher,
+        override val backgroundDispatcher: CoroutineDispatcher,
+        override val uiDispatcher: CoroutineDispatcher,
     ) : CoroutineManager {
 
         override fun runOnBackground(scope: CoroutineScope, block: CoroutineBlock): Job {
@@ -56,10 +56,15 @@ interface CoroutineManager {
         }
     }
 
-    class Base constructor() : Abstract(
+    class Base : Abstract(
         backgroundDispatcher = Dispatchers.IO,
         uiDispatcher = Dispatchers.Main,
     )
+}
+
+interface WorkDispatchersProvider {
+    val backgroundDispatcher: CoroutineDispatcher
+    val uiDispatcher: CoroutineDispatcher
 }
 
 typealias CoroutineBlock = suspend CoroutineScope.() -> Unit

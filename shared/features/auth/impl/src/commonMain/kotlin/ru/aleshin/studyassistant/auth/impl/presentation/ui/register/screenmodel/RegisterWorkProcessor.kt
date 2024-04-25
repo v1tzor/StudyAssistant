@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.models.RegisterCredentialsUi
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEffect
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEffect
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
@@ -32,21 +33,25 @@ import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-internal interface RegisterWorkProcessor : FlowWorkProcessor<RegisterWorkCommand, RegisterAction, RegisterEffect> {
+internal interface RegisterWorkProcessor :
+    FlowWorkProcessor<RegisterWorkCommand, RegisterAction, RegisterEffect> {
 
     class Base(
         private val screenProvider: AuthScreenProvider,
         private val authInteractor: AuthInteractor,
     ) : RegisterWorkProcessor {
 
-        override suspend fun work(command: RegisterWorkCommand) = when(command) {
+        override suspend fun work(command: RegisterWorkCommand) = when (command) {
             is RegisterWorkCommand.RegisterNewAccount -> registerNewAccountWork(command.credentialsUi)
         }
 
         private fun registerNewAccountWork(credentials: RegisterCredentialsUi) = flow {
             emit(ActionResult(RegisterAction.UpdateLoading(true)))
             authInteractor.registerNewAccount(credentials.mapToDomain()).handle(
-                onLeftAction = { emit(EffectResult(RegisterEffect.ShowError(it))) },
+                onLeftAction = {
+                    emit(EffectResult(RegisterEffect.ShowError(it)))
+                    emit(ActionResult(RegisterAction.UpdateLoading(false)))
+                },
                 onRightAction = {
                     val setupScreen = screenProvider.providePreviewScreen(PreviewScreen.Setup)
                     emit(EffectResult(RegisterEffect.ReplaceGlobalScreen(setupScreen)))

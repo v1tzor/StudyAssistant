@@ -28,6 +28,7 @@ import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import navigation.root
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.auth.impl.presentation.models.RegisterCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthTheme
@@ -79,7 +80,7 @@ internal class RegisterScreen : Screen {
 
         handleEffect { effect ->
             when (effect) {
-                is RegisterEffect.ReplaceGlobalScreen -> navigator.parent?.replaceAll(effect.screen)
+                is RegisterEffect.ReplaceGlobalScreen -> navigator.root().replaceAll(effect.screen)
                 is RegisterEffect.PushScreen -> navigator.push(effect.screen)
                 is RegisterEffect.ShowError -> {
                     snackbarState.showSnackbar(

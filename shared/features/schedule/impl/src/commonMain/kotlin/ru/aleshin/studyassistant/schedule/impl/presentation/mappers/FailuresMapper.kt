@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Stanislav Aleshin
+ * Copyright 2024 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,12 +11,18 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * imitations under the License.
+ * limitations under the License.
  */
 
-package entities
+package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
+
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
+import ru.aleshin.studyassistant.schedule.impl.presentation.theme.tokens.ScheduleStrings
+
 
 /**
- * @author Stanislav Aleshin on 05.07.2023.
+ * @author Stanislav Aleshin on 16.04.2024.
  */
-data class ForgotCredentials(val email: String)
+internal fun ScheduleFailures.mapToMessage(strings: ScheduleStrings) = when(this) {
+    is ScheduleFailures.OtherError -> strings.otherErrorMessage
+}

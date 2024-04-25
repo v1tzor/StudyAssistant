@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.di
+package entities.requests
+
+import entities.users.AppUser
 
 /**
- * @author Stanislav Aleshin on 14.04.2024.
+ * @author Stanislav Aleshin on 21.04.2024.
  */
-enum class Platform {
-    Android,  iOS,
-}
-
-expect class PlatformConfiguration {
-    val platform: Platform
-}
+data class FriendRequests(
+    val received: List<AppUser> = emptyList(),
+    val send: List<AppUser> = emptyList(),
+    val lastAccepted: List<AppUser> = emptyList(),
+)

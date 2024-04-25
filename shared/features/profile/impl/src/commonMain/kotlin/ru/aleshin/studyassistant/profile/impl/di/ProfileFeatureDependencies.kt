@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.di
+package ru.aleshin.studyassistant.profile.impl.di
+
+import inject.BaseFeatureDependencies
+import managers.CoroutineManager
+import repositories.AuthRepository
+import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 
 /**
- * @author Stanislav Aleshin on 14.04.2024.
+ * @author Stanislav Aleshin on 21.04.2024.
  */
-actual class PlatformConfiguration {
-    actual val platform = Platform.iOS
+interface ProfileFeatureDependencies : BaseFeatureDependencies {
+    val authFeatureStarter: () -> AuthFeatureStarter
+    val authRepository: AuthRepository
+    val coroutineManager: CoroutineManager
 }

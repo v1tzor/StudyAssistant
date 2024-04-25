@@ -16,12 +16,13 @@
 
 package ru.aleshin.studyassistant.auth.impl.domain.interactors
 
-import entities.AuthCredentials
-import entities.ForgotCredentials
+import entities.auth.AuthCredentials
+import entities.auth.ForgotCredentials
 import entities.users.AppUser
 import functional.DomainResult
 import functional.UnitDomainResult
-import kotlinx.coroutines.delay
+import repositories.AuthRepository
+import repositories.ManageUserRepository
 import ru.aleshin.studyassistant.auth.impl.domain.common.AuthEitherWrapper
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 
@@ -37,22 +38,24 @@ internal interface AuthInteractor {
     suspend fun resetPassword(credentials: ForgotCredentials) : UnitDomainResult<AuthFailures>
 
     class Base(
+        private val authRepository: AuthRepository,
+        private val manageUserRepository: ManageUserRepository,
         private val eitherWrapper: AuthEitherWrapper,
     ) : AuthInteractor {
 
         override suspend fun loginWithEmail(credentials: AuthCredentials) = eitherWrapper.wrap {
-            // TODO Make firebase auth
-            delay(2000L)
-            return@wrap AppUser("0", "0", "Example", "example@example.com", "0")
+            val firebaseUser = authRepository.signInWithEmail(credentials)
+            // TODO Get real user info from firebase
+            return@wrap AppUser(firebaseUser.uid, "0", "Example", firebaseUser.email ?: "", "0")
         }
 
         override suspend fun registerNewAccount(credentials: AuthCredentials) = eitherWrapper.wrap {
-            delay(2000L)
-            return@wrap AppUser("0", "0", "Example", "example@example.com", "0")
-        }
+            val firebaseUser = authRepository.registerByEmail(credentials)
+            // TODO Create user info in firebase
+            return@wrap AppUser(firebaseUser.uid, "0", credentials.username ?: "", firebaseUser.email ?: "", "0")        }
 
         override suspend fun resetPassword(credentials: ForgotCredentials) = eitherWrapper.wrap {
-            delay(2000L)
+            manageUserRepository.sendPasswordResetEmail(credentials.email)
         }
     }
 }

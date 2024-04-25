@@ -7,7 +7,7 @@ jvmTarget = "17"
 version-name = "0.0.1-alpha"
 version-code = "1"
 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-agp = "8.2.0"
+agp = "8.3.2"
 kotlin = "1.9.23"
 kotlin-coroutines = "1.8.0"
 kotlin-datetime = "0.6.0-RC.2"
@@ -19,6 +19,7 @@ compose-material = "1.11.0"
 compose-plugin = "1.6.2"
 androidx-activityCompose = "1.8.2"
 gms = "4.4.1"
+firebase-bom = "32.8.1"
 firebase-gitlive = "1.12.0"
 ksp = "1.9.21-1.0.15"
 voyager = "1.0.0"
@@ -26,9 +27,12 @@ kodein = "7.21.2"
 accompanist = "0.34.0"
 coreKtx = "1.12.0"
 bignum = "0.3.9"
-sqldelight = "1.5.5"
+sqldelight = "2.0.2"
 mokoResources = "0.23.0"
 loggerKermit = "2.0.3"
+placeholder = "1.0.7"
+gms-auth = "21.1.0"
+networkchecker = "1.2.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -44,7 +48,9 @@ compose-foundation = { module = "androidx.compose.foundation:foundation", versio
 compose-material = { group = "com.google.android.material", name = "material", version.ref = "compose-material" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
 google-accompanist = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
-google-placeholder = { group = "com.google.accompanist", name = "accompanist-placeholder", version.ref = "accompanist" }
+google-gms-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "gms-auth" }
+placeholder = { group = "com.eygraber", name = "compose-placeholder-material3", version.ref = "placeholder" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebase-gitlive" }
 firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebase-gitlive" }
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
@@ -54,14 +60,17 @@ voyager-kodein = { module = "cafe.adriel.voyager:voyager-kodein", version.ref = 
 kodein-core = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
 kodein-compose = { module = "org.kodein.di:kodein-di-framework-compose", version.ref = "kodein" }
 bignumn = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
-sqldelight-core = { module = "com.squareup.sqldelight:runtime", version.ref = "sqldelight" }
-sqldelight-android = { module = "com.squareup.sqldelight:android-driver", version.ref = "sqldelight" }
-sqldelight-desktop = { module = "com.squareup.sqldelight:sqlite-driver", version.ref = "sqldelight" }
-sqldelight-native = { module = "com.squareup.sqldelight:native-driver", version.ref = "sqldelight" }
+sqldelight-core = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
+sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
+sqldelight-prmimitiveAdapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
+sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-desktop = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+sqldelight-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 mokoResources-generator = { module = "dev.icerock.moko:resources-generator", version.ref = "mokoResources" }
 mokoResources-core = { module = "dev.icerock.moko:resources", version.ref = "mokoResources" }
 mokoResources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "mokoResources" }
 logger = { module = "co.touchlab:kermit", version.ref = "loggerKermit" }
+networkcheker = { module = "com.github.ln-12:multiplatform-connectivity-status", version.ref = "networkchecker" }
 
 [bundles]
 mokoResources = ["mokoResources-core", "mokoResources-compose"]
@@ -74,10 +83,9 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
-mokoResources = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "mokoResources" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+sqlitedelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 gms = { id = "com.google.gms.google-services", version.ref = "gms" }

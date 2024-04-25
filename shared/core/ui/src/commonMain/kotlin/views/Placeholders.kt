@@ -23,49 +23,49 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-//import com.google.accompanist.placeholder.PlaceholderHighlight
-//import com.google.accompanist.placeholder.placeholder
-//import com.google.accompanist.placeholder.shimmer
+import com.eygraber.compose.placeholder.PlaceholderHighlight
+import com.eygraber.compose.placeholder.placeholder
+import com.eygraber.compose.placeholder.shimmer
 
 /**
  * @author Stanislav Aleshin on 08.02.2024.
  */
-//@Composable
-//fun PlaceholderBox(
-//    modifier: Modifier = Modifier,
-//    shape: Shape = MaterialTheme.shapes.medium,
-//    color: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
-//) = Box(
-//    modifier = modifier
-//        .fillMaxWidth()
-//        .placeholder(
-//            visible = true,
-//            color = color,
-//            shape = shape,
-//            highlight = PlaceholderHighlight.shimmer(
-//                highlightColor = MaterialTheme.colorScheme.highlightColorFor(color),
-//            ),
-//        ),
-//)
-//
-//fun ColorScheme.highlightColorFor(mainColor: Color) = when (mainColor) {
-//    primary -> primaryContainer
-//    secondary -> secondaryContainer
-//    tertiary -> tertiaryContainer
-//    background -> surfaceContainer
-//    error -> errorContainer
-//    primaryContainer -> primary
-//    secondaryContainer -> secondary
-//    tertiaryContainer -> tertiary
-//    errorContainer -> error
-//    inverseSurface -> surfaceContainer
-//    surface -> surfaceContainer
-//    surfaceVariant -> surface
-//    surfaceBright -> surfaceVariant
-//    surfaceContainer -> surfaceContainerHighest
-//    surfaceContainerHigh -> surfaceContainerLow
-//    surfaceContainerHighest -> surfaceContainer
-//    surfaceContainerLow -> surfaceContainerHigh
-//    surfaceContainerLowest -> surfaceVariant
-//    else -> Color.Unspecified
-//}
+@Composable
+fun PlaceholderBox(
+    modifier: Modifier = Modifier,
+    shape: Shape = MaterialTheme.shapes.medium,
+    color: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+) = Box(
+    modifier = modifier
+        .fillMaxWidth()
+        .placeholder(
+            visible = true,
+            color = color,
+            shape = shape,
+            highlight = PlaceholderHighlight.shimmer(
+                highlightColor = MaterialTheme.colorScheme.highlightColorFor(color),
+            ),
+        ),
+)
+
+fun ColorScheme.highlightColorFor(mainColor: Color) = when (mainColor) {
+    primary -> primaryContainer
+    secondary -> secondaryContainer
+    tertiary -> tertiaryContainer
+    background -> surfaceContainer
+    error -> errorContainer
+    primaryContainer -> primary
+    secondaryContainer -> secondary
+    tertiaryContainer -> tertiary
+    errorContainer -> error
+    inverseSurface -> surfaceContainer
+    surface -> surfaceContainer
+    surfaceVariant -> surface
+    surfaceBright -> surfaceVariant
+    surfaceContainer -> surfaceContainerHighest
+    surfaceContainerHigh -> surfaceContainerLow
+    surfaceContainerHighest -> surfaceContainer
+    surfaceContainerLow -> surfaceContainerHigh
+    surfaceContainerLowest -> surfaceVariant
+    else -> Color.Unspecified
+}

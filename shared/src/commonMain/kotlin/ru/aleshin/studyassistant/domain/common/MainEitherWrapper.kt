@@ -18,12 +18,13 @@ package ru.aleshin.studyassistant.domain.common
 
 import ru.aleshin.studyassistant.domain.entities.MainFailures
 import wrappers.EitherWrapper
+import wrappers.FlowEitherWrapper
 
 /**
  * @author Stanislav Aleshin on 27.01.2024
  */
-internal interface MainEitherWrapper : EitherWrapper<MainFailures> {
+interface MainEitherWrapper : FlowEitherWrapper<MainFailures> {
 
     class Base constructor(errorHandler: MainErrorHandler) : MainEitherWrapper,
-        EitherWrapper.Abstract<MainFailures>(errorHandler)
+        FlowEitherWrapper.Abstract<MainFailures>(errorHandler)
 }

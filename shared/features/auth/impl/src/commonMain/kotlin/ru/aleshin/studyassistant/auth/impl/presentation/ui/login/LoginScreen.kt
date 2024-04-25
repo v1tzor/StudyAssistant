@@ -28,10 +28,9 @@ import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import entities.AuthCredentials
+import navigation.root
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.auth.impl.presentation.models.LoginCredentialsUi
-import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthTheme
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEffect
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEvent
@@ -82,7 +81,7 @@ internal class LoginScreen : Screen {
 
         handleEffect { effect ->
             when (effect) {
-                is LoginEffect.ReplaceGlobalScreen -> navigator.parent?.replaceAll(effect.screen)
+                is LoginEffect.ReplaceGlobalScreen -> navigator.root().replaceAll(effect.screen)
                 is LoginEffect.PushScreen -> navigator.push(effect.screen)
                 is LoginEffect.ShowError -> {
                     snackbarState.showSnackbar(

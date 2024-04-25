@@ -30,8 +30,8 @@ import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToString
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewTheme
+import navigation.root
+import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroEffect
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroEvent
@@ -55,7 +55,7 @@ internal class IntroScreen : Screen {
     ) { state ->
         val pagerState = rememberPagerState { IntroPage.entries.size }
         val windowSize = LocalWindowSize.current
-        val mainNavigator = LocalNavigator.currentOrThrow.parent
+        val rootNavigator = LocalNavigator.currentOrThrow.root()
         val strings = PreviewThemeRes.strings
         val snackbarState = remember { SnackbarHostState() }
 
@@ -94,11 +94,11 @@ internal class IntroScreen : Screen {
 
         handleEffect { effect ->
             when (effect) {
-                is IntroEffect.ReplaceGlobalScreen -> mainNavigator?.replaceAll(effect.screen)
+                is IntroEffect.ReplaceGlobalScreen -> rootNavigator?.replaceAll(effect.screen)
                 is IntroEffect.ScrollToPage -> pagerState.animateScrollToPage(effect.pageIndex)
                 is IntroEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToString(strings),
+                        message = effect.failures.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.models
 
 import platform.JavaSerializable
-import entities.ForgotCredentials
+import entities.auth.ForgotCredentials
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.

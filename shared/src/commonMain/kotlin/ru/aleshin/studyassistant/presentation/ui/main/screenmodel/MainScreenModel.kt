@@ -20,11 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import architecture.screenmodel.BaseScreenModel
 import architecture.screenmodel.EmptyDeps
-import architecture.screenmodel.work.BackgroundWorkKey
 import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.screen.Screen
-import functional.Constants
-import kotlinx.coroutines.delay
 import managers.CoroutineManager
 import ru.aleshin.studyassistant.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.navigation.GlobalScreenProvider
@@ -32,7 +29,6 @@ import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEvent
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainViewState
-import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 
 /**
  * @author Stanislav Aleshin on 27.01.2024
@@ -60,10 +56,15 @@ class MainScreenModel constructor(
         event: MainEvent,
     ) {
         when (event) {
-            MainEvent.Init -> launchBackgroundWork(MainBackgroundWorkKey.SPLASH) {
-                delay(Constants.Delay.SPLASH_NAV)
-                // pushScreen(screen = screenProvider.provideTabsScreen())
-                pushScreen(screen = screenProvider.providePreviewScreen(PreviewScreen.Intro))
+            MainEvent.Init -> {
+                launchBackgroundWork(MainWorkCommand.LoadThemeSettings) {
+                    val command = MainWorkCommand.LoadThemeSettings
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+                launchBackgroundWork(MainWorkCommand.InitialNavigation) {
+                    val command = MainWorkCommand.InitialNavigation
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
         }
     }
@@ -73,16 +74,12 @@ class MainScreenModel constructor(
         currentState: MainViewState,
     ) = when (action) {
         is MainAction.UpdateSettings -> currentState.copy(
-            generalSettings = action.settings.general,
+            generalSettings = action.settings,
         )
     }
 
     private suspend fun WorkScope<MainViewState, MainAction, MainEffect>.pushScreen(screen: Screen) =
         sendEffect(MainEffect.ReplaceGlobalScreen(screen = screen))
-}
-
-enum class MainBackgroundWorkKey : BackgroundWorkKey {
-    SPLASH,
 }
 
 @Composable

@@ -16,6 +16,7 @@
 package functional
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -31,14 +32,39 @@ sealed class Either<out L, out R> {
     val isRight = this is Right
 }
 
-fun <L, R> Either<L, R>.rightOrElse(elseValue: R): R = when (this) {
+fun <L, R> Either<L, R>.rightOrElse(
+    elseValue: R
+): R = when (this) {
     is Either.Left -> elseValue
     is Either.Right -> this.data
 }
 
-fun <L, R> Either<L, R>.leftOrElse(elseValue: L): L = when (this) {
+suspend fun <L, R> Either<L, R>.rightOrNull(
+    onLeftAction: suspend (L) -> Unit,
+): R? = when (this) {
+    is Either.Left -> onLeftAction(this.data).let { null }
+    is Either.Right -> this.data
+}
+
+suspend fun <L, R> Flow<Either<L, R>>.firstRightOrNull(
+    onLeftAction: suspend (L) -> Unit,
+): R? = when (val firstValue = first()) {
+    is Either.Left -> onLeftAction(firstValue.data).let { null }
+    is Either.Right -> firstValue.data
+}
+
+fun <L, R> Either<L, R>.leftOrElse(
+    elseValue: L
+): L = when (this) {
     is Either.Left -> this.data
     is Either.Right -> elseValue
+}
+
+suspend fun <L, R> Either<L, R>.leftOrNull(
+    onRightAction: suspend (R) -> Unit,
+): L? = when (this) {
+    is Either.Left -> this.data
+    is Either.Right -> onRightAction(this.data).let { null }
 }
 
 suspend fun <L, R> Either<L, R>.handle(
@@ -56,6 +82,15 @@ suspend fun <L, R, T> Either<L, R>.handleAndGet(
     is Either.Left -> onLeftAction.invoke(this.data)
     is Either.Right -> onRightAction.invoke(this.data)
 }
+
+suspend fun <L, R, T> Flow<Either<L, R>>.firstHandleAndGet(
+    onLeftAction: suspend (L) -> T,
+    onRightAction: suspend (R) -> T,
+) = when (val firstValue = first()) {
+    is Either.Left -> onLeftAction.invoke(firstValue.data)
+    is Either.Right -> onRightAction.invoke(firstValue.data)
+}
+
 
 suspend fun <L, R> Flow<Either<L, R>>.collectAndHandle(
     onLeftAction: suspend (L) -> Unit = {},

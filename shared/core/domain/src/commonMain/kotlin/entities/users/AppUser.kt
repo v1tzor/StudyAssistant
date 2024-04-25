@@ -16,6 +16,7 @@
 
 package entities.users
 
+import entities.settings.PrivacySettings
 import functional.UID
 
 /**
@@ -32,5 +33,7 @@ data class AppUser(
     val city: String? = null,
     val birthday: String? = null,
     val gender: Gender? = null,
+    val friends: List<AppUser> = emptyList(),
     val socialNetworks: List<SocialNetwork> = emptyList(),
+    val privacy: PrivacySettings = PrivacySettings(),
 )

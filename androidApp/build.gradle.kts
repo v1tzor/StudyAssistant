@@ -5,10 +5,11 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kapt)
+    alias(libs.plugins.gms)
 }
 
 android {
-    val localProperties = gradleLocalProperties(rootDir)
+    val localProperties = gradleLocalProperties(rootDir, providers)
 
     namespace = "ru.aleshin.studyassistant.android"
     compileSdk = libs.versions.compileSdk.get().toIntOrNull()
@@ -88,6 +89,10 @@ android {
 
 dependencies {
     implementation(project(":shared"))
+
     implementation(libs.androidx.activity.compose)
     implementation(libs.compose.material)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.google.gms.auth)
 }

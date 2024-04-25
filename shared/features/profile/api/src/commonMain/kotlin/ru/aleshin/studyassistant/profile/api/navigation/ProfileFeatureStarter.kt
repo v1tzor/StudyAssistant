@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Stanislav Aleshin
+ * Copyright 2024 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.presentation.models
+package ru.aleshin.studyassistant.profile.api.navigation
+
+import inject.FeatureStarter
+import inject.MainScreen
 
 /**
- * @author Stanislav Aleshin on 27.01.2024.
+ * @author Stanislav Aleshin on 21.04.2024.
  */
-data class SettingsUi(
-    val general: GeneralSettingsUi = GeneralSettingsUi(),
-)
+interface ProfileFeatureStarter : FeatureStarter<MainScreen>

@@ -24,6 +24,8 @@ import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
+import repositories.AuthRepository
+import repositories.ManageUserRepository
 import ru.aleshin.studyassistant.auth.api.di.AuthFeatureApi
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
@@ -44,6 +46,8 @@ object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeatureDepe
         if (directDI == null) {
             val di = DI {
                 importAll(navigationModule, presentationModule, domainModule)
+                bindSingleton<AuthRepository> { dependencies.authRepository }
+                bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindInstance<() -> NavigationFeatureStarter> { dependencies.navigationFeatureStarter }
                 bindInstance<() -> PreviewFeatureStarter> { dependencies.previewFeatureStarter }

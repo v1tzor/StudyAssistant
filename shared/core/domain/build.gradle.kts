@@ -26,12 +26,13 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":shared:core:common"))
+            implementation(libs.bundles.firebase)
         }
     }
 }
 
 android {
-    namespace = libs.versions.applicationId.get()
+    namespace = "ru.aleshin.studyassistant.core.domain"
     compileSdk = libs.versions.compileSdk.get().toIntOrNull()
 
     defaultConfig {

@@ -23,7 +23,6 @@ import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
 import ru.aleshin.studyassistant.domain.entities.MainFailures
 import ru.aleshin.studyassistant.presentation.models.GeneralSettingsUi
-import ru.aleshin.studyassistant.presentation.models.SettingsUi
 
 /**
  * @author Stanislav Aleshin on 27.01.2024
@@ -42,5 +41,5 @@ sealed class MainEffect : BaseUiEffect {
 }
 
 sealed class MainAction : BaseAction {
-    data class UpdateSettings(val settings: SettingsUi) : MainAction()
+    data class UpdateSettings(val settings: GeneralSettingsUi) : MainAction()
 }

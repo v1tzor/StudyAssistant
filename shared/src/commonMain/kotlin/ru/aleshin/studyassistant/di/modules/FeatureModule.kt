@@ -22,6 +22,8 @@ import org.kodein.di.bindEagerSingleton
 import org.kodein.di.bindProvider
 import org.kodein.di.instance
 import org.kodein.di.provider
+import repositories.AuthRepository
+import repositories.ManageUserRepository
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
@@ -31,6 +33,9 @@ import ru.aleshin.studyassistant.navigation.impl.di.holder.NavigationFeatureDIHo
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 import ru.aleshin.studyassistant.preview.impl.di.PreviewFeatureDependencies
 import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
+import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
+import ru.aleshin.studyassistant.profile.impl.di.ProfileFeatureDependencies
+import ru.aleshin.studyassistant.profile.impl.di.holder.ProfileFeatureDIHolder
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
 import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
@@ -41,6 +46,7 @@ import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
 val featureModule = DI.Module("Feature") {
     bindEagerSingleton<NavigationFeatureDependencies> {
         object : NavigationFeatureDependencies {
+            override val profileFeatureStarter = provider<ProfileFeatureStarter>()
             override val scheduleFeatureStarter = provider<ScheduleFeatureStarter>()
             override val coroutineManager = instance<CoroutineManager>()
         }
@@ -68,6 +74,8 @@ val featureModule = DI.Module("Feature") {
 
     bindEagerSingleton<AuthFeatureDependencies> {
         object : AuthFeatureDependencies {
+            override val authRepository = instance<AuthRepository>()
+            override val manageUserRepository = instance<ManageUserRepository>()
             override val navigationFeatureStarter = provider<NavigationFeatureStarter>()
             override val previewFeatureStarter = provider<PreviewFeatureStarter>()
             override val coroutineManager = instance<CoroutineManager>()
@@ -87,6 +95,20 @@ val featureModule = DI.Module("Feature") {
     }
     bindProvider<ScheduleFeatureStarter> {
         with(ScheduleFeatureDIHolder) {
+            init(instance())
+            fetchApi().fetchStarter()
+        }
+    }
+
+    bindEagerSingleton<ProfileFeatureDependencies> {
+        object : ProfileFeatureDependencies {
+            override val authFeatureStarter = provider<AuthFeatureStarter>()
+            override val authRepository = instance<AuthRepository>()
+            override val coroutineManager = instance<CoroutineManager>()
+        }
+    }
+    bindProvider<ProfileFeatureStarter> {
+        with(ProfileFeatureDIHolder) {
             init(instance())
             fetchApi().fetchStarter()
         }

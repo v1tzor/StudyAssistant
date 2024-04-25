@@ -22,6 +22,7 @@ kotlin {
         it.binaries.framework {
             baseName = "coreCommon"
             isStatic = true
+            transitiveExport = true
         }
     }
 

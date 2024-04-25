@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.libsDirectory
 
 plugins {
@@ -14,7 +15,7 @@ kotlin {
             }
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -23,6 +24,8 @@ kotlin {
         it.binaries.framework {
             baseName = "shared"
             isStatic = true
+//            isStatic = false
+//            transitiveExport = true
         }
     }
 
@@ -36,6 +39,8 @@ kotlin {
             implementation(project(":shared:features:auth:impl"))
             implementation(project(":shared:features:schedule:api"))
             implementation(project(":shared:features:schedule:impl"))
+            implementation(project(":shared:features:profile:api"))
+            implementation(project(":shared:features:profile:impl"))
 
             implementation(project(":shared:core:domain"))
             implementation(project(":shared:core:data"))
@@ -44,6 +49,9 @@ kotlin {
 
             implementation(libs.bundles.firebase)
             implementation(libs.logger)
+        }
+        iosMain.dependencies {
+            implementation(libs.bundles.firebase)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

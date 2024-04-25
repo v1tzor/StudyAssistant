@@ -32,14 +32,15 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginE
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, LoginAction, LoginEffect> {
+internal interface LoginWorkProcessor :
+    FlowWorkProcessor<LoginWorkCommand, LoginAction, LoginEffect> {
 
     class Base(
         private val authInteractor: AuthInteractor,
         private val screenProvider: AuthScreenProvider,
     ) : LoginWorkProcessor {
 
-        override suspend fun work(command: LoginWorkCommand) = when(command) {
+        override suspend fun work(command: LoginWorkCommand) = when (command) {
             is LoginWorkCommand.LoginWithEmail -> loginWithEmailWork(command.credentials)
             is LoginWorkCommand.LoginWithGoogle -> loginWithGoogleWork()
         }
@@ -47,7 +48,10 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
         private fun loginWithEmailWork(credentials: LoginCredentialsUi) = flow {
             emit(ActionResult(LoginAction.UpdateLoading(true)))
             authInteractor.loginWithEmail(credentials.mapToDomain()).handle(
-                onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
+                onLeftAction = {
+                    emit(EffectResult(LoginEffect.ShowError(it)))
+                    emit(ActionResult(LoginAction.UpdateLoading(false)))
+                },
                 onRightAction = {
                     val tabScreen = screenProvider.provideTabNavigationScreen()
                     emit(ActionResult(LoginAction.UpdateLoading(false)))

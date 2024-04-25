@@ -21,13 +21,6 @@ package functional
  */
 object Constants {
 
-    object Regex {
-        const val TEXT_AND_NUMBERS = "^[a-zA-Z0-9]+$"
-        const val ONLY_TEXT = "^[a-zA-Z ]+$"
-        const val NUMBERS = "\\d+"
-        const val PASSWORD = "^[A-Za-z0-9\\!\\\"\\#\\$\\%\\&\\'\\(\\)\\*\\+\\,\\-\\.\\/\\:\\;\\<\\>\\=\\?\\@\\[\\]\\{\\}\\\\\\^\\_\\`\\~]+$"
-    }
-
     object App {
         const val SPLASH_NAME = "STUDY\nASSISTANT"
         const val NAME = "Study Assistant"
@@ -36,6 +29,17 @@ object Constants {
         const val GITHUB_URI = "https://github.com/v1tzor/StudyAssistant"
         const val ISSUES_URI = "https://github.com/v1tzor/StudyAssistant/issues"
         const val PERMISSION_TAG = "Notification_Permission"
+    }
+
+    object Database {
+        val DATABASE_NAME = "study_assistant_main.db"
+    }
+
+    object Regex {
+        const val TEXT_AND_NUMBERS = "^[a-zA-Z0-9]+$"
+        const val ONLY_TEXT = "^[a-zA-Z ]+$"
+        const val NUMBERS = "\\d+"
+        const val PASSWORD = "^[A-Za-z0-9\\!\\\"\\#\\$\\%\\&\\'\\(\\)\\*\\+\\,\\-\\.\\/\\:\\;\\<\\>\\=\\?\\@\\[\\]\\{\\}\\\\\\^\\_\\`\\~]+$"
     }
 
     object Key {

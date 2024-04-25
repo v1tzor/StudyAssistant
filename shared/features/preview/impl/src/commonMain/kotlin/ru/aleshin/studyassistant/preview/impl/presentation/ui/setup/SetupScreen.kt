@@ -26,8 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
-import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToString
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewTheme
+import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupDeps
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEffect
@@ -71,7 +70,7 @@ internal class SetupScreen : Screen {
             when (effect) {
                 is SetupEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToString(strings),
+                        message = effect.failures.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

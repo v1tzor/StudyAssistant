@@ -27,6 +27,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":shared:core:common"))
+            implementation(project(":shared:core:domain"))
 
             api(libs.bundles.voyager)
 
@@ -40,7 +41,7 @@ kotlin {
             api(compose.components.resources)
 
             api(libs.google.accompanist)
-            implementation(libs.google.placeholder)
+            implementation(libs.placeholder)
             implementation(libs.bundles.mokoResources)
         }
     }

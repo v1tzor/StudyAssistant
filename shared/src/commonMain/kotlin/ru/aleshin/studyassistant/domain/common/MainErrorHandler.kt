@@ -22,7 +22,7 @@ import ru.aleshin.studyassistant.domain.entities.MainFailures
 /**
  * @author Stanislav Aleshin on 27.01.2024
  */
-internal interface MainErrorHandler : ErrorHandler<MainFailures> {
+interface MainErrorHandler : ErrorHandler<MainFailures> {
 
     class Base : MainErrorHandler {
         override fun handle(throwable: Throwable) = when (throwable) {

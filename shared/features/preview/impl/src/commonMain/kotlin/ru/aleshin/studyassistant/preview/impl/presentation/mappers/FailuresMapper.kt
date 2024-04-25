@@ -22,6 +22,6 @@ import ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens.PreviewS
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-internal fun PreviewFailures.mapToString(strings: PreviewStrings) = when(this) {
+internal fun PreviewFailures.mapToMessage(strings: PreviewStrings) = when(this) {
     is PreviewFailures.OtherError -> strings.otherErrorMessage
 }
