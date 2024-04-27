@@ -16,9 +16,12 @@
 
 package ru.aleshin.studyassistant
 
+import com.mmk.kmpauth.google.GoogleAuthCredentials
+import com.mmk.kmpauth.google.GoogleAuthProvider
 import di.coreDataModule
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 import di.coreModule
+import functional.Constants.App.WEB_CLIENT_ID
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
@@ -39,5 +42,6 @@ object PlatformSDK {
             importAll(platformModule, coreModule, coreDataModule, featureModule, presentationModule, domainModule)
         }
         MainDependenciesGraph.initialize(graph.direct)
+        GoogleAuthProvider.create(credentials = GoogleAuthCredentials(serverId = WEB_CLIENT_ID))
     }
 }

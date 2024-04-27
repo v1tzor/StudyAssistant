@@ -44,6 +44,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.mmk.kmpauth.google.GoogleButtonUiContainer
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
@@ -58,7 +59,7 @@ internal fun LoginActionsSection(
     enabled: Boolean = true,
     isLoading: Boolean,
     onLoginClick: () -> Unit,
-    onLoginViaGoogleClick: () -> Unit,
+    onLoginViaGoogleClick: (idToken: String?) -> Unit,
 ) {
     Column(
         modifier = modifier.padding(horizontal = 24.dp),
@@ -102,30 +103,34 @@ internal fun LoginActionsSection(
                 color = MaterialTheme.colorScheme.outlineVariant
             )
         }
-        OutlinedButton(
-            onClick = onLoginViaGoogleClick,
-            modifier = Modifier.fillMaxWidth().height(44.dp),
-            enabled = !isLoading,
-            shape = MaterialTheme.shapes.large,
-            colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = MaterialTheme.colorScheme.background,
-            ),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        GoogleButtonUiContainer(
+            onGoogleSignInResult = { googleUser -> onLoginViaGoogleClick(googleUser?.idToken) },
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+            OutlinedButton(
+                onClick = { this.onClick() },
+                modifier = Modifier.fillMaxWidth().height(44.dp),
+                enabled = !isLoading,
+                shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                ),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             ) {
-                Image(
-                    modifier = Modifier.size(18.dp),
-                    painter = painterResource(AuthThemeRes.icons.google),
-                    contentDescription = AuthThemeRes.strings.loginViaGoogleLabel,
-                )
-                Text(
-                    text = AuthThemeRes.strings.loginViaGoogleLabel,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        modifier = Modifier.size(18.dp),
+                        painter = painterResource(AuthThemeRes.icons.google),
+                        contentDescription = AuthThemeRes.strings.loginViaGoogleLabel,
+                    )
+                    Text(
+                        text = AuthThemeRes.strings.loginViaGoogleLabel,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
             }
         }
     }

@@ -35,8 +35,19 @@ internal data class PreviewStrings(
     val friendsIntroBody: String,
     val loginLabel: String,
     val registerLabel: String,
+    val stepTitle: String,
+    val profileStepTitle: String,
+    val profileButtonLabel: String,
+    val organizationStepTitle: String,
+    val organizationButtonLabel: String,
+    val calendarStepTitle: String,
+    val calendarButtonLabel: String,
+    val scheduleStepTitle: String,
+    val scheduleButtonLabel: String,
     val otherErrorMessage: String,
 ) {
+
+
     companion object {
         val RUSSIAN = PreviewStrings(
             continueLabel = "Дальше",
@@ -51,6 +62,15 @@ internal data class PreviewStrings(
             friendsIntroBody = "Войдите в аккаунт, чтобы начать взаимодействовать с другими людьми, а также обмениваться расписаниями и заданиями",
             loginLabel = "Войти в аккаунт",
             registerLabel = "Зарегестрироваться",
+            stepTitle = "Шаг ",
+            profileStepTitle = "Заполните ваш профиль",
+            profileButtonLabel = "Сохранить",
+            organizationStepTitle = "Создайте вашу первую образовательную организацию",
+            organizationButtonLabel = "Создать",
+            calendarStepTitle = "Выберите количество недель в вашем расписании",
+            calendarButtonLabel = "Продолжить",
+            scheduleStepTitle = "Заполните расписания и начните пользоваться приложением!",
+            scheduleButtonLabel = "Заполнить",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = PreviewStrings(
@@ -66,6 +86,15 @@ internal data class PreviewStrings(
             friendsIntroBody = "Log in to your account to start interacting with other people, as well as sharing schedules and tasks",
             loginLabel = "Sign in to your account",
             registerLabel = "Register",
+            stepTitle = "Step ",
+            profileStepTitle = "Fill out your profile",
+            profileButtonLabel = "Save",
+            organizationStepTitle = "Create your first educational organization",
+            organizationButtonLabel = "Create",
+            calendarStepTitle = "Select the number of weeks in your schedule",
+            calendarButtonLabel = "Continue",
+            scheduleStepTitle = "Fill out the schedules and start using the app!",
+            scheduleButtonLabel = "Fill out",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

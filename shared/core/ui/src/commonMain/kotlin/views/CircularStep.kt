@@ -59,7 +59,7 @@ fun CircularStepsRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         items(countSteps) { index ->
-            CircularStep(
+            CircularStepView(
                 modifier = Modifier,
                 active = index == currentStep,
                 size = stepSize,
@@ -71,7 +71,7 @@ fun CircularStepsRow(
 }
 
 @Composable
-fun CircularStep(
+fun CircularStepView(
     modifier: Modifier = Modifier,
     active: Boolean,
     size: CircularStepSize = CircularStepSize.Medium,

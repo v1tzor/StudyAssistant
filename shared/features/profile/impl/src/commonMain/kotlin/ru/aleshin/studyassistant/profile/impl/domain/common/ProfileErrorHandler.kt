@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.profile.impl.presentation.models
+package ru.aleshin.studyassistant.profile.impl.domain.common
 
-import entities.settings.AccessType
+import handlers.ErrorHandler
+import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 
 /**
- * @author Stanislav Aleshin on 21.04.2024.
+ * @author Stanislav Aleshin on 21.04.2024
  */
-internal data class PrivacySettingsUi(
-    val isPrivateProfile: Boolean = false,
-    val showBirthday: AccessType = AccessType.FRIENDS,
-    val showCity: AccessType = AccessType.FRIENDS,
-)
+internal interface ProfileErrorHandler : ErrorHandler<ProfileFailures> {
+
+    class Base : ProfileErrorHandler {
+
+        override fun handle(throwable: Throwable) = when (throwable) {
+            else -> ProfileFailures.OtherError(throwable)
+        }
+    }
+}

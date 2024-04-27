@@ -26,6 +26,6 @@ interface AuthRepository {
     suspend fun fetchCurrentUser(): FirebaseUser?
     suspend fun registerByEmail(credentials: AuthCredentials): FirebaseUser
     suspend fun signInWithEmail(credentials: AuthCredentials): FirebaseUser
-    suspend fun signInViaGoogle(idToken: String): FirebaseUser
+    suspend fun signInViaGoogle(idToken: String?): FirebaseUser
     suspend fun signOut()
 }

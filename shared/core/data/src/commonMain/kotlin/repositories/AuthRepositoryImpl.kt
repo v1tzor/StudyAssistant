@@ -48,7 +48,7 @@ class AuthRepositoryImpl(
         return user ?: throw FirebaseUserException()
     }
 
-    override suspend fun signInViaGoogle(idToken: String): FirebaseUser {
+    override suspend fun signInViaGoogle(idToken: String?): FirebaseUser {
         val user = remoteDataSource.signInViaGoogle(idToken)
         return user ?: throw FirebaseUserException()
     }

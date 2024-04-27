@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.preview.api.navigation
 
+import functional.UID
 import inject.FeatureScreen
 
 /**
@@ -25,5 +26,5 @@ sealed class PreviewScreen : FeatureScreen {
 
     data object Intro : PreviewScreen()
 
-    data object Setup : PreviewScreen()
+    data class Setup(val createdUser: UID) : PreviewScreen()
 }

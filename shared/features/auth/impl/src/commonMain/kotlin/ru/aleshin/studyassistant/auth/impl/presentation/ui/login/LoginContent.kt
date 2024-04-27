@@ -48,7 +48,7 @@ internal fun LoginContent(
     modifier: Modifier,
     onForgotPassword: () -> Unit,
     onLoginClick: (email: String, password: String) -> Unit,
-    onLoginViaGoogleClick: () -> Unit,
+    onLoginViaGoogleClick: (idToken: String?) -> Unit,
     onNotAccountClick: () -> Unit,
 ) {
     var email by rememberSaveable { mutableStateOf("") }
@@ -81,7 +81,7 @@ internal fun LoginContent(
                 enabled = !state.isLoading && email.isNotEmpty() && password.isNotEmpty(),
                 isLoading = state.isLoading,
                 onLoginClick = { onLoginClick(email, password) },
-                onLoginViaGoogleClick = onLoginViaGoogleClick,
+                onLoginViaGoogleClick = { onLoginViaGoogleClick(it) },
             )
         }
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {

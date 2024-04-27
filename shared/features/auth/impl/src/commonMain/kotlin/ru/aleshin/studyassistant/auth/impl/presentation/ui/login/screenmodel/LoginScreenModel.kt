@@ -77,7 +77,7 @@ internal class LoginScreenModel(
                 )
             }
             is LoginEvent.LoginViaGoogle -> launchBackgroundWork(LoginWorkKey.LOGIN_VIA_GOOGLE) {
-                val command = LoginWorkCommand.LoginWithGoogle
+                val command = LoginWorkCommand.LoginWithGoogle(event.idToken)
                 workProcessor.work(command).collectAndHandleWork()
             }
             is LoginEvent.NavigateToForgot -> {

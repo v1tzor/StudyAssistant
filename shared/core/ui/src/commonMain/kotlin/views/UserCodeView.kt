@@ -36,18 +36,19 @@ import theme.material.full
 fun UserCodeView(
     modifier: Modifier = Modifier,
     code: String,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+    contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
     contentColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     backgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     shape: Shape = MaterialTheme.shapes.full(),
 ) {
     Surface(
-        modifier = modifier.padding(contentPadding),
+        modifier = modifier,
         shape = shape,
         color = backgroundColor,
         contentColor = contentColor,
     ) {
         Text(
+            modifier = Modifier.padding(contentPadding),
             text = StudyAssistantRes.strings.userCodeLabel + code,
             style = MaterialTheme.typography.labelLarge,
         )

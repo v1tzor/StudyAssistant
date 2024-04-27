@@ -37,6 +37,7 @@ kotlin {
 
             implementation(compose.components.resources)
             implementation(libs.bundles.firebase)
+            implementation(libs.google.auth)
             implementation(libs.logger)
         }
     }

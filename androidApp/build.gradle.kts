@@ -94,5 +94,5 @@ dependencies {
     implementation(libs.compose.material)
 
     implementation(platform(libs.firebase.bom))
-    implementation(libs.google.gms.auth)
+    implementation(libs.google.auth.android)
 }

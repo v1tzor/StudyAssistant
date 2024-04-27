@@ -20,7 +20,6 @@ import architecture.screenmodel.work.ActionResult
 import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
-import architecture.screenmodel.work.WorkResult
 import functional.handle
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
@@ -42,7 +41,7 @@ internal interface LoginWorkProcessor :
 
         override suspend fun work(command: LoginWorkCommand) = when (command) {
             is LoginWorkCommand.LoginWithEmail -> loginWithEmailWork(command.credentials)
-            is LoginWorkCommand.LoginWithGoogle -> loginWithGoogleWork()
+            is LoginWorkCommand.LoginWithGoogle -> loginWithGoogleWork(command.idToken)
         }
 
         private fun loginWithEmailWork(credentials: LoginCredentialsUi) = flow {
@@ -60,12 +59,19 @@ internal interface LoginWorkProcessor :
             )
         }
 
-        private fun loginWithGoogleWork() = flow<WorkResult<LoginAction, LoginEffect>> {
+        private fun loginWithGoogleWork(idToken: String?) = flow {
+            authInteractor.loginViaGoogle(idToken).handle(
+                onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
+                onRightAction = {
+                    val tabScreen = screenProvider.provideTabNavigationScreen()
+                    emit(EffectResult(LoginEffect.ReplaceGlobalScreen(tabScreen)))
+                }
+            )
         }
     }
 }
 
 internal sealed class LoginWorkCommand : WorkCommand {
     data class LoginWithEmail(val credentials: LoginCredentialsUi) : LoginWorkCommand()
-    data object LoginWithGoogle : LoginWorkCommand()
+    data class LoginWithGoogle(val idToken: String?) : LoginWorkCommand()
 }

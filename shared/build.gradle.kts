@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.libsDirectory
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
@@ -24,8 +21,7 @@ kotlin {
         it.binaries.framework {
             baseName = "shared"
             isStatic = true
-//            isStatic = false
-//            transitiveExport = true
+            binaryOption("bundleId", "ru.aleshin.studyassistant.shared")
         }
     }
 
@@ -48,6 +44,7 @@ kotlin {
             api(project(":shared:core:ui"))
 
             implementation(libs.bundles.firebase)
+            implementation(libs.google.auth)
             implementation(libs.logger)
         }
         iosMain.dependencies {

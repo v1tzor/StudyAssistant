@@ -15,9 +15,11 @@
 */
 package extensions
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -32,4 +34,9 @@ fun Modifier.alphaByEnabled(enabled: Boolean, disabledAlpha: Float = 0.6f) = alp
 
 fun LazyGridScope.emptyItem(modifier: Modifier = Modifier) {
     item { Spacer(modifier = modifier.fillMaxWidth()) }
+}
+
+@ExperimentalFoundationApi
+fun PagerState.pageProgress(): Float {
+    return currentPage.toFloat() / pageCount
 }

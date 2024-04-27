@@ -37,7 +37,7 @@ internal data class LoginViewState(
 
 internal sealed class LoginEvent : BaseEvent {
     data class LoginWithEmail(val credentials: LoginCredentialsUi) : LoginEvent()
-    data object LoginViaGoogle : LoginEvent()
+    data class LoginViaGoogle(val idToken: String?) : LoginEvent()
     data object NavigateToRegister : LoginEvent()
     data object NavigateToForgot : LoginEvent()
 }

@@ -16,13 +16,13 @@ class StudyAssistantApp : Application() {
         PlatformConfiguration(applicationContext)
     }
 
-    private fun initPlatformSDK() = PlatformSDK.doInit(configuration)
-
     override fun onCreate() {
         super.onCreate()
         initPlatformSDK()
         setupStrictMode()
     }
+
+    private fun initPlatformSDK() = PlatformSDK.doInit(configuration)
 
     private fun setupStrictMode() {
         val vmPolicyBuilder = StrictMode.VmPolicy.Builder()

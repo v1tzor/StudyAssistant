@@ -53,10 +53,10 @@ internal class IntroScreen : Screen {
         screenModel = rememberIntroScreenModel(),
         initialState = IntroViewState.Default,
     ) { state ->
-        val pagerState = rememberPagerState { IntroPage.entries.size }
+        val strings = PreviewThemeRes.strings
         val windowSize = LocalWindowSize.current
         val rootNavigator = LocalNavigator.currentOrThrow.root()
-        val strings = PreviewThemeRes.strings
+        val pagerState = rememberPagerState { IntroPage.entries.size }
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(

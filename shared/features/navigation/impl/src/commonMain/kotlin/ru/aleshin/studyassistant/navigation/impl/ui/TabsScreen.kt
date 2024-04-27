@@ -16,6 +16,8 @@
 package ru.aleshin.studyassistant.navigation.impl.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
@@ -49,6 +51,7 @@ internal class TabsScreen : Screen {
             disposeBehavior = NavigatorDisposeBehavior(false, false),
         ) { navigator ->
             Scaffold(
+                modifier = Modifier.fillMaxSize(),
                 content = { paddingValues ->
                     Box(modifier = Modifier.padding(paddingValues)) {
                         FadeTransition(navigator = navigator)
@@ -56,7 +59,7 @@ internal class TabsScreen : Screen {
                 },
                 bottomBar = {
                     TabsBottomNavigationBar(
-                        modifier = Modifier.systemBarsPadding(),
+                        modifier = Modifier.navigationBarsPadding(),
                         selectedItem = state.bottomBarItem,
                         onItemSelected = { tab ->
                             val event = when (tab) {

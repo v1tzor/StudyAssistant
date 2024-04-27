@@ -33,6 +33,8 @@ internal interface AuthInteractor {
 
     suspend fun loginWithEmail(credentials: AuthCredentials) : DomainResult<AuthFailures, AppUser>
 
+    suspend fun loginViaGoogle(idToken: String?) : DomainResult<AuthFailures, AppUser>
+
     suspend fun registerNewAccount(credentials: AuthCredentials) : DomainResult<AuthFailures, AppUser>
 
     suspend fun resetPassword(credentials: ForgotCredentials) : UnitDomainResult<AuthFailures>
@@ -46,6 +48,12 @@ internal interface AuthInteractor {
         override suspend fun loginWithEmail(credentials: AuthCredentials) = eitherWrapper.wrap {
             val firebaseUser = authRepository.signInWithEmail(credentials)
             // TODO Get real user info from firebase
+            return@wrap AppUser(firebaseUser.uid, "0", "Example", firebaseUser.email ?: "", "0")
+        }
+
+        override suspend fun loginViaGoogle(idToken: String?) = eitherWrapper.wrap {
+            val firebaseUser = authRepository.signInViaGoogle(idToken)
+            // TODO Create or get real user info from firebase
             return@wrap AppUser(firebaseUser.uid, "0", "Example", firebaseUser.email ?: "", "0")
         }
 

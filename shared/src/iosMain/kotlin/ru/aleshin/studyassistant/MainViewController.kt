@@ -15,6 +15,8 @@
  */
 
 import androidx.compose.ui.window.ComposeUIViewController
+import co.touchlab.kermit.Logger
+import platform.UIKit.UIApplication
 import ru.aleshin.studyassistant.presentation.ui.main.MainScreen
 
 /**

@@ -15,7 +15,11 @@
   -->
 <resources>
 
-    <style name="Theme.StudyAssistant" parent="Theme.Material3.DayNight.NoActionBar" />
+    <style name="Theme.StudyAssistant" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDisablePreview">true</item>
+    </style>
 
     <style name="Theme.StudyAssistant.Splash" parent="Theme.StudyAssistant">
         <item name="android:windowBackground">#2F2EBE</item>

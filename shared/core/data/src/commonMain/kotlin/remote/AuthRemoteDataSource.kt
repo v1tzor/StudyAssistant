@@ -32,7 +32,7 @@ interface AuthRemoteDataSource {
 
     suspend fun signInWithEmail(email: String, password: String): FirebaseUser?
 
-    suspend fun signInViaGoogle(idToken: String): FirebaseUser?
+    suspend fun signInViaGoogle(idToken: String?): FirebaseUser?
 
     suspend fun sendPasswordResetEmail(email: String)
 
@@ -60,7 +60,7 @@ interface AuthRemoteDataSource {
             return authResult.user
         }
 
-        override suspend fun signInViaGoogle(idToken: String): FirebaseUser? {
+        override suspend fun signInViaGoogle(idToken: String?): FirebaseUser? {
             val credential = GoogleAuthProvider.credential(idToken, null)
             val authResult = firebaseAuth.signInWithCredential(credential)
             return authResult.user

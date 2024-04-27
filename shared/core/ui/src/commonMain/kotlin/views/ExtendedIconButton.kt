@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import extensions.alphaByEnabled
 
 val SIZE = 40.dp
 val SHAPE = CircleShape
@@ -63,6 +64,7 @@ fun ExtendedIconButton(
     // Copied from `IconButton` with some modifications
     Box(
         modifier = modifier
+            .alphaByEnabled(enabled)
             .minimumInteractiveComponentSize()
             .size(SIZE)
             .clip(SHAPE)

@@ -15,9 +15,11 @@
 */
 package theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import models.ThemeUiType
 import theme.material.baseShapes
 import theme.material.baseTypography
@@ -36,6 +38,7 @@ import theme.tokens.fetchAppLanguage
 import theme.tokens.fetchCoreIcons
 import theme.tokens.fetchCoreStrings
 import theme.tokens.rememberScreenSizeInfo
+import views.NavigationBarColor
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
@@ -68,4 +71,5 @@ fun StudyAssistantTheme(
             content = content,
         )
     }
+    NavigationBarColor(themeType.isDarkTheme())
 }

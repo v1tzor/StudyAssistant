@@ -28,11 +28,12 @@ object Constants {
         const val LICENCE = "Apache Licence v2.0"
         const val GITHUB_URI = "https://github.com/v1tzor/StudyAssistant"
         const val ISSUES_URI = "https://github.com/v1tzor/StudyAssistant/issues"
-        const val PERMISSION_TAG = "Notification_Permission"
+        const val PERMISSION_TAG = "Notificatio_Permission"
+        const val WEB_CLIENT_ID = "190379302885-gnrh3tua2lftfs7ke2uhnfj1vinbc8vm.apps.googleusercontent.com"
     }
 
     object Database {
-        val DATABASE_NAME = "study_assistant_main.db"
+        const val DATABASE_NAME = "study_assistant_main.db"
     }
 
     object Regex {

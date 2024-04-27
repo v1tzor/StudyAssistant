@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.preview.impl.navigation
 import cafe.adriel.voyager.core.screen.Screen
 import inject.MainScreen
 import navigation.FeatureScreenProvider
+import ru.aleshin.core.common.navigation.screens.EmptyScreen
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
@@ -33,6 +34,8 @@ internal interface PreviewScreenProvider : FeatureScreenProvider<PreviewScreen> 
 
     fun provideAuthScreen(screen: AuthScreen): Screen
 
+    fun provideScheduleEditorScreen(): Screen
+
     fun provideTabNavigationScreen(): Screen
 
     class Base(
@@ -42,11 +45,16 @@ internal interface PreviewScreenProvider : FeatureScreenProvider<PreviewScreen> 
 
         override fun provideFeatureScreen(screen: PreviewScreen) = when (screen) {
             is PreviewScreen.Intro -> IntroScreen()
-            is PreviewScreen.Setup -> SetupScreen()
+            is PreviewScreen.Setup -> SetupScreen(screen.createdUser)
         }
 
         override fun provideAuthScreen(screen: AuthScreen): Screen {
             return authFeatureStarter().fetchFeatureScreen(screen)
+        }
+
+        override fun provideScheduleEditorScreen(): Screen {
+            // TODO: provide schedule editor screen
+            return EmptyScreen
         }
 
         override fun provideTabNavigationScreen(): Screen {
