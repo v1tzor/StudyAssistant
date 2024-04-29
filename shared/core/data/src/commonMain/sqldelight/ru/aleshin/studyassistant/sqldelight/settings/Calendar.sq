@@ -1,0 +1,15 @@
+CREATE TABLE calendarSettingsEntity (
+  id INTEGER PRIMARY KEY NOT NULL,
+  number_of_week TEXT NOT NULL
+);
+
+INSERT INTO calendarSettingsEntity (id, number_of_week)
+VALUES (1, 'ONE');
+
+fetchSettings:
+SELECT *
+FROM calendarSettingsEntity;
+
+updateSettings:
+INSERT OR REPLACE INTO calendarSettingsEntity (id, number_of_week)
+VALUES ?;
