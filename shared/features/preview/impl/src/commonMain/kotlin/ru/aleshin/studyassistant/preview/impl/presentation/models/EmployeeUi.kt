@@ -16,29 +16,26 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.models
 
-import entities.organizations.OrganizationType
+import entities.employee.EmployeePost
 import functional.UID
+import kotlinx.datetime.Instant
 import platform.JavaSerializable
 
 /**
- * @author Stanislav Aleshin on 27.04.2024.
+ * @author Stanislav Aleshin on 29.04.2024.
  */
-internal data class OrganizationUi(
+internal data class EmployeeUi(
     val uid: UID,
-    val isMain: Boolean,
-    val shortName: String,
-    val fullName: String? = null,
-    val type: OrganizationType = OrganizationType.SCHOOL,
+    val firstName: String,
+    val secondName: String?,
+    val patronymic: String?,
+    val post: EmployeePost,
     val avatar: String? = null,
-    val subjects: List<SubjectUi> = emptyList(),
-    val employee: List<EmployeeUi> = emptyList(),
+    val birthday: String? = null,
+    val workTimeStart: Instant? = null,
+    val workTimeEnd: Instant? = null,
     val emails: List<ContactInfoUi> = emptyList(),
     val phones: List<ContactInfoUi> = emptyList(),
     val locations: List<ContactInfoUi> = emptyList(),
     val webs: List<ContactInfoUi> = emptyList(),
-    val isHide: Boolean = false,
-) : JavaSerializable {
-    companion object {
-        fun createMainOrganization() = OrganizationUi("", true, "")
-    }
-}
+) : JavaSerializable

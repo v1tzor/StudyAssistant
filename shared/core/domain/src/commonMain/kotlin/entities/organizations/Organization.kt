@@ -14,31 +14,28 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.preview.impl.presentation.models
+package entities.organizations
 
-import entities.organizations.OrganizationType
+import entities.common.ContactInfo
+import entities.employee.Employee
+import entities.subject.Subject
 import functional.UID
-import platform.JavaSerializable
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
  */
-internal data class OrganizationUi(
+data class Organization(
     val uid: UID,
     val isMain: Boolean,
     val shortName: String,
     val fullName: String? = null,
     val type: OrganizationType = OrganizationType.SCHOOL,
     val avatar: String? = null,
-    val subjects: List<SubjectUi> = emptyList(),
-    val employee: List<EmployeeUi> = emptyList(),
-    val emails: List<ContactInfoUi> = emptyList(),
-    val phones: List<ContactInfoUi> = emptyList(),
-    val locations: List<ContactInfoUi> = emptyList(),
-    val webs: List<ContactInfoUi> = emptyList(),
+    val subjects: List<Subject> = emptyList(),
+    val employee: List<Employee> = emptyList(),
+    val emails: List<ContactInfo> = emptyList(),
+    val phones: List<ContactInfo> = emptyList(),
+    val locations: List<ContactInfo> = emptyList(),
+    val webs: List<ContactInfo> = emptyList(),
     val isHide: Boolean = false,
-) : JavaSerializable {
-    companion object {
-        fun createMainOrganization() = OrganizationUi("", true, "")
-    }
-}
+)

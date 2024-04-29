@@ -1,0 +1,22 @@
+CREATE TABLE organizationEntity (
+  uid TEXT PRIMARY KEY NOT NULL,
+  is_main INTEGER NOT NULL,
+  short_name TEXT,
+  full_name TEXT,
+  type TEXT,
+  avatar TEXT,
+  is_hide INTEGER NOT NULL
+);
+
+fetchAllOrganizations:
+SELECT *
+FROM organizationEntity;
+
+fetchById:
+SELECT *
+FROM organizationEntity
+WHERE uid = ?;
+
+addOrUpdateOrganization:
+INSERT OR REPLACE INTO organizationEntity (uid, is_main, short_name, full_name, type, avatar, is_hide)
+VALUES ?;

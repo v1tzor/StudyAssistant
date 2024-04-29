@@ -33,6 +33,7 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.nav.NavigationScre
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.SetupEffectCommunicator
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.SetupScreenModel
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.SetupStateCommunicator
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.SetupWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
@@ -50,5 +51,6 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<SetupStateCommunicator> { SetupStateCommunicator.Base() }
     bindProvider<SetupEffectCommunicator> { SetupEffectCommunicator.Base() }
-    bindProvider<SetupScreenModel> { SetupScreenModel(instance(), instance(), instance()) }
+    bindProvider<SetupWorkProcessor> { SetupWorkProcessor.Base(instance(), instance(), instance()) }
+    bindProvider<SetupScreenModel> { SetupScreenModel(instance(), instance(), instance(), instance(), instance()) }
 }
