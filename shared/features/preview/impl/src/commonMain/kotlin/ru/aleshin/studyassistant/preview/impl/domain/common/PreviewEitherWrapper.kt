@@ -18,12 +18,13 @@ package ru.aleshin.studyassistant.preview.impl.domain.common
 
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 import wrappers.EitherWrapper
+import wrappers.FlowEitherWrapper
 
 /**
  * @author Stanislav Aleshin on 07.04.2024
  */
-internal interface PreviewEitherWrapper : EitherWrapper<PreviewFailures> {
+internal interface PreviewEitherWrapper : FlowEitherWrapper<PreviewFailures> {
 
     class Base(errorHandler: PreviewErrorHandler) : PreviewEitherWrapper,
-        EitherWrapper.Abstract<PreviewFailures>(errorHandler)
+        FlowEitherWrapper.Abstract<PreviewFailures>(errorHandler)
 }

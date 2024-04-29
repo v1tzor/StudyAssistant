@@ -50,9 +50,12 @@ internal data class AuthStrings(
     val usernameLengthError: String,
     val emailFormatError: String,
     val passwordFormatError: String,
-    val otherErrorMessage: String,
     val hidePasswordDesc: String,
     val showPasswordDesc: String,
+    val authErrorMessage: String,
+    val userNotFoundErrorMessage: String,
+    val credentialsErrorMessage: String,
+    val otherErrorMessage: String,
 ) {
 
 
@@ -85,9 +88,12 @@ internal data class AuthStrings(
             emailFormatError = "* Неправильный формат ввода",
             passwordFormatError = "* Пароль должен содержать мин. 6 символов (a-Z)(0-9)",
             usernameLengthError = "* Никнейм должен содержать 2-15 символов (a-Z)",
-            otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
             hidePasswordDesc = "Скрыть пароль",
             showPasswordDesc = "Показать пароль",
+            authErrorMessage = "Неправильный логин или пароль!",
+            userNotFoundErrorMessage = "Данные пользователя не найдены!",
+            credentialsErrorMessage = "Данные пользователя, по-видимому, неверны или неполны!",
+            otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = AuthStrings(
             otherSignInWayTitle = "Or log in via",
@@ -117,9 +123,12 @@ internal data class AuthStrings(
             emailFormatError = "* Incorrect input format",
             passwordFormatError = "* The password must contain at least 6 characters (a-Z)(0-9)",
             usernameLengthError = "* The nickname must contain 2-15 characters (a-Z)",
-            otherErrorMessage = "Error! Contact the developer!",
             hidePasswordDesc = "Hide password",
             showPasswordDesc = "Show password",
+            authErrorMessage = "Incorrect username or password!",
+            userNotFoundErrorMessage = "The user's data could not be found!",
+            credentialsErrorMessage = "The user's data seems to be incorrect or incomplete!",
+            otherErrorMessage = "Error! Contact the developer!",
         )
     }
 }

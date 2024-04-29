@@ -22,5 +22,8 @@ import functional.DomainFailures
  * @author Stanislav Aleshin on 16.04.2024.
  */
 internal sealed class AuthFailures : DomainFailures {
+    data object NotFoundUserInfoError : AuthFailures()
+    data object CredentialsError : AuthFailures()
+    data object AuthorizationError : AuthFailures()
     data class OtherError(val throwable: Throwable) : AuthFailures()
 }

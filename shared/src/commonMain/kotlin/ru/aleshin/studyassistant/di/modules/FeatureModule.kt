@@ -23,7 +23,10 @@ import org.kodein.di.bindProvider
 import org.kodein.di.instance
 import org.kodein.di.provider
 import repositories.AuthRepository
+import repositories.CalendarSettingsRepository
 import repositories.ManageUserRepository
+import repositories.OrganizationsRepository
+import repositories.UsersRepository
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
@@ -61,6 +64,9 @@ val featureModule = DI.Module("Feature") {
     bindEagerSingleton<PreviewFeatureDependencies> {
         object : PreviewFeatureDependencies {
             override val navigationFeatureStarter = provider<NavigationFeatureStarter>()
+            override val usersRepository = instance<UsersRepository>()
+            override val organizationsRepository = instance<OrganizationsRepository>()
+            override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val authFeatureStarter = provider<AuthFeatureStarter>()
             override val coroutineManager = instance<CoroutineManager>()
         }
@@ -74,10 +80,11 @@ val featureModule = DI.Module("Feature") {
 
     bindEagerSingleton<AuthFeatureDependencies> {
         object : AuthFeatureDependencies {
-            override val authRepository = instance<AuthRepository>()
-            override val manageUserRepository = instance<ManageUserRepository>()
             override val navigationFeatureStarter = provider<NavigationFeatureStarter>()
             override val previewFeatureStarter = provider<PreviewFeatureStarter>()
+            override val authRepository = instance<AuthRepository>()
+            override val usersRepository = instance<UsersRepository>()
+            override val manageUserRepository = instance<ManageUserRepository>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }

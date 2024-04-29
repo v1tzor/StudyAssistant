@@ -17,6 +17,7 @@ package functional
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -81,6 +82,15 @@ suspend fun <L, R, T> Either<L, R>.handleAndGet(
 ) = when (this) {
     is Either.Left -> onLeftAction.invoke(this.data)
     is Either.Right -> onRightAction.invoke(this.data)
+}
+
+suspend fun <L, R, T> Flow<Either<L, R>>.firstHandleAndGetOrNull(
+    onLeftAction: suspend (L) -> T,
+    onRightAction: suspend (R) -> T,
+): T? = when (val firstValue = firstOrNull()) {
+    is Either.Left -> onLeftAction.invoke(firstValue.data)
+    is Either.Right -> onRightAction.invoke(firstValue.data)
+    else -> null
 }
 
 suspend fun <L, R, T> Flow<Either<L, R>>.firstHandleAndGet(

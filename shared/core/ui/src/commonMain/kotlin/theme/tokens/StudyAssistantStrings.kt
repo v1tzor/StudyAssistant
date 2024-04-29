@@ -16,6 +16,8 @@
 package theme.tokens
 
 import androidx.compose.runtime.staticCompositionLocalOf
+import entities.organizations.OrganizationType
+import kotlinx.datetime.format.MonthNames
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
@@ -53,6 +55,32 @@ data class StudyAssistantStrings(
     val profileBottomItem: String,
     val userCodeLabel: String,
     val backIconDesc: String,
+    val noneGender: String,
+    val maleGender: String,
+    val femaleGender: String,
+    val oneWeekPlural: String,
+    val twoWeekPlural: String,
+    val threeWeekPlural: String,
+    val januaryTitle: String,
+    val februaryTitle: String,
+    val marchTitle: String,
+    val aprilTitle: String,
+    val mayTitle: String,
+    val juneTitle: String,
+    val julyTitle: String,
+    val augustTitle: String,
+    val septemberTitle: String,
+    val octoberTitle: String,
+    val novemberTitle: String,
+    val decemberTitle: String,
+    val schoolOrganizationType: String,
+    val lyceumOrganizationType: String,
+    val seminaryOrganizationType: String,
+    val gymnasiumOrganizationType: String,
+    val collegeOrganizationType: String,
+    val universityOrganizationType: String,
+    val additionalEducationOrganizationType: String,
+    val coursesOrganizationType: String,
 )
 
 internal val russianFamelString = StudyAssistantStrings(
@@ -88,6 +116,32 @@ internal val russianFamelString = StudyAssistantStrings(
     profileBottomItem = "Профиль",
     userCodeLabel = "Код: ",
     backIconDesc = "Назад",
+    noneGender = "Не выбран",
+    maleGender = "Мужской",
+    femaleGender = "Женский",
+    oneWeekPlural = "1 неделя",
+    twoWeekPlural = "2 недели",
+    threeWeekPlural = "3 недели",
+    januaryTitle = "Январь",
+    februaryTitle = "Февраль",
+    marchTitle = "Март",
+    aprilTitle = "Апрель",
+    mayTitle = "Май",
+    juneTitle = "Июнь",
+    julyTitle = "Июль",
+    augustTitle = "Август",
+    septemberTitle = "Сентябрь",
+    octoberTitle = "Октябрь",
+    novemberTitle = "Ноябрь",
+    decemberTitle = "Декабрь",
+    schoolOrganizationType = "Школа",
+    lyceumOrganizationType = "Лицей",
+    gymnasiumOrganizationType = "Гимназия",
+    seminaryOrganizationType = "Семинария",
+    collegeOrganizationType = "Колледж",
+    universityOrganizationType = "Университет",
+    additionalEducationOrganizationType = "Доп. образование",
+    coursesOrganizationType = "Образовательные курсы",
 )
 
 internal val englishFamelString = StudyAssistantStrings(
@@ -123,6 +177,47 @@ internal val englishFamelString = StudyAssistantStrings(
     profileBottomItem = "Profile",
     userCodeLabel = "Code: ",
     backIconDesc = "Go back",
+    noneGender = "Not stated",
+    maleGender = "Male",
+    femaleGender = "Female",
+    oneWeekPlural = "1 week",
+    twoWeekPlural = "2 week",
+    threeWeekPlural = "3 week",
+    januaryTitle = "January",
+    februaryTitle = "February",
+    marchTitle = "March",
+    aprilTitle = "April",
+    mayTitle = "May",
+    juneTitle = "June",
+    julyTitle = "July",
+    augustTitle = "August",
+    septemberTitle = "September",
+    octoberTitle = "October",
+    novemberTitle = "November",
+    decemberTitle = "December",
+    schoolOrganizationType = "School",
+    lyceumOrganizationType = "Lyceum",
+    gymnasiumOrganizationType = "Gymnasium",
+    seminaryOrganizationType = "Seminary",
+    collegeOrganizationType = "College",
+    universityOrganizationType = "University",
+    additionalEducationOrganizationType = "Additional education",
+    coursesOrganizationType = "Educational courses",
+)
+
+fun StudyAssistantStrings.monthNames() = MonthNames(
+    january = januaryTitle,
+    february = februaryTitle,
+    march = marchTitle,
+    april = aprilTitle,
+    may = mayTitle,
+    june = juneTitle,
+    july = julyTitle,
+    august = augustTitle,
+    september = septemberTitle,
+    october = octoberTitle,
+    november = novemberTitle,
+    december = decemberTitle,
 )
 
 val LocalStudyAssistantStrings = staticCompositionLocalOf<StudyAssistantStrings> {

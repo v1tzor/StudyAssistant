@@ -27,3 +27,4 @@ actual class DriverFactory {
         return NativeSqliteDriver(Database.Schema, DATABASE_NAME)
     }
 }
+

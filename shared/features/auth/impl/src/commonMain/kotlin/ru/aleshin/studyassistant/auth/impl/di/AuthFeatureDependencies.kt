@@ -20,6 +20,7 @@ import inject.BaseFeatureDependencies
 import managers.CoroutineManager
 import repositories.AuthRepository
 import repositories.ManageUserRepository
+import repositories.UsersRepository
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 
@@ -30,6 +31,7 @@ interface AuthFeatureDependencies : BaseFeatureDependencies {
     val navigationFeatureStarter: () -> NavigationFeatureStarter
     val previewFeatureStarter: () -> PreviewFeatureStarter
     val authRepository: AuthRepository
+    val usersRepository: UsersRepository
     val manageUserRepository: ManageUserRepository
     val coroutineManager: CoroutineManager
 }

@@ -48,12 +48,12 @@ internal interface RegisterWorkProcessor :
         private fun registerNewAccountWork(credentials: RegisterCredentialsUi) = flow {
             emit(ActionResult(RegisterAction.UpdateLoading(true)))
             authInteractor.registerNewAccount(credentials.mapToDomain()).handle(
-                onLeftAction = {
-                    emit(EffectResult(RegisterEffect.ShowError(it)))
+                onLeftAction = { error ->
+                    emit(EffectResult(RegisterEffect.ShowError(error)))
                     emit(ActionResult(RegisterAction.UpdateLoading(false)))
                 },
-                onRightAction = {
-                    val setupScreen = screenProvider.providePreviewScreen(PreviewScreen.Setup)
+                onRightAction = { user ->
+                    val setupScreen = screenProvider.providePreviewScreen(PreviewScreen.Setup(user.uid))
                     emit(EffectResult(RegisterEffect.ReplaceGlobalScreen(setupScreen)))
                 },
             )

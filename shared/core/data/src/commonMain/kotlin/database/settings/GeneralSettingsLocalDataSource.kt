@@ -24,7 +24,6 @@ import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralSettingsEntity
 import kotlin.coroutines.CoroutineContext
 
-
 /**
  * @author Stanislav Aleshin on 24.04.2024.
  */

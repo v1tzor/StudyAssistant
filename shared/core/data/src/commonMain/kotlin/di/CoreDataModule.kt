@@ -18,23 +18,38 @@ package di
 
 import DriverFactory
 import app.cash.sqldelight.db.SqlDriver
+import database.organizations.OrganizationsLocalDataSource
+import database.settings.CalendarSettingsLocalDataSource
 import database.settings.GeneralSettingsLocalDataSource
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
+import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.firestore.firestore
 import org.kodein.di.DI
 import org.kodein.di.bindEagerSingleton
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import remote.AuthRemoteDataSource
+import remote.auth.AuthRemoteDataSource
+import remote.settings.CalendarSettingsRemoteDataSource
+import remote.settings.OrganizationsRemoteDataSource
+import remote.users.UsersRemoteDataSource
 import repositories.AuthRepository
 import repositories.AuthRepositoryImpl
+import repositories.CalendarSettingsRepository
+import repositories.CalendarSettingsRepositoryImpl
 import repositories.GeneralSettingsRepository
 import repositories.GeneralSettingsRepositoryImpl
 import repositories.ManageUserRepository
 import repositories.ManageUserRepositoryImpl
+import repositories.OrganizationsRepository
+import repositories.OrganizationsRepositoryImpl
+import repositories.UsersRepository
+import repositories.UsersRepositoryImpl
 import ru.aleshin.studyassistant.core.data.Database
+import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
+import ru.aleshin.studyassistant.sqldelight.settings.CalendarQueries
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
 
 /**
@@ -42,6 +57,7 @@ import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
  */
 val coreDataModule = DI.Module("CoreData") {
     bindSingleton<FirebaseAuth> { Firebase.auth }
+    bindSingleton<FirebaseFirestore> { Firebase.firestore }
 
     bindEagerSingleton<SqlDriver> { instance<DriverFactory>().createDriver() }
     bindEagerSingleton<Database> { Database(driver = instance<SqlDriver>()) }
@@ -50,7 +66,20 @@ val coreDataModule = DI.Module("CoreData") {
     bindSingleton<GeneralSettingsLocalDataSource> { GeneralSettingsLocalDataSource.Base(instance(), instance()) }
     bindProvider<GeneralSettingsRepository> { GeneralSettingsRepositoryImpl(instance()) }
 
+    bindSingleton<CalendarQueries> { instance<Database>().calendarQueries }
+    bindSingleton<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance()) }
+    bindSingleton<CalendarSettingsLocalDataSource> { CalendarSettingsLocalDataSource.Base(instance(), instance()) }
+    bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance()) }
+
     bindSingleton<AuthRemoteDataSource> { AuthRemoteDataSource.Base(instance()) }
     bindSingleton<AuthRepository> { AuthRepositoryImpl(instance()) }
     bindSingleton<ManageUserRepository> { ManageUserRepositoryImpl(instance()) }
+
+    bindSingleton<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance()) }
+    bindSingleton<UsersRepository> { UsersRepositoryImpl(instance()) }
+
+    bindSingleton<OrganizationQueries> { instance<Database>().organizationQueries }
+    bindSingleton<OrganizationsLocalDataSource> { OrganizationsLocalDataSource.Base(instance(), instance()) }
+    bindSingleton<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance()) }
+    bindProvider<OrganizationsRepository> { OrganizationsRepositoryImpl(instance(), instance()) }
 }

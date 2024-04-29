@@ -44,9 +44,19 @@ internal data class PreviewStrings(
     val calendarButtonLabel: String,
     val scheduleStepTitle: String,
     val scheduleButtonLabel: String,
+    val avatarDesc: String,
+    val usernameLabel: String,
+    val profileDescriptionLabel: String,
+    val emailLabel: String,
+    val birthdayLabel: String,
+    val genderLabel: String,
+    val shortNameLabel: String,
+    val shortNamePlaceholder: String,
+    val organizationTypeLabel: String,
+    val phoneNumberLabel: String,
+    val websiteLabel: String,
     val otherErrorMessage: String,
 ) {
-
 
     companion object {
         val RUSSIAN = PreviewStrings(
@@ -71,6 +81,17 @@ internal data class PreviewStrings(
             calendarButtonLabel = "Продолжить",
             scheduleStepTitle = "Заполните расписания и начните пользоваться приложением!",
             scheduleButtonLabel = "Заполнить",
+            avatarDesc = "Выбрать фото профиля",
+            usernameLabel = "Отображаемое имя *",
+            profileDescriptionLabel = "Описание профиля",
+            emailLabel = "Email",
+            birthdayLabel = "День рождения",
+            genderLabel = "Пол",
+            shortNameLabel = "Краткое название",
+            shortNamePlaceholder = "Краткое название *",
+            organizationTypeLabel = "Вид организации *",
+            phoneNumberLabel = "Телефон",
+            websiteLabel = "Сайт",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = PreviewStrings(
@@ -95,6 +116,17 @@ internal data class PreviewStrings(
             calendarButtonLabel = "Continue",
             scheduleStepTitle = "Fill out the schedules and start using the app!",
             scheduleButtonLabel = "Fill out",
+            avatarDesc = "Select profile photo",
+            usernameLabel = "Display Name *",
+            profileDescriptionLabel = "Profile Description",
+            emailLabel = "Email",
+            birthdayLabel = "Birthday",
+            genderLabel = "Gender",
+            shortNameLabel = "Short name",
+            shortNamePlaceholder = "Short name *",
+            organizationTypeLabel = "Type of organization *",
+            phoneNumberLabel = "Phone number",
+            websiteLabel = "Website",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

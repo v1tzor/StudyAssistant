@@ -17,6 +17,8 @@
 package ru.aleshin.studyassistant.auth.impl.domain.common
 
 import handlers.ErrorHandler
+import exceptions.FirebaseAuthException
+import exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 
 /**
@@ -27,6 +29,9 @@ internal interface AuthErrorHandler : ErrorHandler<AuthFailures> {
     class Base : AuthErrorHandler {
 
         override fun handle(throwable: Throwable) = when (throwable) {
+            is FirebaseAuthException -> AuthFailures.AuthorizationError
+            is FirebaseUserException -> AuthFailures.NotFoundUserInfoError
+            is IllegalArgumentException -> AuthFailures.CredentialsError
             else -> AuthFailures.OtherError(throwable)
         }
     }

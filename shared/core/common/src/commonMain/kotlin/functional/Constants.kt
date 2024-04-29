@@ -48,8 +48,8 @@ object Constants {
     }
 
     object Text {
-        const val MAX_NOTE_LENGTH = 160
-        const val MAX_LENGTH = 50
+        const val MAX_PROFILE_DESC_LENGTH = 120
+        const val DEFAULT_MAX_TEXT_LENGTH = 32
     }
 
     object Notification {

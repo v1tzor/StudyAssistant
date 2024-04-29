@@ -26,6 +26,7 @@ import org.kodein.di.direct
 import org.kodein.di.instance
 import repositories.AuthRepository
 import repositories.ManageUserRepository
+import repositories.UsersRepository
 import ru.aleshin.studyassistant.auth.api.di.AuthFeatureApi
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
@@ -46,11 +47,12 @@ object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeatureDepe
         if (directDI == null) {
             val di = DI {
                 importAll(navigationModule, presentationModule, domainModule)
-                bindSingleton<AuthRepository> { dependencies.authRepository }
-                bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
-                bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindInstance<() -> NavigationFeatureStarter> { dependencies.navigationFeatureStarter }
                 bindInstance<() -> PreviewFeatureStarter> { dependencies.previewFeatureStarter }
+                bindSingleton<AuthRepository> { dependencies.authRepository }
+                bindSingleton<UsersRepository> { dependencies.usersRepository }
+                bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
+                bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<AuthFeatureApi> {
                     object : AuthFeatureApi {
                         override fun fetchStarter() = instance<AuthFeatureStarter>()

@@ -27,12 +27,12 @@ import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.models.LoginCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEffect
+import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-internal interface LoginWorkProcessor :
-    FlowWorkProcessor<LoginWorkCommand, LoginAction, LoginEffect> {
+internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, LoginAction, LoginEffect> {
 
     class Base(
         private val authInteractor: AuthInteractor,
@@ -49,24 +49,29 @@ internal interface LoginWorkProcessor :
             authInteractor.loginWithEmail(credentials.mapToDomain()).handle(
                 onLeftAction = {
                     emit(EffectResult(LoginEffect.ShowError(it)))
-                    emit(ActionResult(LoginAction.UpdateLoading(false)))
                 },
                 onRightAction = {
                     val tabScreen = screenProvider.provideTabNavigationScreen()
-                    emit(ActionResult(LoginAction.UpdateLoading(false)))
                     emit(EffectResult(LoginEffect.ReplaceGlobalScreen(tabScreen)))
                 }
             )
+            emit(ActionResult(LoginAction.UpdateLoading(false)))
         }
 
         private fun loginWithGoogleWork(idToken: String?) = flow {
+            emit(ActionResult(LoginAction.UpdateLoading(true)))
             authInteractor.loginViaGoogle(idToken).handle(
                 onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
-                onRightAction = {
-                    val tabScreen = screenProvider.provideTabNavigationScreen()
-                    emit(EffectResult(LoginEffect.ReplaceGlobalScreen(tabScreen)))
+                onRightAction = { result ->
+                    val targetScreen =  if (result.isNewUser) {
+                        screenProvider.providePreviewScreen(PreviewScreen.Setup(result.user.uid))
+                    } else {
+                        screenProvider.provideTabNavigationScreen()
+                    }
+                    emit(EffectResult(LoginEffect.ReplaceGlobalScreen(targetScreen)))
                 }
             )
+            emit(ActionResult(LoginAction.UpdateLoading(false)))
         }
     }
 }

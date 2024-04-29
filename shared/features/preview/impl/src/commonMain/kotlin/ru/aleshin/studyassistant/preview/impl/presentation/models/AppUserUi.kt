@@ -36,10 +36,10 @@ internal data class AppUserUi(
     val gender: Gender? = null,
     val isSubscriber: Boolean = false,
     val socialNetworks: List<SocialNetworkUi> = emptyList(),
-    val friends: List<AppUserUi> = emptyList(),
+    val friends: List<UID> = emptyList(),
     val privacy: PrivacySettingsUi = PrivacySettingsUi(),
 ) : JavaSerializable {
     companion object {
-        fun empty() = AppUserUi("", "", "", "", "")
+        fun createEmpty(uid: UID) = AppUserUi(uid, "", "", "", "")
     }
 }

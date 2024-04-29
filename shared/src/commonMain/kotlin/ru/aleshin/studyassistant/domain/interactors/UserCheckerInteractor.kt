@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.domain.interactors
 
 import functional.DomainResult
 import repositories.AuthRepository
+import repositories.UsersRepository
 import ru.aleshin.studyassistant.domain.common.MainEitherWrapper
 import ru.aleshin.studyassistant.domain.entities.MainFailures
 
@@ -29,12 +30,12 @@ interface UserCheckerInteractor {
     suspend fun checkIsAuthorized(): DomainResult<MainFailures, Boolean>
 
     class Base(
-        private val authRepository: AuthRepository,
+        private val usersRepository: UsersRepository,
         private val eitherWrapper: MainEitherWrapper,
     ) : UserCheckerInteractor {
 
         override suspend fun checkIsAuthorized() = eitherWrapper.wrap {
-            authRepository.fetchCurrentUser() != null
+            usersRepository.fetchCurrentUser() != null
         }
     }
 }

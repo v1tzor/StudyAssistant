@@ -18,46 +18,72 @@ package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import functional.UID
+import navigation.root
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupDeps
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEffect
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEvent
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupViewState
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.rememberSetupScreenModel
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupTopBar
+import theme.StudyAssistantRes
+import theme.tokens.LocalWindowSize
 import views.ErrorSnackbar
 
 /**
  * @author Stanislav Aleshin on 17.04.2024
  */
-internal class SetupScreen : Screen {
+internal class SetupScreen(private val createdUser: UID) : Screen {
 
     @Composable
     override fun Content() = ScreenContent(
         screenModel = rememberSetupScreenModel(),
-        dependencies = SetupDeps("test"),
+        dependencies = SetupDeps(createdUser),
         initialState = SetupViewState(),
     ) { state ->
         val strings = PreviewThemeRes.strings
+        val windowSize = LocalWindowSize.current
+        val rootNavigator = LocalNavigator.currentOrThrow.root()
         val snackbarState = remember { SnackbarHostState() }
-
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             content = { paddingValues ->
-                SetupContent(
-                    state = state,
-                    modifier = Modifier.padding(paddingValues),
+                when(windowSize.heightWindowType) {
+                    else -> SetupContent(
+                        state = state,
+                        modifier = Modifier.padding(paddingValues),
+                        onUpdateProfile = { dispatchEvent(SetupEvent.UpdateProfile(it)) },
+                        onUpdateOrganization = { dispatchEvent(SetupEvent.UpdateOrganization(it)) },
+                        onUpdateCalendarSettings = { dispatchEvent(SetupEvent.UpdateCalendarSettings(it)) },
+                        onSaveProfile = { dispatchEvent(SetupEvent.SaveProfileInfo) },
+                        onSaveOrganization = { dispatchEvent(SetupEvent.SaveOrganizationInfo) },
+                        onSaveCalendar = { dispatchEvent(SetupEvent.SaveCalendarInfo) },
+                        onFillOutSchedule = { dispatchEvent(SetupEvent.NavigateToScheduleEditor) },
+                    )
+                }
+            },
+            topBar = {
+                SetupTopBar(
+                    modifier = Modifier.statusBarsPadding(),
+                    enabled = state.currentPage.id != 0,
+                    onBackPressed = { dispatchEvent(SetupEvent.NavigateToBackPage) },
+                    stepProgress = state.currentPage.progress(),
                 )
             },
-            topBar = {},
-            bottomBar = {},
             snackbarHost = {
                 SnackbarHost(
                     hostState = snackbarState,
@@ -68,14 +94,13 @@ internal class SetupScreen : Screen {
 
         handleEffect { effect ->
             when (effect) {
+                is SetupEffect.ReplaceGlobalScreen -> rootNavigator.replaceAll(effect.screen)
                 is SetupEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }
-                is SetupEffect.ReplaceGlobalScreen -> TODO()
-                is SetupEffect.ReplacePage -> TODO()
             }
         }
     }

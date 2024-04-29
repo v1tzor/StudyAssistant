@@ -18,6 +18,10 @@ package ru.aleshin.studyassistant.preview.impl.di
 
 import inject.BaseFeatureDependencies
 import managers.CoroutineManager
+import repositories.AuthRepository
+import repositories.CalendarSettingsRepository
+import repositories.OrganizationsRepository
+import repositories.UsersRepository
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 
@@ -27,5 +31,8 @@ import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStar
 interface PreviewFeatureDependencies : BaseFeatureDependencies {
     val navigationFeatureStarter: () -> NavigationFeatureStarter
     val authFeatureStarter: () -> AuthFeatureStarter
+    val usersRepository: UsersRepository
+    val organizationsRepository: OrganizationsRepository
+    val calendarSettingsRepository: CalendarSettingsRepository
     val coroutineManager: CoroutineManager
 }

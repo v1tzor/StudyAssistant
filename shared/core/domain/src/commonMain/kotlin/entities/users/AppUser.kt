@@ -17,6 +17,7 @@
 package entities.users
 
 import entities.settings.PrivacySettings
+import extensions.generateSevenDigitCode
 import functional.UID
 
 /**
@@ -24,7 +25,7 @@ import functional.UID
  */
 data class AppUser(
     val uid: UID,
-    val messageId: UID,
+    val messageId: UID = "",
     val username: String,
     val email: String,
     val code: String,
@@ -34,7 +35,16 @@ data class AppUser(
     val birthday: String? = null,
     val gender: Gender? = null,
     val isSubscriber: Boolean = false,
-    val friends: List<AppUser> = emptyList(),
+    val friends: List<UID> = emptyList(),
     val socialNetworks: List<SocialNetwork> = emptyList(),
     val privacy: PrivacySettings = PrivacySettings(),
-)
+) {
+    companion object {
+        fun createNewUser(uid: UID, username: String, email: String) = AppUser(
+            uid = uid,
+            username = username,
+            email = email,
+            code = generateSevenDigitCode(),
+        )
+    }
+}

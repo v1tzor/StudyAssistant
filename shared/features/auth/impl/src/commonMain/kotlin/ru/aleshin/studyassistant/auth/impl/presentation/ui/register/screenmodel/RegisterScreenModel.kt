@@ -35,6 +35,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.Reg
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.PasswordValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.UsernameValidator
+import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 import validation.operateValidate
 
 /**

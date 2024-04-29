@@ -21,4 +21,4 @@ import architecture.screenmodel.ScreenDependencies
 /**
  * @author Stanislav Aleshin on 17.04.2024.
  */
-internal data class SetupDeps(val name: String) : ScreenDependencies
+internal data class SetupDeps(val createdUserId: String) : ScreenDependencies
