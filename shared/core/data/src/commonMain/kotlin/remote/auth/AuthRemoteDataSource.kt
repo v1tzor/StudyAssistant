@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package remote
+package remote.auth
 
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseUser
 import dev.gitlive.firebase.auth.GoogleAuthProvider
-import remote.exceptions.FirebaseUserException
+import exceptions.FirebaseUserException
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.

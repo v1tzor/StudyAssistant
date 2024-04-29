@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package remote.exceptions
+package exceptions
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
  */
+class FirebaseAuthException : Exception()
+
 class FirebaseUserException : Exception()

@@ -17,15 +17,19 @@
 package repositories
 
 import dev.gitlive.firebase.auth.FirebaseUser
-import entities.auth.AuthCredentials
+import entities.users.AppUser
 import exceptions.FirebaseUserException
+import functional.UID
+import kotlinx.coroutines.flow.Flow
 
 /**
- * @author Stanislav Aleshin on 22.04.2024.
+ * @author Stanislav Aleshin on 29.04.2024.
  */
-interface AuthRepository {
-    suspend fun registerByEmail(credentials: AuthCredentials): FirebaseUser
-    suspend fun signInWithEmail(credentials: AuthCredentials): FirebaseUser
-    suspend fun signInViaGoogle(idToken: String?): FirebaseUser
-    suspend fun signOut()
+interface UsersRepository {
+    fun fetchCurrentUser(): FirebaseUser?
+    fun fetchCurrentUserOrError() = fetchCurrentUser() ?: throw FirebaseUserException()
+    suspend fun createOrUpdateAppUser(user: AppUser): Boolean
+    suspend fun fetchAppUserById(uid: UID): Flow<AppUser?>
+    suspend fun fetchAppUserByName(query: String): Flow<List<AppUser>>
+    suspend fun fetchAppUserByCode(code: String): Flow<List<AppUser>>
 }
