@@ -58,8 +58,9 @@ internal fun ProfilePageInfo(
     scrollState: ScrollState = rememberScrollState(),
     onUpdateProfile: (AppUserUi) -> Unit,
     onSetAvatar: () -> Unit,
-) {
+) = with(profile){
     var isOpenDatePickerDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(24.dp),

@@ -29,7 +29,6 @@ import ru.aleshin.studyassistant.profile.impl.presentation.models.FriendRequests
  * @author Stanislav Aleshin on 21.04.2024
  */
 internal data class ProfileViewState(
-    val isLoading: Boolean = true,
     val myProfile: AppUserUi? = null,
     val myFriendRequest: FriendRequestsUi? = null,
 ) : BaseViewState
@@ -54,5 +53,4 @@ internal sealed class ProfileEffect : BaseUiEffect {
 
 internal sealed class ProfileAction : BaseAction {
     data class UpdateProfileInfo(val profile: AppUserUi?, val requests: FriendRequestsUi?) : ProfileAction()
-    data class UpdateLoading(val isLoading: Boolean) : ProfileAction()
 }

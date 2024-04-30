@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.profile.impl.presentation.ui.views
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -47,14 +48,13 @@ import views.UserCodeView
 @Composable
 internal fun ProfileInfoSection(
     modifier: Modifier = Modifier,
-    isLoading: Boolean,
     profile: AppUserUi?,
 ) {
     AnimatedContent(
-        targetState = isLoading,
+        targetState = profile == null,
         transitionSpec = {
-            fadeIn(animationSpec = tween(220, delayMillis = 90)).togetherWith(
-                fadeOut(animationSpec = tween(90))
+            fadeIn(animationSpec = tween(500, delayMillis = 180)).togetherWith(
+                fadeOut(animationSpec = tween(500))
             )
         },
     ) { loading ->
@@ -83,7 +83,7 @@ internal fun ProfileInfoSection(
 @Composable
 internal fun AvatarView(
     modifier: Modifier = Modifier,
-    username: String,
+    username: String?,
     imageUrl: String?,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.primary,
@@ -99,8 +99,10 @@ internal fun AvatarView(
         } else {
             Box(contentAlignment = Alignment.Center) {
                 Text(
-                    text = username.substring(0, 2).uppercase(),
-                    style = MaterialTheme.typography.headlineLarge,
+                    text = username?.substring(0, 2)?.uppercase() ?: "-",
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight.Medium,
+                    ),
                 )
             }
         }
@@ -110,8 +112,8 @@ internal fun AvatarView(
 @Composable
 internal fun ContactInfoView(
     modifier: Modifier = Modifier,
-    username: String,
-    code: String,
+    username: String?,
+    code: String?,
 ) {
     Column(
         modifier = modifier,
@@ -119,13 +121,13 @@ internal fun ContactInfoView(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = username,
+            text = username ?: "-",
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
             ),
         )
-        UserCodeView(code = code)
+        UserCodeView(code = code ?: "-")
     }
 }
 
@@ -135,7 +137,8 @@ internal fun AvatarViewPlaceholder(
 ) {
     PlaceholderBox(
         modifier = modifier.size(120.dp),
-        shape = MaterialTheme.shapes.full()
+        shape = MaterialTheme.shapes.full(),
+        highlight = null,
     )
 }
 
@@ -149,12 +152,14 @@ internal fun ContactInfoViewPlaceholder(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         PlaceholderBox(
-            modifier = Modifier.size(200.dp, 28.dp)
+            modifier = Modifier.size(200.dp, 28.dp),
+            highlight = null,
         )
         PlaceholderBox(
             modifier = Modifier.size(93.dp, 24.dp),
             shape = MaterialTheme.shapes.full(),
             color = MaterialTheme.colorScheme.secondary,
+            highlight = null,
         )
     }
 }

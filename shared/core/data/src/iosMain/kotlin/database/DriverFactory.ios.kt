@@ -16,6 +16,7 @@
 
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
+import co.touchlab.sqliter.DatabaseConfiguration
 import functional.Constants.Database.DATABASE_NAME
 import ru.aleshin.studyassistant.core.data.Database
 
@@ -24,7 +25,15 @@ import ru.aleshin.studyassistant.core.data.Database
  */
 actual class DriverFactory {
     actual fun createDriver(): SqlDriver {
-        return NativeSqliteDriver(Database.Schema, DATABASE_NAME)
+        return NativeSqliteDriver(
+            schema = Database.Schema,
+            name = DATABASE_NAME,
+            onConfiguration = { config: DatabaseConfiguration ->
+                config.copy(
+                    extendedConfig = DatabaseConfiguration.Extended(foreignKeyConstraints = true)
+                )
+            }
+        )
     }
 }
 

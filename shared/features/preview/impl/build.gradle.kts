@@ -35,9 +35,7 @@ kotlin {
             implementation(project(":shared:core:domain"))
             implementation(project(":shared:core:ui"))
 
-            implementation(libs.bundles.firebase)
             implementation(compose.components.resources)
-            implementation(libs.logger)
         }
     }
 }
@@ -48,7 +46,7 @@ android {
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
+    sourceSets["main"].resources.srcDirs("src/commonMain/composeResources")
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toIntOrNull()

@@ -52,6 +52,7 @@ internal interface ForgotWorkProcessor : FlowWorkProcessor<ForgotWorkCommand, Fo
                     emit(EffectResult(ForgotEffect.PushScreen(screen)))
                 },
             )
+            emit(ActionResult(ForgotAction.UpdateLoading(false)))
         }
     }
 }

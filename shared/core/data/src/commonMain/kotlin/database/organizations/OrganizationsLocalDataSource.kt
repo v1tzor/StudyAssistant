@@ -21,10 +21,16 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
 import functional.UID
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import managers.CoroutineManager
+import mappers.mapToDetailsData
+import mappers.mapToLocalData
+import models.organizations.OrganizationDetails
 import randomUUID
-import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationEntity
+import remote.StudyAssistantFirestore.LIMITS
+import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
+import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -32,31 +38,74 @@ import kotlin.coroutines.CoroutineContext
  */
 interface OrganizationsLocalDataSource {
 
-    suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationEntity>>
+    suspend fun fetchAllOrganization(): Flow<List<OrganizationDetails>>
 
-    suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationEntity>
+    suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationDetails>
 
-    suspend fun addOrUpdateOrganization(organization: OrganizationEntity): UID
+    suspend fun addOrUpdateOrganization(organization: OrganizationDetails): UID
 
     class Base(
         private val organizationQueries: OrganizationQueries,
+        private val employeeQueries: EmployeeQueries,
+        private val subjectQueries: SubjectQueries,
         private val coroutineManager: CoroutineManager,
     ) : OrganizationsLocalDataSource {
 
         private val coroutineContext: CoroutineContext
             get() = coroutineManager.backgroundDispatcher
 
-        override suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationEntity>> {
-            return organizationQueries.fetchAllOrganizations().asFlow().mapToList(coroutineContext)
+        override suspend fun fetchAllOrganization(): Flow<List<OrganizationDetails>> {
+            val query = organizationQueries.fetchAllOrganizations()
+            val organizationEntityListFlow = query.asFlow().mapToList(coroutineContext)
+
+            return organizationEntityListFlow.map { organizations ->
+                organizations.map { organizationEntity ->
+                    val organizationId = organizationEntity.uid
+                    val employeeQuery = employeeQueries.fetchEmployeesByOrganization(organizationId, LIMITS.ORGANIZATION_EMPLOYEE)
+                    val subjectQuery = subjectQueries.fetchSubjectsByOrganization(organizationId, LIMITS.ORGANIZATION_SUBJECTS)
+
+                    val employeeList = employeeQuery.executeAsList().map { entity ->
+                        entity.mapToDetailsData()
+                    }
+                    val subjectList = subjectQuery.executeAsList().map { entity ->
+                        entity.mapToDetailsData(employeeList.find { it.uid == entity.teacher_id })
+                    }
+
+                    organizationEntity.mapToDetailsData(
+                        employee = employeeList,
+                        subjects = subjectList,
+                    )
+                }
+            }
         }
 
-        override suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationEntity> {
-            return organizationQueries.fetchById(uid).asFlow().mapToOne(coroutineContext)
+        override suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationDetails> {
+            val query = organizationQueries.fetchById(uid)
+            val organizationEntityFlow = query.asFlow().mapToOne(coroutineContext)
+
+            return organizationEntityFlow.map { organizationEntity ->
+                val organizationId = organizationEntity.uid
+                val employeeQuery = employeeQueries.fetchEmployeesByOrganization(organizationId, LIMITS.ORGANIZATION_EMPLOYEE)
+                val subjectQuery = subjectQueries.fetchSubjectsByOrganization(organizationId, LIMITS.ORGANIZATION_SUBJECTS)
+
+                val employeeList = employeeQuery.executeAsList().map { entity ->
+                    entity.mapToDetailsData()
+                }
+                val subjectList = subjectQuery.executeAsList().map { entity ->
+                    entity.mapToDetailsData(employeeList.find { it.uid == entity.teacher_id })
+                }
+
+                organizationEntity.mapToDetailsData(
+                    employee = employeeList,
+                    subjects = subjectList,
+                )
+            }
         }
 
-        override suspend fun addOrUpdateOrganization(organization: OrganizationEntity): UID {
+        override suspend fun addOrUpdateOrganization(organization: OrganizationDetails): UID {
             val uid = randomUUID()
-            organizationQueries.addOrUpdateOrganization(organization)
+            organizationQueries.addOrUpdateOrganization(organization.mapToLocalData())
+
             return uid
         }
     }

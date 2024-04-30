@@ -34,8 +34,7 @@ internal data class AppUserUi(
     val city: String? = null,
     val birthday: String? = null,
     val gender: Gender? = null,
-    val isSubscriber: Boolean = false,
     val socialNetworks: List<SocialNetworkUi> = emptyList(),
-    val friends: List<AppUserUi> = emptyList(),
+    val friends: List<UID> = emptyList(),
     val privacy: PrivacySettingsUi = PrivacySettingsUi(),
 ) : JavaSerializable

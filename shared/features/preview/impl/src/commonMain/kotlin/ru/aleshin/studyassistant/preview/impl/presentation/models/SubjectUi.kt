@@ -25,10 +25,11 @@ import platform.JavaSerializable
  */
 internal data class SubjectUi(
     val uid: UID,
+    val organizationId: UID,
     val eventType: EventType,
     val name: String,
-    val teacher: EmployeeUi,
+    val teacher: EmployeeUi?,
     val office: Int,
     val color: Int,
-    val geo: ContactInfoUi,
+    val location: ContactInfoUi,
 ) : JavaSerializable

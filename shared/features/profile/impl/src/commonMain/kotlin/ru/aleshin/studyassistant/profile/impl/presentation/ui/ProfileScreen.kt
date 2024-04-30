@@ -71,7 +71,6 @@ internal class ProfileScreen : Screen {
                 },
                 topBar = {
                     ProfileTopBar(
-                        enabled = !state.isLoading,
                         onSignOutClick = { dispatchEvent(ProfileEvent.SignOut) },
                         onEditClick = { dispatchEvent(ProfileEvent.EditProfile) },
                     )

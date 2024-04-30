@@ -35,6 +35,9 @@ fun PlaceholderBox(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.medium,
     color: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    highlight: PlaceholderHighlight? = PlaceholderHighlight.shimmer(
+        highlightColor = MaterialTheme.colorScheme.highlightColorFor(color),
+    )
 ) = Box(
     modifier = modifier
         .fillMaxWidth()
@@ -42,9 +45,7 @@ fun PlaceholderBox(
             visible = true,
             color = color,
             shape = shape,
-            highlight = PlaceholderHighlight.shimmer(
-                highlightColor = MaterialTheme.colorScheme.highlightColorFor(color),
-            ),
+            highlight = highlight,
         ),
 )
 

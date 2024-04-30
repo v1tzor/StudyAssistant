@@ -17,7 +17,9 @@
 package di
 
 import DriverFactory
+import app.cash.sqldelight.ColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
+import database.listOfStringsAdapter
 import database.organizations.OrganizationsLocalDataSource
 import database.settings.CalendarSettingsLocalDataSource
 import database.settings.GeneralSettingsLocalDataSource
@@ -48,9 +50,13 @@ import repositories.OrganizationsRepositoryImpl
 import repositories.UsersRepository
 import repositories.UsersRepositoryImpl
 import ru.aleshin.studyassistant.core.data.Database
+import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
+import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
+import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationEntity
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
 import ru.aleshin.studyassistant.sqldelight.settings.CalendarQueries
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
+import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
@@ -60,7 +66,10 @@ val coreDataModule = DI.Module("CoreData") {
     bindSingleton<FirebaseFirestore> { Firebase.firestore }
 
     bindEagerSingleton<SqlDriver> { instance<DriverFactory>().createDriver() }
-    bindEagerSingleton<Database> { Database(driver = instance<SqlDriver>()) }
+    bindEagerSingleton<ColumnAdapter<List<String>, String>> { listOfStringsAdapter }
+    bindEagerSingleton<OrganizationEntity.Adapter> { OrganizationEntity.Adapter(instance(), instance(), instance(), instance()) }
+    bindEagerSingleton<EmployeeEntity.Adapter> { EmployeeEntity.Adapter(instance(), instance(), instance(), instance()) }
+    bindEagerSingleton<Database> { Database(instance<SqlDriver>(), instance(), instance()) }
 
     bindSingleton<GeneralQueries> { instance<Database>().generalQueries }
     bindSingleton<GeneralSettingsLocalDataSource> { GeneralSettingsLocalDataSource.Base(instance(), instance()) }
@@ -79,7 +88,11 @@ val coreDataModule = DI.Module("CoreData") {
     bindSingleton<UsersRepository> { UsersRepositoryImpl(instance()) }
 
     bindSingleton<OrganizationQueries> { instance<Database>().organizationQueries }
-    bindSingleton<OrganizationsLocalDataSource> { OrganizationsLocalDataSource.Base(instance(), instance()) }
+    bindSingleton<OrganizationsLocalDataSource> { OrganizationsLocalDataSource.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance()) }
-    bindProvider<OrganizationsRepository> { OrganizationsRepositoryImpl(instance(), instance()) }
+    bindProvider<OrganizationsRepository> { OrganizationsRepositoryImpl(instance(), instance(), instance()) }
+
+    bindSingleton<SubjectQueries> { instance<Database>().subjectQueries }
+
+    bindSingleton<EmployeeQueries> { instance<Database>().employeeQueries }
 }

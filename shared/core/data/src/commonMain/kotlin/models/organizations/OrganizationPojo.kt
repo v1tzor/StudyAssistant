@@ -19,26 +19,24 @@ package models.organizations
 import entities.organizations.OrganizationType
 import functional.UID
 import kotlinx.serialization.Serializable
-import models.subjects.SubjectPojo
-import models.users.ContactInfoPojo
-import models.users.EmployeePojo
+import models.users.ContactInfoData
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
 @Serializable
 data class OrganizationPojo(
-    val uid: UID,
-    val isMain: Boolean,
-    val shortName: String,
+    val uid: UID = "",
+    val main: Boolean = false,
+    val shortName: String = "",
     val fullName: String? = null,
     val type: String = OrganizationType.SCHOOL.name,
     val avatar: String? = null,
-    val subjects: List<SubjectPojo> = emptyList(),
-    val employee: List<EmployeePojo> = emptyList(),
-    val emails: List<ContactInfoPojo> = emptyList(),
-    val phones: List<ContactInfoPojo> = emptyList(),
-    val locations: List<ContactInfoPojo> = emptyList(),
-    val webs: List<ContactInfoPojo> = emptyList(),
-    val isHide: Boolean = false,
+    val subjects: List<UID> = emptyList(),
+    val employee: List<UID> = emptyList(),
+    val emails: List<ContactInfoData> = emptyList(),
+    val phones: List<ContactInfoData> = emptyList(),
+    val locations: List<ContactInfoData> = emptyList(),
+    val webs: List<ContactInfoData> = emptyList(),
+    val hide: Boolean = false,
 )

@@ -39,12 +39,10 @@ internal fun ProfileContent(
 ) {
     Column(modifier = modifier) {
         ProfileInfoSection(
-            isLoading = state.isLoading,
             profile = state.myProfile,
         )
         ProfileActionsSection(
             modifier = Modifier.weight(1f),
-            isLoading = state.isLoading,
             profile = state.myProfile,
             requests = state.myFriendRequest,
             onFriendsClick = onFriendsClick,

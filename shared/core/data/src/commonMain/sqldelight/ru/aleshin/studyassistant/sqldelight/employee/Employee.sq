@@ -1,0 +1,35 @@
+import kotlin.String;
+import kotlin.collections.List;
+
+CREATE TABLE employeeEntity (
+  uid TEXT PRIMARY KEY NOT NULL,
+  organization_id TEXT NOT NULL,
+  first_name TEXT NOT NULL,
+  second_name TEXT,
+  patronymic TEXT,
+  post TEXT NOT NULL,
+  avatar TEXT,
+  birthday TEXT,
+  workTimeStart INTEGER,
+  workTimeEnd INTEGER,
+  email TEXT AS List<String> NOT NULL,
+  phones TEXT AS List<String> NOT NULL,
+  locations TEXT AS List<String> NOT NULL,
+  webs TEXT AS List<String> NOT NULL,
+  FOREIGN KEY (organization_id) REFERENCES organizationEntity (uid) ON DELETE RESTRICT
+);
+
+fetchEmployeesByOrganization:
+SELECT *
+FROM employeeEntity
+WHERE organization_id = ?
+LIMIT ?;
+
+fetchEmployeeById:
+SELECT *
+FROM employeeEntity
+WHERE uid = ?;
+
+addOrUpdateEmployee:
+INSERT OR REPLACE INTO employeeEntity (uid, organization_id, first_name, second_name, patronymic, post, avatar, birthday, workTimeStart, workTimeEnd, email, phones, locations, webs)
+VALUES ?;

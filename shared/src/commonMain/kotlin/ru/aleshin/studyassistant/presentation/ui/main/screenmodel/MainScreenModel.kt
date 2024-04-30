@@ -24,7 +24,6 @@ import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.screen.Screen
 import managers.CoroutineManager
 import ru.aleshin.studyassistant.di.MainDependenciesGraph
-import ru.aleshin.studyassistant.navigation.GlobalScreenProvider
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEvent
@@ -35,7 +34,6 @@ import ru.aleshin.studyassistant.presentation.ui.main.contract.MainViewState
  */
 class MainScreenModel constructor(
     private val workProcessor: MainWorkProcessor,
-    private val screenProvider: GlobalScreenProvider,
     stateCommunicator: MainStateCommunicator,
     effectCommunicator: MainEffectCommunicator,
     coroutineManager: CoroutineManager,

@@ -30,6 +30,7 @@ import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.touchlab.kermit.Logger
 import functional.UID
 import navigation.root
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
@@ -62,13 +63,19 @@ internal class SetupScreen(private val createdUser: UID) : Screen {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             content = { paddingValues ->
-                when(windowSize.heightWindowType) {
+                when (windowSize.heightWindowType) {
                     else -> SetupContent(
                         state = state,
                         modifier = Modifier.padding(paddingValues),
                         onUpdateProfile = { dispatchEvent(SetupEvent.UpdateProfile(it)) },
                         onUpdateOrganization = { dispatchEvent(SetupEvent.UpdateOrganization(it)) },
-                        onUpdateCalendarSettings = { dispatchEvent(SetupEvent.UpdateCalendarSettings(it)) },
+                        onUpdateCalendarSettings = {
+                            dispatchEvent(
+                                SetupEvent.UpdateCalendarSettings(
+                                    it
+                                )
+                            )
+                        },
                         onSaveProfile = { dispatchEvent(SetupEvent.SaveProfileInfo) },
                         onSaveOrganization = { dispatchEvent(SetupEvent.SaveOrganizationInfo) },
                         onSaveCalendar = { dispatchEvent(SetupEvent.SaveCalendarInfo) },
@@ -97,7 +104,9 @@ internal class SetupScreen(private val createdUser: UID) : Screen {
                 is SetupEffect.ReplaceGlobalScreen -> rootNavigator.replaceAll(effect.screen)
                 is SetupEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings).apply {
+                            Logger.e("error -> ${effect.failures}")
+                        },
                         withDismissAction = true,
                     )
                 }

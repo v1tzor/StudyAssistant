@@ -15,6 +15,7 @@
  */
 
 import android.content.Context
+import androidx.sqlite.db.SupportSQLiteDatabase
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import functional.Constants.Database.DATABASE_NAME
@@ -29,6 +30,11 @@ actual class DriverFactory(private val context: Context) {
             schema = Database.Schema,
             context = context,
             name = DATABASE_NAME,
+            callback = object : AndroidSqliteDriver.Callback(Database.Schema) {
+                override fun onOpen(db: SupportSQLiteDatabase) {
+                    db.setForeignKeyConstraintsEnabled(true)
+                }
+            }
         )
     }
 }

@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import models.users.AppUserPojo
 import exceptions.FirebaseUserException
-import remote.AppFirestorePaths
+import remote.StudyAssistantFirestore.Users
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
@@ -53,7 +53,7 @@ interface UsersRemoteDataSource {
 
         override suspend fun addOrUpdateUser(user: AppUserPojo): Boolean {
             if (user.uid.isEmpty()) throw FirebaseUserException()
-            val reference = database.collection(AppFirestorePaths.Users.ROOT).document(user.uid)
+            val reference = database.collection(Users.ROOT).document(user.uid)
             return database.runTransaction {
                 val isNewUser = !reference.get().exists
                 reference.set(data = user, merge = true)
@@ -67,15 +67,15 @@ interface UsersRemoteDataSource {
 
         override suspend fun fetchUserById(uid: UID): Flow<AppUserPojo?> {
             if (uid.isEmpty()) throw FirebaseUserException()
-            val reference = database.collection(AppFirestorePaths.Users.ROOT).document(uid)
+            val reference = database.collection(Users.ROOT).document(uid)
             return reference.snapshots.map { snapshot ->
                 snapshot.data(serializer<AppUserPojo?>())
             }
         }
 
         override suspend fun fetchUserByName(query: String): Flow<List<AppUserPojo>> {
-            val queryReference = database.collection(AppFirestorePaths.Users.ROOT).where {
-                AppFirestorePaths.Users.USERNAME greaterThanOrEqualTo query
+            val queryReference = database.collection(Users.ROOT).where {
+                Users.USERNAME greaterThanOrEqualTo query
             }
             return queryReference.snapshots.map { snapshot ->
                 snapshot.documents.map { documentSnapshot -> documentSnapshot.data<AppUserPojo>() }
@@ -83,8 +83,8 @@ interface UsersRemoteDataSource {
         }
 
         override suspend fun fetchUserByCode(code: String): Flow<List<AppUserPojo>> {
-            val queryReference = database.collection(AppFirestorePaths.Users.ROOT).where {
-                AppFirestorePaths.Users.CODE equalTo code
+            val queryReference = database.collection(Users.ROOT).where {
+                Users.CODE equalTo code
             }
             return queryReference.snapshots.map { snapshot ->
                 snapshot.documents.map { documentSnapshot -> documentSnapshot.data<AppUserPojo>() }

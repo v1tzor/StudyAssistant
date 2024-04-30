@@ -36,10 +36,13 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,7 +64,6 @@ import views.PlaceholderBox
 @OptIn(ExperimentalResourceApi::class)
 internal fun ProfileActionsSection(
     modifier: Modifier = Modifier,
-    isLoading: Boolean,
     profile: AppUserUi?,
     requests: FriendRequestsUi?,
     onFriendsClick: () -> Unit,
@@ -71,81 +73,101 @@ internal fun ProfileActionsSection(
     onCalendarSettingsClick: () -> Unit,
     onPaymentsSettingsClick: () -> Unit,
 ) {
-    AnimatedContent(
-        targetState = isLoading,
-        transitionSpec = {
-            fadeIn(animationSpec = tween(220, delayMillis = 90)).togetherWith(
-                fadeOut(animationSpec = tween(90))
+    LazyVerticalGrid(
+        modifier = modifier.fillMaxSize().padding(start = 16.dp, end = 16.dp, top = 24.dp),
+        columns = GridCells.Fixed(2),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        item {
+            ProfileActionView(
+                onClick = onFriendsClick,
+                icon = painterResource(ProfileThemeRes.icons.friends),
+                title = ProfileThemeRes.strings.friendsTitle,
+                value = {
+                    AnimatedContent(
+                        targetState = profile == null,
+                        transitionSpec = {
+                            fadeIn(animationSpec = tween(500, delayMillis = 180)).togetherWith(
+                                fadeOut(animationSpec = tween(500))
+                            )
+                        },
+                    ) { loading ->
+                        if (loading) {
+                            PlaceholderBox(
+                                modifier = Modifier.size(40.dp, 28.dp),
+                                shape = MaterialTheme.shapes.small,
+                                highlight = null,
+                            )
+                        } else if (profile != null) {
+                            Text(
+                                text = profile.friends.size.toString(),
+                                maxLines = 1,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                ),
+                            )
+                        }
+                    }
+                },
+                badge = {
+                    AnimatedContent(
+                        targetState = profile == null,
+                        transitionSpec = {
+                            fadeIn(animationSpec = tween(500, delayMillis = 180)).togetherWith(
+                                fadeOut(animationSpec = tween(500))
+                            )
+                        },
+                    ) { loading ->
+                        if (loading) {
+                            PlaceholderBox(
+                                modifier = Modifier.size(25.dp, 16.dp),
+                                shape = RoundedCornerShape(6.dp),
+                                color = MaterialTheme.colorScheme.error,
+                                highlight = null,
+                            )
+                        } else if (requests != null) {
+                            NewFriendBadge(count = requests.received.size)
+                        }
+                    }
+                },
             )
-        },
-    ) { loading ->
-        if (loading) {
-            LazyVerticalGrid(
-                modifier = modifier.fillMaxSize().padding(start = 16.dp, end = 16.dp, top = 24.dp),
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                items(6) {
-                    PlaceholderBox(
-                        modifier = Modifier.height(120.dp).fillMaxWidth(),
-                        shape = MaterialTheme.shapes.large,
-                        color = MaterialTheme.colorScheme.surfaceContainer,
-                    )
-                }
-            }
-        } else {
-            LazyVerticalGrid(
-                modifier = modifier.fillMaxSize().padding(start = 16.dp, end = 16.dp, top = 24.dp),
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                item {
-                    ProfileActionView(
-                        onClick = onFriendsClick,
-                        icon = painterResource(ProfileThemeRes.icons.friends),
-                        title = ProfileThemeRes.strings.friendsTitle,
-                        value = profile?.friends?.size?.toString() ?: "-",
-                        badge = { NewFriendBadge(count = requests?.received?.size ?: 0) },
-                    )
-                }
-                item {
-                    ProfileActionView(
-                        onClick = onPrivacySettingsClick,
-                        icon = painterResource(ProfileThemeRes.icons.privacySettings),
-                        title = ProfileThemeRes.strings.privacySettingsTitle,
-                    )
-                }
-                item {
-                    ProfileActionView(
-                        onClick = onGeneralSettingsClick,
-                        icon = painterResource(ProfileThemeRes.icons.generalSettings),
-                        title = ProfileThemeRes.strings.generalSettingsTitle,
-                    )
-                }
-                item {
-                    ProfileActionView(
-                        onClick = onNotifySettingsClick,
-                        icon = painterResource(ProfileThemeRes.icons.notifySettings),
-                        title = ProfileThemeRes.strings.notifySettingsTitle,
-                    )
-                }
-                item {
-                    ProfileActionView(
-                        onClick = onCalendarSettingsClick,
-                        icon = painterResource(ProfileThemeRes.icons.calendarSettings),
-                        title = ProfileThemeRes.strings.calendarSettingsTitle,
-                    )
-                }
-                item {
-                    ProfileActionView(
-                        onClick = onPaymentsSettingsClick,
-                        icon = painterResource(ProfileThemeRes.icons.paymentsSettings),
-                        title = ProfileThemeRes.strings.paymentsSettingsTitle,
-                    )
-                }
-            }
+        }
+        item {
+            ProfileActionView(
+                onClick = onPrivacySettingsClick,
+                icon = painterResource(ProfileThemeRes.icons.privacySettings),
+                title = ProfileThemeRes.strings.privacySettingsTitle,
+            )
+        }
+        item {
+            ProfileActionView(
+                onClick = onGeneralSettingsClick,
+                icon = painterResource(ProfileThemeRes.icons.generalSettings),
+                title = ProfileThemeRes.strings.generalSettingsTitle,
+            )
+        }
+        item {
+            ProfileActionView(
+                onClick = onNotifySettingsClick,
+                icon = painterResource(ProfileThemeRes.icons.notifySettings),
+                title = ProfileThemeRes.strings.notifySettingsTitle,
+            )
+        }
+        item {
+            ProfileActionView(
+                onClick = onCalendarSettingsClick,
+                icon = painterResource(ProfileThemeRes.icons.calendarSettings),
+                title = ProfileThemeRes.strings.calendarSettingsTitle,
+            )
+        }
+        item {
+            ProfileActionView(
+                onClick = onPaymentsSettingsClick,
+                icon = painterResource(ProfileThemeRes.icons.paymentsSettings),
+                title = ProfileThemeRes.strings.paymentsSettingsTitle,
+            )
         }
     }
 }
@@ -154,10 +176,10 @@ internal fun ProfileActionsSection(
 @OptIn(ExperimentalMaterialApi::class)
 internal fun ProfileActionView(
     modifier: Modifier = Modifier,
-    onClick:() -> Unit,
+    onClick: () -> Unit,
     icon: Painter,
     title: String,
-    value: String? = null,
+    value: (@Composable () -> Unit)? = null,
     badge: (@Composable () -> Unit)? = null,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     shape: Shape = MaterialTheme.shapes.large,
@@ -197,16 +219,7 @@ internal fun ProfileActionView(
                         style = MaterialTheme.typography.titleMedium,
                     )
                 }
-                if (value != null) {
-                    Text(
-                        text = value,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                        ),
-                    )
-                }
+                value?.invoke()
             }
         }
     }

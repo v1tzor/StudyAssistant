@@ -20,6 +20,7 @@ import managers.CoroutineManager
 import managers.DateManager
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
+import payments.SubscriptionChecker
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
@@ -27,4 +28,5 @@ import org.kodein.di.bindSingleton
 val coreModule = DI.Module("Core") {
     bindSingleton<CoroutineManager> { CoroutineManager.Base() }
     bindSingleton<DateManager> { DateManager.Base() }
+    bindSingleton<SubscriptionChecker> { SubscriptionChecker.FreeApp }
 }

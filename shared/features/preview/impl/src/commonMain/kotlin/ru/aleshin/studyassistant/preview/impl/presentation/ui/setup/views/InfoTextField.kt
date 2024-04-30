@@ -124,6 +124,80 @@ internal fun InfoTextField(
 }
 
 @Composable
+internal fun InfoTextField(
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    value: TextFieldValue,
+    maxLength: Int = Constants.Text.DEFAULT_MAX_TEXT_LENGTH,
+    onValueChange: (TextFieldValue) -> Unit,
+    labelText: String,
+    infoIcon: Painter,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
+    supportingText: @Composable (() -> Unit)? = null,
+    isError: Boolean = false,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    singleLine: Boolean = true,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
+        disabledLabelColor = MaterialTheme.colorScheme.onSurface,
+        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+        disabledBorderColor = MaterialTheme.colorScheme.outline,
+        focusedBorderColor = MaterialTheme.colorScheme.outline,
+        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+    )
+) {
+    Row(
+        modifier = modifier.animateContentSize(),
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            modifier = Modifier.size(24.dp),
+            painter = infoIcon,
+            contentDescription = labelText,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        OutlinedTextField(
+            modifier = Modifier.sizeIn(minHeight = 65.dp).fillMaxWidth(),
+            enabled = enabled,
+            value = value,
+            onValueChange = { value1 ->
+                if (value1.text.length <= maxLength) {
+                    onValueChange(value1)
+                }
+            },
+            label = {
+                Text(
+                    text = labelText,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            textStyle = MaterialTheme.typography.bodyLarge,
+            trailingIcon = trailingIcon,
+            prefix = prefix,
+            suffix = suffix,
+            supportingText = supportingText,
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            isError = isError,
+            singleLine = singleLine,
+            maxLines = maxLines,
+            minLines = minLines,
+            interactionSource = interactionSource,
+            colors = colors,
+            shape = MaterialTheme.shapes.large,
+        )
+    }
+}
+
+@Composable
 internal fun VerticalInfoTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -170,6 +244,88 @@ internal fun VerticalInfoTextField(
             onValueChange = { text ->
                 if (text.length <= maxLength) {
                     onValueChange(text)
+                }
+            },
+            placeholder =  {
+                Text(
+                    text = placeholder,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    painter = infoIcon,
+                    contentDescription = labelText,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            trailingIcon = trailingIcon,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            prefix = prefix,
+            suffix = suffix,
+            supportingText = supportingText,
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            isError = isError,
+            singleLine = singleLine,
+            maxLines = maxLines,
+            minLines = minLines,
+            interactionSource = interactionSource,
+            colors = colors,
+            shape = MaterialTheme.shapes.large,
+        )
+    }
+}
+
+@Composable
+internal fun VerticalInfoTextField(
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    value: TextFieldValue,
+    maxLength: Int = Constants.Text.DEFAULT_MAX_TEXT_LENGTH,
+    onValueChange: (TextFieldValue) -> Unit,
+    labelText: String,
+    placeholder: String,
+    infoIcon: Painter,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
+    supportingText: @Composable (() -> Unit)? = null,
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(8.dp),
+    isError: Boolean = false,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    singleLine: Boolean = true,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
+        disabledLabelColor = MaterialTheme.colorScheme.onSurface,
+        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+        disabledBorderColor = MaterialTheme.colorScheme.outline,
+        focusedBorderColor = MaterialTheme.colorScheme.outline,
+        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+    )
+) {
+    Column(
+        modifier = modifier.animateContentSize(spring()),
+        verticalArrangement = verticalArrangement,
+    ) {
+        Text(
+            text = labelText,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        OutlinedTextField(
+            modifier = Modifier.sizeIn(minHeight = 56.dp).fillMaxWidth(),
+            enabled = enabled,
+            value = value,
+            onValueChange = { fieldValue ->
+                if (fieldValue.text.length <= maxLength) {
+                    onValueChange(fieldValue)
                 }
             },
             placeholder =  {

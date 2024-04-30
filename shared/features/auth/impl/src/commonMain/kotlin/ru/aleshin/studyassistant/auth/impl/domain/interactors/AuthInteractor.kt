@@ -69,7 +69,11 @@ internal interface AuthInteractor {
                     email = checkNotNull(firebaseUser.email),
                 )
                 val createdResult = usersRepository.createOrUpdateAppUser(newUserInfo)
-                if (createdResult) AuthResult(user = newUserInfo, isNewUser = true) else throw FirebaseAuthException()
+                if (createdResult) {
+                    AuthResult(user = newUserInfo, isNewUser = true)
+                } else {
+                    throw FirebaseAuthException()
+                }
             }
         }
 
@@ -81,7 +85,11 @@ internal interface AuthInteractor {
                 email = credentials.email,
             )
             val createdResult = usersRepository.createOrUpdateAppUser(newUserInfo)
-            return@wrap if (createdResult) newUserInfo else throw FirebaseAuthException()
+            return@wrap if (createdResult) {
+                newUserInfo
+            } else {
+                throw FirebaseAuthException()
+            }
         }
 
         override suspend fun resetPassword(credentials: ForgotCredentials) = eitherWrapper.wrap {

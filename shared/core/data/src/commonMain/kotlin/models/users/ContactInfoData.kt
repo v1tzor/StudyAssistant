@@ -16,25 +16,13 @@
 
 package models.users
 
-import functional.UID
 import kotlinx.serialization.Serializable
 
 /**
- * @author Stanislav Aleshin on 29.04.2024.
+ * @author Stanislav Aleshin on 27.04.2024.
  */
 @Serializable
-data class EmployeePojo(
-    val uid: UID,
-    val firstName: String,
-    val secondName: String?,
-    val patronymic: String?,
-    val post: String,
-    val avatar: String? = null,
-    val birthday: String? = null,
-    val workTimeStart: Long? = null,
-    val workTimeEnd: Long? = null,
-    val emails: List<ContactInfoPojo> = emptyList(),
-    val phones: List<ContactInfoPojo> = emptyList(),
-    val locations: List<ContactInfoPojo> = emptyList(),
-    val webs: List<ContactInfoPojo> = emptyList(),
+data class ContactInfoData(
+    val label: String? = null,
+    val value: String = "",
 )

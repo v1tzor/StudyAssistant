@@ -24,6 +24,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
 import repositories.AuthRepository
+import repositories.UsersRepository
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.profile.api.di.ProfileFeatureApi
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
@@ -44,6 +45,7 @@ object ProfileFeatureDIHolder : BaseFeatureDIHolder<ProfileFeatureApi, ProfileFe
                 importAll(presentationModule, domainModule)
                 bindSingleton<() -> AuthFeatureStarter> { dependencies.authFeatureStarter }
                 bindSingleton<AuthRepository> { dependencies.authRepository }
+                bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<ProfileFeatureApi> {
                     object : ProfileFeatureApi {

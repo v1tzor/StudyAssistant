@@ -20,7 +20,10 @@ import database.organizations.OrganizationsLocalDataSource
 import entities.organizations.Organization
 import functional.UID
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import mappers.mapToData
+import mappers.mapToDomain
+import payments.SubscriptionChecker
 import remote.settings.OrganizationsRemoteDataSource
 
 /**
@@ -29,20 +32,37 @@ import remote.settings.OrganizationsRemoteDataSource
 class OrganizationsRepositoryImpl(
     private val localDataSource: OrganizationsLocalDataSource,
     private val remoteDataSource: OrganizationsRemoteDataSource,
+    private val subscriptionChecker: SubscriptionChecker,
 ) : OrganizationsRepository {
 
     override suspend fun fetchAllOrganization(targetUser: UID): Flow<List<Organization>> {
-        // TODO("Not yet implemented")
-        return flowOf()
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val organizations = if (isSubscriber) {
+            remoteDataSource.fetchAllOrganization(targetUser)
+        } else {
+            localDataSource.fetchAllOrganization()
+        }
+        return organizations.map { organizationList ->
+            organizationList.map { organization -> organization.mapToDomain() }
+        }
     }
 
-    override suspend fun fetchOrganizationById(uid: UID): Flow<Organization> {
-        // TODO("Not yet implemented")
-        return flowOf()
+    override suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<Organization> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val organizations = if (isSubscriber) {
+            remoteDataSource.fetchOrganizationById(uid, targetUser)
+        } else {
+            localDataSource.fetchOrganizationById(uid)
+        }
+        return organizations.map { organization -> organization.mapToDomain() }
     }
 
     override suspend fun addOrUpdateOrganization(organization: Organization, targetUser: UID): UID {
-        // TODO("Not yet implemented")
-        return ""
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        return if (isSubscriber) {
+            remoteDataSource.addOrUpdateOrganization(organization.mapToData(), targetUser)
+        } else {
+            localDataSource.addOrUpdateOrganization(organization.mapToData())
+        }
     }
 }

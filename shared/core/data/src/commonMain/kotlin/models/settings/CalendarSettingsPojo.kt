@@ -16,6 +16,7 @@
 
 package models.settings
 
+import entities.settings.NumberOfWeek
 import kotlinx.serialization.Serializable
 
 /**
@@ -23,5 +24,9 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class CalendarSettingsPojo(
-    val numberOfWeek: String,
-)
+    val numberOfWeek: String = NumberOfWeek.ONE.name,
+) {
+    companion object {
+        fun default() = CalendarSettingsPojo()
+    }
+}

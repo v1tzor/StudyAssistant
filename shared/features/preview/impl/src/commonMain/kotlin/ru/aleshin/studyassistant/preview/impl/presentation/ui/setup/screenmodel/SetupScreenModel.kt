@@ -118,14 +118,14 @@ internal class SetupScreenModel(
             organization = action.organization,
             calendarSettings = action.calendarSettings,
         )
-        is SetupAction.UpdateCalendarSettings -> currentState.copy(
-            calendarSettings = action.calendarSettings,
+        is SetupAction.UpdateProfileInfo -> currentState.copy(
+            profile = action.profile,
         )
         is SetupAction.UpdateOrganizationInfo -> currentState.copy(
             organization = action.organization,
         )
-        is SetupAction.UpdateProfileInfo -> currentState.copy(
-            profile = action.profile,
+        is SetupAction.UpdateCalendarSettings -> currentState.copy(
+            calendarSettings = action.calendarSettings,
         )
     }
 }

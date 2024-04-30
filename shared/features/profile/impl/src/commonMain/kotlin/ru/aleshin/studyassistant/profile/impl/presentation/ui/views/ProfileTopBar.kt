@@ -35,7 +35,7 @@ import views.TopAppBarTitle
 @OptIn(ExperimentalResourceApi::class)
 internal fun ProfileTopBar(
     modifier: Modifier = Modifier,
-    enabled: Boolean,
+    enabled: Boolean = true,
     onSignOutClick: () -> Unit,
     onEditClick: () -> Unit,
 ) {

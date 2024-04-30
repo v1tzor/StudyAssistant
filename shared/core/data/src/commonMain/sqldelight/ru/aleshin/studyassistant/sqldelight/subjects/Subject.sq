@@ -1,0 +1,27 @@
+CREATE TABLE subjectEntity (
+    uid TEXT PRIMARY KEY NOT NULL,
+    organization_id TEXT NOT NULL,
+    event_type TEXT NOT NULL,
+    name TEXT NOT NULL,
+    teacher_id TEXT,
+    office INTEGER NOT NULL,
+    color INTEGER NOT NULL,
+    location TEXT NOT NULL,
+    FOREIGN KEY (organization_id) REFERENCES organizationEntity (uid) ON DELETE RESTRICT,
+    FOREIGN KEY (teacher_id) REFERENCES employeeEntity (uid) ON DELETE SET NULL
+);
+
+fetchSubjectsByOrganization:
+SELECT *
+FROM subjectEntity
+WHERE organization_id = ?
+LIMIT ?;
+
+fetchSubjectById:
+SELECT *
+FROM subjectEntity
+WHERE uid = ?;
+
+addOrUpdateSubject:
+INSERT OR REPLACE INTO subjectEntity (uid, organization_id, event_type, name, teacher_id, office, color, location)
+VALUES ?;

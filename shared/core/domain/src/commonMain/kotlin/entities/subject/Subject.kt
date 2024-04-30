@@ -25,10 +25,11 @@ import functional.UID
  */
 data class Subject(
     val uid: UID,
+    val organizationId: UID,
     val eventType: EventType,
     val name: String,
-    val teacher: Employee,
+    val teacher: Employee?,
     val office: Int,
     val color: Int,
-    val geo: ContactInfo,
+    val location: ContactInfo,
 )

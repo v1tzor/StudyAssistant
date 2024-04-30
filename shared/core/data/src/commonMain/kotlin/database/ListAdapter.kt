@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package remote
+package database
+
+import app.cash.sqldelight.ColumnAdapter
 
 /**
- * @author Stanislav Aleshin on 29.04.2024.
+ * @author Stanislav Aleshin on 30.04.2024.
  */
-object AppFirestorePaths {
+val listOfStringsAdapter = object : ColumnAdapter<List<String>, String> {
 
-    object Users {
-        const val ROOT = "users"
-        const val USERNAME = "username"
-        const val CODE = "code"
+    override fun decode(databaseValue: String): List<String> {
+        return if (databaseValue.isEmpty()) listOf() else databaseValue.split(",")
+    }
+
+    override fun encode(value: List<String>): String {
+        return value.joinToString(separator = ",")
     }
 }

@@ -24,20 +24,22 @@ import ru.aleshin.studyassistant.preview.impl.presentation.models.SubjectUi
  */
 internal fun Subject.mapToUi() = SubjectUi(
     uid = uid,
+    organizationId = organizationId,
     eventType = eventType,
     name = name,
-    teacher = teacher.mapToUi(),
+    teacher = teacher?.mapToUi(),
     office = office,
     color = color,
-    geo = geo.mapToUi(),
+    location = location.mapToUi(),
 )
 
 internal fun SubjectUi.mapToDomain() = Subject(
     uid = uid,
+    organizationId = organizationId,
     eventType = eventType,
     name = name,
-    teacher = teacher.mapToDomain(),
+    teacher = teacher?.mapToDomain(),
     office = office,
     color = color,
-    geo = geo.mapToDomain(),
+    location = location.mapToDomain(),
 )

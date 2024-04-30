@@ -17,28 +17,41 @@
 package remote.settings
 
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import exceptions.FirebaseUserException
+import functional.UID
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.serialization.serializer
 import models.settings.CalendarSettingsPojo
+import remote.StudyAssistantFirestore.UserData
 
 /**
  * @author Stanislav Aleshin on 24.04.2024.
  */
 interface CalendarSettingsRemoteDataSource {
 
-    fun fetchSettings(): Flow<CalendarSettingsPojo>
+    fun fetchSettings(targetUser: UID): Flow<CalendarSettingsPojo>
 
-    suspend fun updateSettings(settings: CalendarSettingsPojo)
+    suspend fun addOrUpdateSettings(settings: CalendarSettingsPojo, targetUser: UID)
 
     class Base(
         private val database: FirebaseFirestore
     ) : CalendarSettingsRemoteDataSource {
-
-        override fun fetchSettings(): Flow<CalendarSettingsPojo> {
-            TODO()
+        override fun fetchSettings(targetUser: UID): Flow<CalendarSettingsPojo> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+            val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
+            return reference.snapshots.map { snapshot ->
+                val settings = snapshot.data(serializer<CalendarSettingsPojo?>())
+                return@map settings ?: CalendarSettingsPojo.default()
+            }
         }
 
-        override suspend fun updateSettings(settings: CalendarSettingsPojo) {
-            TODO()
+        override suspend fun addOrUpdateSettings(settings: CalendarSettingsPojo, targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+            val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
+            reference.set(settings, merge = true)
         }
     }
 }

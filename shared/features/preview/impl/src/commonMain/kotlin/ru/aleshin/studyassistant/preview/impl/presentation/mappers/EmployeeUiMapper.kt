@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.preview.impl.presentation.models.EmployeeUi
  */
 internal fun Employee.mapToUi() = EmployeeUi(
     uid = uid,
+    organizationId = organizationId,
     firstName = firstName,
     secondName = secondName,
     patronymic = patronymic,
@@ -41,6 +42,7 @@ internal fun Employee.mapToUi() = EmployeeUi(
 
 internal fun EmployeeUi.mapToDomain() = Employee(
     uid = uid,
+    organizationId = organizationId,
     firstName = firstName,
     secondName = secondName,
     patronymic = patronymic,

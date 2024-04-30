@@ -34,7 +34,6 @@ data class AppUser(
     val city: String? = null,
     val birthday: String? = null,
     val gender: Gender? = null,
-    val isSubscriber: Boolean = false,
     val friends: List<UID> = emptyList(),
     val socialNetworks: List<SocialNetwork> = emptyList(),
     val privacy: PrivacySettings = PrivacySettings(),

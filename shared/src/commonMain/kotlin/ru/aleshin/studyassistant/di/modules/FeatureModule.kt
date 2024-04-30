@@ -110,6 +110,7 @@ val featureModule = DI.Module("Feature") {
     bindEagerSingleton<ProfileFeatureDependencies> {
         object : ProfileFeatureDependencies {
             override val authFeatureStarter = provider<AuthFeatureStarter>()
+            override val usersRepository = instance<UsersRepository>()
             override val authRepository = instance<AuthRepository>()
             override val coroutineManager = instance<CoroutineManager>()
         }

@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package models.users
+package mappers
 
-import kotlinx.serialization.Serializable
+import entities.common.ContactInfo
+import models.users.ContactInfoData
 
 /**
- * @author Stanislav Aleshin on 27.04.2024.
+ * @author Stanislav Aleshin on 30.04.2024.
  */
-@Serializable
-data class ContactInfoPojo(
-    val label: String? = null,
-    val value: String = "",
+fun ContactInfo.mapToData() = ContactInfoData(
+    label = label,
+    value = value,
+)
+
+fun ContactInfoData.mapToDomain() = ContactInfo(
+    label = label,
+    value = value,
 )

@@ -26,6 +26,7 @@ import platform.JavaSerializable
  */
 internal data class EmployeeUi(
     val uid: UID,
+    val organizationId: UID,
     val firstName: String,
     val secondName: String?,
     val patronymic: String?,

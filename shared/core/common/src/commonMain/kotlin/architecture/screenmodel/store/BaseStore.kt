@@ -78,8 +78,8 @@ interface BaseStore<S : BaseViewState, E : BaseEvent, A : BaseAction, F : BaseUi
             stateCommunicator.update(state)
         }
 
-        override suspend fun handleAction(action: A) = updateState {
-            reducer.reduce(action, fetchState())
+        override suspend fun handleAction(action: A) = updateState { currentState ->
+            reducer.reduce(action, currentState)
         }
 
         override suspend fun collectState(collector: FlowCollector<S>) {

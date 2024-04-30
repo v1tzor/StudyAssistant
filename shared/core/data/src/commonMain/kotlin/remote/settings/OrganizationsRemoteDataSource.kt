@@ -17,35 +17,121 @@
 package remote.settings
 
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.firestore.where
+import exceptions.FirebaseUserException
 import functional.UID
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.serialization.serializer
+import mappers.mapToDetailsData
+import mappers.mapToRemoteData
+import models.organizations.OrganizationDetails
 import models.organizations.OrganizationPojo
+import models.subjects.SubjectPojo
+import models.users.EmployeeDetails
+import remote.StudyAssistantFirestore.UserData
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
 interface OrganizationsRemoteDataSource {
 
-    suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationPojo>>
+    suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationDetails>>
 
-    suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationPojo>
+    suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetails>
 
-    suspend fun addOrUpdateOrganization(organization: OrganizationPojo): UID
+    suspend fun addOrUpdateOrganization(organization: OrganizationDetails, targetUser: UID): UID
 
     class Base(
         private val database: FirebaseFirestore,
     ) : OrganizationsRemoteDataSource {
 
-        override suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationPojo>> {
-            TODO()
+        override suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationDetails>> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
+
+            val organizationPojoListFlow = reference.snapshots.map { snapshot ->
+                snapshot.documents.map { it.data(serializer<OrganizationPojo>()) }
+            }
+
+            return organizationPojoListFlow.map { organizations ->
+                organizations.map { organizationPojo ->
+                    val employeeReference = userDataRoot.collection(UserData.EMPLOYEE).where {
+                        UserData.ORGANIZATION_ID equalTo organizationPojo.uid
+                    }
+                    val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).where {
+                        UserData.ORGANIZATION_ID equalTo organizationPojo.uid
+                    }
+
+                    val employeeList = employeeReference.get().documents.map { it.data<EmployeeDetails>() }
+                    val subjectList = subjectsReference.get().documents.map { it.data<SubjectPojo>() }.map { subjectPojo ->
+                        subjectPojo.mapToDetailsData(employeeList.find { it.uid == subjectPojo.teacher })
+                    }
+
+                    organizationPojo.mapToDetailsData(
+                        employee = employeeList,
+                        subjects = subjectList,
+                    )
+                }
+            }
         }
 
-        override suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationPojo> {
-            TODO()
+        override suspend fun fetchOrganizationById(
+            uid: UID,
+            targetUser: UID
+        ): Flow<OrganizationDetails> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.ORGANIZATIONS).document(uid)
+
+            val organizationPojoFlow = reference.snapshots.map { snapshot ->
+                snapshot.data(serializer<OrganizationPojo>())
+            }
+
+            return organizationPojoFlow.map { organizationPojo ->
+                val employeeReference = userDataRoot.collection(UserData.EMPLOYEE).where {
+                    UserData.ORGANIZATION_ID equalTo organizationPojo.uid
+                }
+                val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).where {
+                    UserData.ORGANIZATION_ID equalTo organizationPojo.uid
+                }
+
+                val employeeList = employeeReference.get().documents.map { it.data<EmployeeDetails>() }
+                val subjectList = subjectsReference.get().documents.map { it.data<SubjectPojo>() }.map { subjectPojo ->
+                    subjectPojo.mapToDetailsData(employeeList.find { it.uid == subjectPojo.teacher })
+                }
+
+                organizationPojo.mapToDetailsData(
+                    subjects = subjectList,
+                    employee = employeeList,
+                )
+            }
         }
 
-        override suspend fun addOrUpdateOrganization(organization: OrganizationPojo): UID {
-            TODO()
+        override suspend fun addOrUpdateOrganization(
+            organization: OrganizationDetails,
+            targetUser: UID
+        ): UID {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+            val organizationPojo = organization.mapToRemoteData()
+
+            val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
+
+            return database.runTransaction {
+                val isExist = organizationPojo.uid.isNotEmpty() && reference.document(organizationPojo.uid).get().exists
+                if (isExist) {
+                    reference.document(organizationPojo.uid).set(data = organizationPojo, merge = true)
+                    return@runTransaction organizationPojo.uid
+                } else {
+                    val uid = reference.add(organizationPojo).id
+                    reference.document(uid).update(UserData.UID to uid)
+                    return@runTransaction uid
+                }
+            }
         }
     }
 }

@@ -17,6 +17,7 @@
 package entities.employee
 
 import entities.common.ContactInfo
+import entities.subject.Subject
 import functional.TimeRange
 import functional.UID
 
@@ -25,6 +26,7 @@ import functional.UID
  */
 data class Employee(
     val uid: UID,
+    val organizationId: UID,
     val firstName: String,
     val secondName: String?,
     val patronymic: String?,

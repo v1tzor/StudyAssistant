@@ -40,9 +40,10 @@ kotlin {
             api(compose.foundation)
             api(compose.components.resources)
 
+            api(libs.logger)
+
             api(libs.google.accompanist)
-            implementation(libs.placeholder)
-            implementation(libs.bundles.mokoResources)
+            api(libs.placeholder)
         }
     }
 

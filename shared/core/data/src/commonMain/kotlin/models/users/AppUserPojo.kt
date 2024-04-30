@@ -35,7 +35,6 @@ data class AppUserPojo(
     val city: String? = null,
     val birthday: String? = null,
     val gender: String? = null,
-    val isSubscriber: Boolean = false,
     val friends: List<UID> = emptyList(),
     val socialNetworks: List<SocialNetworkPojo> = emptyList(),
     val privateProfile: Boolean = false,

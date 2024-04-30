@@ -18,12 +18,13 @@ package ru.aleshin.studyassistant.profile.impl.domain.common
 
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 import wrappers.EitherWrapper
+import wrappers.FlowEitherWrapper
 
 /**
  * @author Stanislav Aleshin on 21.04.2024
  */
-internal interface ProfileEitherWrapper : EitherWrapper<ProfileFailures> {
+internal interface ProfileEitherWrapper : FlowEitherWrapper<ProfileFailures> {
 
     class Base(errorHandler: ProfileErrorHandler) : ProfileEitherWrapper,
-        EitherWrapper.Abstract<ProfileFailures>(errorHandler)
+        FlowEitherWrapper.Abstract<ProfileFailures>(errorHandler)
 }

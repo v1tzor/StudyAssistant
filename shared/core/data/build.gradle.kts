@@ -33,10 +33,13 @@ kotlin {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:domain"))
 
-            implementation(libs.bundles.firebase)
+            api(libs.bundles.firebase)
             implementation(libs.sqldelight.core)
             implementation(libs.sqldelight.prmimitiveAdapters)
             implementation(libs.sqldelight.coroutines)
+            implementation(libs.kotlin.serialization)
+            implementation(libs.kotlin.serialization.json)
+            implementation(libs.logger)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)

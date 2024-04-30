@@ -79,11 +79,7 @@ internal class ProfileScreenModel(
         action: ProfileAction,
         currentState: ProfileViewState,
     ) = when (action) {
-        is ProfileAction.UpdateLoading -> currentState.copy(
-            isLoading = action.isLoading,
-        )
         is ProfileAction.UpdateProfileInfo -> currentState.copy(
-            isLoading = false,
             myProfile = action.profile,
             myFriendRequest = action.requests,
         )

@@ -36,5 +36,5 @@ val presentationModule = DI.Module("Presentation") {
     bindSingleton<MainStateCommunicator> { MainStateCommunicator.Base() }
     bindSingleton<MainEffectCommunicator> { MainEffectCommunicator.Base() }
     bindSingleton<MainWorkProcessor> { MainWorkProcessor.Base(instance(), instance(), instance()) }
-    bindSingleton<MainScreenModel> { MainScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<MainScreenModel> { MainScreenModel(instance(), instance(), instance(), instance()) }
 }

@@ -35,7 +35,6 @@ import ru.aleshin.studyassistant.preview.impl.presentation.models.CalendarSettin
 import ru.aleshin.studyassistant.preview.impl.presentation.models.OrganizationUi
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupAction
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEffect
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupPage
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.

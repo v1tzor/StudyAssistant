@@ -43,9 +43,8 @@ kotlin {
             api(project(":shared:core:common"))
             api(project(":shared:core:ui"))
 
-            implementation(libs.bundles.firebase)
+            implementation(compose.components.resources)
             implementation(libs.google.auth)
-            implementation(libs.logger)
         }
         iosMain.dependencies {
             implementation(libs.bundles.firebase)

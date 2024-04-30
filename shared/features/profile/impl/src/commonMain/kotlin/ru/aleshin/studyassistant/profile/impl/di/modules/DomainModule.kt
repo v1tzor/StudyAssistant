@@ -23,6 +23,8 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.profile.impl.domain.common.ProfileEitherWrapper
 import ru.aleshin.studyassistant.profile.impl.domain.common.ProfileErrorHandler
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.AuthInteractor
+import ru.aleshin.studyassistant.profile.impl.domain.interactors.FriendsInteractor
+import ru.aleshin.studyassistant.profile.impl.domain.interactors.UserInteractor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -32,4 +34,6 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<ProfileEitherWrapper> { ProfileEitherWrapper.Base(instance()) }
 
     bindProvider<AuthInteractor> { AuthInteractor.Base(instance(), instance()) }
+    bindProvider<UserInteractor> { UserInteractor.Base(instance(), instance()) }
+    bindProvider<FriendsInteractor> { FriendsInteractor.Base(instance()) }
 }

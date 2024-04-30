@@ -35,10 +35,8 @@ kotlin {
             implementation(project(":shared:core:domain"))
             implementation(project(":shared:core:ui"))
 
-            implementation(compose.components.resources)
-            implementation(libs.bundles.firebase)
             implementation(libs.google.auth)
-            implementation(libs.logger)
+            implementation(compose.components.resources)
         }
     }
 }

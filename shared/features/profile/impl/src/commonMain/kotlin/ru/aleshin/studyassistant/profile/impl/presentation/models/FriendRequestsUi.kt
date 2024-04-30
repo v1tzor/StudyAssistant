@@ -16,13 +16,14 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.models
 
+import functional.UID
 import platform.JavaSerializable
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 internal data class FriendRequestsUi(
-    val received: List<AppUserUi> = emptyList(),
-    val send: List<AppUserUi> = emptyList(),
-    val lastAccepted: List<AppUserUi> = emptyList(),
+    val received: List<UID> = emptyList(),
+    val send: List<UID> = emptyList(),
+    val lastAccepted: List<UID> = emptyList(),
 ) : JavaSerializable

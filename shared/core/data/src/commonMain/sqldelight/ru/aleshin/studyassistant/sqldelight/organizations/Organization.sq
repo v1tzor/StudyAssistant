@@ -1,10 +1,17 @@
+import kotlin.String;
+import kotlin.collections.List;
+
 CREATE TABLE organizationEntity (
   uid TEXT PRIMARY KEY NOT NULL,
   is_main INTEGER NOT NULL,
-  short_name TEXT,
+  short_name TEXT NOT NULL,
   full_name TEXT,
-  type TEXT,
+  type TEXT NOT NULL,
   avatar TEXT,
+  emails TEXT AS List<String> NOT NULL,
+  phones TEXT AS List<String> NOT NULL,
+  locations TEXT AS List<String> NOT NULL,
+  webs TEXT AS List<String> NOT NULL,
   is_hide INTEGER NOT NULL
 );
 
@@ -18,5 +25,5 @@ FROM organizationEntity
 WHERE uid = ?;
 
 addOrUpdateOrganization:
-INSERT OR REPLACE INTO organizationEntity (uid, is_main, short_name, full_name, type, avatar, is_hide)
+INSERT OR REPLACE INTO organizationEntity (uid, is_main, short_name, full_name, type, avatar, emails, phones, locations, webs, is_hide)
 VALUES ?;
