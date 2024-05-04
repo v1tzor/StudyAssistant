@@ -43,6 +43,11 @@ object StudyAssistantFirestore {
 
         const val UID = "uid"
         const val HOMEWORK_DATE = "date"
+        const val VERSION_FROM = "dateVersionFrom"
+        const val CLASS_SCHEDULE_ID = "scheduleId"
+        const val WEEK = "week"
+        const val DAY_OF_WEEK = "weekDayOfWeek"
+        const val VERSION_TO = "dateVersionTo"
         const val ORGANIZATION_ID = "organization_id"
     }
 

@@ -43,8 +43,8 @@ class OrganizationsRepositoryImpl(
             localDataSource.fetchAllOrganization()
         }
 
-        return organizationsFlow.map { organizationList ->
-            organizationList.map { organization -> organization.mapToDomain() }
+        return organizationsFlow.map { organizationListData ->
+            organizationListData.map { organization -> organization.mapToDomain() }
         }
     }
 
@@ -56,7 +56,9 @@ class OrganizationsRepositoryImpl(
             localDataSource.fetchOrganizationById(uid)
         }
 
-        return organizationFlow.map { organization -> organization.mapToDomain() }
+        return organizationFlow.map { organizationData ->
+            organizationData.mapToDomain()
+        }
     }
 
     override suspend fun addOrUpdateOrganization(organization: Organization, targetUser: UID): UID {

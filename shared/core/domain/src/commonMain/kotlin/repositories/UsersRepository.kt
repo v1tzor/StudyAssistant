@@ -30,6 +30,6 @@ interface UsersRepository {
     fun fetchCurrentUserOrError() = fetchCurrentUser() ?: throw FirebaseUserException()
     suspend fun createOrUpdateAppUser(user: AppUser): Boolean
     suspend fun fetchAppUserById(uid: UID): Flow<AppUser?>
-    suspend fun fetchAppUserByName(query: String): Flow<List<AppUser>>
-    suspend fun fetchAppUserByCode(code: String): Flow<List<AppUser>>
+    suspend fun fetchAppUsersByName(query: String): Flow<List<AppUser>>
+    suspend fun fetchAppUsersByCode(code: String): Flow<List<AppUser>>
 }

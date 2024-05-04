@@ -38,31 +38,31 @@ class HomeworksRepositoryImpl(
 
     override suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val timeStart = timeRange.from.toEpochMilliseconds()
+        val timeEnd = timeRange.to.toEpochMilliseconds()
+
         val homeworksFlow = if (isSubscriber) {
-            val from = timeRange.from.toEpochMilliseconds().toInt()
-            val to = timeRange.to.toEpochMilliseconds().toInt()
-            remoteDataSource.fetchHomeworksByTime(from, to, targetUser)
+            remoteDataSource.fetchHomeworksByTime(timeStart.toInt(), timeEnd.toInt(), targetUser)
         } else {
-            val from = timeRange.from.toEpochMilliseconds()
-            val to = timeRange.to.toEpochMilliseconds()
-            localDataSource.fetchHomeworksByTime(from, to)
+            localDataSource.fetchHomeworksByTime(timeStart, timeEnd)
         }
 
-        return homeworksFlow.map { homeworkList ->
-            homeworkList.map { it.mapToDomain() }
+        return homeworksFlow.map { homeworkListData ->
+            homeworkListData.map { it.mapToDomain() }
         }
     }
 
     override suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<Homework?> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
         val homeworkFlow = if (isSubscriber) {
             remoteDataSource.fetchHomeworkById(uid, targetUser)
         } else {
             localDataSource.fetchHomeworkById(uid)
         }
 
-        return homeworkFlow.map { homework ->
-            homework?.mapToDomain()
+        return homeworkFlow.map { homeworkData ->
+            homeworkData?.mapToDomain()
         }
     }
 

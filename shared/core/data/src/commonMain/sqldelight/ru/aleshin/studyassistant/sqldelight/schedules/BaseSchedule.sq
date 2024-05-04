@@ -9,7 +9,7 @@ CREATE TABLE baseScheduleEntity (
 fetchSchedulesByDate:
 SELECT *
 FROM baseScheduleEntity
-WHERE week = ? AND week_day_of_week = ? AND date_version_from >= ? AND date_version_to <= ?
+WHERE week = ? AND week_day_of_week = ? AND date_version_from <= ? AND date_version_to >= ?
 ORDER BY date_version_to DESC;
 
 fetchSchedulesByTimeRange:

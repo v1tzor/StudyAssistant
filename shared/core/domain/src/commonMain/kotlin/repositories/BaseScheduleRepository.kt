@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package models.schedules
+package repositories
 
+import entities.schedules.BaseSchedule
+import entities.settings.NumberOfWeek
+import functional.TimeRange
 import functional.UID
-import kotlinx.serialization.Serializable
-import models.classes.ClassDetailsData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.DayOfWeek
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
-@Serializable
-data class BaseScheduleDetailsData(
-    val uid: UID,
-    val dateVersionFrom: Long,
-    val dateVersionTo: Long,
-    val weekDayOfWeek: String,
-    val week: String,
-    val classes: List<ClassDetailsData>,
-)
+interface BaseScheduleRepository {
+    suspend fun fetchScheduleByDate(week: NumberOfWeek, weekDayOfWeek: DayOfWeek, targetUser: UID): Flow<BaseSchedule?>
+    suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<BaseSchedule>>
+    suspend fun addOrUpdateSchedule(schedule: BaseSchedule, targetUser: UID): UID
+}

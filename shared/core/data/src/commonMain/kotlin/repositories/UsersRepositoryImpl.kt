@@ -21,8 +21,6 @@ import entities.users.AppUser
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import mappers.organizations.mapToData
-import mappers.organizations.mapToDomain
 import mappers.users.mapToData
 import mappers.users.mapToDomain
 import remote.users.UsersRemoteDataSource
@@ -46,15 +44,19 @@ class UsersRepositoryImpl(
         return remoteDataSource.fetchUserById(uid).map { it?.mapToDomain() }
     }
 
-    override suspend fun fetchAppUserByName(query: String): Flow<List<AppUser>> {
-        return remoteDataSource.fetchUserByName(query).map { userList ->
-            userList.map { user -> user.mapToDomain() }
+    override suspend fun fetchAppUsersByName(query: String): Flow<List<AppUser>> {
+        val userListFlow = remoteDataSource.fetchUsersByName(query)
+
+        return userListFlow.map { userListData ->
+            userListData.map { userData -> userData.mapToDomain() }
         }
     }
 
-    override suspend fun fetchAppUserByCode(code: String): Flow<List<AppUser>> {
-        return remoteDataSource.fetchUserByCode(code).map { userList ->
-            userList.map { user -> user.mapToDomain() }
+    override suspend fun fetchAppUsersByCode(code: String): Flow<List<AppUser>> {
+        val userListFlow = remoteDataSource.fetchUsersByCode(code)
+
+        return userListFlow.map { userListData ->
+            userListData.map { userData -> userData.mapToDomain() }
         }
     }
 }

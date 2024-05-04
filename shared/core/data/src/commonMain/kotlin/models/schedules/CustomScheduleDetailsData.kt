@@ -17,14 +17,15 @@
 package models.schedules
 
 import functional.UID
-import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import models.classes.ClassDetailsData
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
+@Serializable
 data class CustomScheduleDetailsData(
     val uid: UID,
-    val date: Instant,
+    val date: Long,
     val classes: List<ClassDetailsData>,
 )

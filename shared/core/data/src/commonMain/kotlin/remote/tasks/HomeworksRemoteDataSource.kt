@@ -16,6 +16,7 @@
 
 package remote.tasks
 
+import dev.gitlive.firebase.firestore.DocumentReference
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.where
 import exceptions.FirebaseUserException
@@ -64,28 +65,7 @@ interface HomeworksRemoteDataSource {
             }
 
             return homeworkPojoListFlow.map { homeworks ->
-                homeworks.map { homeworkPojo ->
-                    val organizationId = homeworkPojo.organizationId
-
-                    val organizationReference = userDataRoot.collection(UserData.ORGANIZATIONS).document(organizationId)
-                    val subjectReference = homeworkPojo.subjectId?.let {
-                        userDataRoot.collection(UserData.SUBJECTS).document(it)
-                    }
-
-                    val organization = organizationReference.get().data<OrganizationShortData>()
-                    val subject = subjectReference?.get()?.data<SubjectPojo>().let { subjectPojo ->
-                        val employeeReference = subjectPojo?.teacher?.let {
-                            userDataRoot.collection(UserData.EMPLOYEE).document(it)
-                        }
-                        val employee = employeeReference?.get()?.data(serializer<EmployeeDetailsData?>())
-                        subjectPojo?.mapToDetailsData(employee)
-                    }
-
-                    homeworkPojo.mapToDetailsData(
-                        organization = organization,
-                        subject = subject,
-                    )
-                }
+                homeworks.map { homeworkPojo -> homeworkPojo.mapToDetails(userDataRoot) }
             }
         }
 
@@ -99,28 +79,7 @@ interface HomeworksRemoteDataSource {
                 snapshot.data(serializer<HomeworkPojo?>())
             }
 
-            return homeworkPojoFlow.map { homeworkPojo ->
-                if (homeworkPojo == null) return@map null
-                val organizationId = homeworkPojo.organizationId
-
-                val employeeReferenceRoot = userDataRoot.collection(UserData.EMPLOYEE)
-                val organizationReference = userDataRoot.collection(UserData.ORGANIZATIONS).document(organizationId)
-                val subjectReference = homeworkPojo.subjectId?.let { subjectId ->
-                    userDataRoot.collection(UserData.SUBJECTS).document(subjectId)
-                }
-
-                val organization = organizationReference.get().data<OrganizationShortData>()
-                val subject = subjectReference?.get()?.data<SubjectPojo>().let { subjectPojo ->
-                    val employeeReference = subjectPojo?.teacher?.let { employeeReferenceRoot.document(it) }
-                    val employee = employeeReference?.get()?.data(serializer<EmployeeDetailsData?>())
-                    subjectPojo?.mapToDetailsData(employee)
-                }
-
-                homeworkPojo.mapToDetailsData(
-                    organization = organization,
-                    subject = subject,
-                )
-            }
+            return homeworkPojoFlow.map { homeworkPojo -> homeworkPojo?.mapToDetails(userDataRoot) }
         }
 
         override suspend fun addOrUpdateHomework(homework: HomeworkDetailsData, targetUser: UID): UID {
@@ -150,6 +109,25 @@ interface HomeworksRemoteDataSource {
             val reference = userDataRoot.collection(UserData.HOMEWORKS).document(uid)
 
             return reference.delete()
+        }
+
+        private suspend fun HomeworkPojo.mapToDetails(userDataRoot: DocumentReference): HomeworkDetailsData {
+            val organizationReference = userDataRoot.collection(UserData.ORGANIZATIONS).document(organizationId)
+            val subjectReference = subjectId?.let { userDataRoot.collection(UserData.SUBJECTS).document(it) }
+
+            val organization = organizationReference.get().data<OrganizationShortData>()
+            val subject = subjectReference?.get()?.data<SubjectPojo>().let { subjectPojo ->
+                val employeeReference = subjectPojo?.teacher?.let {
+                    userDataRoot.collection(UserData.EMPLOYEE).document(it)
+                }
+                val employee = employeeReference?.get()?.data(serializer<EmployeeDetailsData?>())
+                subjectPojo?.mapToDetailsData(employee)
+            }
+
+            return mapToDetailsData(
+                organization = organization,
+                subject = subject,
+            )
         }
     }
 }

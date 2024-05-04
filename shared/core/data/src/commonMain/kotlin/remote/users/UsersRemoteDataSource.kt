@@ -42,9 +42,9 @@ interface UsersRemoteDataSource {
 
     suspend fun fetchUserById(uid: UID): Flow<AppUserPojo?>
 
-    suspend fun fetchUserByName(query: String): Flow<List<AppUserPojo>>
+    suspend fun fetchUsersByName(query: String): Flow<List<AppUserPojo>>
 
-    suspend fun fetchUserByCode(code: String): Flow<List<AppUserPojo>>
+    suspend fun fetchUsersByCode(code: String): Flow<List<AppUserPojo>>
 
     class Base(
         private val auth: FirebaseAuth,
@@ -73,7 +73,7 @@ interface UsersRemoteDataSource {
             }
         }
 
-        override suspend fun fetchUserByName(query: String): Flow<List<AppUserPojo>> {
+        override suspend fun fetchUsersByName(query: String): Flow<List<AppUserPojo>> {
             val queryReference = database.collection(Users.ROOT).where {
                 Users.USERNAME greaterThanOrEqualTo query
             }
@@ -82,7 +82,7 @@ interface UsersRemoteDataSource {
             }
         }
 
-        override suspend fun fetchUserByCode(code: String): Flow<List<AppUserPojo>> {
+        override suspend fun fetchUsersByCode(code: String): Flow<List<AppUserPojo>> {
             val queryReference = database.collection(Users.ROOT).where {
                 Users.CODE equalTo code
             }

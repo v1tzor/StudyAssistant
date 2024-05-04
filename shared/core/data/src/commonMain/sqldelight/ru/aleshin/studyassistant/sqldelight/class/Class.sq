@@ -13,11 +13,15 @@ CREATE TABLE classEntity (
   notification INTEGER NOT NULL
 );
 
-
 fetchClassById:
 SELECT *
 FROM classEntity
 WHERE uid = ?;
+
+fetchClassByScheduleId:
+SELECT *
+FROM classEntity
+WHERE schedule_id = ?;
 
 addOrUpdateClass:
 INSERT OR REPLACE INTO classEntity (uid, schedule_id, organization_id, event_type, subject_id, custom_data, teacher_id, office, location, start_time, end_time, notification)

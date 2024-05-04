@@ -18,17 +18,15 @@ package models.schedules
 
 import functional.UID
 import kotlinx.serialization.Serializable
-import models.classes.ClassDetailsData
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
 @Serializable
-data class BaseScheduleDetailsData(
+data class BaseSchedulePojo(
     val uid: UID,
     val dateVersionFrom: Long,
     val dateVersionTo: Long,
     val weekDayOfWeek: String,
     val week: String,
-    val classes: List<ClassDetailsData>,
 )
