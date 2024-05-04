@@ -69,13 +69,7 @@ internal class SetupScreen(private val createdUser: UID) : Screen {
                         modifier = Modifier.padding(paddingValues),
                         onUpdateProfile = { dispatchEvent(SetupEvent.UpdateProfile(it)) },
                         onUpdateOrganization = { dispatchEvent(SetupEvent.UpdateOrganization(it)) },
-                        onUpdateCalendarSettings = {
-                            dispatchEvent(
-                                SetupEvent.UpdateCalendarSettings(
-                                    it
-                                )
-                            )
-                        },
+                        onUpdateCalendarSettings = { dispatchEvent(SetupEvent.UpdateCalendarSettings(it)) },
                         onSaveProfile = { dispatchEvent(SetupEvent.SaveProfileInfo) },
                         onSaveOrganization = { dispatchEvent(SetupEvent.SaveOrganizationInfo) },
                         onSaveCalendar = { dispatchEvent(SetupEvent.SaveCalendarInfo) },

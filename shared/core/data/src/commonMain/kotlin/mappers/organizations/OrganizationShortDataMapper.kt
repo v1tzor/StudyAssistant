@@ -14,11 +14,25 @@
  * limitations under the License.
  */
 
-package exceptions
+package mappers.organizations
+
+import entities.organizations.OrganizationShort
+import entities.organizations.OrganizationType
+import models.organizations.OrganizationShortData
 
 /**
- * @author Stanislav Aleshin on 22.04.2024.
+ * @author Stanislav Aleshin on 04.05.2024.
  */
-class FirebaseDataAuthException : Exception()
+fun OrganizationShort.mapToData() = OrganizationShortData(
+    uid = uid,
+    shortName = shortName,
+    type = type.name,
+    avatar = avatar,
+)
 
-class FirebaseUserException : Exception()
+fun OrganizationShortData.mapToDomain() = OrganizationShort(
+    uid = uid,
+    shortName = shortName,
+    type = OrganizationType.valueOf(type),
+    avatar = avatar,
+)

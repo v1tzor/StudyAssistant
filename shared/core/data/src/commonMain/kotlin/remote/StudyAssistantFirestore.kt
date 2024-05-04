@@ -29,12 +29,19 @@ object StudyAssistantFirestore {
 
     object UserData {
         const val ROOT = "data"
+
         const val ORGANIZATIONS = "organizations"
+        const val HOMEWORKS = "homeworks"
+        const val BASE_SCHEDULES = "baseSchedules"
+        const val CUSTOM_SCHEDULES = "customSchedules"
         const val SUBJECTS = "subjects"
         const val EMPLOYEE = "employee"
+
         const val SETTINGS = "settings"
         const val CALENDAR_SETTINGS = "calendar"
+
         const val UID = "uid"
+        const val HOMEWORK_DATE = "date"
         const val ORGANIZATION_ID = "organization_id"
     }
 

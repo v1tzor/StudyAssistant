@@ -23,9 +23,11 @@ import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import managers.CoroutineManager
-import mappers.mapToDetailsData
-import mappers.mapToLocalData
-import models.organizations.OrganizationDetails
+import mappers.organizations.mapToDetailsData
+import mappers.organizations.mapToLocalData
+import mappers.subjects.mapToDetailsData
+import mappers.users.mapToDetailsData
+import models.organizations.OrganizationDetailsData
 import randomUUID
 import remote.StudyAssistantFirestore.LIMITS
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
@@ -38,11 +40,11 @@ import kotlin.coroutines.CoroutineContext
  */
 interface OrganizationsLocalDataSource {
 
-    suspend fun fetchAllOrganization(): Flow<List<OrganizationDetails>>
+    suspend fun fetchAllOrganization(): Flow<List<OrganizationDetailsData>>
 
-    suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationDetails>
+    suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationDetailsData>
 
-    suspend fun addOrUpdateOrganization(organization: OrganizationDetails): UID
+    suspend fun addOrUpdateOrganization(organization: OrganizationDetailsData): UID
 
     class Base(
         private val organizationQueries: OrganizationQueries,
@@ -54,7 +56,7 @@ interface OrganizationsLocalDataSource {
         private val coroutineContext: CoroutineContext
             get() = coroutineManager.backgroundDispatcher
 
-        override suspend fun fetchAllOrganization(): Flow<List<OrganizationDetails>> {
+        override suspend fun fetchAllOrganization(): Flow<List<OrganizationDetailsData>> {
             val query = organizationQueries.fetchAllOrganizations()
             val organizationEntityListFlow = query.asFlow().mapToList(coroutineContext)
 
@@ -79,7 +81,7 @@ interface OrganizationsLocalDataSource {
             }
         }
 
-        override suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationDetails> {
+        override suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationDetailsData> {
             val query = organizationQueries.fetchById(uid)
             val organizationEntityFlow = query.asFlow().mapToOne(coroutineContext)
 
@@ -102,7 +104,7 @@ interface OrganizationsLocalDataSource {
             }
         }
 
-        override suspend fun addOrUpdateOrganization(organization: OrganizationDetails): UID {
+        override suspend fun addOrUpdateOrganization(organization: OrganizationDetailsData): UID {
             val uid = randomUUID()
             organizationQueries.addOrUpdateOrganization(organization.mapToLocalData())
 

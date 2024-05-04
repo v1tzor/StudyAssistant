@@ -14,28 +14,35 @@
  * limitations under the License.
  */
 
-package mappers
+package mappers.organizations
 
 import entities.organizations.Organization
 import entities.organizations.OrganizationType
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import models.organizations.OrganizationDetails
+import mappers.mapToData
+import mappers.mapToDomain
+import mappers.subjects.mapToData
+import mappers.subjects.mapToDomain
+import mappers.users.mapToData
+import mappers.users.mapToDomain
+import models.organizations.OrganizationDetailsData
 import models.organizations.OrganizationPojo
-import models.subjects.SubjectDetails
-import models.users.EmployeeDetails
+import models.subjects.SubjectDetailsData
+import models.users.EmployeeDetailsData
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationEntity
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
-fun OrganizationDetails.mapToDomain() = Organization(
+fun OrganizationDetailsData.mapToDomain() = Organization(
     uid = uid,
     isMain = isMain,
     shortName = shortName,
     fullName = fullName,
     type = OrganizationType.valueOf(type),
     avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
     subjects = subjects.map { it.mapToDomain() },
     employee = employee.map { it.mapToDomain() },
     emails = emails.map { it.mapToDomain() },
@@ -45,13 +52,14 @@ fun OrganizationDetails.mapToDomain() = Organization(
     isHide = isHide,
 )
 
-fun Organization.mapToData() = OrganizationDetails(
+fun Organization.mapToData() = OrganizationDetailsData(
     uid = uid,
     isMain = isMain,
     shortName = shortName,
     fullName = fullName,
     type = type.name,
     avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToDate(),
     subjects = subjects.map { it.mapToData() },
     employee = employee.map { it.mapToData() },
     emails = emails.map { it.mapToData() },
@@ -61,13 +69,14 @@ fun Organization.mapToData() = OrganizationDetails(
     isHide = isHide,
 )
 
-fun OrganizationDetails.mapToLocalData() = OrganizationEntity(
+fun OrganizationDetailsData.mapToLocalData() = OrganizationEntity(
     uid = uid,
     is_main = if (isMain) 1L else 0L,
     short_name = shortName,
     full_name = fullName,
     type = type,
     avatar = avatar,
+    scheduleTimeIntervals = Json.encodeToString(scheduleTimeIntervals),
     emails = emails.map { Json.encodeToString(it) },
     phones = phones.map { Json.encodeToString(it) },
     locations = locations.map { Json.encodeToString(it) },
@@ -76,15 +85,16 @@ fun OrganizationDetails.mapToLocalData() = OrganizationEntity(
 )
 
 fun OrganizationEntity.mapToDetailsData(
-    subjects: List<SubjectDetails>,
-    employee: List<EmployeeDetails>,
-) = OrganizationDetails(
+    subjects: List<SubjectDetailsData>,
+    employee: List<EmployeeDetailsData>,
+) = OrganizationDetailsData(
     uid = uid,
     isMain = is_main == 1L,
     shortName = short_name,
     fullName = full_name,
     type = type,
     avatar = avatar,
+    scheduleTimeIntervals = Json.decodeFromString(scheduleTimeIntervals),
     subjects = subjects,
     employee = employee,
     emails = emails.map { Json.decodeFromString(it) },
@@ -94,15 +104,14 @@ fun OrganizationEntity.mapToDetailsData(
     isHide = is_hide == 1L,
 )
 
-fun OrganizationDetails.mapToRemoteData() = OrganizationPojo(
+fun OrganizationDetailsData.mapToRemoteData() = OrganizationPojo(
     uid = uid,
     main = isMain,
     shortName = shortName,
     fullName = fullName,
     type = type,
+    scheduleTimeIntervals = scheduleTimeIntervals,
     avatar = avatar,
-    subjects = subjects.map { it.uid },
-    employee = employee.map { it.uid },
     emails = emails,
     phones = phones,
     locations = locations,
@@ -111,15 +120,16 @@ fun OrganizationDetails.mapToRemoteData() = OrganizationPojo(
 )
 
 fun OrganizationPojo.mapToDetailsData(
-    subjects: List<SubjectDetails>,
-    employee: List<EmployeeDetails>,
-) = OrganizationDetails(
+    subjects: List<SubjectDetailsData>,
+    employee: List<EmployeeDetailsData>,
+) = OrganizationDetailsData(
     uid = uid,
     isMain = main,
     shortName = shortName,
     fullName = fullName,
     type = type,
     avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals,
     subjects = subjects,
     employee = employee,
     emails = emails,

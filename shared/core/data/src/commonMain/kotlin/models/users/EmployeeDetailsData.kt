@@ -14,29 +14,28 @@
  * limitations under the License.
  */
 
-package models.organizations
+package models.users
 
-import entities.organizations.OrganizationType
-import entities.organizations.ScheduleTimeIntervals
 import functional.UID
 import kotlinx.serialization.Serializable
-import models.users.ContactInfoData
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
 @Serializable
-data class OrganizationPojo(
-    val uid: UID = "",
-    val main: Boolean = false,
-    val shortName: String = "",
-    val fullName: String? = null,
-    val type: String = OrganizationType.SCHOOL.name,
+data class EmployeeDetailsData(
+    val uid: UID,
+    val organizationId: UID,
+    val firstName: String,
+    val secondName: String?,
+    val patronymic: String?,
+    val post: String,
     val avatar: String? = null,
-    val scheduleTimeIntervals: ScheduleTimeIntervalsData = ScheduleTimeIntervalsData(),
+    val birthday: String? = null,
+    val workTimeStart: Long? = null,
+    val workTimeEnd: Long? = null,
     val emails: List<ContactInfoData> = emptyList(),
     val phones: List<ContactInfoData> = emptyList(),
     val locations: List<ContactInfoData> = emptyList(),
     val webs: List<ContactInfoData> = emptyList(),
-    val hide: Boolean = false,
 )

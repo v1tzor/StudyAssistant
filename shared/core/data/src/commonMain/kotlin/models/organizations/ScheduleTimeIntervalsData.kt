@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package models.subjects
+package models.organizations
 
-import functional.UID
 import kotlinx.serialization.Serializable
-import models.users.ContactInfoData
-import models.users.EmployeeDetails
 
 /**
- * @author Stanislav Aleshin on 30.04.2024.
+ * @author Stanislav Aleshin on 04.05.2024.
  */
 @Serializable
-data class SubjectDetails(
-    val uid: UID,
-    val organizationId: UID,
-    val eventType: String,
-    val name: String,
-    val teacher: EmployeeDetails?,
-    val office: Int,
-    val color: Int,
-    val location: ContactInfoData,
+data class ScheduleTimeIntervalsData(
+    val firstClassTime: Long? = null,
+    val classDuration: List<NumberedDurationData> = emptyList(),
+    val breakDuration: List<NumberedDurationData> = emptyList(),
 )

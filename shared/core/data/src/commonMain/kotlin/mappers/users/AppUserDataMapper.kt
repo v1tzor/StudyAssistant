@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mappers
+package mappers.users
 
 import entities.settings.AccessType
 import entities.settings.PrivacySettings

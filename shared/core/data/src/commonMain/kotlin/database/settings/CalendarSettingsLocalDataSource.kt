@@ -19,11 +19,14 @@ package database.settings
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToOne
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import managers.CoroutineManager
+import mappers.organizations.mapToDetailsData
+import mappers.organizations.mapToLocalData
+import mappers.settings.mapToDetailsData
+import mappers.settings.mapToLocalData
+import models.settings.CalendarSettingsDetailsData
 import ru.aleshin.studyassistant.sqldelight.settings.CalendarQueries
-import ru.aleshin.studyassistant.sqldelight.settings.CalendarSettingsEntity
-import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
-import ru.aleshin.studyassistant.sqldelight.settings.GeneralSettingsEntity
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -31,9 +34,9 @@ import kotlin.coroutines.CoroutineContext
  */
 interface CalendarSettingsLocalDataSource {
 
-    fun fetchSettings(): Flow<CalendarSettingsEntity>
+    fun fetchSettings(): Flow<CalendarSettingsDetailsData>
 
-    suspend fun updateSettings(settings: CalendarSettingsEntity)
+    suspend fun updateSettings(settings: CalendarSettingsDetailsData)
 
     class Base(
         private val calendarQueries: CalendarQueries,
@@ -43,12 +46,14 @@ interface CalendarSettingsLocalDataSource {
         private val coroutineContext: CoroutineContext
             get() = coroutineManager.backgroundDispatcher
 
-        override fun fetchSettings(): Flow<CalendarSettingsEntity> {
-            return calendarQueries.fetchSettings().asFlow().mapToOne(coroutineContext)
+        override fun fetchSettings(): Flow<CalendarSettingsDetailsData> {
+            return calendarQueries.fetchSettings().asFlow().mapToOne(coroutineContext).map { settingsEntity ->
+                settingsEntity.mapToDetailsData()
+            }
         }
 
-        override suspend fun updateSettings(settings: CalendarSettingsEntity) {
-            calendarQueries.updateSettings(settings)
+        override suspend fun updateSettings(settings: CalendarSettingsDetailsData) {
+            calendarQueries.updateSettings(settings.mapToLocalData())
         }
     }
 }

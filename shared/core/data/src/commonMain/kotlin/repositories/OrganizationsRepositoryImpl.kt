@@ -21,10 +21,10 @@ import entities.organizations.Organization
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import mappers.mapToData
-import mappers.mapToDomain
+import mappers.organizations.mapToData
+import mappers.organizations.mapToDomain
 import payments.SubscriptionChecker
-import remote.settings.OrganizationsRemoteDataSource
+import remote.organizations.OrganizationsRemoteDataSource
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
@@ -37,28 +37,31 @@ class OrganizationsRepositoryImpl(
 
     override suspend fun fetchAllOrganization(targetUser: UID): Flow<List<Organization>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-        val organizations = if (isSubscriber) {
+        val organizationsFlow = if (isSubscriber) {
             remoteDataSource.fetchAllOrganization(targetUser)
         } else {
             localDataSource.fetchAllOrganization()
         }
-        return organizations.map { organizationList ->
+
+        return organizationsFlow.map { organizationList ->
             organizationList.map { organization -> organization.mapToDomain() }
         }
     }
 
     override suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<Organization> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-        val organizations = if (isSubscriber) {
+        val organizationFlow = if (isSubscriber) {
             remoteDataSource.fetchOrganizationById(uid, targetUser)
         } else {
             localDataSource.fetchOrganizationById(uid)
         }
-        return organizations.map { organization -> organization.mapToDomain() }
+
+        return organizationFlow.map { organization -> organization.mapToDomain() }
     }
 
     override suspend fun addOrUpdateOrganization(organization: Organization, targetUser: UID): UID {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
         return if (isSubscriber) {
             remoteDataSource.addOrUpdateOrganization(organization.mapToData(), targetUser)
         } else {

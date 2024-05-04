@@ -28,7 +28,6 @@ import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import co.touchlab.kermit.Logger
 import navigation.root
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.auth.impl.presentation.models.LoginCredentialsUi

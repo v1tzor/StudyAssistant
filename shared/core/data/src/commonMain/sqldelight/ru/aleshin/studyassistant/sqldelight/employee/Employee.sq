@@ -12,7 +12,7 @@ CREATE TABLE employeeEntity (
   birthday TEXT,
   workTimeStart INTEGER,
   workTimeEnd INTEGER,
-  email TEXT AS List<String> NOT NULL,
+  emails TEXT AS List<String> NOT NULL,
   phones TEXT AS List<String> NOT NULL,
   locations TEXT AS List<String> NOT NULL,
   webs TEXT AS List<String> NOT NULL,
@@ -31,5 +31,5 @@ FROM employeeEntity
 WHERE uid = ?;
 
 addOrUpdateEmployee:
-INSERT OR REPLACE INTO employeeEntity (uid, organization_id, first_name, second_name, patronymic, post, avatar, birthday, workTimeStart, workTimeEnd, email, phones, locations, webs)
+INSERT OR REPLACE INTO employeeEntity (uid, organization_id, first_name, second_name, patronymic, post, avatar, birthday, workTimeStart, workTimeEnd, emails, phones, locations, webs)
 VALUES ?;

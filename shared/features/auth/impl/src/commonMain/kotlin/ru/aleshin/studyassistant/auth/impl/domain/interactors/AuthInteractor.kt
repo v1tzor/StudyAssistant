@@ -22,7 +22,7 @@ import entities.users.AppUser
 import functional.DomainResult
 import functional.UnitDomainResult
 import kotlinx.coroutines.flow.firstOrNull
-import exceptions.FirebaseAuthException
+import exceptions.FirebaseDataAuthException
 import exceptions.FirebaseUserException
 import repositories.AuthRepository
 import repositories.ManageUserRepository
@@ -72,7 +72,7 @@ internal interface AuthInteractor {
                 if (createdResult) {
                     AuthResult(user = newUserInfo, isNewUser = true)
                 } else {
-                    throw FirebaseAuthException()
+                    throw FirebaseDataAuthException()
                 }
             }
         }
@@ -88,7 +88,7 @@ internal interface AuthInteractor {
             return@wrap if (createdResult) {
                 newUserInfo
             } else {
-                throw FirebaseAuthException()
+                throw FirebaseDataAuthException()
             }
         }
 

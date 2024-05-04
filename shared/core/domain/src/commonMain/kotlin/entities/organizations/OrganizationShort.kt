@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package exceptions
+package entities.organizations
+
+import functional.UID
 
 /**
- * @author Stanislav Aleshin on 22.04.2024.
+ * @author Stanislav Aleshin on 01.05.2024.
  */
-class FirebaseDataAuthException : Exception()
-
-class FirebaseUserException : Exception()
+data class OrganizationShort(
+    val uid: UID,
+    val shortName: String,
+    val type: OrganizationType = OrganizationType.SCHOOL,
+    val avatar: String? = null,
+)

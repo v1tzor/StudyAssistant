@@ -20,8 +20,10 @@ import database.settings.GeneralSettingsLocalDataSource
 import entities.settings.GeneralSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import mappers.mapToData
-import mappers.mapToDomain
+import mappers.organizations.mapToData
+import mappers.organizations.mapToDomain
+import mappers.settings.mapToData
+import mappers.settings.mapToDomain
 
 /**
  * @author Stanislav Aleshin on 25.04.2024.

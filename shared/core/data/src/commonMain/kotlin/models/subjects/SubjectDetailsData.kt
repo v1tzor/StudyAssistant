@@ -14,11 +14,24 @@
  * limitations under the License.
  */
 
-package exceptions
+package models.subjects
+
+import functional.UID
+import kotlinx.serialization.Serializable
+import models.users.ContactInfoData
+import models.users.EmployeeDetailsData
 
 /**
- * @author Stanislav Aleshin on 22.04.2024.
+ * @author Stanislav Aleshin on 30.04.2024.
  */
-class FirebaseDataAuthException : Exception()
-
-class FirebaseUserException : Exception()
+@Serializable
+data class SubjectDetailsData(
+    val uid: UID,
+    val organizationId: UID,
+    val eventType: String,
+    val name: String,
+    val teacher: EmployeeDetailsData?,
+    val office: Int,
+    val color: Int,
+    val location: ContactInfoData,
+)

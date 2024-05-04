@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mappers
+package mappers.settings
 
 import entities.settings.GeneralSettings
 import entities.settings.LanguageType

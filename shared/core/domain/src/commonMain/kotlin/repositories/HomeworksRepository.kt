@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-package exceptions
+package repositories
+
+import entities.tasks.Homework
+import functional.TimeRange
+import functional.UID
+import kotlinx.coroutines.flow.Flow
 
 /**
- * @author Stanislav Aleshin on 22.04.2024.
+ * @author Stanislav Aleshin on 04.05.2024.
  */
-class FirebaseDataAuthException : Exception()
-
-class FirebaseUserException : Exception()
+interface HomeworksRepository {
+    suspend fun fetchHomeworksByTime(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>>
+    suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<Homework?>
+    suspend fun addOrUpdateHomework(homework: Homework, targetUser: UID): UID
+    suspend fun deleteHomework(uid: UID, targetUser: UID)
+}

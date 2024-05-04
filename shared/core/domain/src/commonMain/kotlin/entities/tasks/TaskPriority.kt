@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package exceptions
+package entities.tasks
 
 /**
- * @author Stanislav Aleshin on 22.04.2024.
+ * @author Stanislav Aleshin on 01.05.2024.
  */
-class FirebaseDataAuthException : Exception()
-
-class FirebaseUserException : Exception()
+enum class TaskPriority {
+    STANDARD, MEDIUM, HIGH
+}

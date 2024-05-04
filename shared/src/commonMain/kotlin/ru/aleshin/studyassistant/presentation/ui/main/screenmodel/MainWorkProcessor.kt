@@ -21,12 +21,9 @@ import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
 import extensions.delayedAction
-import functional.Constants
 import functional.Constants.Delay.SPLASH_NAV
 import functional.Either
 import functional.collectAndHandle
-import functional.firstRightOrNull
-import functional.rightOrNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
@@ -37,7 +34,6 @@ import ru.aleshin.studyassistant.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
-import wrappers.EitherWrapper
 import kotlin.time.ExperimentalTime
 
 /**

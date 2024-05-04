@@ -18,23 +18,24 @@ package models.organizations
 
 import functional.UID
 import kotlinx.serialization.Serializable
-import models.subjects.SubjectDetails
+import models.subjects.SubjectDetailsData
 import models.users.ContactInfoData
-import models.users.EmployeeDetails
+import models.users.EmployeeDetailsData
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
 @Serializable
-data class OrganizationDetails(
+data class OrganizationDetailsData(
     val uid: UID,
     val isMain: Boolean,
     val shortName: String,
     val fullName: String? = null,
     val type: String,
     val avatar: String? = null,
-    val subjects: List<SubjectDetails> = emptyList(),
-    val employee: List<EmployeeDetails> = emptyList(),
+    val scheduleTimeIntervals: ScheduleTimeIntervalsData,
+    val subjects: List<SubjectDetailsData> = emptyList(),
+    val employee: List<EmployeeDetailsData> = emptyList(),
     val emails: List<ContactInfoData> = emptyList(),
     val phones: List<ContactInfoData> = emptyList(),
     val locations: List<ContactInfoData> = emptyList(),

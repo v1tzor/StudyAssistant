@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mappers
+package mappers.users
 
 import entities.employee.Employee
 import entities.employee.EmployeePost
@@ -22,13 +22,17 @@ import extensions.mapEpochTimeToInstant
 import functional.TimeRange
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import models.users.EmployeeDetails
+import mappers.mapToData
+import mappers.mapToDomain
+import mappers.settings.mapToData
+import mappers.settings.mapToDomain
+import models.users.EmployeeDetailsData
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
-fun EmployeeDetails.mapToDomain() = Employee(
+fun EmployeeDetailsData.mapToDomain() = Employee(
     uid = uid,
     organizationId = organizationId,
     firstName = firstName,
@@ -49,7 +53,7 @@ fun EmployeeDetails.mapToDomain() = Employee(
     webs = webs.map { it.mapToDomain() },
 )
 
-fun Employee.mapToData() = EmployeeDetails(
+fun Employee.mapToData() = EmployeeDetailsData(
     uid = uid,
     organizationId = organizationId,
     firstName = firstName,
@@ -66,7 +70,7 @@ fun Employee.mapToData() = EmployeeDetails(
     webs = webs.map { it.mapToData() },
 )
 
-fun EmployeeDetails.mapToLocalData() = EmployeeEntity(
+fun EmployeeDetailsData.mapToLocalData() = EmployeeEntity(
     uid = uid,
     organization_id = organizationId,
     first_name = firstName,
@@ -77,14 +81,14 @@ fun EmployeeDetails.mapToLocalData() = EmployeeEntity(
     birthday = birthday,
     workTimeStart = workTimeStart,
     workTimeEnd = workTimeEnd,
-    email = emails.map { Json.encodeToString(it) },
+    emails = emails.map { Json.encodeToString(it) },
     phones = phones.map { Json.encodeToString(it) },
     locations = locations.map { Json.encodeToString(it) },
     webs = webs.map { Json.encodeToString(it) },
 )
 
 
-fun EmployeeEntity.mapToDetailsData() = EmployeeDetails(
+fun EmployeeEntity.mapToDetailsData() = EmployeeDetailsData(
     uid = uid,
     organizationId = organization_id,
     firstName = first_name,
@@ -95,7 +99,7 @@ fun EmployeeEntity.mapToDetailsData() = EmployeeDetails(
     birthday = birthday,
     workTimeStart = workTimeStart,
     workTimeEnd = workTimeEnd,
-    emails = email.map { Json.decodeFromString(it) },
+    emails = emails.map { Json.decodeFromString(it) },
     phones = phones.map { Json.decodeFromString(it) },
     locations = locations.map { Json.decodeFromString(it) },
     webs = webs.map { Json.decodeFromString(it) },

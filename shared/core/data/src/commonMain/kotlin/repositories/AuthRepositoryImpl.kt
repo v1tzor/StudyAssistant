@@ -18,8 +18,8 @@ package repositories
 
 import dev.gitlive.firebase.auth.FirebaseUser
 import entities.auth.AuthCredentials
+import exceptions.FirebaseDataAuthException
 import remote.auth.AuthRemoteDataSource
-import exceptions.FirebaseAuthException
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
@@ -33,7 +33,7 @@ class AuthRepositoryImpl(
             email = credentials.email,
             password = credentials.password
         )
-        return user ?: throw FirebaseAuthException()
+        return user ?: throw FirebaseDataAuthException()
     }
 
     override suspend fun signInWithEmail(credentials: AuthCredentials): FirebaseUser {
@@ -41,12 +41,12 @@ class AuthRepositoryImpl(
             email = credentials.email,
             password = credentials.password
         )
-        return user ?: throw FirebaseAuthException()
+        return user ?: throw FirebaseDataAuthException()
     }
 
     override suspend fun signInViaGoogle(idToken: String?): FirebaseUser {
         val user = remoteDataSource.signInViaGoogle(idToken)
-        return user ?: throw FirebaseAuthException()
+        return user ?: throw FirebaseDataAuthException()
     }
 
     override suspend fun signOut() {

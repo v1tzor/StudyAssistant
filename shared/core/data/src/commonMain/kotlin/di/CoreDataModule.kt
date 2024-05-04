@@ -23,6 +23,7 @@ import database.listOfStringsAdapter
 import database.organizations.OrganizationsLocalDataSource
 import database.settings.CalendarSettingsLocalDataSource
 import database.settings.GeneralSettingsLocalDataSource
+import database.tasks.HomeworksLocalDataSource
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
@@ -35,7 +36,8 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import remote.auth.AuthRemoteDataSource
 import remote.settings.CalendarSettingsRemoteDataSource
-import remote.settings.OrganizationsRemoteDataSource
+import remote.organizations.OrganizationsRemoteDataSource
+import remote.tasks.HomeworksRemoteDataSource
 import remote.users.UsersRemoteDataSource
 import repositories.AuthRepository
 import repositories.AuthRepositoryImpl
@@ -43,6 +45,8 @@ import repositories.CalendarSettingsRepository
 import repositories.CalendarSettingsRepositoryImpl
 import repositories.GeneralSettingsRepository
 import repositories.GeneralSettingsRepositoryImpl
+import repositories.HomeworksRepository
+import repositories.HomeworksRepositoryImpl
 import repositories.ManageUserRepository
 import repositories.ManageUserRepositoryImpl
 import repositories.OrganizationsRepository
@@ -57,6 +61,7 @@ import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
 import ru.aleshin.studyassistant.sqldelight.settings.CalendarQueries
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries
+import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkQueries
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
@@ -78,7 +83,7 @@ val coreDataModule = DI.Module("CoreData") {
     bindSingleton<CalendarQueries> { instance<Database>().calendarQueries }
     bindSingleton<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance()) }
     bindSingleton<CalendarSettingsLocalDataSource> { CalendarSettingsLocalDataSource.Base(instance(), instance()) }
-    bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance()) }
+    bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance(), instance()) }
 
     bindSingleton<AuthRemoteDataSource> { AuthRemoteDataSource.Base(instance()) }
     bindSingleton<AuthRepository> { AuthRepositoryImpl(instance()) }
@@ -95,4 +100,9 @@ val coreDataModule = DI.Module("CoreData") {
     bindSingleton<SubjectQueries> { instance<Database>().subjectQueries }
 
     bindSingleton<EmployeeQueries> { instance<Database>().employeeQueries }
+
+    bindSingleton<HomeworkQueries> { instance<Database>().homeworkQueries }
+    bindSingleton<HomeworksLocalDataSource> { HomeworksLocalDataSource.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<HomeworksRemoteDataSource> { HomeworksRemoteDataSource.Base(instance()) }
+    bindProvider<HomeworksRepository> { HomeworksRepositoryImpl(instance(), instance(), instance()) }
 }

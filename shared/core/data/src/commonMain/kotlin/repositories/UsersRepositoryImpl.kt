@@ -21,8 +21,10 @@ import entities.users.AppUser
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import mappers.mapToData
-import mappers.mapToDomain
+import mappers.organizations.mapToData
+import mappers.organizations.mapToDomain
+import mappers.users.mapToData
+import mappers.users.mapToDomain
 import remote.users.UsersRemoteDataSource
 
 /**

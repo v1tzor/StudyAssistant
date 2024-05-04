@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views
 
 import androidx.annotation.FloatRange
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.TopAppBar
@@ -44,7 +45,10 @@ internal fun SetupTopBar(
     onBackPressed: () -> Unit,
     @FloatRange(0.0, 1.0) stepProgress: Float,
 ) {
-    val progress by animateFloatAsState(stepProgress)
+    val progress by animateFloatAsState(
+        targetValue = stepProgress,
+        animationSpec = tween(320)
+    )
     TopAppBar(
         modifier = modifier,
         title = {

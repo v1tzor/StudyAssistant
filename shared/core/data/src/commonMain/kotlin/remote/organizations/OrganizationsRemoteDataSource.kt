@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package remote.settings
+package remote.organizations
 
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.where
@@ -23,12 +23,13 @@ import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
-import mappers.mapToDetailsData
-import mappers.mapToRemoteData
-import models.organizations.OrganizationDetails
+import mappers.organizations.mapToDetailsData
+import mappers.organizations.mapToRemoteData
+import mappers.subjects.mapToDetailsData
+import models.organizations.OrganizationDetailsData
 import models.organizations.OrganizationPojo
 import models.subjects.SubjectPojo
-import models.users.EmployeeDetails
+import models.users.EmployeeDetailsData
 import remote.StudyAssistantFirestore.UserData
 
 /**
@@ -36,17 +37,17 @@ import remote.StudyAssistantFirestore.UserData
  */
 interface OrganizationsRemoteDataSource {
 
-    suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationDetails>>
+    suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationDetailsData>>
 
-    suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetails>
+    suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsData>
 
-    suspend fun addOrUpdateOrganization(organization: OrganizationDetails, targetUser: UID): UID
+    suspend fun addOrUpdateOrganization(organization: OrganizationDetailsData, targetUser: UID): UID
 
     class Base(
         private val database: FirebaseFirestore,
     ) : OrganizationsRemoteDataSource {
 
-        override suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationDetails>> {
+        override suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationDetailsData>> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
@@ -65,7 +66,7 @@ interface OrganizationsRemoteDataSource {
                         UserData.ORGANIZATION_ID equalTo organizationPojo.uid
                     }
 
-                    val employeeList = employeeReference.get().documents.map { it.data<EmployeeDetails>() }
+                    val employeeList = employeeReference.get().documents.map { it.data<EmployeeDetailsData>() }
                     val subjectList = subjectsReference.get().documents.map { it.data<SubjectPojo>() }.map { subjectPojo ->
                         subjectPojo.mapToDetailsData(employeeList.find { it.uid == subjectPojo.teacher })
                     }
@@ -78,10 +79,7 @@ interface OrganizationsRemoteDataSource {
             }
         }
 
-        override suspend fun fetchOrganizationById(
-            uid: UID,
-            targetUser: UID
-        ): Flow<OrganizationDetails> {
+        override suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsData> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
@@ -99,7 +97,7 @@ interface OrganizationsRemoteDataSource {
                     UserData.ORGANIZATION_ID equalTo organizationPojo.uid
                 }
 
-                val employeeList = employeeReference.get().documents.map { it.data<EmployeeDetails>() }
+                val employeeList = employeeReference.get().documents.map { it.data<EmployeeDetailsData>() }
                 val subjectList = subjectsReference.get().documents.map { it.data<SubjectPojo>() }.map { subjectPojo ->
                     subjectPojo.mapToDetailsData(employeeList.find { it.uid == subjectPojo.teacher })
                 }
@@ -111,10 +109,7 @@ interface OrganizationsRemoteDataSource {
             }
         }
 
-        override suspend fun addOrUpdateOrganization(
-            organization: OrganizationDetails,
-            targetUser: UID
-        ): UID {
+        override suspend fun addOrUpdateOrganization(organization: OrganizationDetailsData, targetUser: UID): UID {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
             val organizationPojo = organization.mapToRemoteData()

@@ -31,6 +31,7 @@ data class Organization(
     val fullName: String? = null,
     val type: OrganizationType = OrganizationType.SCHOOL,
     val avatar: String? = null,
+    val scheduleTimeIntervals: ScheduleTimeIntervals = ScheduleTimeIntervals(),
     val subjects: List<Subject> = emptyList(),
     val employee: List<Employee> = emptyList(),
     val emails: List<ContactInfo> = emptyList(),

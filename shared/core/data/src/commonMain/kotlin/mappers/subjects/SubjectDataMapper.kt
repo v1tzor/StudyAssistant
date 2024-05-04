@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package mappers
+package mappers.subjects
 
 import entities.subject.EventType
 import entities.subject.Subject
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import models.subjects.SubjectDetails
+import mappers.mapToData
+import mappers.mapToDomain
+import mappers.users.mapToData
+import mappers.users.mapToDomain
+import models.subjects.SubjectDetailsData
 import models.subjects.SubjectPojo
-import models.users.EmployeeDetails
+import models.users.EmployeeDetailsData
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectEntity
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
-fun SubjectDetails.mapToDomain() = Subject(
+fun SubjectDetailsData.mapToDomain() = Subject(
     uid = uid,
     organizationId = organizationId,
     eventType = EventType.valueOf(eventType),
@@ -39,7 +43,7 @@ fun SubjectDetails.mapToDomain() = Subject(
     location = location.mapToDomain(),
 )
 
-fun Subject.mapToData() = SubjectDetails(
+fun Subject.mapToData() = SubjectDetailsData(
     uid = uid,
     organizationId = organizationId,
     eventType = eventType.name,
@@ -50,7 +54,7 @@ fun Subject.mapToData() = SubjectDetails(
     location = location.mapToData(),
 )
 
-fun SubjectDetails.mapToLocalData() = SubjectEntity(
+fun SubjectDetailsData.mapToLocalData() = SubjectEntity(
     uid = uid,
     organization_id = organizationId,
     event_type = eventType,
@@ -62,8 +66,8 @@ fun SubjectDetails.mapToLocalData() = SubjectEntity(
 )
 
 fun SubjectEntity.mapToDetailsData(
-    employee: EmployeeDetails?,
-) = SubjectDetails(
+    employee: EmployeeDetailsData?,
+) = SubjectDetailsData(
     uid = uid,
     organizationId = organization_id,
     eventType = event_type,
@@ -74,7 +78,7 @@ fun SubjectEntity.mapToDetailsData(
     location = Json.decodeFromString(location),
 )
 
-fun SubjectDetails.mapToRemoteData() = SubjectPojo(
+fun SubjectDetailsData.mapToRemoteData() = SubjectPojo(
     uid = uid,
     organizationId = organizationId,
     eventType = eventType,
@@ -86,8 +90,8 @@ fun SubjectDetails.mapToRemoteData() = SubjectPojo(
 )
 
 fun SubjectPojo.mapToDetailsData(
-    employee: EmployeeDetails?,
-) = SubjectDetails(
+    employee: EmployeeDetailsData?,
+) = SubjectDetailsData(
     uid = uid,
     organizationId = organizationId,
     eventType = eventType,

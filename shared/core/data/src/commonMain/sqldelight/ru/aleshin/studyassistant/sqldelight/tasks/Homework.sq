@@ -1,0 +1,33 @@
+CREATE TABLE homeworkEntity (
+    uid TEXT PRIMARY KEY NOT NULL,
+    class_id TEXT,
+    date INTEGER NOT NULL,
+    subject_id TEXT,
+    organization_id TEXT NOT NULL,
+    event_type TEXT NOT NULL,
+    theoretical_tasks TEXT NOT NULL,
+    practical_tasks TEXT NOT NULL,
+    presentations TEXT NOT NULL,
+    test TEXT,
+    priority TEXT NOT NULL,
+    is_done INTEGER NOT NULL
+);
+
+fetchHomeworksByTimeRange:
+SELECT *
+FROM homeworkEntity
+WHERE date BETWEEN ? AND ?
+ORDER BY date DESC;
+
+fetchHomeworkById:
+SELECT *
+FROM homeworkEntity
+WHERE uid = ?;
+
+addOrUpdateHomeworks:
+INSERT OR REPLACE INTO homeworkEntity (uid, class_id, date, subject_id, organization_id, event_type, theoretical_tasks, practical_tasks, presentations, test, priority, is_done)
+VALUES ?;
+
+deleteHomework:
+DELETE FROM homeworkEntity
+WHERE uid = ?;

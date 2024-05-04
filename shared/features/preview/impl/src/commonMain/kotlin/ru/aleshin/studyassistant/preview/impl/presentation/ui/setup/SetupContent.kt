@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -68,11 +69,11 @@ internal fun SetupContent(
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         AnimatedContent(
-            targetState = state.currentPage,
+            targetState = if (profile != null) currentPage else null,
             modifier = Modifier.weight(1f).padding(horizontal = 24.dp),
             transitionSpec = {
                 fadeIn(animationSpec = tween(320, delayMillis = 90)).togetherWith(
-                    fadeOut(animationSpec = tween(180))
+                    fadeOut(animationSpec = tween(320))
                 )
             },
         ) { page ->
@@ -80,35 +81,39 @@ internal fun SetupContent(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
-                    SetupStepHeader(
-                        title = page.stepTitle,
-                        currentStep = page.id.inc(),
-                        maxSteps = SetupPage.entries.size,
-                    )
-                    when (page) {
-                        SetupPage.PROFILE -> if (profile != null) {
-                            ProfilePageInfo(
-                                profile = profile,
-                                onUpdateProfile = onUpdateProfile,
-                                onSetAvatar = {},
-                            )
+                if (page != null) {
+                    Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
+                        SetupStepHeader(
+                            title = page.stepTitle,
+                            currentStep = page.id.inc(),
+                            maxSteps = SetupPage.entries.size,
+                        )
+                        when (page) {
+                            SetupPage.PROFILE -> if (profile != null) {
+                                ProfilePageInfo(
+                                    profile = profile,
+                                    onUpdateProfile = onUpdateProfile,
+                                    onSetAvatar = {},
+                                )
+                            }
+                            SetupPage.ORGANIZATION -> if (organization != null) {
+                                OrganizationPageInfo(
+                                    organization = organization,
+                                    onUpdateOrganization = onUpdateOrganization,
+                                    onSetAvatar = {},
+                                )
+                            }
+                            SetupPage.CALENDAR -> if (calendarSettings != null) {
+                                CalendarPageInfo(
+                                    calendarSettings = calendarSettings,
+                                    onUpdateCalendarSettings = onUpdateCalendarSettings,
+                                )
+                            }
+                            SetupPage.SCHEDULE -> SchedulePageInfo()
                         }
-                        SetupPage.ORGANIZATION -> if (organization != null) {
-                            OrganizationPageInfo(
-                                organization = organization,
-                                onUpdateOrganization = onUpdateOrganization,
-                                onSetAvatar = {},
-                            )
-                        }
-                        SetupPage.CALENDAR -> if (calendarSettings != null) {
-                            CalendarPageInfo(
-                                calendarSettings = calendarSettings,
-                                onUpdateCalendarSettings = onUpdateCalendarSettings,
-                            )
-                        }
-                        SetupPage.SCHEDULE -> SchedulePageInfo()
                     }
+                } else {
+                    CircularProgressIndicator()
                 }
             }
         }

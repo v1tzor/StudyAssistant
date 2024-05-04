@@ -8,6 +8,7 @@ CREATE TABLE organizationEntity (
   full_name TEXT,
   type TEXT NOT NULL,
   avatar TEXT,
+  scheduleTimeIntervals TEXT NOT NULL,
   emails TEXT AS List<String> NOT NULL,
   phones TEXT AS List<String> NOT NULL,
   locations TEXT AS List<String> NOT NULL,
@@ -25,5 +26,5 @@ FROM organizationEntity
 WHERE uid = ?;
 
 addOrUpdateOrganization:
-INSERT OR REPLACE INTO organizationEntity (uid, is_main, short_name, full_name, type, avatar, emails, phones, locations, webs, is_hide)
+INSERT OR REPLACE INTO organizationEntity (uid, is_main, short_name, full_name, type, avatar, scheduleTimeIntervals, emails, phones, locations, webs, is_hide)
 VALUES ?;

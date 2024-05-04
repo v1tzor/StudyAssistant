@@ -22,6 +22,11 @@ import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
+import mappers.organizations.mapToDetailsData
+import mappers.organizations.mapToRemoteData
+import mappers.settings.mapToDetailsData
+import mappers.settings.mapToRemoteData
+import models.settings.CalendarSettingsDetailsData
 import models.settings.CalendarSettingsPojo
 import remote.StudyAssistantFirestore.UserData
 
@@ -30,28 +35,28 @@ import remote.StudyAssistantFirestore.UserData
  */
 interface CalendarSettingsRemoteDataSource {
 
-    fun fetchSettings(targetUser: UID): Flow<CalendarSettingsPojo>
+    fun fetchSettings(targetUser: UID): Flow<CalendarSettingsDetailsData>
 
-    suspend fun addOrUpdateSettings(settings: CalendarSettingsPojo, targetUser: UID)
+    suspend fun addOrUpdateSettings(settings: CalendarSettingsDetailsData, targetUser: UID)
 
     class Base(
         private val database: FirebaseFirestore
     ) : CalendarSettingsRemoteDataSource {
-        override fun fetchSettings(targetUser: UID): Flow<CalendarSettingsPojo> {
+        override fun fetchSettings(targetUser: UID): Flow<CalendarSettingsDetailsData> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
             val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
             return reference.snapshots.map { snapshot ->
-                val settings = snapshot.data(serializer<CalendarSettingsPojo?>())
-                return@map settings ?: CalendarSettingsPojo.default()
+                val settings = snapshot.data(serializer<CalendarSettingsPojo?>()) ?: CalendarSettingsPojo.default()
+                return@map settings.mapToDetailsData()
             }
         }
 
-        override suspend fun addOrUpdateSettings(settings: CalendarSettingsPojo, targetUser: UID) {
+        override suspend fun addOrUpdateSettings(settings: CalendarSettingsDetailsData, targetUser: UID) {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
             val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
-            reference.set(settings, merge = true)
+            reference.set(settings.mapToRemoteData(), merge = true)
         }
     }
 }

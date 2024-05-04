@@ -14,28 +14,19 @@
  * limitations under the License.
  */
 
-package models.users
+package models.settings
 
-import functional.UID
+import entities.settings.NumberOfWeek
 import kotlinx.serialization.Serializable
 
 /**
- * @author Stanislav Aleshin on 29.04.2024.
+ * @author Stanislav Aleshin on 01.05.2024.
  */
 @Serializable
-data class EmployeeDetails(
-    val uid: UID,
-    val organizationId: UID,
-    val firstName: String,
-    val secondName: String?,
-    val patronymic: String?,
-    val post: String,
-    val avatar: String? = null,
-    val birthday: String? = null,
-    val workTimeStart: Long? = null,
-    val workTimeEnd: Long? = null,
-    val emails: List<ContactInfoData> = emptyList(),
-    val phones: List<ContactInfoData> = emptyList(),
-    val locations: List<ContactInfoData> = emptyList(),
-    val webs: List<ContactInfoData> = emptyList(),
-)
+data class CalendarSettingsDetailsData(
+    val numberOfWeek: String = NumberOfWeek.ONE.name,
+) {
+    companion object {
+        fun default() = CalendarSettingsDetailsData()
+    }
+}
