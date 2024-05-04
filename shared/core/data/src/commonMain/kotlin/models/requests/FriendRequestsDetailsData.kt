@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package repositories
+package models.requests
 
-import entities.tasks.Homework
-import functional.TimeRange
-import functional.UID
-import kotlinx.coroutines.flow.Flow
+import models.users.AppUserPojo
 
 /**
- * @author Stanislav Aleshin on 04.05.2024.
+ * @author Stanislav Aleshin on 21.04.2024.
  */
-interface HomeworksRepository {
-    suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>>
-    suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<Homework?>
-    suspend fun addOrUpdateHomework(homework: Homework, targetUser: UID): UID
-    suspend fun deleteHomework(uid: UID, targetUser: UID)
-}
+data class FriendRequestsDetailsData(
+    val received: List<AppUserPojo> = emptyList(),
+    val send: List<AppUserPojo> = emptyList(),
+    val lastAccepted: List<AppUserPojo> = emptyList(),
+)

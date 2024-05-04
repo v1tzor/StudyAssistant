@@ -19,6 +19,7 @@ package database.tasks
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
+import app.cash.sqldelight.coroutines.mapToOneOrNull
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -63,7 +64,7 @@ interface HomeworksLocalDataSource {
 
             return homeworkEntityListFlow.map { homeworks ->
                 homeworks.map { homeworkEntity ->
-                    val organizationQuery = organizationsQueries.fetchById(
+                    val organizationQuery = organizationsQueries.fetchOrganizationById(
                         uid = homeworkEntity.organization_id,
                         mapper = { uid, _, shortName, _, type, avatar, _, _, _, _, _, _ ->
                             OrganizationShortData(uid, shortName, type, avatar)
@@ -88,21 +89,23 @@ interface HomeworksLocalDataSource {
 
         override suspend fun fetchHomeworkById(uid: UID): Flow<HomeworkDetailsData?> {
             val query = homeworkQueries.fetchHomeworkById(uid)
-            val homeworkEntityFlow = query.asFlow().mapToOne(coroutineContext)
+            val homeworkEntityFlow = query.asFlow().mapToOneOrNull(coroutineContext)
 
             return homeworkEntityFlow.map { homeworkEntity ->
-                val organizationQuery = organizationsQueries.fetchById(
+                if (homeworkEntity == null) return@map null
+
+                val subjectQuery = homeworkEntity.subject_id?.let { subjectQueries.fetchSubjectById(it) }
+                val organizationQuery = organizationsQueries.fetchOrganizationById(
                     uid = homeworkEntity.organization_id,
                     mapper = { uid, _, shortName, _, type, avatar, _, _, _, _, _, _ ->
                         OrganizationShortData(uid, shortName, type, avatar)
                     },
                 )
-                val subjectQuery = homeworkEntity.subject_id?.let { subjectQueries.fetchSubjectById(it) }
 
                 val organization = organizationQuery.executeAsOne()
-                val subject = subjectQuery?.executeAsOne().let { subjectEntity ->
+                val subject = subjectQuery?.executeAsOneOrNull().let { subjectEntity ->
                     val employeeQuery = subjectEntity?.teacher_id?.let { employeeQueries.fetchEmployeeById(it) }
-                    val employee = employeeQuery?.executeAsOne()?.mapToDetailsData()
+                    val employee = employeeQuery?.executeAsOneOrNull()?.mapToDetailsData()
                     subjectEntity?.mapToDetailsData(employee)
                 }
 
@@ -114,8 +117,9 @@ interface HomeworksLocalDataSource {
         }
 
         override suspend fun addOrUpdateHomework(homework: HomeworkDetailsData): UID {
-            val uid = randomUUID()
-            homeworkQueries.addOrUpdateHomeworks(homework.mapToLocalData())
+            val uid = homework.uid.ifEmpty { randomUUID() }
+            val homeworkEntity = homework.mapToLocalData()
+            homeworkQueries.addOrUpdateHomeworks(homeworkEntity.copy(uid = uid))
 
             return uid
         }

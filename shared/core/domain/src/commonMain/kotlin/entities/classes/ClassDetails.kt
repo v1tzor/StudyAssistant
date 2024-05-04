@@ -14,19 +14,30 @@
  * limitations under the License.
  */
 
-package repositories
+package entities.classes
 
+import entities.common.ContactInfo
+import entities.employee.Employee
+import entities.organizations.OrganizationShort
+import entities.subject.EventType
+import entities.subject.Subject
 import entities.tasks.Homework
 import functional.TimeRange
 import functional.UID
-import kotlinx.coroutines.flow.Flow
 
 /**
- * @author Stanislav Aleshin on 04.05.2024.
+ * @author Stanislav Aleshin on 01.05.2024.
  */
-interface HomeworksRepository {
-    suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>>
-    suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<Homework?>
-    suspend fun addOrUpdateHomework(homework: Homework, targetUser: UID): UID
-    suspend fun deleteHomework(uid: UID, targetUser: UID)
-}
+data class ClassDetails(
+    val uid: UID,
+    val organization: OrganizationShort,
+    val eventType: EventType,
+    val subject: Subject?,
+    val customData: String? = null,
+    val teacher: Employee?,
+    val office: Int,
+    val location: ContactInfo,
+    val timeRange: TimeRange,
+    val notification: Boolean = false,
+    val homeWork: Homework? = null,
+)

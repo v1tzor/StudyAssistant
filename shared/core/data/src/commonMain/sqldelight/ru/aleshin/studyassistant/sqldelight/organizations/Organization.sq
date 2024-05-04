@@ -20,7 +20,7 @@ fetchAllOrganizations:
 SELECT *
 FROM organizationEntity;
 
-fetchById:
+fetchOrganizationById:
 SELECT *
 FROM organizationEntity
 WHERE uid = ?;

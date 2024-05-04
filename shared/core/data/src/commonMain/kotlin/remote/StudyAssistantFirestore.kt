@@ -34,6 +34,7 @@ object StudyAssistantFirestore {
         const val HOMEWORKS = "homeworks"
         const val BASE_SCHEDULES = "baseSchedules"
         const val CUSTOM_SCHEDULES = "customSchedules"
+        const val CLASSES = "classes"
         const val SUBJECTS = "subjects"
         const val EMPLOYEE = "employee"
 

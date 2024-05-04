@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 
-package repositories
+package models.classes
 
-import entities.tasks.Homework
-import functional.TimeRange
 import functional.UID
-import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.Serializable
+import models.users.ContactInfoData
 
 /**
- * @author Stanislav Aleshin on 04.05.2024.
+ * @author Stanislav Aleshin on 01.05.2024.
  */
-interface HomeworksRepository {
-    suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>>
-    suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<Homework?>
-    suspend fun addOrUpdateHomework(homework: Homework, targetUser: UID): UID
-    suspend fun deleteHomework(uid: UID, targetUser: UID)
-}
+@Serializable
+data class ClassPojo(
+    val uid: UID,
+    val scheduleId: UID,
+    val organizationId: UID,
+    val eventType: String,
+    val subjectId: UID?,
+    val customData: String? = null,
+    val teacherId: UID?,
+    val office: Int,
+    val location: ContactInfoData,
+    val startTime: Long,
+    val endTime: Long,
+    val notification: Boolean = false,
+)

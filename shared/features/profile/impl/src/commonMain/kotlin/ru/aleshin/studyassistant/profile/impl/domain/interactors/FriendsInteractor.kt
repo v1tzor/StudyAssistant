@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.profile.impl.domain.interactors
 
-import entities.requests.FriendRequestsShort
+import models.requests.FriendRequestsPojo
 import functional.FlowDomainResult
 import kotlinx.coroutines.flow.flowOf
 import ru.aleshin.studyassistant.profile.impl.domain.common.ProfileEitherWrapper
@@ -27,7 +27,7 @@ import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
  */
 internal interface FriendsInteractor {
 
-    suspend fun fetchAllFriendRequests(): FlowDomainResult<ProfileFailures, FriendRequestsShort>
+    suspend fun fetchAllFriendRequests(): FlowDomainResult<ProfileFailures, FriendRequestsPojo>
 
     class Base(
         private val eitherWrapper: ProfileEitherWrapper,
@@ -35,7 +35,7 @@ internal interface FriendsInteractor {
 
         override suspend fun fetchAllFriendRequests() = eitherWrapper.wrapFlow {
             // TODO: Make friends data layer
-            flowOf(FriendRequestsShort())
+            flowOf(FriendRequestsPojo())
         }
     }
 }

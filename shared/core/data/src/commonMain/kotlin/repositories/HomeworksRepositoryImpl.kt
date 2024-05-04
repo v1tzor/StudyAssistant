@@ -36,7 +36,7 @@ class HomeworksRepositoryImpl(
     private val subscriptionChecker: SubscriptionChecker,
 ) : HomeworksRepository {
 
-    override suspend fun fetchHomeworksByTime(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>> {
+    override suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
         val homeworksFlow = if (isSubscriber) {
             val from = timeRange.from.toEpochMilliseconds().toInt()

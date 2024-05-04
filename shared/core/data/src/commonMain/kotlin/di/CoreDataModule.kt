@@ -19,6 +19,7 @@ package di
 import DriverFactory
 import app.cash.sqldelight.ColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
+import database.classes.ClassLocalDataSource
 import database.listOfStringsAdapter
 import database.organizations.OrganizationsLocalDataSource
 import database.settings.CalendarSettingsLocalDataSource
@@ -35,14 +36,17 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import remote.auth.AuthRemoteDataSource
-import remote.settings.CalendarSettingsRemoteDataSource
+import remote.classes.ClassRemoteDataSource
 import remote.organizations.OrganizationsRemoteDataSource
+import remote.settings.CalendarSettingsRemoteDataSource
 import remote.tasks.HomeworksRemoteDataSource
 import remote.users.UsersRemoteDataSource
 import repositories.AuthRepository
 import repositories.AuthRepositoryImpl
 import repositories.CalendarSettingsRepository
 import repositories.CalendarSettingsRepositoryImpl
+import repositories.ClassRepository
+import repositories.ClassRepositoryImpl
 import repositories.GeneralSettingsRepository
 import repositories.GeneralSettingsRepositoryImpl
 import repositories.HomeworksRepository
@@ -54,6 +58,7 @@ import repositories.OrganizationsRepositoryImpl
 import repositories.UsersRepository
 import repositories.UsersRepositoryImpl
 import ru.aleshin.studyassistant.core.data.Database
+import ru.aleshin.studyassistant.sqldelight.`class`.ClassQueries
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationEntity
@@ -105,4 +110,9 @@ val coreDataModule = DI.Module("CoreData") {
     bindSingleton<HomeworksLocalDataSource> { HomeworksLocalDataSource.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<HomeworksRemoteDataSource> { HomeworksRemoteDataSource.Base(instance()) }
     bindProvider<HomeworksRepository> { HomeworksRepositoryImpl(instance(), instance(), instance()) }
+
+    bindSingleton<ClassQueries> { instance<Database>().classQueries }
+    bindSingleton<ClassLocalDataSource> { ClassLocalDataSource.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ClassRemoteDataSource> { ClassRemoteDataSource.Base(instance()) }
+    bindProvider<ClassRepository> { ClassRepositoryImpl(instance(), instance(), instance()) }
 }

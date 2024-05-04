@@ -16,13 +16,13 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.mappers
 
-import entities.requests.FriendRequestsShort
+import models.requests.FriendRequestsPojo
 import ru.aleshin.studyassistant.profile.impl.presentation.models.FriendRequestsUi
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
-internal fun FriendRequestsShort.mapToUi() = FriendRequestsUi(
+internal fun FriendRequestsPojo.mapToUi() = FriendRequestsUi(
     received = received,
     send = send,
     lastAccepted = lastAccepted,

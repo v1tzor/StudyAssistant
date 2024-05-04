@@ -16,17 +16,17 @@
 
 package repositories
 
-import entities.tasks.Homework
+import entities.schedules.CustomSchedule
 import functional.TimeRange
 import functional.UID
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
-interface HomeworksRepository {
-    suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>>
-    suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<Homework?>
-    suspend fun addOrUpdateHomework(homework: Homework, targetUser: UID): UID
-    suspend fun deleteHomework(uid: UID, targetUser: UID)
+interface CustomSchedulesRepository {
+    suspend fun fetchScheduleByDate(date: Instant, targetUser: UID): Flow<CustomSchedule?>
+    suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<CustomSchedule>>
+    suspend fun addOrUpdateSchedule(schedule: CustomSchedule, targetUser: UID): UID
 }

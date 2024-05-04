@@ -1,0 +1,20 @@
+CREATE TABLE customScheduleEntity (
+  uid TEXT PRIMARY KEY NOT NULL,
+  date INTEGER NOT NULL
+);
+
+fetchSchedulesByDate:
+SELECT *
+FROM customScheduleEntity
+WHERE date = ?
+ORDER BY date DESC;
+
+fetchSchedulesByTimeRange:
+SELECT *
+FROM customScheduleEntity
+WHERE date >= ? AND date <= ?
+ORDER BY date DESC;
+
+addOrUpdateSchedule:
+INSERT OR REPLACE INTO customScheduleEntity (uid, date)
+VALUES ?;

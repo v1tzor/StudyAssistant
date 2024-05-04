@@ -16,7 +16,7 @@
 
 package repositories
 
-import remote.auth.AuthRemoteDataSource
+import database.auth.AuthRemoteDataSource
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.

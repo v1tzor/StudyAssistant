@@ -47,7 +47,11 @@ interface HomeworksRemoteDataSource {
         private val database: FirebaseFirestore,
     ) : HomeworksRemoteDataSource {
 
-        override suspend fun fetchHomeworksByTime(from: Int, to: Int, targetUser: UID): Flow<List<HomeworkDetailsData>> {
+        override suspend fun fetchHomeworksByTime(
+            from: Int,
+            to: Int,
+            targetUser: UID
+        ): Flow<List<HomeworkDetailsData>> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
@@ -61,7 +65,9 @@ interface HomeworksRemoteDataSource {
 
             return homeworkPojoListFlow.map { homeworks ->
                 homeworks.map { homeworkPojo ->
-                    val organizationReference = userDataRoot.collection(UserData.ORGANIZATIONS).document(homeworkPojo.organizationId)
+                    val organizationId = homeworkPojo.organizationId
+
+                    val organizationReference = userDataRoot.collection(UserData.ORGANIZATIONS).document(organizationId)
                     val subjectReference = homeworkPojo.subjectId?.let {
                         userDataRoot.collection(UserData.SUBJECTS).document(it)
                     }
@@ -95,12 +101,17 @@ interface HomeworksRemoteDataSource {
 
             return homeworkPojoFlow.map { homeworkPojo ->
                 if (homeworkPojo == null) return@map null
-                val organizationReference = userDataRoot.collection(UserData.ORGANIZATIONS).document(homeworkPojo.organizationId)
-                val subjectReference = homeworkPojo.subjectId?.let { userDataRoot.collection(UserData.SUBJECTS).document(it) }
+                val organizationId = homeworkPojo.organizationId
+
+                val employeeReferenceRoot = userDataRoot.collection(UserData.EMPLOYEE)
+                val organizationReference = userDataRoot.collection(UserData.ORGANIZATIONS).document(organizationId)
+                val subjectReference = homeworkPojo.subjectId?.let { subjectId ->
+                    userDataRoot.collection(UserData.SUBJECTS).document(subjectId)
+                }
 
                 val organization = organizationReference.get().data<OrganizationShortData>()
                 val subject = subjectReference?.get()?.data<SubjectPojo>().let { subjectPojo ->
-                    val employeeReference = subjectPojo?.teacher?.let { userDataRoot.collection(UserData.EMPLOYEE).document(it) }
+                    val employeeReference = subjectPojo?.teacher?.let { employeeReferenceRoot.document(it) }
                     val employee = employeeReference?.get()?.data(serializer<EmployeeDetailsData?>())
                     subjectPojo?.mapToDetailsData(employee)
                 }

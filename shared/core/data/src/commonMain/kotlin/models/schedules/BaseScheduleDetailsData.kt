@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package repositories
+package models.schedules
 
-import entities.tasks.Homework
-import functional.TimeRange
 import functional.UID
-import kotlinx.coroutines.flow.Flow
+import models.classes.ClassDetailsData
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
-interface HomeworksRepository {
-    suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>>
-    suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<Homework?>
-    suspend fun addOrUpdateHomework(homework: Homework, targetUser: UID): UID
-    suspend fun deleteHomework(uid: UID, targetUser: UID)
-}
+data class BaseScheduleDetailsData(
+    val uid: UID,
+    val dateVersionFrom: Long,
+    val dateVersionTo: Long,
+    val weekDayOfWeek: String,
+    val week: String,
+    val classes: List<ClassDetailsData>,
+)

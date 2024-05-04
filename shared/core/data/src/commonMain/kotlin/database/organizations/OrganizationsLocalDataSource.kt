@@ -29,7 +29,8 @@ import mappers.subjects.mapToDetailsData
 import mappers.users.mapToDetailsData
 import models.organizations.OrganizationDetailsData
 import randomUUID
-import remote.StudyAssistantFirestore.LIMITS
+import remote.StudyAssistantFirestore.LIMITS.ORGANIZATION_EMPLOYEE
+import remote.StudyAssistantFirestore.LIMITS.ORGANIZATION_SUBJECTS
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries
@@ -63,8 +64,8 @@ interface OrganizationsLocalDataSource {
             return organizationEntityListFlow.map { organizations ->
                 organizations.map { organizationEntity ->
                     val organizationId = organizationEntity.uid
-                    val employeeQuery = employeeQueries.fetchEmployeesByOrganization(organizationId, LIMITS.ORGANIZATION_EMPLOYEE)
-                    val subjectQuery = subjectQueries.fetchSubjectsByOrganization(organizationId, LIMITS.ORGANIZATION_SUBJECTS)
+                    val employeeQuery = employeeQueries.fetchEmployeesByOrganization(organizationId, ORGANIZATION_EMPLOYEE)
+                    val subjectQuery = subjectQueries.fetchSubjectsByOrganization(organizationId, ORGANIZATION_SUBJECTS)
 
                     val employeeList = employeeQuery.executeAsList().map { entity ->
                         entity.mapToDetailsData()
@@ -82,13 +83,13 @@ interface OrganizationsLocalDataSource {
         }
 
         override suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationDetailsData> {
-            val query = organizationQueries.fetchById(uid)
+            val query = organizationQueries.fetchOrganizationById(uid)
             val organizationEntityFlow = query.asFlow().mapToOne(coroutineContext)
 
             return organizationEntityFlow.map { organizationEntity ->
                 val organizationId = organizationEntity.uid
-                val employeeQuery = employeeQueries.fetchEmployeesByOrganization(organizationId, LIMITS.ORGANIZATION_EMPLOYEE)
-                val subjectQuery = subjectQueries.fetchSubjectsByOrganization(organizationId, LIMITS.ORGANIZATION_SUBJECTS)
+                val employeeQuery = employeeQueries.fetchEmployeesByOrganization(organizationId, ORGANIZATION_EMPLOYEE)
+                val subjectQuery = subjectQueries.fetchSubjectsByOrganization(organizationId, ORGANIZATION_SUBJECTS)
 
                 val employeeList = employeeQuery.executeAsList().map { entity ->
                     entity.mapToDetailsData()
@@ -105,8 +106,9 @@ interface OrganizationsLocalDataSource {
         }
 
         override suspend fun addOrUpdateOrganization(organization: OrganizationDetailsData): UID {
-            val uid = randomUUID()
-            organizationQueries.addOrUpdateOrganization(organization.mapToLocalData())
+            val uid = organization.uid.ifEmpty { randomUUID() }
+            val organizationEntity = organization.mapToLocalData()
+            organizationQueries.addOrUpdateOrganization(organizationEntity.copy(uid = uid))
 
             return uid
         }
