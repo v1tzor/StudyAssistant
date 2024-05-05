@@ -36,6 +36,7 @@ import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationEntity
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
 import ru.aleshin.studyassistant.sqldelight.schedules.BaseScheduleQueries
+import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleQueries
 import ru.aleshin.studyassistant.sqldelight.settings.CalendarQueries
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries
@@ -61,10 +62,11 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
 
     bindSingleton<GeneralQueries> { instance<Database>().generalQueries }
     bindSingleton<CalendarQueries> { instance<Database>().calendarQueries }
+    bindSingleton<BaseScheduleQueries> { instance<Database>().baseScheduleQueries }
+    bindSingleton<CustomScheduleQueries> { instance<Database>().customScheduleQueries }
+    bindSingleton<ClassQueries> { instance<Database>().classQueries }
+    bindSingleton<HomeworkQueries> { instance<Database>().homeworkQueries }
     bindSingleton<OrganizationQueries> { instance<Database>().organizationQueries }
     bindSingleton<SubjectQueries> { instance<Database>().subjectQueries }
     bindSingleton<EmployeeQueries> { instance<Database>().employeeQueries }
-    bindSingleton<HomeworkQueries> { instance<Database>().homeworkQueries }
-    bindSingleton<ClassQueries> { instance<Database>().classQueries }
-    bindSingleton<BaseScheduleQueries> { instance<Database>().baseScheduleQueries }
 }

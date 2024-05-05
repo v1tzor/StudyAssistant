@@ -19,13 +19,14 @@ package ru.aleshin.studyassistant
 import com.mmk.kmpauth.google.GoogleAuthCredentials
 import com.mmk.kmpauth.google.GoogleAuthProvider
 import di.coreDataModule
-import ru.aleshin.studyassistant.di.PlatformConfiguration
+import di.coreDatabaseModule
 import di.coreModule
 import functional.Constants.App.WEB_CLIENT_ID
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import ru.aleshin.studyassistant.di.MainDependenciesGraph
+import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.aleshin.studyassistant.di.modules.domainModule
 import ru.aleshin.studyassistant.di.modules.featureModule
 import ru.aleshin.studyassistant.di.modules.platformModule
@@ -39,7 +40,15 @@ object PlatformSDK {
     fun doInit(configuration: PlatformConfiguration) {
         val graph = DI {
             bindSingleton<PlatformConfiguration> { configuration }
-            importAll(platformModule, coreModule, coreDataModule, featureModule, presentationModule, domainModule)
+            importAll(
+                platformModule,
+                coreModule,
+                coreDatabaseModule,
+                coreDataModule,
+                featureModule,
+                presentationModule,
+                domainModule,
+            )
         }
         MainDependenciesGraph.initialize(graph.direct)
         GoogleAuthProvider.create(credentials = GoogleAuthCredentials(serverId = WEB_CLIENT_ID))
