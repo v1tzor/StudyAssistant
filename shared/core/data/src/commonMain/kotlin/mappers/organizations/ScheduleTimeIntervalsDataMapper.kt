@@ -27,8 +27,10 @@ import models.organizations.ScheduleTimeIntervalsData
  */
 fun ScheduleTimeIntervals.mapToDate() = ScheduleTimeIntervalsData(
     firstClassTime = firstClassTime?.toEpochMilliseconds(),
-    classDuration = classDuration.map { it.mapToDate() },
-    breakDuration = breakDuration.map { it.mapToDate() }
+    baseClassDuration = baseClassDuration,
+    baseBreakDuration = baseBreakDuration,
+    specificClassDuration = specificClassDuration.map { it.mapToDate() },
+    specificBreakDuration = specificBreakDuration.map { it.mapToDate() }
 )
 
 fun NumberedDuration.mapToDate() = NumberedDurationData(
@@ -38,8 +40,10 @@ fun NumberedDuration.mapToDate() = NumberedDurationData(
 
 fun ScheduleTimeIntervalsData.mapToDomain() = ScheduleTimeIntervals(
     firstClassTime = firstClassTime?.mapEpochTimeToInstant(),
-    classDuration = classDuration.map { it.mapToDomain() },
-    breakDuration = breakDuration.map { it.mapToDomain() },
+    baseClassDuration = baseClassDuration,
+    baseBreakDuration = baseBreakDuration,
+    specificClassDuration = specificClassDuration.map { it.mapToDomain() },
+    specificBreakDuration = specificBreakDuration.map { it.mapToDomain() },
 )
 
 fun NumberedDurationData.mapToDomain() = NumberedDuration(

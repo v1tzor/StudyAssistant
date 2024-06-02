@@ -16,6 +16,7 @@
 
 package models.organizations
 
+import entities.organizations.Millis
 import kotlinx.serialization.Serializable
 
 /**
@@ -24,6 +25,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ScheduleTimeIntervalsData(
     val firstClassTime: Long? = null,
-    val classDuration: List<NumberedDurationData> = emptyList(),
-    val breakDuration: List<NumberedDurationData> = emptyList(),
+    val baseClassDuration: Millis? = null,
+    val baseBreakDuration: Millis? = null,
+    val specificClassDuration: List<NumberedDurationData> = emptyList(),
+    val specificBreakDuration: List<NumberedDurationData> = emptyList(),
 )

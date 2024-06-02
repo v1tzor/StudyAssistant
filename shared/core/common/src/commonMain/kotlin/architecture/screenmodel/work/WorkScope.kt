@@ -94,3 +94,5 @@ interface WorkScope<S : BaseViewState, A : BaseAction, F : BaseUiEffect> : WorkR
 }
 
 interface BackgroundWorkKey
+
+object MainWorkKey : BackgroundWorkKey

@@ -1,7 +1,16 @@
+import kotlin.String;
+import kotlin.collections.List;
+
 CREATE TABLE customScheduleEntity (
   uid TEXT PRIMARY KEY NOT NULL,
-  date INTEGER NOT NULL
+  date INTEGER NOT NULL,
+  classes TEXT AS List<String> NOT NULL
 );
+
+fetchScheduleById:
+SELECT *
+FROM customScheduleEntity
+WHERE uid = ?;
 
 fetchSchedulesByDate:
 SELECT *
@@ -16,5 +25,5 @@ WHERE date >= ? AND date <= ?
 ORDER BY date DESC;
 
 addOrUpdateSchedule:
-INSERT OR REPLACE INTO customScheduleEntity (uid, date)
+INSERT OR REPLACE INTO customScheduleEntity (uid, date, classes)
 VALUES ?;

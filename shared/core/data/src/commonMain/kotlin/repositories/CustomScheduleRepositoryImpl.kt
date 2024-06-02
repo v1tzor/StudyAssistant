@@ -17,6 +17,7 @@
 package repositories
 
 import database.schedules.CustomScheduleLocalDataSource
+import entities.classes.Class
 import entities.schedules.CustomSchedule
 import functional.TimeRange
 import functional.UID
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import mappers.schedules.mapToData
 import mappers.schedules.mapToDomain
+import mappers.tasks.mapToDomain
 import payments.SubscriptionChecker
 import remote.schedules.CustomScheduleRemoteDataSource
 
@@ -37,17 +39,29 @@ class CustomScheduleRepositoryImpl(
     private val subscriptionChecker: SubscriptionChecker,
 ) : CustomScheduleRepository {
 
+    override suspend fun addOrUpdateSchedule(
+        schedule: CustomSchedule,
+        targetUser: UID
+    ): UID {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.addOrUpdateSchedule(schedule.mapToData(), targetUser)
+        } else {
+            localDataSource.addOrUpdateSchedule(schedule.mapToData())
+        }
+    }
+
     override suspend fun fetchScheduleByDate(
         date: Instant,
         targetUser: UID
     ): Flow<CustomSchedule?> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-        val dateMillis = date.toEpochMilliseconds()
 
         val scheduleFlow = if (isSubscriber) {
-            remoteDataSource.fetchScheduleByDate(dateMillis.toInt(), targetUser)
+            remoteDataSource.fetchScheduleByDate(date, targetUser)
         } else {
-            localDataSource.fetchScheduleByDate(dateMillis)
+            localDataSource.fetchScheduleByDate(date)
         }
 
         return scheduleFlow.map { scheduleData ->
@@ -60,13 +74,11 @@ class CustomScheduleRepositoryImpl(
         targetUser: UID
     ): Flow<List<CustomSchedule>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-        val timeStart = timeRange.from.toEpochMilliseconds()
-        val timeEnd = timeRange.to.toEpochMilliseconds()
 
         val scheduleListFlow = if (isSubscriber) {
-            remoteDataSource.fetchSchedulesByTimeRange(timeStart.toInt(), timeEnd.toInt(), targetUser)
+            remoteDataSource.fetchSchedulesByTimeRange(timeRange.from, timeRange.to, targetUser)
         } else {
-            localDataSource.fetchSchedulesByTimeRange(timeStart, timeEnd)
+            localDataSource.fetchSchedulesByTimeRange(timeRange.from, timeRange.to)
         }
 
         return scheduleListFlow.map { scheduleList ->
@@ -74,16 +86,17 @@ class CustomScheduleRepositoryImpl(
         }
     }
 
-    override suspend fun addOrUpdateSchedule(
-        schedule: CustomSchedule,
-        targetUser: UID
-    ): UID {
+    override suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<Class?> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateSchedule(schedule.mapToData(), targetUser)
+        val classFlow = if (isSubscriber) {
+            remoteDataSource.fetchClassById(uid, scheduleId, targetUser)
         } else {
-            localDataSource.addOrUpdateSchedule(schedule.mapToData())
+            localDataSource.fetchClassById(uid, scheduleId)
+        }
+
+        return classFlow.map { classData ->
+            classData?.mapToDomain()
         }
     }
 }

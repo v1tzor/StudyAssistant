@@ -29,7 +29,7 @@ import theme.StudyAssistantRes
  */
 @Composable
 internal fun AuthTheme(content: @Composable () -> Unit) {
-    val icons = fetchAuthIcons(StudyAssistantRes.colorsType.isDark)
+    val icons = fetchAuthIcons(StudyAssistantRes.colors.isDark)
     val strings = fetchAuthStrings(StudyAssistantRes.language)
 
     CompositionLocalProvider(

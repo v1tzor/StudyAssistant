@@ -19,6 +19,7 @@ package di
 import DriverFactory
 import app.cash.sqldelight.ColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
+import database.listOfIntAdapter
 import database.listOfStringsAdapter
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
@@ -30,12 +31,13 @@ import org.kodein.di.bindEagerSingleton
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.data.Database
-import ru.aleshin.studyassistant.sqldelight.`class`.ClassQueries
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationEntity
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
+import ru.aleshin.studyassistant.sqldelight.schedules.BaseScheduleEntity
 import ru.aleshin.studyassistant.sqldelight.schedules.BaseScheduleQueries
+import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleEntity
 import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleQueries
 import ru.aleshin.studyassistant.sqldelight.settings.CalendarQueries
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
@@ -51,20 +53,19 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
 
     bindEagerSingleton<SqlDriver> { instance<DriverFactory>().createDriver() }
     bindEagerSingleton<ColumnAdapter<List<String>, String>> { listOfStringsAdapter }
-    bindEagerSingleton<OrganizationEntity.Adapter> {
-        OrganizationEntity.Adapter(instance(), instance(), instance(), instance())
-    }
-    bindEagerSingleton<EmployeeEntity.Adapter> {
-        EmployeeEntity.Adapter(instance(), instance(), instance(), instance())
-    }
+    bindEagerSingleton<ColumnAdapter<List<Int>, String>> { listOfIntAdapter }
+    bindEagerSingleton<CustomScheduleEntity.Adapter> { CustomScheduleEntity.Adapter(instance()) }
+    bindEagerSingleton<BaseScheduleEntity.Adapter> { BaseScheduleEntity.Adapter(instance()) }
+    bindEagerSingleton<OrganizationEntity.Adapter> { OrganizationEntity.Adapter(instance(), instance(), instance(), instance(), instance()) }
+    bindEagerSingleton<EmployeeEntity.Adapter> { EmployeeEntity.Adapter(instance(), instance(), instance(), instance()) }
 
-    bindEagerSingleton<Database> { Database(instance<SqlDriver>(), instance(), instance()) }
+    bindEagerSingleton<Database> { Database(instance<SqlDriver>(), instance(), instance(), instance(), instance()) }
 
     bindSingleton<GeneralQueries> { instance<Database>().generalQueries }
     bindSingleton<CalendarQueries> { instance<Database>().calendarQueries }
     bindSingleton<BaseScheduleQueries> { instance<Database>().baseScheduleQueries }
     bindSingleton<CustomScheduleQueries> { instance<Database>().customScheduleQueries }
-    bindSingleton<ClassQueries> { instance<Database>().classQueries }
+    // bindSingleton<ClassQueries> { instance<Database>().classQueries }
     bindSingleton<HomeworkQueries> { instance<Database>().homeworkQueries }
     bindSingleton<OrganizationQueries> { instance<Database>().organizationQueries }
     bindSingleton<SubjectQueries> { instance<Database>().subjectQueries }

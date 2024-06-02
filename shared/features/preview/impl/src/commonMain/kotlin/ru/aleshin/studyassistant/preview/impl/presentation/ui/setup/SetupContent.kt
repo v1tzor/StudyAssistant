@@ -117,8 +117,14 @@ internal fun SetupContent(
                 }
             }
         }
+        // TODO: Make button for navigate to schedule screen
         NavigationPageButton(
-            modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 36.dp, top = 16.dp),
+            modifier = Modifier.padding(
+                start = 24.dp,
+                end = 24.dp,
+                bottom = 36.dp,
+                top = 16.dp
+            ),
             navigationLabel = currentPage.buttonLabel,
             onClick = {
                 when (currentPage) {

@@ -26,3 +26,7 @@ import kotlin.random.Random
 fun generateSevenDigitCode(): String {
     return abs(Random(Clock.System.now().toEpochMilliseconds()).nextInt()).toString().substring(IntRange(0, 6))
 }
+
+inline fun <T> Iterable<T>.forEachWith(action: T.() -> Unit) {
+    for (element in this) action(element)
+}

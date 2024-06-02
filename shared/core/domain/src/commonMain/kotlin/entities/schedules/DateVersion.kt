@@ -16,8 +16,12 @@
 
 package entities.schedules
 
+import extensions.dateOfWeekDay
+import extensions.endThisDay
 import extensions.shiftDay
+import extensions.startThisDay
 import functional.Constants.Date.MAX_DAYS_SHIFT
+import kotlinx.datetime.DayOfWeek.MONDAY
 import kotlinx.datetime.Instant
 
 /**
@@ -27,9 +31,14 @@ data class DateVersion(
     val from: Instant,
     val to: Instant,
 ) {
+
+    fun makeDeprecated(currentDate: Instant): DateVersion {
+        return copy(to = currentDate.dateOfWeekDay(MONDAY).shiftDay(-1).endThisDay())
+    }
+
     companion object {
         fun createNewVersion(currentDate: Instant) = DateVersion(
-            from = currentDate,
+            from = currentDate.dateOfWeekDay(MONDAY).startThisDay(),
             to = currentDate.shiftDay(MAX_DAYS_SHIFT),
         )
     }

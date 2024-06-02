@@ -16,18 +16,21 @@
 
 package repositories
 
+import entities.classes.Class
+import entities.common.NumberOfRepeatWeek
 import entities.schedules.BaseSchedule
-import entities.settings.NumberOfWeek
 import functional.TimeRange
 import functional.UID
 import kotlinx.coroutines.flow.Flow
-import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.Instant
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
 interface BaseScheduleRepository {
-    suspend fun fetchScheduleByDate(week: NumberOfWeek, weekDayOfWeek: DayOfWeek, targetUser: UID): Flow<BaseSchedule?>
-    suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<BaseSchedule>>
     suspend fun addOrUpdateSchedule(schedule: BaseSchedule, targetUser: UID): UID
+    suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<BaseSchedule?>
+    suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek, targetUser: UID): Flow<BaseSchedule?>
+    suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<BaseSchedule>>
+    suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<Class?>
 }

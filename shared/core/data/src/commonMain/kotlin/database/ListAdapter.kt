@@ -31,3 +31,15 @@ val listOfStringsAdapter = object : ColumnAdapter<List<String>, String> {
         return value.joinToString(separator = ",")
     }
 }
+
+val listOfIntAdapter = object : ColumnAdapter<List<Int>, String> {
+
+    override fun decode(databaseValue: String): List<Int> {
+        val stringList = if (databaseValue.isEmpty()) listOf() else databaseValue.split(",")
+        return stringList.map { it.toInt() }
+    }
+
+    override fun encode(value: List<Int>): String {
+        return value.joinToString(separator = ",")
+    }
+}

@@ -49,6 +49,7 @@ fun OrganizationDetailsData.mapToDomain() = Organization(
     phones = phones.map { it.mapToDomain() },
     locations = locations.map { it.mapToDomain() },
     webs = webs.map { it.mapToDomain() },
+    offices = offices,
     isHide = isHide,
 )
 
@@ -66,6 +67,7 @@ fun Organization.mapToData() = OrganizationDetailsData(
     phones = phones.map { it.mapToData() },
     locations = locations.map { it.mapToData() },
     webs = webs.map { it.mapToData() },
+    offices = offices,
     isHide = isHide,
 )
 
@@ -81,6 +83,7 @@ fun OrganizationDetailsData.mapToLocalData() = OrganizationEntity(
     phones = phones.map { Json.encodeToString(it) },
     locations = locations.map { Json.encodeToString(it) },
     webs = webs.map { Json.encodeToString(it) },
+    offices = offices,
     is_hide = if (isHide) 1L else 0L,
 )
 
@@ -101,6 +104,7 @@ fun OrganizationEntity.mapToDetailsData(
     phones = phones.map { Json.decodeFromString(it) },
     locations = locations.map { Json.decodeFromString(it) },
     webs = webs.map { Json.decodeFromString(it) },
+    offices = offices,
     isHide = is_hide == 1L,
 )
 
@@ -116,6 +120,7 @@ fun OrganizationDetailsData.mapToRemoteData() = OrganizationPojo(
     phones = phones,
     locations = locations,
     webs = webs,
+    offices = offices,
     hide = isHide,
 )
 
@@ -136,5 +141,6 @@ fun OrganizationPojo.mapToDetailsData(
     phones = phones,
     locations = locations,
     webs = webs,
+    offices = offices,
     isHide = hide,
 )

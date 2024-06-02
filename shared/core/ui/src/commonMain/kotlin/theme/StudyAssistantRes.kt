@@ -38,7 +38,7 @@ object StudyAssistantRes {
     val language: StudyAssistantLanguage
         @Composable get() = LocalStudyAssistantLanguage.current
 
-    val colorsType: StudyAssistantColors
+    val colors: StudyAssistantColors
         @Composable get() = LocalStudyAssistantColors.current
 
     val strings: StudyAssistantStrings

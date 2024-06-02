@@ -91,7 +91,10 @@ object Constants {
         const val DAYS_IN_MONTH = 31
         const val DAYS_IN_HALF_YEAR = 183
         const val DAYS_IN_YEAR = 365
-        const val MAX_DAYS_SHIFT = 1460
+        const val MAX_DAYS_SHIFT = 730
+
+        const val MAX_HOUR = 23
+        const val MAX_MINUTE = 59
 
         const val EMPTY_DURATION = 0L
         const val MILLIS_IN_SECONDS = 1000L
@@ -116,5 +119,9 @@ object Constants {
 
     object Image {
         const val ILLUSTRATION_HEIGHT_RATION = 0.82
+    }
+
+    object Window {
+        const val SAFE_AREA_PX = 32
     }
 }

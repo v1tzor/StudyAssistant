@@ -38,6 +38,7 @@ internal interface UserInteractor {
         override suspend fun fetchCurrentAppUser() = eitherWrapper.wrapFlow {
             val currentUser = usersRepository.fetchCurrentUserOrError()
             val userInfo = usersRepository.fetchAppUserById(currentUser.uid)
+
             return@wrapFlow userInfo.map { info -> checkNotNull(info) }
         }
     }

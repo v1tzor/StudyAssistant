@@ -31,7 +31,7 @@ import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainWorkProces
  * @author Stanislav Aleshin on 14.04.2024.
  */
 val presentationModule = DI.Module("Presentation") {
-    bindProvider<GlobalScreenProvider> { GlobalScreenProvider.Base(provider(), provider(), provider()) }
+    bindProvider<GlobalScreenProvider> { GlobalScreenProvider.Base(provider(), provider(), provider(), provider(), provider()) }
 
     bindSingleton<MainStateCommunicator> { MainStateCommunicator.Base() }
     bindSingleton<MainEffectCommunicator> { MainEffectCommunicator.Base() }

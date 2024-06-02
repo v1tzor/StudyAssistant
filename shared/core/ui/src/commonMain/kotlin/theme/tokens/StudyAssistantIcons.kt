@@ -19,6 +19,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.core.ui.generated.resources.Res
+import studyassistant.shared.core.ui.generated.resources.ic_duration
 import studyassistant.shared.core.ui.generated.resources.ic_organization
 import studyassistant.shared.core.ui.generated.resources.ic_organization_outline
 import studyassistant.shared.core.ui.generated.resources.ic_profile
@@ -28,6 +29,7 @@ import studyassistant.shared.core.ui.generated.resources.ic_study_assistant
 import studyassistant.shared.core.ui.generated.resources.ic_study_outline
 import studyassistant.shared.core.ui.generated.resources.ic_tasks
 import studyassistant.shared.core.ui.generated.resources.ic_tasks_outline
+import studyassistant.shared.core.ui.generated.resources.ic_time_outline
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
@@ -43,6 +45,8 @@ data class StudyAssistantIcons(
     val informationDisabled: DrawableResource,
     val profile: DrawableResource,
     val profileDisabled: DrawableResource,
+    val timeOutline: DrawableResource,
+    val duration: DrawableResource,
 ) {
     companion object {
         val BASE = StudyAssistantIcons(
@@ -55,6 +59,8 @@ data class StudyAssistantIcons(
             informationDisabled = Res.drawable.ic_organization_outline,
             profile = Res.drawable.ic_profile,
             profileDisabled = Res.drawable.ic_profile_outline,
+            timeOutline = Res.drawable.ic_time_outline,
+            duration = Res.drawable.ic_duration,
         )
     }
 }

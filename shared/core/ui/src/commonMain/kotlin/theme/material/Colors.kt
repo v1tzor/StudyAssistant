@@ -21,6 +21,8 @@ import androidx.compose.ui.graphics.Color
  * @author Stanislav Aleshin on 13.04.2024.
  */
 
+// Material You
+
 val primaryLight = Color(0xFF575992)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFFE1E0FF)
@@ -239,18 +241,35 @@ val surfaceContainerHighestDarkHighContrast = Color(0xFF35343A)
 
 val seed = Color(0xFF6366F1)
 
+// Splash
+
 val onSplash = Color(0xFFEEEEEE)
 val splash = Color(0xFF2F2EBE)
 
-val badge = Color(0xFFDB1C11)
-val redLight = Color(0xFFD15F5F)
-val greenLight = Color(0xFF2FC217)
-val blueLight = Color(0xFF5F6FFD)
+// Accents
 
-val yellow = Color(0xFFDDE117)
-val redDark = Color(0xFFE92222)
-val greenDark = Color(0xFF157805)
-val blueDark = Color(0xFF0A5AFE)
-val orange = Color(0xFFFFAC0C)
+val redLight = Color(0xFFBA1A1A)
+val redContainerLight = Color(0xFFFFDAD6)
+val onRedContainerLight = Color(0xFF410002)
+val orangeLight = Color(0xFFFF6E01)
+val orangeContainerLight = Color(0xFFFFE1CB)
+val onOrangeContainerLight = Color(0xFF66330C)
+val yellowLight = Color(0xFFE5C22B)
+val yellowContainerLight = Color(0xFFFDF2C7)
+val onYellowContainerLight = Color(0xFF826E19)
+val greenLight = Color(0xFF18BA45)
+val greenContainerLight = Color(0xFFC7F5D1)
+val onGreenContainerLight = Color(0xFF08581E)
 
-val gray = Color(0xFF696969)
+val redDark = Color(0xFFFFB4AB)
+val redContainerDark = Color(0xFF93000A)
+val onRedContainerDark = Color(0xFFFFDAD6)
+val orangeDark = Color(0xFFF89245)
+val orangeContainerDark = Color(0xFFFFE1CB)
+val onOrangeContainerDark = Color(0xFFFFBA86)
+val yellowDark = Color(0xFFEDC51A)
+val yellowContainerDark = Color(0xFF6B5A14)
+val onYellowContainerDark = Color(0xFFFFE472)
+val greenDark = Color(0xFF1BE152)
+val greenContainerDark = Color(0xFF2C6639)
+val onGreenContainerDark = Color(0xFF92FF8F)

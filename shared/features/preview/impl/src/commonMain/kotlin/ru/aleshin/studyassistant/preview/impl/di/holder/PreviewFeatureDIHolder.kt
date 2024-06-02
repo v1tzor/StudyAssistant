@@ -24,11 +24,11 @@ import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
-import repositories.AuthRepository
 import repositories.CalendarSettingsRepository
 import repositories.OrganizationsRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.api.PreviewFeatureApi
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
@@ -48,6 +48,7 @@ object PreviewFeatureDIHolder : BaseFeatureDIHolder<PreviewFeatureApi, PreviewFe
         if (directDi == null) {
             val di = DI {
                 importAll(navigationModule, presentationModule, domainModule)
+                bindInstance<() -> EditorFeatureStarter> { dependencies.editorFeatureStarter }
                 bindInstance<() -> AuthFeatureStarter> { dependencies.authFeatureStarter }
                 bindInstance<() -> NavigationFeatureStarter> { dependencies.navigationFeatureStarter }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }

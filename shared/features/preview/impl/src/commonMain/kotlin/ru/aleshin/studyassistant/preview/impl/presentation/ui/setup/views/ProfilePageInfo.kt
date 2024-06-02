@@ -27,7 +27,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +47,7 @@ import theme.StudyAssistantRes
 import views.BirthdayDatePicker
 import views.ExpandedIcon
 import views.GenderDropdownMenu
+import views.InfoTextField
 
 /**
  * @author Stanislav Aleshin on 27.04.2024
@@ -126,7 +126,6 @@ internal fun ProfilePageInfo(
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-
                 }
             )
             var isExpandedGenderMenu by remember { mutableStateOf(false) }
@@ -156,13 +155,14 @@ internal fun ProfilePageInfo(
             )
         }
     }
-    BirthdayDatePicker(
-        isOpenDialog = isOpenDatePickerDialog,
-        label = PreviewThemeRes.strings.birthdayLabel,
-        onDismiss = { isOpenDatePickerDialog = false },
-        onSelectedDate = { birthday ->
-            onUpdateProfile(profile.copy(birthday = birthday))
-            isOpenDatePickerDialog = false
-        }
-    )
+    if (isOpenDatePickerDialog) {
+        BirthdayDatePicker(
+            label = PreviewThemeRes.strings.birthdayLabel,
+            onDismiss = { isOpenDatePickerDialog = false },
+            onSelectedDate = { birthday ->
+                onUpdateProfile(profile.copy(birthday = birthday))
+                isOpenDatePickerDialog = false
+            }
+        )
+    }
 }

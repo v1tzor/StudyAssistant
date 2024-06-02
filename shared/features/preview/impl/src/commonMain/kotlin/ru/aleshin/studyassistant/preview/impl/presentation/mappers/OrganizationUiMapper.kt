@@ -29,12 +29,14 @@ internal fun Organization.mapToUi() = OrganizationUi(
     fullName = fullName,
     type = type,
     avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToUi(),
     subjects = subjects.map { it.mapToUi() },
     employee = employee.map { it.mapToUi() },
     emails = emails.map { it.mapToUi() },
     phones = phones.map { it.mapToUi() },
     locations = locations.map { it.mapToUi() },
     webs = webs.map { it.mapToUi() },
+    offices = offices,
     isHide = isHide,
 )
 
@@ -45,11 +47,13 @@ internal fun OrganizationUi.mapToDomain() = Organization(
     fullName = fullName,
     type = type,
     avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
     subjects = subjects.map { it.mapToDomain() },
     employee = employee.map { it.mapToDomain() },
     emails = emails.map { it.mapToDomain() },
     phones = phones.map { it.mapToDomain() },
     locations = locations.map { it.mapToDomain() },
     webs = webs.map { it.mapToDomain() },
+    offices = offices,
     isHide = isHide,
 )

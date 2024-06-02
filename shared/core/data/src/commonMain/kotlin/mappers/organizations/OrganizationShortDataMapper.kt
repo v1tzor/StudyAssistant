@@ -18,6 +18,8 @@ package mappers.organizations
 
 import entities.organizations.OrganizationShort
 import entities.organizations.OrganizationType
+import mappers.mapToData
+import mappers.mapToDomain
 import models.organizations.OrganizationShortData
 
 /**
@@ -25,14 +27,22 @@ import models.organizations.OrganizationShortData
  */
 fun OrganizationShort.mapToData() = OrganizationShortData(
     uid = uid,
+    main = isMain,
     shortName = shortName,
     type = type.name,
     avatar = avatar,
+    locations = locations.map { it.mapToData() },
+    offices = offices,
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToDate(),
 )
 
 fun OrganizationShortData.mapToDomain() = OrganizationShort(
     uid = uid,
+    isMain = main,
     shortName = shortName,
     type = OrganizationType.valueOf(type),
+    locations = locations.map { it.mapToDomain() },
+    offices = offices,
     avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
 )

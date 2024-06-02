@@ -23,6 +23,8 @@ import kotlinx.datetime.Instant
  */
 data class ScheduleTimeIntervals(
     val firstClassTime: Instant? = null,
-    val classDuration: List<NumberedDuration> = emptyList(),
-    val breakDuration: List<NumberedDuration> = emptyList(),
+    val baseClassDuration: Millis? = null,
+    val baseBreakDuration: Millis? = null,
+    val specificClassDuration: List<NumberedDuration> = emptyList(),
+    val specificBreakDuration: List<NumberedDuration> = emptyList(),
 )

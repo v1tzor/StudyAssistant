@@ -27,6 +27,7 @@ internal data class ScheduleStrings(
     val detailsHeader: String,
     val otherErrorMessage: String,
 ) {
+
     companion object {
         val RUSSIAN = ScheduleStrings(
             overviewHeader = "Обзор",

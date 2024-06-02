@@ -18,7 +18,6 @@ package navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.stack.Stack
 import cafe.adriel.voyager.navigator.Navigator
 import inject.FeatureScreen
 import org.kodein.di.compose.localDI
@@ -30,7 +29,7 @@ import org.kodein.di.instance
  */
 interface NavigatorManager<S : FeatureScreen> : NavigatorHolder, StartScreenHolder<S> {
 
-    fun executeNavigation(command: Stack<Screen>.() -> Unit)
+    fun executeNavigation(command: NavigationCommand)
 
     abstract class Abstract<S : FeatureScreen>(
         private val commandBuffer: CommandBuffer
@@ -38,7 +37,7 @@ interface NavigatorManager<S : FeatureScreen> : NavigatorHolder, StartScreenHold
 
         private var navigator: Navigator? = null
 
-        override fun executeNavigation(command: Stack<Screen>.() -> Unit) {
+        override fun executeNavigation(command: NavigationCommand) {
             commandBuffer.sendCommand(command)
         }
 

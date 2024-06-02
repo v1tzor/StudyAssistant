@@ -17,19 +17,25 @@
 package ru.aleshin.studyassistant.di.modules
 
 import managers.CoroutineManager
+import managers.DateManager
 import org.kodein.di.DI
 import org.kodein.di.bindEagerSingleton
 import org.kodein.di.bindProvider
 import org.kodein.di.instance
 import org.kodein.di.provider
 import repositories.AuthRepository
+import repositories.BaseScheduleRepository
 import repositories.CalendarSettingsRepository
+import repositories.CustomScheduleRepository
 import repositories.ManageUserRepository
 import repositories.OrganizationsRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
+import ru.aleshin.studyassistant.editor.impl.di.EditorFeatureDependencies
+import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.navigation.impl.di.NavigationFeatureDependencies
 import ru.aleshin.studyassistant.navigation.impl.di.holder.NavigationFeatureDIHolder
@@ -63,11 +69,12 @@ val featureModule = DI.Module("Feature") {
 
     bindEagerSingleton<PreviewFeatureDependencies> {
         object : PreviewFeatureDependencies {
+            override val editorFeatureStarter = provider<EditorFeatureStarter>()
             override val navigationFeatureStarter = provider<NavigationFeatureStarter>()
+            override val authFeatureStarter = provider<AuthFeatureStarter>()
             override val usersRepository = instance<UsersRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
-            override val authFeatureStarter = provider<AuthFeatureStarter>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }
@@ -97,6 +104,9 @@ val featureModule = DI.Module("Feature") {
 
     bindEagerSingleton<ScheduleFeatureDependencies> {
         object : ScheduleFeatureDependencies {
+            override val baseScheduleRepository = instance<BaseScheduleRepository>()
+            override val customScheduleRepository = instance<CustomScheduleRepository>()
+            override val organizationsRepository = instance<OrganizationsRepository>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }
@@ -110,13 +120,31 @@ val featureModule = DI.Module("Feature") {
     bindEagerSingleton<ProfileFeatureDependencies> {
         object : ProfileFeatureDependencies {
             override val authFeatureStarter = provider<AuthFeatureStarter>()
-            override val usersRepository = instance<UsersRepository>()
             override val authRepository = instance<AuthRepository>()
+            override val usersRepository = instance<UsersRepository>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }
     bindProvider<ProfileFeatureStarter> {
         with(ProfileFeatureDIHolder) {
+            init(instance())
+            fetchApi().fetchStarter()
+        }
+    }
+
+    bindEagerSingleton<EditorFeatureDependencies> {
+        object : EditorFeatureDependencies {
+            override val baseScheduleRepository = instance<BaseScheduleRepository>()
+            override val customScheduleRepository = instance<CustomScheduleRepository>()
+            override val organizationsRepository = instance<OrganizationsRepository>()
+            override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val usersRepository = instance<UsersRepository>()
+            override val dateManager = instance<DateManager>()
+            override val coroutineManager = instance<CoroutineManager>()
+        }
+    }
+    bindProvider<EditorFeatureStarter> {
+        with(EditorFeatureDIHolder) {
             init(instance())
             fetchApi().fetchStarter()
         }

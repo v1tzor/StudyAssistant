@@ -16,9 +16,11 @@
 
 package entities.settings
 
+import entities.common.NumberOfRepeatWeek
+
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
 data class CalendarSettings(
-    val numberOfWeek: NumberOfWeek = NumberOfWeek.ONE,
+    val numberOfWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
 )

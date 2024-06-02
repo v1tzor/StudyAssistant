@@ -18,18 +18,20 @@ package database.tasks
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import app.cash.sqldelight.coroutines.mapToOne
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
 import managers.CoroutineManager
 import mappers.subjects.mapToDetailsData
 import mappers.tasks.mapToDetailsData
 import mappers.tasks.mapToLocalData
 import mappers.users.mapToDetailsData
 import models.organizations.OrganizationShortData
+import models.organizations.ScheduleTimeIntervalsData
 import models.tasks.HomeworkDetailsData
+import models.users.ContactInfoData
 import randomUUID
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
@@ -66,8 +68,10 @@ interface HomeworksLocalDataSource {
                 homeworks.map { homeworkEntity ->
                     val organizationQuery = organizationsQueries.fetchOrganizationById(
                         uid = homeworkEntity.organization_id,
-                        mapper = { uid, _, shortName, _, type, avatar, _, _, _, _, _, _ ->
-                            OrganizationShortData(uid, shortName, type, avatar)
+                        mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel, _, _, locationList, _, offices, _ ->
+                            val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsData>(timeIntervalsModel)
+                            val locations = locationList.map { Json.decodeFromString<ContactInfoData>(it) }
+                            OrganizationShortData(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
                         },
                     )
                     val subjectQuery = homeworkEntity.subject_id?.let { subjectQueries.fetchSubjectById(it) }
@@ -97,8 +101,10 @@ interface HomeworksLocalDataSource {
                 val subjectQuery = homeworkEntity.subject_id?.let { subjectQueries.fetchSubjectById(it) }
                 val organizationQuery = organizationsQueries.fetchOrganizationById(
                     uid = homeworkEntity.organization_id,
-                    mapper = { uid, _, shortName, _, type, avatar, _, _, _, _, _, _ ->
-                        OrganizationShortData(uid, shortName, type, avatar)
+                    mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel, _, _, locationList, _, offices, _ ->
+                        val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsData>(timeIntervalsModel)
+                        val locations = locationList.map { Json.decodeFromString<ContactInfoData>(it) }
+                        OrganizationShortData(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
                     },
                 )
 

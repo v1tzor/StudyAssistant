@@ -15,17 +15,15 @@
 */
 package theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.SideEffect
 import models.ThemeUiType
 import theme.material.baseShapes
 import theme.material.baseTypography
 import theme.material.isDarkTheme
+import theme.material.toColorAccents
 import theme.material.toColorScheme
-import theme.tokens.StudyAssistantColors
 import theme.tokens.LanguageUiType
 import theme.tokens.LocalStudyAssistantColors
 import theme.tokens.LocalStudyAssistantElevations
@@ -33,6 +31,7 @@ import theme.tokens.LocalStudyAssistantIcons
 import theme.tokens.LocalStudyAssistantLanguage
 import theme.tokens.LocalStudyAssistantStrings
 import theme.tokens.LocalWindowSize
+import theme.tokens.StudyAssistantColors
 import theme.tokens.fetchAppElevations
 import theme.tokens.fetchAppLanguage
 import theme.tokens.fetchCoreIcons
@@ -50,11 +49,11 @@ fun StudyAssistantTheme(
     content: @Composable () -> Unit,
 ) {
     val windowSize = rememberScreenSizeInfo()
-    val colorsType = StudyAssistantColors(themeType.isDarkTheme())
     val appLanguage = fetchAppLanguage(languageType)
-    val coreStrings = fetchCoreStrings(appLanguage)
     val appElevations = fetchAppElevations()
     val appIcons = fetchCoreIcons()
+    val coreColors = StudyAssistantColors(themeType.isDarkTheme(), themeType.toColorAccents())
+    val coreStrings = fetchCoreStrings(appLanguage)
 
     MaterialTheme(
         colorScheme = themeType.toColorScheme(),
@@ -63,7 +62,7 @@ fun StudyAssistantTheme(
     ) {
         CompositionLocalProvider(
             LocalStudyAssistantLanguage provides appLanguage,
-            LocalStudyAssistantColors provides colorsType,
+            LocalStudyAssistantColors provides coreColors,
             LocalStudyAssistantElevations provides appElevations,
             LocalStudyAssistantStrings provides coreStrings,
             LocalStudyAssistantIcons provides appIcons,

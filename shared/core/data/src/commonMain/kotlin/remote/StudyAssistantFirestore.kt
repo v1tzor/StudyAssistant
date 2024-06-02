@@ -34,7 +34,6 @@ object StudyAssistantFirestore {
         const val HOMEWORKS = "homeworks"
         const val BASE_SCHEDULES = "baseSchedules"
         const val CUSTOM_SCHEDULES = "customSchedules"
-        const val CLASSES = "classes"
         const val SUBJECTS = "subjects"
         const val EMPLOYEE = "employee"
 
@@ -42,13 +41,14 @@ object StudyAssistantFirestore {
         const val CALENDAR_SETTINGS = "calendar"
 
         const val UID = "uid"
+        const val SCHEDULE_CLASSES = "classes"
         const val HOMEWORK_DATE = "date"
         const val VERSION_FROM = "dateVersionFrom"
+        const val VERSION_TO = "dateVersionTo"
         const val CLASS_SCHEDULE_ID = "scheduleId"
         const val CUSTOM_SCHEDULE_DATE = "date"
         const val WEEK = "week"
         const val DAY_OF_WEEK = "weekDayOfWeek"
-        const val VERSION_TO = "dateVersionTo"
         const val ORGANIZATION_ID = "organization_id"
     }
 

@@ -36,7 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import entities.settings.NumberOfWeek
+import entities.common.NumberOfRepeatWeek
 import extensions.alphaByEnabled
 import mappers.mapToSting
 import ru.aleshin.studyassistant.preview.impl.presentation.models.CalendarSettingsUi
@@ -57,7 +57,7 @@ internal fun CalendarPageInfo(
         modifier = modifier.padding(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(NumberOfWeek.entries) { week ->
+        items(NumberOfRepeatWeek.entries) { week ->
             NumberOfWeekView(
                 modifier = Modifier.animateItemPlacement(),
                 selected = week == calendarSettings.numberOfWeek,
@@ -73,7 +73,7 @@ internal fun NumberOfWeekView(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     selected: Boolean,
-    week: NumberOfWeek,
+    week: NumberOfRepeatWeek,
     onSelected: () -> Unit,
 ) {
     Surface(

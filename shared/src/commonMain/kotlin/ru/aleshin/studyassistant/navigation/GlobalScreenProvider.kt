@@ -20,9 +20,13 @@ import cafe.adriel.voyager.core.screen.Screen
 import inject.MainScreen
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
 
 /**
  * @author Stanislav Aleshin on 09.02.2024.
@@ -31,12 +35,16 @@ interface GlobalScreenProvider {
 
     fun providePreviewScreen(screen: PreviewScreen): Screen
     fun provideAuthScreen(screen: AuthScreen): Screen
+    fun provideScheduleScreen(screen: ScheduleScreen): Screen
+    fun provideEditorScreen(screen: EditorScreen): Screen
     fun provideTabNavigationScreen(): Screen
 
     class Base(
         private val navigationStarter: () -> NavigationFeatureStarter,
         private val previewStarter: () -> PreviewFeatureStarter,
         private val authStarter: () -> AuthFeatureStarter,
+        private val scheduleStarter: () -> ScheduleFeatureStarter,
+        private val editorStarter: () -> EditorFeatureStarter,
     ) : GlobalScreenProvider {
 
         override fun providePreviewScreen(screen: PreviewScreen): Screen {
@@ -47,8 +55,16 @@ interface GlobalScreenProvider {
             return authStarter().fetchFeatureScreen(screen)
         }
 
+        override fun provideScheduleScreen(screen: ScheduleScreen): Screen {
+            return scheduleStarter().fetchFeatureScreen(screen)
+        }
+
         override fun provideTabNavigationScreen(): Screen {
             return navigationStarter().fetchFeatureScreen(MainScreen)
+        }
+
+        override fun provideEditorScreen(screen: EditorScreen): Screen {
+            return editorStarter().fetchFeatureScreen(screen)
         }
     }
 }

@@ -16,14 +16,14 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.models
 
-import entities.settings.NumberOfWeek
+import entities.common.NumberOfRepeatWeek
 import platform.JavaSerializable
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
 internal data class CalendarSettingsUi(
-    val numberOfWeek: NumberOfWeek = NumberOfWeek.ONE,
+    val numberOfWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
 ) : JavaSerializable {
     companion object {
         fun createEmpty() = CalendarSettingsUi()

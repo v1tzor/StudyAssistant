@@ -23,22 +23,17 @@ import dev.gitlive.firebase.firestore.orderBy
 import dev.gitlive.firebase.firestore.where
 import exceptions.FirebaseUserException
 import functional.UID
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Instant
 import kotlinx.serialization.serializer
-import managers.DateManager
 import mappers.schedules.mapToDetailsData
 import mappers.schedules.mapToRemoteData
 import mappers.subjects.mapToDetailsData
-import mappers.tasks.mapToDetailsDate
+import mappers.tasks.mapToDetailsData
+import models.classes.ClassData
 import models.classes.ClassDetailsData
-import models.classes.ClassPojo
 import models.organizations.OrganizationShortData
-import models.schedules.BaseScheduleDetailsData
-import models.schedules.BaseSchedulePojo
 import models.schedules.CustomScheduleDetailsData
 import models.schedules.CustomSchedulePojo
 import models.subjects.SubjectPojo
@@ -50,71 +45,14 @@ import remote.StudyAssistantFirestore.UserData
  */
 interface CustomScheduleRemoteDataSource {
 
-    suspend fun fetchScheduleByDate(date: Int, targetUser: UID): Flow<CustomScheduleDetailsData?>
-    suspend fun fetchSchedulesByTimeRange(from: Int, to: Int, targetUser: UID): Flow<List<CustomScheduleDetailsData>>
     suspend fun addOrUpdateSchedule(schedule: CustomScheduleDetailsData, targetUser: UID): UID
+    suspend fun fetchScheduleByDate(date: Instant, targetUser: UID): Flow<CustomScheduleDetailsData?>
+    suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant, targetUser: UID): Flow<List<CustomScheduleDetailsData>>
+    suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<ClassDetailsData?>
 
     class Base(
         private val database: FirebaseFirestore,
-        private val dateManager: DateManager,
     ) : CustomScheduleRemoteDataSource {
-
-        @OptIn(ExperimentalCoroutinesApi::class)
-        override suspend fun fetchScheduleByDate(date: Int, targetUser: UID): Flow<CustomScheduleDetailsData?> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES).where {
-                UserData.CUSTOM_SCHEDULE_DATE equalTo date
-            }.orderBy(UserData.VERSION_TO, Direction.DESCENDING)
-
-            val schedulePojoFlow = reference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data(serializer<CustomSchedulePojo?>()) }.getOrNull(0)
-            }
-
-            return schedulePojoFlow.flatMapLatest { schedulePojo ->
-                if (schedulePojo == null) return@flatMapLatest flowOf(null)
-                val classesReference = userDataRoot.collection(UserData.CLASSES).where {
-                    UserData.CLASS_SCHEDULE_ID equalTo schedulePojo.uid
-                }
-
-                return@flatMapLatest classesReference.snapshots.map { classesQuerySnapshot ->
-                    val classPojoList = classesQuerySnapshot.documents.map { snapshot ->
-                        snapshot.data(serializer<ClassPojo>()).mapToDetails(userDataRoot)
-                    }
-                    schedulePojo.mapToDetailsData(classes = classPojoList)
-                }
-            }
-        }
-
-        override suspend fun fetchSchedulesByTimeRange(
-            from: Int,
-            to: Int,
-            targetUser: UID
-        ): Flow<List<CustomScheduleDetailsData>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES).where {
-                (UserData.CUSTOM_SCHEDULE_DATE greaterThanOrEqualTo from) and (UserData.CUSTOM_SCHEDULE_DATE lessThanOrEqualTo to)
-            }.orderBy(UserData.VERSION_TO, Direction.DESCENDING)
-
-            val schedulePojoListFlow = reference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data(serializer<CustomSchedulePojo>()) }
-            }
-
-            return schedulePojoListFlow.map { schedulePojoList ->
-                schedulePojoList.map { schedulePojo ->
-                    val classesReference = userDataRoot.collection(UserData.CLASSES).where {
-                        UserData.CLASS_SCHEDULE_ID equalTo schedulePojo.uid
-                    }
-                    val classes = classesReference.get().documents.map { snapshot ->
-                        snapshot.data(serializer<ClassPojo>()).mapToDetails(userDataRoot)
-                    }
-                    schedulePojo.mapToDetailsData(classes = classes)
-                }
-            }
-        }
 
         override suspend fun addOrUpdateSchedule(
             schedule: CustomScheduleDetailsData,
@@ -124,12 +62,12 @@ interface CustomScheduleRemoteDataSource {
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
             val schedulePojo = schedule.mapToRemoteData()
 
-            val reference = userDataRoot.collection(UserData.BASE_SCHEDULES)
+            val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES)
 
             return database.runTransaction {
                 val isExist = schedulePojo.uid.isNotEmpty() && reference.document(schedulePojo.uid).get().exists
                 if (isExist) {
-                    reference.document(schedulePojo.uid).set(data = schedulePojo, merge = true)
+                    reference.document(schedulePojo.uid).set(data = schedulePojo)
                     return@runTransaction schedulePojo.uid
                 } else {
                     val uid = reference.add(schedulePojo).id
@@ -139,7 +77,76 @@ interface CustomScheduleRemoteDataSource {
             }
         }
 
-        private suspend fun ClassPojo.mapToDetails(userDataRoot: DocumentReference): ClassDetailsData {
+        override suspend fun fetchScheduleByDate(date: Instant, targetUser: UID): Flow<CustomScheduleDetailsData?> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+            val dateMillis = date.toEpochMilliseconds()
+
+            val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES).where {
+                UserData.CUSTOM_SCHEDULE_DATE equalTo dateMillis
+            }.orderBy(UserData.VERSION_TO, Direction.DESCENDING)
+
+            val schedulePojoFlow = reference.snapshots.map { snapshot ->
+                snapshot.documents.map { it.data(serializer<CustomSchedulePojo?>()) }.getOrNull(0)
+            }
+
+            return schedulePojoFlow.map { schedulePojo ->
+                schedulePojo?.mapToDetailsData(
+                    classMapper = { it.mapToDetails(userDataRoot, schedulePojo.uid) },
+                )
+            }
+        }
+
+        override suspend fun fetchSchedulesByTimeRange(
+            from: Instant,
+            to: Instant,
+            targetUser: UID
+        ): Flow<List<CustomScheduleDetailsData>> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+            val fromMillis = from.toEpochMilliseconds()
+            val toMillis = to.toEpochMilliseconds()
+
+            val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES).where {
+                val firstDateFilter = UserData.CUSTOM_SCHEDULE_DATE greaterThanOrEqualTo fromMillis
+                val secondDateFilter = UserData.CUSTOM_SCHEDULE_DATE lessThanOrEqualTo toMillis
+                return@where firstDateFilter and secondDateFilter
+            }.orderBy(UserData.VERSION_TO, Direction.DESCENDING)
+
+            val schedulePojoListFlow = reference.snapshots.map { snapshot ->
+                snapshot.documents.map { it.data(serializer<CustomSchedulePojo>()) }
+            }
+
+            return schedulePojoListFlow.map { schedulePojoList ->
+                schedulePojoList.map { schedulePojo ->
+                    schedulePojo.mapToDetailsData(
+                        classMapper = { it.mapToDetails(userDataRoot, schedulePojo.uid) },
+                    )
+                }
+            }
+        }
+
+        override suspend fun fetchClassById(
+            uid: UID,
+            scheduleId: UID,
+            targetUser: UID
+        ): Flow<ClassDetailsData?> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val scheduleReference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES).document(scheduleId)
+            val classReference = scheduleReference.collection(UserData.SCHEDULE_CLASSES).document(uid)
+
+            val classPojoFlow = classReference.snapshots.map { snapshot ->
+                snapshot.data(serializer<ClassData?>())
+            }
+
+            return classPojoFlow.map { classPojo ->
+                classPojo?.mapToDetails(userDataRoot, scheduleId)
+            }
+        }
+
+        private suspend fun ClassData.mapToDetails(userDataRoot: DocumentReference, scheduleId: UID): ClassDetailsData {
             val employeeReferenceRoot = userDataRoot.collection(UserData.EMPLOYEE)
 
             val organizationReference = userDataRoot.collection(UserData.ORGANIZATIONS).document(organizationId)
@@ -149,7 +156,7 @@ interface CustomScheduleRemoteDataSource {
 
             val organization = organizationReference.get().data<OrganizationShortData>()
             val subject = subjectReference?.get()?.data<SubjectPojo>().let { subjectPojo ->
-                val employeeReference = subjectPojo?.teacher?.let { employeeReferenceRoot.document(it) }
+                val employeeReference = subjectPojo?.teacherId?.let { employeeReferenceRoot.document(it) }
                 val employee = employeeReference?.get()?.data(serializer<EmployeeDetailsData?>())
                 subjectPojo?.mapToDetailsData(employee)
             }
@@ -158,7 +165,8 @@ interface CustomScheduleRemoteDataSource {
                 employeeReference.get().data(serializer<EmployeeDetailsData?>())
             }
 
-            return mapToDetailsDate(
+            return mapToDetailsData(
+                scheduleId = scheduleId,
                 organization = organization,
                 subject = subject,
                 employee = employee,

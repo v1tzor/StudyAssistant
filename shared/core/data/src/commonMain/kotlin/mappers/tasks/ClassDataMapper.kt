@@ -20,8 +20,7 @@ import entities.classes.Class
 import entities.subject.EventType
 import extensions.mapEpochTimeToInstant
 import functional.TimeRange
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import functional.UID
 import mappers.mapToData
 import mappers.mapToDomain
 import mappers.organizations.mapToData
@@ -30,12 +29,11 @@ import mappers.subjects.mapToData
 import mappers.subjects.mapToDomain
 import mappers.users.mapToData
 import mappers.users.mapToDomain
+import models.classes.ClassData
 import models.classes.ClassDetailsData
-import models.classes.ClassPojo
 import models.organizations.OrganizationShortData
 import models.subjects.SubjectDetailsData
 import models.users.EmployeeDetailsData
-import ru.aleshin.studyassistant.sqldelight.`class`.ClassEntity
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
@@ -69,43 +67,8 @@ fun Class.mapToData() = ClassDetailsData(
     notification = notification,
 )
 
-fun ClassDetailsData.mapToLocalDate() = ClassEntity(
+fun ClassDetailsData.mapToData() = ClassData(
     uid = uid,
-    schedule_id = scheduleId,
-    organization_id = organization.uid,
-    event_type = eventType,
-    subject_id = subject?.uid,
-    custom_data = customData,
-    teacher_id = teacher?.uid,
-    office = office.toLong(),
-    location = Json.encodeToString(location),
-    start_time = startTime,
-    end_time = endTime,
-    notification = if (notification) 1L else 0L,
-)
-
-fun ClassEntity.mapToDetailsDate(
-    organization: OrganizationShortData,
-    subject: SubjectDetailsData?,
-    employee: EmployeeDetailsData?,
-) = ClassDetailsData(
-    uid = uid,
-    scheduleId = schedule_id,
-    organization = organization,
-    eventType = event_type,
-    subject = subject,
-    customData = custom_data,
-    teacher = employee,
-    office = office.toInt(),
-    location = Json.decodeFromString(location),
-    startTime = start_time,
-    endTime = end_time,
-    notification = notification == 1L,
-)
-
-fun ClassDetailsData.mapToRemoteDate() = ClassPojo(
-    uid = uid,
-    scheduleId = scheduleId,
     organizationId = organization.uid,
     eventType = eventType,
     subjectId = subject?.uid,
@@ -118,7 +81,8 @@ fun ClassDetailsData.mapToRemoteDate() = ClassPojo(
     notification = notification,
 )
 
-fun ClassPojo.mapToDetailsDate(
+fun ClassData.mapToDetailsData(
+    scheduleId: UID,
     organization: OrganizationShortData,
     subject: SubjectDetailsData?,
     employee: EmployeeDetailsData?,

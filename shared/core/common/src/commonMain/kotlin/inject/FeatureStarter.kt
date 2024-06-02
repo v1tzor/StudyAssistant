@@ -34,9 +34,9 @@ interface FeatureStarter<S : FeatureScreen> {
     ) : FeatureStarter<S> {
 
         override fun fetchFeatureScreen(screen: S): Screen {
+            val featureScreen = screenProvider.provideFeatureScreen(screen)
             val isSetStartScreen = navigatorManager.setStartScreen(screen)
             if (!isSetStartScreen) {
-                val featureScreen = screenProvider.provideFeatureScreen(screen)
                 navigatorManager.executeNavigation {
                     val lastScreen = lastItemOrNull
                     if (lastScreen?.key != featureScreen.key) push(featureScreen)

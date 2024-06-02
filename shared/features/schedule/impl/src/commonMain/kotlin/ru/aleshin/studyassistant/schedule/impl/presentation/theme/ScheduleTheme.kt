@@ -29,7 +29,7 @@ import theme.StudyAssistantRes
  */
 @Composable
 internal fun ScheduleTheme(content: @Composable () -> Unit) {
-    val icons = fetchScheduleIcons(StudyAssistantRes.colorsType.isDark)
+    val icons = fetchScheduleIcons(StudyAssistantRes.colors.isDark)
     val strings = fetchScheduleStrings(StudyAssistantRes.language)
 
     CompositionLocalProvider(

@@ -43,54 +43,51 @@ import theme.tokens.monthNames
 @OptIn(ExperimentalMaterial3Api::class)
 fun BirthdayDatePicker(
     modifier: Modifier = Modifier,
-    isOpenDialog: Boolean,
     label: String,
     onDismiss: () -> Unit,
     onSelectedDate: (String) -> Unit,
 ) {
-    if (isOpenDialog) {
-        val datePickerState = rememberDatePickerState()
-        val confirmEnabled by remember {
-            derivedStateOf { datePickerState.selectedDateMillis != null }
-        }
-        DatePickerDialog(
-            modifier = modifier,
-            onDismissRequest = onDismiss,
-            confirmButton = {
-                TextButton(
-                    enabled = confirmEnabled,
-                    onClick = {
-                        val selectedDate = datePickerState.selectedDateMillis ?: return@TextButton
-                        val dateFormat = DateTimeComponents.Format {
-                            dayOfMonth(); char('.'); monthNumber(); char('.'); year()
-                        }
-                        val birthday = selectedDate.mapEpochTimeToInstant().format(dateFormat)
-                        onSelectedDate.invoke(birthday)
-                    },
-                    content = { Text(text = StudyAssistantRes.strings.selectConfirmTitle) }
+    val datePickerState = rememberDatePickerState()
+    val confirmEnabled by remember {
+        derivedStateOf { datePickerState.selectedDateMillis != null }
+    }
+    DatePickerDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                enabled = confirmEnabled,
+                onClick = {
+                    val selectedDate = datePickerState.selectedDateMillis ?: return@TextButton
+                    val dateFormat = DateTimeComponents.Format {
+                        dayOfMonth(); char('.'); monthNumber(); char('.'); year()
+                    }
+                    val birthday = selectedDate.mapEpochTimeToInstant().format(dateFormat)
+                    onSelectedDate.invoke(birthday)
+                },
+                content = { Text(text = StudyAssistantRes.strings.selectConfirmTitle) }
+            )
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = StudyAssistantRes.strings.cancelTitle)
+            }
+        },
+    ) {
+        DatePicker(
+            state = datePickerState,
+            title = {
+                Text(
+                    modifier = Modifier.padding(start = 24.dp, top = 24.dp),
+                    text = StudyAssistantRes.strings.datePickerDialogHeader,
                 )
             },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(text = StudyAssistantRes.strings.cancelTitle)
-                }
+            headline = {
+                Text(
+                    modifier = Modifier.padding(start = 24.dp),
+                    text = label,
+                )
             },
-        ) {
-            DatePicker(
-                state = datePickerState,
-                title = {
-                    Text(
-                        modifier = Modifier.padding(start = 24.dp, top = 24.dp),
-                        text = StudyAssistantRes.strings.datePickerDialogHeader,
-                    )
-                },
-                headline = {
-                    Text(
-                        modifier = Modifier.padding(start = 24.dp),
-                        text = label,
-                    )
-                },
-            )
-        }
+        )
     }
 }

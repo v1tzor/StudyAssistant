@@ -18,17 +18,18 @@ package ru.aleshin.studyassistant.preview.impl.di
 
 import inject.BaseFeatureDependencies
 import managers.CoroutineManager
-import repositories.AuthRepository
 import repositories.CalendarSettingsRepository
 import repositories.OrganizationsRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 interface PreviewFeatureDependencies : BaseFeatureDependencies {
+    val editorFeatureStarter: () -> EditorFeatureStarter
     val navigationFeatureStarter: () -> NavigationFeatureStarter
     val authFeatureStarter: () -> AuthFeatureStarter
     val usersRepository: UsersRepository

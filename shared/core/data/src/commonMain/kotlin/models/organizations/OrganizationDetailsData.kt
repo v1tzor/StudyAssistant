@@ -40,5 +40,6 @@ data class OrganizationDetailsData(
     val phones: List<ContactInfoData> = emptyList(),
     val locations: List<ContactInfoData> = emptyList(),
     val webs: List<ContactInfoData> = emptyList(),
+    val offices: List<Int> = emptyList(),
     val isHide: Boolean = false,
 )

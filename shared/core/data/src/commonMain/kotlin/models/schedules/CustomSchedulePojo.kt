@@ -18,6 +18,7 @@ package models.schedules
 
 import functional.UID
 import kotlinx.serialization.Serializable
+import models.classes.ClassData
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
@@ -26,4 +27,5 @@ import kotlinx.serialization.Serializable
 data class CustomSchedulePojo(
     val uid: UID,
     val date: Long,
+    val classes: List<ClassData>,
 )

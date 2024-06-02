@@ -19,11 +19,11 @@ package ru.aleshin.studyassistant.auth.impl.domain.interactors
 import entities.auth.AuthCredentials
 import entities.auth.ForgotCredentials
 import entities.users.AppUser
+import exceptions.FirebaseDataAuthException
+import exceptions.FirebaseUserException
 import functional.DomainResult
 import functional.UnitDomainResult
 import kotlinx.coroutines.flow.firstOrNull
-import exceptions.FirebaseDataAuthException
-import exceptions.FirebaseUserException
 import repositories.AuthRepository
 import repositories.ManageUserRepository
 import repositories.UsersRepository
@@ -36,13 +36,13 @@ import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthResult
  */
 internal interface AuthInteractor {
 
-    suspend fun loginWithEmail(credentials: AuthCredentials) : DomainResult<AuthFailures, AppUser>
+    suspend fun loginWithEmail(credentials: AuthCredentials): DomainResult<AuthFailures, AppUser>
 
-    suspend fun loginViaGoogle(idToken: String?) : DomainResult<AuthFailures, AuthResult>
+    suspend fun loginViaGoogle(idToken: String?): DomainResult<AuthFailures, AuthResult>
 
-    suspend fun registerNewAccount(credentials: AuthCredentials) : DomainResult<AuthFailures, AppUser>
+    suspend fun registerNewAccount(credentials: AuthCredentials): DomainResult<AuthFailures, AppUser>
 
-    suspend fun resetPassword(credentials: ForgotCredentials) : UnitDomainResult<AuthFailures>
+    suspend fun resetPassword(credentials: ForgotCredentials): UnitDomainResult<AuthFailures>
 
     class Base(
         private val authRepository: AuthRepository,
@@ -54,12 +54,14 @@ internal interface AuthInteractor {
         override suspend fun loginWithEmail(credentials: AuthCredentials) = eitherWrapper.wrap {
             val firebaseUser = authRepository.signInWithEmail(credentials)
             val userInfo = usersRepository.fetchAppUserById(firebaseUser.uid).firstOrNull()
+
             return@wrap userInfo ?: throw FirebaseUserException()
         }
 
         override suspend fun loginViaGoogle(idToken: String?) = eitherWrapper.wrap {
             val firebaseUser = authRepository.signInViaGoogle(idToken)
             val userInfo = usersRepository.fetchAppUserById(firebaseUser.uid).firstOrNull()
+
             return@wrap if (userInfo != null) {
                 AuthResult(user = userInfo, isNewUser = false)
             } else {
@@ -85,6 +87,7 @@ internal interface AuthInteractor {
                 email = credentials.email,
             )
             val createdResult = usersRepository.createOrUpdateAppUser(newUserInfo)
+
             return@wrap if (createdResult) {
                 newUserInfo
             } else {

@@ -29,7 +29,7 @@ import theme.StudyAssistantRes
  */
 @Composable
 internal fun PreviewTheme(content: @Composable () -> Unit) {
-    val icons = fetchPreviewIcons(StudyAssistantRes.colorsType.isDark)
+    val icons = fetchPreviewIcons(StudyAssistantRes.colors.isDark)
     val strings = fetchPreviewStrings(StudyAssistantRes.language)
 
     CompositionLocalProvider(

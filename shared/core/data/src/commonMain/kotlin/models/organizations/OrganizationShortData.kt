@@ -16,16 +16,22 @@
 
 package models.organizations
 
+import entities.organizations.OrganizationType
 import functional.UID
 import kotlinx.serialization.Serializable
+import models.users.ContactInfoData
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
 @Serializable
 data class OrganizationShortData(
-    val uid: UID,
-    val shortName: String,
-    val type: String,
+    val uid: UID = "",
+    val main: Boolean = false,
+    val shortName: String = "",
+    val type: String = OrganizationType.SCHOOL.toString(),
     val avatar: String? = null,
+    val locations: List<ContactInfoData> = emptyList(),
+    val offices: List<Int> = emptyList(),
+    val scheduleTimeIntervals: ScheduleTimeIntervalsData = ScheduleTimeIntervalsData(),
 )

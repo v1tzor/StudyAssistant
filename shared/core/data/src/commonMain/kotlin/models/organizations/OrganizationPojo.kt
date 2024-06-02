@@ -17,7 +17,6 @@
 package models.organizations
 
 import entities.organizations.OrganizationType
-import entities.organizations.ScheduleTimeIntervals
 import functional.UID
 import kotlinx.serialization.Serializable
 import models.users.ContactInfoData
@@ -38,5 +37,6 @@ data class OrganizationPojo(
     val phones: List<ContactInfoData> = emptyList(),
     val locations: List<ContactInfoData> = emptyList(),
     val webs: List<ContactInfoData> = emptyList(),
+    val offices: List<Int> = emptyList(),
     val hide: Boolean = false,
 )

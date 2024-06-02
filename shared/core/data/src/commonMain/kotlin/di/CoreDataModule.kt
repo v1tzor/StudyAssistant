@@ -16,7 +16,6 @@
 
 package di
 
-import database.classes.ClassLocalDataSource
 import database.organizations.OrganizationsLocalDataSource
 import database.schedules.BaseScheduleLocalDataSource
 import database.schedules.CustomScheduleLocalDataSource
@@ -28,7 +27,6 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import remote.auth.AuthRemoteDataSource
-import remote.classes.ClassRemoteDataSource
 import remote.organizations.OrganizationsRemoteDataSource
 import remote.schedules.BaseScheduleRemoteDataSource
 import remote.schedules.CustomScheduleRemoteDataSource
@@ -41,8 +39,6 @@ import repositories.BaseScheduleRepository
 import repositories.BaseScheduleRepositoryImpl
 import repositories.CalendarSettingsRepository
 import repositories.CalendarSettingsRepositoryImpl
-import repositories.ClassRepository
-import repositories.ClassRepositoryImpl
 import repositories.CustomScheduleRepository
 import repositories.CustomScheduleRepositoryImpl
 import repositories.GeneralSettingsRepository
@@ -75,34 +71,34 @@ val coreDataModule = DI.Module("CoreData") {
     bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance(), instance()) }
 
     bindSingleton<BaseScheduleLocalDataSource> {
-        BaseScheduleLocalDataSource.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance())
+        BaseScheduleLocalDataSource.Base(instance(), instance(), instance(), instance(), instance())
     }
     bindSingleton<BaseScheduleRemoteDataSource> {
-        BaseScheduleRemoteDataSource.Base(instance(), instance())
+        BaseScheduleRemoteDataSource.Base(instance())
     }
     bindProvider<BaseScheduleRepository> {
         BaseScheduleRepositoryImpl(instance(), instance(), instance())
     }
 
     bindSingleton<CustomScheduleLocalDataSource> {
-        CustomScheduleLocalDataSource.Base(instance(), instance(), instance(), instance(), instance(), instance())
+        CustomScheduleLocalDataSource.Base(instance(), instance(), instance(), instance(), instance())
     }
     bindSingleton<CustomScheduleRemoteDataSource> {
-        CustomScheduleRemoteDataSource.Base(instance(), instance())
+        CustomScheduleRemoteDataSource.Base(instance())
     }
     bindProvider<CustomScheduleRepository> {
         CustomScheduleRepositoryImpl(instance(), instance(), instance())
     }
 
-    bindSingleton<ClassLocalDataSource> {
-        ClassLocalDataSource.Base(instance(), instance(), instance(), instance(), instance())
-    }
-    bindSingleton<ClassRemoteDataSource> {
-        ClassRemoteDataSource.Base(instance())
-    }
-    bindProvider<ClassRepository> {
-        ClassRepositoryImpl(instance(), instance(), instance())
-    }
+//    bindSingleton<ClassLocalDataSource> {
+//        ClassLocalDataSource.Base(instance(), instance(), instance(), instance(), instance())
+//    }
+//    bindSingleton<ClassRemoteDataSource> {
+//        ClassRemoteDataSource.Base(instance())
+//    }
+//    bindProvider<ClassRepository> {
+//        ClassRepositoryImpl(instance(), instance(), instance())
+//    }
 
     bindSingleton<HomeworksLocalDataSource> {
         HomeworksLocalDataSource.Base(instance(), instance(), instance(), instance(), instance())

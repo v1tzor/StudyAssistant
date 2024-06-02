@@ -23,8 +23,6 @@ import inject.FeatureScreen
  * @author Stanislav Aleshin on 07.04.2024.
  */
 sealed class PreviewScreen : FeatureScreen {
-
     data object Intro : PreviewScreen()
-
     data class Setup(val createdUser: UID) : PreviewScreen()
 }

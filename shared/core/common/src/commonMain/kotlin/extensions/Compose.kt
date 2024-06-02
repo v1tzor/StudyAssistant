@@ -17,12 +17,21 @@ package extensions
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import functional.Constants
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -39,4 +48,33 @@ fun LazyGridScope.emptyItem(modifier: Modifier = Modifier) {
 @ExperimentalFoundationApi
 fun PagerState.pageProgress(): Float {
     return currentPage.toFloat() / pageCount
+}
+
+@Composable
+fun WindowInsets.Companion.safeNavigationBarsInPx(density: Density): Int {
+    return this.navigationBars.getBottom(density) + Constants.Window.SAFE_AREA_PX
+}
+
+@Composable
+fun WindowInsets.Companion.navigationBarsInDp(): Dp {
+    return this.navigationBars.asPaddingValues().calculateBottomPadding()
+}
+
+@Composable
+fun TextStyle.boldWeight() = copy(
+    fontWeight = FontWeight.Bold,
+)
+
+@Composable
+fun TextStyle.extraBoldWeight() = copy(
+    fontWeight = FontWeight.ExtraBold,
+)
+
+@Composable
+fun TextStyle.BlackWeight() = copy(
+    fontWeight = FontWeight.Black,
+)
+
+fun Int.pxToDp(density: Density) = with(density) {
+    this@pxToDp.toDp()
 }

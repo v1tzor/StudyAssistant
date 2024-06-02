@@ -24,6 +24,7 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import managers.CoroutineManager
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
 import ru.aleshin.studyassistant.preview.impl.navigation.PreviewScreenProvider
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupAction
@@ -97,7 +98,7 @@ internal class SetupScreenModel(
                 sendAction(SetupAction.UpdatePage(SetupPage.SCHEDULE))
             }
             is SetupEvent.NavigateToScheduleEditor -> {
-                val screen = screenProvider.provideScheduleEditorScreen()
+                val screen = screenProvider.provideScheduleEditorScreen(EditorScreen.Schedule)
                 sendEffect(SetupEffect.ReplaceGlobalScreen(screen))
             }
             is SetupEvent.NavigateToBackPage -> with(state()) {

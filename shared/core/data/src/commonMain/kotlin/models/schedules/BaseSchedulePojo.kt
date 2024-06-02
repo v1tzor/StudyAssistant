@@ -18,6 +18,7 @@ package models.schedules
 
 import functional.UID
 import kotlinx.serialization.Serializable
+import models.classes.ClassData
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
@@ -29,4 +30,5 @@ data class BaseSchedulePojo(
     val dateVersionTo: Long,
     val weekDayOfWeek: String,
     val week: String,
+    val classes: Map<UID, ClassData>,
 )

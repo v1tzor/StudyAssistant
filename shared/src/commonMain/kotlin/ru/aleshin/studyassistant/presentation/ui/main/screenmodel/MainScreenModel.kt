@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import architecture.screenmodel.BaseScreenModel
 import architecture.screenmodel.EmptyDeps
 import architecture.screenmodel.work.WorkScope
-import cafe.adriel.voyager.core.screen.Screen
 import managers.CoroutineManager
 import ru.aleshin.studyassistant.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
@@ -32,7 +31,7 @@ import ru.aleshin.studyassistant.presentation.ui.main.contract.MainViewState
 /**
  * @author Stanislav Aleshin on 27.01.2024
  */
-class MainScreenModel constructor(
+class MainScreenModel(
     private val workProcessor: MainWorkProcessor,
     stateCommunicator: MainStateCommunicator,
     effectCommunicator: MainEffectCommunicator,
@@ -75,9 +74,6 @@ class MainScreenModel constructor(
             generalSettings = action.settings,
         )
     }
-
-    private suspend fun WorkScope<MainViewState, MainAction, MainEffect>.pushScreen(screen: Screen) =
-        sendEffect(MainEffect.ReplaceGlobalScreen(screen = screen))
 }
 
 @Composable

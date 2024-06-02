@@ -17,9 +17,12 @@
 package entities.schedules
 
 import entities.classes.Class
-import entities.settings.NumberOfWeek
+import entities.common.DayOfNumberedWeek
+import entities.common.NumberOfRepeatWeek
 import functional.UID
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.Instant
+import randomUUID
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
@@ -27,7 +30,23 @@ import kotlinx.datetime.DayOfWeek
 data class BaseSchedule(
     val uid: UID,
     val dateVersion: DateVersion,
-    val weekDayOfWeek: DayOfWeek,
-    val week: NumberOfWeek = NumberOfWeek.ONE,
+    val dayOfWeek: DayOfWeek,
+    val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val classes: List<Class>,
-)
+) {
+    companion object {
+        fun createActual(
+            currentDate: Instant,
+            dayOfNumberedWeek: DayOfNumberedWeek,
+            classes: List<Class> = emptyList(),
+        ): BaseSchedule {
+            return BaseSchedule(
+                uid = randomUUID(),
+                dateVersion = DateVersion.createNewVersion(currentDate),
+                dayOfWeek = dayOfNumberedWeek.dayOfWeek,
+                week = dayOfNumberedWeek.week,
+                classes = classes,
+            )
+        }
+    }
+}

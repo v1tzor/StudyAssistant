@@ -47,7 +47,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
         private val userCheckerInteractor: UserCheckerInteractor,
     ) : MainWorkProcessor {
 
-        override suspend fun work(command: MainWorkCommand) = when(command) {
+        override suspend fun work(command: MainWorkCommand) = when (command) {
             MainWorkCommand.LoadThemeSettings -> loadThemeWork()
             MainWorkCommand.InitialNavigation -> initialNavigationWork()
         }

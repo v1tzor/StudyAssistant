@@ -20,28 +20,25 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import functional.UID
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Instant
+import kotlinx.serialization.json.Json
 import managers.CoroutineManager
-import managers.DateManager
 import mappers.schedules.mapToDetailsData
 import mappers.schedules.mapToLocalData
 import mappers.subjects.mapToDetailsData
-import mappers.tasks.mapToDetailsDate
+import mappers.tasks.mapToDetailsData
 import mappers.users.mapToDetailsData
+import models.classes.ClassData
 import models.classes.ClassDetailsData
 import models.organizations.OrganizationShortData
-import models.schedules.BaseScheduleDetailsData
+import models.organizations.ScheduleTimeIntervalsData
 import models.schedules.CustomScheduleDetailsData
+import models.users.ContactInfoData
 import randomUUID
-import ru.aleshin.studyassistant.sqldelight.`class`.ClassEntity
-import ru.aleshin.studyassistant.sqldelight.`class`.ClassQueries
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
-import ru.aleshin.studyassistant.sqldelight.schedules.BaseScheduleQueries
 import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleQueries
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries
 import kotlin.coroutines.CoroutineContext
@@ -51,13 +48,13 @@ import kotlin.coroutines.CoroutineContext
  */
 interface CustomScheduleLocalDataSource {
 
-    suspend fun fetchScheduleByDate(date: Long): Flow<CustomScheduleDetailsData?>
-    suspend fun fetchSchedulesByTimeRange(from: Long, to: Long): Flow<List<CustomScheduleDetailsData>>
     suspend fun addOrUpdateSchedule(schedule: CustomScheduleDetailsData): UID
+    suspend fun fetchScheduleByDate(date: Instant): Flow<CustomScheduleDetailsData?>
+    suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant): Flow<List<CustomScheduleDetailsData>>
+    suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<ClassDetailsData?>
 
     class Base(
         private val scheduleQueries: CustomScheduleQueries,
-        private val classQueries: ClassQueries,
         private val organizationsQueries: OrganizationQueries,
         private val employeeQueries: EmployeeQueries,
         private val subjectQueries: SubjectQueries,
@@ -67,36 +64,6 @@ interface CustomScheduleLocalDataSource {
         private val coroutineContext: CoroutineContext
             get() = coroutineManager.backgroundDispatcher
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        override suspend fun fetchScheduleByDate(date: Long): Flow<CustomScheduleDetailsData?> {
-            val query = scheduleQueries.fetchSchedulesByDate(date)
-            val scheduleEntityFlow = query.asFlow().mapToOneOrNull(coroutineContext)
-
-            return scheduleEntityFlow.flatMapLatest { scheduleEntity ->
-                if (scheduleEntity == null) return@flatMapLatest flowOf(null)
-                val classesQuery = classQueries.fetchClassByScheduleId(scheduleEntity.uid)
-                val classListFlow = classesQuery.asFlow().mapToList(coroutineContext)
-
-                return@flatMapLatest classListFlow.map { classList ->
-                    val classes = classList.map { it.mapToDetails() }
-                    scheduleEntity.mapToDetailsData(classes = classes)
-                }
-            }
-        }
-
-        override suspend fun fetchSchedulesByTimeRange(from: Long, to: Long): Flow<List<CustomScheduleDetailsData>> {
-            val query = scheduleQueries.fetchSchedulesByTimeRange(from, to)
-            val scheduleEntityListFlow = query.asFlow().mapToList(coroutineContext)
-
-            return scheduleEntityListFlow.map { scheduleEntityList ->
-                scheduleEntityList.map { scheduleEntity ->
-                    val classesQuery = classQueries.fetchClassByScheduleId(scheduleEntity.uid)
-                    val classes = classesQuery.executeAsList().map { it.mapToDetails() }
-                    scheduleEntity.mapToDetailsData(classes = classes)
-                }
-            }
-        }
-
         override suspend fun addOrUpdateSchedule(schedule: CustomScheduleDetailsData): UID {
             val uid = schedule.uid.ifEmpty { randomUUID() }
             val scheduleClassEntity = schedule.mapToLocalData()
@@ -105,12 +72,53 @@ interface CustomScheduleLocalDataSource {
             return uid
         }
 
-        private suspend fun ClassEntity.mapToDetails(): ClassDetailsData {
-            val subjectQuery = subject_id?.let { subjectQueries.fetchSubjectById(it) }
+        override suspend fun fetchScheduleByDate(date: Instant): Flow<CustomScheduleDetailsData?> {
+            val dateMillis = date.toEpochMilliseconds()
+
+            val query = scheduleQueries.fetchSchedulesByDate(dateMillis)
+            val scheduleEntityFlow = query.asFlow().mapToOneOrNull(coroutineContext)
+
+            return scheduleEntityFlow.map { scheduleEntity ->
+                scheduleEntity?.mapToDetailsData(
+                    classMapper = { it.mapToDetails(scheduleEntity.uid) },
+                )
+            }
+        }
+
+        override suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant): Flow<List<CustomScheduleDetailsData>> {
+            val fromMillis = from.toEpochMilliseconds()
+            val toMillis = to.toEpochMilliseconds()
+
+            val query = scheduleQueries.fetchSchedulesByTimeRange(fromMillis, toMillis)
+            val scheduleEntityListFlow = query.asFlow().mapToList(coroutineContext)
+
+            return scheduleEntityListFlow.map { scheduleEntityList ->
+                scheduleEntityList.map { scheduleEntity ->
+                    scheduleEntity.mapToDetailsData(
+                        classMapper = { it.mapToDetails(scheduleEntity.uid) },
+                    )
+                }
+            }
+        }
+
+        override suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<ClassDetailsData?> {
+            val scheduleFlow = scheduleQueries.fetchScheduleById(scheduleId).asFlow().mapToOneOrNull(coroutineContext)
+
+            return scheduleFlow.map { schedule ->
+                val classes = schedule?.classes?.map { Json.decodeFromString<ClassData>(it) }
+                val foundClass = classes?.find { it.uid == uid }
+                return@map foundClass?.mapToDetails(scheduleId)
+            }
+        }
+
+        private suspend fun ClassData.mapToDetails(scheduleId: UID): ClassDetailsData {
+            val subjectQuery = subjectId?.let { subjectQueries.fetchSubjectById(it) }
             val organizationQuery = organizationsQueries.fetchOrganizationById(
-                uid = organization_id,
-                mapper = { uid, _, shortName, _, type, avatar, _, _, _, _, _, _ ->
-                    OrganizationShortData(uid, shortName, type, avatar)
+                uid = organizationId,
+                mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel, _, _, locationList, _, offices, _ ->
+                    val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsData>(timeIntervalsModel)
+                    val locations = locationList.map { Json.decodeFromString<ContactInfoData>(it) }
+                    OrganizationShortData(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
                 },
             )
 
@@ -120,12 +128,13 @@ interface CustomScheduleLocalDataSource {
                 val employee = employeeQuery?.executeAsOneOrNull()?.mapToDetailsData()
                 subjectEntity?.mapToDetailsData(employee)
             }
-            val employee = teacher_id?.let { teacherId ->
+            val employee = teacherId?.let { teacherId ->
                 val employeeQuery = employeeQueries.fetchEmployeeById(teacherId)
                 employeeQuery.executeAsOneOrNull()?.mapToDetailsData()
             }
 
-            return mapToDetailsDate(
+            return mapToDetailsData(
+                scheduleId = scheduleId,
                 organization = organization,
                 subject = subject,
                 employee = employee,

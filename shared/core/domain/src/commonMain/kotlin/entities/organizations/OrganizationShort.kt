@@ -16,6 +16,7 @@
 
 package entities.organizations
 
+import entities.common.ContactInfo
 import functional.UID
 
 /**
@@ -23,7 +24,33 @@ import functional.UID
  */
 data class OrganizationShort(
     val uid: UID,
-    val shortName: String,
+    val isMain: Boolean = false,
+    val shortName: String = "",
     val type: OrganizationType = OrganizationType.SCHOOL,
+    val locations: List<ContactInfo> = emptyList(),
+    val offices: List<Int> = emptyList(),
+    val scheduleTimeIntervals: ScheduleTimeIntervals = ScheduleTimeIntervals(),
     val avatar: String? = null,
+)
+
+fun Organization.convertToShort() = OrganizationShort(
+    uid = uid,
+    isMain = isMain,
+    shortName = shortName,
+    type = type,
+    locations = locations,
+    offices = offices,
+    scheduleTimeIntervals = scheduleTimeIntervals,
+    avatar = avatar
+)
+
+fun OrganizationShort.convertToBase(base: Organization) = base.copy(
+    uid = uid,
+    isMain = isMain,
+    shortName = shortName,
+    type = type,
+    locations = locations,
+    offices = offices,
+    scheduleTimeIntervals = scheduleTimeIntervals,
+    avatar = avatar,
 )

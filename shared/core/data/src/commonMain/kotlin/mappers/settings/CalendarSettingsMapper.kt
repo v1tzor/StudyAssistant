@@ -17,7 +17,7 @@
 package mappers.settings
 
 import entities.settings.CalendarSettings
-import entities.settings.NumberOfWeek
+import entities.common.NumberOfRepeatWeek
 import models.settings.CalendarSettingsDetailsData
 import models.settings.CalendarSettingsPojo
 import ru.aleshin.studyassistant.sqldelight.settings.CalendarSettingsEntity
@@ -30,7 +30,7 @@ fun CalendarSettings.mapToData() = CalendarSettingsDetailsData(
 )
 
 fun CalendarSettingsDetailsData.mapToDomain() = CalendarSettings(
-    numberOfWeek = NumberOfWeek.valueOf(numberOfWeek),
+    numberOfWeek = NumberOfRepeatWeek.valueOf(numberOfWeek),
 )
 
 fun CalendarSettingsDetailsData.mapToLocalData() = CalendarSettingsEntity(

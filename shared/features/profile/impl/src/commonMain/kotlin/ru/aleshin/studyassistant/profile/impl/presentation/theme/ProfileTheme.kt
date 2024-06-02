@@ -29,7 +29,7 @@ import theme.StudyAssistantRes
  */
 @Composable
 internal fun ProfileTheme(content: @Composable () -> Unit) {
-    val icons = fetchProfileIcons(StudyAssistantRes.colorsType.isDark)
+    val icons = fetchProfileIcons(StudyAssistantRes.colors.isDark)
     val strings = fetchProfileStrings(StudyAssistantRes.language)
 
     CompositionLocalProvider(

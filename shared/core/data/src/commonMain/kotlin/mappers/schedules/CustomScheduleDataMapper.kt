@@ -18,8 +18,11 @@ package mappers.schedules
 
 import entities.schedules.CustomSchedule
 import extensions.mapEpochTimeToInstant
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import mappers.tasks.mapToData
 import mappers.tasks.mapToDomain
+import models.classes.ClassData
 import models.classes.ClassDetailsData
 import models.schedules.CustomScheduleDetailsData
 import models.schedules.CustomSchedulePojo
@@ -43,25 +46,27 @@ fun CustomSchedule.mapToData() = CustomScheduleDetailsData(
 fun CustomScheduleDetailsData.mapToLocalData() = CustomScheduleEntity(
     uid = uid,
     date = date,
+    classes = classes.map { Json.encodeToString(it.mapToData()) },
 )
 
-fun CustomScheduleEntity.mapToDetailsData(
-    classes: List<ClassDetailsData>,
+suspend fun CustomScheduleEntity.mapToDetailsData(
+    classMapper: suspend (ClassData) -> ClassDetailsData,
 ) = CustomScheduleDetailsData(
     uid = uid,
     date = date,
-    classes = classes,
+    classes = classes.map { classMapper(Json.decodeFromString<ClassData>(it)) },
 )
 
 fun CustomScheduleDetailsData.mapToRemoteData() = CustomSchedulePojo(
     uid = uid,
     date = date,
+    classes = classes.map { it.mapToData() },
 )
 
-fun CustomSchedulePojo.mapToDetailsData(
-    classes: List<ClassDetailsData>,
+suspend fun CustomSchedulePojo.mapToDetailsData(
+    classMapper: suspend (ClassData) -> ClassDetailsData,
 ) = CustomScheduleDetailsData(
     uid = uid,
     date = date,
-    classes = classes,
+    classes = classes.map { classMapper(it) },
 )

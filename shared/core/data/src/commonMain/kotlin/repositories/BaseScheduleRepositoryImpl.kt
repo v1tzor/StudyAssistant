@@ -17,15 +17,17 @@
 package repositories
 
 import database.schedules.BaseScheduleLocalDataSource
+import entities.classes.Class
+import entities.common.NumberOfRepeatWeek
 import entities.schedules.BaseSchedule
-import entities.settings.NumberOfWeek
 import functional.TimeRange
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.Instant
 import mappers.schedules.mapToData
 import mappers.schedules.mapToDomain
+import mappers.tasks.mapToDomain
 import payments.SubscriptionChecker
 import remote.schedules.BaseScheduleRemoteDataSource
 
@@ -38,17 +40,44 @@ class BaseScheduleRepositoryImpl(
     private val subscriptionChecker: SubscriptionChecker,
 ) : BaseScheduleRepository {
 
+    override suspend fun addOrUpdateSchedule(
+        schedule: BaseSchedule,
+        targetUser: UID
+    ): UID {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.addOrUpdateSchedule(schedule.mapToData(), targetUser)
+        } else {
+            localDataSource.addOrUpdateSchedule(schedule.mapToData())
+        }
+    }
+
+    override suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<BaseSchedule?> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        val scheduleFlow = if (isSubscriber) {
+            remoteDataSource.fetchScheduleById(uid, targetUser)
+        } else {
+            localDataSource.fetchScheduleById(uid)
+        }
+
+        return scheduleFlow.map { scheduleData ->
+            scheduleData?.mapToDomain()
+        }
+    }
+
     override suspend fun fetchScheduleByDate(
-        week: NumberOfWeek,
-        weekDayOfWeek: DayOfWeek,
+        date: Instant,
+        numberOfWeek: NumberOfRepeatWeek,
         targetUser: UID
     ): Flow<BaseSchedule?> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         val scheduleFlow = if (isSubscriber) {
-            remoteDataSource.fetchScheduleByDate(week.name, weekDayOfWeek.name, targetUser)
+            remoteDataSource.fetchScheduleByDate(date, numberOfWeek, targetUser)
         } else {
-            localDataSource.fetchScheduleByDate(week.name, weekDayOfWeek.name)
+            localDataSource.fetchScheduleByDate(date, numberOfWeek)
         }
 
         return scheduleFlow.map { scheduleData ->
@@ -61,13 +90,11 @@ class BaseScheduleRepositoryImpl(
         targetUser: UID
     ): Flow<List<BaseSchedule>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-        val timeStart = timeRange.from.toEpochMilliseconds()
-        val timeEnd = timeRange.to.toEpochMilliseconds()
 
         val scheduleListFlow = if (isSubscriber) {
-            remoteDataSource.fetchSchedulesByTimeRange(timeStart.toInt(), timeEnd.toInt(), targetUser)
+            remoteDataSource.fetchSchedulesByTimeRange(timeRange.from, timeRange.to, targetUser)
         } else {
-            localDataSource.fetchSchedulesByTimeRange(timeStart, timeEnd)
+            localDataSource.fetchSchedulesByTimeRange(timeRange.from, timeRange.to)
         }
 
         return scheduleListFlow.map { scheduleList ->
@@ -75,16 +102,17 @@ class BaseScheduleRepositoryImpl(
         }
     }
 
-    override suspend fun addOrUpdateSchedule(
-        schedule: BaseSchedule,
-        targetUser: UID
-    ): UID {
+    override suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<Class?> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateSchedule(schedule.mapToData(), targetUser)
+        val classFlow = if (isSubscriber) {
+            remoteDataSource.fetchClassById(uid, scheduleId, targetUser)
         } else {
-            localDataSource.addOrUpdateSchedule(schedule.mapToData())
+            localDataSource.fetchClassById(uid, scheduleId)
+        }
+
+        return classFlow.map { classData ->
+            classData?.mapToDomain()
         }
     }
 }

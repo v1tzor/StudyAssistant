@@ -21,5 +21,7 @@ package entities.organizations
  */
 data class NumberedDuration(
     val number: Int,
-    val duration: Int,
+    val duration: Millis,
 )
+
+typealias Millis = Long

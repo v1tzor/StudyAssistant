@@ -18,10 +18,16 @@ package ru.aleshin.studyassistant.schedule.impl.di
 
 import inject.BaseFeatureDependencies
 import managers.CoroutineManager
+import repositories.BaseScheduleRepository
+import repositories.CustomScheduleRepository
+import repositories.OrganizationsRepository
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 interface ScheduleFeatureDependencies : BaseFeatureDependencies {
+    val baseScheduleRepository: BaseScheduleRepository
+    val customScheduleRepository: CustomScheduleRepository
+    val organizationsRepository: OrganizationsRepository
     val coroutineManager: CoroutineManager
 }

@@ -38,5 +38,6 @@ data class Organization(
     val phones: List<ContactInfo> = emptyList(),
     val locations: List<ContactInfo> = emptyList(),
     val webs: List<ContactInfo> = emptyList(),
+    val offices: List<Int> = emptyList(),
     val isHide: Boolean = false,
 )

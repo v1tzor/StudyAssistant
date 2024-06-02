@@ -16,6 +16,7 @@
 
 package repositories
 
+import entities.classes.Class
 import entities.schedules.CustomSchedule
 import functional.TimeRange
 import functional.UID
@@ -26,7 +27,8 @@ import kotlinx.datetime.Instant
  * @author Stanislav Aleshin on 04.05.2024.
  */
 interface CustomScheduleRepository {
+    suspend fun addOrUpdateSchedule(schedule: CustomSchedule, targetUser: UID): UID
     suspend fun fetchScheduleByDate(date: Instant, targetUser: UID): Flow<CustomSchedule?>
     suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<CustomSchedule>>
-    suspend fun addOrUpdateSchedule(schedule: CustomSchedule, targetUser: UID): UID
+    suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<Class?>
 }

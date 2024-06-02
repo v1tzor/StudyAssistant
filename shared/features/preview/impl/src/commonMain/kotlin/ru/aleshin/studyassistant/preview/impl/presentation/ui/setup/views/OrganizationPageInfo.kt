@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -44,7 +43,9 @@ import ru.aleshin.studyassistant.preview.impl.presentation.models.OrganizationUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import theme.StudyAssistantRes
 import views.ExpandedIcon
+import views.InfoTextField
 import views.OrganizationTypeDropdownMenu
+import views.VerticalInfoTextField
 
 /**
  * @author Stanislav Aleshin on 27.04.2024

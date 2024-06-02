@@ -16,7 +16,7 @@
 
 package models.settings
 
-import entities.settings.NumberOfWeek
+import entities.common.NumberOfRepeatWeek
 import kotlinx.serialization.Serializable
 
 /**
@@ -24,7 +24,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class CalendarSettingsDetailsData(
-    val numberOfWeek: String = NumberOfWeek.ONE.name,
+    val numberOfWeek: String = NumberOfRepeatWeek.ONE.name,
 ) {
     companion object {
         fun default() = CalendarSettingsDetailsData()

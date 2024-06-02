@@ -29,6 +29,7 @@ internal data class OrganizationUi(
     val shortName: String,
     val fullName: String? = null,
     val type: OrganizationType = OrganizationType.SCHOOL,
+    val scheduleTimeIntervals: ScheduleTimeIntervalsUi = ScheduleTimeIntervalsUi(),
     val avatar: String? = null,
     val subjects: List<SubjectUi> = emptyList(),
     val employee: List<EmployeeUi> = emptyList(),
@@ -36,6 +37,7 @@ internal data class OrganizationUi(
     val phones: List<ContactInfoUi> = emptyList(),
     val locations: List<ContactInfoUi> = emptyList(),
     val webs: List<ContactInfoUi> = emptyList(),
+    val offices: List<Int> = emptyList(),
     val isHide: Boolean = false,
 ) : JavaSerializable {
     companion object {

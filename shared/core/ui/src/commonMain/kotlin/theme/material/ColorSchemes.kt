@@ -20,6 +20,8 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import models.ThemeUiType
+import theme.tokens.darkColorAccents
+import theme.tokens.lightColorAccents
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
@@ -258,6 +260,13 @@ fun ThemeUiType.toColorScheme() = when (this) {
     ThemeUiType.DEFAULT -> if (isSystemInDarkTheme()) darkScheme else lightScheme
     ThemeUiType.LIGHT -> lightScheme
     ThemeUiType.DARK -> darkScheme
+}
+
+@Composable
+fun ThemeUiType.toColorAccents() = when (this) {
+    ThemeUiType.DEFAULT -> if (isSystemInDarkTheme()) darkColorAccents() else lightColorAccents()
+    ThemeUiType.LIGHT -> lightColorAccents()
+    ThemeUiType.DARK -> darkColorAccents()
 }
 
 @Composable

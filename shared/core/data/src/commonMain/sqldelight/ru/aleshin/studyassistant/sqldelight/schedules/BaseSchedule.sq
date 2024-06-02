@@ -1,10 +1,19 @@
+import kotlin.String;
+import kotlin.collections.List;
+
 CREATE TABLE baseScheduleEntity (
   uid TEXT PRIMARY KEY NOT NULL,
   date_version_from INTEGER NOT NULL,
   date_version_to INTEGER NOT NULL,
   week_day_of_week TEXT NOT NULL,
-  week TEXT NOT NULL
+  week TEXT NOT NULL,
+  classes TEXT AS List<String> NOT NULL
 );
+
+fetchScheduleById:
+SELECT *
+FROM baseScheduleEntity
+WHERE uid = ?;
 
 fetchSchedulesByDate:
 SELECT *
@@ -15,9 +24,9 @@ ORDER BY date_version_to DESC;
 fetchSchedulesByTimeRange:
 SELECT *
 FROM baseScheduleEntity
-WHERE date_version_from >= ? AND date_version_to <= ?
+WHERE date_version_to >= ? AND date_version_from <= ?
 ORDER BY date_version_to DESC;
 
 addOrUpdateSchedule:
-INSERT OR REPLACE INTO baseScheduleEntity (uid, date_version_from, date_version_to, week_day_of_week, week)
+INSERT OR REPLACE INTO baseScheduleEntity (uid, date_version_from, date_version_to, week_day_of_week, week, classes)
 VALUES ?;

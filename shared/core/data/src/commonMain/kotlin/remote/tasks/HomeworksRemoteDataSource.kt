@@ -22,6 +22,7 @@ import dev.gitlive.firebase.firestore.where
 import exceptions.FirebaseUserException
 import functional.UID
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import mappers.subjects.mapToDetailsData
@@ -39,14 +40,48 @@ import remote.StudyAssistantFirestore.UserData
  */
 interface HomeworksRemoteDataSource {
 
-    suspend fun fetchHomeworksByTime(from: Int, to: Int, targetUser: UID): Flow<List<HomeworkDetailsData>>
-    suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<HomeworkDetailsData?>
     suspend fun addOrUpdateHomework(homework: HomeworkDetailsData, targetUser: UID): UID
+    suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<HomeworkDetailsData?>
+    suspend fun fetchHomeworksByTime(from: Int, to: Int, targetUser: UID): Flow<List<HomeworkDetailsData>>
     suspend fun deleteHomework(uid: UID, targetUser: UID)
 
     class Base(
         private val database: FirebaseFirestore,
     ) : HomeworksRemoteDataSource {
+
+        override suspend fun addOrUpdateHomework(homework: HomeworkDetailsData, targetUser: UID): UID {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+            val homeworkPojo = homework.mapToRemoteData()
+
+            val reference = userDataRoot.collection(UserData.HOMEWORKS)
+
+            return database.runTransaction {
+                val isExist = homeworkPojo.uid.isNotEmpty() && reference.document(homeworkPojo.uid).get().exists
+                if (isExist) {
+                    reference.document(homeworkPojo.uid).set(data = homeworkPojo)
+                    return@runTransaction homeworkPojo.uid
+                } else {
+                    val uid = reference.add(homeworkPojo).id
+                    reference.document(uid).update(UserData.UID to uid)
+                    return@runTransaction uid
+                }
+            }
+        }
+
+        override suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<HomeworkDetailsData?> {
+            if (uid.isEmpty()) return flowOf(null)
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.HOMEWORKS).document(uid)
+
+            val homeworkPojoFlow = reference.snapshots.map { snapshot ->
+                snapshot.data(serializer<HomeworkPojo?>())
+            }
+
+            return homeworkPojoFlow.map { homeworkPojo -> homeworkPojo?.mapToDetails(userDataRoot) }
+        }
 
         override suspend fun fetchHomeworksByTime(
             from: Int,
@@ -69,39 +104,6 @@ interface HomeworksRemoteDataSource {
             }
         }
 
-        override suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<HomeworkDetailsData?> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.HOMEWORKS).document(uid)
-
-            val homeworkPojoFlow = reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<HomeworkPojo?>())
-            }
-
-            return homeworkPojoFlow.map { homeworkPojo -> homeworkPojo?.mapToDetails(userDataRoot) }
-        }
-
-        override suspend fun addOrUpdateHomework(homework: HomeworkDetailsData, targetUser: UID): UID {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-            val homeworkPojo = homework.mapToRemoteData()
-
-            val reference = userDataRoot.collection(UserData.HOMEWORKS)
-
-            return database.runTransaction {
-                val isExist = homeworkPojo.uid.isNotEmpty() && reference.document(homeworkPojo.uid).get().exists
-                if (isExist) {
-                    reference.document(homeworkPojo.uid).set(data = homeworkPojo, merge = true)
-                    return@runTransaction homeworkPojo.uid
-                } else {
-                    val uid = reference.add(homeworkPojo).id
-                    reference.document(uid).update(UserData.UID to uid)
-                    return@runTransaction uid
-                }
-            }
-        }
-
         override suspend fun deleteHomework(uid: UID, targetUser: UID) {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
@@ -117,7 +119,7 @@ interface HomeworksRemoteDataSource {
 
             val organization = organizationReference.get().data<OrganizationShortData>()
             val subject = subjectReference?.get()?.data<SubjectPojo>().let { subjectPojo ->
-                val employeeReference = subjectPojo?.teacher?.let {
+                val employeeReference = subjectPojo?.teacherId?.let {
                     userDataRoot.collection(UserData.EMPLOYEE).document(it)
                 }
                 val employee = employeeReference?.get()?.data(serializer<EmployeeDetailsData?>())

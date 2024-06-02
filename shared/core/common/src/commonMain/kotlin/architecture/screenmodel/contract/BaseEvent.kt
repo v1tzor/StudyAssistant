@@ -19,7 +19,3 @@ package architecture.screenmodel.contract
  * @author Stanislav Aleshin on 12.06.2023.
  */
 interface BaseEvent
-
-
-
-

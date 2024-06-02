@@ -16,6 +16,7 @@
 
 package models.subjects
 
+import entities.subject.EventType
 import functional.UID
 import kotlinx.serialization.Serializable
 import models.users.ContactInfoData
@@ -25,12 +26,12 @@ import models.users.ContactInfoData
  */
 @Serializable
 data class SubjectPojo(
-    val uid: UID,
-    val organizationId: UID,
-    val eventType: String,
-    val name: String,
-    val teacher: UID?,
-    val office: Int,
-    val color: Int,
-    val location: ContactInfoData,
+    val uid: UID = "",
+    val organizationId: UID = "",
+    val eventType: String = EventType.LESSON.toString(),
+    val name: String = "",
+    val teacherId: UID? = null,
+    val office: Int = 0,
+    val color: Int = 0,
+    val location: ContactInfoData = ContactInfoData(),
 )

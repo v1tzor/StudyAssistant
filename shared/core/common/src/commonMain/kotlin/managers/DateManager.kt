@@ -16,6 +16,7 @@
 package managers
 
 import extensions.endThisDay
+import extensions.isCurrentDay
 import extensions.startThisDay
 import extensions.toMinutes
 import kotlinx.datetime.Clock
@@ -29,6 +30,7 @@ interface DateManager {
     fun fetchCurrentDate(): Instant
     fun fetchBeginningCurrentDay(): Instant
     fun fetchEndCurrentDay(): Instant
+    fun isCurrentDay(date: Instant): Boolean
     fun calculateLeftTime(endTime: Instant): Long
     fun calculateProgress(startTime: Instant, endTime: Instant): Float
 
@@ -42,6 +44,10 @@ interface DateManager {
 
         override fun fetchEndCurrentDay(): Instant {
             return fetchCurrentDate().endThisDay()
+        }
+
+        override fun isCurrentDay(date: Instant): Boolean {
+            return fetchCurrentDate().isCurrentDay(date)
         }
 
         override fun calculateLeftTime(endTime: Instant): Long {

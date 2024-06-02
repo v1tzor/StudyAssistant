@@ -16,8 +16,9 @@
 package functional
 
 import kotlinx.datetime.Instant
+import platform.JavaSerializable
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
-data class TimeRange(val from: Instant, val to: Instant)
+data class TimeRange(val from: Instant, val to: Instant) : JavaSerializable

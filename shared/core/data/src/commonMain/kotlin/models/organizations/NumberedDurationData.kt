@@ -16,6 +16,7 @@
 
 package models.organizations
 
+import entities.organizations.Millis
 import kotlinx.serialization.Serializable
 
 /**
@@ -24,5 +25,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NumberedDurationData(
     val number: Int,
-    val duration: Int
+    val duration: Millis
 )
