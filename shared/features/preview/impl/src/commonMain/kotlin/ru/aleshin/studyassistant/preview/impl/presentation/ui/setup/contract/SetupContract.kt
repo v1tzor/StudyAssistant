@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupP
  * @author Stanislav Aleshin on 17.04.2024
  */
 internal data class SetupViewState(
+    // TODO: Not serializable
     val currentPage: SetupPage = SetupPage.PROFILE,
     val profile: AppUserUi? = null,
     val organization: OrganizationUi? = null,

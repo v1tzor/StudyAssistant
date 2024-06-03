@@ -17,10 +17,12 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
 import entities.schedules.BaseSchedule
+import entities.schedules.CustomSchedule
 import entities.schedules.DateVersion
 import ru.aleshin.studyassistant.editor.impl.domain.entities.BaseWeekSchedule
 import ru.aleshin.studyassistant.editor.impl.presentation.models.BaseScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.BaseWeekScheduleUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.CustomScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.DateVersionUi
 
 /**
@@ -41,6 +43,12 @@ internal fun BaseSchedule.mapToUi() = BaseScheduleUi(
     classes = classes.map { it.mapToUi() }
 )
 
+internal fun CustomSchedule.mapToUi() = CustomScheduleUi(
+    uid = uid,
+    date = date,
+    classes = classes.map { it.mapToUi() }
+)
+
 internal fun DateVersion.mapToUi() = DateVersionUi(
     from = from,
     to = to,
@@ -58,6 +66,12 @@ internal fun BaseScheduleUi.mapToDomain() = BaseSchedule(
     dateVersion = dateVersion.mapToDomain(),
     dayOfWeek = dayOfWeek,
     week = week,
+    classes = classes.map { it.mapToDomain() },
+)
+
+internal fun CustomScheduleUi.mapToDomain() = CustomSchedule(
+    uid = uid,
+    date = date,
     classes = classes.map { it.mapToDomain() },
 )
 

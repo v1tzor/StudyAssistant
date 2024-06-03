@@ -49,6 +49,7 @@ import kotlin.coroutines.CoroutineContext
 interface CustomScheduleLocalDataSource {
 
     suspend fun addOrUpdateSchedule(schedule: CustomScheduleDetailsData): UID
+    suspend fun fetchScheduleById(uid: UID): Flow<CustomScheduleDetailsData?>
     suspend fun fetchScheduleByDate(date: Instant): Flow<CustomScheduleDetailsData?>
     suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant): Flow<List<CustomScheduleDetailsData>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<ClassDetailsData?>
@@ -70,6 +71,17 @@ interface CustomScheduleLocalDataSource {
             scheduleQueries.addOrUpdateSchedule(scheduleClassEntity.copy(uid = uid))
 
             return uid
+        }
+
+        override suspend fun fetchScheduleById(uid: UID): Flow<CustomScheduleDetailsData?> {
+            val query = scheduleQueries.fetchScheduleById(uid)
+            val scheduleEntityFlow = query.asFlow().mapToOneOrNull(coroutineContext)
+
+            return scheduleEntityFlow.map { scheduleEntity ->
+                scheduleEntity?.mapToDetailsData(
+                    classMapper = { it.mapToDetails(scheduleEntity.uid) },
+                )
+            }
         }
 
         override suspend fun fetchScheduleByDate(date: Instant): Flow<CustomScheduleDetailsData?> {

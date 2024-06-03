@@ -28,6 +28,7 @@ import kotlinx.datetime.Instant
  */
 interface CustomScheduleRepository {
     suspend fun addOrUpdateSchedule(schedule: CustomSchedule, targetUser: UID): UID
+    suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<CustomSchedule?>
     suspend fun fetchScheduleByDate(date: Instant, targetUser: UID): Flow<CustomSchedule?>
     suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<CustomSchedule>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<Class?>

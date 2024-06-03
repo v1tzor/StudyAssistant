@@ -33,3 +33,7 @@ WHERE uid = ?;
 addOrUpdateEmployee:
 INSERT OR REPLACE INTO employeeEntity (uid, organization_id, first_name, second_name, patronymic, post, avatar, birthday, workTimeStart, workTimeEnd, emails, phones, locations, webs)
 VALUES ?;
+
+deleteEmployee:
+DELETE FROM employeeEntity
+WHERE uid = ?;

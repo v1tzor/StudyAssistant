@@ -41,7 +41,7 @@ import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.models.NumberedDurationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import theme.StudyAssistantRes
-import views.DurationPickerDialog
+import views.dialog.DurationPickerDialog
 import views.menu.BackMenuItem
 
 /**

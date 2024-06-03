@@ -41,7 +41,6 @@ import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import co.touchlab.kermit.Logger
 import extensions.navigationBarsInDp
 import extensions.safeNavigationBarsInPx
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
@@ -135,7 +134,7 @@ internal class ScheduleEditorScreen : Screen {
                 is ScheduleEditorEffect.NavigateToLocal -> navigator.push(effect.pushScreen)
                 is ScheduleEditorEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.apply { Logger.e { "error -> ${effect.failures}" } }.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

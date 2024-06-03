@@ -23,6 +23,10 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.impl.navigation.EditorFeatureStarterImpl
 import ru.aleshin.studyassistant.editor.impl.navigation.EditorScreenProvider
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEditorEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEditorScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEditorStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEditorWorkProcessor
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorEffectCommunicator
@@ -44,4 +48,9 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<ScheduleEditorEffectCommunicator> { ScheduleEditorEffectCommunicator.Base() }
     bindProvider<ScheduleEditorWorkProcessor> { ScheduleEditorWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindProvider<ScheduleEditorScreenModel> { ScheduleEditorScreenModel(instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<ClassEditorStateCommunicator> { ClassEditorStateCommunicator.Base() }
+    bindProvider<ClassEditorEffectCommunicator> { ClassEditorEffectCommunicator.Base() }
+    bindProvider<ClassEditorWorkProcessor> { ClassEditorWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<ClassEditorScreenModel> { ClassEditorScreenModel(instance(), instance(), instance(), instance()) }
 }

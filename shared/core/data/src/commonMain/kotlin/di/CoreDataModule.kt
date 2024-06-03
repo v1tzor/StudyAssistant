@@ -16,21 +16,25 @@
 
 package di
 
+import database.employee.EmployeeLocalDataSource
 import database.organizations.OrganizationsLocalDataSource
 import database.schedules.BaseScheduleLocalDataSource
 import database.schedules.CustomScheduleLocalDataSource
 import database.settings.CalendarSettingsLocalDataSource
 import database.settings.GeneralSettingsLocalDataSource
+import database.subjects.SubjectsLocalDataSource
 import database.tasks.HomeworksLocalDataSource
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import remote.auth.AuthRemoteDataSource
+import remote.employee.EmployeeRemoteDataSource
 import remote.organizations.OrganizationsRemoteDataSource
 import remote.schedules.BaseScheduleRemoteDataSource
 import remote.schedules.CustomScheduleRemoteDataSource
 import remote.settings.CalendarSettingsRemoteDataSource
+import remote.subjects.SubjectsRemoteDataSource
 import remote.tasks.HomeworksRemoteDataSource
 import remote.users.UsersRemoteDataSource
 import repositories.AuthRepository
@@ -41,6 +45,8 @@ import repositories.CalendarSettingsRepository
 import repositories.CalendarSettingsRepositoryImpl
 import repositories.CustomScheduleRepository
 import repositories.CustomScheduleRepositoryImpl
+import repositories.EmployeeRepository
+import repositories.EmployeeRepositoryImpl
 import repositories.GeneralSettingsRepository
 import repositories.GeneralSettingsRepositoryImpl
 import repositories.HomeworksRepository
@@ -49,6 +55,8 @@ import repositories.ManageUserRepository
 import repositories.ManageUserRepositoryImpl
 import repositories.OrganizationsRepository
 import repositories.OrganizationsRepositoryImpl
+import repositories.SubjectsRepository
+import repositories.SubjectsRepositoryImpl
 import repositories.UsersRepository
 import repositories.UsersRepositoryImpl
 
@@ -90,15 +98,25 @@ val coreDataModule = DI.Module("CoreData") {
         CustomScheduleRepositoryImpl(instance(), instance(), instance())
     }
 
-//    bindSingleton<ClassLocalDataSource> {
-//        ClassLocalDataSource.Base(instance(), instance(), instance(), instance(), instance())
-//    }
-//    bindSingleton<ClassRemoteDataSource> {
-//        ClassRemoteDataSource.Base(instance())
-//    }
-//    bindProvider<ClassRepository> {
-//        ClassRepositoryImpl(instance(), instance(), instance())
-//    }
+    bindSingleton<SubjectsLocalDataSource> {
+        SubjectsLocalDataSource.Base(instance(), instance(), instance())
+    }
+    bindSingleton<SubjectsRemoteDataSource> {
+        SubjectsRemoteDataSource.Base(instance())
+    }
+    bindProvider<SubjectsRepository> {
+        SubjectsRepositoryImpl(instance(), instance(), instance())
+    }
+
+    bindSingleton<EmployeeLocalDataSource> {
+        EmployeeLocalDataSource.Base(instance(), instance())
+    }
+    bindSingleton<EmployeeRemoteDataSource> {
+        EmployeeRemoteDataSource.Base(instance())
+    }
+    bindProvider<EmployeeRepository> {
+        EmployeeRepositoryImpl(instance(), instance(), instance())
+    }
 
     bindSingleton<HomeworksLocalDataSource> {
         HomeworksLocalDataSource.Base(instance(), instance(), instance(), instance(), instance())

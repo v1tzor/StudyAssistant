@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,9 +41,10 @@ import ru.aleshin.studyassistant.preview.impl.presentation.models.ContactInfoUi
 import ru.aleshin.studyassistant.preview.impl.presentation.models.OrganizationUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import theme.StudyAssistantRes
+import views.ClickableInfoTextField
 import views.ExpandedIcon
 import views.InfoTextField
-import views.OrganizationTypeDropdownMenu
+import views.menu.OrganizationTypeDropdownMenu
 import views.VerticalInfoTextField
 
 /**
@@ -101,19 +101,17 @@ internal fun OrganizationPageInfo(
                 mutableStateOf(TextFieldValue(webs.getOrElse(0) { ContactInfoUi() }.value))
             }
 
-            InfoTextField(
-                enabled = false,
+            ClickableInfoTextField(
+                onClick = { isExpandedTypeMenu = true },
                 value = type.mapToSting(StudyAssistantRes.strings),
-                onValueChange = {},
-                labelText = PreviewThemeRes.strings.organizationTypeLabel,
-                infoIcon = painterResource(PreviewThemeRes.icons.organization),
+                label = PreviewThemeRes.strings.organizationTypeLabel,
+                placeholder = PreviewThemeRes.strings.organizationTypePlaceholder,
+                leadingInfoIcon = painterResource(PreviewThemeRes.icons.organization),
                 trailingIcon = {
-                    IconButton(onClick = { isExpandedTypeMenu = true }) {
-                        ExpandedIcon(
-                            isExpanded = isExpandedTypeMenu,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+                    ExpandedIcon(
+                        isExpanded = isExpandedTypeMenu,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                     OrganizationTypeDropdownMenu(
                         isExpanded = isExpandedTypeMenu,
                         selected = type,
@@ -131,7 +129,9 @@ internal fun OrganizationPageInfo(
                     editableEmail = it
                     val currentEmail = emails.getOrElse(0) { ContactInfoUi() }
                     val emails = emails.toMutableList().apply {
-                        if (size != 0) set(0, currentEmail.copy(value = it.text)) else add(currentEmail)
+                        if (size != 0) set(0, currentEmail.copy(value = it.text)) else add(
+                            currentEmail
+                        )
                     }
                     onUpdateOrganization(organization.copy(emails = emails))
                 },
@@ -144,7 +144,9 @@ internal fun OrganizationPageInfo(
                     editablePhone = it
                     val currentPhone = phones.getOrElse(0) { ContactInfoUi() }
                     val phones = phones.toMutableList().apply {
-                        if (size != 0) set(0, currentPhone.copy(value = it.text)) else add(currentPhone)
+                        if (size != 0) set(0, currentPhone.copy(value = it.text)) else add(
+                            currentPhone
+                        )
                     }
                     onUpdateOrganization(organization.copy(phones = phones))
                 },

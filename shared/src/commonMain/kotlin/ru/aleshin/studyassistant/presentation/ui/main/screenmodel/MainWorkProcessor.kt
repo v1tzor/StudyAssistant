@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.domain.interactors.GeneralSettingsInteractor
 import ru.aleshin.studyassistant.domain.interactors.UserCheckerInteractor
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.navigation.GlobalScreenProvider
 import ru.aleshin.studyassistant.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
@@ -86,7 +87,8 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                         screenProvider.provideAuthScreen(AuthScreen.Login)
                     }
                 }
-                return@delayedAction EffectResult(MainEffect.ReplaceGlobalScreen(targetScreen))
+                val testScreen = screenProvider.provideEditorScreen(EditorScreen.Schedule)
+                return@delayedAction EffectResult(MainEffect.ReplaceGlobalScreen(testScreen))
             }
             emit(result)
         }

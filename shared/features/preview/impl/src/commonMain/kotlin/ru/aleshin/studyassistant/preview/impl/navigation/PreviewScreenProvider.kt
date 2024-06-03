@@ -35,14 +35,14 @@ internal interface PreviewScreenProvider : FeatureScreenProvider<PreviewScreen> 
 
     fun provideAuthScreen(screen: AuthScreen): Screen
 
-    fun provideScheduleEditorScreen(screen: EditorScreen): Screen
+    fun provideEditorScreen(screen: EditorScreen): Screen
 
     fun provideTabNavigationScreen(): Screen
 
     class Base(
-        private val navigationFeatureStarter: () -> NavigationFeatureStarter,
         private val editorFeatureStarter: () -> EditorFeatureStarter,
         private val authFeatureStarter: () -> AuthFeatureStarter,
+        private val navigationFeatureStarter: () -> NavigationFeatureStarter,
     ) : PreviewScreenProvider {
 
         override fun provideFeatureScreen(screen: PreviewScreen) = when (screen) {
@@ -54,7 +54,7 @@ internal interface PreviewScreenProvider : FeatureScreenProvider<PreviewScreen> 
             return authFeatureStarter().fetchFeatureScreen(screen)
         }
 
-        override fun provideScheduleEditorScreen(screen: EditorScreen): Screen {
+        override fun provideEditorScreen(screen: EditorScreen): Screen {
             return editorFeatureStarter().fetchFeatureScreen(screen)
         }
 

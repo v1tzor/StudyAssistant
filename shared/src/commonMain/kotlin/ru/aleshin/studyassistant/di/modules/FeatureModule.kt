@@ -27,8 +27,10 @@ import repositories.AuthRepository
 import repositories.BaseScheduleRepository
 import repositories.CalendarSettingsRepository
 import repositories.CustomScheduleRepository
+import repositories.EmployeeRepository
 import repositories.ManageUserRepository
 import repositories.OrganizationsRepository
+import repositories.SubjectsRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
@@ -69,9 +71,9 @@ val featureModule = DI.Module("Feature") {
 
     bindEagerSingleton<PreviewFeatureDependencies> {
         object : PreviewFeatureDependencies {
+            override val authFeatureStarter = provider<AuthFeatureStarter>()
             override val editorFeatureStarter = provider<EditorFeatureStarter>()
             override val navigationFeatureStarter = provider<NavigationFeatureStarter>()
-            override val authFeatureStarter = provider<AuthFeatureStarter>()
             override val usersRepository = instance<UsersRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
@@ -136,6 +138,8 @@ val featureModule = DI.Module("Feature") {
         object : EditorFeatureDependencies {
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
+            override val subjectsRepository = instance<SubjectsRepository>()
+            override val employeeRepository = instance<EmployeeRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val usersRepository = instance<UsersRepository>()

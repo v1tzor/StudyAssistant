@@ -25,3 +25,7 @@ WHERE uid = ?;
 addOrUpdateSubject:
 INSERT OR REPLACE INTO subjectEntity (uid, organization_id, event_type, name, teacher_id, office, color, location)
 VALUES ?;
+
+deleteSubject:
+DELETE FROM subjectEntity
+WHERE uid = ?;

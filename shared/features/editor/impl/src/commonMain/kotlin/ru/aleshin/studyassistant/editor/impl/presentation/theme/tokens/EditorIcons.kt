@@ -23,9 +23,12 @@ import studyassistant.shared.features.editor.impl.generated.resources.Res
 import studyassistant.shared.features.editor.impl.generated.resources.ic_break
 import studyassistant.shared.features.editor.impl.generated.resources.ic_class
 import studyassistant.shared.features.editor.impl.generated.resources.ic_clear_circular
+import studyassistant.shared.features.editor.impl.generated.resources.ic_clock
+import studyassistant.shared.features.editor.impl.generated.resources.ic_employee
+import studyassistant.shared.features.editor.impl.generated.resources.ic_map_marker
+import studyassistant.shared.features.editor.impl.generated.resources.ic_notify
 import studyassistant.shared.features.editor.impl.generated.resources.ic_number
-import studyassistant.shared.features.editor.impl.generated.resources.ic_organization_geo
-import studyassistant.shared.features.editor.impl.generated.resources.ic_time
+import studyassistant.shared.features.editor.impl.generated.resources.ic_organization
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -38,23 +41,32 @@ internal data class EditorIcons(
     val number: DrawableResource,
     val time: DrawableResource,
     val clearCircular: DrawableResource,
+    val location: DrawableResource,
+    val employee: DrawableResource,
+    val notification: DrawableResource,
 ) {
     companion object {
         val LIGHT = EditorIcons(
-            organization = Res.drawable.ic_organization_geo,
+            organization = Res.drawable.ic_organization,
             classes = Res.drawable.ic_class,
             breaks = Res.drawable.ic_break,
             number = Res.drawable.ic_number,
-            time = Res.drawable.ic_time,
+            time = Res.drawable.ic_clock,
+            location = Res.drawable.ic_map_marker,
             clearCircular = Res.drawable.ic_clear_circular,
+            employee = Res.drawable.ic_employee,
+            notification = Res.drawable.ic_notify
         )
         val DARK = EditorIcons(
-            organization = Res.drawable.ic_organization_geo,
+            organization = Res.drawable.ic_organization,
             classes = Res.drawable.ic_class,
             breaks = Res.drawable.ic_break,
             number = Res.drawable.ic_number,
-            time = Res.drawable.ic_time,
+            time = Res.drawable.ic_clock,
+            location = Res.drawable.ic_map_marker,
             clearCircular = Res.drawable.ic_clear_circular,
+            employee = Res.drawable.ic_employee,
+            notification = Res.drawable.ic_notify
         )
     }
 }

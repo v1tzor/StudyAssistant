@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views
+package views.dialog
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker

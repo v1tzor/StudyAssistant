@@ -49,11 +49,13 @@ object StudyAssistantFirestore {
         const val CUSTOM_SCHEDULE_DATE = "date"
         const val WEEK = "week"
         const val DAY_OF_WEEK = "weekDayOfWeek"
-        const val ORGANIZATION_ID = "organization_id"
+        const val ORGANIZATION_ID = "organizationId"
     }
 
     object LIMITS {
         const val ORGANIZATION_EMPLOYEE = 6L
         const val ORGANIZATION_SUBJECTS = 8L
+        const val EDITOR_SUBJECTS = 50L
+        const val EDITOR_EMPLOYEE = 50L
     }
 }

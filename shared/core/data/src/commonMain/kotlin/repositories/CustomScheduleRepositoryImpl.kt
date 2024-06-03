@@ -52,6 +52,23 @@ class CustomScheduleRepositoryImpl(
         }
     }
 
+    override suspend fun fetchScheduleById(
+        uid: UID,
+        targetUser: UID
+    ): Flow<CustomSchedule?> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        val scheduleFlow = if (isSubscriber) {
+            remoteDataSource.fetchScheduleById(uid, targetUser)
+        } else {
+            localDataSource.fetchScheduleById(uid)
+        }
+
+        return scheduleFlow.map { scheduleData ->
+            scheduleData?.mapToDomain()
+        }
+    }
+
     override suspend fun fetchScheduleByDate(
         date: Instant,
         targetUser: UID

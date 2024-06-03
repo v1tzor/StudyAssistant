@@ -30,7 +30,12 @@ internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen> {
 
         override fun provideFeatureScreen(screen: EditorScreen) = when (screen) {
             is EditorScreen.Schedule -> ScheduleEditorScreen()
-            is EditorScreen.Class -> ClassEditorScreen(screen.classId, screen.scheduleId, screen.weekDay)
+            is EditorScreen.Class -> ClassEditorScreen(
+                classId = screen.classId,
+                scheduleId = screen.scheduleId,
+                customSchedule = screen.customSchedule,
+                weekDay = screen.weekDay,
+            )
         }
     }
 }

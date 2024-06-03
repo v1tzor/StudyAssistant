@@ -27,7 +27,7 @@ import platform.JavaSerializable
  */
 internal data class EditClassUi(
     val uid: UID,
-    val scheduleId: UID,
+    val scheduleId: UID?,
     val organization: OrganizationShortUi? = null,
     val eventType: EventType? = null,
     val subject: SubjectUi? = null,
@@ -39,9 +39,13 @@ internal data class EditClassUi(
     val endTime: Instant? = null,
     val notification: Boolean = false,
 ) : JavaSerializable {
+
+    fun isValid() = organization != null && eventType != null && subject != null &&
+        teacher != null && office != null && startTime != null && endTime != null
+
     companion object {
-        fun createEditModel(uid: UID, scheduleId: UID) = EditClassUi(
-            uid = uid,
+        fun createEditModel(uid: UID?, scheduleId: UID?) = EditClassUi(
+            uid = uid ?: "",
             scheduleId = scheduleId
         )
     }
@@ -64,14 +68,14 @@ internal fun ClassUi.convertToEditModel() = EditClassUi(
 
 internal fun EditClassUi.convertToBase() = ClassUi(
     uid = uid,
-    scheduleId = scheduleId,
+    scheduleId = scheduleId ?: "",
     organization = checkNotNull(organization),
     eventType = checkNotNull(eventType),
     subject = subject,
     customData = customData,
     teacher = teacher,
     office = checkNotNull(office),
-    location = checkNotNull(location),
+    location = location ?: ContactInfoUi(),
     timeRange = TimeRange(
         from = checkNotNull(startTime),
         to = checkNotNull(endTime),

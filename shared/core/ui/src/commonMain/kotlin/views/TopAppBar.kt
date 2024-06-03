@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -32,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -54,24 +57,26 @@ import org.jetbrains.compose.resources.painterResource
 fun TopAppBarTitle(
     modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Start,
-    text: String,
-    subText: String? = null,
+    header: String,
+    title: String? = null,
+    headerStyle: TextStyle = MaterialTheme.typography.titleLarge,
+    titleStyle: TextStyle = MaterialTheme.typography.titleSmall,
 ) {
     Column(modifier = modifier) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = text,
+            text = header,
             textAlign = textAlign,
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleLarge,
+            style = headerStyle,
         )
-        if (subText != null) {
+        if (title != null) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = subText,
+                text = title,
                 textAlign = textAlign,
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleSmall,
+                style = titleStyle,
             )
         }
     }
@@ -123,7 +128,9 @@ fun TopAppBarButton(
 ) {
     Box {
         if (badge != null) {
-            Box(modifier = Modifier.padding(top = 4.dp, end = 2.dp).align(Alignment.TopEnd)) { badge() }
+            Box(
+                modifier = Modifier.padding(top = 4.dp, end = 2.dp).align(Alignment.TopEnd)
+            ) { badge() }
         }
         ExtendedIconButton(
             modifier = modifier.size(48.dp),
@@ -139,6 +146,24 @@ fun TopAppBarButton(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+}
+
+@Composable
+fun TopAppBarTextButton(
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    text: String,
+    onClick: () -> Unit,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) {
+    TextButton(
+        onClick = onClick,
+        modifier = modifier.height(40.dp),
+        enabled = enabled,
+        interactionSource = interactionSource,
+    ) {
+        Text(text = text)
     }
 }
 
@@ -177,13 +202,15 @@ fun <T : TopAppBarAction> TopAppBarMoreActions(
                             style = MaterialTheme.typography.titleMedium,
                         )
                     },
-                    leadingIcon = if (item.icon != null) { {
-                        Icon(
-                            painter = painterResource(DrawableResource(checkNotNull(item.icon))),
-                            contentDescription = item.title,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    } } else {
+                    leadingIcon = if (item.icon != null) {
+                        {
+                            Icon(
+                                painter = painterResource(DrawableResource(checkNotNull(item.icon))),
+                                contentDescription = item.title,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    } else {
                         null
                     },
                     onClick = {

@@ -71,11 +71,11 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.ScheduleTimeInt
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import theme.StudyAssistantRes
 import theme.material.full
-import views.BaseTimePickerDialog
 import views.ClickableTextField
 import views.DialogButtons
 import views.DialogHeader
-import views.DurationPickerDialog
+import views.dialog.BaseTimePickerDialog
+import views.dialog.DurationPickerDialog
 
 /**
  * @author Stanislav Aleshin on 26.05.2024.
@@ -93,7 +93,7 @@ internal fun ScheduleIntervalsDialog(
 
     BasicAlertDialog(onDismissRequest = onDismiss, modifier = modifier) {
         Surface(
-            modifier = modifier.width(350.dp).wrapContentHeight(),
+            modifier = Modifier.width(350.dp).wrapContentHeight(),
             shape = MaterialTheme.shapes.extraLarge,
             color = MaterialTheme.colorScheme.surfaceContainer,
             shadowElevation = 4.dp,

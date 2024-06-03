@@ -65,7 +65,6 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
     bindSingleton<CalendarQueries> { instance<Database>().calendarQueries }
     bindSingleton<BaseScheduleQueries> { instance<Database>().baseScheduleQueries }
     bindSingleton<CustomScheduleQueries> { instance<Database>().customScheduleQueries }
-    // bindSingleton<ClassQueries> { instance<Database>().classQueries }
     bindSingleton<HomeworkQueries> { instance<Database>().homeworkQueries }
     bindSingleton<OrganizationQueries> { instance<Database>().organizationQueries }
     bindSingleton<SubjectQueries> { instance<Database>().subjectQueries }

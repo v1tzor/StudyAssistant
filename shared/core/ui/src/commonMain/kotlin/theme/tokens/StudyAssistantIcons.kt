@@ -19,9 +19,10 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.core.ui.generated.resources.Res
+import studyassistant.shared.core.ui.generated.resources.ic_clock_outline
 import studyassistant.shared.core.ui.generated.resources.ic_duration
-import studyassistant.shared.core.ui.generated.resources.ic_organization
-import studyassistant.shared.core.ui.generated.resources.ic_organization_outline
+import studyassistant.shared.core.ui.generated.resources.ic_organization_geo
+import studyassistant.shared.core.ui.generated.resources.ic_organization_geo_outline
 import studyassistant.shared.core.ui.generated.resources.ic_profile
 import studyassistant.shared.core.ui.generated.resources.ic_profile_outline
 import studyassistant.shared.core.ui.generated.resources.ic_study
@@ -29,7 +30,6 @@ import studyassistant.shared.core.ui.generated.resources.ic_study_assistant
 import studyassistant.shared.core.ui.generated.resources.ic_study_outline
 import studyassistant.shared.core.ui.generated.resources.ic_tasks
 import studyassistant.shared.core.ui.generated.resources.ic_tasks_outline
-import studyassistant.shared.core.ui.generated.resources.ic_time_outline
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
@@ -47,6 +47,7 @@ data class StudyAssistantIcons(
     val profileDisabled: DrawableResource,
     val timeOutline: DrawableResource,
     val duration: DrawableResource,
+    val organizationGeo: DrawableResource,
 ) {
     companion object {
         val BASE = StudyAssistantIcons(
@@ -55,12 +56,13 @@ data class StudyAssistantIcons(
             scheduleDisabled = Res.drawable.ic_study_outline,
             tasks = Res.drawable.ic_tasks,
             tasksDisabled = Res.drawable.ic_tasks_outline,
-            information = Res.drawable.ic_organization,
-            informationDisabled = Res.drawable.ic_organization_outline,
+            information = Res.drawable.ic_organization_geo,
+            informationDisabled = Res.drawable.ic_organization_geo_outline,
             profile = Res.drawable.ic_profile,
             profileDisabled = Res.drawable.ic_profile_outline,
-            timeOutline = Res.drawable.ic_time_outline,
+            timeOutline = Res.drawable.ic_clock_outline,
             duration = Res.drawable.ic_duration,
+            organizationGeo = Res.drawable.ic_organization_geo,
         )
     }
 }

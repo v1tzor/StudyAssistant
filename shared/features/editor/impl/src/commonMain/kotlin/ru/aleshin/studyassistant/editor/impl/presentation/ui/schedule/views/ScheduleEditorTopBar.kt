@@ -37,7 +37,7 @@ internal fun ScheduleEditorTopBar(
         modifier = modifier,
         title = {
             TopAppBarTitle(
-                text = EditorThemeRes.strings.editorTitle,
+                header = EditorThemeRes.strings.scheduleEditorHeader,
                 textAlign = TextAlign.Center,
             )
         },

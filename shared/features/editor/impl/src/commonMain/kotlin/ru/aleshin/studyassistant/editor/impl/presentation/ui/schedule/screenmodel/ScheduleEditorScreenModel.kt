@@ -79,11 +79,12 @@ internal class ScheduleEditorScreenModel(
                 workProcessor.work(command).collectAndHandleWork()
             }
             is ScheduleEditorEvent.CreateClass -> launchBackgroundWork(BackgroundKey.DELETE_CLASS) {
-                val command = ScheduleEditorWorkCommand.DeleteClass(null)
-                workProcessor.work(command).collectAndHandleWork()
+                val featureScreen = EditorScreen.Class(null, event.schedule?.uid, false, event.weekDay)
+                val targetScreen = screenProvider.provideFeatureScreen(featureScreen)
+                sendEffect(ScheduleEditorEffect.NavigateToLocal(targetScreen))
             }
             is ScheduleEditorEvent.EditClass -> with(event) {
-                val featureScreen = EditorScreen.Class(editClass.uid, editClass.scheduleId, weekDay)
+                val featureScreen = EditorScreen.Class(editClass.uid, editClass.scheduleId, false, weekDay)
                 val targetScreen = screenProvider.provideFeatureScreen(featureScreen)
                 sendEffect(ScheduleEditorEffect.NavigateToLocal(targetScreen))
             }

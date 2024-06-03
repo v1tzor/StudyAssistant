@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -44,7 +43,8 @@ import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.preview.impl.presentation.models.AppUserUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import theme.StudyAssistantRes
-import views.BirthdayDatePicker
+import views.dialog.BirthdayDatePicker
+import views.ClickableInfoTextField
 import views.ExpandedIcon
 import views.GenderDropdownMenu
 import views.InfoTextField
@@ -60,7 +60,7 @@ internal fun ProfilePageInfo(
     scrollState: ScrollState = rememberScrollState(),
     onUpdateProfile: (AppUserUi) -> Unit,
     onSetAvatar: () -> Unit,
-) = with(profile){
+) = with(profile) {
     var isOpenDatePickerDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -112,36 +112,32 @@ internal fun ProfilePageInfo(
                     disabledBorderColor = MaterialTheme.colorScheme.outline,
                 )
             )
-            InfoTextField(
-                enabled = false,
+            ClickableInfoTextField(
                 value = profile.birthday,
-                onValueChange = {},
-                labelText = PreviewThemeRes.strings.birthdayLabel,
-                infoIcon = painterResource(PreviewThemeRes.icons.birthday),
+                onClick = { isOpenDatePickerDialog = true },
+                label = PreviewThemeRes.strings.birthdayLabel,
+                placeholder = PreviewThemeRes.strings.birthdayPlaceholder,
+                leadingInfoIcon = painterResource(PreviewThemeRes.icons.birthday),
                 trailingIcon = {
-                    IconButton(onClick = { isOpenDatePickerDialog = true }) {
-                        Icon(
-                            painter = painterResource(PreviewThemeRes.icons.selectDate),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+                    Icon(
+                        painter = painterResource(PreviewThemeRes.icons.selectDate),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             )
             var isExpandedGenderMenu by remember { mutableStateOf(false) }
-            InfoTextField(
-                enabled = false,
+            ClickableInfoTextField(
                 value = profile.gender?.mapToSting(StudyAssistantRes.strings),
-                onValueChange = {},
-                labelText = PreviewThemeRes.strings.genderLabel,
-                infoIcon = painterResource(PreviewThemeRes.icons.gender),
+                onClick = { isExpandedGenderMenu = true },
+                label = PreviewThemeRes.strings.genderLabel,
+                placeholder = PreviewThemeRes.strings.genderPlaceholder,
+                leadingInfoIcon = painterResource(PreviewThemeRes.icons.gender),
                 trailingIcon = {
-                    IconButton(onClick = { isExpandedGenderMenu = true }) {
-                        ExpandedIcon(
-                            isExpanded = isExpandedGenderMenu,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+                    ExpandedIcon(
+                        isExpanded = isExpandedGenderMenu,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                     GenderDropdownMenu(
                         isExpanded = isExpandedGenderMenu,
                         selected = profile.gender ?: Gender.NONE,

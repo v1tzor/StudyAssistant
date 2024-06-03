@@ -28,6 +28,7 @@ sealed class EditorScreen : FeatureScreen {
     data class Class(
         val classId: UID?,
         val scheduleId: UID?,
+        val customSchedule: Boolean,
         val weekDay: DayOfNumberedWeekUi,
     ) : EditorScreen()
 }

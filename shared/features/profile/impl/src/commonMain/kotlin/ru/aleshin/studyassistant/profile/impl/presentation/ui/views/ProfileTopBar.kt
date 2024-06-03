@@ -44,7 +44,7 @@ internal fun ProfileTopBar(
         title = {
             TopAppBarTitle(
                 textAlign = TextAlign.Center,
-                text = ProfileThemeRes.strings.profileHeader,
+                header = ProfileThemeRes.strings.profileHeader,
             )
         },
         navigationIcon = {

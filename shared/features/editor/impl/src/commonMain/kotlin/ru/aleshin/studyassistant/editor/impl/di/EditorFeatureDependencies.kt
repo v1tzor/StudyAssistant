@@ -22,7 +22,9 @@ import managers.DateManager
 import repositories.BaseScheduleRepository
 import repositories.CalendarSettingsRepository
 import repositories.CustomScheduleRepository
+import repositories.EmployeeRepository
 import repositories.OrganizationsRepository
+import repositories.SubjectsRepository
 import repositories.UsersRepository
 
 /**
@@ -31,6 +33,8 @@ import repositories.UsersRepository
 interface EditorFeatureDependencies : BaseFeatureDependencies {
     val baseScheduleRepository: BaseScheduleRepository
     val customScheduleRepository: CustomScheduleRepository
+    val employeeRepository: EmployeeRepository
+    val subjectsRepository: SubjectsRepository
     val organizationsRepository: OrganizationsRepository
     val calendarSettingsRepository: CalendarSettingsRepository
     val usersRepository: UsersRepository

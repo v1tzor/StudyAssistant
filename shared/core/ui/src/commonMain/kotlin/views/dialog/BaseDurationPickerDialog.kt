@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views
+package views.dialog
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

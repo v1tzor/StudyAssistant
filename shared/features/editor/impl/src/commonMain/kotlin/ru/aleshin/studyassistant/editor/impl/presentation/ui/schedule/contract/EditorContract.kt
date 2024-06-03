@@ -34,6 +34,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.OrganizationSho
  * @author Stanislav Aleshin on 05.05.2024
  */
 internal data class ScheduleEditorViewState(
+    // TODO: Not serializable
     val currentWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val isLoading: Boolean = true,
     val weekSchedule: BaseWeekScheduleUi? = null,

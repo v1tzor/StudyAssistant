@@ -260,7 +260,7 @@ internal fun ScheduleTimeIntervalsItem(
             ) {
                 Icon(
                     modifier = Modifier.size(18.dp),
-                    painter = painterResource(EditorThemeRes.icons.organization),
+                    painter = painterResource(StudyAssistantRes.icons.organizationGeo),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                 )

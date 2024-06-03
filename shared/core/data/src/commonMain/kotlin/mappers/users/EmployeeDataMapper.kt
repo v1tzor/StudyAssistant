@@ -24,8 +24,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mappers.mapToData
 import mappers.mapToDomain
-import mappers.settings.mapToData
-import mappers.settings.mapToDomain
 import models.users.EmployeeDetailsData
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 
@@ -41,10 +39,12 @@ fun EmployeeDetailsData.mapToDomain() = Employee(
     post = EmployeePost.valueOf(post),
     avatar = avatar,
     birthday = birthday,
-    workTime = if (workTimeStart != null && workTimeEnd != null) TimeRange(
-        from = workTimeStart.mapEpochTimeToInstant(),
-        to = workTimeEnd.mapEpochTimeToInstant(),
-    ) else {
+    workTime = if (workTimeStart != null && workTimeEnd != null) {
+        TimeRange(
+            from = workTimeStart.mapEpochTimeToInstant(),
+            to = workTimeEnd.mapEpochTimeToInstant(),
+        )
+    } else {
         null
     },
     emails = emails.map { it.mapToDomain() },
@@ -86,7 +86,6 @@ fun EmployeeDetailsData.mapToLocalData() = EmployeeEntity(
     locations = locations.map { Json.encodeToString(it) },
     webs = webs.map { Json.encodeToString(it) },
 )
-
 
 fun EmployeeEntity.mapToDetailsData() = EmployeeDetailsData(
     uid = uid,

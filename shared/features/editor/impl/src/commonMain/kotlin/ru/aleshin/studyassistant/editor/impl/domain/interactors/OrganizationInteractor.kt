@@ -32,7 +32,7 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 /**
  * @author Stanislav Aleshin on 30.05.2024.
  */
-internal interface OrganizationsInteractor {
+internal interface OrganizationInteractor {
 
     suspend fun fetchAllShortOrganizations(): FlowDomainResult<EditorFailures, List<OrganizationShort>>
 
@@ -42,7 +42,7 @@ internal interface OrganizationsInteractor {
         private val organizationsRepository: OrganizationsRepository,
         private val usersRepository: UsersRepository,
         private val eitherWrapper: EditorEitherWrapper,
-    ) : OrganizationsInteractor {
+    ) : OrganizationInteractor {
 
         private val targetUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid

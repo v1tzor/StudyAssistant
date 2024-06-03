@@ -35,8 +35,8 @@ import kotlinx.datetime.toLocalDateTime
 import managers.DateManager
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseClassInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.CalendarSettingsInteractor
-import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationsInteractor
-import ru.aleshin.studyassistant.editor.impl.domain.interactors.ScheduleInteractor
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseScheduleInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.ClassUi
@@ -51,9 +51,9 @@ internal interface ScheduleEditorWorkProcessor :
     FlowWorkProcessor<ScheduleEditorWorkCommand, ScheduleEditorAction, ScheduleEditorEffect> {
 
     class Base(
-        private val scheduleInteractor: ScheduleInteractor,
+        private val scheduleInteractor: BaseScheduleInteractor,
         private val baseClassInteractor: BaseClassInteractor,
-        private val organizationsInteractor: OrganizationsInteractor,
+        private val organizationInteractor: OrganizationInteractor,
         private val settingsInteractor: CalendarSettingsInteractor,
         private val dateManager: DateManager,
     ) : ScheduleEditorWorkProcessor {
@@ -84,7 +84,7 @@ internal interface ScheduleEditorWorkProcessor :
 
         @OptIn(ExperimentalCoroutinesApi::class)
         private fun loadOrganizationsDataWork() = flow {
-            organizationsInteractor.fetchAllShortOrganizations().flatMapLatest { organizationsEither ->
+            organizationInteractor.fetchAllShortOrganizations().flatMapLatest { organizationsEither ->
                 organizationsEither.handleAndGet(
                     onLeftAction = { flowOf(EffectResult(ScheduleEditorEffect.ShowError(it))) },
                     onRightAction = { shortOrganizations ->
@@ -106,7 +106,7 @@ internal interface ScheduleEditorWorkProcessor :
         }
 
         private fun updateOrganizationWork(organization: OrganizationShortUi) = flow {
-            organizationsInteractor.updateShortOrganization(organization.mapToDomain()).handle(
+            organizationInteractor.updateShortOrganization(organization.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(ScheduleEditorEffect.ShowError(it))) },
             )
         }

@@ -26,5 +26,6 @@ import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
 internal data class ClassEditorDeps(
     val classId: UID?,
     val scheduleId: UID?,
+    val customSchedule: Boolean,
     val weekDay: DayOfNumberedWeekUi,
 ) : ScreenDependencies

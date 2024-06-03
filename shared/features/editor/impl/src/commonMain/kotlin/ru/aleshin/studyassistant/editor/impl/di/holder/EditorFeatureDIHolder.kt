@@ -27,7 +27,9 @@ import org.kodein.di.instance
 import repositories.BaseScheduleRepository
 import repositories.CalendarSettingsRepository
 import repositories.CustomScheduleRepository
+import repositories.EmployeeRepository
 import repositories.OrganizationsRepository
+import repositories.SubjectsRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.di.EditorFeatureApi
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
@@ -49,6 +51,8 @@ object EditorFeatureDIHolder : BaseFeatureDIHolder<EditorFeatureApi, EditorFeatu
                 importAll(navigationModule, presentationModule, domainModule)
                 bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
                 bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
+                bindSingleton<EmployeeRepository> { dependencies.employeeRepository }
+                bindSingleton<SubjectsRepository> { dependencies.subjectsRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }

@@ -46,6 +46,7 @@ import remote.StudyAssistantFirestore.UserData
 interface CustomScheduleRemoteDataSource {
 
     suspend fun addOrUpdateSchedule(schedule: CustomScheduleDetailsData, targetUser: UID): UID
+    suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<CustomScheduleDetailsData?>
     suspend fun fetchScheduleByDate(date: Instant, targetUser: UID): Flow<CustomScheduleDetailsData?>
     suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant, targetUser: UID): Flow<List<CustomScheduleDetailsData>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<ClassDetailsData?>
@@ -74,6 +75,23 @@ interface CustomScheduleRemoteDataSource {
                     reference.document(uid).update(UserData.UID to uid)
                     return@runTransaction uid
                 }
+            }
+        }
+
+        override suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<CustomScheduleDetailsData?> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES).document(uid)
+
+            val schedulePojoFlow = reference.snapshots.map { snapshot ->
+                snapshot.data(serializer<CustomSchedulePojo?>())
+            }
+
+            return schedulePojoFlow.map { schedulePojo ->
+                schedulePojo?.mapToDetailsData(
+                    classMapper = { it.mapToDetails(userDataRoot, schedulePojo.uid) },
+                )
             }
         }
 

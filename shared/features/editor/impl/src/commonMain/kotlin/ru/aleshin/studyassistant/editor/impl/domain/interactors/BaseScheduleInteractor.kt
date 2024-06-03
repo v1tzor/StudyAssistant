@@ -32,8 +32,9 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-internal interface ScheduleInteractor {
+internal interface BaseScheduleInteractor {
 
+    suspend fun fetchScheduleById(uid: UID): FlowDomainResult<EditorFailures, BaseSchedule?>
     suspend fun fetchScheduleByTimeRange(
         timeRange: TimeRange,
         numberOfWeek: NumberOfRepeatWeek
@@ -43,10 +44,14 @@ internal interface ScheduleInteractor {
         private val scheduleRepository: BaseScheduleRepository,
         private val usersRepository: UsersRepository,
         private val eitherWrapper: EditorEitherWrapper,
-    ) : ScheduleInteractor {
+    ) : BaseScheduleInteractor {
 
         private val targetUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid
+
+        override suspend fun fetchScheduleById(uid: UID) = eitherWrapper.wrapFlow {
+            scheduleRepository.fetchScheduleById(uid, targetUser)
+        }
 
         override suspend fun fetchScheduleByTimeRange(
             timeRange: TimeRange,

@@ -16,6 +16,7 @@
 
 package views
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
@@ -24,20 +25,15 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -65,6 +61,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import functional.Constants
 
@@ -397,7 +394,7 @@ fun ClickableInfoTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     value: String?,
-    label: String,
+    label: String?,
     placeholder: String,
     leadingInfoIcon: Painter,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -407,22 +404,27 @@ fun ClickableInfoTextField(
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     borderColor: Color = MaterialTheme.colorScheme.outline,
     containerColor: Color = MaterialTheme.colorScheme.background,
-    maxLines: Int = Int.MAX_VALUE,
+    singleLine: Boolean = true,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     Row(
-        modifier = Modifier.padding(paddingValues).animateContentSize(),
+        modifier = Modifier.animateContentSize().padding(paddingValues).animateContentSize(),
         horizontalArrangement = Arrangement.spacedBy(24.dp),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            modifier = Modifier.padding(top = 5.dp).size(24.dp),
-            painter = leadingInfoIcon,
-            contentDescription = label,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Box(modifier = modifier.padding(top = 5.dp)) {
+        Box(
+            modifier = Modifier.height(56.dp).padding(top = if (label != null) 5.dp else 0.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                modifier = Modifier.size(24.dp),
+                painter = leadingInfoIcon,
+                contentDescription = label,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Box(modifier = modifier.padding(top = if (label != null) 5.dp else 0.dp)) {
             Surface(
                 onClick = onClick,
                 modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 56.dp),
@@ -445,23 +447,35 @@ fun ClickableInfoTextField(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    if (value != null) {
-                        Text(
-                            text = value,
-                            color = textColor,
-                            maxLines = maxLines,
-                            minLines = minLines,
-                            style = textStyle,
-                        )
-                    } else {
-                        Text(
-                            text = placeholder,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = textStyle,
-                        )
+                    AnimatedContent(
+                        modifier = Modifier.weight(1f),
+                        targetState = value,
+                    ) { textValue ->
+                        if (textValue != null) {
+                            Text(
+                                modifier = Modifier.weight(1f),
+                                text = textValue,
+                                color = textColor,
+                                maxLines = if (singleLine) 1 else maxLines,
+                                minLines = minLines,
+                                overflow = TextOverflow.Ellipsis,
+                                style = textStyle,
+                            )
+                        } else {
+                            Text(
+                                modifier = Modifier.weight(1f),
+                                text = placeholder,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = textStyle,
+                            )
+                        }
                     }
-                    Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
-                        trailingIcon?.invoke()
+                    if (trailingIcon != null) {
+                        Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
+                            trailingIcon.invoke()
+                        }
                     }
                 }
             }
@@ -470,16 +484,18 @@ fun ClickableInfoTextField(
                 shape = MaterialTheme.shapes.medium,
                 color = containerColor,
             ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 4.dp),
-                    text = label,
-                    color = if (isError) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                if (label != null) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                        text = label,
+                        color = if (isError) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
             }
         }
     }
@@ -491,7 +507,7 @@ fun ClickableTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     value: String?,
-    label: String,
+    label: String?,
     placeholder: String,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -500,11 +516,12 @@ fun ClickableTextField(
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     borderColor: Color = MaterialTheme.colorScheme.outline,
     containerColor: Color = MaterialTheme.colorScheme.background,
-    maxLines: Int = Int.MAX_VALUE,
+    singleLine: Boolean = true,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    Box(modifier = modifier.padding(top = 5.dp)) {
+    Box(modifier = modifier.animateContentSize().padding(top = if (label != null) 5.dp else 0.dp)) {
         Surface(
             onClick = onClick,
             modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 56.dp),
@@ -527,44 +544,60 @@ fun ClickableTextField(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
-                    leadingIcon?.invoke()
+                if (leadingIcon != null) {
+                    Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
+                        leadingIcon.invoke()
+                    }
                 }
-                if (value != null) {
-                    Text(
-                        text = value,
-                        color = textColor,
-                        maxLines = maxLines,
-                        minLines = minLines,
-                        style = textStyle,
-                    )
-                } else {
-                    Text(
-                        text = placeholder,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = textStyle,
-                    )
+                AnimatedContent(
+                    modifier = Modifier.weight(1f),
+                    targetState = value,
+                ) { textValue ->
+                    if (textValue != null) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = textValue,
+                            color = textColor,
+                            maxLines = if (singleLine) 1 else maxLines,
+                            minLines = minLines,
+                            overflow = TextOverflow.Ellipsis,
+                            style = textStyle,
+                        )
+                    } else {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = placeholder,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = textStyle,
+                        )
+                    }
                 }
-                Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
-                    trailingIcon?.invoke()
+                if (trailingIcon != null) {
+                    Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
+                        trailingIcon.invoke()
+                    }
                 }
             }
         }
-        Surface(
-            modifier = Modifier.offset(x = 16.dp, y = (-8).dp),
-            shape = MaterialTheme.shapes.medium,
-            color = containerColor,
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 4.dp),
-                text = label,
-                color = if (isError) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-                style = MaterialTheme.typography.bodySmall,
-            )
+        if (label != null) {
+            Surface(
+                modifier = Modifier.offset(x = 16.dp, y = (-8).dp),
+                shape = MaterialTheme.shapes.medium,
+                color = containerColor,
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    text = label,
+                    color = if (isError) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
         }
     }
 }

@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -30,7 +29,6 @@ import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import co.touchlab.kermit.Logger
 import functional.UID
 import navigation.root
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
@@ -41,7 +39,6 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.Set
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupViewState
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.rememberSetupScreenModel
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupTopBar
-import theme.StudyAssistantRes
 import theme.tokens.LocalWindowSize
 import views.ErrorSnackbar
 
@@ -98,9 +95,7 @@ internal class SetupScreen(private val createdUser: UID) : Screen {
                 is SetupEffect.ReplaceGlobalScreen -> rootNavigator.replaceAll(effect.screen)
                 is SetupEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings).apply {
-                            Logger.e("error -> ${effect.failures}")
-                        },
+                        message = effect.failures.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

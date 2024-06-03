@@ -39,4 +39,18 @@ internal data class EmployeeUi(
     val phones: List<ContactInfoUi> = emptyList(),
     val locations: List<ContactInfoUi> = emptyList(),
     val webs: List<ContactInfoUi> = emptyList(),
-) : JavaSerializable
+) : JavaSerializable {
+    fun name(): String {
+        return buildString {
+            if (secondName != null) {
+                append(secondName)
+                append(" ")
+            }
+            append(firstName)
+            if (patronymic != null) {
+                append(" ")
+                append(patronymic)
+            }
+        }
+    }
+}

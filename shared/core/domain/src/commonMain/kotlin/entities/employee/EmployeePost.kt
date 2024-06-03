@@ -24,5 +24,6 @@ enum class EmployeePost {
     TEACHER,
     DIRECTOR,
     MENTOR,
+    TUTOR,
     MANAGER,
 }

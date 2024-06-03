@@ -20,7 +20,6 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import org.kodein.di.provider
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
@@ -45,7 +44,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<NavigationScreen> { NavigationScreen() }
 
     bindProvider<PreviewFeatureStarter> { PreviewFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<PreviewScreenProvider> { PreviewScreenProvider.Base(provider<NavigationFeatureStarter>(), provider<EditorFeatureStarter>(), provider<AuthFeatureStarter>()) }
+    bindProvider<PreviewScreenProvider> { PreviewScreenProvider.Base(instance<() -> EditorFeatureStarter>(), instance<() -> AuthFeatureStarter>(), instance<() -> NavigationFeatureStarter>()) }
 
     bindProvider<IntroStateCommunicator> { IntroStateCommunicator.Base() }
     bindProvider<IntroEffectCommunicator> { IntroEffectCommunicator.Base() }

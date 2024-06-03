@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views
+package views.menu
 
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.DropdownMenu
@@ -28,7 +28,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import entities.organizations.OrganizationType
-import entities.users.Gender
 import mappers.mapToSting
 import theme.StudyAssistantRes
 
