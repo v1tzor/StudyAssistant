@@ -16,11 +16,13 @@
 
 package architecture.screenmodel
 
-import platform.JavaSerializable
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
-interface ScreenDependencies : JavaSerializable
+interface ScreenDependencies : Parcelable
 
+@Parcelize
 object EmptyDeps : ScreenDependencies

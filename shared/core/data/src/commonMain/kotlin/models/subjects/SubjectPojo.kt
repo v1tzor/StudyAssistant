@@ -31,7 +31,7 @@ data class SubjectPojo(
     val eventType: String = EventType.LESSON.toString(),
     val name: String = "",
     val teacherId: UID? = null,
-    val office: Int = 0,
+    val office: String = "",
     val color: Int = 0,
-    val location: ContactInfoData = ContactInfoData(),
+    val location: ContactInfoData? = null,
 )

@@ -46,7 +46,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -68,12 +67,14 @@ fun TopAppBarTitle(
             text = header,
             textAlign = textAlign,
             color = MaterialTheme.colorScheme.onBackground,
+            maxLines = 1,
             style = headerStyle,
         )
         if (title != null) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = title,
+                maxLines = 1,
                 textAlign = textAlign,
                 color = MaterialTheme.colorScheme.onBackground,
                 style = titleStyle,
@@ -205,7 +206,7 @@ fun <T : TopAppBarAction> TopAppBarMoreActions(
                     leadingIcon = if (item.icon != null) {
                         {
                             Icon(
-                                painter = painterResource(DrawableResource(checkNotNull(item.icon))),
+                                painter = painterResource(checkNotNull(item.icon)),
                                 contentDescription = item.title,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )

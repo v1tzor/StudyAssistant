@@ -17,12 +17,14 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract
 
 import architecture.screenmodel.ScreenDependencies
+import dev.icerock.moko.parcelize.Parcelize
 import functional.UID
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
 
 /**
  * @author Stanislav Aleshin on 01.06.2024.
  */
+@Parcelize
 internal data class ClassEditorDeps(
     val classId: UID?,
     val scheduleId: UID?,

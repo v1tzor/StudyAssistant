@@ -35,10 +35,11 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import entities.organizations.Millis
 import extensions.alphaByEnabled
+import functional.Constants.Class.MAX_NUMBER
 import mappers.toMinutesOrHoursTitle
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.editor.impl.presentation.models.NumberedDurationUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import theme.StudyAssistantRes
 import views.dialog.DurationPickerDialog
@@ -53,7 +54,7 @@ internal fun NumberDropdownMenu(
     expanded: Boolean,
     enabled: (Int) -> Boolean,
     currentNumber: Int,
-    numberRange: IntRange = 1..15,
+    numberRange: IntRange = 1..MAX_NUMBER,
     onDismiss: () -> Unit,
     onConfirm: (Int) -> Unit,
 ) {

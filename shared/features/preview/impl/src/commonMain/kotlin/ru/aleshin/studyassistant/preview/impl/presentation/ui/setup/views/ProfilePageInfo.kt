@@ -43,11 +43,11 @@ import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.preview.impl.presentation.models.AppUserUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import theme.StudyAssistantRes
-import views.dialog.BirthdayDatePicker
 import views.ClickableInfoTextField
 import views.ExpandedIcon
 import views.GenderDropdownMenu
 import views.InfoTextField
+import views.dialog.BirthdayDatePicker
 
 /**
  * @author Stanislav Aleshin on 27.04.2024
@@ -87,8 +87,8 @@ internal fun ProfilePageInfo(
                     editableUsername = it
                     onUpdateProfile(profile.copy(username = it.text))
                 },
-                labelText = PreviewThemeRes.strings.usernameLabel,
-                infoIcon = painterResource(PreviewThemeRes.icons.name),
+                label = PreviewThemeRes.strings.usernameLabel,
+                leadingInfoIcon = painterResource(PreviewThemeRes.icons.name),
             )
             InfoTextField(
                 value = editableDescription,
@@ -97,8 +97,8 @@ internal fun ProfilePageInfo(
                     onUpdateProfile(profile.copy(description = it.text.ifEmpty { null }))
                 },
                 maxLength = Constants.Text.MAX_PROFILE_DESC_LENGTH,
-                labelText = PreviewThemeRes.strings.profileDescriptionLabel,
-                infoIcon = painterResource(PreviewThemeRes.icons.description),
+                label = PreviewThemeRes.strings.profileDescriptionLabel,
+                leadingInfoIcon = painterResource(PreviewThemeRes.icons.description),
                 singleLine = false,
                 maxLines = 4,
             )
@@ -106,8 +106,8 @@ internal fun ProfilePageInfo(
                 enabled = false,
                 value = email,
                 onValueChange = {},
-                labelText = PreviewThemeRes.strings.emailLabel,
-                infoIcon = painterResource(PreviewThemeRes.icons.email),
+                label = PreviewThemeRes.strings.emailLabel,
+                leadingInfoIcon = painterResource(StudyAssistantRes.icons.email),
                 colors = OutlinedTextFieldDefaults.colors(
                     disabledBorderColor = MaterialTheme.colorScheme.outline,
                 )
@@ -117,10 +117,10 @@ internal fun ProfilePageInfo(
                 onClick = { isOpenDatePickerDialog = true },
                 label = PreviewThemeRes.strings.birthdayLabel,
                 placeholder = PreviewThemeRes.strings.birthdayPlaceholder,
-                leadingInfoIcon = painterResource(PreviewThemeRes.icons.birthday),
+                infoIcon = painterResource(StudyAssistantRes.icons.birthday),
                 trailingIcon = {
                     Icon(
-                        painter = painterResource(PreviewThemeRes.icons.selectDate),
+                        painter = painterResource(StudyAssistantRes.icons.selectDate),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -132,7 +132,7 @@ internal fun ProfilePageInfo(
                 onClick = { isExpandedGenderMenu = true },
                 label = PreviewThemeRes.strings.genderLabel,
                 placeholder = PreviewThemeRes.strings.genderPlaceholder,
-                leadingInfoIcon = painterResource(PreviewThemeRes.icons.gender),
+                infoIcon = painterResource(PreviewThemeRes.icons.gender),
                 trailingIcon = {
                     ExpandedIcon(
                         isExpanded = isExpandedGenderMenu,

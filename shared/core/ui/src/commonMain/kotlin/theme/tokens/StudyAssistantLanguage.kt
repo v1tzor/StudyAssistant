@@ -17,7 +17,8 @@ package theme.tokens
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.intl.Locale
-import platform.JavaSerializable
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
@@ -27,7 +28,8 @@ enum class StudyAssistantLanguage(val code: String) {
     RU("ru")
 }
 
-enum class LanguageUiType(val code: String?) : JavaSerializable {
+@Parcelize
+enum class LanguageUiType(val code: String?) : Parcelable {
     DEFAULT(null),
     EN("en"),
     RU("ru")

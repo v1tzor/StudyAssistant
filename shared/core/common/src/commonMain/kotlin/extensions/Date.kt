@@ -18,7 +18,7 @@ package extensions
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import functional.Constants
+import functional.Constants.Date
 import functional.TimeRange
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
@@ -36,6 +36,8 @@ import kotlinx.datetime.until
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
+fun Instant.dateTimeUTC() = toLocalDateTime(TimeZone.UTC)
+
 fun Instant.shiftDay(amount: Int, timeZone: TimeZone = TimeZone.UTC): Instant {
     return if (amount < 0) {
         this.minus(value = -amount, unit = DateTimeUnit.DAY, timeZone = timeZone)
@@ -56,7 +58,7 @@ fun Instant.shiftMinutes(
 }
 
 fun Instant.shiftMillis(
-    amount: Int,
+    amount: Long,
     timeZone: TimeZone = TimeZone.UTC
 ): Instant {
     return if (amount < 0) {
@@ -66,10 +68,9 @@ fun Instant.shiftMillis(
     }
 }
 
-fun Instant.isCurrentDay(date: Instant): Boolean {
-    val timeZone = TimeZone.UTC
+fun Instant.isCurrentDay(date: Instant?, timeZone: TimeZone = TimeZone.UTC): Boolean {
     val currentDate = this.toLocalDateTime(timeZone).dayOfYear
-    val compareDate = date.toLocalDateTime(timeZone).dayOfYear
+    val compareDate = date?.toLocalDateTime(timeZone)?.dayOfYear ?: false
 
     return currentDate == compareDate
 }
@@ -104,8 +105,14 @@ fun LocalDateTime.setEndDay() = LocalDateTime(
     time = LocalTime(23, 59, 59, 59)
 )
 
-fun Instant.setHoursAndMinutes(hour: Int, minute: Int): Instant {
-    val timeZone = TimeZone.UTC
+fun Instant.setHoursAndMinutes(instance: Instant, timeZone: TimeZone = TimeZone.UTC): Instant {
+    val dateTime = instance.toLocalDateTime(timeZone)
+    val hour = dateTime.hour
+    val minute = dateTime.minute
+    return setHoursAndMinutes(hour, minute)
+}
+
+fun Instant.setHoursAndMinutes(hour: Int, minute: Int, timeZone: TimeZone = TimeZone.UTC): Instant {
     val dateTime = this.toLocalDateTime(timeZone)
     return LocalDateTime(
         date = dateTime.date,
@@ -122,6 +129,14 @@ fun epochDuration(start: Instant, end: Instant): Long {
     return end.toEpochMilliseconds() - start.toEpochMilliseconds()
 }
 
+fun LocalDateTime.dayEpochDuration(): Long {
+    return time.epochDuration()
+}
+
+fun LocalTime.epochDuration(): Long {
+    return hour.hoursToMillis() + minute.minutesToMillis()
+}
+
 fun Instant.isNotZeroDifference(end: Instant): Boolean {
     return epochDuration(this, end) > 0L
 }
@@ -133,7 +148,7 @@ fun epochDuration(timeRange: TimeRange): Long {
 fun durationOrZero(start: Instant?, end: Instant?) = if (start != null && end != null) {
     epochDuration(start, end)
 } else {
-    Constants.Date.EMPTY_DURATION
+    Date.EMPTY_DURATION
 }
 
 fun Long?.mapEpochTimeToInstantOrDefault(default: Instant): Instant {
@@ -145,29 +160,29 @@ fun Long.mapEpochTimeToInstant(): Instant {
 }
 
 fun Long.toSeconds(): Long {
-    return this / Constants.Date.MILLIS_IN_SECONDS
+    return this / Date.MILLIS_IN_SECONDS
 }
 
 fun Long.toMinutes(): Long {
-    return toSeconds() / Constants.Date.SECONDS_IN_MINUTE
+    return toSeconds() / Date.SECONDS_IN_MINUTE
 }
 
 fun Long.toMinutesInHours(): Long {
     val hours = toHorses()
     val minutes = toMinutes()
-    return minutes - hours * Constants.Date.MINUTES_IN_HOUR
+    return minutes - hours * Date.MINUTES_IN_HOUR
 }
 
 fun Long.toHorses(): Long {
-    return toMinutes() / Constants.Date.MINUTES_IN_HOUR
+    return toMinutes() / Date.MINUTES_IN_HOUR
 }
 
 fun Int.minutesToMillis(): Long {
-    return this * Constants.Date.MILLIS_IN_MINUTE
+    return this * Date.MILLIS_IN_MINUTE
 }
 
 fun Int.hoursToMillis(): Long {
-    return this * Constants.Date.MILLIS_IN_HOUR
+    return this * Date.MILLIS_IN_HOUR
 }
 
 fun Long.toMinutesOrHoursString(minutesSuffix: String, hoursSuffix: String): AnnotatedString {
@@ -196,7 +211,7 @@ fun Long.toMinutesAndHoursString(minutesSuffix: String, hoursSuffix: String): An
     return buildAnnotatedString {
         append(hours.toString(), hoursSuffix)
         append(' ')
-        append((minutes - hours * Constants.Date.MINUTES_IN_HOUR).toString(), minutesSuffix)
+        append((minutes - hours * Date.MINUTES_IN_HOUR).toString(), minutesSuffix)
     }
 }
 
@@ -236,11 +251,11 @@ fun Long.toMinutesAndHoursString(minutesSuffix: String, hoursSuffix: String): An
 //}
 
 fun countWeeksByDays(days: Int): Int {
-    return BigDecimal.fromDouble(days.toDouble() / Constants.Date.DAYS_IN_WEEK).ceil().intValue()
+    return BigDecimal.fromDouble(days.toDouble() / Date.DAYS_IN_WEEK).ceil().intValue()
 }
 
 fun countMonthByDays(days: Int): Int {
-    return BigDecimal.fromDouble(days.toDouble() / Constants.Date.DAYS_IN_MONTH).ceil().intValue()
+    return BigDecimal.fromDouble(days.toDouble() / Date.DAYS_IN_MONTH).ceil().intValue()
 }
 
 fun Instant.dateOfWeekDay(dayOfWeek: DayOfWeek, timeZone: TimeZone = TimeZone.UTC): Instant {

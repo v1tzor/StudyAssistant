@@ -21,72 +21,71 @@ import architecture.screenmodel.contract.BaseEvent
 import architecture.screenmodel.contract.BaseUiEffect
 import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
+import dev.icerock.moko.parcelize.Parcelize
+import dev.icerock.moko.parcelize.TypeParceler
 import entities.subject.EventType
 import functional.TimeRange
 import functional.UID
 import kotlinx.datetime.Instant
+import platform.InstantParceler
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
-import ru.aleshin.studyassistant.editor.impl.presentation.models.ContactInfoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.EditClassUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.EmployeeUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.OrganizationShortUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.SubjectUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.EditClassUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.ScheduleUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeUi
 
 /**
  * @author Stanislav Aleshin on 01.06.2024
  */
+@Parcelize
 internal data class ClassEditorViewState(
-    val editModel: EditClassUi? = null,
-    val isCustomSchedule: Boolean = false,
-    val classesTimeRanges: List<TimeRange> = emptyList(),
+    val isLoading: Boolean = true,
+    val editableClass: EditClassUi? = null,
+    val schedule: ScheduleUi? = null,
+    @TypeParceler<Instant, InstantParceler>
+    val freeClassTimeRanges: Map<TimeRange, Boolean>? = null,
     val weekDay: DayOfNumberedWeekUi? = null,
-    val organizations: List<OrganizationShortUi> = emptyList(),
-    val subjects: List<SubjectUi> = emptyList(),
-    val teachers: List<EmployeeUi> = emptyList(),
-    val locations: List<ContactInfoUi> = emptyList(),
-    val offices: List<Int> = emptyList(),
+    val organizations: List<OrganizationUi> = emptyList(),
 ) : BaseViewState
 
 internal sealed class ClassEditorEvent : BaseEvent {
     data class Init(
         val classId: UID?,
         val scheduleId: UID?,
-        val customSchedule: Boolean,
+        val isCustomSchedule: Boolean,
         val weekDay: DayOfNumberedWeekUi
     ) : ClassEditorEvent()
-    data class SelectOrganization(val organization: OrganizationShortUi?) : ClassEditorEvent()
+    data class UpdateLocations(val locations: List<ContactInfoUi>) : ClassEditorEvent()
+    data class UpdateOffices(val offices: List<String>) : ClassEditorEvent()
+    data class SelectOrganization(val organization: OrganizationUi?) : ClassEditorEvent()
     data class SelectSubject(val type: EventType?, val subject: SubjectUi?) : ClassEditorEvent()
     data class SelectTeacher(val teacher: EmployeeUi?) : ClassEditorEvent()
-    data class SelectLocation(val location: ContactInfoUi?, val office: Int?) : ClassEditorEvent()
+    data class SelectLocation(val location: ContactInfoUi?, val office: String?) : ClassEditorEvent()
     data class SelectTime(val startTime: Instant?, val endTime: Instant?) : ClassEditorEvent()
     data class ChangeNotifyParams(val notification: Boolean) : ClassEditorEvent()
+    data object NavigateToSubjectEditor : ClassEditorEvent()
+    data object NavigateToEmployeeEditor : ClassEditorEvent()
     data object SaveClass : ClassEditorEvent()
     data object NavigateToBack : ClassEditorEvent()
 }
 
 internal sealed class ClassEditorEffect : BaseUiEffect {
     data class ShowError(val failures: EditorFailures) : ClassEditorEffect()
-    data class LoadOrganizationData(val organization: OrganizationShortUi) : ClassEditorEffect()
     data class NavigateToLocal(val pushScreen: Screen) : ClassEditorEffect()
     data object NavigateToBack : ClassEditorEffect()
 }
 
 internal sealed class ClassEditorAction : BaseAction {
     data class SetupEditModel(
-        val model: EditClassUi,
+        val editableClass: EditClassUi,
+        val schedule: ScheduleUi,
+        val freeClassTimeRanges: Map<TimeRange, Boolean>?,
         val weekDay: DayOfNumberedWeekUi,
-        val customSchedule: Boolean,
-        val times: List<TimeRange>,
+        val organizations: List<OrganizationUi>,
     ) : ClassEditorAction()
-
-    data class UpdateOrganizationData(
-        val subjects: List<SubjectUi> = emptyList(),
-        val employees: List<EmployeeUi> = emptyList(),
-        val locations: List<ContactInfoUi> = emptyList(),
-        val offices: List<Int> = emptyList(),
-    ) : ClassEditorAction()
-
+    data class UpdateLoading(val isLoading: Boolean) : ClassEditorAction()
     data class UpdateEditModel(val model: EditClassUi?) : ClassEditorAction()
-    data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : ClassEditorAction()
 }

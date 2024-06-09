@@ -16,7 +16,10 @@
 
 package ru.aleshin.studyassistant.schedule.impl.navigation
 
+import cafe.adriel.voyager.core.screen.Screen
 import navigation.FeatureScreenProvider
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.DetailsScreen
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.OverviewScreen
@@ -26,11 +29,19 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.Overview
  */
 internal interface ScheduleScreenProvider : FeatureScreenProvider<ScheduleScreen> {
 
-    class Base : ScheduleScreenProvider {
+    fun provideEditorScreen(screen: EditorScreen): Screen
+
+    class Base(
+        private val editorFeatureStarter: () -> EditorFeatureStarter,
+    ) : ScheduleScreenProvider {
 
         override fun provideFeatureScreen(screen: ScheduleScreen) = when (screen) {
             is ScheduleScreen.Overview -> OverviewScreen()
             is ScheduleScreen.Details -> DetailsScreen()
+        }
+
+        override fun provideEditorScreen(screen: EditorScreen): Screen {
+            return editorFeatureStarter().fetchFeatureScreen(screen)
         }
     }
 }

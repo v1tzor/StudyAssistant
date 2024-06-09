@@ -27,12 +27,20 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEditorScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEditorStateCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEditorWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorWorkProcessor
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorEffectCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorStateCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectEditorEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectEditorScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectEditorStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectEditorWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -51,6 +59,16 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<ClassEditorStateCommunicator> { ClassEditorStateCommunicator.Base() }
     bindProvider<ClassEditorEffectCommunicator> { ClassEditorEffectCommunicator.Base() }
-    bindProvider<ClassEditorWorkProcessor> { ClassEditorWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<ClassEditorScreenModel> { ClassEditorScreenModel(instance(), instance(), instance(), instance()) }
+    bindProvider<ClassEditorWorkProcessor> { ClassEditorWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<ClassEditorScreenModel> { ClassEditorScreenModel(instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<SubjectEditorStateCommunicator> { SubjectEditorStateCommunicator.Base() }
+    bindProvider<SubjectEditorEffectCommunicator> { SubjectEditorEffectCommunicator.Base() }
+    bindProvider<SubjectEditorWorkProcessor> { SubjectEditorWorkProcessor.Base(instance(), instance()) }
+    bindProvider<SubjectEditorScreenModel> { SubjectEditorScreenModel(instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<EmployeeEditorStateCommunicator> { EmployeeEditorStateCommunicator.Base() }
+    bindProvider<EmployeeEditorEffectCommunicator> { EmployeeEditorEffectCommunicator.Base() }
+    bindProvider<EmployeeEditorWorkProcessor> { EmployeeEditorWorkProcessor.Base(instance(), instance()) }
+    bindProvider<EmployeeEditorScreenModel> { EmployeeEditorScreenModel(instance(), instance(), instance(), instance()) }
 }

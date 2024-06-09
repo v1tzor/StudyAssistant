@@ -18,6 +18,7 @@ package di
 
 import managers.CoroutineManager
 import managers.DateManager
+import managers.TimeOverlayManager
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import payments.SubscriptionChecker
@@ -28,5 +29,6 @@ import payments.SubscriptionChecker
 val coreModule = DI.Module("Core") {
     bindSingleton<CoroutineManager> { CoroutineManager.Base() }
     bindSingleton<DateManager> { DateManager.Base() }
+    bindSingleton<TimeOverlayManager> { TimeOverlayManager.Base() }
     bindSingleton<SubscriptionChecker> { SubscriptionChecker.FreeApp }
 }

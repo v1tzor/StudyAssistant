@@ -4,9 +4,9 @@ CREATE TABLE subjectEntity (
     event_type TEXT NOT NULL,
     name TEXT NOT NULL,
     teacher_id TEXT,
-    office INTEGER NOT NULL,
+    office TEXT NOT NULL,
     color INTEGER NOT NULL,
-    location TEXT NOT NULL,
+    location TEXT,
     FOREIGN KEY (organization_id) REFERENCES organizationEntity (uid) ON DELETE RESTRICT,
     FOREIGN KEY (teacher_id) REFERENCES employeeEntity (uid) ON DELETE SET NULL
 );

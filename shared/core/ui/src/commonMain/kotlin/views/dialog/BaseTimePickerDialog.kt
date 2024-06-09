@@ -77,12 +77,6 @@ fun BaseTimePickerDialog(
 ) {
     val is24Format = true // TODO: Real get 24 format
     val initDateTime = initTime?.toLocalDateTime(TimeZone.UTC)
-    val currentDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
-    var hour by rememberSaveable { mutableStateOf(initDateTime?.hour) }
-    var minute by rememberSaveable { mutableStateOf(initDateTime?.minute) }
-    var format by remember {
-        mutableStateOf(if (hour != null && hour!! > 11) TimeFormat.PM else TimeFormat.AM)
-    }
 
     BasicAlertDialog(onDismissRequest = onDismiss) {
         Surface(
@@ -96,6 +90,12 @@ fun BaseTimePickerDialog(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.End,
             ) {
+                val currentDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+                var hour by rememberSaveable { mutableStateOf(initDateTime?.hour) }
+                var minute by rememberSaveable { mutableStateOf(initDateTime?.minute) }
+                var format by remember {
+                    mutableStateOf(if (hour != null && hour!! > 11) TimeFormat.PM else TimeFormat.AM)
+                }
                 TimePickerHeader(title = header)
                 TimePickerHourMinuteSelector(
                     modifier = Modifier.weight(1f),

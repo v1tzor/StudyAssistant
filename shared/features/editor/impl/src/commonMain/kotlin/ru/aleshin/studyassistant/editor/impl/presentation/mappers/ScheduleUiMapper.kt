@@ -20,10 +20,10 @@ import entities.schedules.BaseSchedule
 import entities.schedules.CustomSchedule
 import entities.schedules.DateVersion
 import ru.aleshin.studyassistant.editor.impl.domain.entities.BaseWeekSchedule
-import ru.aleshin.studyassistant.editor.impl.presentation.models.BaseScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.BaseWeekScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.CustomScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.DateVersionUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseWeekScheduleUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.CustomScheduleUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.DateVersionUi
 
 /**
  * @author Stanislav Aleshin on 30.05.2024.

@@ -36,6 +36,10 @@ object Constants {
         const val DATABASE_NAME = "study_assistant_main.db"
     }
 
+    object Class {
+        const val MAX_NUMBER = 15
+    }
+
     object Regex {
         const val TEXT_AND_NUMBERS = "^[a-zA-Z0-9]+$"
         const val ONLY_TEXT = "^[a-zA-Z ]+$"
@@ -49,6 +53,7 @@ object Constants {
 
     object Text {
         const val MAX_PROFILE_DESC_LENGTH = 120
+        const val SUBJECT_TEXT_LENGTH = 56
         const val DEFAULT_MAX_TEXT_LENGTH = 32
     }
 
@@ -100,6 +105,7 @@ object Constants {
         const val MILLIS_IN_SECONDS = 1000L
         const val MILLIS_IN_MINUTE = 60000L
         const val MILLIS_IN_HOUR = 3600000L
+        const val MILLIS_IN_DAY = 86400000L
         const val SECONDS_IN_MINUTE = 60L
         const val MINUTES_IN_MILLIS = 60000L
         const val MINUTES_IN_HOUR = 60L

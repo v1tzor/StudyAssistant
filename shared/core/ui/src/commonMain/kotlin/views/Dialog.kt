@@ -69,7 +69,10 @@ fun DialogButtons(
                 style = MaterialTheme.typography.labelLarge,
             )
         }
-        TextButton(enabled = confirmEnabled, onClick = onConfirmClick) {
+        TextButton(
+            enabled = confirmEnabled,
+            onClick = onConfirmClick
+        ) {
             Text(
                 text = confirmTitle,
                 color = when (confirmEnabled) {
@@ -85,6 +88,8 @@ fun DialogButtons(
 @Composable
 fun DialogButtons(
     modifier: Modifier = Modifier,
+    enabledConfirmFirst: Boolean = true,
+    enabledConfirmSecond: Boolean = true,
     confirmFirstTitle: String,
     confirmSecondTitle: String,
     onCancelClick: () -> Unit,
@@ -95,25 +100,34 @@ fun DialogButtons(
         modifier = modifier.padding(top = 16.dp, bottom = 16.dp, end = 16.dp, start = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        TextButton(onClick = onCancelClick) {
+        TextButton(
+            enabled = enabledConfirmSecond,
+            onClick = onConfirmSecondClick
+        ) {
             Text(
-                text = StudyAssistantRes.strings.cancelTitle,
+                text = confirmSecondTitle,
                 color = MaterialTheme.colorScheme.secondary,
+                maxLines = 1,
                 style = MaterialTheme.typography.labelLarge,
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-        TextButton(onClick = onConfirmFirstClick) {
+        TextButton(onClick = onCancelClick) {
             Text(
-                text = confirmFirstTitle,
+                text = StudyAssistantRes.strings.cancelTitle,
                 color = MaterialTheme.colorScheme.primary,
+                maxLines = 1,
                 style = MaterialTheme.typography.labelLarge,
             )
         }
-        TextButton(onClick = onConfirmSecondClick) {
+        TextButton(
+            enabled = enabledConfirmFirst,
+            onClick = onConfirmFirstClick,
+        ) {
             Text(
-                text = confirmSecondTitle,
+                text = confirmFirstTitle,
                 color = MaterialTheme.colorScheme.primary,
+                maxLines = 1,
                 style = MaterialTheme.typography.labelLarge,
             )
         }

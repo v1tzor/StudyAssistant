@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.editor.impl.di.holder
 import inject.BaseFeatureDIHolder
 import managers.CoroutineManager
 import managers.DateManager
+import managers.TimeOverlayManager
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
 import org.kodein.di.bindSingleton
@@ -56,6 +57,7 @@ object EditorFeatureDIHolder : BaseFeatureDIHolder<EditorFeatureApi, EditorFeatu
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
+                bindSingleton<TimeOverlayManager> { dependencies.overlayManager }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<EditorFeatureApi> {

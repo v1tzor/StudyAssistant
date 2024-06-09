@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.editor.impl.di
 import inject.BaseFeatureDependencies
 import managers.CoroutineManager
 import managers.DateManager
+import managers.TimeOverlayManager
 import repositories.BaseScheduleRepository
 import repositories.CalendarSettingsRepository
 import repositories.CustomScheduleRepository
@@ -39,5 +40,6 @@ interface EditorFeatureDependencies : BaseFeatureDependencies {
     val calendarSettingsRepository: CalendarSettingsRepository
     val usersRepository: UsersRepository
     val dateManager: DateManager
+    val overlayManager: TimeOverlayManager
     val coroutineManager: CoroutineManager
 }

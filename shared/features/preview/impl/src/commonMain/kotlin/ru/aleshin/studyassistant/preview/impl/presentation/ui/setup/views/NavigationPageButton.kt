@@ -19,11 +19,8 @@ package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.MaterialTheme
@@ -39,12 +36,12 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 internal fun NavigationPageButton(
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     navigationLabel: String,
-    onClick: () -> Unit,
     shape: Shape = MaterialTheme.shapes.large,
-    colors: ButtonColors = ButtonDefaults.buttonColors(),
+    isTonal: Boolean = false,
     elevation: ButtonElevation? = null,
     border: BorderStroke? = null,
     contentPadding: PaddingValues = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
@@ -55,7 +52,14 @@ internal fun NavigationPageButton(
         onClick = onClick,
         enabled = enabled,
         shape = shape,
-        colors = colors,
+        colors = if (isTonal) {
+            ButtonDefaults.filledTonalButtonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+        } else {
+            ButtonDefaults.buttonColors()
+        },
         elevation = elevation,
         border = border,
         contentPadding = contentPadding,

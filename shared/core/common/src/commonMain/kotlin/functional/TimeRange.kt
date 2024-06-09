@@ -15,10 +15,31 @@
 */
 package functional
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
+import dev.icerock.moko.parcelize.TypeParceler
+import extensions.epochDuration
 import kotlinx.datetime.Instant
-import platform.JavaSerializable
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import platform.InstantParceler
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
-data class TimeRange(val from: Instant, val to: Instant) : JavaSerializable
+@Parcelize
+data class TimeRange(
+    @TypeParceler<Instant, InstantParceler> val from: Instant,
+    @TypeParceler<Instant, InstantParceler> val to: Instant
+) : Parcelable {
+
+    fun timeEquals(other: TimeRange?): Boolean {
+        val fromTime = from.toLocalDateTime(TimeZone.UTC).time
+        val endTime = from.toLocalDateTime(TimeZone.UTC).time
+        val otherFromTime = other?.from?.toLocalDateTime(TimeZone.UTC)?.time
+        val otherEndTime = other?.from?.toLocalDateTime(TimeZone.UTC)?.time
+
+        return fromTime.epochDuration() == otherFromTime?.epochDuration() &&
+            endTime.epochDuration() == otherEndTime?.epochDuration()
+    }
+}

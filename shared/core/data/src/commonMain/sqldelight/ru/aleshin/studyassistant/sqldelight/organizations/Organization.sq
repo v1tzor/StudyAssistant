@@ -1,5 +1,4 @@
 import kotlin.String;
-import kotlin.Int;
 import kotlin.collections.List;
 
 CREATE TABLE organizationEntity (
@@ -9,12 +8,12 @@ CREATE TABLE organizationEntity (
   full_name TEXT,
   type TEXT NOT NULL,
   avatar TEXT,
-  scheduleTimeIntervals TEXT NOT NULL,
+  schedule_time_intervals TEXT NOT NULL,
   emails TEXT AS List<String> NOT NULL,
   phones TEXT AS List<String> NOT NULL,
   locations TEXT AS List<String> NOT NULL,
   webs TEXT AS List<String> NOT NULL,
-  offices TEXT AS List<Int> NOT NULL,
+  offices TEXT AS List<String> NOT NULL,
   is_hide INTEGER NOT NULL
 );
 
@@ -28,5 +27,5 @@ FROM organizationEntity
 WHERE uid = ?;
 
 addOrUpdateOrganization:
-INSERT OR REPLACE INTO organizationEntity (uid, is_main, short_name, full_name, type, avatar, scheduleTimeIntervals, emails, phones, locations, webs, offices, is_hide)
+INSERT OR REPLACE INTO organizationEntity (uid, is_main, short_name, full_name, type, avatar, schedule_time_intervals, emails, phones, locations, webs, offices, is_hide)
 VALUES ?;

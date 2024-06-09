@@ -55,6 +55,5 @@ fun MainScreen() = ScreenContent(
                 }
             }
         }
-
     }
 }

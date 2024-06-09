@@ -20,16 +20,10 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.features.preview.impl.generated.resources.Res
-import studyassistant.shared.features.preview.impl.generated.resources.ic_birthday
 import studyassistant.shared.features.preview.impl.generated.resources.ic_description
-import studyassistant.shared.features.preview.impl.generated.resources.ic_email
 import studyassistant.shared.features.preview.impl.generated.resources.ic_gender
 import studyassistant.shared.features.preview.impl.generated.resources.ic_organization_type
-import studyassistant.shared.features.preview.impl.generated.resources.ic_phone
-import studyassistant.shared.features.preview.impl.generated.resources.ic_select_date
 import studyassistant.shared.features.preview.impl.generated.resources.ic_textbox
-import studyassistant.shared.features.preview.impl.generated.resources.ic_upload
-import studyassistant.shared.features.preview.impl.generated.resources.ic_web
 import studyassistant.shared.features.preview.impl.generated.resources.il_analytics
 import studyassistant.shared.features.preview.impl.generated.resources.il_analytics_dark
 import studyassistant.shared.features.preview.impl.generated.resources.il_friends
@@ -51,16 +45,10 @@ internal data class PreviewIcons(
     val analyticsIllustration: DrawableResource,
     val friendsIllustration: DrawableResource,
     val scheduleIllustration: DrawableResource,
-    val upload: DrawableResource,
     val name: DrawableResource,
     val description: DrawableResource,
-    val birthday: DrawableResource,
-    val gender: DrawableResource,
     val organization: DrawableResource,
-    val email: DrawableResource,
-    val phone: DrawableResource,
-    val website: DrawableResource,
-    val selectDate: DrawableResource,
+    val gender: DrawableResource,
 ) {
     companion object {
         val LIGHT = PreviewIcons(
@@ -69,16 +57,10 @@ internal data class PreviewIcons(
             analyticsIllustration = Res.drawable.il_analytics,
             friendsIllustration = Res.drawable.il_friends,
             scheduleIllustration = Res.drawable.il_schedule,
-            upload = Res.drawable.ic_upload,
             name = Res.drawable.ic_textbox,
             description = Res.drawable.ic_description,
-            birthday = Res.drawable.ic_birthday,
             gender = Res.drawable.ic_gender,
-            organization = Res.drawable.ic_organization_type,
-            email = Res.drawable.ic_email,
-            phone = Res.drawable.ic_phone,
-            website = Res.drawable.ic_web,
-            selectDate = Res.drawable.ic_select_date,
+            organization = Res.drawable.ic_organization_type
         )
         val DARK = PreviewIcons(
             studyIllustration = Res.drawable.il_study_dark,
@@ -86,16 +68,10 @@ internal data class PreviewIcons(
             analyticsIllustration = Res.drawable.il_analytics_dark,
             friendsIllustration = Res.drawable.il_friends_dark,
             scheduleIllustration = Res.drawable.il_schedule_dark,
-            upload = Res.drawable.ic_upload,
             name = Res.drawable.ic_textbox,
             description = Res.drawable.ic_description,
-            birthday = Res.drawable.ic_birthday,
             gender = Res.drawable.ic_gender,
             organization = Res.drawable.ic_organization_type,
-            email = Res.drawable.ic_email,
-            phone = Res.drawable.ic_phone,
-            website = Res.drawable.ic_web,
-            selectDate = Res.drawable.ic_select_date,
         )
     }
 }

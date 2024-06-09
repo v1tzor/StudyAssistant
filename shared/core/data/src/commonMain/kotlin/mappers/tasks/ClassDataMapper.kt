@@ -47,7 +47,7 @@ fun ClassDetailsData.mapToDomain() = Class(
     customData = customData,
     teacher = teacher?.mapToDomain(),
     office = office,
-    location = location.mapToDomain(),
+    location = location?.mapToDomain(),
     timeRange = TimeRange(startTime.mapEpochTimeToInstant(), endTime.mapEpochTimeToInstant()),
     notification = notification,
 )
@@ -61,7 +61,7 @@ fun Class.mapToData() = ClassDetailsData(
     customData = customData,
     teacher = teacher?.mapToData(),
     office = office,
-    location = location.mapToData(),
+    location = location?.mapToData(),
     startTime = timeRange.from.toEpochMilliseconds(),
     endTime = timeRange.to.toEpochMilliseconds(),
     notification = notification,

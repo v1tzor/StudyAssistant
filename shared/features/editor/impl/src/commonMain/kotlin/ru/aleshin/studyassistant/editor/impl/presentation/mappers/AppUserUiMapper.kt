@@ -19,9 +19,9 @@ package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 import entities.settings.PrivacySettings
 import entities.users.AppUser
 import entities.users.SocialNetwork
-import ru.aleshin.studyassistant.editor.impl.presentation.models.AppUserUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.PrivacySettingsUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.SocialNetworkUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.users.AppUserUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.settings.PrivacySettingsUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.users.SocialNetworkUi
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.

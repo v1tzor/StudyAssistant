@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
 import entities.subject.Subject
-import ru.aleshin.studyassistant.editor.impl.presentation.models.SubjectUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -30,7 +30,7 @@ internal fun Subject.mapToUi() = SubjectUi(
     teacher = teacher?.mapToUi(),
     office = office,
     color = color,
-    location = location.mapToUi(),
+    location = location?.mapToUi(),
 )
 
 internal fun SubjectUi.mapToDomain() = Subject(
@@ -41,5 +41,5 @@ internal fun SubjectUi.mapToDomain() = Subject(
     teacher = teacher?.mapToDomain(),
     office = office,
     color = color,
-    location = location.mapToDomain(),
+    location = location?.mapToDomain(),
 )

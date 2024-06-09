@@ -32,10 +32,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import functional.UID
 import kotlinx.datetime.DayOfWeek
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.BaseScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.ClassUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.ScheduleView
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.ScheduleViewPlaceholder
@@ -49,9 +50,9 @@ internal fun ScheduleEditorContent(
     state: ScheduleEditorViewState,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
-    onCreateClass: (BaseScheduleUi?, DayOfNumberedWeekUi) -> Unit,
+    onCreateClass: (DayOfNumberedWeekUi, BaseScheduleUi?) -> Unit,
     onEditClass: (ClassUi, DayOfNumberedWeekUi) -> Unit,
-    onDeleteClass: (ClassUi) -> Unit,
+    onDeleteClass: (UID, BaseScheduleUi) -> Unit,
 ) = with(state) {
     AnimatedContent(
         modifier = modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, end = 16.dp),
@@ -74,13 +75,13 @@ internal fun ScheduleEditorContent(
                         dayOfWeek = dayOfWeek,
                         schedule = schedule,
                         onCreateClass = {
-                            onCreateClass(schedule, DayOfNumberedWeekUi(dayOfWeek, currentWeek))
+                            onCreateClass(DayOfNumberedWeekUi(dayOfWeek, currentWeek), schedule)
                         },
                         onEditClass = { editClass ->
                             onEditClass(editClass, DayOfNumberedWeekUi(dayOfWeek, currentWeek))
                         },
                         onDeleteClass = { targetClass ->
-                            onDeleteClass(targetClass)
+                            if (schedule != null) onDeleteClass(targetClass.uid, schedule)
                         },
                     )
                 }

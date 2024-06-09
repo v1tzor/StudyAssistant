@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.di.modules
 
 import managers.CoroutineManager
 import managers.DateManager
+import managers.TimeOverlayManager
 import org.kodein.di.DI
 import org.kodein.di.bindEagerSingleton
 import org.kodein.di.bindProvider
@@ -106,6 +107,7 @@ val featureModule = DI.Module("Feature") {
 
     bindEagerSingleton<ScheduleFeatureDependencies> {
         object : ScheduleFeatureDependencies {
+            override val editorFeatureStarter = provider<EditorFeatureStarter>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
@@ -144,6 +146,7 @@ val featureModule = DI.Module("Feature") {
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val usersRepository = instance<UsersRepository>()
             override val dateManager = instance<DateManager>()
+            override val overlayManager = instance<TimeOverlayManager>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }

@@ -21,11 +21,13 @@ import architecture.screenmodel.contract.BaseEvent
 import architecture.screenmodel.contract.BaseUiEffect
 import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
+import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 
 /**
  * @author Stanislav Aleshin on 14.04.2024
  */
+@Parcelize
 internal sealed class IntroViewState : BaseViewState {
     data object Default : IntroViewState()
 }

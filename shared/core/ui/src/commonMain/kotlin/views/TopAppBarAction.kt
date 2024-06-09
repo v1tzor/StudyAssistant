@@ -16,13 +16,16 @@
 package views
 
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 /**
  * @author Stanislav Aleshin on 08.02.2024.
  */
+@OptIn(ExperimentalResourceApi::class)
 interface TopAppBarAction {
 
-    val icon: String? @Composable get
+    val icon: DrawableResource? @Composable get
 
     val title: String @Composable get
 

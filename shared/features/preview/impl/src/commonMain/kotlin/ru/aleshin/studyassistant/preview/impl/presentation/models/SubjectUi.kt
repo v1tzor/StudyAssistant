@@ -16,20 +16,22 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.models
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import entities.subject.EventType
 import functional.UID
-import platform.JavaSerializable
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
+@Parcelize
 internal data class SubjectUi(
     val uid: UID,
     val organizationId: UID,
     val eventType: EventType,
     val name: String,
     val teacher: EmployeeUi?,
-    val office: Int,
+    val office: String,
     val color: Int,
-    val location: ContactInfoUi,
-) : JavaSerializable
+    val location: ContactInfoUi?,
+) : Parcelable

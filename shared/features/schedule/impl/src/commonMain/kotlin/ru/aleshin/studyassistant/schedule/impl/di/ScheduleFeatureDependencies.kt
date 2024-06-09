@@ -21,11 +21,13 @@ import managers.CoroutineManager
 import repositories.BaseScheduleRepository
 import repositories.CustomScheduleRepository
 import repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 interface ScheduleFeatureDependencies : BaseFeatureDependencies {
+    val editorFeatureStarter: () -> EditorFeatureStarter
     val baseScheduleRepository: BaseScheduleRepository
     val customScheduleRepository: CustomScheduleRepository
     val organizationsRepository: OrganizationsRepository

@@ -20,12 +20,14 @@ import inject.BaseFeatureDIHolder
 import managers.CoroutineManager
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
+import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
 import repositories.BaseScheduleRepository
 import repositories.CustomScheduleRepository
 import repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.di.ScheduleFeatureApi
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
@@ -44,6 +46,7 @@ object ScheduleFeatureDIHolder : BaseFeatureDIHolder<ScheduleFeatureApi, Schedul
         if (directDi == null) {
             val di = DI {
                 importAll(navigationModule, presentationModule, domainModule)
+                bindInstance<() -> EditorFeatureStarter> { dependencies.editorFeatureStarter }
                 bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
                 bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }

@@ -43,10 +43,10 @@ import views.ErrorSnackbar
  * @author Stanislav Aleshin on 02.06.2024
  */
 internal class ClassEditorScreen(
-    val classId: UID?,
-    val scheduleId: UID?,
-    val customSchedule: Boolean,
-    val weekDay: DayOfNumberedWeekUi,
+    private val classId: UID?,
+    private val scheduleId: UID?,
+    private val customSchedule: Boolean,
+    private val weekDay: DayOfNumberedWeekUi,
 ) : Screen {
 
     @Composable
@@ -66,10 +66,10 @@ internal class ClassEditorScreen(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
                     onAddOrganization = {},
-                    onAddSubject = {},
-                    onAddTeacher = {},
-                    onAddLocation = {},
-                    onAddOffice = {},
+                    onAddSubject = { dispatchEvent(ClassEditorEvent.NavigateToSubjectEditor) },
+                    onAddTeacher = { dispatchEvent(ClassEditorEvent.NavigateToEmployeeEditor) },
+                    onUpdateLocations = { dispatchEvent(ClassEditorEvent.UpdateLocations(it)) },
+                    onUpdateOffices = { dispatchEvent(ClassEditorEvent.UpdateOffices(it)) },
                     onSelectOrganization = { dispatchEvent(ClassEditorEvent.SelectOrganization(it)) },
                     onSelectTeacher = { dispatchEvent(ClassEditorEvent.SelectTeacher(it)) },
                     onChangeNotifyParams = { dispatchEvent(ClassEditorEvent.ChangeNotifyParams(it)) },
@@ -86,7 +86,8 @@ internal class ClassEditorScreen(
             },
             topBar = {
                 ClassEditorTopBar(
-                    enabledSave = state.editModel?.isValid() ?: false,
+                    enabledSave = state.editableClass?.isValid() ?: false,
+                    isLoading = state.isLoading,
                     onSaveClick = { dispatchEvent(ClassEditorEvent.SaveClass) },
                     onBackClick = { dispatchEvent(ClassEditorEvent.NavigateToBack) },
                 )
@@ -103,9 +104,6 @@ internal class ClassEditorScreen(
             when (effect) {
                 is ClassEditorEffect.NavigateToLocal -> navigator?.push(effect.pushScreen)
                 is ClassEditorEffect.NavigateToBack -> navigator?.pop()
-                is ClassEditorEffect.LoadOrganizationData -> dispatchEvent(
-                    event = ClassEditorEvent.SelectOrganization(effect.organization),
-                )
                 is ClassEditorEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

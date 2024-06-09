@@ -29,7 +29,7 @@ data class Subject(
     val eventType: EventType,
     val name: String,
     val teacher: Employee?,
-    val office: Int,
+    val office: String,
     val color: Int,
-    val location: ContactInfo,
+    val location: ContactInfo?,
 )

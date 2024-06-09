@@ -34,7 +34,6 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import theme.StudyAssistantRes
-import theme.tokens.monthNames
 
 /**
  * @author Stanislav Aleshin on 27.04.2024
@@ -60,7 +59,11 @@ fun BirthdayDatePicker(
                 onClick = {
                     val selectedDate = datePickerState.selectedDateMillis ?: return@TextButton
                     val dateFormat = DateTimeComponents.Format {
-                        dayOfMonth(); char('.'); monthNumber(); char('.'); year()
+                        dayOfMonth()
+                        char('.')
+                        monthNumber()
+                        char('.')
+                        year()
                     }
                     val birthday = selectedDate.mapEpochTimeToInstant().format(dateFormat)
                     onSelectedDate.invoke(birthday)

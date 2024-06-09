@@ -19,9 +19,9 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 import entities.settings.PrivacySettings
 import entities.users.AppUser
 import entities.users.SocialNetwork
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.AppUserUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.PrivacySettingsUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.SocialNetworkUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.AppUserUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.settings.PrivacySettingsUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SocialNetworkUi
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.

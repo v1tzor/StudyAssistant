@@ -35,9 +35,23 @@ data class ClassDetails(
     val subject: Subject?,
     val customData: String? = null,
     val teacher: Employee?,
-    val office: Int,
-    val location: ContactInfo,
+    val office: String,
+    val location: ContactInfo?,
     val timeRange: TimeRange,
     val notification: Boolean = false,
     val homeWork: Homework? = null,
+)
+
+fun Class.convertToDetails(homeWork: Homework?) = ClassDetails(
+    uid = uid,
+    organization = organization,
+    eventType = eventType,
+    subject = subject,
+    customData = customData,
+    teacher = teacher,
+    office = office,
+    location = location,
+    timeRange = timeRange,
+    notification = notification,
+    homeWork = homeWork,
 )

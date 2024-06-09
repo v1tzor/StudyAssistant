@@ -24,7 +24,10 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import managers.CoroutineManager
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
+import ru.aleshin.studyassistant.editor.impl.navigation.EditorScreenProvider
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.convertToShort
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEditorAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEditorDeps
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEditorEffect
@@ -36,6 +39,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.Cl
  */
 internal class ClassEditorScreenModel(
     private val workProcessor: ClassEditorWorkProcessor,
+    private val screenProvider: EditorScreenProvider,
     stateCommunicator: ClassEditorStateCommunicator,
     effectCommunicator: ClassEditorEffectCommunicator,
     coroutineManager: CoroutineManager,
@@ -61,60 +65,86 @@ internal class ClassEditorScreenModel(
                     val command = ClassEditorWorkCommand.LoadEditModel(
                         classId = event.classId,
                         scheduleId = event.scheduleId,
-                        isCustomSchedule = event.customSchedule,
+                        isCustomSchedule = event.isCustomSchedule,
                         weekDay = event.weekDay,
                     )
                     workProcessor.work(command).collectAndHandleWork()
                 }
-                launchBackgroundWork(BackgroundKey.LOAD_ORGANIZATIONS) {
-                    val command = ClassEditorWorkCommand.LoadOrganizations
-                    workProcessor.work(command).collectAndHandleWork()
+            }
+            is ClassEditorEvent.UpdateOffices -> with(state()) {
+                launchBackgroundWork(BackgroundKey.UPDATE_LOCATIONS) {
+                    val organization = editableClass?.organization
+                    if (organization != null) {
+                        val command = ClassEditorWorkCommand.UpdateOffices(organization, event.offices)
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
+                }
+            }
+            is ClassEditorEvent.UpdateLocations -> with(state()) {
+                launchBackgroundWork(BackgroundKey.UPDATE_LOCATIONS) {
+                    val organization = editableClass?.organization
+                    if (organization != null) {
+                        val command = ClassEditorWorkCommand.UpdateLocations(organization, event.locations)
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
                 }
             }
             is ClassEditorEvent.SelectOrganization -> with(state()) {
-                val action = ClassEditorAction.UpdateEditModel(
-                    model = editModel?.copy(organization = event.organization),
+                val updatedClass = editableClass?.copy(
+                    organization = event.organization?.convertToShort(),
+                    eventType = null,
+                    subject = null,
+                    customData = null,
+                    teacher = null,
+                    office = null,
+                    location = null,
                 )
-                sendAction(action)
-                launchBackgroundWork(BackgroundKey.LOAD_ORGANIZATION_DATA) {
-                    val command = ClassEditorWorkCommand.LoadOrganizationData(event.organization)
-                    workProcessor.work(command).collectAndHandleWork()
-                }
+                sendAction(ClassEditorAction.UpdateEditModel(updatedClass))
             }
             is ClassEditorEvent.SelectSubject -> with(state()) {
-                val action = ClassEditorAction.UpdateEditModel(
-                    model = editModel?.copy(subject = event.subject, eventType = event.type),
+                val updatedClass = editableClass?.copy(
+                    subject = event.subject,
+                    eventType = event.type,
+                    teacher = event.subject?.teacher,
+                    location = event.subject?.location,
+                    office = event.subject?.office,
                 )
-                sendAction(action)
+                sendAction(ClassEditorAction.UpdateEditModel(updatedClass))
             }
             is ClassEditorEvent.SelectTeacher -> with(state()) {
-                val action = ClassEditorAction.UpdateEditModel(
-                    model = editModel?.copy(teacher = event.teacher),
-                )
-                sendAction(action)
+                val updatedClass = editableClass?.copy(teacher = event.teacher)
+                sendAction(ClassEditorAction.UpdateEditModel(updatedClass))
             }
             is ClassEditorEvent.SelectLocation -> with(state()) {
-                val action = ClassEditorAction.UpdateEditModel(
-                    model = editModel?.copy(location = event.location, office = event.office),
-                )
-                sendAction(action)
+                val updatedClass = editableClass?.copy(location = event.location, office = event.office)
+                sendAction(ClassEditorAction.UpdateEditModel(updatedClass))
             }
             is ClassEditorEvent.SelectTime -> with(state()) {
-                val action = ClassEditorAction.UpdateEditModel(
-                    model = editModel?.copy(startTime = event.startTime, endTime = event.endTime),
-                )
-                sendAction(action)
+                val updatedClass = editableClass?.copy(startTime = event.startTime, endTime = event.endTime)
+                sendAction(ClassEditorAction.UpdateEditModel(updatedClass))
             }
             is ClassEditorEvent.ChangeNotifyParams -> with(state()) {
-                val action = ClassEditorAction.UpdateEditModel(
-                    model = editModel?.copy(notification = event.notification),
-                )
-                sendAction(action)
+                val updateClass = editableClass?.copy(notification = event.notification)
+                sendAction(ClassEditorAction.UpdateEditModel(updateClass))
+            }
+            is ClassEditorEvent.NavigateToSubjectEditor -> with(state()) {
+                if (editableClass?.organization != null) {
+                    val featureScreen = EditorScreen.Subject(null, editableClass.organization.uid)
+                    val targetScreen = screenProvider.provideFeatureScreen(featureScreen)
+                    sendEffect(ClassEditorEffect.NavigateToLocal(targetScreen))
+                }
+            }
+            is ClassEditorEvent.NavigateToEmployeeEditor -> with(state()) {
+                if (editableClass?.organization != null) {
+                    val featureScreen = EditorScreen.Employee(null, editableClass.organization.uid)
+                    val targetScreen = screenProvider.provideFeatureScreen(featureScreen)
+                    sendEffect(ClassEditorEffect.NavigateToLocal(targetScreen))
+                }
             }
             is ClassEditorEvent.SaveClass -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SAVE_CLASS) {
-                    if (editModel != null && weekDay != null) {
-                        val command = ClassEditorWorkCommand.SaveEditModel(editModel, isCustomSchedule, weekDay)
+                    if (editableClass != null && schedule != null && weekDay != null) {
+                        val command = ClassEditorWorkCommand.SaveEditModel(editableClass, schedule, weekDay)
                         workProcessor.work(command).collectAndHandleWork()
                     }
                 }
@@ -130,27 +160,23 @@ internal class ClassEditorScreenModel(
         currentState: ClassEditorViewState,
     ) = when (action) {
         is ClassEditorAction.SetupEditModel -> currentState.copy(
-            editModel = action.model,
+            editableClass = action.editableClass,
+            schedule = action.schedule,
+            freeClassTimeRanges = action.freeClassTimeRanges,
             weekDay = action.weekDay,
-            isCustomSchedule = action.customSchedule,
-            classesTimeRanges = action.times,
+            organizations = action.organizations,
+            isLoading = false,
         )
         is ClassEditorAction.UpdateEditModel -> currentState.copy(
-            editModel = action.model,
+            editableClass = action.model,
         )
-        is ClassEditorAction.UpdateOrganizations -> currentState.copy(
-            organizations = action.organizations,
-        )
-        is ClassEditorAction.UpdateOrganizationData -> currentState.copy(
-            subjects = action.subjects,
-            teachers = action.employees,
-            locations = action.locations,
-            offices = action.offices,
+        is ClassEditorAction.UpdateLoading -> currentState.copy(
+            isLoading = action.isLoading,
         )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_CLASS, LOAD_ORGANIZATIONS, LOAD_ORGANIZATION_DATA, SAVE_CLASS
+        LOAD_CLASS, UPDATE_LOCATIONS, SAVE_CLASS
     }
 }
 

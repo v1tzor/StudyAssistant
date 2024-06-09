@@ -16,17 +16,12 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel
 
-import architecture.screenmodel.work.ActionResult
 import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
 import functional.handle
-import functional.handleAndGet
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.FriendsInteractor
@@ -55,23 +50,18 @@ internal interface ProfileWorkProcessor : FlowWorkProcessor<ProfileWorkCommand, 
 
         @OptIn(ExperimentalCoroutinesApi::class)
         private fun loadProfileInfoWork() = flow {
-            userInteractor.fetchCurrentAppUser().flatMapLatest { userEither ->
-                userEither.handleAndGet(
-                    onLeftAction = { flowOf(EffectResult(ProfileEffect.ShowError(it))) },
-                    onRightAction = { userInfo ->
-                        friendsInteractor.fetchAllFriendRequests().map { friendsEither ->
-                            friendsEither.handleAndGet(
-                                onLeftAction = { EffectResult(ProfileEffect.ShowError(it)) },
-                                onRightAction = { friendRequest ->
-                                    val profile = userInfo.mapToUi()
-                                    val requests = friendRequest.mapToUi()
-                                    ActionResult(ProfileAction.UpdateProfileInfo(profile, requests))
-                                }
-                            )
-                        }
-                    },
-                )
-            }.collect { workResult ->
+            val userInfoFlow = userInteractor.fetchCurrentAppUser()
+            val friendsRequestsFlow = friendsInteractor.fetchAllFriendRequests()
+
+            userInfoFlow.flatMapLatestWithResult(
+                secondFlow = friendsRequestsFlow,
+                onError = { ProfileEffect.ShowError(it) },
+                onData = { userInfo, friendRequest ->
+                    val profile = userInfo.mapToUi()
+                    val requests = friendRequest.mapToUi()
+                    ProfileAction.UpdateProfileInfo(profile, requests)
+                },
+            ).collect { workResult ->
                 emit(workResult)
             }
         }

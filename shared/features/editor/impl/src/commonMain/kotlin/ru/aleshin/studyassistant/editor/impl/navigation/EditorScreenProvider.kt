@@ -19,7 +19,9 @@ package ru.aleshin.studyassistant.editor.impl.navigation
 import navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.ClassEditorScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.EmployeeEditorScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.ScheduleEditorScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.SubjectEditorScreen
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -33,8 +35,16 @@ internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen> {
             is EditorScreen.Class -> ClassEditorScreen(
                 classId = screen.classId,
                 scheduleId = screen.scheduleId,
-                customSchedule = screen.customSchedule,
+                customSchedule = screen.isCustomSchedule,
                 weekDay = screen.weekDay,
+            )
+            is EditorScreen.Subject -> SubjectEditorScreen(
+                subjectId = screen.subjectId,
+                organizationId = screen.organizationId,
+            )
+            is EditorScreen.Employee -> EmployeeEditorScreen(
+                employeeId = screen.employeeId,
+                organizationId = screen.organizationId,
             )
         }
     }

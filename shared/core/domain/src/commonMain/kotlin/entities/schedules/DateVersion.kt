@@ -16,6 +16,9 @@
 
 package entities.schedules
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
+import dev.icerock.moko.parcelize.TypeParceler
 import extensions.dateOfWeekDay
 import extensions.endThisDay
 import extensions.shiftDay
@@ -23,15 +26,16 @@ import extensions.startThisDay
 import functional.Constants.Date.MAX_DAYS_SHIFT
 import kotlinx.datetime.DayOfWeek.MONDAY
 import kotlinx.datetime.Instant
+import platform.InstantParceler
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
+@Parcelize
 data class DateVersion(
-    val from: Instant,
-    val to: Instant,
-) {
-
+    @TypeParceler<Instant, InstantParceler> val from: Instant,
+    @TypeParceler<Instant, InstantParceler> val to: Instant,
+) : Parcelable {
     fun makeDeprecated(currentDate: Instant): DateVersion {
         return copy(to = currentDate.dateOfWeekDay(MONDAY).shiftDay(-1).endThisDay())
     }

@@ -89,7 +89,7 @@ internal class ScheduleEditorScreenModel(
                 sendEffect(ScheduleEditorEffect.NavigateToLocal(targetScreen))
             }
             is ScheduleEditorEvent.DeleteClass -> launchBackgroundWork(BackgroundKey.DELETE_CLASS) {
-                val command = ScheduleEditorWorkCommand.DeleteClass(event.targetClass)
+                val command = ScheduleEditorWorkCommand.DeleteClass(event.uid, event.schedule)
                 workProcessor.work(command).collectAndHandleWork()
             }
             is ScheduleEditorEvent.SaveSchedule -> {

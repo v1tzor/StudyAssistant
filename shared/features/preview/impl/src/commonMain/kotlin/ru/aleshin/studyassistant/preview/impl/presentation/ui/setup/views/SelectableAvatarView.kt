@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
+import theme.StudyAssistantRes
 import theme.material.full
 
 /**
@@ -75,8 +75,8 @@ internal fun SelectableAvatarView(
                 .size(24.dp)
                 .clip(MaterialTheme.shapes.full())
                 .border(2.dp, MaterialTheme.colorScheme.surfaceContainerLow),
-            painter = painterResource(PreviewThemeRes.icons.upload),
-            contentDescription = PreviewThemeRes.strings.avatarDesc,
+            painter = painterResource(StudyAssistantRes.icons.upload),
+            contentDescription = StudyAssistantRes.strings.avatarDesc,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }

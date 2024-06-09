@@ -17,7 +17,6 @@
 package entities.tasks
 
 import entities.organizations.OrganizationShort
-import entities.subject.EventType
 import entities.subject.Subject
 import extensions.startThisDay
 import functional.UID
@@ -33,7 +32,6 @@ data class Homework(
     val date: Instant = Clock.System.now().startThisDay(),
     val subject: Subject? = null,
     val organization: OrganizationShort,
-    val eventType: EventType = EventType.LESSON,
     val theoreticalTasks: String = "",
     val practicalTasks: String = "",
     val presentations: String = "",

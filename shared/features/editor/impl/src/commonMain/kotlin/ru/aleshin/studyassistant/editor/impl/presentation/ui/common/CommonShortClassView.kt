@@ -49,8 +49,8 @@ import extensions.boldWeight
 import extensions.pxToDp
 import functional.TimeRange
 import mappers.format
-import ru.aleshin.studyassistant.editor.impl.presentation.models.OrganizationShortUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.SubjectUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 import theme.StudyAssistantRes
 
 /**
@@ -64,7 +64,7 @@ internal fun CommonClassView(
     number: Int,
     timeRange: TimeRange,
     subject: SubjectUi?,
-    office: Int,
+    office: String,
     organization: OrganizationShortUi?,
     headerBadge: (@Composable () -> Unit)? = null,
     footer: (@Composable ColumnScope.() -> Unit)? = null,
@@ -143,7 +143,7 @@ internal fun CommonClassViewContent(
     modifier: Modifier = Modifier,
     timeRange: TimeRange,
     subject: String?,
-    office: Int,
+    office: String,
     organization: String?,
     headerBadge: (@Composable () -> Unit)? = null,
     footer: (@Composable ColumnScope.() -> Unit)? = null,
@@ -185,7 +185,7 @@ internal fun CommonClassViewContent(
             } else {
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
-                        text = office.toString(),
+                        text = office,
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         style = MaterialTheme.typography.labelMedium,

@@ -28,7 +28,7 @@ data class OrganizationShort(
     val shortName: String = "",
     val type: OrganizationType = OrganizationType.SCHOOL,
     val locations: List<ContactInfo> = emptyList(),
-    val offices: List<Int> = emptyList(),
+    val offices: List<String> = emptyList(),
     val scheduleTimeIntervals: ScheduleTimeIntervals = ScheduleTimeIntervals(),
     val avatar: String? = null,
 )

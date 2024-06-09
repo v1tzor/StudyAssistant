@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.compose)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.parcelize)
 }
 
 kotlin {
@@ -34,6 +35,7 @@ kotlin {
             api(libs.kotlin.coroutines)
             api(libs.kotlin.datetime)
             api(libs.kotlin.serialization)
+            api(libs.moko.parcelize)
             api(libs.bignumn)
 
             api(libs.kodein.core)

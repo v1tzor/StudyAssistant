@@ -40,7 +40,7 @@ fun SubjectDetailsData.mapToDomain() = Subject(
     teacher = teacher?.mapToDomain(),
     office = office,
     color = color,
-    location = location.mapToDomain(),
+    location = location?.mapToDomain(),
 )
 
 fun Subject.mapToData() = SubjectDetailsData(
@@ -51,7 +51,7 @@ fun Subject.mapToData() = SubjectDetailsData(
     teacher = teacher?.mapToData(),
     office = office,
     color = color,
-    location = location.mapToData(),
+    location = location?.mapToData(),
 )
 
 fun SubjectDetailsData.mapToLocalData() = SubjectEntity(
@@ -60,7 +60,7 @@ fun SubjectDetailsData.mapToLocalData() = SubjectEntity(
     event_type = eventType,
     name = name,
     teacher_id = teacher?.uid,
-    office = office.toLong(),
+    office = office,
     color = color.toLong(),
     location = Json.encodeToString(location),
 )
@@ -73,9 +73,9 @@ fun SubjectEntity.mapToDetailsData(
     eventType = event_type,
     name = name,
     teacher = employee,
-    office = office.toInt(),
+    office = office,
     color = color.toInt(),
-    location = Json.decodeFromString(location),
+    location = location?.let { Json.decodeFromString(it) },
 )
 
 fun SubjectDetailsData.mapToRemoteData() = SubjectPojo(

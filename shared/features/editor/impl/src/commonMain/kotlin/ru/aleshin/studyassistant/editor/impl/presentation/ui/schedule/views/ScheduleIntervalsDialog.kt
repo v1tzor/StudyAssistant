@@ -66,8 +66,8 @@ import kotlinx.datetime.format.char
 import mappers.toMinutesOrHoursTitle
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.editor.impl.presentation.models.NumberedDurationUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.ScheduleTimeIntervalsUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import theme.StudyAssistantRes
 import theme.material.full
@@ -162,7 +162,7 @@ internal fun StartOfClassesField(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
         )
 
         if (isOpenTimePickerDialog) {

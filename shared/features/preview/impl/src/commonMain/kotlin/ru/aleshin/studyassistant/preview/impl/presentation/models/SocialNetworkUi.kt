@@ -16,13 +16,15 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.models
 
-import platform.JavaSerializable
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
+@Parcelize
 internal data class SocialNetworkUi(
     val name: String,
     val icon: String,
     val url: String,
-) : JavaSerializable
+) : Parcelable

@@ -16,13 +16,15 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.models
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import entities.users.Gender
 import functional.UID
-import platform.JavaSerializable
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
+@Parcelize
 internal data class AppUserUi(
     val uid: UID,
     val messageId: UID,
@@ -37,4 +39,4 @@ internal data class AppUserUi(
     val socialNetworks: List<SocialNetworkUi> = emptyList(),
     val friends: List<UID> = emptyList(),
     val privacy: PrivacySettingsUi = PrivacySettingsUi(),
-) : JavaSerializable
+) : Parcelable

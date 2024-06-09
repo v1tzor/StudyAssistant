@@ -16,15 +16,17 @@
 
 package ru.aleshin.studyassistant.presentation.models
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import models.ThemeUiType
-import platform.JavaSerializable
 import theme.tokens.LanguageUiType
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
  */
+@Parcelize
 data class GeneralSettingsUi(
     val isFirstStart: Boolean = true,
     val themeType: ThemeUiType = ThemeUiType.DEFAULT,
     val languageType: LanguageUiType = LanguageUiType.DEFAULT,
-) : JavaSerializable
+) : Parcelable

@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
 import entities.employee.Employee
 import functional.TimeRange
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.EmployeeUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.

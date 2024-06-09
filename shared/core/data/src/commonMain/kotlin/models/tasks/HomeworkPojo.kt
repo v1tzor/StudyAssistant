@@ -16,7 +16,6 @@
 
 package models.tasks
 
-import entities.subject.EventType
 import entities.tasks.TaskPriority
 import extensions.startThisDay
 import functional.UID
@@ -33,7 +32,6 @@ data class HomeworkPojo(
     val date: Long = Clock.System.now().startThisDay().toEpochMilliseconds(),
     val subjectId: UID? = null,
     val organizationId: UID = "",
-    val eventType: String = EventType.CLASS.name,
     val theoreticalTasks: String = "",
     val practicalTasks: String = "",
     val presentations: String = "",

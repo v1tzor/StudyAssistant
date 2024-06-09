@@ -21,14 +21,19 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.features.editor.impl.generated.resources.Res
 import studyassistant.shared.features.editor.impl.generated.resources.ic_break
+import studyassistant.shared.features.editor.impl.generated.resources.ic_circle_edit_outline
 import studyassistant.shared.features.editor.impl.generated.resources.ic_class
 import studyassistant.shared.features.editor.impl.generated.resources.ic_clear_circular
 import studyassistant.shared.features.editor.impl.generated.resources.ic_clock
+import studyassistant.shared.features.editor.impl.generated.resources.ic_color
 import studyassistant.shared.features.editor.impl.generated.resources.ic_employee
+import studyassistant.shared.features.editor.impl.generated.resources.ic_employee_post
 import studyassistant.shared.features.editor.impl.generated.resources.ic_map_marker
 import studyassistant.shared.features.editor.impl.generated.resources.ic_notify
 import studyassistant.shared.features.editor.impl.generated.resources.ic_number
 import studyassistant.shared.features.editor.impl.generated.resources.ic_organization
+import studyassistant.shared.features.editor.impl.generated.resources.ic_subject_name
+import studyassistant.shared.features.editor.impl.generated.resources.ic_worktime
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -44,6 +49,11 @@ internal data class EditorIcons(
     val location: DrawableResource,
     val employee: DrawableResource,
     val notification: DrawableResource,
+    val name: DrawableResource,
+    val color: DrawableResource,
+    val pickColor: DrawableResource,
+    val employeePost: DrawableResource,
+    val workTime: DrawableResource,
 ) {
     companion object {
         val LIGHT = EditorIcons(
@@ -52,10 +62,15 @@ internal data class EditorIcons(
             breaks = Res.drawable.ic_break,
             number = Res.drawable.ic_number,
             time = Res.drawable.ic_clock,
-            location = Res.drawable.ic_map_marker,
             clearCircular = Res.drawable.ic_clear_circular,
+            location = Res.drawable.ic_map_marker,
             employee = Res.drawable.ic_employee,
-            notification = Res.drawable.ic_notify
+            notification = Res.drawable.ic_notify,
+            name = Res.drawable.ic_subject_name,
+            color = Res.drawable.ic_color,
+            pickColor = Res.drawable.ic_circle_edit_outline,
+            employeePost = Res.drawable.ic_employee_post,
+            workTime = Res.drawable.ic_worktime,
         )
         val DARK = EditorIcons(
             organization = Res.drawable.ic_organization,
@@ -63,10 +78,15 @@ internal data class EditorIcons(
             breaks = Res.drawable.ic_break,
             number = Res.drawable.ic_number,
             time = Res.drawable.ic_clock,
-            location = Res.drawable.ic_map_marker,
             clearCircular = Res.drawable.ic_clear_circular,
+            location = Res.drawable.ic_map_marker,
             employee = Res.drawable.ic_employee,
-            notification = Res.drawable.ic_notify
+            notification = Res.drawable.ic_notify,
+            name = Res.drawable.ic_subject_name,
+            color = Res.drawable.ic_color,
+            pickColor = Res.drawable.ic_circle_edit_outline,
+            employeePost = Res.drawable.ic_employee_post,
+            workTime = Res.drawable.ic_worktime,
         )
     }
 }

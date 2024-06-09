@@ -44,8 +44,8 @@ import theme.StudyAssistantRes
 import views.ClickableInfoTextField
 import views.ExpandedIcon
 import views.InfoTextField
-import views.menu.OrganizationTypeDropdownMenu
 import views.VerticalInfoTextField
+import views.menu.OrganizationTypeDropdownMenu
 
 /**
  * @author Stanislav Aleshin on 27.04.2024
@@ -106,7 +106,7 @@ internal fun OrganizationPageInfo(
                 value = type.mapToSting(StudyAssistantRes.strings),
                 label = PreviewThemeRes.strings.organizationTypeLabel,
                 placeholder = PreviewThemeRes.strings.organizationTypePlaceholder,
-                leadingInfoIcon = painterResource(PreviewThemeRes.icons.organization),
+                infoIcon = painterResource(PreviewThemeRes.icons.organization),
                 trailingIcon = {
                     ExpandedIcon(
                         isExpanded = isExpandedTypeMenu,
@@ -135,8 +135,8 @@ internal fun OrganizationPageInfo(
                     }
                     onUpdateOrganization(organization.copy(emails = emails))
                 },
-                labelText = PreviewThemeRes.strings.emailLabel,
-                infoIcon = painterResource(PreviewThemeRes.icons.email),
+                label = PreviewThemeRes.strings.emailLabel,
+                leadingInfoIcon = painterResource(StudyAssistantRes.icons.email),
             )
             InfoTextField(
                 value = editablePhone,
@@ -150,8 +150,8 @@ internal fun OrganizationPageInfo(
                     }
                     onUpdateOrganization(organization.copy(phones = phones))
                 },
-                labelText = PreviewThemeRes.strings.phoneNumberLabel,
-                infoIcon = painterResource(PreviewThemeRes.icons.phone),
+                label = PreviewThemeRes.strings.phoneNumberLabel,
+                leadingInfoIcon = painterResource(StudyAssistantRes.icons.phone),
             )
             InfoTextField(
                 value = editableWeb,
@@ -163,8 +163,8 @@ internal fun OrganizationPageInfo(
                     }
                     onUpdateOrganization(organization.copy(webs = webs))
                 },
-                labelText = PreviewThemeRes.strings.websiteLabel,
-                infoIcon = painterResource(PreviewThemeRes.icons.website),
+                label = PreviewThemeRes.strings.websiteLabel,
+                leadingInfoIcon = painterResource(StudyAssistantRes.icons.website),
             )
         }
     }

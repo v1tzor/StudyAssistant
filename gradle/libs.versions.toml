@@ -10,8 +10,9 @@ testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 agp = "8.3.2"
 kotlin = "1.9.23"
 kotlin-coroutines = "1.8.0"
-kotlin-datetime = "0.6.0-RC.2"
+kotlin-datetime = "0.6.0"
 kotlin-serialization = "1.6.2"
+mokoParcelize = "0.9.0"
 compose = "1.6.7"
 compose-compiler = "1.5.11"
 compose-material3 = "1.2.1"
@@ -34,12 +35,14 @@ placeholder = "1.0.7"
 gms-auth = "21.2.0"
 networkchecker = "1.2.0"
 kmpauth-google = "1.3.0"
+charts = "Beta-0.0.5"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime" }
 kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlin-serialization" }
+moko-parcelize = { module = "dev.icerock.moko:parcelize", version.ref = "mokoParcelize" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -62,6 +65,7 @@ voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", vers
 voyager-kodein = { module = "cafe.adriel.voyager:voyager-kodein", version.ref = "voyager" }
 kodein-core = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
 kodein-compose = { module = "org.kodein.di:kodein-di-framework-compose", version.ref = "kodein" }
+kodein-android = { module = "org.kodein.di:kodein-di-framework-compose", version.ref = "kodein" }
 bignumn = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 sqldelight-core = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
@@ -74,6 +78,7 @@ mokoResources-core = { module = "dev.icerock.moko:resources", version.ref = "mok
 mokoResources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "mokoResources" }
 logger = { module = "co.touchlab:kermit", version.ref = "loggerKermit" }
 networkcheker = { module = "com.github.ln-12:multiplatform-connectivity-status", version.ref = "networkchecker" }
+charts = { module = "io.github.thechance101:chart", version.ref = "charts" }
 
 [bundles]
 mokoResources = ["mokoResources-core", "mokoResources-compose"]
@@ -87,6 +92,7 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }

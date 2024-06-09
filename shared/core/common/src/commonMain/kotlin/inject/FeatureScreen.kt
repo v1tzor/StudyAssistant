@@ -16,11 +16,9 @@
 
 package inject
 
-import platform.JavaSerializable
-
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface FeatureScreen : JavaSerializable
+interface FeatureScreen
 
 object MainScreen : FeatureScreen

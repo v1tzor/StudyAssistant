@@ -16,11 +16,9 @@
 
 package models
 
-import platform.JavaSerializable
-
 /**
  * @author Stanislav Aleshin on 27.01.2024.
  */
-enum class ThemeUiType : JavaSerializable {
+enum class ThemeUiType {
     DEFAULT, LIGHT, DARK
 }

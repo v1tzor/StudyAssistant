@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.compose)
+    alias(libs.plugins.parcelize)
 }
 
 kotlin {
@@ -27,6 +28,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":shared:features:schedule:api"))
+            implementation(project(":shared:features:editor:api"))
 
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:data"))
@@ -34,6 +36,7 @@ kotlin {
             implementation(project(":shared:core:ui"))
 
             implementation(compose.components.resources)
+            implementation(libs.charts)
         }
     }
 }

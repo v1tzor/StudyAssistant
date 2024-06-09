@@ -31,7 +31,7 @@ data class SubjectDetailsData(
     val eventType: String,
     val name: String,
     val teacher: EmployeeDetailsData?,
-    val office: Int,
+    val office: String,
     val color: Int,
-    val location: ContactInfoData,
+    val location: ContactInfoData?,
 )

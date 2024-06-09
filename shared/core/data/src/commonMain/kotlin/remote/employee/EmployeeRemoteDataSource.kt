@@ -21,6 +21,7 @@ import dev.gitlive.firebase.firestore.where
 import exceptions.FirebaseUserException
 import functional.UID
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import models.users.EmployeeDetailsData
@@ -61,6 +62,7 @@ interface EmployeeRemoteDataSource {
 
         override suspend fun fetchEmployeeById(uid: UID, targetUser: UID): Flow<EmployeeDetailsData?> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (uid.isEmpty()) return flowOf(null)
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.EMPLOYEE).document(uid)

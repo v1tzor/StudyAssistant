@@ -16,15 +16,23 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.Surface
-import androidx.compose.material.TopAppBar
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -39,16 +47,15 @@ import views.TopAppBarTitle
  * @author Stanislav Aleshin on 02.06.2024.
  */
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 internal fun ClassEditorTopBar(
     modifier: Modifier = Modifier,
     enabledSave: Boolean,
+    isLoading: Boolean,
     onSaveClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     Column {
-        Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
-            Box(modifier = Modifier.fillMaxWidth().statusBarsPadding())
-        }
         TopAppBar(
             modifier = modifier,
             title = {
@@ -73,8 +80,21 @@ internal fun ClassEditorTopBar(
                     onClick = onSaveClick,
                 )
             },
-            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
-            elevation = 0.dp,
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
         )
+        AnimatedContent(
+            targetState = isLoading,
+            transitionSpec = {
+                (fadeIn() + expandVertically()).togetherWith(exit = fadeOut() + shrinkVertically())
+            }
+        ) { loading ->
+            if (loading) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            } else {
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+        }
     }
 }

@@ -63,6 +63,7 @@ internal fun SetupContent(
     onSaveOrganization: () -> Unit,
     onSaveCalendar: () -> Unit,
     onFillOutSchedule: () -> Unit,
+    onStartUsing: () -> Unit,
 ) = with(state) {
     Column(
         modifier = modifier,
@@ -117,24 +118,37 @@ internal fun SetupContent(
                 }
             }
         }
-        // TODO: Make button for navigate to schedule screen
-        NavigationPageButton(
-            modifier = Modifier.padding(
-                start = 24.dp,
-                end = 24.dp,
-                bottom = 36.dp,
-                top = 16.dp
-            ),
-            navigationLabel = currentPage.buttonLabel,
-            onClick = {
-                when (currentPage) {
-                    SetupPage.PROFILE -> onSaveProfile()
-                    SetupPage.ORGANIZATION -> onSaveOrganization()
-                    SetupPage.CALENDAR -> onSaveCalendar()
-                    SetupPage.SCHEDULE -> onFillOutSchedule()
+        Column(
+            modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 36.dp, top = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            when (currentPage) {
+                SetupPage.PROFILE -> NavigationPageButton(
+                    onClick = onSaveProfile,
+                    navigationLabel = currentPage.buttonLabel,
+                )
+                SetupPage.ORGANIZATION -> NavigationPageButton(
+                    onClick = onSaveOrganization,
+                    navigationLabel = currentPage.buttonLabel,
+                )
+                SetupPage.CALENDAR -> NavigationPageButton(
+                    onClick = onSaveCalendar,
+                    navigationLabel = currentPage.buttonLabel,
+                )
+                SetupPage.SCHEDULE -> {
+                    NavigationPageButton(
+                        onClick = onFillOutSchedule,
+                        navigationLabel = currentPage.buttonLabel,
+                    )
+                    NavigationPageButton(
+                        enabled = state.isFillOutSchedule,
+                        onClick = onStartUsing,
+                        navigationLabel = PreviewThemeRes.strings.scheduleStartButtonLabel,
+                        isTonal = true,
+                    )
                 }
-            },
-        )
+            }
+        }
     }
 }
 

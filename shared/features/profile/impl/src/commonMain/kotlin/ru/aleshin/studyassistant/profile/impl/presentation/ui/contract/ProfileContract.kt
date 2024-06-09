@@ -21,6 +21,7 @@ import architecture.screenmodel.contract.BaseEvent
 import architecture.screenmodel.contract.BaseUiEffect
 import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
+import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 import ru.aleshin.studyassistant.profile.impl.presentation.models.AppUserUi
 import ru.aleshin.studyassistant.profile.impl.presentation.models.FriendRequestsUi
@@ -28,6 +29,7 @@ import ru.aleshin.studyassistant.profile.impl.presentation.models.FriendRequests
 /**
  * @author Stanislav Aleshin on 21.04.2024
  */
+@Parcelize
 internal data class ProfileViewState(
     val myProfile: AppUserUi? = null,
     val myFriendRequest: FriendRequestsUi? = null,

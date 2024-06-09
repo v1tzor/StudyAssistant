@@ -100,6 +100,11 @@ internal class SetupScreenModel(
             is SetupEvent.NavigateToScheduleEditor -> {
                 val screen = screenProvider.provideEditorScreen(EditorScreen.Schedule)
                 sendEffect(SetupEffect.ReplaceGlobalScreen(screen))
+                sendAction(SetupAction.UpdateFillOutSchedule(isFillOut = true))
+            }
+            is SetupEvent.NavigateToSchedule -> {
+                val screen = screenProvider.provideTabNavigationScreen()
+                sendEffect(SetupEffect.ReplaceGlobalScreen(screen))
             }
             is SetupEvent.NavigateToBackPage -> with(state()) {
                 sendAction(SetupAction.UpdatePage(SetupPage.previousPage(currentPage)))
@@ -127,6 +132,9 @@ internal class SetupScreenModel(
         )
         is SetupAction.UpdateCalendarSettings -> currentState.copy(
             calendarSettings = action.calendarSettings,
+        )
+        is SetupAction.UpdateFillOutSchedule -> currentState.copy(
+            isFillOutSchedule = action.isFillOut,
         )
     }
 }

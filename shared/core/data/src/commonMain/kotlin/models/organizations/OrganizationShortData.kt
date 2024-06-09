@@ -32,6 +32,6 @@ data class OrganizationShortData(
     val type: String = OrganizationType.SCHOOL.toString(),
     val avatar: String? = null,
     val locations: List<ContactInfoData> = emptyList(),
-    val offices: List<Int> = emptyList(),
+    val offices: List<String> = emptyList(),
     val scheduleTimeIntervals: ScheduleTimeIntervalsData = ScheduleTimeIntervalsData(),
 )

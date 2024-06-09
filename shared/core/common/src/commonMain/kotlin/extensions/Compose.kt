@@ -15,6 +15,8 @@
 */
 package extensions
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -24,9 +26,9 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
@@ -37,9 +39,13 @@ import functional.Constants
  * @author Stanislav Aleshin on 12.06.2023.
  */
 @Composable
-fun Modifier.alphaByEnabled(enabled: Boolean, disabledAlpha: Float = 0.6f) = alpha(
-    alpha = if (enabled) 1f else disabledAlpha,
-)
+fun Modifier.alphaByEnabled(enabled: Boolean, disabledAlpha: Float = 0.6f): Modifier {
+    val value by animateFloatAsState(
+        targetValue = if (enabled) 1f else disabledAlpha,
+        animationSpec = tween(),
+    )
+    return alpha(alpha = value)
+}
 
 fun LazyGridScope.emptyItem(modifier: Modifier = Modifier) {
     item { Spacer(modifier = modifier.fillMaxWidth()) }

@@ -21,6 +21,7 @@ import architecture.screenmodel.contract.BaseEvent
 import architecture.screenmodel.contract.BaseUiEffect
 import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
+import dev.icerock.moko.parcelize.Parcelize
 import functional.UID
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 import ru.aleshin.studyassistant.preview.impl.presentation.models.AppUserUi
@@ -31,12 +32,13 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupP
 /**
  * @author Stanislav Aleshin on 17.04.2024
  */
+@Parcelize
 internal data class SetupViewState(
-    // TODO: Not serializable
     val currentPage: SetupPage = SetupPage.PROFILE,
     val profile: AppUserUi? = null,
     val organization: OrganizationUi? = null,
     val calendarSettings: CalendarSettingsUi? = null,
+    val isFillOutSchedule: Boolean = false,
 ) : BaseViewState
 
 internal sealed class SetupEvent : BaseEvent {
@@ -49,6 +51,7 @@ internal sealed class SetupEvent : BaseEvent {
     data object SaveOrganizationInfo : SetupEvent()
     data object SaveCalendarInfo : SetupEvent()
     data object NavigateToScheduleEditor : SetupEvent()
+    data object NavigateToSchedule : SetupEvent()
 }
 
 internal sealed class SetupEffect : BaseUiEffect {
@@ -58,8 +61,13 @@ internal sealed class SetupEffect : BaseUiEffect {
 
 internal sealed class SetupAction : BaseAction {
     data class UpdatePage(val page: SetupPage) : SetupAction()
-    data class UpdateAll(val profile: AppUserUi, val organization: OrganizationUi,  val calendarSettings: CalendarSettingsUi) : SetupAction()
+    data class UpdateAll(
+        val profile: AppUserUi,
+        val organization: OrganizationUi,
+        val calendarSettings: CalendarSettingsUi
+    ) : SetupAction()
     data class UpdateProfileInfo(val profile: AppUserUi) : SetupAction()
     data class UpdateOrganizationInfo(val organization: OrganizationUi) : SetupAction()
-    data class UpdateCalendarSettings( val calendarSettings: CalendarSettingsUi) : SetupAction()
+    data class UpdateCalendarSettings(val calendarSettings: CalendarSettingsUi) : SetupAction()
+    data class UpdateFillOutSchedule(val isFillOut: Boolean) : SetupAction()
 }

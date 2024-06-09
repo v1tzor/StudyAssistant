@@ -16,17 +16,22 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.models
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
+import dev.icerock.moko.parcelize.TypeParceler
 import entities.organizations.Millis
 import kotlinx.datetime.Instant
-import platform.JavaSerializable
+import platform.NullInstantParceler
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
  */
+@Parcelize
 internal data class ScheduleTimeIntervalsUi(
+    @TypeParceler<Instant?, NullInstantParceler>
     val firstClassTime: Instant? = null,
     val baseClassDuration: Millis? = null,
     val baseBreakDuration: Millis? = null,
     val specificClassDuration: List<NumberedDurationUi> = emptyList(),
     val specificBreakDuration: List<NumberedDurationUi> = emptyList(),
-) : JavaSerializable
+) : Parcelable

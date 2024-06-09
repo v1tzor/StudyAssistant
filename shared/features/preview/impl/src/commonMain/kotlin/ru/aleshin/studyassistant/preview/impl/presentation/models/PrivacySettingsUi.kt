@@ -16,14 +16,16 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.models
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import entities.settings.AccessType
-import platform.JavaSerializable
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
+@Parcelize
 internal data class PrivacySettingsUi(
     val isPrivateProfile: Boolean = false,
     val showBirthday: AccessType = AccessType.FRIENDS,
     val showCity: AccessType = AccessType.FRIENDS,
-) : JavaSerializable
+) : Parcelable

@@ -16,13 +16,15 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.models
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import entities.organizations.OrganizationType
 import functional.UID
-import platform.JavaSerializable
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
  */
+@Parcelize
 internal data class OrganizationUi(
     val uid: UID,
     val isMain: Boolean,
@@ -37,9 +39,9 @@ internal data class OrganizationUi(
     val phones: List<ContactInfoUi> = emptyList(),
     val locations: List<ContactInfoUi> = emptyList(),
     val webs: List<ContactInfoUi> = emptyList(),
-    val offices: List<Int> = emptyList(),
+    val offices: List<String> = emptyList(),
     val isHide: Boolean = false,
-) : JavaSerializable {
+) : Parcelable {
     companion object {
         fun createMainOrganization() = OrganizationUi("", true, "")
     }

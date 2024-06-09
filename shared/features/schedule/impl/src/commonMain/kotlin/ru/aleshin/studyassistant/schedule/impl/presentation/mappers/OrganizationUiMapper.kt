@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
 import entities.organizations.OrganizationShort
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.OrganizationShortUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
@@ -29,6 +29,7 @@ internal fun OrganizationShort.mapToUi() = OrganizationShortUi(
     type = type,
     locations = locations.map { it.mapToUi() },
     offices = offices,
+    avatar = avatar,
     scheduleTimeIntervals = scheduleTimeIntervals.mapToUi(),
 )
 
@@ -39,5 +40,6 @@ internal fun OrganizationShortUi.mapToDomain() = OrganizationShort(
     type = type,
     locations = locations.map { it.mapToDomain() },
     offices = offices,
+    avatar = avatar,
     scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
 )

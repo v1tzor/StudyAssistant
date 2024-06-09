@@ -42,8 +42,8 @@ import kotlinx.datetime.DayOfWeek
 import mappers.mapToSting
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.editor.impl.presentation.models.BaseScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.ClassUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.CommonClassView
 import theme.StudyAssistantRes

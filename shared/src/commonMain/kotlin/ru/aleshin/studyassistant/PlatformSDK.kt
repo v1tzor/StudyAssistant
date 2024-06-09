@@ -18,6 +18,8 @@ package ru.aleshin.studyassistant
 
 import com.mmk.kmpauth.google.GoogleAuthCredentials
 import com.mmk.kmpauth.google.GoogleAuthProvider
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.firestore.firestore
 import di.coreDataModule
 import di.coreDatabaseModule
 import di.coreModule
@@ -50,7 +52,8 @@ object PlatformSDK {
                 domainModule,
             )
         }
-        MainDependenciesGraph.initialize(graph.direct)
+        Firebase.firestore.setSettings(persistenceEnabled = true)
         GoogleAuthProvider.create(credentials = GoogleAuthCredentials(serverId = WEB_CLIENT_ID))
+        MainDependenciesGraph.initialize(graph.direct)
     }
 }

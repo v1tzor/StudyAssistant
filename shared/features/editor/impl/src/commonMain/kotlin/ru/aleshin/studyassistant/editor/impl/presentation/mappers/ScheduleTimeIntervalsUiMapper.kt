@@ -18,8 +18,8 @@ package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
 import entities.organizations.NumberedDuration
 import entities.organizations.ScheduleTimeIntervals
-import ru.aleshin.studyassistant.editor.impl.presentation.models.NumberedDurationUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.ScheduleTimeIntervalsUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -29,7 +29,7 @@ internal fun ScheduleTimeIntervals.mapToUi() = ScheduleTimeIntervalsUi(
     baseClassDuration = baseClassDuration,
     baseBreakDuration = baseBreakDuration,
     specificClassDuration = specificClassDuration.map { it.mapToUi() },
-    specificBreakDuration = specificBreakDuration.map { it.mapToUi() }
+    specificBreakDuration = specificBreakDuration.map { it.mapToUi() },
 )
 
 internal fun NumberedDuration.mapToUi() = NumberedDurationUi(

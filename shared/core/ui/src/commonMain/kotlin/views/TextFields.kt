@@ -19,6 +19,10 @@ package views
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -63,6 +67,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import extensions.alphaByEnabled
 import functional.Constants
 
 /**
@@ -75,8 +80,9 @@ fun InfoTextField(
     value: String?,
     maxLength: Int = Constants.Text.DEFAULT_MAX_TEXT_LENGTH,
     onValueChange: (String) -> Unit,
-    labelText: String,
-    infoIcon: Painter,
+    label: String,
+    leadingInfoIcon: Painter,
+    placeholder: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     prefix: @Composable (() -> Unit)? = null,
     suffix: @Composable (() -> Unit)? = null,
@@ -93,8 +99,8 @@ fun InfoTextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-        disabledBorderColor = MaterialTheme.colorScheme.outline,
+        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
         focusedBorderColor = MaterialTheme.colorScheme.outline,
         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
     )
@@ -106,8 +112,8 @@ fun InfoTextField(
     ) {
         Icon(
             modifier = Modifier.size(24.dp),
-            painter = infoIcon,
-            contentDescription = labelText,
+            painter = leadingInfoIcon,
+            contentDescription = label,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         OutlinedTextField(
@@ -121,10 +127,11 @@ fun InfoTextField(
             },
             label = {
                 Text(
-                    text = labelText,
+                    text = label,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
+            placeholder = placeholder,
             textStyle = textStyle,
             trailingIcon = trailingIcon,
             prefix = prefix,
@@ -151,8 +158,9 @@ fun InfoTextField(
     value: TextFieldValue,
     maxLength: Int = Constants.Text.DEFAULT_MAX_TEXT_LENGTH,
     onValueChange: (TextFieldValue) -> Unit,
-    labelText: String,
-    infoIcon: Painter,
+    label: String,
+    leadingInfoIcon: Painter,
+    placeholder: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     prefix: @Composable (() -> Unit)? = null,
     suffix: @Composable (() -> Unit)? = null,
@@ -169,8 +177,8 @@ fun InfoTextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-        disabledBorderColor = MaterialTheme.colorScheme.outline,
+        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
         focusedBorderColor = MaterialTheme.colorScheme.outline,
         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
     )
@@ -182,8 +190,8 @@ fun InfoTextField(
     ) {
         Icon(
             modifier = Modifier.size(24.dp),
-            painter = infoIcon,
-            contentDescription = labelText,
+            painter = leadingInfoIcon,
+            contentDescription = label,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         OutlinedTextField(
@@ -197,10 +205,11 @@ fun InfoTextField(
             },
             label = {
                 Text(
-                    text = labelText,
+                    text = label,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
+            placeholder = placeholder,
             textStyle = textStyle,
             trailingIcon = trailingIcon,
             prefix = prefix,
@@ -247,8 +256,8 @@ fun VerticalInfoTextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-        disabledBorderColor = MaterialTheme.colorScheme.outline,
+        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
         focusedBorderColor = MaterialTheme.colorScheme.outline,
         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
     )
@@ -331,8 +340,8 @@ fun VerticalInfoTextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-        disabledBorderColor = MaterialTheme.colorScheme.outline,
+        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
         focusedBorderColor = MaterialTheme.colorScheme.outline,
         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
     )
@@ -396,14 +405,15 @@ fun ClickableInfoTextField(
     value: String?,
     label: String?,
     placeholder: String,
-    leadingInfoIcon: Painter,
+    infoIcon: Painter,
+    leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     paddingValues: PaddingValues = PaddingValues(),
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     borderColor: Color = MaterialTheme.colorScheme.outline,
-    containerColor: Color = MaterialTheme.colorScheme.background,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
@@ -419,7 +429,7 @@ fun ClickableInfoTextField(
         ) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = leadingInfoIcon,
+                painter = infoIcon,
                 contentDescription = label,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -427,10 +437,10 @@ fun ClickableInfoTextField(
         Box(modifier = modifier.padding(top = if (label != null) 5.dp else 0.dp)) {
             Surface(
                 onClick = onClick,
-                modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 56.dp),
+                modifier = Modifier.alphaByEnabled(enabled).fillMaxWidth().sizeIn(minHeight = 56.dp),
                 enabled = enabled,
                 shape = MaterialTheme.shapes.large,
-                color = containerColor,
+                color = Color.Transparent,
                 border = BorderStroke(
                     width = 1.dp,
                     color = if (isError) MaterialTheme.colorScheme.error else borderColor
@@ -439,7 +449,7 @@ fun ClickableInfoTextField(
             ) {
                 Row(
                     modifier = Modifier.padding(
-                        start = 16.dp,
+                        start = if (leadingIcon != null) 8.dp else 16.dp,
                         top = 12.dp,
                         end = if (trailingIcon != null) 8.dp else 16.dp,
                         bottom = 12.dp,
@@ -447,14 +457,20 @@ fun ClickableInfoTextField(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    if (leadingIcon != null) {
+                        Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
+                            leadingIcon.invoke()
+                        }
+                    }
                     AnimatedContent(
+                        targetState = value != null,
                         modifier = Modifier.weight(1f),
-                        targetState = value,
-                    ) { textValue ->
-                        if (textValue != null) {
+                        transitionSpec = { fadeIn(tween()).togetherWith(fadeOut(tween())) },
+                    ) { isShowValue ->
+                        if (isShowValue && value != null) {
                             Text(
                                 modifier = Modifier.weight(1f),
-                                text = textValue,
+                                text = value,
                                 color = textColor,
                                 maxLines = if (singleLine) 1 else maxLines,
                                 minLines = minLines,
@@ -482,7 +498,7 @@ fun ClickableInfoTextField(
             Surface(
                 modifier = Modifier.offset(x = 16.dp, y = (-8).dp),
                 shape = MaterialTheme.shapes.medium,
-                color = containerColor,
+                color = backgroundColor,
             ) {
                 if (label != null) {
                     Text(
@@ -515,7 +531,7 @@ fun ClickableTextField(
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     borderColor: Color = MaterialTheme.colorScheme.outline,
-    containerColor: Color = MaterialTheme.colorScheme.background,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
@@ -524,10 +540,10 @@ fun ClickableTextField(
     Box(modifier = modifier.animateContentSize().padding(top = if (label != null) 5.dp else 0.dp)) {
         Surface(
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 56.dp),
+            modifier = Modifier.alphaByEnabled(enabled).fillMaxWidth().sizeIn(minHeight = 56.dp),
             enabled = enabled,
             shape = MaterialTheme.shapes.large,
-            color = containerColor,
+            color = Color.Transparent,
             border = BorderStroke(
                 width = 1.dp,
                 color = if (isError) MaterialTheme.colorScheme.error else borderColor
@@ -550,13 +566,14 @@ fun ClickableTextField(
                     }
                 }
                 AnimatedContent(
+                    targetState = value != null,
                     modifier = Modifier.weight(1f),
-                    targetState = value,
-                ) { textValue ->
-                    if (textValue != null) {
+                    transitionSpec = { fadeIn(tween()).togetherWith(fadeOut(tween())) },
+                ) { isShowValue ->
+                    if (isShowValue && value != null) {
                         Text(
                             modifier = Modifier.weight(1f),
-                            text = textValue,
+                            text = value,
                             color = textColor,
                             maxLines = if (singleLine) 1 else maxLines,
                             minLines = minLines,
@@ -585,7 +602,7 @@ fun ClickableTextField(
             Surface(
                 modifier = Modifier.offset(x = 16.dp, y = (-8).dp),
                 shape = MaterialTheme.shapes.medium,
-                color = containerColor,
+                color = backgroundColor,
             ) {
                 Text(
                     modifier = Modifier.padding(horizontal = 4.dp),

@@ -17,8 +17,10 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract
 
 import architecture.screenmodel.ScreenDependencies
+import dev.icerock.moko.parcelize.Parcelize
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.
  */
+@Parcelize
 internal data class SetupDeps(val createdUserId: String) : ScreenDependencies

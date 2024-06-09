@@ -21,6 +21,7 @@ import architecture.screenmodel.contract.BaseEvent
 import architecture.screenmodel.contract.BaseUiEffect
 import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
+import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.auth.impl.presentation.models.EmailValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.models.LoginCredentialsUi
@@ -29,6 +30,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.models.PasswordValidErro
 /**
  * @author Stanislav Aleshin on 16.04.2024
  */
+@Parcelize
 internal data class LoginViewState(
     val isLoading: Boolean = false,
     val emailValidError: EmailValidError? = null,

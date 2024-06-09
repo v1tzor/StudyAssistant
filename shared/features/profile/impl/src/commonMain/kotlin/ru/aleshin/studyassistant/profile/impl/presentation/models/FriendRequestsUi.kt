@@ -16,14 +16,16 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.models
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import functional.UID
-import platform.JavaSerializable
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
+@Parcelize
 internal data class FriendRequestsUi(
     val received: List<UID> = emptyList(),
     val send: List<UID> = emptyList(),
     val lastAccepted: List<UID> = emptyList(),
-) : JavaSerializable
+) : Parcelable

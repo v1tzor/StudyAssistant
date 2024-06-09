@@ -16,12 +16,13 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.ui.views
 
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.profile.impl.presentation.theme.ProfileThemeRes
@@ -32,7 +33,7 @@ import views.TopAppBarTitle
  * @author Stanislav Aleshin on 21.04.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 internal fun ProfileTopBar(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -63,7 +64,8 @@ internal fun ProfileTopBar(
                 onButtonClick = onEditClick,
             )
         },
-        backgroundColor = MaterialTheme.colorScheme.background,
-        elevation = 0.dp,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        ),
     )
 }

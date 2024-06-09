@@ -16,14 +16,18 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.models
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
+import dev.icerock.moko.parcelize.TypeParceler
 import entities.employee.EmployeePost
 import functional.UID
 import kotlinx.datetime.Instant
-import platform.JavaSerializable
+import platform.NullInstantParceler
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
+@Parcelize
 internal data class EmployeeUi(
     val uid: UID,
     val organizationId: UID,
@@ -33,10 +37,12 @@ internal data class EmployeeUi(
     val post: EmployeePost,
     val avatar: String? = null,
     val birthday: String? = null,
+    @TypeParceler<Instant?, NullInstantParceler>
     val workTimeStart: Instant? = null,
+    @TypeParceler<Instant?, NullInstantParceler>
     val workTimeEnd: Instant? = null,
     val emails: List<ContactInfoUi> = emptyList(),
     val phones: List<ContactInfoUi> = emptyList(),
     val locations: List<ContactInfoUi> = emptyList(),
     val webs: List<ContactInfoUi> = emptyList(),
-) : JavaSerializable
+) : Parcelable

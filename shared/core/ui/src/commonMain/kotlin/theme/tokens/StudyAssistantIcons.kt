@@ -19,17 +19,23 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.core.ui.generated.resources.Res
+import studyassistant.shared.core.ui.generated.resources.ic_birthday
 import studyassistant.shared.core.ui.generated.resources.ic_clock_outline
 import studyassistant.shared.core.ui.generated.resources.ic_duration
+import studyassistant.shared.core.ui.generated.resources.ic_email
 import studyassistant.shared.core.ui.generated.resources.ic_organization_geo
 import studyassistant.shared.core.ui.generated.resources.ic_organization_geo_outline
+import studyassistant.shared.core.ui.generated.resources.ic_phone
 import studyassistant.shared.core.ui.generated.resources.ic_profile
 import studyassistant.shared.core.ui.generated.resources.ic_profile_outline
+import studyassistant.shared.core.ui.generated.resources.ic_select_date
 import studyassistant.shared.core.ui.generated.resources.ic_study
 import studyassistant.shared.core.ui.generated.resources.ic_study_assistant
 import studyassistant.shared.core.ui.generated.resources.ic_study_outline
 import studyassistant.shared.core.ui.generated.resources.ic_tasks
 import studyassistant.shared.core.ui.generated.resources.ic_tasks_outline
+import studyassistant.shared.core.ui.generated.resources.ic_upload_circular
+import studyassistant.shared.core.ui.generated.resources.ic_web
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
@@ -48,6 +54,12 @@ data class StudyAssistantIcons(
     val timeOutline: DrawableResource,
     val duration: DrawableResource,
     val organizationGeo: DrawableResource,
+    val upload: DrawableResource,
+    val birthday: DrawableResource,
+    val email: DrawableResource,
+    val phone: DrawableResource,
+    val website: DrawableResource,
+    val selectDate: DrawableResource,
 ) {
     companion object {
         val BASE = StudyAssistantIcons(
@@ -63,6 +75,12 @@ data class StudyAssistantIcons(
             timeOutline = Res.drawable.ic_clock_outline,
             duration = Res.drawable.ic_duration,
             organizationGeo = Res.drawable.ic_organization_geo,
+            upload = Res.drawable.ic_upload_circular,
+            birthday = Res.drawable.ic_birthday,
+            email = Res.drawable.ic_email,
+            phone = Res.drawable.ic_phone,
+            website = Res.drawable.ic_web,
+            selectDate = Res.drawable.ic_select_date,
         )
     }
 }

@@ -16,20 +16,59 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
+import entities.organizations.Organization
 import entities.organizations.OrganizationShort
-import ru.aleshin.studyassistant.editor.impl.presentation.models.OrganizationShortUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationUi
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
+internal fun Organization.mapToUi() = OrganizationUi(
+    uid = uid,
+    isMain = isMain,
+    shortName = shortName,
+    fullName = fullName,
+    type = type,
+    avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToUi(),
+    subjects = subjects.map { it.mapToUi() },
+    employee = employee.map { it.mapToUi() },
+    emails = emails.map { it.mapToUi() },
+    phones = phones.map { it.mapToUi() },
+    locations = locations.map { it.mapToUi() },
+    webs = webs.map { it.mapToUi() },
+    offices = offices,
+    isHide = isHide,
+)
+
 internal fun OrganizationShort.mapToUi() = OrganizationShortUi(
     uid = uid,
     isMain = isMain,
     shortName = shortName,
     type = type,
     locations = locations.map { it.mapToUi() },
+    avatar = avatar,
     offices = offices,
     scheduleTimeIntervals = scheduleTimeIntervals.mapToUi(),
+)
+
+internal fun OrganizationUi.mapToDomain() = Organization(
+    uid = uid,
+    isMain = isMain,
+    shortName = shortName,
+    fullName = fullName,
+    type = type,
+    avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
+    subjects = subjects.map { it.mapToDomain() },
+    employee = employee.map { it.mapToDomain() },
+    emails = emails.map { it.mapToDomain() },
+    phones = phones.map { it.mapToDomain() },
+    locations = locations.map { it.mapToDomain() },
+    webs = webs.map { it.mapToDomain() },
+    offices = offices,
+    isHide = isHide,
 )
 
 internal fun OrganizationShortUi.mapToDomain() = OrganizationShort(
@@ -39,5 +78,6 @@ internal fun OrganizationShortUi.mapToDomain() = OrganizationShort(
     type = type,
     locations = locations.map { it.mapToDomain() },
     offices = offices,
+    avatar = avatar,
     scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
 )

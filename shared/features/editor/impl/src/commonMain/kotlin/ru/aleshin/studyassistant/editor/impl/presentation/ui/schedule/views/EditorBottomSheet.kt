@@ -55,11 +55,11 @@ import entities.common.NumberOfRepeatWeek
 import mappers.toMinutesOrHoursTitle
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.editor.impl.presentation.models.BaseWeekScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.NumberOfWeekItem
-import ru.aleshin.studyassistant.editor.impl.presentation.models.OrganizationShortUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.ScheduleTimeIntervalsUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.toItem
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseWeekScheduleUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.NumberOfWeekItem
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.toItem
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import theme.StudyAssistantRes
 import views.PlaceholderBox
@@ -204,11 +204,15 @@ internal fun EditorBottomSheetContent(
                 )
             },
         ) { loading ->
-            if (!loading) {
-                LazyRow(
-                    modifier = Modifier.height(126.dp).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(24.dp),
-                ) {
+            LazyRow(
+                modifier = Modifier.height(126.dp).fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                if (loading) {
+                    items(3) {
+                        ScheduleTimeIntervalsItemPlaceholder()
+                    }
+                } else if (organizations.isNotEmpty()) {
                     items(organizations) { organization ->
                         ScheduleTimeIntervalsItem(
                             organization = organization.shortName,
@@ -219,6 +223,8 @@ internal fun EditorBottomSheetContent(
                             },
                         )
                     }
+                } else {
+                    // TODO: Show add organization item
                 }
             }
         }
@@ -291,10 +297,7 @@ internal fun ScheduleTimeIntervalsItem(
                         )
                         Text(
                             text = buildAnnotatedString {
-                                append(
-                                    minDuration?.toMinutesOrHoursTitle()
-                                        ?: StudyAssistantRes.strings.noneTitle
-                                )
+                                append(minDuration?.toMinutesOrHoursTitle() ?: StudyAssistantRes.strings.noneTitle)
                                 if (maxDuration != null) append(" - " + maxDuration.toMinutesOrHoursTitle())
                             },
                             color = MaterialTheme.colorScheme.onSurface,
@@ -322,10 +325,7 @@ internal fun ScheduleTimeIntervalsItem(
                         )
                         Text(
                             text = buildAnnotatedString {
-                                append(
-                                    minDuration?.toMinutesOrHoursTitle()
-                                        ?: StudyAssistantRes.strings.noneTitle
-                                )
+                                append(minDuration?.toMinutesOrHoursTitle() ?: StudyAssistantRes.strings.noneTitle)
                                 if (maxDuration != null) append(" - " + maxDuration.toMinutesOrHoursTitle())
                             },
                             color = MaterialTheme.colorScheme.onSurface,
@@ -336,6 +336,17 @@ internal fun ScheduleTimeIntervalsItem(
             }
         }
     }
+}
+
+@Composable
+internal fun ScheduleTimeIntervalsItemPlaceholder(
+    modifier: Modifier = Modifier,
+) {
+    PlaceholderBox(
+        modifier = modifier.size(200.dp, 126.dp),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+    )
 }
 
 @Composable

@@ -17,13 +17,14 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views
 
 import androidx.compose.runtime.Composable
-import platform.JavaSerializable
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.IntroPage
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
  */
+@Parcelize
 internal enum class SetupPage : SetupPageData {
     PROFILE {
         override val id get() = 0
@@ -43,7 +44,7 @@ internal enum class SetupPage : SetupPageData {
     SCHEDULE {
         override val id get() = 3
         override val stepTitle @Composable get() = PreviewThemeRes.strings.scheduleStepTitle
-        override val buttonLabel @Composable get() = PreviewThemeRes.strings.scheduleButtonLabel
+        override val buttonLabel @Composable get() = PreviewThemeRes.strings.scheduleFillOutButtonLabel
     };
 
     fun progress(): Float {
@@ -56,7 +57,7 @@ internal enum class SetupPage : SetupPageData {
     }
 }
 
-interface SetupPageData : JavaSerializable {
+interface SetupPageData : Parcelable {
     val id: Int
     val stepTitle: String @Composable get
     val buttonLabel: String @Composable get

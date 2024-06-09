@@ -88,7 +88,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                     }
                 }
                 val testScreen = screenProvider.provideEditorScreen(EditorScreen.Schedule)
-                return@delayedAction EffectResult(MainEffect.ReplaceGlobalScreen(testScreen))
+                return@delayedAction EffectResult(MainEffect.ReplaceGlobalScreen(targetScreen))
             }
             emit(result)
         }

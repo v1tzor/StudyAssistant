@@ -30,7 +30,7 @@ internal fun Subject.mapToUi() = SubjectUi(
     teacher = teacher?.mapToUi(),
     office = office,
     color = color,
-    location = location.mapToUi(),
+    location = location?.mapToUi(),
 )
 
 internal fun SubjectUi.mapToDomain() = Subject(
@@ -41,5 +41,5 @@ internal fun SubjectUi.mapToDomain() = Subject(
     teacher = teacher?.mapToDomain(),
     office = office,
     color = color,
-    location = location.mapToDomain(),
+    location = location?.mapToDomain(),
 )

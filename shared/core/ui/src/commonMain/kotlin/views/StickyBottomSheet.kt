@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,6 +43,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,9 +75,9 @@ fun StickyBottomSheet(
     tonalElevation: Dp = 0.dp,
     shadowElevation: Dp = 0.dp,
 ) {
-    var headerHeight by remember { mutableIntStateOf(0) }
-    var footerHeight by remember { mutableIntStateOf(0) }
-    var sheetOffset by remember { mutableFloatStateOf(0f) }
+    var headerHeight by rememberSaveable { mutableIntStateOf(0) }
+    var footerHeight by rememberSaveable { mutableIntStateOf(0) }
+    var sheetOffset by rememberSaveable { mutableFloatStateOf(0f) }
 
     Surface(
         modifier = modifier,

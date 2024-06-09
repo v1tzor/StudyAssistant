@@ -16,17 +16,18 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.models
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import entities.auth.AuthCredentials
-import platform.JavaSerializable
-
 
 /**
  * @author Stanislav Aleshin on 04.07.2023.
  */
+@Parcelize
 internal data class LoginCredentialsUi(
     val email: String = "",
     val password: String = "",
-) : JavaSerializable {
+) : Parcelable {
     fun mapToDomain() = AuthCredentials(
         username = null,
         email = email,

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.compose)
+    alias(libs.plugins.parcelize)
 }
 
 kotlin {
@@ -46,6 +47,7 @@ kotlin {
             api(project(":shared:core:ui"))
 
             implementation(compose.components.resources)
+            implementation(libs.firebase.firestore)
             implementation(libs.google.auth)
         }
         iosMain.dependencies {

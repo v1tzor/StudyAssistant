@@ -16,11 +16,13 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.models
 
+import dev.icerock.moko.parcelize.Parcelize
 import validation.ValidateError
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.
  */
+@Parcelize
 internal sealed class EmailValidError : ValidateError {
     data object EmailFormat : EmailValidError()
 }

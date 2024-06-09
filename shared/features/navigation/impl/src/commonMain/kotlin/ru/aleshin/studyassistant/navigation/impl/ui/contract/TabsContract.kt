@@ -20,11 +20,13 @@ import architecture.screenmodel.contract.BaseEvent
 import architecture.screenmodel.contract.BaseUiEffect
 import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
+import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.navigation.impl.ui.views.TabsBottomBarItems
 
 /**
  * @author Stanislav Aleshin on 18.02.2023.
  */
+@Parcelize
 internal data class TabsViewState(
     val bottomBarItem: TabsBottomBarItems = TabsBottomBarItems.SCHEDULE,
 ) : BaseViewState

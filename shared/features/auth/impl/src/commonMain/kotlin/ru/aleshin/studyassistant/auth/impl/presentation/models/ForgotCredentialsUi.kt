@@ -16,14 +16,16 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.models
 
-import platform.JavaSerializable
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import entities.auth.ForgotCredentials
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.
  */
+@Parcelize
 internal data class ForgotCredentialsUi(
     val email: String = "",
-) : JavaSerializable {
+) : Parcelable {
     fun mapToDomain() = ForgotCredentials(email = email)
 }

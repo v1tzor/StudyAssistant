@@ -35,8 +35,8 @@ data class Class(
     val subject: Subject?,
     val customData: String? = null,
     val teacher: Employee?,
-    val office: Int,
-    val location: ContactInfo,
+    val office: String,
+    val location: ContactInfo?,
     val timeRange: TimeRange,
     val notification: Boolean = false,
 )

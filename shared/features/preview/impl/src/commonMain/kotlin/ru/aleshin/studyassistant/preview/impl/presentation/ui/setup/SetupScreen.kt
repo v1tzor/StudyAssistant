@@ -71,6 +71,7 @@ internal class SetupScreen(private val createdUser: UID) : Screen {
                         onSaveOrganization = { dispatchEvent(SetupEvent.SaveOrganizationInfo) },
                         onSaveCalendar = { dispatchEvent(SetupEvent.SaveCalendarInfo) },
                         onFillOutSchedule = { dispatchEvent(SetupEvent.NavigateToScheduleEditor) },
+                        onStartUsing = { dispatchEvent(SetupEvent.NavigateToSchedule) },
                     )
                 }
             },

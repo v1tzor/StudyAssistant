@@ -20,9 +20,14 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleFeatureStarterImpl
 import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleScreenProvider
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel.DetailsEffectCommunicator
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel.DetailsScreenModel
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel.DetailsStateCommunicator
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel.DetailsWorkProcessor
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation.NavigationScreenModel
 
@@ -34,5 +39,10 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<NavigationScreen> { NavigationScreen() }
 
     bindProvider<ScheduleFeatureStarter> { ScheduleFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<ScheduleScreenProvider> { ScheduleScreenProvider.Base() }
+    bindProvider<ScheduleScreenProvider> { ScheduleScreenProvider.Base(instance<() -> EditorFeatureStarter>()) }
+
+    bindProvider<DetailsStateCommunicator> { DetailsStateCommunicator.Base() }
+    bindProvider<DetailsEffectCommunicator> { DetailsEffectCommunicator.Base() }
+    bindProvider<DetailsWorkProcessor> { DetailsWorkProcessor.Base(instance()) }
+    bindProvider<DetailsScreenModel> { DetailsScreenModel(instance(), instance(), instance(), instance(), instance()) }
 }

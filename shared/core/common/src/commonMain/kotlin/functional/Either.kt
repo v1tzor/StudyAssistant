@@ -31,6 +31,24 @@ sealed class Either<out L, out R> {
     val isLeft = this is Left
 
     val isRight = this is Right
+
+    fun <LT, RT> map(
+        leftMapper: (L) -> LT,
+        rightMapper: (R) -> RT,
+    ): Either<LT, RT> = when (this) {
+        is Left -> Left(leftMapper(data))
+        is Right -> Right(rightMapper(this.data))
+    }
+
+    fun <T> mapLeft(mapper: (L) -> T) = map(
+        leftMapper = mapper,
+        rightMapper = { it },
+    )
+
+    fun <T> mapRight(mapper: (R) -> T) = map(
+        leftMapper = { it },
+        rightMapper = mapper,
+    )
 }
 
 fun <L, R> Either<L, R>.rightOrElse(
@@ -41,14 +59,14 @@ fun <L, R> Either<L, R>.rightOrElse(
 }
 
 suspend fun <L, R> Either<L, R>.rightOrNull(
-    onLeftAction: suspend (L) -> Unit,
+    onLeftAction: suspend (L) -> Unit = {},
 ): R? = when (this) {
     is Either.Left -> onLeftAction(this.data).let { null }
     is Either.Right -> this.data
 }
 
 suspend fun <L, R> Flow<Either<L, R>>.firstRightOrNull(
-    onLeftAction: suspend (L) -> Unit,
+    onLeftAction: suspend (L) -> Unit = {},
 ): R? = when (val firstValue = first()) {
     is Either.Left -> onLeftAction(firstValue.data).let { null }
     is Either.Right -> firstValue.data
@@ -62,7 +80,7 @@ fun <L, R> Either<L, R>.leftOrElse(
 }
 
 suspend fun <L, R> Either<L, R>.leftOrNull(
-    onRightAction: suspend (R) -> Unit,
+    onRightAction: suspend (R) -> Unit = {},
 ): L? = when (this) {
     is Either.Left -> this.data
     is Either.Right -> onRightAction(this.data).let { null }
@@ -100,7 +118,6 @@ suspend fun <L, R, T> Flow<Either<L, R>>.firstHandleAndGet(
     is Either.Left -> onLeftAction.invoke(firstValue.data)
     is Either.Right -> onRightAction.invoke(firstValue.data)
 }
-
 
 suspend fun <L, R> Flow<Either<L, R>>.collectAndHandle(
     onLeftAction: suspend (L) -> Unit = {},

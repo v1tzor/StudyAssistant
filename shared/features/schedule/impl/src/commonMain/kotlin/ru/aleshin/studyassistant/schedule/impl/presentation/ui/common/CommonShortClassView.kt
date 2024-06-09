@@ -49,8 +49,8 @@ import extensions.boldWeight
 import extensions.pxToDp
 import functional.TimeRange
 import mappers.format
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.OrganizationShortUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.SubjectUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
 import theme.StudyAssistantRes
 
 /**

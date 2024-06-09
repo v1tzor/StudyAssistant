@@ -30,6 +30,7 @@ data class StudyAssistantStrings(
     val saveConfirmTitle: String,
     val changeConfirmTitle: String,
     val okConfirmTitle: String,
+    val deleteConfirmTitle: String,
     val timePickerDialogHeader: String,
     val datePickerDialogHeader: String,
     val warningDialogTitle: String,
@@ -106,7 +107,10 @@ data class StudyAssistantStrings(
     val postMentor: String,
     val postTutor: String,
     val postManager: String,
-)
+    val notSelectedTitle: String,
+    val avatarDesc: String,
+) {
+}
 
 internal val russianFamelString = StudyAssistantStrings(
     appName = "Study Assistant",
@@ -117,6 +121,7 @@ internal val russianFamelString = StudyAssistantStrings(
     saveConfirmTitle = "Сохранить",
     changeConfirmTitle = "Изменить",
     okConfirmTitle = "ОК",
+    deleteConfirmTitle = "Удалить",
     timePickerDialogHeader = "Выберите время",
     datePickerDialogHeader = "Выберите дату",
     warningDialogTitle = "Предупреждение!",
@@ -193,6 +198,8 @@ internal val russianFamelString = StudyAssistantStrings(
     postMentor = "Наставник",
     postTutor = "Куратор",
     postManager = "Менеджер",
+    notSelectedTitle = "Не выбрано",
+    avatarDesc = "Выбрать фото профиля",
 )
 
 internal val englishFamelString = StudyAssistantStrings(
@@ -204,6 +211,7 @@ internal val englishFamelString = StudyAssistantStrings(
     saveConfirmTitle = "Save",
     changeConfirmTitle = "Change",
     okConfirmTitle = "OK",
+    deleteConfirmTitle = "Delete",
     timePickerDialogHeader = "Selected time",
     datePickerDialogHeader = "Selected date",
     warningDialogTitle = "Warning!",
@@ -280,6 +288,8 @@ internal val englishFamelString = StudyAssistantStrings(
     postMentor = "Mentor",
     postTutor = "Tutor",
     postManager = "Manager",
+    notSelectedTitle = "Not selected",
+    avatarDesc = "Select profile photo",
 )
 
 fun StudyAssistantStrings.monthNames() = MonthNames(

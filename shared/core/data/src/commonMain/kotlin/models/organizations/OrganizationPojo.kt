@@ -37,6 +37,6 @@ data class OrganizationPojo(
     val phones: List<ContactInfoData> = emptyList(),
     val locations: List<ContactInfoData> = emptyList(),
     val webs: List<ContactInfoData> = emptyList(),
-    val offices: List<Int> = emptyList(),
+    val offices: List<String> = emptyList(),
     val hide: Boolean = false,
 )

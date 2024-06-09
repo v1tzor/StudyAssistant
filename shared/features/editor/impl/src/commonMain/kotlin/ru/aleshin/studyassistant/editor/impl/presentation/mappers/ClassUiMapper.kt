@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
 import entities.classes.Class
-import ru.aleshin.studyassistant.editor.impl.presentation.models.ClassUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 
 /**
  * @author Stanislav Aleshin on 30.05.2024.
@@ -31,7 +31,7 @@ internal fun Class.mapToUi() = ClassUi(
     customData = customData,
     teacher = teacher?.mapToUi(),
     office = office,
-    location = location.mapToUi(),
+    location = location?.mapToUi(),
     timeRange = timeRange,
     notification = notification,
 )
@@ -45,7 +45,7 @@ internal fun ClassUi.mapToDomain() = Class(
     customData = customData,
     teacher = teacher?.mapToDomain(),
     office = office,
-    location = location.mapToDomain(),
+    location = location?.mapToDomain(),
     timeRange = timeRange,
     notification = notification,
 )

@@ -15,7 +15,9 @@
 */
 package validation
 
+import dev.icerock.moko.parcelize.Parcelable
+
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
-interface ValidateError
+interface ValidateError : Parcelable

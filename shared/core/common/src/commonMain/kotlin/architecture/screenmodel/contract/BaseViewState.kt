@@ -15,9 +15,9 @@
  */
 package architecture.screenmodel.contract
 
-import platform.JavaSerializable
+import dev.icerock.moko.parcelize.Parcelable
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
-interface BaseViewState : JavaSerializable
+interface BaseViewState : Parcelable

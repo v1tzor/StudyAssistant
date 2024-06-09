@@ -126,6 +126,24 @@ fun darkColorAccents(
     onGreenContainer = onGreenContainer,
 )
 
+enum class CustomColors(val dark: Long, val light: Long) {
+    RED(0xFFDE2419, 0xFFEE5E55),
+    ORANGE(0xFFFF961A, 0xFFDFA96A),
+    YELLOW(0xFFE1CC0F, 0xFFE7DA6B),
+    PISTACHIO(0xFFC5E01C, 0xFFD3E36E),
+    LIME(0xFF89E514, 0xFFB3E672),
+    GREEN(0xFF26E415, 0xFF89F080),
+    EMERALD(0xFF19EF7C, 0xFF8AEFB8),
+    CYAN(0xFF1CE8C3, 0xFF7AEEE7),
+    BLUE(0xFF16AFF1, 0xFF9CD8F1),
+    DARK_BLUE(0xFF3A56EB, 0xFF8B9CF6),
+    INDIGO(0xFF7F37F3, 0xFFB085F7),
+    LAVENDER(0xFFAA2CF6, 0xFFD58FFF),
+    LIGHT_PINK(0xFFF22CF6, 0xFFF179F4),
+    PINK(0xFFF118B4, 0xFFF77DD4),
+    FUCHSIA(0xFFEC1C80, 0xFFF876B4),
+}
+
 @Stable
 @Composable
 fun ColorAccents.contentColorFor(backgroundColor: Color): Color =

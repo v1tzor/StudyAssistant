@@ -31,7 +31,6 @@ data class HomeworkDetailsData(
     val date: Long,
     val subject: SubjectDetailsData? = null,
     val organization: OrganizationShortData,
-    val eventType: String,
     val theoreticalTasks: String = "",
     val practicalTasks: String = "",
     val presentations: String = "",

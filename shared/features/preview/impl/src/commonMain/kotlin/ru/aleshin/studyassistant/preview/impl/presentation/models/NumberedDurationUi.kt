@@ -16,13 +16,15 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.models
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import entities.organizations.Millis
-import platform.JavaSerializable
 
 /**
  * @author Stanislav Aleshin on 17.05.2024.
  */
+@Parcelize
 internal data class NumberedDurationUi(
     val number: Int,
     val duration: Millis,
-) : JavaSerializable
+) : Parcelable

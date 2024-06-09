@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -73,7 +74,7 @@ internal class ScheduleEditorScreen : Screen {
             confirmValueChange = { it != SheetValue.Hidden }
         )
         val scaffoldState = rememberBottomSheetScaffoldState(sheetState, snackbarState)
-        var layoutHeight by remember { mutableIntStateOf(0) }
+        var layoutHeight by rememberSaveable { mutableIntStateOf(0) }
         val navBar = WindowInsets.safeNavigationBarsInPx(LocalDensity.current)
 
         Box(modifier = Modifier.onGloballyPositioned { layoutHeight = it.size.height - navBar }) {
@@ -97,14 +98,14 @@ internal class ScheduleEditorScreen : Screen {
                     ScheduleEditorContent(
                         state = state,
                         modifier = Modifier.padding(paddingValues),
-                        onCreateClass = { schedule, weekDay ->
-                            dispatchEvent(ScheduleEditorEvent.CreateClass(schedule, weekDay))
+                        onCreateClass = { weekDay, schedule ->
+                            dispatchEvent(ScheduleEditorEvent.CreateClass(weekDay, schedule))
                         },
                         onEditClass = { editClass, weekDay ->
                             dispatchEvent(ScheduleEditorEvent.EditClass(editClass, weekDay))
                         },
-                        onDeleteClass = { targetClass ->
-                            dispatchEvent(ScheduleEditorEvent.DeleteClass(targetClass))
+                        onDeleteClass = { uid, schedule ->
+                            dispatchEvent(ScheduleEditorEvent.DeleteClass(uid, schedule))
                         },
                     )
                 },

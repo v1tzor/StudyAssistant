@@ -22,25 +22,22 @@ import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
 import entities.common.NumberOfRepeatWeek
 import extensions.weekTimeRange
+import functional.UID
 import functional.collectAndHandle
 import functional.handle
-import functional.handleAndGet
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import managers.DateManager
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseClassInteractor
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseScheduleInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.CalendarSettingsInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
-import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseScheduleInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.ClassUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.OrganizationShortUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorEffect
 
@@ -61,7 +58,7 @@ internal interface ScheduleEditorWorkProcessor :
             is ScheduleEditorWorkCommand.LoadWeekSchedule -> loadWeekScheduleWork(command.numberOfWeek)
             is ScheduleEditorWorkCommand.LoadOrganizationsData -> loadOrganizationsDataWork()
             is ScheduleEditorWorkCommand.UpdateOrganization -> updateOrganizationWork(command.organization)
-            is ScheduleEditorWorkCommand.DeleteClass -> deleteClassWork(command.targetClass)
+            is ScheduleEditorWorkCommand.DeleteClass -> deleteClassWork(command.uid, command.schedule)
         }
 
         private fun loadWeekScheduleWork(week: NumberOfRepeatWeek) = flow {
@@ -84,23 +81,18 @@ internal interface ScheduleEditorWorkProcessor :
 
         @OptIn(ExperimentalCoroutinesApi::class)
         private fun loadOrganizationsDataWork() = flow {
-            organizationInteractor.fetchAllShortOrganizations().flatMapLatest { organizationsEither ->
-                organizationsEither.handleAndGet(
-                    onLeftAction = { flowOf(EffectResult(ScheduleEditorEffect.ShowError(it))) },
-                    onRightAction = { shortOrganizations ->
-                        settingsInteractor.fetchSettings().map { settingsEither ->
-                            settingsEither.handleAndGet(
-                                onLeftAction = { EffectResult(ScheduleEditorEffect.ShowError(it)) },
-                                onRightAction = { calendarSettings ->
-                                    val organizations = shortOrganizations.map { it.mapToUi() }
-                                    val settings = calendarSettings.mapToUi()
-                                    ActionResult(ScheduleEditorAction.UpdateOrganizationData(organizations, settings))
-                                }
-                            )
-                        }
-                    },
-                )
-            }.collect { result ->
+            val organizationsFlow = organizationInteractor.fetchAllShortOrganizations()
+            val settingsFlow = settingsInteractor.fetchSettings()
+
+            organizationsFlow.flatMapLatestWithResult(
+                secondFlow = settingsFlow,
+                onError = { ScheduleEditorEffect.ShowError(it) },
+                onData = { shortOrganizations, calendarSettings ->
+                    val organizations = shortOrganizations.map { it.mapToUi() }
+                    val settings = calendarSettings.mapToUi()
+                    ScheduleEditorAction.UpdateOrganizationData(organizations, settings)
+                }
+            ).collect { result ->
                 emit(result)
             }
         }
@@ -111,12 +103,10 @@ internal interface ScheduleEditorWorkProcessor :
             )
         }
 
-        private fun deleteClassWork(targetClass: ClassUi?) = flow {
-            if (targetClass != null) {
-                baseClassInteractor.deleteClass(targetClass.mapToDomain()).handle(
-                    onLeftAction = { emit(EffectResult(ScheduleEditorEffect.ShowError(it))) },
-                )
-            }
+        private fun deleteClassWork(uid: UID, schedule: BaseScheduleUi) = flow {
+            baseClassInteractor.deleteClassBySchedule(uid, schedule.mapToDomain()).handle(
+                onLeftAction = { emit(EffectResult(ScheduleEditorEffect.ShowError(it))) },
+            )
         }
     }
 }
@@ -125,5 +115,5 @@ internal sealed class ScheduleEditorWorkCommand : WorkCommand {
     data object LoadOrganizationsData : ScheduleEditorWorkCommand()
     data class LoadWeekSchedule(val numberOfWeek: NumberOfRepeatWeek) : ScheduleEditorWorkCommand()
     data class UpdateOrganization(val organization: OrganizationShortUi) : ScheduleEditorWorkCommand()
-    data class DeleteClass(val targetClass: ClassUi?) : ScheduleEditorWorkCommand()
+    data class DeleteClass(val uid: UID, val schedule: BaseScheduleUi) : ScheduleEditorWorkCommand()
 }
