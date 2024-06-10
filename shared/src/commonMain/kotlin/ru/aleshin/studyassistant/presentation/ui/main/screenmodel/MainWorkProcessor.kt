@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.domain.interactors.GeneralSettingsInteractor
 import ru.aleshin.studyassistant.domain.interactors.UserCheckerInteractor
-import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.navigation.GlobalScreenProvider
 import ru.aleshin.studyassistant.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
@@ -43,9 +42,9 @@ import kotlin.time.ExperimentalTime
 interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, MainEffect> {
 
     class Base(
-        private val screenProvider: GlobalScreenProvider,
-        private val settingsInteractor: GeneralSettingsInteractor,
         private val userCheckerInteractor: UserCheckerInteractor,
+        private val settingsInteractor: GeneralSettingsInteractor,
+        private val screenProvider: GlobalScreenProvider,
     ) : MainWorkProcessor {
 
         override suspend fun work(command: MainWorkCommand) = when (command) {
@@ -87,7 +86,6 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                         screenProvider.provideAuthScreen(AuthScreen.Login)
                     }
                 }
-                val testScreen = screenProvider.provideEditorScreen(EditorScreen.Schedule)
                 return@delayedAction EffectResult(MainEffect.ReplaceGlobalScreen(targetScreen))
             }
             emit(result)

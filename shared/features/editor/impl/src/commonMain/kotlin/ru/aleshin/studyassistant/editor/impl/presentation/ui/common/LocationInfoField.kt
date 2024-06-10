@@ -43,6 +43,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import views.ClickableTextField
 import views.ExpandedIcon
 import views.dialog.BaseSelectorDialog
+import views.dialog.ContactInfoEditorDialog
 import views.dialog.SelectorDialogAddItemView
 import views.dialog.SelectorDialogItemView
 import views.dialog.SelectorDialogNotSelectedItemView
@@ -150,7 +151,7 @@ internal fun LocationSelectorDialog(
     onDismiss: () -> Unit,
     onConfirm: (ContactInfoUi?) -> Unit,
 ) {
-    var isOpenContactInfoEditorDialog by remember { mutableStateOf(false) }
+    var contactInfoEditorDialogState by remember { mutableStateOf(false) }
     var editableContactInfo by remember { mutableStateOf<ContactInfoUi?>(null) }
     var selectedLocation by remember { mutableStateOf(selected) }
 
@@ -170,7 +171,7 @@ internal fun LocationSelectorDialog(
         },
         addItemView = {
             SelectorDialogAddItemView(
-                onClick = { isOpenContactInfoEditorDialog = true }
+                onClick = { contactInfoEditorDialogState = true }
             )
         },
         notSelectedItem = {
@@ -183,15 +184,20 @@ internal fun LocationSelectorDialog(
         onConfirm = onConfirm,
     )
 
-    if (isOpenContactInfoEditorDialog) {
+    if (contactInfoEditorDialogState) {
         ContactInfoEditorDialog(
             header = EditorThemeRes.strings.locationFieldLabel,
-            contactInfo = editableContactInfo,
+            label = editableContactInfo?.label,
+            value = editableContactInfo?.value,
             onDismiss = {
                 editableContactInfo = null
-                isOpenContactInfoEditorDialog = false
+                contactInfoEditorDialogState = false
             },
-            onConfirm = { location ->
+            onConfirm = { label, value ->
+                val location = (editableContactInfo ?: ContactInfoUi()).copy(
+                    label = label,
+                    value = value
+                )
                 val updatedLocations = locations.toMutableList().apply {
                     if (editableContactInfo != null) {
                         set(indexOf(editableContactInfo), location)
@@ -200,16 +206,18 @@ internal fun LocationSelectorDialog(
                     }
                 }
                 onUpdateLocations(updatedLocations)
+
                 editableContactInfo = null
-                isOpenContactInfoEditorDialog = false
+                contactInfoEditorDialogState = false
             },
             onDelete = {
                 val updatedLocations = locations.toMutableList().apply {
                     if (editableContactInfo != null) remove(editableContactInfo)
                 }
                 onUpdateLocations(updatedLocations)
+
                 editableContactInfo = null
-                isOpenContactInfoEditorDialog = false
+                contactInfoEditorDialogState = false
             }
         )
     }

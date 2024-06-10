@@ -20,11 +20,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.runtime.remember
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
@@ -51,8 +51,8 @@ internal class IntroScreen : Screen {
     @OptIn(ExperimentalFoundationApi::class)
     override fun Content() = ScreenContent(
         screenModel = rememberIntroScreenModel(),
-        initialState = IntroViewState.Default,
-    ) { state ->
+        initialState = IntroViewState,
+    ) {
         val strings = PreviewThemeRes.strings
         val windowSize = LocalWindowSize.current
         val rootNavigator = LocalNavigator.currentOrThrow.root()
@@ -64,7 +64,6 @@ internal class IntroScreen : Screen {
             content = { paddingValues ->
                 when (windowSize.heightWindowType) {
                     WindowSize.WindowType.COMPACT -> IntroContentCompact(
-                        state = state,
                         modifier = Modifier.padding(paddingValues),
                         pagerState = pagerState,
                         onBackClick = { dispatchEvent(IntroEvent.PreviousPage(pagerState.currentPage)) },
@@ -72,9 +71,7 @@ internal class IntroScreen : Screen {
                         onLoginClick = { dispatchEvent(IntroEvent.NavigateToLogin) },
                         onRegisterClick = { dispatchEvent(IntroEvent.NavigateToRegister) },
                     )
-
                     else -> IntroContent(
-                        state = state,
                         modifier = Modifier.padding(paddingValues),
                         pagerState = pagerState,
                         onBackClick = { dispatchEvent(IntroEvent.PreviousPage(pagerState.currentPage)) },
@@ -94,7 +91,7 @@ internal class IntroScreen : Screen {
 
         handleEffect { effect ->
             when (effect) {
-                is IntroEffect.ReplaceGlobalScreen -> rootNavigator?.replaceAll(effect.screen)
+                is IntroEffect.ReplaceGlobalScreen -> rootNavigator.replaceAll(effect.screen)
                 is IntroEffect.ScrollToPage -> pagerState.animateScrollToPage(effect.pageIndex)
                 is IntroEffect.ShowError -> {
                     snackbarState.showSnackbar(

@@ -30,3 +30,7 @@ fun generateSevenDigitCode(): String {
 inline fun <T> Iterable<T>.forEachWith(action: T.() -> Unit) {
     for (element in this) action(element)
 }
+
+fun <T> List<List<T>>.extractAllItem() = mutableListOf<T>().apply {
+    this@extractAllItem.forEach { addAll(it) }
+}

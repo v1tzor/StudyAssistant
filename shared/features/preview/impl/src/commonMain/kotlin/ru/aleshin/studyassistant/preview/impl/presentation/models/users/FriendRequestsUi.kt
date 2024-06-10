@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.preview.impl.presentation.models
+package ru.aleshin.studyassistant.preview.impl.presentation.models.users
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 
 /**
- * @author Stanislav Aleshin on 20.04.2024.
+ * @author Stanislav Aleshin on 21.04.2024.
  */
 @Parcelize
-internal data class SocialNetworkUi(
-    val name: String,
-    val icon: String,
-    val url: String,
+internal data class FriendRequestsUi(
+    val received: List<AppUserUi> = emptyList(),
+    val send: List<AppUserUi> = emptyList(),
+    val lastAccepted: List<AppUserUi> = emptyList(),
 ) : Parcelable

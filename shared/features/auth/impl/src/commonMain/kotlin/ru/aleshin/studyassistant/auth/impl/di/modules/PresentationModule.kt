@@ -38,8 +38,8 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterStateCommunicator
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterWorkProcessor
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
-import ru.aleshin.studyassistant.auth.impl.presentation.validation.UsernameValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.PasswordValidator
+import ru.aleshin.studyassistant.auth.impl.presentation.validation.UsernameValidator
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 
@@ -51,7 +51,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<NavigationScreen> { NavigationScreen() }
 
     bindProvider<AuthFeatureStarter> { AuthFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<AuthScreenProvider> { AuthScreenProvider.Base(instance<() -> NavigationFeatureStarter>(), instance<() -> PreviewFeatureStarter>()) }
+    bindProvider<AuthScreenProvider> { AuthScreenProvider.Base(instance<() -> PreviewFeatureStarter>(), instance<() -> NavigationFeatureStarter>()) }
 
     bindSingleton<EmailValidator> { EmailValidator.Base() }
     bindSingleton<PasswordValidator> { PasswordValidator.Base() }

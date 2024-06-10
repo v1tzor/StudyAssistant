@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.mappers
 
 import entities.common.ContactInfo
-import ru.aleshin.studyassistant.preview.impl.presentation.models.ContactInfoUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.users.ContactInfoUi
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.

@@ -16,13 +16,13 @@
 package ru.aleshin.studyassistant.navigation.impl.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
@@ -59,7 +59,6 @@ internal class TabsScreen : Screen {
                 },
                 bottomBar = {
                     TabsBottomNavigationBar(
-                        modifier = Modifier.navigationBarsPadding(),
                         selectedItem = state.bottomBarItem,
                         onItemSelected = { tab ->
                             val event = when (tab) {
@@ -72,6 +71,7 @@ internal class TabsScreen : Screen {
                         },
                     )
                 },
+                contentWindowInsets = WindowInsets(0.dp),
             )
 
             handleEffect { effect ->

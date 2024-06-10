@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.preview.impl.presentation.models
+package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import entities.organizations.Millis
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewViewState
 
 /**
- * @author Stanislav Aleshin on 17.05.2024.
+ * @author Stanislav Aleshin on 09.06.2024
  */
-@Parcelize
-internal data class NumberedDurationUi(
-    val number: Int,
-    val duration: Millis,
-) : Parcelable
+@Composable
+internal fun OverviewContent(
+    state: OverviewViewState,
+    modifier: Modifier = Modifier,
+) {
+    // TODO
+}

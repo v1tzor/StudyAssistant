@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.views
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,9 +50,8 @@ internal fun EventTypeInfoField(
 
     ClickableInfoTextField(
         onClick = { isOpenEventTypeSelector = true },
-        modifier = modifier,
+        modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
-        paddingValues = PaddingValues(start = 16.dp, end = 24.dp),
         value = eventType?.mapToString(StudyAssistantRes.strings),
         label = EditorThemeRes.strings.eventTypeFieldLabel,
         placeholder = EditorThemeRes.strings.eventTypeFieldPlaceholder,

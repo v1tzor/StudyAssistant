@@ -30,6 +30,9 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmod
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel.DetailsWorkProcessor
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation.NavigationScreenModel
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewEffectCommunicator
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewScreenModel
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewStateCommunicator
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -41,8 +44,13 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<ScheduleFeatureStarter> { ScheduleFeatureStarterImpl(instance(), instance(), instance()) }
     bindProvider<ScheduleScreenProvider> { ScheduleScreenProvider.Base(instance<() -> EditorFeatureStarter>()) }
 
+    bindProvider<OverviewStateCommunicator> { OverviewStateCommunicator.Base() }
+    bindProvider<OverviewEffectCommunicator> { OverviewEffectCommunicator.Base() }
+//    bindProvider<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance()) }
+    bindProvider<OverviewScreenModel> { OverviewScreenModel(instance(), instance(), instance(), instance()) }
+
     bindProvider<DetailsStateCommunicator> { DetailsStateCommunicator.Base() }
     bindProvider<DetailsEffectCommunicator> { DetailsEffectCommunicator.Base() }
-    bindProvider<DetailsWorkProcessor> { DetailsWorkProcessor.Base(instance()) }
+    bindProvider<DetailsWorkProcessor> { DetailsWorkProcessor.Base(instance(), instance()) }
     bindProvider<DetailsScreenModel> { DetailsScreenModel(instance(), instance(), instance(), instance(), instance()) }
 }

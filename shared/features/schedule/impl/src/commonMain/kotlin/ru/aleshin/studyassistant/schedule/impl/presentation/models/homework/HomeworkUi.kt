@@ -19,12 +19,12 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.models.homework
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
-import entities.subject.Subject
 import entities.tasks.TaskPriority
 import functional.UID
 import kotlinx.datetime.Instant
 import platform.InstantParceler
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
@@ -35,7 +35,7 @@ internal data class HomeworkUi(
     val classId: UID? = null,
     @TypeParceler<Instant, InstantParceler>
     val date: Instant,
-    val subject: Subject? = null,
+    val subject: SubjectUi? = null,
     val organization: OrganizationShortUi,
     val theoreticalTasks: String = "",
     val practicalTasks: String = "",

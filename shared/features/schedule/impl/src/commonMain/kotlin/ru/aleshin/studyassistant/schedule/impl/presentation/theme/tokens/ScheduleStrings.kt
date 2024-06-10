@@ -25,6 +25,13 @@ import theme.tokens.StudyAssistantLanguage
 internal data class ScheduleStrings(
     val overviewHeader: String,
     val detailsHeader: String,
+    val currentWeekTitle: String,
+    val previousWeekTitle: String,
+    val nextWeekTitle: String,
+    val commonScheduleViewType: String,
+    val verticalScheduleViewType: String,
+    val testLabel: String,
+    val emptyClassesTitle: String,
     val otherErrorMessage: String,
 ) {
 
@@ -32,11 +39,25 @@ internal data class ScheduleStrings(
         val RUSSIAN = ScheduleStrings(
             overviewHeader = "Обзор",
             detailsHeader = "Расписание",
+            currentWeekTitle = "Текущая неделя",
+            nextWeekTitle = "Следующая неделя",
+            previousWeekTitle = "Предыдущая неделя",
+            commonScheduleViewType = "Общий вид",
+            verticalScheduleViewType = "Вертикальный вид",
+            testLabel = "Тест",
+            emptyClassesTitle = "Занятия отсутствуют",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = ScheduleStrings(
             overviewHeader = "Overview",
             detailsHeader = "Schedule",
+            currentWeekTitle = "Current week",
+            nextWeekTitle = "Next week",
+            previousWeekTitle = "Previous week",
+            commonScheduleViewType = "General view",
+            verticalScheduleViewType = "Vertical view",
+            testLabel = "Test",
+            emptyClassesTitle = "Classes are absent",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -48,8 +48,7 @@ internal fun BirthdayInfoField(
 
     ClickableInfoTextField(
         onClick = { isOpenDatePickerDialog = true },
-        modifier = modifier,
-        paddingValues = PaddingValues(start = 16.dp, end = 24.dp),
+        modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
         value = birthday,
         label = EditorThemeRes.strings.birthdayFieldLabel,

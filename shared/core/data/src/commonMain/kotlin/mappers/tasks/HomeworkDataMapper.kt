@@ -16,7 +16,6 @@
 
 package mappers.tasks
 
-import entities.subject.EventType
 import entities.tasks.Homework
 import entities.tasks.TaskPriority
 import extensions.mapEpochTimeToInstant
@@ -39,7 +38,6 @@ fun HomeworkDetailsData.mapToDomain() = Homework(
     date = date.mapEpochTimeToInstant(),
     subject = subject?.mapToDomain(),
     organization = organization.mapToDomain(),
-    eventType = EventType.valueOf(eventType),
     theoreticalTasks = theoreticalTasks,
     practicalTasks = practicalTasks,
     presentations = presentations,
@@ -54,7 +52,6 @@ fun Homework.mapToData() = HomeworkDetailsData(
     date = date.toEpochMilliseconds(),
     subject = subject?.mapToData(),
     organization = organization.mapToData(),
-    eventType = eventType.name,
     theoreticalTasks = theoreticalTasks,
     practicalTasks = practicalTasks,
     presentations = presentations,
@@ -69,7 +66,6 @@ fun HomeworkDetailsData.mapToLocalData() = HomeworkEntity(
     date = date,
     subject_id = subject?.uid,
     organization_id = organization.uid,
-    event_type = eventType,
     theoretical_tasks = theoreticalTasks,
     practical_tasks = practicalTasks,
     presentations = presentations,
@@ -87,7 +83,6 @@ fun HomeworkEntity.mapToDetailsData(
     date = date,
     subject = subject,
     organization = organization,
-    eventType = event_type,
     theoreticalTasks = theoretical_tasks,
     practicalTasks = practical_tasks,
     presentations = presentations,
@@ -102,7 +97,6 @@ fun HomeworkDetailsData.mapToRemoteData() = HomeworkPojo(
     date = date,
     subjectId = subject?.uid,
     organizationId = organization.uid,
-    eventType = eventType,
     theoreticalTasks = theoreticalTasks,
     practicalTasks = practicalTasks,
     presentations = presentations,
@@ -120,7 +114,6 @@ fun HomeworkPojo.mapToDetailsData(
     date = date,
     subject = subject,
     organization = organization,
-    eventType = eventType,
     theoreticalTasks = theoreticalTasks,
     practicalTasks = practicalTasks,
     presentations = presentations,
@@ -128,5 +121,3 @@ fun HomeworkPojo.mapToDetailsData(
     priority = priority,
     isDone = done,
 )
-
-

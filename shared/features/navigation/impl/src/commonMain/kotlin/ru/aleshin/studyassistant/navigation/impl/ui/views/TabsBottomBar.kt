@@ -15,10 +15,9 @@
  */
 package ru.aleshin.studyassistant.navigation.impl.ui.views
 
-import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import theme.StudyAssistantRes
@@ -35,11 +34,16 @@ internal fun TabsBottomNavigationBar(
     onItemSelected: (TabsBottomBarItems) -> Unit,
 ) {
     BottomNavigationBar(
-        modifier = modifier.height(60.dp),
+        modifier = modifier,
         selectedItem = selectedItem,
         items = TabsBottomBarItems.entries.toTypedArray(),
         showLabel = false,
         onItemSelected = onItemSelected,
+        containerColor = if (selectedItem == TabsBottomBarItems.SCHEDULE) {
+            MaterialTheme.colorScheme.surfaceContainerLow
+        } else {
+            MaterialTheme.colorScheme.background
+        }
     )
 }
 

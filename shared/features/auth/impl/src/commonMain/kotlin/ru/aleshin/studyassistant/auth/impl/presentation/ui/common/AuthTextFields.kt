@@ -57,6 +57,7 @@ internal fun UsernameTextField(
     onUsernameChanged: (String) -> Unit,
     isError: Boolean,
     errorText: String?,
+    keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
     Column(
         modifier = modifier.animateContentSize(),
@@ -80,20 +81,22 @@ internal fun UsernameTextField(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
-            supportingText = if (isError) { {
-                errorText?.let {
-                    Text(
-                        text = it,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.labelSmall,
-                    )
+            supportingText = if (isError) {
+                {
+                    errorText?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
                 }
-            } } else {
+            } else {
                 null
             },
             isError = isError,
+            keyboardActions = keyboardActions,
             singleLine = true,
-            maxLines = 1,
             colors = OutlinedTextFieldDefaults.colors(
                 errorTextColor = MaterialTheme.colorScheme.error,
             ),
@@ -111,6 +114,7 @@ internal fun EmailTextField(
     onEmailChanged: (String) -> Unit,
     isError: Boolean,
     errorText: String?,
+    keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
     Column(
         modifier = modifier.animateContentSize(),
@@ -135,21 +139,23 @@ internal fun EmailTextField(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
-            supportingText = if (isError) { {
-                errorText?.let {
-                    Text(
-                        text = it,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.labelSmall,
-                    )
+            supportingText = if (isError) {
+                {
+                    errorText?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
                 }
-            } } else {
+            } else {
                 null
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             isError = isError,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardActions = keyboardActions,
             singleLine = true,
-            maxLines = 1,
             colors = OutlinedTextFieldDefaults.colors(
                 errorTextColor = MaterialTheme.colorScheme.error,
             ),
@@ -167,6 +173,7 @@ internal fun PasswordTextField(
     onPasswordChanged: (String) -> Unit,
     isError: Boolean,
     errorText: String?,
+    keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
     Column(
         modifier = modifier.animateContentSize(),
@@ -209,22 +216,28 @@ internal fun PasswordTextField(
                     }
                 }
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            visualTransformation = if (isShowPassword) VisualTransformation.None else PasswordVisualTransformation(),
-            supportingText = if (isError) { {
-                errorText?.let {
-                    Text(
-                        text = it,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.labelSmall,
-                    )
+            supportingText = if (isError) {
+                {
+                    errorText?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
                 }
-            } } else {
+            } else {
                 null
             },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardActions = keyboardActions,
             isError = isError,
+            visualTransformation = if (isShowPassword) {
+                VisualTransformation.None
+            } else {
+                PasswordVisualTransformation()
+            },
             singleLine = true,
-            maxLines = 1,
             colors = OutlinedTextFieldDefaults.colors(
                 errorTextColor = MaterialTheme.colorScheme.error,
             ),

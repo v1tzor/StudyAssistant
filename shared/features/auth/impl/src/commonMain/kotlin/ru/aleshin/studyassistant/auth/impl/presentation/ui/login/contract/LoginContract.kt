@@ -23,9 +23,9 @@ import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
-import ru.aleshin.studyassistant.auth.impl.presentation.models.EmailValidError
-import ru.aleshin.studyassistant.auth.impl.presentation.models.LoginCredentialsUi
-import ru.aleshin.studyassistant.auth.impl.presentation.models.PasswordValidError
+import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.LoginCredentialsUi
+import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.EmailValidError
+import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.PasswordValidError
 
 /**
  * @author Stanislav Aleshin on 16.04.2024

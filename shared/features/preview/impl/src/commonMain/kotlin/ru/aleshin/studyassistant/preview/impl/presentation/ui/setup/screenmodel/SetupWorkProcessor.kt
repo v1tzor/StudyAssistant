@@ -30,9 +30,9 @@ import ru.aleshin.studyassistant.preview.impl.domain.interactors.OrganizationsIn
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.UsersInteractor
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.AppUserUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.CalendarSettingsUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.OrganizationUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupAction
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEffect
 

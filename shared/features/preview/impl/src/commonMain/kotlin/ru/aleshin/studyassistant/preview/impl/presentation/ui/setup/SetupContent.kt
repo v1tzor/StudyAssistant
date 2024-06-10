@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -37,9 +38,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.preview.impl.presentation.models.AppUserUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.CalendarSettingsUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.OrganizationUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupViewState
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.CalendarPageInfo
@@ -69,91 +70,92 @@ internal fun SetupContent(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        AnimatedContent(
-            targetState = if (profile != null) currentPage else null,
-            modifier = Modifier.weight(1f).padding(horizontal = 24.dp),
-            transitionSpec = {
-                fadeIn(animationSpec = tween(320, delayMillis = 90)).togetherWith(
-                    fadeOut(animationSpec = tween(320))
-                )
-            },
-        ) { page ->
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                if (page != null) {
-                    Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
-                        SetupStepHeader(
-                            title = page.stepTitle,
-                            currentStep = page.id.inc(),
-                            maxSteps = SetupPage.entries.size,
-                        )
-                        when (page) {
-                            SetupPage.PROFILE -> if (profile != null) {
-                                ProfilePageInfo(
-                                    profile = profile,
-                                    onUpdateProfile = onUpdateProfile,
-                                    onSetAvatar = {},
-                                )
-                            }
-                            SetupPage.ORGANIZATION -> if (organization != null) {
-                                OrganizationPageInfo(
-                                    organization = organization,
-                                    onUpdateOrganization = onUpdateOrganization,
-                                    onSetAvatar = {},
-                                )
-                            }
-                            SetupPage.CALENDAR -> if (calendarSettings != null) {
-                                CalendarPageInfo(
-                                    calendarSettings = calendarSettings,
-                                    onUpdateCalendarSettings = onUpdateCalendarSettings,
-                                )
-                            }
-                            SetupPage.SCHEDULE -> SchedulePageInfo()
-                        }
-                    }
-                } else {
-                    CircularProgressIndicator()
-                }
-            }
-        }
-        Column(
-            modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 36.dp, top = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+        SetupPageInfoSection(
+            modifier = Modifier.weight(1f),
+            currentPage = currentPage,
+            profile = profile,
+            organization = organization,
+            calendarSettings = calendarSettings,
+            onUpdateProfile = onUpdateProfile,
+            onUpdateOrganization = onUpdateOrganization,
+            onUpdateCalendarSettings = onUpdateCalendarSettings,
+        )
+        SetupPageNavigationSection(
+            currentPage = currentPage,
+            isFillOutSchedule = isFillOutSchedule,
+            onSaveProfile = onSaveProfile,
+            onSaveOrganization = onSaveOrganization,
+            onSaveCalendar = onSaveCalendar,
+            onFillOutSchedule = onFillOutSchedule,
+            onStartUsing = onStartUsing,
+        )
+    }
+}
+
+@Composable
+private fun SetupPageInfoSection(
+    modifier: Modifier = Modifier,
+    currentPage: SetupPage,
+    profile: AppUserUi?,
+    organization: OrganizationUi?,
+    calendarSettings: CalendarSettingsUi?,
+    onUpdateProfile: (AppUserUi) -> Unit,
+    onUpdateOrganization: (OrganizationUi) -> Unit,
+    onUpdateCalendarSettings: (CalendarSettingsUi) -> Unit,
+) {
+    AnimatedContent(
+        targetState = if (profile != null) currentPage else null,
+        modifier = modifier.padding(horizontal = 24.dp),
+        transitionSpec = {
+            fadeIn(animationSpec = tween(320, delayMillis = 90)).togetherWith(
+                fadeOut(animationSpec = tween(320))
+            )
+        },
+    ) { page ->
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            when (currentPage) {
-                SetupPage.PROFILE -> NavigationPageButton(
-                    onClick = onSaveProfile,
-                    navigationLabel = currentPage.buttonLabel,
-                )
-                SetupPage.ORGANIZATION -> NavigationPageButton(
-                    onClick = onSaveOrganization,
-                    navigationLabel = currentPage.buttonLabel,
-                )
-                SetupPage.CALENDAR -> NavigationPageButton(
-                    onClick = onSaveCalendar,
-                    navigationLabel = currentPage.buttonLabel,
-                )
-                SetupPage.SCHEDULE -> {
-                    NavigationPageButton(
-                        onClick = onFillOutSchedule,
-                        navigationLabel = currentPage.buttonLabel,
+            if (page != null) {
+                Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
+                    SetupStepHeader(
+                        title = page.stepTitle,
+                        currentStep = page.id.inc(),
+                        maxSteps = SetupPage.entries.size,
                     )
-                    NavigationPageButton(
-                        enabled = state.isFillOutSchedule,
-                        onClick = onStartUsing,
-                        navigationLabel = PreviewThemeRes.strings.scheduleStartButtonLabel,
-                        isTonal = true,
-                    )
+                    when (page) {
+                        SetupPage.PROFILE -> if (profile != null) {
+                            ProfilePageInfo(
+                                profile = profile,
+                                onUpdateProfile = onUpdateProfile,
+                                onSetAvatar = {},
+                            )
+                        }
+                        SetupPage.ORGANIZATION -> if (organization != null) {
+                            OrganizationPageInfo(
+                                organization = organization,
+                                onUpdateOrganization = onUpdateOrganization,
+                                onSetAvatar = {},
+                            )
+                        }
+                        SetupPage.CALENDAR -> if (calendarSettings != null) {
+                            CalendarPageInfo(
+                                calendarSettings = calendarSettings,
+                                onUpdateCalendarSettings = onUpdateCalendarSettings,
+                            )
+                        }
+                        SetupPage.SCHEDULE -> SchedulePageInfo()
+                    }
                 }
+            } else {
+                CircularProgressIndicator()
             }
         }
     }
 }
 
 @Composable
-internal fun SetupStepHeader(
+private fun SetupStepHeader(
     modifier: Modifier = Modifier,
     title: String,
     currentStep: Int,
@@ -182,5 +184,52 @@ internal fun SetupStepHeader(
                 fontWeight = FontWeight.Bold,
             ),
         )
+    }
+}
+
+@Composable
+private fun SetupPageNavigationSection(
+    modifier: Modifier = Modifier,
+    currentPage: SetupPage,
+    isFillOutSchedule: Boolean,
+    onSaveProfile: () -> Unit,
+    onSaveOrganization: () -> Unit,
+    onSaveCalendar: () -> Unit,
+    onFillOutSchedule: () -> Unit,
+    onStartUsing: () -> Unit,
+) {
+    Column(
+        modifier = modifier.padding(start = 24.dp, end = 24.dp, bottom = 36.dp, top = 16.dp).animateContentSize(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        when (currentPage) {
+            SetupPage.PROFILE -> NavigationPageButton(
+                onClick = onSaveProfile,
+                navigationLabel = currentPage.buttonLabel,
+            )
+
+            SetupPage.ORGANIZATION -> NavigationPageButton(
+                onClick = onSaveOrganization,
+                navigationLabel = currentPage.buttonLabel,
+            )
+
+            SetupPage.CALENDAR -> NavigationPageButton(
+                onClick = onSaveCalendar,
+                navigationLabel = currentPage.buttonLabel,
+            )
+
+            SetupPage.SCHEDULE -> {
+                NavigationPageButton(
+                    onClick = onFillOutSchedule,
+                    navigationLabel = currentPage.buttonLabel,
+                )
+                NavigationPageButton(
+                    enabled = isFillOutSchedule,
+                    onClick = onStartUsing,
+                    navigationLabel = PreviewThemeRes.strings.scheduleStartButtonLabel,
+                    isTonal = true,
+                )
+            }
+        }
     }
 }

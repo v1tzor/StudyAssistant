@@ -24,8 +24,8 @@ import functional.handle
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
-import ru.aleshin.studyassistant.auth.impl.presentation.models.RegisterCredentialsUi
-import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEffect
+import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToDomain
+import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.RegisterCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEffect
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
@@ -33,34 +33,31 @@ import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-internal interface RegisterWorkProcessor :
-    FlowWorkProcessor<RegisterWorkCommand, RegisterAction, RegisterEffect> {
+internal interface RegisterWorkProcessor : FlowWorkProcessor<RegisterWorkCommand, RegisterAction, RegisterEffect> {
 
     class Base(
-        private val screenProvider: AuthScreenProvider,
         private val authInteractor: AuthInteractor,
+        private val screenProvider: AuthScreenProvider,
     ) : RegisterWorkProcessor {
 
         override suspend fun work(command: RegisterWorkCommand) = when (command) {
-            is RegisterWorkCommand.RegisterNewAccount -> registerNewAccountWork(command.credentialsUi)
+            is RegisterWorkCommand.RegisterNewAccount -> registerNewAccountWork(command.credentials)
         }
 
         private fun registerNewAccountWork(credentials: RegisterCredentialsUi) = flow {
             emit(ActionResult(RegisterAction.UpdateLoading(true)))
             authInteractor.registerNewAccount(credentials.mapToDomain()).handle(
-                onLeftAction = { error ->
-                    emit(EffectResult(RegisterEffect.ShowError(error)))
-                    emit(ActionResult(RegisterAction.UpdateLoading(false)))
-                },
+                onLeftAction = { emit(EffectResult(RegisterEffect.ShowError(it))) },
                 onRightAction = { user ->
-                    val setupScreen = screenProvider.providePreviewScreen(PreviewScreen.Setup(user.uid))
-                    emit(EffectResult(RegisterEffect.ReplaceGlobalScreen(setupScreen)))
+                    val targetScreen = screenProvider.providePreviewScreen(PreviewScreen.Setup(user.uid))
+                    emit(EffectResult(RegisterEffect.ReplaceGlobalScreen(targetScreen)))
                 },
             )
+            emit(ActionResult(RegisterAction.UpdateLoading(false)))
         }
     }
 }
 
 internal sealed class RegisterWorkCommand : WorkCommand {
-    data class RegisterNewAccount(val credentialsUi: RegisterCredentialsUi) : RegisterWorkCommand()
+    data class RegisterNewAccount(val credentials: RegisterCredentialsUi) : RegisterWorkCommand()
 }

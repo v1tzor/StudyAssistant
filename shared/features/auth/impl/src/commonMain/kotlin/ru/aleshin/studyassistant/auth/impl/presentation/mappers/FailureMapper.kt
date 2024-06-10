@@ -22,7 +22,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.theme.tokens.AuthStrings
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-internal fun AuthFailures.mapToMessage(strings: AuthStrings) = when(this) {
+internal fun AuthFailures.mapToMessage(strings: AuthStrings) = when (this) {
     is AuthFailures.AuthorizationError -> strings.authErrorMessage
     is AuthFailures.CredentialsError -> strings.credentialsErrorMessage
     is AuthFailures.NotFoundUserInfoError -> strings.userNotFoundErrorMessage

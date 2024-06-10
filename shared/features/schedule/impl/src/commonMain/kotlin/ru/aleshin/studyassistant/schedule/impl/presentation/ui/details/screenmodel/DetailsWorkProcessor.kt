@@ -16,12 +16,15 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel
 
+import architecture.screenmodel.work.ActionResult
+import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
-import architecture.screenmodel.work.WorkResult
 import functional.TimeRange
+import functional.collectAndHandle
 import kotlinx.coroutines.flow.flow
-import managers.DateManager
+import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleInteractor
+import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsAction
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
 
@@ -31,23 +34,25 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.
 internal interface DetailsWorkProcessor : FlowWorkProcessor<DetailsWorkCommand, DetailsAction, DetailsEffect> {
 
     class Base(
-        private val dateManager: DateManager,
+        private val scheduleInteractor: ScheduleInteractor,
     ) : DetailsWorkProcessor {
 
         override suspend fun work(command: DetailsWorkCommand) = when (command) {
-            is DetailsWorkCommand.SetupWeekSchedule -> setupWeekScheduleWork()
             is DetailsWorkCommand.LoadWeekSchedule -> loadWeekScheduleWork(command.week)
         }
-
-        private fun setupWeekScheduleWork() = flow<WorkResult<DetailsAction, DetailsEffect>> {
-        }
-
-        private fun loadWeekScheduleWork(week: TimeRange?) = flow<WorkResult<DetailsAction, DetailsEffect>> {
+        private fun loadWeekScheduleWork(week: TimeRange) = flow {
+            emit(ActionResult(DetailsAction.UpdateLoading(true)))
+            scheduleInteractor.fetchDetailsWeekSchedule(week).collectAndHandle(
+                onLeftAction = { emit(EffectResult(DetailsEffect.ShowError(it))) },
+                onRightAction = { weekScheduleDetails ->
+                    val weekSchedule = weekScheduleDetails.mapToUi()
+                    emit(ActionResult(DetailsAction.UpdateWeekSchedule(weekSchedule)))
+                }
+            )
         }
     }
 }
 
 internal sealed class DetailsWorkCommand : WorkCommand {
-    data object SetupWeekSchedule : DetailsWorkCommand()
-    data class LoadWeekSchedule(val week: TimeRange?) : DetailsWorkCommand()
+    data class LoadWeekSchedule(val week: TimeRange) : DetailsWorkCommand()
 }

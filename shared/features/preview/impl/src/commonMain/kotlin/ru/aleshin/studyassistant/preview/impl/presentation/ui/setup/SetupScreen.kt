@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -45,7 +44,7 @@ import views.ErrorSnackbar
 /**
  * @author Stanislav Aleshin on 17.04.2024
  */
-internal class SetupScreen(private val createdUser: UID) : Screen {
+internal data class SetupScreen(private val createdUser: UID) : Screen {
 
     @Composable
     override fun Content() = ScreenContent(
@@ -57,6 +56,7 @@ internal class SetupScreen(private val createdUser: UID) : Screen {
         val windowSize = LocalWindowSize.current
         val rootNavigator = LocalNavigator.currentOrThrow.root()
         val snackbarState = remember { SnackbarHostState() }
+
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             content = { paddingValues ->
@@ -77,7 +77,6 @@ internal class SetupScreen(private val createdUser: UID) : Screen {
             },
             topBar = {
                 SetupTopBar(
-                    modifier = Modifier.statusBarsPadding(),
                     enabled = state.currentPage.id != 0,
                     onBackPressed = { dispatchEvent(SetupEvent.NavigateToBackPage) },
                     stepProgress = state.currentPage.progress(),
@@ -93,6 +92,7 @@ internal class SetupScreen(private val createdUser: UID) : Screen {
 
         handleEffect { effect ->
             when (effect) {
+                is SetupEffect.NavigateToGlobalScreen -> rootNavigator.push(effect.pushScreen)
                 is SetupEffect.ReplaceGlobalScreen -> rootNavigator.replaceAll(effect.screen)
                 is SetupEffect.ShowError -> {
                     snackbarState.showSnackbar(

@@ -37,14 +37,14 @@ internal interface AuthScreenProvider : FeatureScreenProvider<AuthScreen> {
     fun provideTabNavigationScreen(): Screen
 
     class Base(
-        private val navigationFeatureProvider: () -> NavigationFeatureStarter,
         private val previewFeatureProvider: () -> PreviewFeatureStarter,
+        private val navigationFeatureProvider: () -> NavigationFeatureStarter,
     ) : AuthScreenProvider {
 
         override fun provideFeatureScreen(screen: AuthScreen) = when (screen) {
-            AuthScreen.Login -> LoginScreen()
-            AuthScreen.Register -> RegisterScreen()
-            AuthScreen.Forgot -> ForgotScreen()
+            is AuthScreen.Login -> LoginScreen()
+            is AuthScreen.Register -> RegisterScreen()
+            is AuthScreen.Forgot -> ForgotScreen()
         }
 
         override fun providePreviewScreen(screen: PreviewScreen): Screen {

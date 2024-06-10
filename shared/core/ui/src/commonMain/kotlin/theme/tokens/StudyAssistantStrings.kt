@@ -109,8 +109,9 @@ data class StudyAssistantStrings(
     val postManager: String,
     val notSelectedTitle: String,
     val avatarDesc: String,
-) {
-}
+    val contactInfoLabel: String,
+    val contactInfoValue: String,
+)
 
 internal val russianFamelString = StudyAssistantStrings(
     appName = "Study Assistant",
@@ -200,6 +201,8 @@ internal val russianFamelString = StudyAssistantStrings(
     postManager = "Менеджер",
     notSelectedTitle = "Не выбрано",
     avatarDesc = "Выбрать фото профиля",
+    contactInfoLabel = "Название",
+    contactInfoValue = "Данные *",
 )
 
 internal val englishFamelString = StudyAssistantStrings(
@@ -290,6 +293,8 @@ internal val englishFamelString = StudyAssistantStrings(
     postManager = "Manager",
     notSelectedTitle = "Not selected",
     avatarDesc = "Select profile photo",
+    contactInfoLabel = "Name",
+    contactInfoValue = "Data *",
 )
 
 fun StudyAssistantStrings.monthNames() = MonthNames(

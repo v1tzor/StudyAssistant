@@ -15,6 +15,9 @@
  */
 package views
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -23,7 +26,11 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import mappers.pxToDp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -38,13 +45,19 @@ fun <Item : BottomBarItem> BottomNavigationBar(
     modifier: Modifier,
     selectedItem: Item,
     items: Array<Item>,
-    showLabel: Boolean,
     onItemSelected: (Item) -> Unit,
+    showLabel: Boolean,
+    containerColor: Color = MaterialTheme.colorScheme.background,
+    windowInsets: WindowInsets = WindowInsets.navigationBars,
 ) {
+    val density = LocalDensity.current
     NavigationBar(
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.background,
+        modifier = modifier.height(
+            height = (if (showLabel) 80.dp else 60.dp) + windowInsets.getBottom(density).pxToDp()
+        ),
+        containerColor = containerColor,
         tonalElevation = StudyAssistantRes.elevations.levelZero,
+        windowInsets = windowInsets,
     ) {
         items.forEach { item ->
             NavigationBarItem(
@@ -58,12 +71,14 @@ fun <Item : BottomBarItem> BottomNavigationBar(
                         description = item.label,
                     )
                 },
-                label = if (showLabel) { {
-                    BottomBarLabel(
-                        selected = selectedItem == item,
-                        title = item.label,
-                    )
-                } } else {
+                label = if (showLabel) {
+                    {
+                        BottomBarLabel(
+                            selected = selectedItem == item,
+                            title = item.label,
+                        )
+                    }
+                } else {
                     null
                 },
                 colors = NavigationBarItemDefaults.colors(

@@ -20,8 +20,10 @@ import architecture.communications.state.StateCommunicator
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainViewState
 
 /**
- * @author Stanislav Aleshin on 27.01.2024.
+ * @author Stanislav Aleshin on 10.06.2024.
  */
 interface MainStateCommunicator : StateCommunicator<MainViewState> {
-    class Base : MainStateCommunicator, StateCommunicator.Abstract<MainViewState>(MainViewState())
+    class Base : MainStateCommunicator, StateCommunicator.Abstract<MainViewState>(
+        defaultState = MainViewState()
+    )
 }

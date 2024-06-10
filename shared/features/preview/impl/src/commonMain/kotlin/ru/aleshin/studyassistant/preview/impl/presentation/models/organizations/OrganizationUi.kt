@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.preview.impl.presentation.models
+package ru.aleshin.studyassistant.preview.impl.presentation.models.organizations
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import entities.organizations.OrganizationType
 import functional.UID
+import ru.aleshin.studyassistant.preview.impl.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.users.EmployeeUi
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
@@ -43,6 +46,10 @@ internal data class OrganizationUi(
     val isHide: Boolean = false,
 ) : Parcelable {
     companion object {
-        fun createMainOrganization() = OrganizationUi("", true, "")
+        fun createMainOrganization() = OrganizationUi(
+            uid = "",
+            isMain = true,
+            shortName = "",
+        )
     }
 }

@@ -23,9 +23,12 @@ import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
+import entities.organizations.Millis
 import functional.TimeRange
+import functional.UID
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import platform.NullInstantParceler
+import platform.InstantParceler
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.WeekScheduleDetailsUi
@@ -36,16 +39,19 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.Week
 @Parcelize
 internal data class DetailsViewState(
     val isLoading: Boolean = true,
-    val schedule: WeekScheduleDetailsUi? = null,
-    @TypeParceler<Instant?, NullInstantParceler>
-    val currentWeek: TimeRange? = null,
+    @TypeParceler<Instant, InstantParceler>
+    val currentDate: Instant = Clock.System.now(),
+    val weekSchedule: WeekScheduleDetailsUi? = null,
     val selectedWeek: TimeRange? = null,
+    val activeClass: Pair<UID, Millis>? = null,
     val scheduleView: ScheduleViewType = ScheduleViewType.COMMON,
 ) : BaseViewState
 
 internal sealed class DetailsEvent : BaseEvent {
     data object Init : DetailsEvent()
-    data class SelectedWeek(val week: TimeRange) : DetailsEvent()
+    data object SelectedNextWeek : DetailsEvent()
+    data object SelectedCurrentWeek : DetailsEvent()
+    data object SelectedPreviousWeek : DetailsEvent()
     data class SelectedViewType(val scheduleView: ScheduleViewType) : DetailsEvent()
     data object NavigateToOverview : DetailsEvent()
     data object NavigateToEditor : DetailsEvent()
@@ -58,12 +64,9 @@ internal sealed class DetailsEffect : BaseUiEffect {
 }
 
 internal sealed class DetailsAction : BaseAction {
-    data class SetupWeekSchedule(
-        val schedule: WeekScheduleDetailsUi,
-        val currentWeek: TimeRange,
-    ) : DetailsAction()
     data class UpdateWeekSchedule(val schedule: WeekScheduleDetailsUi) : DetailsAction()
-    data class UpdateSelectedWeek(val week: TimeRange) : DetailsAction()
+    data class UpdateSelectedWeek(val week: TimeRange?) : DetailsAction()
+    data class UpdateActiveClass(val activeClass: Pair<UID, Millis>?) : DetailsAction()
     data class UpdateViewType(val scheduleView: ScheduleViewType) : DetailsAction()
     data class UpdateLoading(val isLoading: Boolean) : DetailsAction()
 }

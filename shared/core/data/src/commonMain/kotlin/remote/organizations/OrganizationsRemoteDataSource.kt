@@ -66,7 +66,7 @@ interface OrganizationsRemoteDataSource {
         }
 
         override suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsData> {
-            if (uid.isEmpty()) throw IllegalArgumentException("Organization id is empty")
+            require(uid.isNotEmpty())
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 

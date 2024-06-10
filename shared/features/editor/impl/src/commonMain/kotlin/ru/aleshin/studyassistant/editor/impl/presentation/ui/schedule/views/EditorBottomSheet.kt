@@ -55,10 +55,10 @@ import entities.common.NumberOfRepeatWeek
 import mappers.toMinutesOrHoursTitle
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseWeekScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.NumberOfWeekItem
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseWeekScheduleUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.NumberOfWeekItem
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.toItem
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import theme.StudyAssistantRes

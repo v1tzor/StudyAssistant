@@ -61,15 +61,20 @@ internal fun CommonClassView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    highlightContent: Boolean = false,
     number: Int,
     timeRange: TimeRange,
     subject: SubjectUi?,
-    office: Int,
+    office: String,
     organization: OrganizationShortUi?,
     headerBadge: (@Composable () -> Unit)? = null,
-    footer: (@Composable ColumnScope.() -> Unit)? = null,
+    footer: (@Composable ColumnScope.() -> Unit)? = {
+        OfficeAndOrganizationFooter(
+            office = office,
+            organization = if (organization?.isMain == true) organization.shortName else null,
+        )
+    },
     trailingIcon: (@Composable () -> Unit)? = null,
-    highlightContent: Boolean = false,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     Row(
@@ -103,8 +108,6 @@ internal fun CommonClassView(
             },
             timeRange = timeRange,
             subject = subject?.name,
-            office = office,
-            organization = organization?.takeIf { !it.isMain }?.shortName,
             headerBadge = headerBadge,
             footer = footer,
             highlightContent = highlightContent
@@ -114,7 +117,35 @@ internal fun CommonClassView(
 }
 
 @Composable
-internal fun CommonClassViewColorIndicator(
+internal fun OfficeAndOrganizationFooter(
+    modifier: Modifier = Modifier,
+    office: String,
+    organization: String?,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = office,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            style = MaterialTheme.typography.labelMedium,
+        )
+        if (organization != null) {
+            Text(
+                text = organization,
+                color = MaterialTheme.colorScheme.tertiary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.labelMedium,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CommonClassViewColorIndicator(
     modifier: Modifier = Modifier,
     number: Int,
     indicatorColor: Color?,
@@ -139,12 +170,10 @@ internal fun CommonClassViewColorIndicator(
 }
 
 @Composable
-internal fun CommonClassViewContent(
+private fun CommonClassViewContent(
     modifier: Modifier = Modifier,
     timeRange: TimeRange,
     subject: String?,
-    office: Int,
-    organization: String?,
     headerBadge: (@Composable () -> Unit)? = null,
     footer: (@Composable ColumnScope.() -> Unit)? = null,
     highlightContent: Boolean = false,
@@ -182,24 +211,6 @@ internal fun CommonClassViewContent(
             )
             if (footer != null) {
                 footer(this)
-            } else {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(
-                        text = office.toString(),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                    if (organization != null) {
-                        Text(
-                            text = organization,
-                            color = MaterialTheme.colorScheme.tertiary,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    }
-                }
             }
         }
     }

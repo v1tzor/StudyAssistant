@@ -17,7 +17,8 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.validation
 
 import functional.Constants
-import ru.aleshin.studyassistant.auth.impl.presentation.models.UsernameValidError
+import functional.Constants.Text.USERNAME_LENGTH
+import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.UsernameValidError
 import validation.ValidateResult
 import validation.Validator
 
@@ -27,7 +28,7 @@ import validation.Validator
 internal interface UsernameValidator : Validator<String, UsernameValidError> {
     class Base : UsernameValidator {
         override fun validate(data: String): ValidateResult<UsernameValidError> {
-            return if (data.length in 2..15 && data.matches(Regex(Constants.Regex.ONLY_TEXT))) {
+            return if (data.length in 2..USERNAME_LENGTH && data.matches(Regex(Constants.Regex.ONLY_TEXT))) {
                 ValidateResult(true, null)
             } else {
                 ValidateResult(false, UsernameValidError.LengthError)

@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import functional.UID
 import kotlinx.datetime.DayOfWeek
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.ScheduleView
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.ScheduleViewPlaceholder
@@ -58,8 +58,8 @@ internal fun ScheduleEditorContent(
         modifier = modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, end = 16.dp),
         targetState = state.isLoading,
         transitionSpec = {
-            fadeIn(animationSpec = tween(500, delayMillis = 180)).togetherWith(
-                fadeOut(animationSpec = tween(500))
+            fadeIn(animationSpec = tween(400)).togetherWith(
+                fadeOut(animationSpec = tween(400))
             )
         },
     ) { loading ->

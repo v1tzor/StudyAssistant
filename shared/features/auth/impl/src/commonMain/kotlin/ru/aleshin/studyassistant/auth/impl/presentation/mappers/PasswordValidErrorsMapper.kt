@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.mappers
 
 import androidx.compose.runtime.Composable
-import ru.aleshin.studyassistant.auth.impl.presentation.models.PasswordValidError
+import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.PasswordValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 
 /**
@@ -25,5 +25,5 @@ import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
  */
 @Composable
 internal fun PasswordValidError.mapToMessage() = when (this) {
-    PasswordValidError.FormatError -> AuthThemeRes.strings.passwordFormatError
+    is PasswordValidError.FormatError -> AuthThemeRes.strings.passwordFormatError
 }

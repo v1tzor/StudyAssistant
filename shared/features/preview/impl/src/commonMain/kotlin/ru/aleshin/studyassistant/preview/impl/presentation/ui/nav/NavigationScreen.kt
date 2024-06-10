@@ -17,17 +17,13 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.nav
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
 import di.withDirectDI
-import navigation.NavigatorManager
 import navigation.NestedFeatureNavigator
 import navigation.rememberNavigatorManager
 import navigation.rememberScreenProvider
-import org.kodein.di.compose.withDI
-import org.kodein.di.instance
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
 import ru.aleshin.studyassistant.preview.impl.navigation.PreviewNavigatorManager

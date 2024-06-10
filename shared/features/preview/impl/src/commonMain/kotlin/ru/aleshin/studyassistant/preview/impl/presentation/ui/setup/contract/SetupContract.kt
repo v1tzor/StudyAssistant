@@ -24,9 +24,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import functional.UID
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
-import ru.aleshin.studyassistant.preview.impl.presentation.models.AppUserUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.CalendarSettingsUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.OrganizationUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupPage
 
 /**
@@ -56,6 +56,7 @@ internal sealed class SetupEvent : BaseEvent {
 
 internal sealed class SetupEffect : BaseUiEffect {
     data class ShowError(val failures: PreviewFailures) : SetupEffect()
+    data class NavigateToGlobalScreen(val pushScreen: Screen) : SetupEffect()
     data class ReplaceGlobalScreen(val screen: Screen) : SetupEffect()
 }
 

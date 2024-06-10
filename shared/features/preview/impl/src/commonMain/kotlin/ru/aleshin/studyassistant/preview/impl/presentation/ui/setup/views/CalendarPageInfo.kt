@@ -39,9 +39,8 @@ import androidx.compose.ui.unit.dp
 import entities.common.NumberOfRepeatWeek
 import extensions.alphaByEnabled
 import mappers.mapToSting
-import ru.aleshin.studyassistant.preview.impl.presentation.models.CalendarSettingsUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
 import theme.StudyAssistantRes
-
 
 /**
  * @author Stanislav Aleshin on 27.04.2024
@@ -82,7 +81,7 @@ internal fun NumberOfWeekView(
         enabled = enabled,
         shape = MaterialTheme.shapes.large,
         color = animateColorAsState(
-            animationSpec = tween(300),
+            animationSpec = tween(),
             targetValue = when (selected) {
                 true -> MaterialTheme.colorScheme.primaryContainer
                 false -> MaterialTheme.colorScheme.surfaceContainer
@@ -105,12 +104,13 @@ internal fun NumberOfWeekView(
                 style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.weight(1f))
-            if (selected)
+            if (selected) {
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                 )
+            }
         }
     }
 }

@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.preview.impl.presentation.models
+package ru.aleshin.studyassistant.auth.impl.presentation.models.validation
 
-import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import validation.ValidateError
 
 /**
- * @author Stanislav Aleshin on 21.04.2024.
+ * @author Stanislav Aleshin on 17.04.2024.
  */
 @Parcelize
-internal data class FriendRequestsUi(
-    val received: List<AppUserUi> = emptyList(),
-    val send: List<AppUserUi> = emptyList(),
-    val lastAccepted: List<AppUserUi> = emptyList(),
-) : Parcelable
+internal sealed class PasswordValidError : ValidateError {
+    data object FormatError : PasswordValidError()
+}

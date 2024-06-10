@@ -19,6 +19,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -43,6 +44,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import theme.StudyAssistantRes
 import theme.material.onSplash
+import theme.material.splash
 
 /**
  * @author Stanislav Aleshin on 09.02.2024.
@@ -52,11 +54,11 @@ import theme.material.onSplash
 fun SplashContent(
     modifier: Modifier = Modifier,
 ) {
-    var isVisibleLogo by remember { mutableStateOf(false) }
     var isVisibleText by remember { mutableStateOf(false) }
+    var isVisibleLogo by remember { mutableStateOf(false) }
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().background(splash),
         contentAlignment = Alignment.Center,
     ) {
         Row(

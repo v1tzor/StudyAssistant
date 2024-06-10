@@ -18,9 +18,13 @@ package ru.aleshin.studyassistant.schedule.impl.di
 
 import inject.BaseFeatureDependencies
 import managers.CoroutineManager
+import managers.DateManager
 import repositories.BaseScheduleRepository
+import repositories.CalendarSettingsRepository
 import repositories.CustomScheduleRepository
+import repositories.HomeworksRepository
 import repositories.OrganizationsRepository
+import repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 
 /**
@@ -31,5 +35,9 @@ interface ScheduleFeatureDependencies : BaseFeatureDependencies {
     val baseScheduleRepository: BaseScheduleRepository
     val customScheduleRepository: CustomScheduleRepository
     val organizationsRepository: OrganizationsRepository
+    val calendarSettingsRepository: CalendarSettingsRepository
+    val homeworkRepository: HomeworksRepository
+    val usersRepository: UsersRepository
+    val dateManager: DateManager
     val coroutineManager: CoroutineManager
 }

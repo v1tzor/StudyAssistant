@@ -35,15 +35,14 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.Reg
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.PasswordValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.UsernameValidator
-import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 import validation.operateValidate
 
 /**
  * @author Stanislav Aleshin on 17.04.2024
  */
 internal class RegisterScreenModel(
-    private val screenProvider: AuthScreenProvider,
     private val workProcessor: RegisterWorkProcessor,
+    private val screenProvider: AuthScreenProvider,
     private val usernameValidator: UsernameValidator,
     private val emailValidator: EmailValidator,
     private val passwordValidator: PasswordValidator,
@@ -60,7 +59,7 @@ internal class RegisterScreenModel(
         event: RegisterEvent,
     ) {
         when (event) {
-            is RegisterEvent.RegisterNewAccount -> launchBackgroundWork(RegisterWorkKey.REGISTER) {
+            is RegisterEvent.RegisterNewAccount -> launchBackgroundWork(BackgroundKey.REGISTER) {
                 val usernameValidResult = usernameValidator.validate(event.credentials.username)
                 val emailValidResult = emailValidator.validate(event.credentials.email)
                 val passwordValidResult = passwordValidator.validate(event.credentials.password)
@@ -106,10 +105,10 @@ internal class RegisterScreenModel(
             passwordValidError = action.password,
         )
     }
-}
 
-internal enum class RegisterWorkKey : BackgroundWorkKey {
-    REGISTER,
+    enum class BackgroundKey : BackgroundWorkKey {
+        REGISTER,
+    }
 }
 
 @Composable

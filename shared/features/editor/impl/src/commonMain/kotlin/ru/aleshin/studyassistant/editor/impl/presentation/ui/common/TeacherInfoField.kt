@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -61,9 +61,8 @@ internal fun TeacherInfoField(
 
     ClickableInfoTextField(
         onClick = { isOpenTeacherSelector = true },
-        modifier = modifier,
+        modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
-        paddingValues = PaddingValues(start = 16.dp, end = 24.dp),
         value = teacher?.name(),
         label = EditorThemeRes.strings.teacherFieldLabel,
         placeholder = EditorThemeRes.strings.teacherFieldPlaceholder,

@@ -17,13 +17,13 @@
 package ru.aleshin.studyassistant.schedule.impl.domain.common
 
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
-import wrappers.EitherWrapper
+import wrappers.FlowEitherWrapper
 
 /**
  * @author Stanislav Aleshin on 21.04.2024
  */
-internal interface ScheduleEitherWrapper : EitherWrapper<ScheduleFailures> {
+internal interface ScheduleEitherWrapper : FlowEitherWrapper<ScheduleFailures> {
 
     class Base(errorHandler: ScheduleErrorHandler) : ScheduleEitherWrapper,
-        EitherWrapper.Abstract<ScheduleFailures>(errorHandler)
+        FlowEitherWrapper.Abstract<ScheduleFailures>(errorHandler)
 }

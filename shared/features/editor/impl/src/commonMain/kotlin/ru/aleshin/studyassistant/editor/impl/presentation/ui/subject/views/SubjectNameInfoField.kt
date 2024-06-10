@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.views
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
@@ -50,19 +50,22 @@ internal fun SubjectNameInfoField(
     name: String?,
     onNameChange: (String) -> Unit,
 ) {
-    var editableName by remember { mutableStateOf(name) }
     val focusManager = LocalFocusManager.current
     val nameInteraction = remember { MutableInteractionSource() }
+    var editableName by remember { mutableStateOf(name) }
 
     InfoTextField(
-        modifier = modifier,
+        modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
-        paddingValues = PaddingValues(start = 16.dp, end = 24.dp),
         value = editableName,
+        maxLength = Constants.Text.SUBJECT_TEXT_LENGTH,
         onValueChange = {
             editableName = it
             onNameChange(it)
         },
+        label = EditorThemeRes.strings.subjectNameFieldLabel,
+        leadingInfoIcon = painterResource(EditorThemeRes.icons.name),
+        placeholder = { Text(text = EditorThemeRes.strings.subjectNameFieldPlaceholder) },
         trailingIcon = {
             if (nameInteraction.collectIsFocusedAsState().value) {
                 IconButton(onClick = { focusManager.clearFocus() }) {
@@ -75,9 +78,5 @@ internal fun SubjectNameInfoField(
             }
         },
         interactionSource = nameInteraction,
-        maxLength = Constants.Text.SUBJECT_TEXT_LENGTH,
-        label = EditorThemeRes.strings.subjectNameFieldLabel,
-        placeholder = { Text(text = EditorThemeRes.strings.subjectNameFieldPlaceholder) },
-        leadingInfoIcon = painterResource(EditorThemeRes.icons.name),
     )
 }

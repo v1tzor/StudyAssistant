@@ -44,6 +44,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import extensions.navigationBarsInDp
 import extensions.safeNavigationBarsInPx
+import navigation.root
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorEffect
@@ -131,7 +132,7 @@ internal class ScheduleEditorScreen : Screen {
 
         handleEffect { effect ->
             when (effect) {
-                is ScheduleEditorEffect.NavigateToBack -> navigator.pop()
+                is ScheduleEditorEffect.NavigateToBack -> navigator.root().pop()
                 is ScheduleEditorEffect.NavigateToLocal -> navigator.push(effect.pushScreen)
                 is ScheduleEditorEffect.ShowError -> {
                     snackbarState.showSnackbar(

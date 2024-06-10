@@ -22,7 +22,7 @@ import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
- */ 
+ */
 internal interface PreviewNavigatorManager : NavigatorManager<PreviewScreen> {
     class Base(commandBuffer: CommandBuffer) : PreviewNavigatorManager,
         NavigatorManager.Abstract<PreviewScreen>(commandBuffer = commandBuffer)

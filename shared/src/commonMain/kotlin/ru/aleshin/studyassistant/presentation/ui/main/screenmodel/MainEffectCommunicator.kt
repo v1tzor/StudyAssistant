@@ -20,7 +20,7 @@ import architecture.communications.state.EffectCommunicator
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 
 /**
- * @author Stanislav Aleshin on 27.01.2024.
+ * @author Stanislav Aleshin on 10.06.2024.
  */
 interface MainEffectCommunicator : EffectCommunicator<MainEffect> {
     class Base : MainEffectCommunicator, EffectCommunicator.Abstract<MainEffect>()

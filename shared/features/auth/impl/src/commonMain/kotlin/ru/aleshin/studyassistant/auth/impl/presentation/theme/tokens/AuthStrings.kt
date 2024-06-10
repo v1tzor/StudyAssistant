@@ -58,7 +58,6 @@ internal data class AuthStrings(
     val otherErrorMessage: String,
 ) {
 
-
     companion object {
         val RUSSIAN = AuthStrings(
             otherSignInWayTitle = "Или войдите через",

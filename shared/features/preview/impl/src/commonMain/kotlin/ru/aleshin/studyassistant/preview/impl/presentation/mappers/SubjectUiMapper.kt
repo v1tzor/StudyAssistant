@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.mappers
 
 import entities.subject.Subject
-import ru.aleshin.studyassistant.preview.impl.presentation.models.SubjectUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.subjects.SubjectUi
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.

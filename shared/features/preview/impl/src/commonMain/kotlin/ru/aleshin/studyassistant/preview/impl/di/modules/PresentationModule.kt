@@ -44,7 +44,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<NavigationScreen> { NavigationScreen() }
 
     bindProvider<PreviewFeatureStarter> { PreviewFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<PreviewScreenProvider> { PreviewScreenProvider.Base(instance<() -> EditorFeatureStarter>(), instance<() -> AuthFeatureStarter>(), instance<() -> NavigationFeatureStarter>()) }
+    bindProvider<PreviewScreenProvider> { PreviewScreenProvider.Base(instance<() -> AuthFeatureStarter>(), instance<() -> EditorFeatureStarter>(), instance<() -> NavigationFeatureStarter>()) }
 
     bindProvider<IntroStateCommunicator> { IntroStateCommunicator.Base() }
     bindProvider<IntroEffectCommunicator> { IntroEffectCommunicator.Base() }

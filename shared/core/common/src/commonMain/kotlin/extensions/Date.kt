@@ -19,6 +19,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import functional.Constants.Date
+import functional.Constants.Date.DAYS_IN_WEEK
 import functional.TimeRange
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
@@ -68,11 +69,23 @@ fun Instant.shiftMillis(
     }
 }
 
-fun Instant.isCurrentDay(date: Instant?, timeZone: TimeZone = TimeZone.UTC): Boolean {
-    val currentDate = this.toLocalDateTime(timeZone).dayOfYear
-    val compareDate = date?.toLocalDateTime(timeZone)?.dayOfYear ?: false
+fun TimeRange.shiftWeek(value: Int, timeZone: TimeZone = TimeZone.UTC): TimeRange {
+    return copy(
+        from = from.shiftDay(value * DAYS_IN_WEEK, timeZone),
+        to = to.shiftDay(value * DAYS_IN_WEEK, timeZone),
+    )
+}
 
-    return currentDate == compareDate
+fun LocalDate.isCurrentDay(date: LocalDate?): Boolean {
+    return dayOfYear == date?.dayOfYear
+}
+
+fun Instant.isCurrentDay(date: LocalDate?, timeZone: TimeZone = TimeZone.UTC): Boolean {
+    return toLocalDateTime(timeZone).date.isCurrentDay(date)
+}
+
+fun Instant.isCurrentDay(date: Instant?, timeZone: TimeZone = TimeZone.UTC): Boolean {
+    return isCurrentDay(date?.toLocalDateTime(timeZone)?.date)
 }
 
 fun Instant.compareByHoursAndMinutes(compareDate: Instant): Boolean {
@@ -251,7 +264,7 @@ fun Long.toMinutesAndHoursString(minutesSuffix: String, hoursSuffix: String): An
 //}
 
 fun countWeeksByDays(days: Int): Int {
-    return BigDecimal.fromDouble(days.toDouble() / Date.DAYS_IN_WEEK).ceil().intValue()
+    return BigDecimal.fromDouble(days.toDouble() / DAYS_IN_WEEK).ceil().intValue()
 }
 
 fun countMonthByDays(days: Int): Int {

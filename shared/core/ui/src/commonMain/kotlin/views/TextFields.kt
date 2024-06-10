@@ -18,7 +18,6 @@ package views
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -29,7 +28,6 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -88,7 +86,6 @@ fun InfoTextField(
     suffix: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
-    paddingValues: PaddingValues = PaddingValues(),
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -106,7 +103,7 @@ fun InfoTextField(
     )
 ) {
     Row(
-        modifier = Modifier.padding(paddingValues).animateContentSize(),
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(24.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -117,7 +114,7 @@ fun InfoTextField(
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         OutlinedTextField(
-            modifier = modifier.sizeIn(minHeight = 65.dp).fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 65.dp).animateContentSize(),
             enabled = enabled,
             value = value ?: "",
             onValueChange = { text ->
@@ -166,7 +163,6 @@ fun InfoTextField(
     suffix: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
-    paddingValues: PaddingValues = PaddingValues(),
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -184,7 +180,7 @@ fun InfoTextField(
     )
 ) {
     Row(
-        modifier = Modifier.padding(paddingValues).animateContentSize(),
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(24.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -195,7 +191,7 @@ fun InfoTextField(
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         OutlinedTextField(
-            modifier = modifier.sizeIn(minHeight = 65.dp).fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 65.dp).animateContentSize(),
             enabled = enabled,
             value = value,
             onValueChange = { value1 ->
@@ -245,7 +241,6 @@ fun VerticalInfoTextField(
     supportingText: @Composable (() -> Unit)? = null,
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(8.dp),
     isError: Boolean = false,
-    paddingValues: PaddingValues = PaddingValues(),
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -263,7 +258,7 @@ fun VerticalInfoTextField(
     )
 ) {
     Column(
-        modifier = Modifier.padding(paddingValues).animateContentSize(spring()),
+        modifier = modifier,
         verticalArrangement = verticalArrangement,
     ) {
         Text(
@@ -272,7 +267,7 @@ fun VerticalInfoTextField(
             style = MaterialTheme.typography.bodyMedium,
         )
         OutlinedTextField(
-            modifier = modifier.sizeIn(minHeight = 56.dp).fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 56.dp).animateContentSize(),
             enabled = enabled,
             value = value ?: "",
             onValueChange = { text ->
@@ -329,7 +324,6 @@ fun VerticalInfoTextField(
     supportingText: @Composable (() -> Unit)? = null,
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(8.dp),
     isError: Boolean = false,
-    paddingValues: PaddingValues = PaddingValues(),
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -347,7 +341,7 @@ fun VerticalInfoTextField(
     )
 ) {
     Column(
-        modifier = Modifier.padding(paddingValues).animateContentSize(spring()),
+        modifier = modifier,
         verticalArrangement = verticalArrangement,
     ) {
         Text(
@@ -356,7 +350,7 @@ fun VerticalInfoTextField(
             style = MaterialTheme.typography.bodyMedium,
         )
         OutlinedTextField(
-            modifier = modifier.sizeIn(minHeight = 56.dp).fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 56.dp).animateContentSize(),
             enabled = enabled,
             value = value,
             onValueChange = { fieldValue ->
@@ -409,7 +403,6 @@ fun ClickableInfoTextField(
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
-    paddingValues: PaddingValues = PaddingValues(),
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     borderColor: Color = MaterialTheme.colorScheme.outline,
@@ -420,8 +413,8 @@ fun ClickableInfoTextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     Row(
-        modifier = Modifier.animateContentSize().padding(paddingValues).animateContentSize(),
-        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Box(
             modifier = Modifier.height(56.dp).padding(top = if (label != null) 5.dp else 0.dp),
@@ -434,10 +427,14 @@ fun ClickableInfoTextField(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        Box(modifier = modifier.padding(top = if (label != null) 5.dp else 0.dp)) {
+        Box(modifier = Modifier.padding(top = if (label != null) 5.dp else 0.dp)) {
             Surface(
                 onClick = onClick,
-                modifier = Modifier.alphaByEnabled(enabled).fillMaxWidth().sizeIn(minHeight = 56.dp),
+                modifier = Modifier
+                    .alphaByEnabled(enabled)
+                    .fillMaxWidth()
+                    .sizeIn(minHeight = 56.dp)
+                    .animateContentSize(),
                 enabled = enabled,
                 shape = MaterialTheme.shapes.large,
                 color = Color.Transparent,
@@ -537,10 +534,14 @@ fun ClickableTextField(
     minLines: Int = 1,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    Box(modifier = modifier.animateContentSize().padding(top = if (label != null) 5.dp else 0.dp)) {
+    Box(modifier = modifier.padding(top = if (label != null) 5.dp else 0.dp)) {
         Surface(
             onClick = onClick,
-            modifier = Modifier.alphaByEnabled(enabled).fillMaxWidth().sizeIn(minHeight = 56.dp),
+            modifier = Modifier
+                .alphaByEnabled(enabled)
+                .fillMaxWidth()
+                .sizeIn(minHeight = 56.dp)
+                .animateContentSize(),
             enabled = enabled,
             shape = MaterialTheme.shapes.large,
             color = Color.Transparent,

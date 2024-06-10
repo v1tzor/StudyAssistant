@@ -28,9 +28,7 @@ import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
  * @author Stanislav Aleshin on 14.04.2024
  */
 @Parcelize
-internal sealed class IntroViewState : BaseViewState {
-    data object Default : IntroViewState()
-}
+internal object IntroViewState : BaseViewState
 
 internal sealed class IntroEvent : BaseEvent {
     data class NextPage(val currentPage: Int) : IntroEvent()
@@ -45,4 +43,4 @@ internal sealed class IntroEffect : BaseUiEffect {
     data class ReplaceGlobalScreen(val screen: Screen) : IntroEffect()
 }
 
-internal sealed class IntroAction : BaseAction
+internal object IntroAction : BaseAction

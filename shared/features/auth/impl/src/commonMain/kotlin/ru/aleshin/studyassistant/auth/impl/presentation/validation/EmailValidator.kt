@@ -16,7 +16,8 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.validation
 
-import ru.aleshin.studyassistant.auth.impl.presentation.models.EmailValidError
+import functional.Constants.Text.MIN_EMAIL_LENGTH
+import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.EmailValidError
 import validation.ValidateResult
 import validation.Validator
 
@@ -26,7 +27,7 @@ import validation.Validator
 internal interface EmailValidator : Validator<String, EmailValidError> {
     class Base : EmailValidator {
         override fun validate(data: String): ValidateResult<EmailValidError> {
-            return if (data.contains('@') && data.contains('.') && data.length > 5) {
+            return if (data.contains('@') && data.contains('.') && data.length > MIN_EMAIL_LENGTH) {
                 ValidateResult(true, null)
             } else {
                 ValidateResult(false, EmailValidError.EmailFormat)

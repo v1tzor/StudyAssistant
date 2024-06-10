@@ -19,12 +19,14 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -46,8 +48,6 @@ internal fun ForgotContent(
     onSendEmailClick: (email: String) -> Unit,
     onAlreadyHavePasswordClick: () -> Unit,
 ) {
-    var email by rememberSaveable { mutableStateOf("") }
-
     Column(
         modifier = modifier.padding(bottom = 16.dp, top = 6.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -59,6 +59,9 @@ internal fun ForgotContent(
             contentDescription = AuthThemeRes.strings.forgotDesc,
         )
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            val focusManager = LocalFocusManager.current
+            var email by rememberSaveable { mutableStateOf("") }
+
             EmailTextField(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 enabled = !state.isLoading,
@@ -66,6 +69,12 @@ internal fun ForgotContent(
                 onEmailChanged = { email = it },
                 isError = state.emailValidError != null,
                 errorText = state.emailValidError?.mapToMessage(),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (email.isNotEmpty()) onSendEmailClick(email)
+                        focusManager.clearFocus()
+                    },
+                )
             )
             ForgotActionsSection(
                 enabled = !state.isLoading && email.isNotEmpty(),

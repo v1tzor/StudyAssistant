@@ -40,8 +40,8 @@ internal interface PreviewScreenProvider : FeatureScreenProvider<PreviewScreen> 
     fun provideTabNavigationScreen(): Screen
 
     class Base(
-        private val editorFeatureStarter: () -> EditorFeatureStarter,
         private val authFeatureStarter: () -> AuthFeatureStarter,
+        private val editorFeatureStarter: () -> EditorFeatureStarter,
         private val navigationFeatureStarter: () -> NavigationFeatureStarter,
     ) : PreviewScreenProvider {
 

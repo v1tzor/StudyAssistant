@@ -16,8 +16,10 @@
 
 package remote.tasks
 
+import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.DocumentReference
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.firestore.orderBy
 import dev.gitlive.firebase.firestore.where
 import exceptions.FirebaseUserException
 import functional.UID
@@ -42,7 +44,7 @@ interface HomeworksRemoteDataSource {
 
     suspend fun addOrUpdateHomework(homework: HomeworkDetailsData, targetUser: UID): UID
     suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<HomeworkDetailsData?>
-    suspend fun fetchHomeworksByTime(from: Int, to: Int, targetUser: UID): Flow<List<HomeworkDetailsData>>
+    suspend fun fetchHomeworksByTime(from: Long, to: Long, targetUser: UID): Flow<List<HomeworkDetailsData>>
     suspend fun deleteHomework(uid: UID, targetUser: UID)
 
     class Base(
@@ -84,8 +86,8 @@ interface HomeworksRemoteDataSource {
         }
 
         override suspend fun fetchHomeworksByTime(
-            from: Int,
-            to: Int,
+            from: Long,
+            to: Long,
             targetUser: UID
         ): Flow<List<HomeworkDetailsData>> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
@@ -93,7 +95,7 @@ interface HomeworksRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.HOMEWORKS).where {
                 (UserData.HOMEWORK_DATE greaterThanOrEqualTo from) and (UserData.HOMEWORK_DATE lessThanOrEqualTo to)
-            }
+            }.orderBy(UserData.HOMEWORK_DATE, Direction.DESCENDING)
 
             val homeworkPojoListFlow = reference.snapshots.map { snapshot ->
                 snapshot.documents.map { it.data(serializer<HomeworkPojo>()) }

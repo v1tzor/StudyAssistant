@@ -55,7 +55,7 @@ internal class ForgotScreenModel(
         event: ForgotEvent,
     ) {
         when (event) {
-            is ForgotEvent.SendResetPasswordEmail -> launchBackgroundWork(ForgotWorkKey.RESET_PASSWORD) {
+            is ForgotEvent.SendResetPasswordEmail -> launchBackgroundWork(BackgroundKey.RESET_PASSWORD) {
                 val emailValidResult = emailValidator.validate(event.credentials.email)
                 operateValidate(
                     isSuccess = {
@@ -86,15 +86,15 @@ internal class ForgotScreenModel(
             isLoading = action.isLoading,
             emailValidError = null,
         )
-        is ForgotAction.UpdateValidError ->  currentState.copy(
+        is ForgotAction.UpdateValidError -> currentState.copy(
             isLoading = false,
             emailValidError = action.email,
         )
     }
-}
 
-internal enum class ForgotWorkKey : BackgroundWorkKey {
-    RESET_PASSWORD
+    enum class BackgroundKey : BackgroundWorkKey {
+        RESET_PASSWORD,
+    }
 }
 
 @Composable

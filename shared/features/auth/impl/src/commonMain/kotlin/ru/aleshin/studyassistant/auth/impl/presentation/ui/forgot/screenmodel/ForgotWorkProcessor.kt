@@ -25,7 +25,8 @@ import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
-import ru.aleshin.studyassistant.auth.impl.presentation.models.ForgotCredentialsUi
+import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToDomain
+import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.ForgotCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEffect
 
@@ -39,7 +40,7 @@ internal interface ForgotWorkProcessor : FlowWorkProcessor<ForgotWorkCommand, Fo
         private val authInteractor: AuthInteractor,
     ) : ForgotWorkProcessor {
 
-        override suspend fun work(command: ForgotWorkCommand) = when(command) {
+        override suspend fun work(command: ForgotWorkCommand) = when (command) {
             is ForgotWorkCommand.SendResetPasswordEmail -> sendResetPasswordEmailWork(command.credentialsUi)
         }
 
@@ -48,8 +49,8 @@ internal interface ForgotWorkProcessor : FlowWorkProcessor<ForgotWorkCommand, Fo
             authInteractor.resetPassword(credentials.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(ForgotEffect.ShowError(it))) },
                 onRightAction = {
-                    val screen = screenProvider.provideFeatureScreen(AuthScreen.Login)
-                    emit(EffectResult(ForgotEffect.PushScreen(screen)))
+                    val targetScreen = screenProvider.provideFeatureScreen(AuthScreen.Login)
+                    emit(EffectResult(ForgotEffect.PushScreen(targetScreen)))
                 },
             )
             emit(ActionResult(ForgotAction.UpdateLoading(false)))

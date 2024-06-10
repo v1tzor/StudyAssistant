@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.mappers
 
 import entities.organizations.Organization
-import ru.aleshin.studyassistant.preview.impl.presentation.models.OrganizationUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.

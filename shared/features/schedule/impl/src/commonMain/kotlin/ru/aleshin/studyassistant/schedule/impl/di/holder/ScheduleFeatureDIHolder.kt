@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.schedule.impl.di.holder
 
 import inject.BaseFeatureDIHolder
 import managers.CoroutineManager
+import managers.DateManager
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
 import org.kodein.di.bindInstance
@@ -25,8 +26,11 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
 import repositories.BaseScheduleRepository
+import repositories.CalendarSettingsRepository
 import repositories.CustomScheduleRepository
+import repositories.HomeworksRepository
 import repositories.OrganizationsRepository
+import repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.di.ScheduleFeatureApi
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
@@ -50,6 +54,10 @@ object ScheduleFeatureDIHolder : BaseFeatureDIHolder<ScheduleFeatureApi, Schedul
                 bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
                 bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
+                bindSingleton<UsersRepository> { dependencies.usersRepository }
+                bindSingleton<HomeworksRepository> { dependencies.homeworkRepository }
+                bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
+                bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<ScheduleFeatureApi> {
                     object : ScheduleFeatureApi {

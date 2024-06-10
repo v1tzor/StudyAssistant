@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.preview.impl.presentation.models
+package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import architecture.communications.state.StateCommunicator
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewViewState
 
 /**
- * @author Stanislav Aleshin on 27.04.2024.
+ * @author Stanislav Aleshin on 09.06.2024.
  */
-@Parcelize
-data class ContactInfoUi(
-    val label: String? = null,
-    val value: String = "",
-) : Parcelable
+internal interface OverviewStateCommunicator : StateCommunicator<OverviewViewState> {
+    class Base : OverviewStateCommunicator, StateCommunicator.Abstract<OverviewViewState>(
+        defaultState = OverviewViewState()
+    )
+}

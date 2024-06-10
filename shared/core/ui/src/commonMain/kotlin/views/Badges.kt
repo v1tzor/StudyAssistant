@@ -30,7 +30,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import extensions.boldWeight
 import theme.StudyAssistantRes
@@ -42,9 +41,9 @@ import theme.tokens.contentColorFor
 @Composable
 fun SmallInfoBadge(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
     containerColor: Color = StudyAssistantRes.colors.accents.redContainer,
     contentColor: Color = StudyAssistantRes.colors.accents.contentColorFor(containerColor),
+    content: @Composable () -> Unit,
 ) {
     Surface(
         modifier = modifier,
@@ -66,11 +65,11 @@ fun SmallInfoBadge(
 @Composable
 fun InfoBadge(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
     leadingIcon: (@Composable () -> Unit)? = null,
     trailingIcon: (@Composable () -> Unit)? = null,
     containerColor: Color = StudyAssistantRes.colors.accents.red,
     contentColor: Color = StudyAssistantRes.colors.accents.contentColorFor(containerColor),
+    content: @Composable () -> Unit,
 ) {
     Surface(
         modifier = modifier,

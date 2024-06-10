@@ -27,12 +27,17 @@ import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import extensions.dateTimeUTC
+import extensions.weekTimeRange
 import navigation.root
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEvent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsViewState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel.rememberDetailsScreenModel
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.DetailsBottomBar
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.DetailsTopBar
 import views.ErrorSnackbar
 
 /**
@@ -58,10 +63,21 @@ internal class DetailsScreen : Screen {
                 )
             },
             topBar = {
-
+                DetailsTopBar(
+                    onEditClick = { dispatchEvent(DetailsEvent.NavigateToEditor) },
+                    onCurrentWeek = { dispatchEvent(DetailsEvent.SelectedCurrentWeek) },
+                    onOverviewClick = { dispatchEvent(DetailsEvent.NavigateToOverview) },
+                )
             },
             bottomBar = {
-
+                DetailsBottomBar(
+                    currentWeek = state.currentDate.dateTimeUTC().weekTimeRange(),
+                    selectedWeek = state.selectedWeek,
+                    viewType = state.scheduleView,
+                    onNextWeek = { dispatchEvent(DetailsEvent.SelectedNextWeek) },
+                    onPreviousWeek = { dispatchEvent(DetailsEvent.SelectedPreviousWeek) },
+                    onViewTypeSelected = { dispatchEvent(DetailsEvent.SelectedViewType(it)) },
+                )
             },
             snackbarHost = {
                 SnackbarHost(

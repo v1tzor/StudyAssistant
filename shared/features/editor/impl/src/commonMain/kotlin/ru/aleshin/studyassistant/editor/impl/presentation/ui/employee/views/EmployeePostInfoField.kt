@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -53,9 +53,8 @@ internal fun EmployeePostInfoField(
 
     ClickableInfoTextField(
         onClick = { isOpenEmployeePostSelector = true },
-        modifier = modifier,
+        modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
-        paddingValues = PaddingValues(start = 16.dp, end = 24.dp),
         value = post?.mapToString(StudyAssistantRes.strings),
         label = EditorThemeRes.strings.employeePostFieldLabel,
         placeholder = EditorThemeRes.strings.employeePostFieldPlaceholder,

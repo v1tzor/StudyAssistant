@@ -21,9 +21,12 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.features.schedule.impl.generated.resources.Res
 import studyassistant.shared.features.schedule.impl.generated.resources.ic_calendar_today
+import studyassistant.shared.features.schedule.impl.generated.resources.ic_format_columns
+import studyassistant.shared.features.schedule.impl.generated.resources.ic_format_grid
 import studyassistant.shared.features.schedule.impl.generated.resources.ic_list_edit
 import studyassistant.shared.features.schedule.impl.generated.resources.ic_open_table
 import studyassistant.shared.features.schedule.impl.generated.resources.ic_table_edit
+import studyassistant.shared.features.schedule.impl.generated.resources.ic_view_dashboard
 
 /**
  * @author Stanislav Aleshin on 21.06.2023.
@@ -32,21 +35,30 @@ import studyassistant.shared.features.schedule.impl.generated.resources.ic_table
 internal data class ScheduleIcons(
     val openTable: DrawableResource,
     val openOverview: DrawableResource,
+    val currentDayOrWeek: DrawableResource,
     val editList: DrawableResource,
     val editTable: DrawableResource,
+    val formatGrid: DrawableResource,
+    val formatColumns: DrawableResource,
 ) {
     companion object {
         val LIGHT = ScheduleIcons(
             openTable = Res.drawable.ic_open_table,
-            openOverview = Res.drawable.ic_calendar_today,
+            openOverview = Res.drawable.ic_view_dashboard,
+            currentDayOrWeek = Res.drawable.ic_calendar_today,
             editList = Res.drawable.ic_list_edit,
             editTable = Res.drawable.ic_table_edit,
+            formatColumns = Res.drawable.ic_format_columns,
+            formatGrid = Res.drawable.ic_format_grid,
         )
         val DARK = ScheduleIcons(
             openTable = Res.drawable.ic_open_table,
-            openOverview = Res.drawable.ic_calendar_today,
+            openOverview = Res.drawable.ic_view_dashboard,
+            currentDayOrWeek = Res.drawable.ic_calendar_today,
             editList = Res.drawable.ic_list_edit,
             editTable = Res.drawable.ic_table_edit,
+            formatColumns = Res.drawable.ic_format_columns,
+            formatGrid = Res.drawable.ic_format_grid,
         )
     }
 }

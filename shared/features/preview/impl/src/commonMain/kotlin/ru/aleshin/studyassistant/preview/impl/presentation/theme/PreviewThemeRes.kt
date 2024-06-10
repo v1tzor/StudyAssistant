@@ -17,10 +17,10 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.theme
 
 import androidx.compose.runtime.Composable
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens.PreviewIcons
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens.PreviewStrings
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens.LocalPreviewIcons
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens.LocalPreviewStrings
+import ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens.PreviewIcons
+import ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens.PreviewStrings
 
 /**
  * @author Stanislav Aleshin on 14.06.2023

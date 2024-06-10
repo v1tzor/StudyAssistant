@@ -18,20 +18,18 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.remember
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalWindowInfo
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.auth.impl.presentation.models.ForgotCredentialsUi
-import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthTheme
+import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.ForgotCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEffect
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEvent

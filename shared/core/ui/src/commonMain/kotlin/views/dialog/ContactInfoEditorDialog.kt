@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
+package views.dialog
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,8 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import functional.Constants
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import theme.StudyAssistantRes
 import views.DialogButtons
 import views.DialogHeader
@@ -48,16 +46,17 @@ import views.DialogHeader
  */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun ContactInfoEditorDialog(
+fun ContactInfoEditorDialog(
     modifier: Modifier = Modifier,
     header: String,
-    contactInfo: ContactInfoUi?,
+    label: String?,
+    value: String?,
     onDelete: () -> Unit,
-    onConfirm: (ContactInfoUi) -> Unit,
+    onConfirm: (label: String?, value: String) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    var editableLabel by remember { mutableStateOf(contactInfo?.label) }
-    var editableValue by remember { mutableStateOf(contactInfo?.value) }
+    var editableLabel by remember { mutableStateOf(label) }
+    var editableValue by remember { mutableStateOf(value) }
 
     BasicAlertDialog(
         onDismissRequest = onDismiss,
@@ -84,7 +83,7 @@ internal fun ContactInfoEditorDialog(
                                 editableLabel = text
                             }
                         },
-                        label = { Text(text = EditorThemeRes.strings.contactInfoLabel) },
+                        label = { Text(text = StudyAssistantRes.strings.contactInfoLabel) },
                         singleLine = true,
                         shape = MaterialTheme.shapes.large,
                     )
@@ -96,23 +95,19 @@ internal fun ContactInfoEditorDialog(
                                 editableValue = text
                             }
                         },
-                        label = { Text(text = EditorThemeRes.strings.contactInfoValue) },
+                        label = { Text(text = StudyAssistantRes.strings.contactInfoValue) },
                         singleLine = true,
                         shape = MaterialTheme.shapes.large,
                     )
                 }
                 DialogButtons(
                     enabledConfirmFirst = editableValue?.isNotEmpty() == true,
-                    enabledConfirmSecond = contactInfo != null,
+                    enabledConfirmSecond = value != null,
                     confirmFirstTitle = StudyAssistantRes.strings.saveConfirmTitle,
                     confirmSecondTitle = StudyAssistantRes.strings.deleteConfirmTitle,
                     onCancelClick = onDismiss,
                     onConfirmFirstClick = {
-                        val editContactInfo = (contactInfo ?: ContactInfoUi()).copy(
-                            label = editableLabel,
-                            value = editableValue ?: "",
-                        )
-                        onConfirm(editContactInfo)
+                        if (editableValue != null) onConfirm(editableLabel, editableValue!!)
                     },
                     onConfirmSecondClick = onDelete,
                 )

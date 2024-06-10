@@ -65,7 +65,7 @@ internal class IntroScreenModel(
         }
     }
 
-    override suspend fun reduce(action: IntroAction, currentState: IntroViewState) = IntroViewState.Default
+    override suspend fun reduce(action: IntroAction, currentState: IntroViewState) = IntroViewState
 }
 
 @Composable

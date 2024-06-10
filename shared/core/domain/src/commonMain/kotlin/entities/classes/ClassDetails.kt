@@ -30,6 +30,7 @@ import functional.UID
  */
 data class ClassDetails(
     val uid: UID,
+    val scheduleId: UID,
     val organization: OrganizationShort,
     val eventType: EventType,
     val subject: Subject?,
@@ -44,6 +45,7 @@ data class ClassDetails(
 
 fun Class.convertToDetails(homeWork: Homework?) = ClassDetails(
     uid = uid,
+    scheduleId = scheduleId,
     organization = organization,
     eventType = eventType,
     subject = subject,

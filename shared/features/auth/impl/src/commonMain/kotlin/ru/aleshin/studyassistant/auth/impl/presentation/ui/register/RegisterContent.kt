@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -45,14 +46,15 @@ internal fun RegisterContent(
     onRegisterClick: (name: String, email: String, password: String) -> Unit,
     onAlreadyHaveAccountClick: () -> Unit,
 ) {
-    var username by rememberSaveable { mutableStateOf("") }
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-
     Column(
         modifier = modifier.padding(bottom = 16.dp, top = 6.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        val focusManager = LocalFocusManager.current
+        var username by rememberSaveable { mutableStateOf("") }
+        var email by rememberSaveable { mutableStateOf("") }
+        var password by rememberSaveable { mutableStateOf("") }
+
         AuthHeaderSection(
             modifier = Modifier.weight(1f),
             text = AuthThemeRes.strings.registerHeadline,
@@ -70,6 +72,12 @@ internal fun RegisterContent(
             onUsernameChange = { username = it },
             onEmailChange = { email = it },
             onPasswordChange = { password = it },
+            onCompleteEnter = {
+                if (username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
+                    onRegisterClick(username, email, password)
+                }
+                focusManager.clearFocus()
+            }
         )
         RegisterActionsSection(
             enabled = !state.isLoading && username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty(),

@@ -9,12 +9,17 @@ complexity:
   LongMethod:
     threshold: 100
   LongParameterList:
-    functionThreshold: 15
+    functionThreshold: 25
   TooManyFunctions:
     ignoreAnnotatedFunctions: ['Preview']
+formatting:
+  FinalNewline:
+    insertFinalNewLine: false
 style:
   MagicNumber:
     ignorePropertyDeclaration: true
     ignoreCompanionObjectPropertyDeclaration: true
   UnusedPrivateMember:
     ignoreAnnotated: ['Preview']
+  NewLineAtEndOfFile:
+    active: false

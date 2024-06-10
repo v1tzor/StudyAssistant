@@ -4,7 +4,6 @@ CREATE TABLE homeworkEntity (
     date INTEGER NOT NULL,
     subject_id TEXT,
     organization_id TEXT NOT NULL,
-    event_type TEXT NOT NULL,
     theoretical_tasks TEXT NOT NULL,
     practical_tasks TEXT NOT NULL,
     presentations TEXT NOT NULL,
@@ -25,7 +24,7 @@ FROM homeworkEntity
 WHERE uid = ?;
 
 addOrUpdateHomeworks:
-INSERT OR REPLACE INTO homeworkEntity (uid, class_id, date, subject_id, organization_id, event_type, theoretical_tasks, practical_tasks, presentations, test, priority, is_done)
+INSERT OR REPLACE INTO homeworkEntity (uid, class_id, date, subject_id, organization_id, theoretical_tasks, practical_tasks, presentations, test, priority, is_done)
 VALUES ?;
 
 deleteHomework:

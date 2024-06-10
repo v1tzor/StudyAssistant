@@ -51,9 +51,9 @@ internal enum class IntroPage : IntroPageData {
         override val illustration @Composable get() = PreviewThemeRes.icons.friendsIllustration
     };
 
-   companion object {
-       fun fetchByIndex(index: Int) = entries.find { it.id == index }
-   }
+    companion object {
+        fun fetchByIndex(index: Int) = entries.find { it.id == index }
+    }
 }
 
 @OptIn(ExperimentalResourceApi::class)

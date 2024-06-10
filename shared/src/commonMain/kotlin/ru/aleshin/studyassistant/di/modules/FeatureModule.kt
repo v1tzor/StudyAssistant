@@ -29,6 +29,7 @@ import repositories.BaseScheduleRepository
 import repositories.CalendarSettingsRepository
 import repositories.CustomScheduleRepository
 import repositories.EmployeeRepository
+import repositories.HomeworksRepository
 import repositories.ManageUserRepository
 import repositories.OrganizationsRepository
 import repositories.SubjectsRepository
@@ -111,6 +112,10 @@ val featureModule = DI.Module("Feature") {
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
+            override val homeworkRepository = instance<HomeworksRepository>()
+            override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val usersRepository = instance<UsersRepository>()
+            override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }

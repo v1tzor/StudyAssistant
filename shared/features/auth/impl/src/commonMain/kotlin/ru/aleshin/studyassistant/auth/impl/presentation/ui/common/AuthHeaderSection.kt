@@ -30,8 +30,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.

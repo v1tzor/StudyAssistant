@@ -14,34 +14,26 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.preview.impl.presentation.models
+package ru.aleshin.studyassistant.preview.impl.presentation.models.subjects
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.users.Gender
+import entities.subject.EventType
 import functional.UID
+import ru.aleshin.studyassistant.preview.impl.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.users.EmployeeUi
 
 /**
- * @author Stanislav Aleshin on 21.04.2024.
+ * @author Stanislav Aleshin on 29.04.2024.
  */
 @Parcelize
-internal data class AppUserUi(
+internal data class SubjectUi(
     val uid: UID,
-    val messageId: UID,
-    val username: String,
-    val email: String,
-    val code: String,
-    val avatar: String? = null,
-    val description: String? = null,
-    val city: String? = null,
-    val birthday: String? = null,
-    val gender: Gender? = null,
-    val isSubscriber: Boolean = false,
-    val socialNetworks: List<SocialNetworkUi> = emptyList(),
-    val friends: List<UID> = emptyList(),
-    val privacy: PrivacySettingsUi = PrivacySettingsUi(),
-) : Parcelable {
-    companion object {
-        fun createEmpty(uid: UID) = AppUserUi(uid, "", "", "", "")
-    }
-}
+    val organizationId: UID,
+    val eventType: EventType,
+    val name: String,
+    val teacher: EmployeeUi?,
+    val office: String,
+    val color: Int,
+    val location: ContactInfoUi?,
+) : Parcelable

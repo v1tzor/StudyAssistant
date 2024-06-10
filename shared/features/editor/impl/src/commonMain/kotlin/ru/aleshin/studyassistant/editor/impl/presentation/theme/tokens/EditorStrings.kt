@@ -91,8 +91,6 @@ internal data class EditorStrings(
     val webFieldLabel: String,
     val webFieldPlaceholder: String,
     val contactInfoSectionHeader: String,
-    val contactInfoLabel: String,
-    val contactInfoValue: String,
     val otherErrorMessage: String,
 ) {
     companion object {
@@ -165,8 +163,6 @@ internal data class EditorStrings(
             webFieldLabel = "Сайт",
             webFieldPlaceholder = "www.example.com",
             contactInfoSectionHeader = "Связь и данные",
-            contactInfoLabel = "Название",
-            contactInfoValue = "Данные *",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = EditorStrings(
@@ -235,8 +231,6 @@ internal data class EditorStrings(
             phoneFieldLabel = "Phone",
             webFieldLabel = "Web",
             contactInfoSectionHeader = "Communication and data",
-            contactInfoLabel = "Name",
-            contactInfoValue = "Data *",
             emailFieldPlaceholder = "example@example.com",
             phoneFieldPlaceholder = "0-000-000-00-00",
             webFieldPlaceholder = "www.example.com",

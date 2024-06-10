@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -33,6 +32,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -89,7 +89,52 @@ internal fun ScheduleView(
 }
 
 @Composable
-internal fun ScheduleViewHeader(
+internal fun ScheduleViewPlaceholder(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
+        Column {
+            PlaceholderBox(
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surfaceContainer,
+            )
+            Column(
+                modifier = Modifier.padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                repeat(3) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PlaceholderBox(
+                            modifier = Modifier.height(52.dp).width(4.dp),
+                            shape = MaterialTheme.shapes.large,
+                            color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            PlaceholderBox(
+                                modifier = Modifier.size(90.dp, 16.dp),
+                                shape = MaterialTheme.shapes.small,
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            )
+                            PlaceholderBox(
+                                modifier = Modifier.height(32.dp).fillMaxWidth(),
+                                shape = MaterialTheme.shapes.small,
+                                color = MaterialTheme.colorScheme.surfaceContainer,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ScheduleViewHeader(
     modifier: Modifier = Modifier,
     weekDayOfWeek: DayOfWeek,
     numberOfClasses: Int,
@@ -122,7 +167,7 @@ internal fun ScheduleViewHeader(
 
 @Composable
 @OptIn(ExperimentalResourceApi::class)
-internal fun ScheduleViewContent(
+private fun ScheduleViewContent(
     modifier: Modifier = Modifier,
     enabled: Boolean,
     classes: List<ClassUi>?,
@@ -167,7 +212,7 @@ internal fun ScheduleViewContent(
 }
 
 @Composable
-internal fun ScheduleViewFooter(
+private fun ScheduleViewFooter(
     modifier: Modifier = Modifier,
     enabled: Boolean,
     onCreateClass: () -> Unit,
@@ -193,51 +238,6 @@ internal fun ScheduleViewFooter(
                 text = EditorThemeRes.strings.addTitle,
                 style = MaterialTheme.typography.labelLarge,
             )
-        }
-    }
-}
-
-@Composable
-internal fun ScheduleViewPlaceholder(
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
-    ) {
-        Column {
-            PlaceholderBox(
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.large,
-                color = MaterialTheme.colorScheme.surfaceContainer,
-            )
-            Column(
-                modifier = Modifier.padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                repeat(3) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        PlaceholderBox(
-                            modifier = Modifier.height(52.dp).width(4.dp),
-                            shape = MaterialTheme.shapes.large,
-                            color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                        )
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            PlaceholderBox(
-                                modifier = Modifier.size(90.dp, 16.dp),
-                                shape = MaterialTheme.shapes.small,
-                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            )
-                            PlaceholderBox(
-                                modifier = Modifier.height(32.dp).fillMaxWidth(),
-                                shape = MaterialTheme.shapes.small,
-                                color = MaterialTheme.colorScheme.surfaceContainer,
-                            )
-                        }
-                    }
-                }
-            }
         }
     }
 }

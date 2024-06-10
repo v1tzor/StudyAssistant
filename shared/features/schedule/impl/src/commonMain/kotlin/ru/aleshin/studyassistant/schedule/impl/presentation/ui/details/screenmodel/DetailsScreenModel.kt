@@ -23,6 +23,9 @@ import architecture.screenmodel.work.BackgroundWorkKey
 import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import extensions.dateTimeUTC
+import extensions.shiftWeek
+import extensions.weekTimeRange
 import managers.CoroutineManager
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
@@ -60,14 +63,33 @@ internal class DetailsScreenModel(
         event: DetailsEvent,
     ) {
         when (event) {
-            is DetailsEvent.Init -> launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
-                val command = DetailsWorkCommand.SetupWeekSchedule
-                workProcessor.work(command).collectAndHandleWork()
+            is DetailsEvent.Init, DetailsEvent.SelectedCurrentWeek -> with(state()) {
+                launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
+                    val week = currentDate.dateTimeUTC().weekTimeRange()
+                    sendAction(DetailsAction.UpdateSelectedWeek(week))
+                    val command = DetailsWorkCommand.LoadWeekSchedule(week)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
-            is DetailsEvent.SelectedWeek -> launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
-                sendAction(DetailsAction.UpdateSelectedWeek(event.week))
-                val command = DetailsWorkCommand.LoadWeekSchedule(event.week)
-                workProcessor.work(command).collectAndHandleWork()
+            is DetailsEvent.SelectedNextWeek -> with(state()) {
+                launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
+                    if (selectedWeek != null) {
+                        val week = selectedWeek.shiftWeek(1)
+                        sendAction(DetailsAction.UpdateSelectedWeek(week))
+                        val command = DetailsWorkCommand.LoadWeekSchedule(week)
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
+                }
+            }
+            is DetailsEvent.SelectedPreviousWeek -> with(state()) {
+                launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
+                    if (selectedWeek != null) {
+                        val week = selectedWeek.shiftWeek(-1)
+                        sendAction(DetailsAction.UpdateSelectedWeek(week))
+                        val command = DetailsWorkCommand.LoadWeekSchedule(week)
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
+                }
             }
             is DetailsEvent.SelectedViewType -> {
                 sendAction(DetailsAction.UpdateViewType(event.scheduleView))
@@ -87,17 +109,15 @@ internal class DetailsScreenModel(
         action: DetailsAction,
         currentState: DetailsViewState,
     ) = when (action) {
-        is DetailsAction.SetupWeekSchedule -> currentState.copy(
-            schedule = action.schedule,
-            currentWeek = action.currentWeek,
-            isLoading = false,
-        )
         is DetailsAction.UpdateWeekSchedule -> currentState.copy(
-            schedule = action.schedule,
+            weekSchedule = action.schedule,
             isLoading = false,
         )
         is DetailsAction.UpdateSelectedWeek -> currentState.copy(
             selectedWeek = action.week,
+        )
+        is DetailsAction.UpdateActiveClass -> currentState.copy(
+            activeClass = action.activeClass,
         )
         is DetailsAction.UpdateViewType -> currentState.copy(
             scheduleView = action.scheduleView,

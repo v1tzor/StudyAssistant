@@ -57,7 +57,7 @@ internal class LoginScreenModel(
         event: LoginEvent,
     ) {
         when (event) {
-            is LoginEvent.LoginWithEmail -> launchBackgroundWork(LoginWorkKey.LOGIN) {
+            is LoginEvent.LoginWithEmail -> launchBackgroundWork(BackgroundKey.LOGIN) {
                 val emailValidResult = emailValidator.validate(event.credentials.email)
                 val passwordValidResult = passwordValidator.validate(event.credentials.password)
                 operateValidate(
@@ -76,17 +76,17 @@ internal class LoginScreenModel(
                     passwordValidResult.isValid,
                 )
             }
-            is LoginEvent.LoginViaGoogle -> launchBackgroundWork(LoginWorkKey.LOGIN_VIA_GOOGLE) {
+            is LoginEvent.LoginViaGoogle -> launchBackgroundWork(BackgroundKey.LOGIN_VIA_GOOGLE) {
                 val command = LoginWorkCommand.LoginWithGoogle(event.idToken)
                 workProcessor.work(command).collectAndHandleWork()
             }
             is LoginEvent.NavigateToForgot -> {
-                val forgotScreen = screenProvider.provideFeatureScreen(AuthScreen.Forgot)
-                sendEffect(LoginEffect.PushScreen(forgotScreen))
+                val screen = screenProvider.provideFeatureScreen(AuthScreen.Forgot)
+                sendEffect(LoginEffect.PushScreen(screen))
             }
             is LoginEvent.NavigateToRegister -> {
-                val forgotScreen = screenProvider.provideFeatureScreen(AuthScreen.Register)
-                sendEffect(LoginEffect.PushScreen(forgotScreen))
+                val screen = screenProvider.provideFeatureScreen(AuthScreen.Register)
+                sendEffect(LoginEffect.PushScreen(screen))
             }
         }
     }
@@ -106,10 +106,10 @@ internal class LoginScreenModel(
             passwordValidError = action.password,
         )
     }
-}
 
-internal enum class LoginWorkKey : BackgroundWorkKey {
-    LOGIN, LOGIN_VIA_GOOGLE
+    enum class BackgroundKey : BackgroundWorkKey {
+        LOGIN, LOGIN_VIA_GOOGLE
+    }
 }
 
 @Composable

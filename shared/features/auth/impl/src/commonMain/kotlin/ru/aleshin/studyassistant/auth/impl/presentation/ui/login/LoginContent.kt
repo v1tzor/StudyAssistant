@@ -17,17 +17,15 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.login
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -51,9 +49,6 @@ internal fun LoginContent(
     onLoginViaGoogleClick: (idToken: String?) -> Unit,
     onNotAccountClick: () -> Unit,
 ) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-
     Column(
         modifier = modifier.padding(bottom = 16.dp, top = 6.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -64,9 +59,11 @@ internal fun LoginContent(
             illustration = painterResource(AuthThemeRes.icons.loginIllustration),
             contentDescription = AuthThemeRes.strings.loginDesc,
         )
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            val focusManager = LocalFocusManager.current
+            var email by rememberSaveable { mutableStateOf("") }
+            var password by rememberSaveable { mutableStateOf("") }
+
             LoginInputSection(
                 enabled = !state.isLoading,
                 email = email,
@@ -76,6 +73,10 @@ internal fun LoginContent(
                 onEmailChange = { email = it },
                 onPasswordChange = { password = it },
                 onForgotPassword = onForgotPassword,
+                onCompleteEnter = {
+                    if (email.isNotEmpty() && password.isNotEmpty()) onLoginClick(email, password)
+                    focusManager.clearFocus()
+                }
             )
             LoginActionsSection(
                 enabled = !state.isLoading && email.isNotEmpty() && password.isNotEmpty(),
@@ -84,11 +85,9 @@ internal fun LoginContent(
                 onLoginViaGoogleClick = { onLoginViaGoogleClick(it) },
             )
         }
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            NotAccountButton(
-                enabled = !state.isLoading,
-                onClick = onNotAccountClick,
-            )
-        }
+        NotAccountButton(
+            enabled = !state.isLoading,
+            onClick = onNotAccountClick,
+        )
     }
 }

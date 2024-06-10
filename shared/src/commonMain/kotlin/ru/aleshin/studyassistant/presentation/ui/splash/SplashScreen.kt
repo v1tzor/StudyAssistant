@@ -15,11 +15,8 @@
  */
 package ru.aleshin.studyassistant.presentation.ui.splash
 
-import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
-import theme.material.splash
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
@@ -28,6 +25,6 @@ class SplashScreen : Screen {
 
     @Composable
     override fun Content() {
-        SplashContent(modifier = Modifier.background(splash))
+        SplashContent()
     }
 }

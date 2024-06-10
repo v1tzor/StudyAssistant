@@ -39,6 +39,7 @@ kotlin {
             api(compose.material)
             api(compose.material3)
             api(compose.foundation)
+            api(compose.materialIconsExtended)
             api(compose.components.resources)
 
             api(libs.logger)

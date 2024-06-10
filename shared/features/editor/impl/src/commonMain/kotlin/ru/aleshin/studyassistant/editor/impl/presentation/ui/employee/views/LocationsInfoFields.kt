@@ -37,9 +37,9 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.ContactInfoEditorDialog
 import views.ClickableTextField
 import views.ExpandedIcon
+import views.dialog.ContactInfoEditorDialog
 
 /**
  * @author Stanislav Aleshin on 06.06.2024.
@@ -52,7 +52,7 @@ internal fun LocationsInfoFields(
     locations: List<ContactInfoUi>,
     onUpdate: (List<ContactInfoUi>) -> Unit,
 ) {
-    var isOpenContactInfoEditorDialog by remember { mutableStateOf(false) }
+    var contactInfoEditorDialogState by remember { mutableStateOf(false) }
     var editableContactInfo by remember { mutableStateOf<ContactInfoUi?>(null) }
 
     Row(
@@ -77,7 +77,7 @@ internal fun LocationsInfoFields(
                 ClickableTextField(
                     onClick = {
                         editableContactInfo = mainLocation
-                        isOpenContactInfoEditorDialog = true
+                        contactInfoEditorDialogState = true
                     },
                     enabled = !isLoading,
                     modifier = Modifier.height(61.dp).weight(1f),
@@ -86,14 +86,14 @@ internal fun LocationsInfoFields(
                     placeholder = EditorThemeRes.strings.locationFieldPlaceholder,
                     trailingIcon = {
                         ExpandedIcon(
-                            isExpanded = isOpenContactInfoEditorDialog,
+                            isExpanded = contactInfoEditorDialogState,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     },
                     singleLine = true,
                 )
                 if (mainLocation != null) {
-                    AddContactInfoItem(onClick = { isOpenContactInfoEditorDialog = true })
+                    AddContactInfoItem(onClick = { contactInfoEditorDialogState = true })
                 }
             }
             additionalLocations.forEach { additionalLocation ->
@@ -104,7 +104,7 @@ internal fun LocationsInfoFields(
                     ClickableTextField(
                         onClick = {
                             editableContactInfo = additionalLocation
-                            isOpenContactInfoEditorDialog = true
+                            contactInfoEditorDialogState = true
                         },
                         enabled = !isLoading,
                         modifier = Modifier.height(61.dp).weight(1f),
@@ -113,7 +113,7 @@ internal fun LocationsInfoFields(
                         placeholder = EditorThemeRes.strings.locationFieldPlaceholder,
                         trailingIcon = {
                             ExpandedIcon(
-                                isExpanded = isOpenContactInfoEditorDialog,
+                                isExpanded = contactInfoEditorDialogState,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         },
@@ -132,15 +132,20 @@ internal fun LocationsInfoFields(
         }
     }
 
-    if (isOpenContactInfoEditorDialog) {
+    if (contactInfoEditorDialogState) {
         ContactInfoEditorDialog(
             header = EditorThemeRes.strings.locationFieldLabel,
-            contactInfo = editableContactInfo,
+            label = editableContactInfo?.label,
+            value = editableContactInfo?.value,
             onDismiss = {
                 editableContactInfo = null
-                isOpenContactInfoEditorDialog = false
+                contactInfoEditorDialogState = false
             },
-            onConfirm = { location ->
+            onConfirm = { label, value ->
+                val location = (editableContactInfo ?: ContactInfoUi()).copy(
+                    label = label,
+                    value = value
+                )
                 val updatedLocations = locations.toMutableList().apply {
                     if (editableContactInfo != null) {
                         set(indexOf(editableContactInfo), location)
@@ -149,16 +154,18 @@ internal fun LocationsInfoFields(
                     }
                 }
                 onUpdate(updatedLocations)
+
                 editableContactInfo = null
-                isOpenContactInfoEditorDialog = false
+                contactInfoEditorDialogState = false
             },
             onDelete = {
                 val updatedLocations = locations.toMutableList().apply {
                     if (editableContactInfo != null) remove(editableContactInfo)
                 }
                 onUpdate(updatedLocations)
+
                 editableContactInfo = null
-                isOpenContactInfoEditorDialog = false
+                contactInfoEditorDialogState = false
             }
         )
     }

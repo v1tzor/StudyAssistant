@@ -17,13 +17,18 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views
 
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -33,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import entities.users.Gender
@@ -40,7 +46,7 @@ import functional.Constants
 import mappers.mapToSting
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.preview.impl.presentation.models.AppUserUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import theme.StudyAssistantRes
 import views.ClickableInfoTextField
@@ -61,8 +67,6 @@ internal fun ProfilePageInfo(
     onUpdateProfile: (AppUserUi) -> Unit,
     onSetAvatar: () -> Unit,
 ) = with(profile) {
-    var isOpenDatePickerDialog by remember { mutableStateOf(false) }
-
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -76,10 +80,15 @@ internal fun ProfilePageInfo(
         }
         Column(
             modifier = Modifier.verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            val focusManager = LocalFocusManager.current
+            var isExpandedGenderMenu by remember { mutableStateOf(false) }
+            var datePickerDialogState by remember { mutableStateOf(false) }
             var editableUsername by remember { mutableStateOf(TextFieldValue(username)) }
             var editableDescription by remember { mutableStateOf(TextFieldValue(description ?: "")) }
+            val usernameInteraction = remember { MutableInteractionSource() }
+            val descriptionInteraction = remember { MutableInteractionSource() }
 
             InfoTextField(
                 value = editableUsername,
@@ -89,6 +98,18 @@ internal fun ProfilePageInfo(
                 },
                 label = PreviewThemeRes.strings.usernameLabel,
                 leadingInfoIcon = painterResource(PreviewThemeRes.icons.name),
+                trailingIcon = {
+                    if (usernameInteraction.collectIsFocusedAsState().value) {
+                        IconButton(onClick = { focusManager.clearFocus() }) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = StudyAssistantRes.colors.accents.green,
+                            )
+                        }
+                    }
+                },
+                interactionSource = usernameInteraction,
             )
             InfoTextField(
                 value = editableDescription,
@@ -99,8 +120,20 @@ internal fun ProfilePageInfo(
                 maxLength = Constants.Text.MAX_PROFILE_DESC_LENGTH,
                 label = PreviewThemeRes.strings.profileDescriptionLabel,
                 leadingInfoIcon = painterResource(PreviewThemeRes.icons.description),
+                trailingIcon = {
+                    if (descriptionInteraction.collectIsFocusedAsState().value) {
+                        IconButton(onClick = { focusManager.clearFocus() }) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = StudyAssistantRes.colors.accents.green,
+                            )
+                        }
+                    }
+                },
                 singleLine = false,
                 maxLines = 4,
+                interactionSource = descriptionInteraction,
             )
             InfoTextField(
                 enabled = false,
@@ -112,9 +145,10 @@ internal fun ProfilePageInfo(
                     disabledBorderColor = MaterialTheme.colorScheme.outline,
                 )
             )
+
             ClickableInfoTextField(
                 value = profile.birthday,
-                onClick = { isOpenDatePickerDialog = true },
+                onClick = { datePickerDialogState = true },
                 label = PreviewThemeRes.strings.birthdayLabel,
                 placeholder = PreviewThemeRes.strings.birthdayPlaceholder,
                 infoIcon = painterResource(StudyAssistantRes.icons.birthday),
@@ -126,7 +160,17 @@ internal fun ProfilePageInfo(
                     )
                 }
             )
-            var isExpandedGenderMenu by remember { mutableStateOf(false) }
+            if (datePickerDialogState) {
+                BirthdayDatePicker(
+                    label = PreviewThemeRes.strings.birthdayLabel,
+                    onDismiss = { datePickerDialogState = false },
+                    onSelectedDate = { birthday ->
+                        onUpdateProfile(profile.copy(birthday = birthday))
+                        datePickerDialogState = false
+                    }
+                )
+            }
+
             ClickableInfoTextField(
                 value = profile.gender?.mapToSting(StudyAssistantRes.strings),
                 onClick = { isExpandedGenderMenu = true },
@@ -150,15 +194,5 @@ internal fun ProfilePageInfo(
                 }
             )
         }
-    }
-    if (isOpenDatePickerDialog) {
-        BirthdayDatePicker(
-            label = PreviewThemeRes.strings.birthdayLabel,
-            onDismiss = { isOpenDatePickerDialog = false },
-            onSelectedDate = { birthday ->
-                onUpdateProfile(profile.copy(birthday = birthday))
-                isOpenDatePickerDialog = false
-            }
-        )
     }
 }

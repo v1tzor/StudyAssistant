@@ -19,8 +19,12 @@ import extensions.endThisDay
 import extensions.isCurrentDay
 import extensions.startThisDay
 import extensions.toMinutes
+import extensions.weekTimeRange
+import functional.TimeRange
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -28,26 +32,33 @@ import kotlinx.datetime.Instant
 interface DateManager {
 
     fun fetchCurrentDate(): Instant
+    fun fetchCurrentWeek(): TimeRange
     fun fetchBeginningCurrentDay(): Instant
     fun fetchEndCurrentDay(): Instant
     fun isCurrentDay(date: Instant): Boolean
     fun calculateLeftTime(endTime: Instant): Long
     fun calculateProgress(startTime: Instant, endTime: Instant): Float
 
-    class Base : DateManager {
+    class Base(
+        private val timeZone: TimeZone = TimeZone.UTC
+    ) : DateManager {
 
         override fun fetchCurrentDate() = Clock.System.now()
 
+        override fun fetchCurrentWeek(): TimeRange {
+            return fetchCurrentDate().toLocalDateTime(timeZone).weekTimeRange(timeZone)
+        }
+
         override fun fetchBeginningCurrentDay(): Instant {
-            return fetchCurrentDate().startThisDay()
+            return fetchCurrentDate().startThisDay(timeZone)
         }
 
         override fun fetchEndCurrentDay(): Instant {
-            return fetchCurrentDate().endThisDay()
+            return fetchCurrentDate().endThisDay(timeZone)
         }
 
         override fun isCurrentDay(date: Instant): Boolean {
-            return fetchCurrentDate().isCurrentDay(date)
+            return fetchCurrentDate().isCurrentDay(date, timeZone)
         }
 
         override fun calculateLeftTime(endTime: Instant): Long {

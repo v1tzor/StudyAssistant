@@ -60,7 +60,7 @@ internal class SetupScreenModel(
         event: SetupEvent,
     ) {
         when (event) {
-            is SetupEvent.Init -> launchBackgroundWork(SetupWorkKey.FETCH_ALL_DATA) {
+            is SetupEvent.Init -> launchBackgroundWork(BackgroundKey.FETCH_ALL_DATA) {
                 val command = SetupWorkCommand.FetchAllData(event.createdUserId)
                 workProcessor.work(command).collectAndHandleWork()
             }
@@ -74,7 +74,7 @@ internal class SetupScreenModel(
                 sendAction(SetupAction.UpdateCalendarSettings(event.calendarSettings))
             }
             is SetupEvent.SaveProfileInfo -> {
-                launchBackgroundWork(SetupWorkKey.SAVE_PROFILE) {
+                launchBackgroundWork(BackgroundKey.SAVE_PROFILE) {
                     val profile = state().profile ?: return@launchBackgroundWork
                     val command = SetupWorkCommand.SaveProfileInfo(profile)
                     workProcessor.work(command).collectAndHandleWork()
@@ -82,7 +82,7 @@ internal class SetupScreenModel(
                 sendAction(SetupAction.UpdatePage(SetupPage.ORGANIZATION))
             }
             is SetupEvent.SaveOrganizationInfo -> {
-                launchBackgroundWork(SetupWorkKey.SAVE_ORGANIZATION) {
+                launchBackgroundWork(BackgroundKey.SAVE_ORGANIZATION) {
                     val organization = state().organization ?: return@launchBackgroundWork
                     val command = SetupWorkCommand.SaveOrganizationInfo(organization)
                     workProcessor.work(command).collectAndHandleWork()
@@ -90,7 +90,7 @@ internal class SetupScreenModel(
                 sendAction(SetupAction.UpdatePage(SetupPage.CALENDAR))
             }
             is SetupEvent.SaveCalendarInfo -> {
-                launchBackgroundWork(SetupWorkKey.SAVE_SETTINGS) {
+                launchBackgroundWork(BackgroundKey.SAVE_SETTINGS) {
                     val calendarSettings = state().calendarSettings ?: return@launchBackgroundWork
                     val command = SetupWorkCommand.SaveCalendarSettings(calendarSettings)
                     workProcessor.work(command).collectAndHandleWork()
@@ -99,7 +99,7 @@ internal class SetupScreenModel(
             }
             is SetupEvent.NavigateToScheduleEditor -> {
                 val screen = screenProvider.provideEditorScreen(EditorScreen.Schedule)
-                sendEffect(SetupEffect.ReplaceGlobalScreen(screen))
+                sendEffect(SetupEffect.NavigateToGlobalScreen(screen))
                 sendAction(SetupAction.UpdateFillOutSchedule(isFillOut = true))
             }
             is SetupEvent.NavigateToSchedule -> {
@@ -137,10 +137,10 @@ internal class SetupScreenModel(
             isFillOutSchedule = action.isFillOut,
         )
     }
-}
 
-internal enum class SetupWorkKey : BackgroundWorkKey {
-    FETCH_ALL_DATA, SAVE_PROFILE, SAVE_ORGANIZATION, SAVE_SETTINGS
+    enum class BackgroundKey : BackgroundWorkKey {
+        FETCH_ALL_DATA, SAVE_PROFILE, SAVE_ORGANIZATION, SAVE_SETTINGS,
+    }
 }
 
 @Composable

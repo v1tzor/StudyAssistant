@@ -38,7 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroViewState
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.AuthActionsSection
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.IntroPage
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.NavActionsSection
@@ -50,7 +49,6 @@ import views.CircularStepsRow
 @Composable
 @OptIn(ExperimentalResourceApi::class, ExperimentalFoundationApi::class)
 internal fun IntroContentCompact(
-    state: IntroViewState,
     modifier: Modifier,
     pagerState: PagerState,
     onContinueClick: () -> Unit,

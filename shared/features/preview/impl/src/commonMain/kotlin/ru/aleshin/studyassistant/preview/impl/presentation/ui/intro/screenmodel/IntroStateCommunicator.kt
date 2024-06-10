@@ -20,8 +20,10 @@ import architecture.communications.state.StateCommunicator
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroViewState
 
 /**
- * @author Stanislav Aleshin on 14.04.2024.
+ * @author Stanislav Aleshin on 10.06.2024.
  */
 internal interface IntroStateCommunicator : StateCommunicator<IntroViewState> {
-    class Base : IntroStateCommunicator, StateCommunicator.Abstract<IntroViewState>(IntroViewState.Default)
+    class Base : IntroStateCommunicator, StateCommunicator.Abstract<IntroViewState>(
+        defaultState = IntroViewState,
+    )
 }

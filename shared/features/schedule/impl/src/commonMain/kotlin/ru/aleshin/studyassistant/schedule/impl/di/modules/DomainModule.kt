@@ -21,6 +21,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleErrorHandler
+import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleInteractor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -28,4 +29,6 @@ import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleErrorHandle
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<ScheduleErrorHandler> { ScheduleErrorHandler.Base() }
     bindSingleton<ScheduleEitherWrapper> { ScheduleEitherWrapper.Base(instance()) }
+
+    bindSingleton<ScheduleInteractor> { ScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
 }

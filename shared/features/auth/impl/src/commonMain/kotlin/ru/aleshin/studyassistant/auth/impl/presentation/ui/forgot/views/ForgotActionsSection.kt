@@ -16,7 +16,9 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.views
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,11 +32,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -76,12 +78,10 @@ internal fun ForgotActionsSection(
                 )
             }
         }
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            AlreadyHavePasswordButton(
-                enabled = !isLoading,
-                onClick = onAlreadyHavePasswordClick,
-            )
-        }
+        AlreadyHavePasswordButton(
+            enabled = !isLoading,
+            onClick = onAlreadyHavePasswordClick,
+        )
     }
 }
 
@@ -92,24 +92,28 @@ internal fun AlreadyHavePasswordButton(
     enabled: Boolean = true,
     shape: Shape = MaterialTheme.shapes.small,
     contentPadding: PaddingValues = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    Text(
-        modifier = modifier
-            .clip(shape)
-            .clickable(
-                onClick = onClick,
-                enabled = enabled,
-                role = Role.Button,
-            )
-            .padding(contentPadding),
-        text = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
-                append(AuthThemeRes.strings.alreadyHaveAccountLabelFirst)
-            }
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                append(AuthThemeRes.strings.alreadyHaveAccountLabelSecond)
-            }
-        },
-        style = MaterialTheme.typography.labelMedium,
-    )
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Text(
+            modifier = modifier
+                .clip(shape)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = LocalIndication.current,
+                    enabled = enabled,
+                    onClick = onClick,
+                )
+                .padding(contentPadding),
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
+                    append(AuthThemeRes.strings.alreadyHaveAccountLabelFirst)
+                }
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                    append(AuthThemeRes.strings.alreadyHaveAccountLabelSecond)
+                }
+            },
+            style = MaterialTheme.typography.labelMedium,
+        )
+    }
 }

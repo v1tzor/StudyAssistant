@@ -17,14 +17,14 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.mappers
 
 import entities.settings.CalendarSettings
-import ru.aleshin.studyassistant.preview.impl.presentation.models.CalendarSettingsUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
- internal fun CalendarSettings.mapToUi() = CalendarSettingsUi(
-     numberOfWeek = numberOfWeek,
- )
+internal fun CalendarSettings.mapToUi() = CalendarSettingsUi(
+    numberOfWeek = numberOfWeek,
+)
 
 internal fun CalendarSettingsUi.mapToDomain() = CalendarSettings(
     numberOfWeek = numberOfWeek,

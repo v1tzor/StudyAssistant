@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.CurrentScreen
 import di.withDirectDI
 import navigation.NestedFeatureNavigator
@@ -30,7 +29,6 @@ import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
 import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleNavigatorManager
 import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleScreenProvider
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleTheme
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.

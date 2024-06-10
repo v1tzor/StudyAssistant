@@ -18,11 +18,11 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.login
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.remember
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
@@ -30,7 +30,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import navigation.root
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.auth.impl.presentation.models.LoginCredentialsUi
+import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.LoginCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEffect
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEvent
@@ -81,8 +81,8 @@ internal class LoginScreen : Screen {
 
         handleEffect { effect ->
             when (effect) {
-                is LoginEffect.ReplaceGlobalScreen -> navigator.root().replaceAll(effect.screen)
                 is LoginEffect.PushScreen -> navigator.push(effect.screen)
+                is LoginEffect.ReplaceGlobalScreen -> navigator.root().replaceAll(effect.screen)
                 is LoginEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failure.mapToMessage(strings),

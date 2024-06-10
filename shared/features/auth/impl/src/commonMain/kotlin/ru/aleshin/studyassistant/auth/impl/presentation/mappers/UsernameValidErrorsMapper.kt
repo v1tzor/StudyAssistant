@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.mappers
 
 import androidx.compose.runtime.Composable
-import ru.aleshin.studyassistant.auth.impl.presentation.models.UsernameValidError
+import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.UsernameValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 
 /**
@@ -25,5 +25,5 @@ import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
  */
 @Composable
 internal fun UsernameValidError.mapToMessage() = when (this) {
-    UsernameValidError.LengthError -> AuthThemeRes.strings.usernameLengthError
+    is UsernameValidError.LengthError -> AuthThemeRes.strings.usernameLengthError
 }

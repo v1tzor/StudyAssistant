@@ -24,6 +24,16 @@ import dev.icerock.moko.parcelize.Parcelize
  */
 @Parcelize
 internal sealed class ScheduleDetailsUi : Parcelable {
+
     data class Base(val data: BaseScheduleDetailsUi?) : ScheduleDetailsUi()
+
     data class Custom(val data: CustomScheduleDetailsUi?) : ScheduleDetailsUi()
+
+    fun <T> mapToValue(
+        onBaseSchedule: (BaseScheduleDetailsUi?) -> T,
+        onCustomSchedule: (CustomScheduleDetailsUi?) -> T,
+    ) = when (this) {
+        is Base -> onBaseSchedule(data)
+        is Custom -> onCustomSchedule(data)
+    }
 }

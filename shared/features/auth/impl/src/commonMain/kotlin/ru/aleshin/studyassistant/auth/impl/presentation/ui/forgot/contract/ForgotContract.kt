@@ -23,8 +23,8 @@ import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
-import ru.aleshin.studyassistant.auth.impl.presentation.models.EmailValidError
-import ru.aleshin.studyassistant.auth.impl.presentation.models.ForgotCredentialsUi
+import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.ForgotCredentialsUi
+import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.EmailValidError
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.

@@ -19,16 +19,20 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.register.views
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.auth.impl.presentation.models.EmailValidError
-import ru.aleshin.studyassistant.auth.impl.presentation.models.PasswordValidError
-import ru.aleshin.studyassistant.auth.impl.presentation.models.UsernameValidError
+import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.EmailValidError
+import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.PasswordValidError
+import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.UsernameValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.EmailTextField
-import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.UsernameTextField
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.PasswordTextField
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.UsernameTextField
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
@@ -46,31 +50,46 @@ internal fun RegisterInputSection(
     onUsernameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
+    onCompleteEnter: () -> Unit,
 ) {
     Column(
         modifier = modifier.padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        val emailFocusRequester = remember { FocusRequester() }
+        val passwordFocusRequester = remember { FocusRequester() }
+
         UsernameTextField(
             enabled = enabled,
             username = username,
             onUsernameChanged = onUsernameChange,
             isError = usernameValidError != null,
             errorText = usernameValidError?.mapToMessage(),
+            keyboardActions = KeyboardActions(
+                onDone = { emailFocusRequester.requestFocus() },
+            ),
         )
         EmailTextField(
+            modifier = Modifier.focusRequester(emailFocusRequester),
             enabled = enabled,
             email = email,
             onEmailChanged = onEmailChange,
             isError = emailValidError != null,
             errorText = emailValidError?.mapToMessage(),
+            keyboardActions = KeyboardActions(
+                onDone = { passwordFocusRequester.requestFocus() },
+            ),
         )
         PasswordTextField(
+            modifier = Modifier.focusRequester(passwordFocusRequester),
             enabled = enabled,
             password = password,
             onPasswordChanged = onPasswordChange,
             isError = passwordValidError != null,
             errorText = passwordValidError?.mapToMessage(),
+            keyboardActions = KeyboardActions(
+                onDone = { onCompleteEnter() },
+            )
         )
     }
 }

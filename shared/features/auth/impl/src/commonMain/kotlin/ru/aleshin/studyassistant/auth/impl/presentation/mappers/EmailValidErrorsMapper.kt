@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.mappers
 
 import androidx.compose.runtime.Composable
-import ru.aleshin.studyassistant.auth.impl.presentation.models.EmailValidError
+import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.EmailValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 
 /**
@@ -25,5 +25,5 @@ import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
  */
 @Composable
 internal fun EmailValidError.mapToMessage() = when (this) {
-    EmailValidError.EmailFormat -> AuthThemeRes.strings.emailFormatError
+    is EmailValidError.EmailFormat -> AuthThemeRes.strings.emailFormatError
 }

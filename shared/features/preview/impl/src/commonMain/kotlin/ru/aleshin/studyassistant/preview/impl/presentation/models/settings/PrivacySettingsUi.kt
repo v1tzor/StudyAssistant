@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.preview.impl.presentation.models
+package ru.aleshin.studyassistant.preview.impl.presentation.models.settings
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.common.NumberOfRepeatWeek
+import entities.settings.AccessType
 
 /**
- * @author Stanislav Aleshin on 29.04.2024.
+ * @author Stanislav Aleshin on 21.04.2024.
  */
 @Parcelize
-internal data class CalendarSettingsUi(
-    val numberOfWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
-) : Parcelable {
-    companion object {
-        fun createEmpty() = CalendarSettingsUi()
-    }
-}
+internal data class PrivacySettingsUi(
+    val isPrivateProfile: Boolean = false,
+    val showBirthday: AccessType = AccessType.FRIENDS,
+    val showCity: AccessType = AccessType.FRIENDS,
+) : Parcelable

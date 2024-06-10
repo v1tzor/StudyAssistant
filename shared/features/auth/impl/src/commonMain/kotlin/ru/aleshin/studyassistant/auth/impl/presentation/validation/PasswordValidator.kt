@@ -17,7 +17,8 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.validation
 
 import functional.Constants
-import ru.aleshin.studyassistant.auth.impl.presentation.models.PasswordValidError
+import functional.Constants.Text.MIN_PASSWORD_LENGTH
+import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.PasswordValidError
 import validation.ValidateResult
 import validation.Validator
 
@@ -27,7 +28,7 @@ import validation.Validator
 internal interface PasswordValidator : Validator<String, PasswordValidError> {
     class Base : PasswordValidator {
         override fun validate(data: String): ValidateResult<PasswordValidError> {
-            return if (data.length >= 6 && data.matches(Regex(Constants.Regex.PASSWORD))) {
+            return if (data.length >= MIN_PASSWORD_LENGTH && data.matches(Regex(Constants.Regex.PASSWORD))) {
                 ValidateResult(true, null)
             } else {
                 ValidateResult(false, PasswordValidError.FormatError)

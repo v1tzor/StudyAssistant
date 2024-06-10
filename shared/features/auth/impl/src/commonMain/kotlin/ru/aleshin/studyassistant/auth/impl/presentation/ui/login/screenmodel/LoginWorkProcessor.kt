@@ -24,7 +24,8 @@ import functional.handle
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
-import ru.aleshin.studyassistant.auth.impl.presentation.models.LoginCredentialsUi
+import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToDomain
+import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.LoginCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEffect
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
@@ -47,12 +48,10 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
         private fun loginWithEmailWork(credentials: LoginCredentialsUi) = flow {
             emit(ActionResult(LoginAction.UpdateLoading(true)))
             authInteractor.loginWithEmail(credentials.mapToDomain()).handle(
-                onLeftAction = {
-                    emit(EffectResult(LoginEffect.ShowError(it)))
-                },
+                onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
                 onRightAction = {
-                    val tabScreen = screenProvider.provideTabNavigationScreen()
-                    emit(EffectResult(LoginEffect.ReplaceGlobalScreen(tabScreen)))
+                    val targetScreen = screenProvider.provideTabNavigationScreen()
+                    emit(EffectResult(LoginEffect.ReplaceGlobalScreen(targetScreen)))
                 }
             )
             emit(ActionResult(LoginAction.UpdateLoading(false)))
@@ -63,7 +62,7 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
             authInteractor.loginViaGoogle(idToken).handle(
                 onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
                 onRightAction = { result ->
-                    val targetScreen =  if (result.isNewUser) {
+                    val targetScreen = if (result.isNewUser) {
                         screenProvider.providePreviewScreen(PreviewScreen.Setup(result.user.uid))
                     } else {
                         screenProvider.provideTabNavigationScreen()

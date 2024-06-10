@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.preview.impl.presentation.mappers
 
 import entities.employee.Employee
 import functional.TimeRange
-import ru.aleshin.studyassistant.preview.impl.presentation.models.EmployeeUi
+import ru.aleshin.studyassistant.preview.impl.presentation.models.users.EmployeeUi
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.

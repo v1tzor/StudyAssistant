@@ -129,7 +129,7 @@ interface CustomScheduleRemoteDataSource {
                 val firstDateFilter = UserData.CUSTOM_SCHEDULE_DATE greaterThanOrEqualTo fromMillis
                 val secondDateFilter = UserData.CUSTOM_SCHEDULE_DATE lessThanOrEqualTo toMillis
                 return@where firstDateFilter and secondDateFilter
-            }.orderBy(UserData.VERSION_TO, Direction.DESCENDING)
+            }.orderBy(UserData.CUSTOM_SCHEDULE_DATE, Direction.DESCENDING)
 
             val schedulePojoListFlow = reference.snapshots.map { snapshot ->
                 snapshot.documents.map { it.data(serializer<CustomSchedulePojo>()) }

@@ -16,22 +16,26 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import views.TopAppBarButton
+import views.TopAppBarEmptyButton
 import views.TopAppBarTitle
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
  */
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 internal fun DetailsTopBar(
     modifier: Modifier = Modifier,
     onEditClick: () -> Unit,
@@ -44,19 +48,34 @@ internal fun DetailsTopBar(
             TopAppBarTitle(
                 header = ScheduleThemeRes.strings.detailsHeader,
                 textAlign = TextAlign.Center,
-                headerStyle = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Normal,
-                )
             )
         },
         navigationIcon = {
-
+            Row {
+                TopAppBarButton(
+                    imagePainter = painterResource(ScheduleThemeRes.icons.editTable),
+                    imageDescription = null,
+                    onButtonClick = onEditClick,
+                )
+                TopAppBarEmptyButton()
+            }
         },
         actions = {
-
+            Row {
+                TopAppBarButton(
+                    imagePainter = painterResource(ScheduleThemeRes.icons.currentDayOrWeek),
+                    imageDescription = null,
+                    onButtonClick = onCurrentWeek,
+                )
+                TopAppBarButton(
+                    imagePainter = painterResource(ScheduleThemeRes.icons.openOverview),
+                    imageDescription = null,
+                    onButtonClick = onOverviewClick,
+                )
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            containerColor = MaterialTheme.colorScheme.background,
         ),
     )
 }

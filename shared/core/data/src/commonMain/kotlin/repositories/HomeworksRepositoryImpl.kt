@@ -42,7 +42,7 @@ class HomeworksRepositoryImpl(
         val timeEnd = timeRange.to.toEpochMilliseconds()
 
         val homeworksFlow = if (isSubscriber) {
-            remoteDataSource.fetchHomeworksByTime(timeStart.toInt(), timeEnd.toInt(), targetUser)
+            remoteDataSource.fetchHomeworksByTime(timeStart, timeEnd, targetUser)
         } else {
             localDataSource.fetchHomeworksByTime(timeStart, timeEnd)
         }

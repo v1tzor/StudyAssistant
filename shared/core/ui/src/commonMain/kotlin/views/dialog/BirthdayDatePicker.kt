@@ -47,9 +47,8 @@ fun BirthdayDatePicker(
     onSelectedDate: (String) -> Unit,
 ) {
     val datePickerState = rememberDatePickerState()
-    val confirmEnabled by remember {
-        derivedStateOf { datePickerState.selectedDateMillis != null }
-    }
+    val confirmEnabled by remember { derivedStateOf { datePickerState.selectedDateMillis != null } }
+
     DatePickerDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,

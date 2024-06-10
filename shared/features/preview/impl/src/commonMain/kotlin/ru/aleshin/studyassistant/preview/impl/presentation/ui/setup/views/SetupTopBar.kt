@@ -21,11 +21,13 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -39,9 +41,10 @@ import views.TopAppBarEmptyButton
  * @author Stanislav Aleshin on 27.04.2024.
  */
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 internal fun SetupTopBar(
     modifier: Modifier = Modifier,
-    enabled: Boolean,
+    enabled: Boolean = true,
     onBackPressed: () -> Unit,
     @FloatRange(0.0, 1.0) stepProgress: Float,
 ) {
@@ -71,7 +74,8 @@ internal fun SetupTopBar(
         actions = {
             TopAppBarEmptyButton()
         },
-        backgroundColor = MaterialTheme.colorScheme.background,
-        elevation = 0.dp,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+        ),
     )
 }
