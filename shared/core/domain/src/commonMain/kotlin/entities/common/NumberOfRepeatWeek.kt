@@ -22,19 +22,16 @@ import kotlinx.datetime.LocalDate
 /**
  * @author Stanislav Aleshin on 27.04.2024.
  */
-enum class NumberOfRepeatWeek {
-    ONE, TWO, THREE
-}
+enum class NumberOfRepeatWeek(val isoRepeatWeekNumber: Int) {
+    ONE(1), TWO(2), THREE(3);
 
-val NumberOfRepeatWeek.isoRepeatWeekNumber: Int get() = ordinal + 1
-
-fun NumberOfRepeatWeek(isoRepeatWeekNumber: Int): NumberOfRepeatWeek {
-    require(isoRepeatWeekNumber in 1..3)
-    return NumberOfRepeatWeek.entries[isoRepeatWeekNumber - 1]
+    companion object {
+        fun valueOf(isoWeekNumber: Int) = NumberOfRepeatWeek.entries[isoWeekNumber - 1]
+    }
 }
 
 fun LocalDate.numberOfRepeatWeek(repeat: NumberOfRepeatWeek): NumberOfRepeatWeek {
     val isoWeekNumber = isoWeekNumber()
     val isoRepeatWeekNumber = isoWeekNumber - (isoWeekNumber / repeat.isoRepeatWeekNumber) * repeat.isoRepeatWeekNumber
-    return NumberOfRepeatWeek(if (isoRepeatWeekNumber == 0) repeat.isoRepeatWeekNumber else isoRepeatWeekNumber)
+    return NumberOfRepeatWeek.valueOf(if (isoRepeatWeekNumber == 0) repeat.isoRepeatWeekNumber else isoRepeatWeekNumber)
 }

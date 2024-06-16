@@ -22,6 +22,6 @@ import inject.FeatureScreen
  * @author Stanislav Aleshin on 21.04.2024.
  */
 sealed class ScheduleScreen : FeatureScreen {
-    data object Overview : ScheduleScreen()
+    data class Overview(val firstDay: Long?) : ScheduleScreen()
     data object Details : ScheduleScreen()
 }

@@ -30,19 +30,31 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.Week
 /**
  * @author Stanislav Aleshin on 09.06.2024.
  */
-internal fun BaseScheduleDetails.mapToUi() = BaseScheduleDetailsUi(
-    uid = uid,
-    dateVersion = dateVersion.mapToUi(),
-    dayOfWeek = dayOfWeek,
-    week = week,
-    classes = classes.map { it.mapToUi() },
-)
+internal fun BaseScheduleDetails.mapToUi(): BaseScheduleDetailsUi {
+    val groupedClasses = classes.groupBy { it.organization.uid }
+    return BaseScheduleDetailsUi(
+        uid = uid,
+        dateVersion = dateVersion.mapToUi(),
+        dayOfWeek = dayOfWeek,
+        week = week,
+        classes = classes.map {
+            val number = groupedClasses[it.organization.uid]?.indexOf(it)?.inc() ?: 0
+            it.mapToUi(number)
+        },
+    )
+}
 
-internal fun CustomScheduleDetails.mapToUi() = CustomScheduleDetailsUi(
-    uid = uid,
-    date = date,
-    classes = classes.map { it.mapToUi() },
-)
+internal fun CustomScheduleDetails.mapToUi(): CustomScheduleDetailsUi {
+    val groupedClasses = classes.groupBy { it.organization.uid }
+    return CustomScheduleDetailsUi(
+        uid = uid,
+        date = date,
+        classes = classes.map {
+            val number = groupedClasses[it.organization.uid]?.indexOf(it)?.inc() ?: 0
+            it.mapToUi(number)
+        },
+    )
+}
 
 internal fun ScheduleDetails.mapToUi() = when (this) {
     is ScheduleDetails.Base -> ScheduleDetailsUi.Base(data?.mapToUi())

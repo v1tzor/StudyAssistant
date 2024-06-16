@@ -20,15 +20,16 @@ import architecture.screenmodel.work.ActionResult
 import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
+import architecture.screenmodel.work.WorkResult
 import entities.common.NumberOfRepeatWeek
+import extensions.dateTime
 import extensions.weekTimeRange
 import functional.UID
 import functional.collectAndHandle
 import functional.handle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.coroutines.flow.onStart
 import managers.DateManager
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseClassInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseScheduleInteractor
@@ -61,22 +62,19 @@ internal interface ScheduleEditorWorkProcessor :
             is ScheduleEditorWorkCommand.DeleteClass -> deleteClassWork(command.uid, command.schedule)
         }
 
-        private fun loadWeekScheduleWork(week: NumberOfRepeatWeek) = flow {
-            val currentDateTime = dateManager.fetchCurrentDate().toLocalDateTime(TimeZone.UTC)
-            val weekTimeRange = currentDateTime.weekTimeRange(TimeZone.UTC)
+        private fun loadWeekScheduleWork(week: NumberOfRepeatWeek) = flow<ScheduleEditorWorkResult> {
+            val currentDateTime = dateManager.fetchCurrentInstant().dateTime()
+            val weekTimeRange = currentDateTime.weekTimeRange()
 
-            emit(ActionResult(ScheduleEditorAction.UpdateLoading(true)))
-
-            scheduleInteractor.fetchScheduleByTimeRange(
-                timeRange = weekTimeRange,
-                numberOfWeek = week,
-            ).collectAndHandle(
+            scheduleInteractor.fetchScheduleByTimeRange(weekTimeRange, week).collectAndHandle(
                 onLeftAction = { emit(EffectResult(ScheduleEditorEffect.ShowError(it))) },
                 onRightAction = { baseWeekSchedule ->
                     val weekSchedule = baseWeekSchedule.mapToUi()
                     emit(ActionResult(ScheduleEditorAction.UpdateScheduleData(week, weekSchedule)))
                 },
             )
+        }.onStart {
+            emit(ActionResult(ScheduleEditorAction.UpdateLoading(true)))
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -117,3 +115,5 @@ internal sealed class ScheduleEditorWorkCommand : WorkCommand {
     data class UpdateOrganization(val organization: OrganizationShortUi) : ScheduleEditorWorkCommand()
     data class DeleteClass(val uid: UID, val schedule: BaseScheduleUi) : ScheduleEditorWorkCommand()
 }
+
+internal typealias ScheduleEditorWorkResult = WorkResult<ScheduleEditorAction, ScheduleEditorEffect>

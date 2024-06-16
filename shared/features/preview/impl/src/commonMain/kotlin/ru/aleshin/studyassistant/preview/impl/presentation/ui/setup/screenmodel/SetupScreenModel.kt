@@ -98,7 +98,7 @@ internal class SetupScreenModel(
                 sendAction(SetupAction.UpdatePage(SetupPage.SCHEDULE))
             }
             is SetupEvent.NavigateToScheduleEditor -> {
-                val screen = screenProvider.provideEditorScreen(EditorScreen.Schedule)
+                val screen = screenProvider.provideEditorScreen(EditorScreen.Schedule())
                 sendEffect(SetupEffect.NavigateToGlobalScreen(screen))
                 sendAction(SetupAction.UpdateFillOutSchedule(isFillOut = true))
             }

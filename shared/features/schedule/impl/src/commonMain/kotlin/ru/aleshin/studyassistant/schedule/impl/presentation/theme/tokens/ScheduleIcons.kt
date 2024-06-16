@@ -27,12 +27,15 @@ import studyassistant.shared.features.schedule.impl.generated.resources.ic_list_
 import studyassistant.shared.features.schedule.impl.generated.resources.ic_open_table
 import studyassistant.shared.features.schedule.impl.generated.resources.ic_table_edit
 import studyassistant.shared.features.schedule.impl.generated.resources.ic_view_dashboard
+import studyassistant.shared.features.schedule.impl.generated.resources.il_free_time
+import studyassistant.shared.features.schedule.impl.generated.resources.il_free_time_dark
 
 /**
  * @author Stanislav Aleshin on 21.06.2023.
  */
 @OptIn(ExperimentalResourceApi::class)
 internal data class ScheduleIcons(
+    val emptyClassesIllustration: DrawableResource,
     val openTable: DrawableResource,
     val openOverview: DrawableResource,
     val currentDayOrWeek: DrawableResource,
@@ -43,6 +46,7 @@ internal data class ScheduleIcons(
 ) {
     companion object {
         val LIGHT = ScheduleIcons(
+            emptyClassesIllustration = Res.drawable.il_free_time,
             openTable = Res.drawable.ic_open_table,
             openOverview = Res.drawable.ic_view_dashboard,
             currentDayOrWeek = Res.drawable.ic_calendar_today,
@@ -52,6 +56,7 @@ internal data class ScheduleIcons(
             formatGrid = Res.drawable.ic_format_grid,
         )
         val DARK = ScheduleIcons(
+            emptyClassesIllustration = Res.drawable.il_free_time_dark,
             openTable = Res.drawable.ic_open_table,
             openOverview = Res.drawable.ic_view_dashboard,
             currentDayOrWeek = Res.drawable.ic_calendar_today,

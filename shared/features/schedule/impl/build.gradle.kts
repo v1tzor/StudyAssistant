@@ -39,6 +39,8 @@ kotlin {
             implementation(libs.charts)
         }
     }
+
+    task("testClasses")
 }
 
 android {

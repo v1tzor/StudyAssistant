@@ -80,7 +80,6 @@ internal data class SubjectEditorScreen(
             topBar = {
                 SubjectEditorTopBar(
                     enabledSave = state.editableSubject?.isValid() ?: false,
-                    isLoading = state.isLoading,
                     onBackClick = { dispatchEvent(SubjectEditorEvent.NavigateToBack) },
                     onSaveClick = { dispatchEvent(SubjectEditorEvent.SaveSubject) },
                 )

@@ -22,13 +22,13 @@ import entities.schedules.BaseSchedule
 import entities.schedules.DateVersion
 import extensions.dateOfWeekDay
 import extensions.isCurrentDay
+import extensions.randomUUID
 import functional.DomainResult
 import functional.FlowDomainResult
 import functional.UID
 import functional.UnitDomainResult
 import kotlinx.datetime.DayOfWeek
 import managers.DateManager
-import randomUUID
 import repositories.BaseScheduleRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
@@ -67,7 +67,7 @@ internal interface BaseClassInteractor {
             weekDay: DayOfNumberedWeek
         ) = eitherWrapper.wrap {
             val createClassModel = classModel.copy(uid = randomUUID())
-            val currentDate = dateManager.fetchBeginningCurrentDay()
+            val currentDate = dateManager.fetchBeginningCurrentInstant()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
             if (schedule != null) {
@@ -110,7 +110,7 @@ internal interface BaseClassInteractor {
 
         override suspend fun updateClassBySchedule(classModel: Class, schedule: BaseSchedule) = eitherWrapper.wrap {
             val classId = classModel.uid
-            val currentDate = dateManager.fetchBeginningCurrentDay()
+            val currentDate = dateManager.fetchBeginningCurrentInstant()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
             val createClassId: UID
@@ -148,7 +148,7 @@ internal interface BaseClassInteractor {
         }
 
         override suspend fun deleteClassBySchedule(uid: UID, schedule: BaseSchedule) = eitherWrapper.wrapUnit {
-            val currentDate = dateManager.fetchBeginningCurrentDay()
+            val currentDate = dateManager.fetchBeginningCurrentInstant()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
             val actualClasses = schedule.classes.toMutableList().apply {

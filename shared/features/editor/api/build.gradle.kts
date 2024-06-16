@@ -32,6 +32,8 @@ kotlin {
             implementation(project(":shared:core:ui"))
         }
     }
+
+    task("testClasses")
 }
 
 android {

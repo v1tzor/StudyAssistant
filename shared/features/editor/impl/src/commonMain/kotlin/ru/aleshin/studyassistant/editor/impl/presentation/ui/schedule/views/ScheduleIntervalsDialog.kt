@@ -59,8 +59,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import entities.organizations.Millis
+import extensions.formatByTimeZone
 import kotlinx.datetime.Instant
-import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import mappers.toMinutesOrHoursTitle
@@ -146,7 +146,7 @@ internal fun StartOfClassesField(
         char(':')
         minute()
     }
-    val formatStartTime = startOfClassTime?.format(timeFormat)
+    val formatStartTime = startOfClassTime?.formatByTimeZone(timeFormat)
 
     Box(modifier = modifier) {
         ClickableTextField(
@@ -238,7 +238,7 @@ internal fun ClassIntervalsEditor(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    painter = painterResource(EditorThemeRes.icons.classes),
+                    painter = painterResource(StudyAssistantRes.icons.classes),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

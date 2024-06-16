@@ -16,27 +16,30 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import extensions.dateByWeek
+import extensions.dateTime
+import extensions.dateTimeByWeek
 import extensions.isCurrentDay
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsViewState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.CommonScheduleView
@@ -50,37 +53,41 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.Com
 internal fun DetailsContent(
     state: DetailsViewState,
     modifier: Modifier = Modifier,
+    onOpenSchedule: (Instant) -> Unit,
 ) = with(state) {
-    AnimatedContent(
+    Crossfade(
         modifier = modifier,
         targetState = scheduleView,
-        transitionSpec = {
-            fadeIn(animationSpec = tween(400)).togetherWith(
-                fadeOut(animationSpec = tween(400))
-            )
-        },
+        animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
     ) { scheduleViewType ->
+        val gridState = rememberLazyGridState()
+        val listState = rememberLazyListState()
+
         if (scheduleViewType == ScheduleViewType.COMMON) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize().padding(top = 8.dp),
+                state = gridState,
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 if (!isLoading && weekSchedule != null) {
-                    items(DayOfWeek.entries.toTypedArray()) { dayOfWeek ->
+                    items(twoColumnGridDaysOfWeek) { dayOfWeek ->
                         val schedule = weekSchedule.weekDaySchedules[dayOfWeek]
-                        val scheduleDate = dayOfWeek.dateByWeek(weekSchedule.from)
+                        val scheduleDate = dayOfWeek.dateTimeByWeek(weekSchedule.from)
+                        val classes = schedule?.mapToValue(
+                            onBaseSchedule = { it?.classes },
+                            onCustomSchedule = { it?.classes },
+                        )
                         CommonScheduleView(
-                            modifier = Modifier.animateItemPlacement(),
-                            date = scheduleDate,
+                            modifier = Modifier.aspectRatio(0.5f).animateItemPlacement(),
+                            date = scheduleDate.dateTime().date,
                             isCurrentDay = currentDate.isCurrentDay(scheduleDate),
                             activeClass = activeClass,
-                            classes = schedule?.mapToValue(
-                                onBaseSchedule = { it?.classes },
-                                onCustomSchedule = { it?.classes },
-                            ) ?: emptyList(),
+                            classes = classes ?: emptyList(),
+                            userScrollEnabled = true,
+                            onOpenSchedule = { onOpenSchedule(scheduleDate) },
                             onClassClick = {},
                         )
                     }
@@ -95,22 +102,24 @@ internal fun DetailsContent(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(top = 8.dp),
+                state = listState,
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 if (!isLoading && weekSchedule != null) {
                     items(DayOfWeek.entries.toTypedArray()) { dayOfWeek ->
                         val schedule = weekSchedule.weekDaySchedules[dayOfWeek]
-                        val scheduleDate = dayOfWeek.dateByWeek(weekSchedule.from)
+                        val scheduleDate = dayOfWeek.dateTimeByWeek(weekSchedule.from)
                         CommonScheduleView(
                             modifier = Modifier.animateItemPlacement(),
-                            date = scheduleDate,
+                            date = scheduleDate.dateTime().date,
                             isCurrentDay = currentDate.isCurrentDay(scheduleDate),
                             activeClass = activeClass,
                             classes = schedule?.mapToValue(
                                 onBaseSchedule = { it?.classes },
                                 onCustomSchedule = { it?.classes },
                             ) ?: emptyList(),
+                            onOpenSchedule = { onOpenSchedule(scheduleDate) },
                             onClassClick = {},
                         )
                     }
@@ -125,3 +134,14 @@ internal fun DetailsContent(
         }
     }
 }
+
+private val twoColumnGridDaysOfWeek: List<DayOfWeek>
+    get() = listOf(
+        DayOfWeek.MONDAY,
+        DayOfWeek.THURSDAY,
+        DayOfWeek.TUESDAY,
+        DayOfWeek.FRIDAY,
+        DayOfWeek.WEDNESDAY,
+        DayOfWeek.SATURDAY,
+        DayOfWeek.SUNDAY,
+    )

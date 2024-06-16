@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.api.navigation
 
+import entities.common.NumberOfRepeatWeek
 import functional.UID
 import inject.FeatureScreen
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
@@ -25,7 +26,7 @@ import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
  */
 sealed class EditorScreen : FeatureScreen {
 
-    data object Schedule : EditorScreen()
+    data class Schedule(val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE) : EditorScreen()
 
     data class Class(
         val classId: UID?,

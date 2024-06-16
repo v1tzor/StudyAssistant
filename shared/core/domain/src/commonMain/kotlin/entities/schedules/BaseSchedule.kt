@@ -19,10 +19,10 @@ package entities.schedules
 import entities.classes.Class
 import entities.common.DayOfNumberedWeek
 import entities.common.NumberOfRepeatWeek
+import extensions.randomUUID
 import functional.UID
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
-import randomUUID
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.

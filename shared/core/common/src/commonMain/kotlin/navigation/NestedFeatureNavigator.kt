@@ -18,15 +18,12 @@ package navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorContent
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import cafe.adriel.voyager.navigator.OnBackPressed
 import inject.FeatureScreen
-import ru.aleshin.core.common.navigation.screens.EmptyScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
@@ -40,7 +37,7 @@ fun <S : FeatureScreen> NestedFeatureNavigator(
 ) {
     val startScreen = navigatorManager.fetchStartScreen()
     Navigator(
-        screens = listOf(screenProvider.provideFeatureScreen(startScreen)),
+        screen = screenProvider.provideFeatureScreen(startScreen),
         onBackPressed = onBackPressed,
         disposeBehavior = NavigatorDisposeBehavior(
             disposeNestedNavigators = false,

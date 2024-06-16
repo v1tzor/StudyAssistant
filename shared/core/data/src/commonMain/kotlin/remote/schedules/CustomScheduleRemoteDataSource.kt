@@ -22,6 +22,8 @@ import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.orderBy
 import dev.gitlive.firebase.firestore.where
 import exceptions.FirebaseUserException
+import extensions.exists
+import extensions.snapshotGet
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -66,7 +68,7 @@ interface CustomScheduleRemoteDataSource {
             val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES)
 
             return database.runTransaction {
-                val isExist = schedulePojo.uid.isNotEmpty() && reference.document(schedulePojo.uid).get().exists
+                val isExist = schedulePojo.uid.isNotEmpty() && reference.document(schedulePojo.uid).exists()
                 if (isExist) {
                     reference.document(schedulePojo.uid).set(data = schedulePojo)
                     return@runTransaction schedulePojo.uid
@@ -102,7 +104,7 @@ interface CustomScheduleRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES).where {
                 UserData.CUSTOM_SCHEDULE_DATE equalTo dateMillis
-            }.orderBy(UserData.VERSION_TO, Direction.DESCENDING)
+            }.orderBy(UserData.CUSTOM_SCHEDULE_DATE, Direction.DESCENDING)
 
             val schedulePojoFlow = reference.snapshots.map { snapshot ->
                 snapshot.documents.map { it.data(serializer<CustomSchedulePojo?>()) }.getOrNull(0)
@@ -172,15 +174,15 @@ interface CustomScheduleRemoteDataSource {
                 userDataRoot.collection(UserData.SUBJECTS).document(subjectId)
             }
 
-            val organization = organizationReference.get().data<OrganizationShortData>()
-            val subject = subjectReference?.get()?.data<SubjectPojo>().let { subjectPojo ->
+            val organization = organizationReference.snapshotGet().data<OrganizationShortData>()
+            val subject = subjectReference?.snapshotGet()?.data<SubjectPojo>().let { subjectPojo ->
                 val employeeReference = subjectPojo?.teacherId?.let { employeeReferenceRoot.document(it) }
-                val employee = employeeReference?.get()?.data(serializer<EmployeeDetailsData?>())
+                val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeeDetailsData?>())
                 subjectPojo?.mapToDetailsData(employee)
             }
             val employee = teacherId?.let { teacherId ->
                 val employeeReference = employeeReferenceRoot.document(teacherId)
-                employeeReference.get().data(serializer<EmployeeDetailsData?>())
+                employeeReference.snapshotGet().data(serializer<EmployeeDetailsData?>())
             }
 
             return mapToDetailsData(

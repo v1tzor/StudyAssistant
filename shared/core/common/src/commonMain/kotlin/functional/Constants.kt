@@ -29,7 +29,8 @@ object Constants {
         const val GITHUB_URI = "https://github.com/v1tzor/StudyAssistant"
         const val ISSUES_URI = "https://github.com/v1tzor/StudyAssistant/issues"
         const val PERMISSION_TAG = "Notificatio_Permission"
-        const val WEB_CLIENT_ID = "190379302885-gnrh3tua2lftfs7ke2uhnfj1vinbc8vm.apps.googleusercontent.com"
+        const val WEB_CLIENT_ID =
+            "190379302885-gnrh3tua2lftfs7ke2uhnfj1vinbc8vm.apps.googleusercontent.com"
     }
 
     object Database {
@@ -45,10 +46,6 @@ object Constants {
         const val ONLY_TEXT = "^[a-zA-Z ]+$"
         const val NUMBERS = "\\d+"
         const val PASSWORD = "^[A-Za-z0-9\\!\\\"\\#\\$\\%\\&\\'\\(\\)\\*\\+\\,\\-\\.\\/\\:\\;\\<\\>\\=\\?\\@\\[\\]\\{\\}\\\\\\^\\_\\`\\~]+$"
-    }
-
-    object Key {
-        const val MAIN = "MainActivityKey"
     }
 
     object Text {
@@ -81,16 +78,22 @@ object Constants {
     }
 
     object Placeholder {
-        const val ITEMS = 6
-        const val MANY_ITEMS = 15
+        const val OVERVIEW_ITEMS = 8
+        const val SCHEDULE_CLASSES_ITEMS = 3
     }
 
     object Delay {
-        const val LOAD_ANIMATION = 400L
         const val SPLASH_NAV = 1800L
         const val SPLASH_LOGO = 300L
         const val SPLASH_TEXT = 600L
-        const val CHECK_STATUS = 5000L
+        const val UPDATE_ACTIVE_CLASS = 5000L
+        const val PULL_REFRESH = 180L
+    }
+
+    object Animations {
+        const val FADE_FAST = 500
+        const val FADE_SLOW = 800
+        const val FADE_DELAY = 200
     }
 
     object Date {
@@ -114,8 +117,7 @@ object Constants {
         const val MINUTES_IN_HOUR = 60L
         const val HOURS_IN_DAY = 24L
 
-        const val NEXT_REPEAT_LIMIT = 100L
-
+        const val OVERVIEW_FIRST_ITEM = 14
         const val OVERVIEW_NEXT_DAYS = 15
         const val OVERVIEW_PREVIOUS_DAYS = 14
 
@@ -124,10 +126,6 @@ object Constants {
         const val HOURS_AND_MINUTES_FORMAT = "%s%s %s%s"
 
         const val SHIFT_MINUTE_VALUE = 5
-    }
-
-    object Image {
-        const val ILLUSTRATION_HEIGHT_RATION = 0.82
     }
 
     object Window {

@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -27,25 +28,30 @@ import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import entities.organizations.Millis
 import navigation.root
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewDeps
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewEvent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewViewState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.rememberOverviewScreenModel
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.OverviewBottomBar
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.OverviewTopBar
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.OverviewTopSheet
 import views.ErrorSnackbar
 
 /**
  * @author Stanislav Aleshin on 09.06.2024
  */
-internal class OverviewScreen : Screen {
+internal data class OverviewScreen(val firstDay: Millis?) : Screen {
 
     @Composable
     override fun Content() = ScreenContent(
         screenModel = rememberOverviewScreenModel(),
         initialState = OverviewViewState(),
+        dependencies = OverviewDeps(firstDay = firstDay),
     ) { state ->
         val strings = ScheduleThemeRes.strings
         val navigator = LocalNavigator.current
@@ -60,13 +66,27 @@ internal class OverviewScreen : Screen {
                 )
             },
             topBar = {
-                OverviewTopBar(
-                    onEditClick = {},
-                    onCurrentDay = { dispatchEvent(OverviewEvent.SelectedCurrentDay) },
-                    onDetailsClick = { dispatchEvent(OverviewEvent.NavigateToDetails) },
+                Column {
+                    OverviewTopBar(
+                        onEditClick = {},
+                        onCurrentDay = { dispatchEvent(OverviewEvent.SelectedCurrentDay) },
+                        onDetailsClick = { dispatchEvent(OverviewEvent.NavigateToDetails) },
+                    )
+                    OverviewTopSheet(
+                        isLoading = state.isAnalyticsLoading,
+                        selectedDate = state.selectedDate,
+                        weekAnalysis = state.weekAnalysis,
+                        activeClass = state.activeClass,
+                    )
+                }
+            },
+            bottomBar = {
+                OverviewBottomBar(
+                    currentDate = state.currentDate,
+                    selectedDate = state.selectedDate,
+                    onSelectedDate = { dispatchEvent(OverviewEvent.SelectedDate(it)) },
                 )
             },
-            bottomBar = {},
             snackbarHost = {
                 SnackbarHost(
                     hostState = snackbarState,

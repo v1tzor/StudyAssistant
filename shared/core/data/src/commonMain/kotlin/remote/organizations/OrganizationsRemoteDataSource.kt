@@ -19,6 +19,8 @@ package remote.organizations
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.where
 import exceptions.FirebaseUserException
+import extensions.exists
+import extensions.snapshotGet
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -53,9 +55,9 @@ interface OrganizationsRemoteDataSource {
             val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
 
             return database.runTransaction {
-                val isExist = organizationPojo.uid.isNotEmpty() && reference.document(organizationPojo.uid).get().exists
+                val isExist = organizationPojo.uid.isNotEmpty() && reference.document(organizationPojo.uid).exists()
                 if (isExist) {
-                    reference.document(organizationPojo.uid).set(data = organizationPojo)
+                    reference.document(organizationPojo.uid).set(organizationPojo)
                     return@runTransaction organizationPojo.uid
                 } else {
                     val uid = reference.add(organizationPojo).id
@@ -84,8 +86,8 @@ interface OrganizationsRemoteDataSource {
                     UserData.ORGANIZATION_ID equalTo organizationPojo.uid
                 }
 
-                val employeeList = employeeReference.get().documents.map { it.data<EmployeeDetailsData>() }
-                val subjectList = subjectsReference.get().documents.map { it.data<SubjectPojo>() }.map { subjectPojo ->
+                val employeeList = employeeReference.snapshotGet().map { it.data<EmployeeDetailsData>() }
+                val subjectList = subjectsReference.snapshotGet().map { it.data<SubjectPojo>() }.map { subjectPojo ->
                     subjectPojo.mapToDetailsData(employeeList.find { it.uid == subjectPojo.teacherId })
                 }
 
@@ -115,8 +117,8 @@ interface OrganizationsRemoteDataSource {
                         UserData.ORGANIZATION_ID equalTo organizationPojo.uid
                     }
 
-                    val employeeList = employeeReference.get().documents.map { it.data<EmployeeDetailsData>() }
-                    val subjectList = subjectsReference.get().documents.map { it.data<SubjectPojo>() }.map { subjectPojo ->
+                    val employeeList = employeeReference.snapshotGet().map { it.data<EmployeeDetailsData>() }
+                    val subjectList = subjectsReference.snapshotGet().map { it.data<SubjectPojo>() }.map { subjectPojo ->
                         subjectPojo.mapToDetailsData(employeeList.find { it.uid == subjectPojo.teacherId })
                     }
 

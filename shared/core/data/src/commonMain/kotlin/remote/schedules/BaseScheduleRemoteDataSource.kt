@@ -23,13 +23,14 @@ import dev.gitlive.firebase.firestore.orderBy
 import dev.gitlive.firebase.firestore.where
 import entities.common.NumberOfRepeatWeek
 import exceptions.FirebaseUserException
+import extensions.dateTime
+import extensions.exists
+import extensions.snapshotGet
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.serializer
 import mappers.schedules.mapToDetailsData
 import mappers.schedules.mapToRemoteData
@@ -59,6 +60,7 @@ interface BaseScheduleRemoteDataSource {
     suspend fun fetchSchedulesByTimeRange(
         from: Instant,
         to: Instant,
+        numberOfWeek: NumberOfRepeatWeek,
         targetUser: UID
     ): Flow<List<BaseScheduleDetailsData>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<ClassDetailsData?>
@@ -78,7 +80,7 @@ interface BaseScheduleRemoteDataSource {
             val reference = userDataRoot.collection(UserData.BASE_SCHEDULES)
 
             return database.runTransaction {
-                val isExist = schedulePojo.uid.isNotEmpty() && reference.document(schedulePojo.uid).get().exists
+                val isExist = schedulePojo.uid.isNotEmpty() && reference.document(schedulePojo.uid).exists()
                 if (isExist) {
                     reference.document(schedulePojo.uid).set(data = schedulePojo)
                     return@runTransaction schedulePojo.uid
@@ -117,15 +119,15 @@ interface BaseScheduleRemoteDataSource {
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val dateMillis = date.toEpochMilliseconds()
-            val dateTime = date.toLocalDateTime(TimeZone.UTC)
+            val dateTime = date.dateTime()
             val dayOfWeek = dateTime.dayOfWeek.toString()
             val week = numberOfWeek.toString()
 
             val reference = userDataRoot.collection(UserData.BASE_SCHEDULES).where {
-                val firstVersionFilter = UserData.VERSION_FROM lessThanOrEqualTo dateMillis
-                val secondVersionFilter = UserData.VERSION_TO greaterThanOrEqualTo dateMillis
+                val toVersionFilter = UserData.VERSION_TO greaterThanOrEqualTo dateMillis
+                val fromVersionFilter = UserData.VERSION_FROM lessThanOrEqualTo dateMillis
                 val dateFilter = (UserData.WEEK equalTo week) and (UserData.DAY_OF_WEEK equalTo dayOfWeek)
-                return@where firstVersionFilter and secondVersionFilter and dateFilter
+                return@where toVersionFilter and fromVersionFilter and dateFilter
             }.orderBy(UserData.VERSION_TO, Direction.DESCENDING)
 
             val schedulePojoFlow = reference.snapshots.map { snapshot ->
@@ -142,6 +144,7 @@ interface BaseScheduleRemoteDataSource {
         override suspend fun fetchSchedulesByTimeRange(
             from: Instant,
             to: Instant,
+            numberOfWeek: NumberOfRepeatWeek,
             targetUser: UID
         ): Flow<List<BaseScheduleDetailsData>> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
@@ -149,11 +152,13 @@ interface BaseScheduleRemoteDataSource {
 
             val fromMillis = from.toEpochMilliseconds()
             val toMillis = to.toEpochMilliseconds()
+            val week = numberOfWeek.toString()
 
             val reference = userDataRoot.collection(UserData.BASE_SCHEDULES).where {
-                val firstDateFilter = UserData.VERSION_TO greaterThanOrEqualTo fromMillis
-                val secondDateFilter = UserData.VERSION_FROM lessThanOrEqualTo toMillis
-                return@where firstDateFilter and secondDateFilter
+                val toDateFilter = UserData.VERSION_TO greaterThanOrEqualTo fromMillis
+                val fromDateFilter = UserData.VERSION_FROM lessThanOrEqualTo toMillis
+                val weekFilter = UserData.WEEK equalTo week
+                return@where toDateFilter and fromDateFilter and weekFilter
             }.orderBy(UserData.VERSION_TO, Direction.DESCENDING)
 
             val schedulePojoListFlow = reference.snapshots.map { snapshot ->
@@ -199,15 +204,15 @@ interface BaseScheduleRemoteDataSource {
                 userDataRoot.collection(UserData.SUBJECTS).document(subjectId)
             }
 
-            val organization = organizationReference.get().data<OrganizationShortData>()
-            val subject = subjectReference?.get()?.data<SubjectPojo>().let { subjectPojo ->
+            val organization = organizationReference.snapshotGet().data<OrganizationShortData>()
+            val subject = subjectReference?.snapshotGet()?.data<SubjectPojo>().let { subjectPojo ->
                 val employeeReference = subjectPojo?.teacherId?.let { employeeReferenceRoot.document(it) }
-                val employee = employeeReference?.get()?.data(serializer<EmployeeDetailsData?>())
+                val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeeDetailsData?>())
                 subjectPojo?.mapToDetailsData(employee)
             }
             val employee = teacherId?.let { teacherId ->
                 val employeeReference = employeeReferenceRoot.document(teacherId)
-                employeeReference.get().data(serializer<EmployeeDetailsData?>())
+                employeeReference.snapshotGet().data(serializer<EmployeeDetailsData?>())
             }
 
             return mapToDetailsData(

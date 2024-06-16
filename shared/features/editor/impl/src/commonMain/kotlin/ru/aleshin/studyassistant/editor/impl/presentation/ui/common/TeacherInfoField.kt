@@ -63,10 +63,10 @@ internal fun TeacherInfoField(
         onClick = { isOpenTeacherSelector = true },
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
-        value = teacher?.name(),
+        value = teacher?.fullName(),
         label = EditorThemeRes.strings.teacherFieldLabel,
         placeholder = EditorThemeRes.strings.teacherFieldPlaceholder,
-        infoIcon = painterResource(EditorThemeRes.icons.employee),
+        infoIcon = painterResource(StudyAssistantRes.icons.employee),
         trailingIcon = {
             ExpandedIcon(
                 isExpanded = isOpenTeacherSelector,
@@ -117,7 +117,7 @@ internal fun TeacherSelectorDialog(
             SelectorDialogItemView(
                 onClick = { selectedTeacher = employee },
                 selected = employee.uid == selectedTeacher?.uid,
-                title = employee.name(),
+                title = employee.fullName(),
                 label = subjects.find {
                     it.teacher?.uid == employee.uid
                 }?.name ?: employee.post.mapToString(StudyAssistantRes.strings),

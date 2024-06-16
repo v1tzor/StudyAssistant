@@ -19,6 +19,7 @@ package database.tasks
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import extensions.randomUUID
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -32,7 +33,6 @@ import models.organizations.OrganizationShortData
 import models.organizations.ScheduleTimeIntervalsData
 import models.tasks.HomeworkDetailsData
 import models.users.ContactInfoData
-import randomUUID
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries

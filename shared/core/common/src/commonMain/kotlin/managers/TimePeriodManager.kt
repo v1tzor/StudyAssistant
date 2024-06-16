@@ -34,7 +34,7 @@ interface TimePeriodManager {
 
         override fun splitByTimeRanges(period: TimePeriod): List<TimeRange> {
             val timeRanges = mutableListOf<TimeRange>()
-            val currentDate = dateManager.fetchEndCurrentDay()
+            val currentDate = dateManager.fetchEndCurrentInstant()
             val daysInChildPeriod = period.quantityDaysInChildPeriod()
             
             repeat(period.quantityOfChildPeriods()) { childPeriod ->

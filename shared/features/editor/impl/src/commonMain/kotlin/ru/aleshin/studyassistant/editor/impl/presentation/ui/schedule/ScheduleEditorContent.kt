@@ -16,21 +16,24 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import functional.UID
 import kotlinx.datetime.DayOfWeek
@@ -40,59 +43,65 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseS
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.ScheduleView
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.ScheduleViewPlaceholder
+import views.PullToRefreshContainer
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 internal fun ScheduleEditorContent(
     state: ScheduleEditorViewState,
     modifier: Modifier = Modifier,
+    refreshState: PullToRefreshState = rememberPullToRefreshState(),
     listState: LazyListState = rememberLazyListState(),
+    onRefresh: () -> Unit,
     onCreateClass: (DayOfNumberedWeekUi, BaseScheduleUi?) -> Unit,
     onEditClass: (ClassUi, DayOfNumberedWeekUi) -> Unit,
     onDeleteClass: (UID, BaseScheduleUi) -> Unit,
 ) = with(state) {
-    AnimatedContent(
-        modifier = modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, end = 16.dp),
-        targetState = state.isLoading,
-        transitionSpec = {
-            fadeIn(animationSpec = tween(400)).togetherWith(
-                fadeOut(animationSpec = tween(400))
-            )
-        },
-    ) { loading ->
-        if (!loading) {
-            LazyColumn(
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                items(DayOfWeek.entries.toTypedArray()) { dayOfWeek ->
-                    val schedule = weekSchedule?.weekDaySchedules?.get(dayOfWeek)
-                    ScheduleView(
-                        modifier = Modifier.animateItemPlacement(),
-                        dayOfWeek = dayOfWeek,
-                        schedule = schedule,
-                        onCreateClass = {
-                            onCreateClass(DayOfNumberedWeekUi(dayOfWeek, currentWeek), schedule)
-                        },
-                        onEditClass = { editClass ->
-                            onEditClass(editClass, DayOfNumberedWeekUi(dayOfWeek, currentWeek))
-                        },
-                        onDeleteClass = { targetClass ->
-                            if (schedule != null) onDeleteClass(targetClass.uid, schedule)
-                        },
-                    )
+    Box(modifier = modifier.nestedScroll(refreshState.nestedScrollConnection)) {
+        Crossfade(
+            modifier = Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, end = 16.dp),
+            targetState = isLoading,
+            animationSpec = spring(stiffness = Spring.StiffnessLow),
+        ) { loading ->
+            if (!loading) {
+                LazyColumn(
+                    state = listState,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    items(DayOfWeek.entries.toTypedArray()) { dayOfWeek ->
+                        val dayOfWeekSchedule = weekSchedule?.weekDaySchedules?.get(dayOfWeek)
+                        ScheduleView(
+                            dayOfWeek = dayOfWeek,
+                            schedule = dayOfWeekSchedule,
+                            onCreateClass = {
+                                onCreateClass(DayOfNumberedWeekUi(dayOfWeek, selectedWeek), dayOfWeekSchedule)
+                            },
+                            onEditClass = { editClass ->
+                                onEditClass(editClass, DayOfNumberedWeekUi(dayOfWeek, selectedWeek))
+                            },
+                            onDeleteClass = { targetClass ->
+                                if (dayOfWeekSchedule != null) onDeleteClass(targetClass.uid, dayOfWeekSchedule)
+                            },
+                        )
+                    }
+                }
+            } else {
+                LazyColumn(
+                    state = listState,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    items(DayOfWeek.entries.size) { ScheduleViewPlaceholder() }
                 }
             }
-        } else {
-            LazyColumn(
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                items(DayOfWeek.entries.size) { ScheduleViewPlaceholder() }
-            }
         }
+        PullToRefreshContainer(
+            state = refreshState,
+            modifier = Modifier.align(Alignment.TopCenter),
+            isLoading = isLoading,
+            onRefresh = onRefresh,
+        )
     }
 }

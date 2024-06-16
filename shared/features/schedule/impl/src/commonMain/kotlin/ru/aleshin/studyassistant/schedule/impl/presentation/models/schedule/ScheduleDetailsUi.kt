@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 
 /**
  * @author Stanislav Aleshin on 08.06.2024.
@@ -28,6 +29,9 @@ internal sealed class ScheduleDetailsUi : Parcelable {
     data class Base(val data: BaseScheduleDetailsUi?) : ScheduleDetailsUi()
 
     data class Custom(val data: CustomScheduleDetailsUi?) : ScheduleDetailsUi()
+
+    val classes: List<ClassDetailsUi>
+        get() = mapToValue(onBaseSchedule = { it?.classes }, onCustomSchedule = { it?.classes }) ?: emptyList()
 
     fun <T> mapToValue(
         onBaseSchedule: (BaseScheduleDetailsUi?) -> T,

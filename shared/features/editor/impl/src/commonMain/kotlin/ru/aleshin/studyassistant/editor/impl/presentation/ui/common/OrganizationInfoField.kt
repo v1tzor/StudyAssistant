@@ -61,7 +61,7 @@ internal fun OrganizationInfoField(
         value = organization?.shortName,
         label = EditorThemeRes.strings.organizationFieldLabel,
         placeholder = EditorThemeRes.strings.organizationFieldPlaceholder,
-        infoIcon = painterResource(EditorThemeRes.icons.organization),
+        infoIcon = painterResource(StudyAssistantRes.icons.organization),
         trailingIcon = {
             ExpandedIcon(
                 isExpanded = isOpenOrganizationSelector,

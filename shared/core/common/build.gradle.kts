@@ -53,6 +53,7 @@ kotlin {
             api(libs.kotlin.test)
         }
     }
+
     task("testClasses")
 }
 

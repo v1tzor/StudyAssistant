@@ -40,6 +40,8 @@ kotlin {
             implementation(compose.components.resources)
         }
     }
+
+    task("testClasses")
 }
 
 android {

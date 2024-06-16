@@ -30,6 +30,8 @@ kotlin {
             implementation(libs.bundles.firebase)
         }
     }
+
+    task("testClasses")
 }
 
 android {

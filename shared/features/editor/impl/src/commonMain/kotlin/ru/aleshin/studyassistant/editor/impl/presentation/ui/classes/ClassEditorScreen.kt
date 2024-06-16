@@ -87,7 +87,6 @@ internal class ClassEditorScreen(
             topBar = {
                 ClassEditorTopBar(
                     enabledSave = state.editableClass?.isValid() ?: false,
-                    isLoading = state.isLoading,
                     onSaveClick = { dispatchEvent(ClassEditorEvent.SaveClass) },
                     onBackClick = { dispatchEvent(ClassEditorEvent.NavigateToBack) },
                 )

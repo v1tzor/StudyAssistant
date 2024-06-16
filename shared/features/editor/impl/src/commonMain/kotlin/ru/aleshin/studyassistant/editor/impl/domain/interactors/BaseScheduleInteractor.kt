@@ -60,14 +60,13 @@ internal interface BaseScheduleInteractor {
             val weekDaySchedules = mutableMapOf<DayOfWeek, BaseSchedule?>().apply {
                 DayOfWeek.entries.forEach { put(it, null) }
             }
-            val schedulesByTimeRange = scheduleRepository.fetchSchedulesByTimeRange(timeRange, targetUser)
+            val schedulesByTimeRange = scheduleRepository.fetchSchedulesByTimeRange(timeRange, numberOfWeek, targetUser)
 
             return@wrapFlow schedulesByTimeRange.map { rawSchedules ->
-                rawSchedules.groupBy { it.dayOfWeek }.forEach { scheduleEntry ->
-                    val dayOfWeek = scheduleEntry.key
-                    weekDaySchedules[dayOfWeek] = scheduleEntry.value.findLast { baseSchedule ->
-                        baseSchedule.week == numberOfWeek
-                    }
+                rawSchedules.forEach { schedule ->
+                    weekDaySchedules[schedule.dayOfWeek] = schedule.copy(
+                        classes = schedule.classes.sortedBy { it.timeRange.from },
+                    )
                 }
 
                 BaseWeekSchedule(

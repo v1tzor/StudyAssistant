@@ -22,7 +22,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.Class
 /**
  * @author Stanislav Aleshin on 09.06.2024.
  */
-internal fun ClassDetails.mapToUi() = ClassDetailsUi(
+internal fun ClassDetails.mapToUi(number: Int) = ClassDetailsUi(
     uid = uid,
     scheduleId = scheduleId,
     organization = organization.mapToUi(),
@@ -34,5 +34,6 @@ internal fun ClassDetails.mapToUi() = ClassDetailsUi(
     location = location?.mapToUi(),
     timeRange = timeRange,
     notification = notification,
+    number = number,
     homework = homeWork?.mapToUi(),
 )

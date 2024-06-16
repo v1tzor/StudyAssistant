@@ -20,35 +20,89 @@ import architecture.screenmodel.work.ActionResult
 import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
+import extensions.dateTimeByWeek
+import extensions.setHoursAndMinutes
+import functional.Constants.Delay.UPDATE_ACTIVE_CLASS
 import functional.TimeRange
 import functional.collectAndHandle
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.isActive
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import managers.DateManager
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleInteractor
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.WeekScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsAction
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
  */
-internal interface DetailsWorkProcessor : FlowWorkProcessor<DetailsWorkCommand, DetailsAction, DetailsEffect> {
+internal interface DetailsWorkProcessor :
+    FlowWorkProcessor<DetailsWorkCommand, DetailsAction, DetailsEffect> {
 
     class Base(
         private val scheduleInteractor: ScheduleInteractor,
+        private val dateManager: DateManager,
     ) : DetailsWorkProcessor {
 
         override suspend fun work(command: DetailsWorkCommand) = when (command) {
             is DetailsWorkCommand.LoadWeekSchedule -> loadWeekScheduleWork(command.week)
         }
+
         private fun loadWeekScheduleWork(week: TimeRange) = flow {
-            emit(ActionResult(DetailsAction.UpdateLoading(true)))
             scheduleInteractor.fetchDetailsWeekSchedule(week).collectAndHandle(
                 onLeftAction = { emit(EffectResult(DetailsEffect.ShowError(it))) },
                 onRightAction = { weekScheduleDetails ->
                     val weekSchedule = weekScheduleDetails.mapToUi()
                     emit(ActionResult(DetailsAction.UpdateWeekSchedule(weekSchedule)))
+                    emitAll(cycleUpdateActiveClass(weekSchedule))
                 }
             )
+        }.onStart {
+            emit(ActionResult(DetailsAction.UpdateLoading(true)))
+        }
+
+        private fun cycleUpdateActiveClass(schedule: WeekScheduleDetailsUi) = flow {
+            while (currentCoroutineContext().isActive) {
+                var activeClassData: ActiveClassUi? = null
+                val currentInstant = dateManager.fetchCurrentInstant()
+                val currentDateTime = currentInstant.toLocalDateTime(TimeZone.currentSystemDefault())
+
+                val weekDaySchedule = schedule.weekDaySchedules[currentDateTime.dayOfWeek]
+                val classesDate = currentDateTime.dayOfWeek.dateTimeByWeek(schedule.from)
+                val scheduleClasses = weekDaySchedule?.mapToValue(
+                    onBaseSchedule = { it?.classes },
+                    onCustomSchedule = { it?.classes }
+                )
+
+                if (scheduleClasses != null) {
+                    val activeClass = scheduleClasses.find { classModel ->
+                        val startInstant = classesDate.setHoursAndMinutes(classModel.timeRange.from)
+                        val endInstant = classesDate.setHoursAndMinutes(classModel.timeRange.to)
+                        return@find currentInstant in startInstant..endInstant
+                    }
+                    if (activeClass != null) {
+                        val startInstant = classesDate.setHoursAndMinutes(activeClass.timeRange.from)
+                        val endInstant = classesDate.setHoursAndMinutes(activeClass.timeRange.to)
+                        val isStarted = currentInstant > startInstant
+                        activeClassData = ActiveClassUi(
+                            uid = activeClass.uid,
+                            isStarted = isStarted,
+                            progress = dateManager.calculateProgress(startInstant, endInstant),
+                            duration = dateManager.calculateLeftDateTime(if (isStarted) endInstant else startInstant)
+                        )
+                    }
+                }
+                emit(ActionResult(DetailsAction.UpdateActiveClass(activeClassData)))
+                delay(UPDATE_ACTIVE_CLASS)
+            }
         }
     }
 }

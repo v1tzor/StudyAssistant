@@ -39,13 +39,14 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.settings.Calend
 internal data class ScheduleEditorViewState(
     val isLoading: Boolean = true,
     val weekSchedule: BaseWeekScheduleUi? = null,
-    val currentWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
+    val selectedWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val organizations: List<OrganizationShortUi> = emptyList(),
     val calendarSettings: CalendarSettingsUi? = null,
 ) : BaseViewState
 
 internal sealed class ScheduleEditorEvent : BaseEvent {
-    data object Init : ScheduleEditorEvent()
+    data class Init(val week: NumberOfRepeatWeek) : ScheduleEditorEvent()
+    data object Refresh : ScheduleEditorEvent()
     data class ChangeWeek(val numberOfWeek: NumberOfRepeatWeek) : ScheduleEditorEvent()
     data class UpdateOrganization(val organization: OrganizationShortUi) : ScheduleEditorEvent()
     data class CreateClass(val weekDay: DayOfNumberedWeekUi, val schedule: BaseScheduleUi?) : ScheduleEditorEvent()
@@ -62,6 +63,7 @@ internal sealed class ScheduleEditorEffect : BaseUiEffect {
 
 internal sealed class ScheduleEditorAction : BaseAction {
     data class UpdateLoading(val isLoading: Boolean) : ScheduleEditorAction()
+    data class UpdateSelectedWeek(val week: NumberOfRepeatWeek) : ScheduleEditorAction()
     data class UpdateScheduleData(
         val week: NumberOfRepeatWeek,
         val schedule: BaseWeekScheduleUi

@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,16 +39,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import entities.organizations.Millis
 import extensions.forEachWith
-import functional.UID
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
 import mappers.mapToSting
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.CommonClassView
 import theme.StudyAssistantRes
 import theme.tokens.monthNames
 import views.PlaceholderBox
@@ -58,10 +60,13 @@ internal fun CommonScheduleView(
     modifier: Modifier = Modifier,
     date: LocalDate,
     isCurrentDay: Boolean,
-    activeClass: Pair<UID, Millis>?,
+    activeClass: ActiveClassUi?,
     classes: List<ClassDetailsUi>,
+    userScrollEnabled: Boolean = false,
+    onOpenSchedule: () -> Unit,
     onClassClick: (ClassDetailsUi) -> Unit,
 ) {
+    val scrollState = rememberScrollState()
     val coreStrings = StudyAssistantRes.strings
     val dateFormat = LocalDate.Format {
         dayOfMonth()
@@ -75,11 +80,14 @@ internal fun CommonScheduleView(
     ) {
         Column {
             CommonScheduleViewHeader(
+                onClick = onOpenSchedule,
                 dayOfWeek = date.dayOfWeek.mapToSting(coreStrings),
                 date = date.format(dateFormat),
                 isHighlighted = isCurrentDay,
             )
             CommonScheduleViewContent(
+                modifier = if (userScrollEnabled) Modifier.weight(1f) else Modifier.wrapContentSize(),
+                scrollState = if (userScrollEnabled) scrollState else null,
                 activeClass = activeClass,
                 classes = classes,
                 onClassClick = onClassClick,
@@ -135,13 +143,17 @@ internal fun CommonScheduleViewPlaceholder(
 
 @Composable
 private fun CommonScheduleViewHeader(
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     dayOfWeek: String,
     date: String,
     isHighlighted: Boolean,
 ) {
     Surface(
+        onClick = onClick,
         modifier = modifier.fillMaxWidth(),
+        enabled = enabled,
         shape = MaterialTheme.shapes.medium,
         color = if (isHighlighted) {
             MaterialTheme.colorScheme.primaryContainer
@@ -175,32 +187,25 @@ private fun CommonScheduleViewHeader(
 @Composable
 private fun CommonScheduleViewContent(
     modifier: Modifier = Modifier,
-    activeClass: Pair<UID, Millis>?,
+    scrollState: ScrollState?,
+    activeClass: ActiveClassUi?,
     classes: List<ClassDetailsUi>,
     onClassClick: (ClassDetailsUi) -> Unit,
 ) {
     Column(
-        modifier = modifier.padding(
-            start = 6.dp,
-            end = 6.dp,
-            top = 8.dp,
-            bottom = 12.dp
+        modifier = modifier.padding(start = 6.dp, end = 6.dp, top = 8.dp, bottom = 12.dp).then(
+            if (scrollState != null) Modifier.verticalScroll(scrollState) else Modifier
         ),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        val sortedClasses = classes.sortedBy { it.timeRange.from }
-        val groupedClasses = classes.groupBy(keySelector = { it.organization.uid }).mapValues {
-            it.value.sortedBy { baseClass -> baseClass.timeRange.from }
-        }
-
-        if (sortedClasses.isEmpty()) {
+        if (classes.isEmpty()) {
             EmptyClassesView()
         } else {
-            sortedClasses.forEachWith {
+            classes.forEachWith {
                 CommonClassView(
                     onClick = { onClassClick(this) },
-                    highlightContent = activeClass?.first == this.uid,
-                    number = groupedClasses[organization.uid]?.indexOf(this)?.inc() ?: 0,
+                    highlightContent = activeClass?.isStarted?.takeIf { activeClass.uid == this.uid } ?: false,
+                    number = number,
                     timeRange = timeRange,
                     subject = subject,
                     office = office,

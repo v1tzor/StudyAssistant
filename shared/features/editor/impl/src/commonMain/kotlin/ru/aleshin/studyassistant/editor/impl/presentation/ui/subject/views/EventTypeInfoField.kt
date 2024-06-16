@@ -55,7 +55,7 @@ internal fun EventTypeInfoField(
         value = eventType?.mapToString(StudyAssistantRes.strings),
         label = EditorThemeRes.strings.eventTypeFieldLabel,
         placeholder = EditorThemeRes.strings.eventTypeFieldPlaceholder,
-        infoIcon = painterResource(EditorThemeRes.icons.classes),
+        infoIcon = painterResource(StudyAssistantRes.icons.classes),
         trailingIcon = {
             ExpandedIcon(
                 isExpanded = isOpenEventTypeSelector,

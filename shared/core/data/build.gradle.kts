@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.sqldelight.native)
         }
     }
+
     task("testClasses")
 }
 

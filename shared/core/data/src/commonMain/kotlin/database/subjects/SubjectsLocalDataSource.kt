@@ -19,6 +19,7 @@ package database.subjects
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import extensions.randomUUID
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -27,7 +28,6 @@ import mappers.subjects.mapToDetailsData
 import mappers.subjects.mapToLocalData
 import mappers.users.mapToDetailsData
 import models.subjects.SubjectDetailsData
-import randomUUID
 import remote.StudyAssistantFirestore.LIMITS.EDITOR_SUBJECTS
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries

@@ -16,7 +16,6 @@
 
 package entities.common
 
-import entities.common.NumberOfRepeatWeek
 import kotlinx.datetime.DayOfWeek
 
 /**

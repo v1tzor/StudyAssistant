@@ -15,8 +15,6 @@
  */
 package extensions
 
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import functional.Constants.Date
 import functional.Constants.Date.DAYS_IN_WEEK
@@ -28,7 +26,11 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.minus
+import kotlinx.datetime.offsetIn
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
@@ -37,9 +39,17 @@ import kotlinx.datetime.until
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
-fun Instant.dateTimeUTC() = toLocalDateTime(TimeZone.UTC)
+fun Instant.dateTime(timeZone: TimeZone = TimeZone.currentSystemDefault()) = toLocalDateTime(timeZone)
 
-fun Instant.shiftDay(amount: Int, timeZone: TimeZone = TimeZone.UTC): Instant {
+fun Instant.formatByTimeZone(
+    format: DateTimeFormat<DateTimeComponents>,
+    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+): String {
+    val offset = offsetIn(timeZone)
+    return format(format = format, offset = offset)
+}
+
+fun Instant.shiftDay(amount: Int, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
     return if (amount < 0) {
         this.minus(value = -amount, unit = DateTimeUnit.DAY, timeZone = timeZone)
     } else {
@@ -49,7 +59,7 @@ fun Instant.shiftDay(amount: Int, timeZone: TimeZone = TimeZone.UTC): Instant {
 
 fun Instant.shiftMinutes(
     amount: Int,
-    timeZone: TimeZone = TimeZone.UTC
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
 ): Instant {
     return if (amount < 0) {
         this.minus(value = -amount, unit = DateTimeUnit.MINUTE, timeZone = timeZone)
@@ -60,7 +70,7 @@ fun Instant.shiftMinutes(
 
 fun Instant.shiftMillis(
     amount: Long,
-    timeZone: TimeZone = TimeZone.UTC
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
 ): Instant {
     return if (amount < 0) {
         this.minus(value = -amount, unit = DateTimeUnit.MILLISECOND, timeZone = timeZone)
@@ -69,7 +79,7 @@ fun Instant.shiftMillis(
     }
 }
 
-fun TimeRange.shiftWeek(value: Int, timeZone: TimeZone = TimeZone.UTC): TimeRange {
+fun TimeRange.shiftWeek(value: Int, timeZone: TimeZone = TimeZone.currentSystemDefault()): TimeRange {
     return copy(
         from = from.shiftDay(value * DAYS_IN_WEEK, timeZone),
         to = to.shiftDay(value * DAYS_IN_WEEK, timeZone),
@@ -80,16 +90,16 @@ fun LocalDate.isCurrentDay(date: LocalDate?): Boolean {
     return dayOfYear == date?.dayOfYear
 }
 
-fun Instant.isCurrentDay(date: LocalDate?, timeZone: TimeZone = TimeZone.UTC): Boolean {
+fun Instant.isCurrentDay(date: LocalDate?, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {
     return toLocalDateTime(timeZone).date.isCurrentDay(date)
 }
 
-fun Instant.isCurrentDay(date: Instant?, timeZone: TimeZone = TimeZone.UTC): Boolean {
+fun Instant.isCurrentDay(date: Instant?, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {
     return isCurrentDay(date?.toLocalDateTime(timeZone)?.date)
 }
 
 fun Instant.compareByHoursAndMinutes(compareDate: Instant): Boolean {
-    val timeZone = TimeZone.UTC
+    val timeZone = TimeZone.currentSystemDefault()
     val firstDateTime = this.toLocalDateTime(timeZone)
     val secondDateTime = compareDate.toLocalDateTime(timeZone)
     val hoursEquals = firstDateTime.hour == secondDateTime.hour
@@ -98,12 +108,12 @@ fun Instant.compareByHoursAndMinutes(compareDate: Instant): Boolean {
     return hoursEquals && minutesEquals
 }
 
-fun Instant.startThisDay(timeZone: TimeZone = TimeZone.UTC): Instant {
+fun Instant.startThisDay(timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
     val datetime = this.toLocalDateTime(timeZone)
     return datetime.setStartDay().toInstant(timeZone)
 }
 
-fun Instant.endThisDay(timeZone: TimeZone = TimeZone.UTC): Instant {
+fun Instant.endThisDay(timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
     val datetime = this.toLocalDateTime(timeZone)
     return datetime.setEndDay().toInstant(timeZone)
 }
@@ -118,48 +128,51 @@ fun LocalDateTime.setEndDay() = LocalDateTime(
     time = LocalTime(23, 59, 59, 59)
 )
 
-fun Instant.setHoursAndMinutes(instance: Instant, timeZone: TimeZone = TimeZone.UTC): Instant {
+fun Instant.setHoursAndMinutes(instance: Instant, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
     val dateTime = instance.toLocalDateTime(timeZone)
     val hour = dateTime.hour
     val minute = dateTime.minute
     return setHoursAndMinutes(hour, minute)
 }
 
-fun Instant.setHoursAndMinutes(hour: Int, minute: Int, timeZone: TimeZone = TimeZone.UTC): Instant {
-    val dateTime = this.toLocalDateTime(timeZone)
+fun Instant.setHoursAndMinutes(hour: Int, minute: Int, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
+    return toLocalDateTime(timeZone).setHoursAndMinutes(hour, minute).toInstant(timeZone)
+}
+
+fun LocalDateTime.setHoursAndMinutes(hour: Int, minute: Int): LocalDateTime {
     return LocalDateTime(
-        date = dateTime.date,
+        date = date,
         time = LocalTime(
             hour = hour,
             minute = minute,
-            second = dateTime.second,
-            nanosecond = dateTime.nanosecond
+            second = 0,
+            nanosecond = 0
         )
-    ).toInstant(timeZone)
+    )
 }
 
-fun epochDuration(start: Instant, end: Instant): Long {
+fun epochTimeDuration(start: Instant, end: Instant): Long {
     return end.toEpochMilliseconds() - start.toEpochMilliseconds()
 }
 
 fun LocalDateTime.dayEpochDuration(): Long {
-    return time.epochDuration()
+    return time.epochTimeDuration()
 }
 
-fun LocalTime.epochDuration(): Long {
+fun LocalTime.epochTimeDuration(): Long {
     return hour.hoursToMillis() + minute.minutesToMillis()
 }
 
 fun Instant.isNotZeroDifference(end: Instant): Boolean {
-    return epochDuration(this, end) > 0L
+    return epochTimeDuration(this, end) > 0L
 }
 
-fun epochDuration(timeRange: TimeRange): Long {
+fun epochTimeDuration(timeRange: TimeRange): Long {
     return timeRange.to.toEpochMilliseconds() - timeRange.from.toEpochMilliseconds()
 }
 
 fun durationOrZero(start: Instant?, end: Instant?) = if (start != null && end != null) {
-    epochDuration(start, end)
+    epochTimeDuration(start, end)
 } else {
     Date.EMPTY_DURATION
 }
@@ -198,33 +211,46 @@ fun Int.hoursToMillis(): Long {
     return this * Date.MILLIS_IN_HOUR
 }
 
-fun Long.toMinutesOrHoursString(minutesSuffix: String, hoursSuffix: String): AnnotatedString {
+fun Long.toMinutesOrHoursSuffixString(minutesSuffix: String, hoursSuffix: String): String {
     val minutes = this.toMinutes()
     val hours = this.toHorses()
 
     return if (minutes == 0L) {
-        buildAnnotatedString { append("1", minutesSuffix) }
+        buildString { append("1", minutesSuffix) }
     } else if (minutes in 1L..59L) {
-        buildAnnotatedString { append(minutes.toString(), minutesSuffix) }
+        buildString { append(minutes.toString(), minutesSuffix) }
     } else if (minutes > 59L && (minutes % 60L) != 0L) {
-        buildAnnotatedString {
+        buildString {
             append(hours.toString(), hoursSuffix)
             append(' ')
             append(toMinutesInHours().toString(), minutesSuffix)
         }
     } else {
-        buildAnnotatedString { append(hours.toString(), hoursSuffix) }
+        buildString { append(hours.toString(), hoursSuffix) }
     }
 }
 
-fun Long.toMinutesAndHoursString(minutesSuffix: String, hoursSuffix: String): AnnotatedString {
+fun Long.toMinutesAndHoursSuffixString(minutesSuffix: String, hoursSuffix: String): String {
     val minutes = this.toMinutes()
     val hours = this.toHorses()
 
-    return buildAnnotatedString {
+    return buildString {
         append(hours.toString(), hoursSuffix)
         append(' ')
         append((minutes - hours * Date.MINUTES_IN_HOUR).toString(), minutesSuffix)
+    }
+}
+
+fun Long.toMinutesAndHoursString(): String {
+    val minutes = this.toMinutes()
+    val hours = this.toHorses()
+
+    return buildString {
+        if (hours < 10) append("0")
+        append(hours.toString())
+        append(':')
+        if (minutes < 10) append("0")
+        append((minutes - hours * Date.MINUTES_IN_HOUR).toString())
     }
 }
 
@@ -271,23 +297,22 @@ fun countMonthByDays(days: Int): Int {
     return BigDecimal.fromDouble(days.toDouble() / Date.DAYS_IN_MONTH).ceil().intValue()
 }
 
-fun Instant.dateOfWeekDay(dayOfWeek: DayOfWeek, timeZone: TimeZone = TimeZone.UTC): Instant {
+fun Instant.dateOfWeekDay(dayOfWeek: DayOfWeek, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
     val dateTime = toLocalDateTime(timeZone)
     val startOfWeek = shiftDay(-dateTime.dayOfWeek.ordinal, timeZone)
     val shiftedDate = startOfWeek.shiftDay(dayOfWeek.ordinal, timeZone)
     return shiftedDate
 }
 
-fun LocalDateTime.weekTimeRange(timeZone: TimeZone = TimeZone.UTC): TimeRange {
+fun LocalDateTime.weekTimeRange(timeZone: TimeZone = TimeZone.currentSystemDefault()): TimeRange {
     val instant = toInstant(timeZone)
     val startOfWeek = instant.shiftDay(-dayOfWeek.ordinal, timeZone)
     val endOfWeek = instant.shiftDay(DayOfWeek.entries.lastIndex - dayOfWeek.ordinal, timeZone)
-    return TimeRange(startOfWeek.startThisDay(), endOfWeek.endThisDay())
+    return TimeRange(startOfWeek.startThisDay(timeZone), endOfWeek.endThisDay(timeZone))
 }
 
-fun DayOfWeek.dateByWeek(mondayDate: Instant, timeZone: TimeZone = TimeZone.UTC): LocalDate {
-    val dateInstant = mondayDate.shiftDay(ordinal, timeZone)
-    return dateInstant.toLocalDateTime(timeZone).date
+fun DayOfWeek.dateTimeByWeek(mondayDate: Instant, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
+    return mondayDate.shiftDay(ordinal, timeZone)
 }
 
 fun LocalDate.isoWeekNumber(): Int {
@@ -305,5 +330,9 @@ private fun firstWeekInYearStart(year: Int): LocalDate {
     val jan1st = LocalDate(year, 1, 1)
     val previousMonday = jan1st.minus(jan1st.dayOfWeek.ordinal, DateTimeUnit.DAY)
 
-    return if (jan1st.dayOfWeek <= DayOfWeek.THURSDAY) previousMonday else previousMonday.plus(1, DateTimeUnit.WEEK)
+    return if (jan1st.dayOfWeek <= DayOfWeek.THURSDAY) {
+        previousMonday
+    } else {
+        previousMonday.plus(1, DateTimeUnit.WEEK)
+    }
 }

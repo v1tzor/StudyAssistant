@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import extensions.alphaByEnabled
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -51,7 +52,7 @@ fun <Item : SegmentedButtonItem> SegmentedButtons(
                     title = item.title,
                     isSelected = item == selectedItem,
                     shape = SegmentedButtonDefaults.firstButtonShape(),
-                    onClick = { onItemClick.invoke(item) },
+                    onClick = { if (items != selectedItem) onItemClick.invoke(item) },
                 )
             } else if (items.lastIndex == index) {
                 SegmentedButton(
@@ -60,7 +61,7 @@ fun <Item : SegmentedButtonItem> SegmentedButtons(
                     title = item.title,
                     isSelected = item == selectedItem,
                     shape = SegmentedButtonDefaults.lastButtonShape(),
-                    onClick = { onItemClick.invoke(item) },
+                    onClick = { if (items != selectedItem) onItemClick.invoke(item) },
                 )
             } else {
                 SegmentedButton(
@@ -69,7 +70,7 @@ fun <Item : SegmentedButtonItem> SegmentedButtons(
                     title = item.title,
                     isSelected = item == selectedItem,
                     shape = SegmentedButtonDefaults.centerButtonShape(),
-                    onClick = { onItemClick.invoke(item) },
+                    onClick = { if (items != selectedItem) onItemClick.invoke(item) },
                 )
             }
         }
@@ -88,7 +89,7 @@ private fun SegmentedButton(
     OutlinedButton(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.height(SegmentedButtonDefaults.height),
+        modifier = modifier.alphaByEnabled(enabled).height(SegmentedButtonDefaults.height),
         contentPadding = SegmentedButtonDefaults.contentPadding(),
         colors = SegmentedButtonDefaults.buttonColors(isSelected = isSelected),
         shape = shape,

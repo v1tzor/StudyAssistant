@@ -37,6 +37,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import theme.StudyAssistantRes
 import views.ClickableTextField
 import views.ExpandedIcon
 import views.dialog.ContactInfoEditorDialog
@@ -62,7 +63,7 @@ internal fun LocationsInfoFields(
         Box(modifier = Modifier.height(61.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(EditorThemeRes.icons.location),
+                painter = painterResource(StudyAssistantRes.icons.location),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )

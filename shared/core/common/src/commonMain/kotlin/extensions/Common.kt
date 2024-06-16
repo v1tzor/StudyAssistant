@@ -23,14 +23,14 @@ import kotlin.random.Random
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
+fun <T> List<List<T>>.extractAllItem() = mutableListOf<T>().apply {
+    this@extractAllItem.forEach { addAll(it) }
+}
+
 fun generateSevenDigitCode(): String {
     return abs(Random(Clock.System.now().toEpochMilliseconds()).nextInt()).toString().substring(IntRange(0, 6))
 }
 
 inline fun <T> Iterable<T>.forEachWith(action: T.() -> Unit) {
     for (element in this) action(element)
-}
-
-fun <T> List<List<T>>.extractAllItem() = mutableListOf<T>().apply {
-    this@extractAllItem.forEach { addAll(it) }
 }

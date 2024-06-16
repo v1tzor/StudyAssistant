@@ -21,12 +21,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,9 +39,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import extensions.formatByTimeZone
 import functional.TimeRange
 import kotlinx.datetime.Instant
-import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
@@ -92,7 +96,22 @@ internal fun ClassTimeRangeChooser(
 }
 
 @Composable
-internal fun ClassTimeRangeItem(
+internal fun ClassTimeRangeChooserPlaceholder(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth().height(28.dp),
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.surfaceContainer,
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(modifier = Modifier.size(18.dp))
+        }
+    }
+}
+
+@Composable
+private fun ClassTimeRangeItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -124,9 +143,9 @@ internal fun ClassTimeRangeItem(
         Text(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
             text = buildString {
-                append(startTime.format(timeFormat))
+                append(startTime.formatByTimeZone(timeFormat))
                 append("-")
-                append(endTime.format(timeFormat))
+                append(endTime.formatByTimeZone(timeFormat))
             },
             color = when {
                 selected && isFree -> MaterialTheme.colorScheme.onPrimary

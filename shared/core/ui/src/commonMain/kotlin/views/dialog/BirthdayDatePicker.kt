@@ -29,8 +29,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import extensions.formatByTimeZone
 import extensions.mapEpochTimeToInstant
-import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import theme.StudyAssistantRes
@@ -64,7 +64,7 @@ fun BirthdayDatePicker(
                         char('.')
                         year()
                     }
-                    val birthday = selectedDate.mapEpochTimeToInstant().format(dateFormat)
+                    val birthday = selectedDate.mapEpochTimeToInstant().formatByTimeZone(dateFormat)
                     onSelectedDate.invoke(birthday)
                 },
                 content = { Text(text = StudyAssistantRes.strings.selectConfirmTitle) }

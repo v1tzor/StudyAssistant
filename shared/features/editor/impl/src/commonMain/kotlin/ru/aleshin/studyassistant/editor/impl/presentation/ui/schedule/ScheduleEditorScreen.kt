@@ -42,11 +42,13 @@ import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import entities.common.NumberOfRepeatWeek
 import extensions.navigationBarsInDp
 import extensions.safeNavigationBarsInPx
 import navigation.root
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorDeps
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorViewState
@@ -60,13 +62,14 @@ import views.ErrorSnackbar
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-internal class ScheduleEditorScreen : Screen {
+internal data class ScheduleEditorScreen(val week: NumberOfRepeatWeek) : Screen {
 
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     override fun Content() = ScreenContent(
         screenModel = rememberScheduleEditorScreenModel(),
         initialState = ScheduleEditorViewState(),
+        dependencies = ScheduleEditorDeps(week = week),
     ) { state ->
         val strings = EditorThemeRes.strings
         val navigator = LocalNavigator.currentOrThrow
@@ -88,8 +91,8 @@ internal class ScheduleEditorScreen : Screen {
                         isLoading = state.isLoading,
                         weekSchedule = state.weekSchedule,
                         organizations = state.organizations,
-                        numberOfWeek = state.calendarSettings?.numberOfWeek,
-                        currentWeek = state.currentWeek,
+                        maxNumberOfWeek = state.calendarSettings?.numberOfWeek,
+                        selectedWeek = state.selectedWeek,
                         onSaveClick = { dispatchEvent(ScheduleEditorEvent.SaveSchedule) },
                         onUpdateOrganization = { dispatchEvent(ScheduleEditorEvent.UpdateOrganization(it)) },
                         onSelectedWeek = { dispatchEvent(ScheduleEditorEvent.ChangeWeek(it)) },
@@ -99,6 +102,7 @@ internal class ScheduleEditorScreen : Screen {
                     ScheduleEditorContent(
                         state = state,
                         modifier = Modifier.padding(paddingValues),
+                        onRefresh = { dispatchEvent(ScheduleEditorEvent.Refresh) },
                         onCreateClass = { weekDay, schedule ->
                             dispatchEvent(ScheduleEditorEvent.CreateClass(weekDay, schedule))
                         },

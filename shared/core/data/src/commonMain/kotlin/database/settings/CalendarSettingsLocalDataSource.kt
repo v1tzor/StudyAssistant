@@ -21,8 +21,6 @@ import app.cash.sqldelight.coroutines.mapToOne
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import managers.CoroutineManager
-import mappers.organizations.mapToDetailsData
-import mappers.organizations.mapToLocalData
 import mappers.settings.mapToDetailsData
 import mappers.settings.mapToLocalData
 import models.settings.CalendarSettingsDetailsData
@@ -34,7 +32,7 @@ import kotlin.coroutines.CoroutineContext
  */
 interface CalendarSettingsLocalDataSource {
 
-    fun fetchSettings(): Flow<CalendarSettingsDetailsData>
+    suspend fun fetchSettings(): Flow<CalendarSettingsDetailsData>
 
     suspend fun updateSettings(settings: CalendarSettingsDetailsData)
 
@@ -46,7 +44,7 @@ interface CalendarSettingsLocalDataSource {
         private val coroutineContext: CoroutineContext
             get() = coroutineManager.backgroundDispatcher
 
-        override fun fetchSettings(): Flow<CalendarSettingsDetailsData> {
+        override suspend fun fetchSettings(): Flow<CalendarSettingsDetailsData> {
             return calendarQueries.fetchSettings().asFlow().mapToOne(coroutineContext).map { settingsEntity ->
                 settingsEntity.mapToDetailsData()
             }

@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.navigation.impl.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
 import inject.MainScreen
-import ru.aleshin.core.common.navigation.screens.EmptyScreen
+import architecture.screens.EmptyScreen
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen

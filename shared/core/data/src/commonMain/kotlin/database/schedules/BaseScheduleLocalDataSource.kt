@@ -20,12 +20,12 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import entities.common.NumberOfRepeatWeek
+import extensions.dateTime
+import extensions.randomUUID
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import managers.CoroutineManager
 import mappers.schedules.mapToDetailsData
@@ -39,7 +39,6 @@ import models.organizations.OrganizationShortData
 import models.organizations.ScheduleTimeIntervalsData
 import models.schedules.BaseScheduleDetailsData
 import models.users.ContactInfoData
-import randomUUID
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
 import ru.aleshin.studyassistant.sqldelight.schedules.BaseScheduleQueries
@@ -54,7 +53,7 @@ interface BaseScheduleLocalDataSource {
     suspend fun addOrUpdateSchedule(schedule: BaseScheduleDetailsData): UID
     suspend fun fetchScheduleById(uid: UID): Flow<BaseScheduleDetailsData?>
     suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek): Flow<BaseScheduleDetailsData?>
-    suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant): Flow<List<BaseScheduleDetailsData>>
+    suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant, numberOfWeek: NumberOfRepeatWeek): Flow<List<BaseScheduleDetailsData>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<ClassDetailsData?>
 
     class Base(
@@ -89,10 +88,10 @@ interface BaseScheduleLocalDataSource {
 
         override suspend fun fetchScheduleByDate(
             date: Instant,
-            numberOfWeek: NumberOfRepeatWeek
+            numberOfWeek: NumberOfRepeatWeek,
         ): Flow<BaseScheduleDetailsData?> {
             val dateMillis = date.toEpochMilliseconds()
-            val dateTime = date.toLocalDateTime(TimeZone.UTC)
+            val dateTime = date.dateTime()
             val dayOfWeek = dateTime.dayOfWeek.toString()
             val week = numberOfWeek.toString()
 
@@ -108,12 +107,14 @@ interface BaseScheduleLocalDataSource {
 
         override suspend fun fetchSchedulesByTimeRange(
             from: Instant,
-            to: Instant
+            to: Instant,
+            numberOfWeek: NumberOfRepeatWeek
         ): Flow<List<BaseScheduleDetailsData>> {
             val fromMillis = from.toEpochMilliseconds()
             val toMillis = to.toEpochMilliseconds()
+            val week = numberOfWeek.toString()
 
-            val query = scheduleQueries.fetchSchedulesByTimeRange(fromMillis, toMillis)
+            val query = scheduleQueries.fetchSchedulesByTimeRange(week, fromMillis, toMillis)
             val scheduleEntityListFlow = query.asFlow().mapToList(coroutineContext)
 
             return scheduleEntityListFlow.map { scheduleEntityList ->

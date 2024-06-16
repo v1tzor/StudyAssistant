@@ -25,10 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
-import cafe.adriel.voyager.transitions.FadeTransition
-import ru.aleshin.core.common.navigation.screens.EmptyScreen
+import architecture.screens.EmptyScreen
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEffect
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEvent
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsViewState
@@ -54,7 +54,7 @@ internal class TabsScreen : Screen {
                 modifier = Modifier.fillMaxSize(),
                 content = { paddingValues ->
                     Box(modifier = Modifier.padding(paddingValues)) {
-                        FadeTransition(navigator = navigator)
+                        CurrentScreen()
                     }
                 },
                 bottomBar = {

@@ -23,7 +23,8 @@ import architecture.screenmodel.work.BackgroundWorkKey
 import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import extensions.dateTimeUTC
+import entities.common.NumberOfRepeatWeek
+import extensions.dateTime
 import extensions.shiftWeek
 import extensions.weekTimeRange
 import managers.CoroutineManager
@@ -65,7 +66,7 @@ internal class DetailsScreenModel(
         when (event) {
             is DetailsEvent.Init, DetailsEvent.SelectedCurrentWeek -> with(state()) {
                 launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
-                    val week = currentDate.dateTimeUTC().weekTimeRange()
+                    val week = currentDate.dateTime().weekTimeRange()
                     sendAction(DetailsAction.UpdateSelectedWeek(week))
                     val command = DetailsWorkCommand.LoadWeekSchedule(week)
                     workProcessor.work(command).collectAndHandleWork()
@@ -94,12 +95,18 @@ internal class DetailsScreenModel(
             is DetailsEvent.SelectedViewType -> {
                 sendAction(DetailsAction.UpdateViewType(event.scheduleView))
             }
-            is DetailsEvent.NavigateToOverview -> {
-                val screen = screenProvider.provideFeatureScreen(ScheduleScreen.Overview)
+            is DetailsEvent.OpenOverviewSchedule -> {
+                val date = event.date.toEpochMilliseconds()
+                val screen = screenProvider.provideFeatureScreen(ScheduleScreen.Overview(date))
                 sendEffect(DetailsEffect.NavigateToLocal(screen))
             }
-            is DetailsEvent.NavigateToEditor -> {
-                val screen = screenProvider.provideEditorScreen(EditorScreen.Schedule)
+            is DetailsEvent.NavigateToOverview -> {
+                val screen = screenProvider.provideFeatureScreen(ScheduleScreen.Overview(null))
+                sendEffect(DetailsEffect.NavigateToLocal(screen))
+            }
+            is DetailsEvent.NavigateToEditor -> with(state()) {
+                val week = weekSchedule?.numberOfWeek ?: NumberOfRepeatWeek.ONE
+                val screen = screenProvider.provideEditorScreen(EditorScreen.Schedule(week))
                 sendEffect(DetailsEffect.NavigateToGlobal(screen))
             }
         }

@@ -20,6 +20,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,10 +38,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import extensions.dateTimeUTC
+import extensions.dateTime
+import extensions.formatByTimeZone
 import extensions.isoWeekNumber
 import functional.TimeRange
-import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -63,7 +64,7 @@ internal fun DetailsBottomBar(
     onViewTypeSelected: (ScheduleViewType) -> Unit,
 ) {
     Surface(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
@@ -96,8 +97,8 @@ internal fun WeekPickerView(
     onPreviousWeek: () -> Unit,
     onNextWeek: () -> Unit,
 ) {
-    val currentWeekNumber = currentWeek?.from?.dateTimeUTC()?.date?.isoWeekNumber() ?: Int.MIN_VALUE
-    val selectedWeekNumber = selectedWeek?.from?.dateTimeUTC()?.date?.isoWeekNumber() ?: Int.MAX_VALUE
+    val currentWeekNumber = currentWeek?.from?.dateTime()?.date?.isoWeekNumber() ?: Int.MIN_VALUE
+    val selectedWeekNumber = selectedWeek?.from?.dateTime()?.date?.isoWeekNumber() ?: Int.MAX_VALUE
     val dateFormat = DateTimeComponents.Format {
         dayOfMonth()
         char('.')
@@ -130,9 +131,9 @@ internal fun WeekPickerView(
                     currentWeekNumber.inc() == selectedWeekNumber -> ScheduleThemeRes.strings.nextWeekTitle
                     currentWeekNumber.dec() == selectedWeekNumber -> ScheduleThemeRes.strings.previousWeekTitle
                     else -> buildString {
-                        append(selectedWeek.from.format(dateFormat))
+                        append(selectedWeek.from.formatByTimeZone(dateFormat))
                         append(" - ")
-                        append(selectedWeek.to.format(dateFormat))
+                        append(selectedWeek.to.formatByTimeZone(dateFormat))
                     }
                 },
                 color = MaterialTheme.colorScheme.onSurface,

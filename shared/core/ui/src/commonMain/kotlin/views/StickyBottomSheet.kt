@@ -120,8 +120,6 @@ fun StickyBottomSheet(
 @Composable
 fun SmallDragHandle(
     modifier: Modifier = Modifier,
-    width: Dp = 32.dp,
-    height: Dp = 4.dp,
     shape: Shape = MaterialTheme.shapes.extraLarge,
     color: Color = MaterialTheme.colorScheme.outlineVariant,
 ) {
@@ -131,7 +129,7 @@ fun SmallDragHandle(
             color = color,
             shape = shape
         ) {
-            Box(Modifier.size(width = width, height = height))
+            Box(Modifier.size(width = 32.dp, height = 4.dp))
         }
     }
 }

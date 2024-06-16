@@ -35,19 +35,31 @@ internal fun BaseWeekSchedule.mapToUi() = BaseWeekScheduleUi(
     weekDaySchedules = weekDaySchedules.mapValues { it.value?.mapToUi() },
 )
 
-internal fun BaseSchedule.mapToUi() = BaseScheduleUi(
-    uid = uid,
-    dateVersion = dateVersion.mapToUi(),
-    dayOfWeek = dayOfWeek,
-    week = week,
-    classes = classes.map { it.mapToUi() }
-)
+internal fun BaseSchedule.mapToUi(): BaseScheduleUi {
+    val groupedClasses = classes.groupBy { it.organization.uid }
+    return BaseScheduleUi(
+        uid = uid,
+        dateVersion = dateVersion.mapToUi(),
+        dayOfWeek = dayOfWeek,
+        week = week,
+        classes = classes.map {
+            val number = groupedClasses[it.organization.uid]?.indexOf(it)?.inc() ?: 0
+            it.mapToUi(number)
+        }
+    )
+}
 
-internal fun CustomSchedule.mapToUi() = CustomScheduleUi(
-    uid = uid,
-    date = date,
-    classes = classes.map { it.mapToUi() }
-)
+internal fun CustomSchedule.mapToUi(): CustomScheduleUi {
+    val groupedClasses = classes.groupBy { it.organization.uid }
+    return CustomScheduleUi(
+        uid = uid,
+        date = date,
+        classes = classes.map {
+            val number = groupedClasses[it.organization.uid]?.indexOf(it)?.inc() ?: 0
+            it.mapToUi(number)
+        }
+    )
+}
 
 internal fun DateVersion.mapToUi() = DateVersionUi(
     from = from,

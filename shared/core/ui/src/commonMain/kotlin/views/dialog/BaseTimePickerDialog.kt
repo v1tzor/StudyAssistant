@@ -50,6 +50,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import extensions.dateTime
 import functional.TimeFormat
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -57,7 +58,6 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import theme.StudyAssistantRes
@@ -76,7 +76,7 @@ fun BaseTimePickerDialog(
     onConfirmTime: (Instant) -> Unit,
 ) {
     val is24Format = true // TODO: Real get 24 format
-    val initDateTime = initTime?.toLocalDateTime(TimeZone.UTC)
+    val initDateTime = initTime?.dateTime()
 
     BasicAlertDialog(onDismissRequest = onDismiss) {
         Surface(
@@ -90,7 +90,7 @@ fun BaseTimePickerDialog(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.End,
             ) {
-                val currentDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+                val currentDateTime = Clock.System.now().dateTime()
                 var hour by rememberSaveable { mutableStateOf(initDateTime?.hour) }
                 var minute by rememberSaveable { mutableStateOf(initDateTime?.minute) }
                 var format by remember {
@@ -129,7 +129,7 @@ fun BaseTimePickerDialog(
                                 nanosecond = 0,
                             )
                         )
-                        onConfirmTime.invoke(time.toInstant(TimeZone.UTC))
+                        onConfirmTime.invoke(time.toInstant(TimeZone.currentSystemDefault()))
                     },
                 )
             }

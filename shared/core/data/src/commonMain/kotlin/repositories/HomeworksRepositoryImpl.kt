@@ -18,10 +18,13 @@ package repositories
 
 import database.tasks.HomeworksLocalDataSource
 import entities.tasks.Homework
+import extensions.endThisDay
+import extensions.startThisDay
 import functional.TimeRange
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Instant
 import mappers.tasks.mapToData
 import mappers.tasks.mapToDomain
 import payments.SubscriptionChecker
@@ -36,19 +39,13 @@ class HomeworksRepositoryImpl(
     private val subscriptionChecker: SubscriptionChecker,
 ) : HomeworksRepository {
 
-    override suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>> {
+    override suspend fun addOrUpdateHomework(homework: Homework, targetUser: UID): UID {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-        val timeStart = timeRange.from.toEpochMilliseconds()
-        val timeEnd = timeRange.to.toEpochMilliseconds()
 
-        val homeworksFlow = if (isSubscriber) {
-            remoteDataSource.fetchHomeworksByTime(timeStart, timeEnd, targetUser)
+        return if (isSubscriber) {
+            remoteDataSource.addOrUpdateHomework(homework.mapToData(), targetUser)
         } else {
-            localDataSource.fetchHomeworksByTime(timeStart, timeEnd)
-        }
-
-        return homeworksFlow.map { homeworkListData ->
-            homeworkListData.map { it.mapToDomain() }
+            localDataSource.addOrUpdateHomework(homework.mapToData())
         }
     }
 
@@ -66,13 +63,35 @@ class HomeworksRepositoryImpl(
         }
     }
 
-    override suspend fun addOrUpdateHomework(homework: Homework, targetUser: UID): UID {
+    override suspend fun fetchHomeworksByDate(date: Instant, targetUser: UID): Flow<List<Homework>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val timeStart = date.startThisDay().toEpochMilliseconds()
+        val timeEnd = date.endThisDay().toEpochMilliseconds()
 
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateHomework(homework.mapToData(), targetUser)
+        val homeworksFlow = if (isSubscriber) {
+            remoteDataSource.fetchHomeworksByTimeRange(timeStart, timeEnd, targetUser)
         } else {
-            localDataSource.addOrUpdateHomework(homework.mapToData())
+            localDataSource.fetchHomeworksByTime(timeStart, timeEnd)
+        }
+
+        return homeworksFlow.map { homeworkListData ->
+            homeworkListData.map { it.mapToDomain() }
+        }
+    }
+
+    override suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val timeStart = timeRange.from.toEpochMilliseconds()
+        val timeEnd = timeRange.to.toEpochMilliseconds()
+
+        val homeworksFlow = if (isSubscriber) {
+            remoteDataSource.fetchHomeworksByTimeRange(timeStart, timeEnd, targetUser)
+        } else {
+            localDataSource.fetchHomeworksByTime(timeStart, timeEnd)
+        }
+
+        return homeworksFlow.map { homeworkListData ->
+            homeworkListData.map { it.mapToDomain() }
         }
     }
 

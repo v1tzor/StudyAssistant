@@ -15,7 +15,9 @@
 */
 package managers
 
+import extensions.dateTime
 import extensions.endThisDay
+import extensions.epochTimeDuration
 import extensions.isCurrentDay
 import extensions.startThisDay
 import extensions.toMinutes
@@ -23,6 +25,7 @@ import extensions.weekTimeRange
 import functional.TimeRange
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -31,49 +34,56 @@ import kotlinx.datetime.toLocalDateTime
  */
 interface DateManager {
 
-    fun fetchCurrentDate(): Instant
+    fun fetchCurrentInstant(): Instant
     fun fetchCurrentWeek(): TimeRange
-    fun fetchBeginningCurrentDay(): Instant
-    fun fetchEndCurrentDay(): Instant
+    fun fetchBeginningCurrentInstant(): Instant
+    fun fetchEndCurrentInstant(): Instant
     fun isCurrentDay(date: Instant): Boolean
-    fun calculateLeftTime(endTime: Instant): Long
+    fun calculateLeftDateTime(endDateTime: Instant): Long
+    fun calculateLeftTime(endTime: LocalTime): Long
     fun calculateProgress(startTime: Instant, endTime: Instant): Float
 
     class Base(
-        private val timeZone: TimeZone = TimeZone.UTC
+        private val timeZone: TimeZone = TimeZone.currentSystemDefault()
     ) : DateManager {
 
-        override fun fetchCurrentDate() = Clock.System.now()
+        override fun fetchCurrentInstant() = Clock.System.now()
 
         override fun fetchCurrentWeek(): TimeRange {
-            return fetchCurrentDate().toLocalDateTime(timeZone).weekTimeRange(timeZone)
+            return fetchCurrentInstant().toLocalDateTime(timeZone).weekTimeRange(timeZone)
         }
 
-        override fun fetchBeginningCurrentDay(): Instant {
-            return fetchCurrentDate().startThisDay(timeZone)
+        override fun fetchBeginningCurrentInstant(): Instant {
+            return fetchCurrentInstant().startThisDay(timeZone)
         }
 
-        override fun fetchEndCurrentDay(): Instant {
-            return fetchCurrentDate().endThisDay(timeZone)
+        override fun fetchEndCurrentInstant(): Instant {
+            return fetchCurrentInstant().endThisDay(timeZone)
         }
 
         override fun isCurrentDay(date: Instant): Boolean {
-            return fetchCurrentDate().isCurrentDay(date, timeZone)
+            return fetchCurrentInstant().isCurrentDay(date, timeZone)
         }
 
-        override fun calculateLeftTime(endTime: Instant): Long {
-            val currentDate = fetchCurrentDate()
-            val duration = endTime.toEpochMilliseconds() - currentDate.toEpochMilliseconds()
+        override fun calculateLeftDateTime(endDateTime: Instant): Long {
+            val currentDate = fetchCurrentInstant()
+            val duration = endDateTime.toEpochMilliseconds() - currentDate.toEpochMilliseconds()
+            return duration
+        }
+
+        override fun calculateLeftTime(endTime: LocalTime): Long {
+            val currentTimeMillis = fetchCurrentInstant().dateTime().time.epochTimeDuration()
+            val duration = endTime.epochTimeDuration() - currentTimeMillis
             return duration
         }
 
         override fun calculateProgress(startTime: Instant, endTime: Instant): Float {
-            val currentTime = fetchCurrentDate().toEpochMilliseconds()
-            val pastTime = ((currentTime - startTime.toEpochMilliseconds()).toMinutes()).toFloat()
+            val currentTimeMillis = fetchCurrentInstant().toEpochMilliseconds()
+            val pastTime = ((currentTimeMillis - startTime.toEpochMilliseconds()).toMinutes()).toFloat()
             val duration = ((endTime.toEpochMilliseconds() - startTime.toEpochMilliseconds()).toMinutes()).toFloat()
             val progress = pastTime / duration
 
-            return if (progress < 0f) 0f else if (progress > 1f) 1f else progress
+            return if (progress < 0f) -1f else if (progress > 1f) 1f else progress
         }
     }
 }

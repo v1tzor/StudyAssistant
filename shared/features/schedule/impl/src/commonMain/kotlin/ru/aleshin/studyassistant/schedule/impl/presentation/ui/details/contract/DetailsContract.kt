@@ -23,13 +23,12 @@ import architecture.screenmodel.contract.BaseViewState
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
-import entities.organizations.Millis
 import functional.TimeRange
-import functional.UID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import platform.InstantParceler
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.WeekScheduleDetailsUi
 
@@ -43,7 +42,7 @@ internal data class DetailsViewState(
     val currentDate: Instant = Clock.System.now(),
     val weekSchedule: WeekScheduleDetailsUi? = null,
     val selectedWeek: TimeRange? = null,
-    val activeClass: Pair<UID, Millis>? = null,
+    val activeClass: ActiveClassUi? = null,
     val scheduleView: ScheduleViewType = ScheduleViewType.COMMON,
 ) : BaseViewState
 
@@ -52,6 +51,7 @@ internal sealed class DetailsEvent : BaseEvent {
     data object SelectedNextWeek : DetailsEvent()
     data object SelectedCurrentWeek : DetailsEvent()
     data object SelectedPreviousWeek : DetailsEvent()
+    data class OpenOverviewSchedule(val date: Instant) : DetailsEvent()
     data class SelectedViewType(val scheduleView: ScheduleViewType) : DetailsEvent()
     data object NavigateToOverview : DetailsEvent()
     data object NavigateToEditor : DetailsEvent()
@@ -66,7 +66,7 @@ internal sealed class DetailsEffect : BaseUiEffect {
 internal sealed class DetailsAction : BaseAction {
     data class UpdateWeekSchedule(val schedule: WeekScheduleDetailsUi) : DetailsAction()
     data class UpdateSelectedWeek(val week: TimeRange?) : DetailsAction()
-    data class UpdateActiveClass(val activeClass: Pair<UID, Millis>?) : DetailsAction()
+    data class UpdateActiveClass(val activeClass: ActiveClassUi?) : DetailsAction()
     data class UpdateViewType(val scheduleView: ScheduleViewType) : DetailsAction()
     data class UpdateLoading(val isLoading: Boolean) : DetailsAction()
 }

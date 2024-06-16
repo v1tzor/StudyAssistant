@@ -22,6 +22,8 @@ import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.orderBy
 import dev.gitlive.firebase.firestore.where
 import exceptions.FirebaseUserException
+import extensions.exists
+import extensions.snapshotGet
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -44,7 +46,7 @@ interface HomeworksRemoteDataSource {
 
     suspend fun addOrUpdateHomework(homework: HomeworkDetailsData, targetUser: UID): UID
     suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<HomeworkDetailsData?>
-    suspend fun fetchHomeworksByTime(from: Long, to: Long, targetUser: UID): Flow<List<HomeworkDetailsData>>
+    suspend fun fetchHomeworksByTimeRange(from: Long, to: Long, targetUser: UID): Flow<List<HomeworkDetailsData>>
     suspend fun deleteHomework(uid: UID, targetUser: UID)
 
     class Base(
@@ -59,7 +61,7 @@ interface HomeworksRemoteDataSource {
             val reference = userDataRoot.collection(UserData.HOMEWORKS)
 
             return database.runTransaction {
-                val isExist = homeworkPojo.uid.isNotEmpty() && reference.document(homeworkPojo.uid).get().exists
+                val isExist = homeworkPojo.uid.isNotEmpty() && reference.document(homeworkPojo.uid).exists()
                 if (isExist) {
                     reference.document(homeworkPojo.uid).set(data = homeworkPojo)
                     return@runTransaction homeworkPojo.uid
@@ -85,7 +87,7 @@ interface HomeworksRemoteDataSource {
             return homeworkPojoFlow.map { homeworkPojo -> homeworkPojo?.mapToDetails(userDataRoot) }
         }
 
-        override suspend fun fetchHomeworksByTime(
+        override suspend fun fetchHomeworksByTimeRange(
             from: Long,
             to: Long,
             targetUser: UID
@@ -119,12 +121,12 @@ interface HomeworksRemoteDataSource {
             val organizationReference = userDataRoot.collection(UserData.ORGANIZATIONS).document(organizationId)
             val subjectReference = subjectId?.let { userDataRoot.collection(UserData.SUBJECTS).document(it) }
 
-            val organization = organizationReference.get().data<OrganizationShortData>()
-            val subject = subjectReference?.get()?.data<SubjectPojo>().let { subjectPojo ->
+            val organization = organizationReference.snapshotGet().data<OrganizationShortData>()
+            val subject = subjectReference?.snapshotGet()?.data<SubjectPojo>().let { subjectPojo ->
                 val employeeReference = subjectPojo?.teacherId?.let {
                     userDataRoot.collection(UserData.EMPLOYEE).document(it)
                 }
-                val employee = employeeReference?.get()?.data(serializer<EmployeeDetailsData?>())
+                val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeeDetailsData?>())
                 subjectPojo?.mapToDetailsData(employee)
             }
 

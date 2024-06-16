@@ -18,18 +18,17 @@ package ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmod
 
 import androidx.compose.runtime.Composable
 import architecture.screenmodel.BaseScreenModel
-import architecture.screenmodel.EmptyDeps
 import architecture.screenmodel.work.BackgroundWorkKey
 import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import entities.common.NumberOfRepeatWeek
 import managers.CoroutineManager
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
 import ru.aleshin.studyassistant.editor.impl.navigation.EditorScreenProvider
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorAction
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorDeps
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorViewState
@@ -43,16 +42,16 @@ internal class ScheduleEditorScreenModel(
     stateCommunicator: ScheduleEditorStateCommunicator,
     effectCommunicator: ScheduleEditorEffectCommunicator,
     coroutineManager: CoroutineManager,
-) : BaseScreenModel<ScheduleEditorViewState, ScheduleEditorEvent, ScheduleEditorAction, ScheduleEditorEffect, EmptyDeps>(
+) : BaseScreenModel<ScheduleEditorViewState, ScheduleEditorEvent, ScheduleEditorAction, ScheduleEditorEffect, ScheduleEditorDeps>(
     stateCommunicator = stateCommunicator,
     effectCommunicator = effectCommunicator,
     coroutineManager = coroutineManager,
 ) {
 
-    override fun init(deps: EmptyDeps) {
+    override fun init(deps: ScheduleEditorDeps) {
         if (!isInitialize) {
             super.init(deps)
-            dispatchEvent(ScheduleEditorEvent.Init)
+            dispatchEvent(ScheduleEditorEvent.Init(deps.week))
         }
     }
 
@@ -61,18 +60,32 @@ internal class ScheduleEditorScreenModel(
     ) {
         when (event) {
             is ScheduleEditorEvent.Init -> {
+                sendAction(ScheduleEditorAction.UpdateSelectedWeek(event.week))
                 launchBackgroundWork(BackgroundKey.FETCH_ORGANIZATIONS) {
                     val command = ScheduleEditorWorkCommand.LoadOrganizationsData
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.FETCH_SCHEDULE) {
-                    val command = ScheduleEditorWorkCommand.LoadWeekSchedule(NumberOfRepeatWeek.ONE)
+                    val command = ScheduleEditorWorkCommand.LoadWeekSchedule(event.week)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is ScheduleEditorEvent.ChangeWeek -> launchBackgroundWork(BackgroundKey.FETCH_SCHEDULE) {
-                val command = ScheduleEditorWorkCommand.LoadWeekSchedule(event.numberOfWeek)
-                workProcessor.work(command).collectAndHandleWork()
+            is ScheduleEditorEvent.Refresh -> with(state()) {
+                launchBackgroundWork(BackgroundKey.FETCH_ORGANIZATIONS) {
+                    val command = ScheduleEditorWorkCommand.LoadOrganizationsData
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+                launchBackgroundWork(BackgroundKey.FETCH_SCHEDULE) {
+                    val command = ScheduleEditorWorkCommand.LoadWeekSchedule(selectedWeek)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is ScheduleEditorEvent.ChangeWeek -> {
+                sendAction(ScheduleEditorAction.UpdateSelectedWeek(event.numberOfWeek))
+                launchBackgroundWork(BackgroundKey.FETCH_SCHEDULE) {
+                    val command = ScheduleEditorWorkCommand.LoadWeekSchedule(event.numberOfWeek)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is ScheduleEditorEvent.UpdateOrganization -> launchBackgroundWork(BackgroundKey.UPDATE_ORGANIZATION) {
                 val command = ScheduleEditorWorkCommand.UpdateOrganization(event.organization)
@@ -105,8 +118,11 @@ internal class ScheduleEditorScreenModel(
         is ScheduleEditorAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )
+        is ScheduleEditorAction.UpdateSelectedWeek -> currentState.copy(
+            selectedWeek = action.week,
+        )
         is ScheduleEditorAction.UpdateScheduleData -> currentState.copy(
-            currentWeek = action.week,
+            selectedWeek = action.week,
             weekSchedule = action.schedule,
             isLoading = false,
         )

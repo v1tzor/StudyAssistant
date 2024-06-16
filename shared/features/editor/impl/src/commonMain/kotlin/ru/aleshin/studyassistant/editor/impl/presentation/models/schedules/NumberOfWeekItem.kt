@@ -23,7 +23,7 @@ import views.SegmentedButtonItem
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-internal enum class NumberOfWeekItem(val id: Int) : SegmentedButtonItem {
+internal enum class NumberOfWeekItem(val isoWeekNumber: Int) : SegmentedButtonItem {
     ONE(1) {
         override val title: String @Composable get() = "1"
     },
@@ -34,15 +34,11 @@ internal enum class NumberOfWeekItem(val id: Int) : SegmentedButtonItem {
         override val title: String @Composable get() = "3"
     };
 
-    fun toModel() = when (this) {
-        ONE -> NumberOfRepeatWeek.ONE
-        TWO -> NumberOfRepeatWeek.TWO
-        THREE -> NumberOfRepeatWeek.THREE
+    fun toModel() = NumberOfRepeatWeek.valueOf(isoWeekNumber)
+
+    companion object {
+        fun valueOf(isoWeekNumber: Int) = NumberOfWeekItem.entries[isoWeekNumber - 1]
     }
 }
 
-internal fun NumberOfRepeatWeek.toItem() = when (this) {
-    NumberOfRepeatWeek.ONE -> NumberOfWeekItem.ONE
-    NumberOfRepeatWeek.TWO -> NumberOfWeekItem.TWO
-    NumberOfRepeatWeek.THREE -> NumberOfWeekItem.THREE
-}
+internal fun NumberOfRepeatWeek.toItem() = NumberOfWeekItem.valueOf(isoRepeatWeekNumber)

@@ -24,7 +24,7 @@ ORDER BY date_version_to DESC;
 fetchSchedulesByTimeRange:
 SELECT *
 FROM baseScheduleEntity
-WHERE date_version_to >= ? AND date_version_from <= ?
+WHERE week = ? AND date_version_to >= ? AND date_version_from <= ?
 ORDER BY date_version_to DESC;
 
 addOrUpdateSchedule:

@@ -17,7 +17,6 @@
 package repositories
 
 import entities.settings.CalendarSettings
-import entities.users.AppUser
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 

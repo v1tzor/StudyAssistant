@@ -18,10 +18,15 @@ package functional
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
-import extensions.epochDuration
+import extensions.dateTime
+import extensions.epochTimeDuration
+import extensions.shiftDay
+import extensions.startThisDay
+import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.periodUntil
 import platform.InstantParceler
 
 /**
@@ -34,12 +39,24 @@ data class TimeRange(
 ) : Parcelable {
 
     fun timeEquals(other: TimeRange?): Boolean {
-        val fromTime = from.toLocalDateTime(TimeZone.UTC).time
-        val endTime = from.toLocalDateTime(TimeZone.UTC).time
-        val otherFromTime = other?.from?.toLocalDateTime(TimeZone.UTC)?.time
-        val otherEndTime = other?.from?.toLocalDateTime(TimeZone.UTC)?.time
+        val fromTime = from.dateTime().time
+        val endTime = from.dateTime().time
+        val otherFromTime = other?.from?.dateTime()?.time
+        val otherEndTime = other?.from?.dateTime()?.time
 
-        return fromTime.epochDuration() == otherFromTime?.epochDuration() &&
-            endTime.epochDuration() == otherEndTime?.epochDuration()
+        return fromTime.epochTimeDuration() == otherFromTime?.epochTimeDuration() &&
+            endTime.epochTimeDuration() == otherEndTime?.epochTimeDuration()
+    }
+
+    fun periodDuration(timeZone: TimeZone = TimeZone.currentSystemDefault()): DateTimePeriod {
+        return from.periodUntil(to, timeZone)
+    }
+
+    fun periodDates(timeZone: TimeZone = TimeZone.currentSystemDefault()): List<Instant> {
+        val days = from.daysUntil(to, timeZone)
+        val dateList = mutableListOf<Instant>().apply {
+            for (shiftValue in 0..days) add(from.startThisDay().shiftDay(shiftValue, timeZone))
+        }
+        return dateList.toList()
     }
 }

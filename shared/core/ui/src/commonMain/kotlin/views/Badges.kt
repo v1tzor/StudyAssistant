@@ -16,6 +16,7 @@
 
 package views
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -46,7 +47,7 @@ fun SmallInfoBadge(
     content: @Composable () -> Unit,
 ) {
     Surface(
-        modifier = modifier,
+        modifier = modifier.animateContentSize(),
         shape = RoundedCornerShape(6.dp),
         color = containerColor,
     ) {
@@ -54,9 +55,11 @@ fun SmallInfoBadge(
             LocalContentColor provides contentColor
         ) {
             ProvideTextStyle(value = MaterialTheme.typography.labelSmall.boldWeight()) {
-                Box(modifier = Modifier.padding(horizontal = 4.dp)) {
-                    content()
-                }
+                Box(
+                    modifier = Modifier.padding(horizontal = 6.dp),
+                    contentAlignment = Alignment.Center,
+                    content = { content() },
+                )
             }
         }
     }

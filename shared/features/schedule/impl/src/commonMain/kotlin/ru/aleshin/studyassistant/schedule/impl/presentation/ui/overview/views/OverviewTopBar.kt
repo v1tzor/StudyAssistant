@@ -75,7 +75,7 @@ internal fun OverviewTopBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         ),
     )
 }

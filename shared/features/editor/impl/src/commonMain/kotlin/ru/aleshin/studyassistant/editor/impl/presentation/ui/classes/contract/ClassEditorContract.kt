@@ -27,7 +27,7 @@ import entities.subject.EventType
 import functional.TimeRange
 import functional.UID
 import kotlinx.datetime.Instant
-import platform.InstantParceler
+import platform.NullInstantParceler
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.EditClassUi
@@ -45,7 +45,7 @@ internal data class ClassEditorViewState(
     val isLoading: Boolean = true,
     val editableClass: EditClassUi? = null,
     val schedule: ScheduleUi? = null,
-    @TypeParceler<Instant, InstantParceler>
+    @TypeParceler<Instant?, NullInstantParceler>
     val freeClassTimeRanges: Map<TimeRange, Boolean>? = null,
     val weekDay: DayOfNumberedWeekUi? = null,
     val organizations: List<OrganizationUi> = emptyList(),

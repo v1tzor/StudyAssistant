@@ -87,14 +87,15 @@ class BaseScheduleRepositoryImpl(
 
     override suspend fun fetchSchedulesByTimeRange(
         timeRange: TimeRange,
+        numberOfWeek: NumberOfRepeatWeek,
         targetUser: UID
     ): Flow<List<BaseSchedule>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         val scheduleListFlow = if (isSubscriber) {
-            remoteDataSource.fetchSchedulesByTimeRange(timeRange.from, timeRange.to, targetUser)
+            remoteDataSource.fetchSchedulesByTimeRange(timeRange.from, timeRange.to, numberOfWeek, targetUser)
         } else {
-            localDataSource.fetchSchedulesByTimeRange(timeRange.from, timeRange.to)
+            localDataSource.fetchSchedulesByTimeRange(timeRange.from, timeRange.to, numberOfWeek)
         }
 
         return scheduleListFlow.map { scheduleList ->

@@ -33,6 +33,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation.Naviga
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewEffectCommunicator
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewScreenModel
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewStateCommunicator
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -46,8 +47,8 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<OverviewStateCommunicator> { OverviewStateCommunicator.Base() }
     bindProvider<OverviewEffectCommunicator> { OverviewEffectCommunicator.Base() }
-//    bindProvider<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance()) }
-    bindProvider<OverviewScreenModel> { OverviewScreenModel(instance(), instance(), instance(), instance()) }
+    bindProvider<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance(), instance()) }
+    bindProvider<OverviewScreenModel> { OverviewScreenModel(instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<DetailsStateCommunicator> { DetailsStateCommunicator.Base() }
     bindProvider<DetailsEffectCommunicator> { DetailsEffectCommunicator.Base() }

@@ -84,7 +84,7 @@ internal fun ClassUi.convertToEditModel() = EditClassUi(
     notification = notification,
 )
 
-internal fun EditClassUi.convertToBase() = ClassUi(
+internal fun EditClassUi.convertToBase(number: Int = 0) = ClassUi(
     uid = uid,
     scheduleId = scheduleId ?: "",
     organization = checkNotNull(organization),
@@ -98,5 +98,6 @@ internal fun EditClassUi.convertToBase() = ClassUi(
         from = checkNotNull(startTime),
         to = checkNotNull(endTime),
     ),
+    number = number,
     notification = notification,
 )

@@ -23,7 +23,7 @@ import kotlinx.datetime.Instant
  */
 data class DailyAnalysis(
     val date: Instant,
-    val generalAssessment: Int,
+    val generalAssessment: Float,
     val numberOfClasses: Int,
     val numberOfTests: Int,
     val numberOfMovements: Int,

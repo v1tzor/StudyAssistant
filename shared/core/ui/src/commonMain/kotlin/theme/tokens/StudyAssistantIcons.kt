@@ -19,23 +19,36 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.core.ui.generated.resources.Res
+import studyassistant.shared.core.ui.generated.resources.ic_alert_circle_outline
 import studyassistant.shared.core.ui.generated.resources.ic_birthday
+import studyassistant.shared.core.ui.generated.resources.ic_class
+import studyassistant.shared.core.ui.generated.resources.ic_classes_column
 import studyassistant.shared.core.ui.generated.resources.ic_clock_outline
 import studyassistant.shared.core.ui.generated.resources.ic_duration
 import studyassistant.shared.core.ui.generated.resources.ic_email
+import studyassistant.shared.core.ui.generated.resources.ic_employee
+import studyassistant.shared.core.ui.generated.resources.ic_lecture
+import studyassistant.shared.core.ui.generated.resources.ic_map_marker
+import studyassistant.shared.core.ui.generated.resources.ic_movements
+import studyassistant.shared.core.ui.generated.resources.ic_online_lesson
+import studyassistant.shared.core.ui.generated.resources.ic_organization
 import studyassistant.shared.core.ui.generated.resources.ic_organization_geo
 import studyassistant.shared.core.ui.generated.resources.ic_organization_geo_outline
 import studyassistant.shared.core.ui.generated.resources.ic_phone
+import studyassistant.shared.core.ui.generated.resources.ic_practice
 import studyassistant.shared.core.ui.generated.resources.ic_profile
 import studyassistant.shared.core.ui.generated.resources.ic_profile_outline
 import studyassistant.shared.core.ui.generated.resources.ic_select_date
+import studyassistant.shared.core.ui.generated.resources.ic_seminar
 import studyassistant.shared.core.ui.generated.resources.ic_study
 import studyassistant.shared.core.ui.generated.resources.ic_study_assistant
 import studyassistant.shared.core.ui.generated.resources.ic_study_outline
 import studyassistant.shared.core.ui.generated.resources.ic_tasks
+import studyassistant.shared.core.ui.generated.resources.ic_tasks_circular
 import studyassistant.shared.core.ui.generated.resources.ic_tasks_outline
 import studyassistant.shared.core.ui.generated.resources.ic_upload_circular
 import studyassistant.shared.core.ui.generated.resources.ic_web
+import studyassistant.shared.core.ui.generated.resources.ic_webinar
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
@@ -54,12 +67,27 @@ data class StudyAssistantIcons(
     val timeOutline: DrawableResource,
     val duration: DrawableResource,
     val organizationGeo: DrawableResource,
+    val organization: DrawableResource,
     val upload: DrawableResource,
     val birthday: DrawableResource,
     val email: DrawableResource,
     val phone: DrawableResource,
     val website: DrawableResource,
     val selectDate: DrawableResource,
+    val location: DrawableResource,
+    val classes: DrawableResource,
+    val lesson: DrawableResource,
+    val lecture: DrawableResource,
+    val practice: DrawableResource,
+    val seminar: DrawableResource,
+    val onlineClass: DrawableResource,
+    val webinar: DrawableResource,
+    val employee: DrawableResource,
+    val homeworks: DrawableResource,
+    val tests: DrawableResource,
+    val classesList: DrawableResource,
+    val movements: DrawableResource,
+    val tasksOutline: DrawableResource,
 ) {
     companion object {
         val BASE = StudyAssistantIcons(
@@ -75,12 +103,27 @@ data class StudyAssistantIcons(
             timeOutline = Res.drawable.ic_clock_outline,
             duration = Res.drawable.ic_duration,
             organizationGeo = Res.drawable.ic_organization_geo,
+            organization = Res.drawable.ic_organization,
             upload = Res.drawable.ic_upload_circular,
             birthday = Res.drawable.ic_birthday,
             email = Res.drawable.ic_email,
             phone = Res.drawable.ic_phone,
             website = Res.drawable.ic_web,
             selectDate = Res.drawable.ic_select_date,
+            location = Res.drawable.ic_map_marker,
+            classes = Res.drawable.ic_class,
+            lesson = Res.drawable.ic_class,
+            lecture = Res.drawable.ic_lecture,
+            practice = Res.drawable.ic_practice,
+            seminar = Res.drawable.ic_seminar,
+            onlineClass = Res.drawable.ic_online_lesson,
+            webinar = Res.drawable.ic_webinar,
+            employee = Res.drawable.ic_employee,
+            homeworks = Res.drawable.ic_tasks_circular,
+            tests = Res.drawable.ic_alert_circle_outline,
+            classesList = Res.drawable.ic_classes_column,
+            movements = Res.drawable.ic_movements,
+            tasksOutline = Res.drawable.ic_tasks_outline,
         )
     }
 }

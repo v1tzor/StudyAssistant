@@ -42,6 +42,7 @@ internal data class ClassDetailsUi(
     val office: String,
     val location: ContactInfoUi?,
     val timeRange: TimeRange,
+    val number: Int,
     val notification: Boolean = false,
     val homework: HomeworkUi?,
 ) : Parcelable

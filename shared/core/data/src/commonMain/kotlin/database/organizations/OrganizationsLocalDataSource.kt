@@ -19,6 +19,7 @@ package database.organizations
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
+import extensions.randomUUID
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -28,7 +29,6 @@ import mappers.organizations.mapToLocalData
 import mappers.subjects.mapToDetailsData
 import mappers.users.mapToDetailsData
 import models.organizations.OrganizationDetailsData
-import randomUUID
 import remote.StudyAssistantFirestore.LIMITS.ORGANIZATION_EMPLOYEE
 import remote.StudyAssistantFirestore.LIMITS.ORGANIZATION_SUBJECTS
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries

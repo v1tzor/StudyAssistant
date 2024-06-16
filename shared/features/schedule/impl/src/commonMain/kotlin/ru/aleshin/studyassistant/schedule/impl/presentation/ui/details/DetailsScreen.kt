@@ -27,7 +27,8 @@ import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import extensions.dateTimeUTC
+import cafe.adriel.voyager.navigator.currentOrThrow
+import extensions.dateTime
 import extensions.weekTimeRange
 import navigation.root
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
@@ -51,7 +52,7 @@ internal class DetailsScreen : Screen {
         initialState = DetailsViewState(),
     ) { state ->
         val strings = ScheduleThemeRes.strings
-        val navigator = LocalNavigator.current
+        val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -60,6 +61,7 @@ internal class DetailsScreen : Screen {
                 DetailsContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
+                    onOpenSchedule = { dispatchEvent(DetailsEvent.OpenOverviewSchedule(it)) },
                 )
             },
             topBar = {
@@ -71,7 +73,7 @@ internal class DetailsScreen : Screen {
             },
             bottomBar = {
                 DetailsBottomBar(
-                    currentWeek = state.currentDate.dateTimeUTC().weekTimeRange(),
+                    currentWeek = state.currentDate.dateTime().weekTimeRange(),
                     selectedWeek = state.selectedWeek,
                     viewType = state.scheduleView,
                     onNextWeek = { dispatchEvent(DetailsEvent.SelectedNextWeek) },
@@ -89,8 +91,8 @@ internal class DetailsScreen : Screen {
 
         handleEffect { effect ->
             when (effect) {
-                is DetailsEffect.NavigateToLocal -> navigator?.push(effect.pushScreen)
-                is DetailsEffect.NavigateToGlobal -> navigator?.root()?.push(effect.pushScreen)
+                is DetailsEffect.NavigateToLocal -> navigator.push(effect.pushScreen)
+                is DetailsEffect.NavigateToGlobal -> navigator.root().push(effect.pushScreen)
                 is DetailsEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

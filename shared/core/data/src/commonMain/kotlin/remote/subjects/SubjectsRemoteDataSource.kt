@@ -19,6 +19,8 @@ package remote.subjects
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.where
 import exceptions.FirebaseUserException
+import extensions.exists
+import extensions.snapshotGet
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -53,7 +55,7 @@ interface SubjectsRemoteDataSource {
             val reference = userDataRoot.collection(UserData.SUBJECTS)
 
             return database.runTransaction {
-                val isExist = subjectPojo.uid.isNotEmpty() && reference.document(subjectPojo.uid).get().exists
+                val isExist = subjectPojo.uid.isNotEmpty() && reference.document(subjectPojo.uid).exists()
                 if (isExist) {
                     reference.document(subjectPojo.uid).set(data = subjectPojo)
                     return@runTransaction subjectPojo.uid
@@ -80,7 +82,7 @@ interface SubjectsRemoteDataSource {
                 val employeeReferenceRoot = userDataRoot.collection(UserData.EMPLOYEE)
 
                 val employeeReference = subjectPojo?.teacherId?.let { employeeReferenceRoot.document(it) }
-                val employee = employeeReference?.get()?.data(serializer<EmployeeDetailsData?>())
+                val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeeDetailsData?>())
 
                 return@map subjectPojo?.mapToDetailsData(employee = employee)
             }
@@ -106,7 +108,7 @@ interface SubjectsRemoteDataSource {
                     val employeeReferenceRoot = userDataRoot.collection(UserData.EMPLOYEE)
 
                     val employeeReference = subjectPojo.teacherId?.let { employeeReferenceRoot.document(it) }
-                    val employee = employeeReference?.get()?.data(serializer<EmployeeDetailsData?>())
+                    val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeeDetailsData?>())
 
                     subjectPojo.mapToDetailsData(employee = employee)
                 }

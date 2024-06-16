@@ -74,18 +74,15 @@ internal interface ClassEditorWorkProcessor :
                 isCustom = command.isCustomSchedule,
                 weekDay = command.weekDay,
             )
-
             is ClassEditorWorkCommand.SaveEditModel -> saveEditModelWork(
                 editModel = command.editModel,
                 command.schedule,
                 weekDay = command.weekDay,
             )
-
             is ClassEditorWorkCommand.UpdateOffices -> updateOfficesWork(
                 organization = command.organization,
                 offices = command.offices,
             )
-
             is ClassEditorWorkCommand.UpdateLocations -> updateLocationsWork(
                 organization = command.organization,
                 locations = command.locations,

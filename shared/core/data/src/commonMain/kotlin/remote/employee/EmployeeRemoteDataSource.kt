@@ -19,6 +19,7 @@ package remote.employee
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.where
 import exceptions.FirebaseUserException
+import extensions.exists
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -48,9 +49,9 @@ interface EmployeeRemoteDataSource {
             val reference = userDataRoot.collection(UserData.EMPLOYEE)
 
             return database.runTransaction {
-                val isExist = employee.uid.isNotEmpty() && reference.document(employee.uid).get().exists
+                val isExist = employee.uid.isNotEmpty() && reference.document(employee.uid).exists()
                 if (isExist) {
-                    reference.document(employee.uid).set(data = employee)
+                    reference.document(employee.uid).set(employee)
                     return@runTransaction employee.uid
                 } else {
                     val uid = reference.add(employee).id

@@ -20,12 +20,13 @@ import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseUser
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.where
+import exceptions.FirebaseUserException
+import extensions.exists
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import models.users.AppUserPojo
-import exceptions.FirebaseUserException
 import remote.StudyAssistantFirestore.Users
 
 /**
@@ -53,10 +54,12 @@ interface UsersRemoteDataSource {
 
         override suspend fun addOrUpdateUser(user: AppUserPojo): Boolean {
             if (user.uid.isEmpty()) throw FirebaseUserException()
+
             val reference = database.collection(Users.ROOT).document(user.uid)
+
             return database.runTransaction {
-                val isNewUser = !reference.get().exists
-                reference.set(data = user, merge = true)
+                val isNewUser = !reference.exists()
+                reference.set(user)
                 return@runTransaction isNewUser
             }
         }
@@ -67,7 +70,9 @@ interface UsersRemoteDataSource {
 
         override suspend fun fetchUserById(uid: UID): Flow<AppUserPojo?> {
             if (uid.isEmpty()) throw FirebaseUserException()
+
             val reference = database.collection(Users.ROOT).document(uid)
+
             return reference.snapshots.map { snapshot ->
                 snapshot.data(serializer<AppUserPojo?>())
             }

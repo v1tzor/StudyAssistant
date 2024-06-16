@@ -16,13 +16,12 @@
 package mappers
 
 import androidx.compose.runtime.Composable
-import extensions.toMinutesAndHoursString
-import extensions.toMinutesOrHoursString
+import extensions.formatByTimeZone
+import extensions.toMinutesAndHoursSuffixString
+import extensions.toMinutesOrHoursSuffixString
 import functional.TimeRange
-import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DateTimeFormat
-import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import theme.StudyAssistantRes
 
@@ -34,7 +33,7 @@ fun Long.toMinutesOrHoursTitle(): String {
     val minutesSymbols = StudyAssistantRes.strings.minutesSuffix
     val hoursSymbols = StudyAssistantRes.strings.hoursSuffix
 
-    return this.toMinutesOrHoursString(minutesSymbols, hoursSymbols).text
+    return this.toMinutesOrHoursSuffixString(minutesSymbols, hoursSymbols)
 }
 
 @Composable
@@ -42,27 +41,26 @@ fun Long.toMinutesAndHoursTitle(): String {
     val minutesSymbols = StudyAssistantRes.strings.minutesSuffix
     val hoursSymbols = StudyAssistantRes.strings.hoursSuffix
 
-    return this.toMinutesAndHoursString(minutesSymbols, hoursSymbols).text
+    return this.toMinutesAndHoursSuffixString(minutesSymbols, hoursSymbols)
 }
 
 @Composable
 fun TimeRange.format(
     fromDateTimeFormat: DateTimeFormat<DateTimeComponents> = DateTimeComponents.Format {
-        hour(Padding.ZERO)
+        hour()
         char(':')
-        minute(Padding.ZERO)
+        minute()
     },
     joinSymbol: String = " - ",
     toDateTimeFormat: DateTimeFormat<DateTimeComponents> = DateTimeComponents.Format {
-        hour(Padding.ZERO)
+        hour()
         char(':')
-        minute(Padding.ZERO)
+        minute()
     },
 ): String {
     return buildString {
-        append(from.format(fromDateTimeFormat))
+        append(from.formatByTimeZone(fromDateTimeFormat))
         append(joinSymbol)
-        append(to.format(toDateTimeFormat))
+        append(to.formatByTimeZone(toDateTimeFormat))
     }
 }
-

@@ -35,7 +35,7 @@ interface CalendarSettingsRemoteDataSource {
 
     suspend fun addOrUpdateSettings(settings: CalendarSettingsDetailsData, targetUser: UID)
 
-    fun fetchSettings(targetUser: UID): Flow<CalendarSettingsDetailsData>
+    suspend fun fetchSettings(targetUser: UID): Flow<CalendarSettingsDetailsData>
 
     class Base(
         private val database: FirebaseFirestore
@@ -47,10 +47,11 @@ interface CalendarSettingsRemoteDataSource {
             reference.set(settings.mapToRemoteData())
         }
 
-        override fun fetchSettings(targetUser: UID): Flow<CalendarSettingsDetailsData> {
+        override suspend fun fetchSettings(targetUser: UID): Flow<CalendarSettingsDetailsData> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
             val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
+
             return reference.snapshots.map { snapshot ->
                 val settings = snapshot.data(serializer<CalendarSettingsPojo?>()) ?: CalendarSettingsPojo.default()
                 return@map settings.mapToDetailsData()

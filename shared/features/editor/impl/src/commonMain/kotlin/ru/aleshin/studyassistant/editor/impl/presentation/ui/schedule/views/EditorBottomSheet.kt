@@ -16,11 +16,9 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -53,7 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import entities.common.NumberOfRepeatWeek
 import mappers.toMinutesOrHoursTitle
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
@@ -77,8 +74,8 @@ internal fun ScheduleEditorBottomSheet(
     layoutHeight: Int,
     isLoading: Boolean,
     weekSchedule: BaseWeekScheduleUi?,
-    numberOfWeek: NumberOfRepeatWeek?,
-    currentWeek: NumberOfRepeatWeek,
+    maxNumberOfWeek: NumberOfRepeatWeek?,
+    selectedWeek: NumberOfRepeatWeek,
     organizations: List<OrganizationShortUi>,
     onSelectedWeek: (NumberOfRepeatWeek) -> Unit,
     onUpdateOrganization: (OrganizationShortUi) -> Unit,
@@ -94,8 +91,8 @@ internal fun ScheduleEditorBottomSheet(
                 numberOfClasses = weekSchedule?.weekDaySchedules?.values?.sumOf { schedule ->
                     schedule?.classes?.size ?: 0
                 } ?: 0,
-                numberOfWeek = numberOfWeek,
-                currentWeek = currentWeek,
+                maxNumberOfWeek = maxNumberOfWeek,
+                selectedWeek = selectedWeek,
                 onSelectedWeek = onSelectedWeek,
             )
         },
@@ -109,7 +106,6 @@ internal fun ScheduleEditorBottomSheet(
         footer = { paddingValues ->
             EditorBottomSheetFooter(
                 modifier = Modifier.padding(paddingValues),
-                enabled = !isLoading,
                 onSaveClick = onSaveClick,
             )
         },
@@ -121,8 +117,8 @@ internal fun EditorBottomSheetHeader(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     numberOfClasses: Int,
-    numberOfWeek: NumberOfRepeatWeek?,
-    currentWeek: NumberOfRepeatWeek,
+    maxNumberOfWeek: NumberOfRepeatWeek?,
+    selectedWeek: NumberOfRepeatWeek,
     onSelectedWeek: (NumberOfRepeatWeek) -> Unit,
 ) {
     Row(
@@ -141,13 +137,9 @@ internal fun EditorBottomSheetHeader(
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.labelMedium,
             )
-            AnimatedContent(
+            Crossfade(
                 targetState = isLoading,
-                transitionSpec = {
-                    fadeIn(animationSpec = tween(500, delayMillis = 180)).togetherWith(
-                        fadeOut(animationSpec = tween(500))
-                    )
-                },
+                animationSpec = spring(stiffness = Spring.StiffnessLow),
             ) { loading ->
                 if (!loading) {
                     Text(
@@ -169,9 +161,9 @@ internal fun EditorBottomSheetHeader(
         }
         SegmentedButtons(
             modifier = Modifier.width(180.dp),
-            enabled = { it.id <= (numberOfWeek?.toItem()?.id ?: -1) },
+            enabled = { it.isoWeekNumber <= (maxNumberOfWeek?.toItem()?.isoWeekNumber ?: -1) },
             items = NumberOfWeekItem.entries.toTypedArray(),
-            selectedItem = currentWeek.toItem(),
+            selectedItem = selectedWeek.toItem(),
             onItemClick = { onSelectedWeek(it.toModel()) },
         )
     }
@@ -185,7 +177,7 @@ internal fun EditorBottomSheetContent(
     onUpdateOrganization: (OrganizationShortUi) -> Unit,
 ) {
     var dialogOrganization by remember { mutableStateOf<OrganizationShortUi?>(null) }
-    var isShowScheduleIntervalsDialog by rememberSaveable { mutableStateOf(false) }
+    var scheduleIntervalsDialogState by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
@@ -196,13 +188,9 @@ internal fun EditorBottomSheetContent(
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.labelMedium,
         )
-        AnimatedContent(
+        Crossfade(
             targetState = isLoading,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(500, delayMillis = 180)).togetherWith(
-                    fadeOut(animationSpec = tween(500))
-                )
-            },
+            animationSpec = spring(stiffness = Spring.StiffnessLow),
         ) { loading ->
             LazyRow(
                 modifier = Modifier.height(126.dp).fillMaxWidth(),
@@ -219,7 +207,7 @@ internal fun EditorBottomSheetContent(
                             intervals = organization.scheduleTimeIntervals,
                             onClick = {
                                 dialogOrganization = organization
-                                isShowScheduleIntervalsDialog = true
+                                scheduleIntervalsDialogState = true
                             },
                         )
                     }
@@ -230,20 +218,19 @@ internal fun EditorBottomSheetContent(
         }
     }
 
-    if (isShowScheduleIntervalsDialog && dialogOrganization != null) {
+    if (scheduleIntervalsDialogState && dialogOrganization != null) {
         ScheduleIntervalsDialog(
             organization = dialogOrganization!!.shortName,
             intervals = dialogOrganization!!.scheduleTimeIntervals,
-            onDismiss = { isShowScheduleIntervalsDialog = false },
+            onDismiss = { scheduleIntervalsDialogState = false },
             onConfirm = {
                 onUpdateOrganization(dialogOrganization!!.copy(scheduleTimeIntervals = it))
-                isShowScheduleIntervalsDialog = false
+                scheduleIntervalsDialogState = false
             },
         )
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun ScheduleTimeIntervalsItem(
     modifier: Modifier = Modifier,
@@ -283,7 +270,7 @@ internal fun ScheduleTimeIntervalsItem(
                 ) {
                     Icon(
                         modifier = Modifier.size(24.dp),
-                        painter = painterResource(EditorThemeRes.icons.classes),
+                        painter = painterResource(StudyAssistantRes.icons.classes),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurface,
                     )

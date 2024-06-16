@@ -72,7 +72,7 @@ internal fun SubjectInfoField(
         Box(modifier = Modifier.height(61.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(EditorThemeRes.icons.classes),
+                painter = painterResource(StudyAssistantRes.icons.classes),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )

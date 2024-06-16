@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,25 +28,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import extensions.forEachWith
+import functional.Constants.Placeholder
 import kotlinx.datetime.DayOfWeek
 import mappers.mapToSting
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.CommonClassView
 import theme.StudyAssistantRes
 import views.PlaceholderBox
 
@@ -55,7 +54,6 @@ import views.PlaceholderBox
 @Composable
 internal fun ScheduleView(
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
     dayOfWeek: DayOfWeek,
     schedule: BaseScheduleUi?,
     onCreateClass: () -> Unit,
@@ -72,16 +70,12 @@ internal fun ScheduleView(
                 weekDayOfWeek = dayOfWeek,
                 numberOfClasses = schedule?.classes?.size ?: 0,
             )
-            if (schedule?.classes?.isNotEmpty() == true) {
-                ScheduleViewContent(
-                    enabled = enabled,
-                    classes = schedule.classes,
-                    onEditClass = onEditClass,
-                    onDeleteClass = onDeleteClass,
-                )
-            }
+            ScheduleViewContent(
+                classes = schedule?.classes,
+                onEditClass = onEditClass,
+                onDeleteClass = onDeleteClass,
+            )
             ScheduleViewFooter(
-                enabled = enabled,
                 onCreateClass = onCreateClass,
             )
         }
@@ -107,7 +101,7 @@ internal fun ScheduleViewPlaceholder(
                 modifier = Modifier.padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                repeat(3) {
+                repeat(Placeholder.SCHEDULE_CLASSES_ITEMS) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         PlaceholderBox(
                             modifier = Modifier.height(52.dp).width(4.dp),
@@ -140,7 +134,7 @@ private fun ScheduleViewHeader(
     numberOfClasses: Int,
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().height(56.dp),
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainer,
     ) {
@@ -153,10 +147,10 @@ private fun ScheduleViewHeader(
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
+                modifier = Modifier.animateContentSize(),
                 text = buildString {
                     append(EditorThemeRes.strings.quantityOfClassesTitle)
-                    append(' ')
-                    append(numberOfClasses.toString())
+                    append(" ", numberOfClasses.toString())
                 },
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelMedium,
@@ -166,35 +160,32 @@ private fun ScheduleViewHeader(
 }
 
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 private fun ScheduleViewContent(
     modifier: Modifier = Modifier,
-    enabled: Boolean,
     classes: List<ClassUi>?,
     onEditClass: (ClassUi) -> Unit,
     onDeleteClass: (ClassUi) -> Unit,
 ) {
-    val sortedClasses = classes?.sortedBy { it.timeRange.from }
-    val groupedClasses = classes?.groupBy(keySelector = { it.organization.uid })?.mapValues {
-        it.value.sortedBy { baseClass -> baseClass.timeRange.from }
-    }
-
     Column(
-        modifier = modifier.animateContentSize().padding(start = 6.dp, end = 6.dp, top = 6.dp),
+        modifier = modifier
+            .animateContentSize()
+            .padding(
+                top = if (classes?.isNotEmpty() == true) 6.dp else 0.dp,
+                start = 6.dp,
+                end = 6.dp,
+            ),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        sortedClasses?.forEachWith {
+        classes?.forEachWith {
             CommonClassView(
-                enabled = enabled,
                 onClick = { onEditClass(this) },
-                number = groupedClasses?.get(organization.uid)?.indexOf(this)?.inc() ?: 0,
+                number = number,
                 timeRange = timeRange,
                 subject = subject,
                 office = office,
                 organization = organization,
                 trailingIcon = {
                     IconButton(
-                        enabled = enabled,
                         modifier = Modifier.size(28.dp),
                         onClick = { onDeleteClass(this) },
                     ) {
@@ -214,29 +205,26 @@ private fun ScheduleViewContent(
 @Composable
 private fun ScheduleViewFooter(
     modifier: Modifier = Modifier,
-    enabled: Boolean,
+    enabled: Boolean = true,
     onCreateClass: () -> Unit,
 ) {
-    Row(modifier = modifier.padding(all = 8.dp)) {
-        Button(
+    Row(modifier = modifier.padding(8.dp)) {
+        OutlinedButton(
             onClick = onCreateClass,
             modifier = Modifier.height(40.dp).fillMaxWidth(),
             enabled = enabled,
             shape = MaterialTheme.shapes.large,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         ) {
             Icon(
                 imageVector = Icons.Filled.Add,
                 contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = EditorThemeRes.strings.addTitle,
                 style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

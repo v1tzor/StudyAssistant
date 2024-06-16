@@ -82,7 +82,6 @@ internal class EmployeeEditorScreen(
             },
             topBar = {
                 EmployeeEditorTopBar(
-                    isLoading = state.isLoading,
                     enabledSave = state.editableEmployee?.isValid() ?: false,
                     onBackClick = { dispatchEvent(EmployeeEditorEvent.NavigateToBack) },
                     onSaveClick = { dispatchEvent(EmployeeEditorEvent.SaveEmployee) },

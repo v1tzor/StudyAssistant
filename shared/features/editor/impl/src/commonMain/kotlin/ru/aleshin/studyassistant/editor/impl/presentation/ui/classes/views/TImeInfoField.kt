@@ -16,6 +16,10 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,12 +37,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import extensions.formatByTimeZone
 import functional.TimeRange
 import kotlinx.datetime.Instant
-import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import views.ClickableTextField
@@ -49,7 +52,6 @@ import views.dialog.BaseTimePickerDialog
  * @author Stanislav Aleshin on 05.06.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun TimeInfoField(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
@@ -58,8 +60,8 @@ internal fun TimeInfoField(
     freeClassTimeRanges: Map<TimeRange, Boolean>?,
     onSelectedTime: (Instant?, Instant?) -> Unit,
 ) {
-    var isOpenStartTimePicker by remember { mutableStateOf(false) }
-    var isOpenEndTimePicker by remember { mutableStateOf(false) }
+    var startTimePickerState by remember { mutableStateOf(false) }
+    var endTimePickerState by remember { mutableStateOf(false) }
 
     Row(
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
@@ -73,7 +75,10 @@ internal fun TimeInfoField(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(
+            modifier = Modifier.animateContentSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 val timeFormat = DateTimeComponents.Format {
                     hour()
@@ -81,15 +86,15 @@ internal fun TimeInfoField(
                     minute()
                 }
                 ClickableTextField(
-                    onClick = { isOpenStartTimePicker = true },
+                    onClick = { startTimePickerState = true },
                     enabled = !isLoading,
                     modifier = Modifier.weight(1f),
-                    value = startTime?.format(timeFormat),
+                    value = startTime?.formatByTimeZone(timeFormat),
                     label = EditorThemeRes.strings.startTimeFieldLabel,
                     placeholder = EditorThemeRes.strings.startTimeFieldPlaceholder,
                     trailingIcon = {
                         ExpandedIcon(
-                            isExpanded = isOpenStartTimePicker,
+                            isExpanded = startTimePickerState,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     },
@@ -97,49 +102,58 @@ internal fun TimeInfoField(
                 ClickableTextField(
                     modifier = Modifier.weight(1f),
                     enabled = !isLoading,
-                    value = endTime?.format(timeFormat),
+                    value = endTime?.formatByTimeZone(timeFormat),
                     label = EditorThemeRes.strings.endTimeFieldLabel,
                     placeholder = EditorThemeRes.strings.endTimeFieldPlaceholder,
                     trailingIcon = {
                         ExpandedIcon(
-                            isExpanded = isOpenEndTimePicker,
+                            isExpanded = endTimePickerState,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     },
-                    onClick = { isOpenEndTimePicker = true },
+                    onClick = { endTimePickerState = true },
                 )
             }
-            ClassTimeRangeChooser(
-                enabled = !isLoading,
-                currentTime = if (startTime != null && endTime != null) {
-                    TimeRange(startTime, endTime)
+            Crossfade(
+                targetState = isLoading,
+                animationSpec = spring(stiffness = Spring.StiffnessLow),
+            ) { loading ->
+                if (!loading) {
+                    ClassTimeRangeChooser(
+                        enabled = !isLoading,
+                        currentTime = if (startTime != null && endTime != null) {
+                            TimeRange(startTime, endTime)
+                        } else {
+                            null
+                        },
+                        freeClassTimeRanges = freeClassTimeRanges,
+                        onChoose = { onSelectedTime(it.from, it.to) },
+                    )
                 } else {
-                    null
-                },
-                freeClassTimeRanges = freeClassTimeRanges,
-                onChoose = { onSelectedTime(it.from, it.to) },
-            )
+                    ClassTimeRangeChooserPlaceholder()
+                }
+            }
         }
     }
 
-    if (isOpenStartTimePicker) {
+    if (startTimePickerState) {
         BaseTimePickerDialog(
             initTime = startTime,
-            onDismiss = { isOpenStartTimePicker = false },
+            onDismiss = { startTimePickerState = false },
             onConfirmTime = { selectedStartTime ->
                 onSelectedTime(selectedStartTime, endTime)
-                isOpenStartTimePicker = false
+                startTimePickerState = false
             },
         )
     }
 
-    if (isOpenEndTimePicker) {
+    if (endTimePickerState) {
         BaseTimePickerDialog(
             initTime = endTime,
-            onDismiss = { isOpenEndTimePicker = false },
+            onDismiss = { endTimePickerState = false },
             onConfirmTime = { selectedEndTime ->
                 onSelectedTime(startTime, selectedEndTime)
-                isOpenEndTimePicker = false
+                endTimePickerState = false
             },
         )
     }
