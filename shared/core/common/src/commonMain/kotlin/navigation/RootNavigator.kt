@@ -16,6 +16,7 @@
 
 package navigation
 
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.Navigator
 
 /**
@@ -23,4 +24,14 @@ import cafe.adriel.voyager.navigator.Navigator
  */
 fun Navigator.root(): Navigator {
     return if (level == 0) this else checkNotNull(parent).root()
+}
+
+@OptIn(InternalVoyagerApi::class)
+fun Navigator.nestedPop() {
+    if (canPop) {
+        pop()
+    } else {
+        dispose(lastItem)
+        parent?.nestedPop()
+    }
 }

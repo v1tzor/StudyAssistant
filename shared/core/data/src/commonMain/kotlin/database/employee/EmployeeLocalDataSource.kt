@@ -27,7 +27,6 @@ import managers.CoroutineManager
 import mappers.users.mapToDetailsData
 import mappers.users.mapToLocalData
 import models.users.EmployeeDetailsData
-import remote.StudyAssistantFirestore.LIMITS.EDITOR_EMPLOYEE
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import kotlin.coroutines.CoroutineContext
 
@@ -67,7 +66,7 @@ interface EmployeeLocalDataSource {
         }
 
         override suspend fun fetchAllEmployeeByOrganization(organizationId: UID): Flow<List<EmployeeDetailsData>> {
-            val query = employeeQueries.fetchEmployeesByOrganization(organizationId, EDITOR_EMPLOYEE)
+            val query = employeeQueries.fetchEmployeesByOrganization(organizationId)
             val employeeEntityListFlow = query.asFlow().mapToList(coroutineContext)
 
             return employeeEntityListFlow.map { employeeEntityList ->

@@ -28,6 +28,7 @@ import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import functional.UID
+import navigation.nestedPop
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
@@ -102,7 +103,7 @@ internal class ClassEditorScreen(
         handleEffect { effect ->
             when (effect) {
                 is ClassEditorEffect.NavigateToLocal -> navigator?.push(effect.pushScreen)
-                is ClassEditorEffect.NavigateToBack -> navigator?.pop()
+                is ClassEditorEffect.NavigateToBack -> navigator?.nestedPop()
                 is ClassEditorEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

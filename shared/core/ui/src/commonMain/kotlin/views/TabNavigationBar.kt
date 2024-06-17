@@ -32,22 +32,26 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import mappers.pxToDp
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 08.02.2024.
  */
+interface BottomBarItem {
+    val label: String @Composable get
+    val enabledIcon: DrawableResource @Composable get
+    val disabledIcon: DrawableResource @Composable get
+    val containerColor: Color @Composable get() = MaterialTheme.colorScheme.background
+}
+
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 fun <Item : BottomBarItem> BottomNavigationBar(
     modifier: Modifier,
     selectedItem: Item,
     items: Array<Item>,
     onItemSelected: (Item) -> Unit,
     showLabel: Boolean,
-    containerColor: Color = MaterialTheme.colorScheme.background,
     windowInsets: WindowInsets = WindowInsets.navigationBars,
 ) {
     val density = LocalDensity.current
@@ -55,7 +59,7 @@ fun <Item : BottomBarItem> BottomNavigationBar(
         modifier = modifier.height(
             height = (if (showLabel) 80.dp else 60.dp) + windowInsets.getBottom(density).pxToDp()
         ),
-        containerColor = containerColor,
+        containerColor = selectedItem.containerColor,
         tonalElevation = StudyAssistantRes.elevations.levelZero,
         windowInsets = windowInsets,
     ) {
@@ -119,11 +123,4 @@ fun BottomBarLabel(
         },
         style = MaterialTheme.typography.labelMedium,
     )
-}
-
-@OptIn(ExperimentalResourceApi::class)
-interface BottomBarItem {
-    val label: String @Composable get
-    val enabledIcon: DrawableResource @Composable get
-    val disabledIcon: DrawableResource @Composable get
 }

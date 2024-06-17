@@ -18,10 +18,12 @@ package ru.aleshin.studyassistant.info.impl.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
 import navigation.FeatureScreenProvider
-import architecture.screens.EmptyScreen
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
+import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.EmployeeScreen
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.OrganizationsScreen
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.SubjectsScreen
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -35,9 +37,9 @@ internal interface InfoScreenProvider : FeatureScreenProvider<InfoScreen> {
     ) : InfoScreenProvider {
 
         override fun provideFeatureScreen(screen: InfoScreen) = when (screen) {
-            is InfoScreen.Organizations -> EmptyScreen
-            is InfoScreen.Subjects -> EmptyScreen
-            is InfoScreen.Employee -> EmptyScreen
+            is InfoScreen.Organizations -> OrganizationsScreen()
+            is InfoScreen.Subjects -> SubjectsScreen(screen.organizationId)
+            is InfoScreen.Employee -> EmployeeScreen(screen.organizationId)
         }
 
         override fun provideEditorScreen(screen: EditorScreen): Screen {

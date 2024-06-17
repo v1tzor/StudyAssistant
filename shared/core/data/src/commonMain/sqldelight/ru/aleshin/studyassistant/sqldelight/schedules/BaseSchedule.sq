@@ -21,10 +21,16 @@ FROM baseScheduleEntity
 WHERE week = ? AND week_day_of_week = ? AND date_version_from <= ? AND date_version_to >= ?
 ORDER BY date_version_to DESC;
 
-fetchSchedulesByTimeRange:
+fetchSchedulesByTimeRangeWithWeek:
 SELECT *
 FROM baseScheduleEntity
 WHERE week = ? AND date_version_to >= ? AND date_version_from <= ?
+ORDER BY date_version_to DESC;
+
+fetchSchedulesByTimeRange:
+SELECT *
+FROM baseScheduleEntity
+WHERE date_version_to >= ? AND date_version_from <= ?
 ORDER BY date_version_to DESC;
 
 addOrUpdateSchedule:

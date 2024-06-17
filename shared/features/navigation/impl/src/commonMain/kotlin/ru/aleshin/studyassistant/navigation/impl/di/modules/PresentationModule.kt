@@ -20,6 +20,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.navigation.impl.navigation.NavigationFeatureStarterImpl
 import ru.aleshin.studyassistant.navigation.impl.navigation.NavigationScreenProvider
@@ -37,12 +38,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<Screen> { TabsScreen() }
 
     bindSingleton<NavigationFeatureStarter> { NavigationFeatureStarterImpl(instance()) }
-    bindSingleton<NavigationScreenProvider> {
-        NavigationScreenProvider.Base(
-            scheduleFeatureStarter = instance<() -> ScheduleFeatureStarter>(),
-            profileFeatureStarter = instance<() -> ProfileFeatureStarter>()
-        )
-    }
+    bindSingleton<NavigationScreenProvider> { NavigationScreenProvider.Base(instance<() -> ScheduleFeatureStarter>(), instance<() -> InfoFeatureStarter>(), instance<() -> ProfileFeatureStarter>()) }
 
     bindSingleton<TabsEffectCommunicator> { TabsEffectCommunicator.Base() }
     bindSingleton<TabsStateCommunicator> { TabsStateCommunicator.Base() }

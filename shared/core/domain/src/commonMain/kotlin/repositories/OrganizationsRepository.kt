@@ -17,6 +17,7 @@
 package repositories
 
 import entities.organizations.Organization
+import entities.organizations.OrganizationShort
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 
@@ -24,7 +25,8 @@ import kotlinx.coroutines.flow.Flow
  * @author Stanislav Aleshin on 29.04.2024.
  */
 interface OrganizationsRepository {
-    suspend fun fetchAllOrganization(targetUser: UID): Flow<List<Organization>>
-    suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<Organization>
     suspend fun addOrUpdateOrganization(organization: Organization, targetUser: UID): UID
+    suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<Organization?>
+    suspend fun fetchAllOrganization(targetUser: UID): Flow<List<Organization>>
+    suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShort>>
 }

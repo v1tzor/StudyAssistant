@@ -17,6 +17,7 @@
 package mappers
 
 import entities.organizations.OrganizationType
+import theme.tokens.StudyAssistantIcons
 import theme.tokens.StudyAssistantStrings
 
 /**
@@ -31,4 +32,15 @@ fun OrganizationType.mapToSting(strings: StudyAssistantStrings) = when (this) {
     OrganizationType.UNIVERSITY -> strings.universityOrganizationType
     OrganizationType.ADDITIONAL_EDUCATION -> strings.additionalEducationOrganizationType
     OrganizationType.COURSES -> strings.coursesOrganizationType
+}
+
+fun OrganizationType.mapToIcon(icons: StudyAssistantIcons) = when (this) {
+    OrganizationType.SCHOOL -> icons.classes
+    OrganizationType.LYCEUM -> icons.classes
+    OrganizationType.GYMNASIUM -> icons.classes
+    OrganizationType.SEMINARY -> icons.seminary
+    OrganizationType.COLLEGE -> icons.university
+    OrganizationType.UNIVERSITY -> icons.university
+    OrganizationType.ADDITIONAL_EDUCATION -> icons.additionalEducation
+    OrganizationType.COURSES -> icons.additionalEducation
 }

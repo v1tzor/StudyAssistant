@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.interactors
 
-import co.touchlab.kermit.Logger
 import entities.classes.convertToDetails
 import entities.common.numberOfRepeatWeek
 import entities.schedules.ScheduleDetails
@@ -101,9 +100,7 @@ internal interface ScheduleInteractor {
                     to = week.to,
                     numberOfWeek = numberOfWeek,
                     weekDaySchedules = weekDaySchedules,
-                ).apply {
-                    Logger.i { "Schedule -> $this" }
-                }
+                )
             }
         }
 

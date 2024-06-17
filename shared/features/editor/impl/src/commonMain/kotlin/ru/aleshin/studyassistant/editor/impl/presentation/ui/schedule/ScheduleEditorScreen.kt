@@ -45,7 +45,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import entities.common.NumberOfRepeatWeek
 import extensions.navigationBarsInDp
 import extensions.safeNavigationBarsInPx
-import navigation.root
+import navigation.nestedPop
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorDeps
@@ -136,7 +136,7 @@ internal data class ScheduleEditorScreen(val week: NumberOfRepeatWeek) : Screen 
 
         handleEffect { effect ->
             when (effect) {
-                is ScheduleEditorEffect.NavigateToBack -> navigator.root().pop()
+                is ScheduleEditorEffect.NavigateToBack -> navigator.nestedPop()
                 is ScheduleEditorEffect.NavigateToLocal -> navigator.push(effect.pushScreen)
                 is ScheduleEditorEffect.ShowError -> {
                     snackbarState.showSnackbar(

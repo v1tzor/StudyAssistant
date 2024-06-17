@@ -28,7 +28,6 @@ import mappers.subjects.mapToDetailsData
 import mappers.subjects.mapToLocalData
 import mappers.users.mapToDetailsData
 import models.subjects.SubjectDetailsData
-import remote.StudyAssistantFirestore.LIMITS.EDITOR_SUBJECTS
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries
 import kotlin.coroutines.CoroutineContext
@@ -74,7 +73,7 @@ interface SubjectsLocalDataSource {
         }
 
         override suspend fun fetchAllSubjectsByOrganization(organizationId: UID): Flow<List<SubjectDetailsData>> {
-            val query = subjectQueries.fetchSubjectsByOrganization(organizationId, EDITOR_SUBJECTS)
+            val query = subjectQueries.fetchSubjectsByOrganization(organizationId)
             val subjectEntityListFlow = query.asFlow().mapToList(coroutineContext)
 
             return subjectEntityListFlow.map { subjectEntityList ->

@@ -53,8 +53,6 @@ object StudyAssistantFirestore {
     }
 
     object LIMITS {
-        const val ORGANIZATION_EMPLOYEE = 6L
-        const val ORGANIZATION_SUBJECTS = 8L
         const val EDITOR_SUBJECTS = 50L
         const val EDITOR_EMPLOYEE = 50L
     }

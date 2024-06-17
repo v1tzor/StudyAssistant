@@ -22,8 +22,7 @@ CREATE TABLE employeeEntity (
 fetchEmployeesByOrganization:
 SELECT *
 FROM employeeEntity
-WHERE organization_id = ?
-LIMIT ?;
+WHERE organization_id = ?;
 
 fetchEmployeeById:
 SELECT *

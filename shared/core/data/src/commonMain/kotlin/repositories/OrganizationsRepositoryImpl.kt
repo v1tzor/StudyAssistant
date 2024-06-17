@@ -18,6 +18,7 @@ package repositories
 
 import database.organizations.OrganizationsLocalDataSource
 import entities.organizations.Organization
+import entities.organizations.OrganizationShort
 import functional.UID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -35,6 +36,29 @@ class OrganizationsRepositoryImpl(
     private val subscriptionChecker: SubscriptionChecker,
 ) : OrganizationsRepository {
 
+    override suspend fun addOrUpdateOrganization(organization: Organization, targetUser: UID): UID {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.addOrUpdateOrganization(organization.mapToData(), targetUser)
+        } else {
+            localDataSource.addOrUpdateOrganization(organization.mapToData())
+        }
+    }
+
+    override suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<Organization?> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val organizationFlow = if (isSubscriber) {
+            remoteDataSource.fetchOrganizationById(uid, targetUser)
+        } else {
+            localDataSource.fetchOrganizationById(uid)
+        }
+
+        return organizationFlow.map { organizationData ->
+            organizationData?.mapToDomain()
+        }
+    }
+
     override suspend fun fetchAllOrganization(targetUser: UID): Flow<List<Organization>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
         val organizationsFlow = if (isSubscriber) {
@@ -48,26 +72,16 @@ class OrganizationsRepositoryImpl(
         }
     }
 
-    override suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<Organization> {
+    override suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShort>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-        val organizationFlow = if (isSubscriber) {
-            remoteDataSource.fetchOrganizationById(uid, targetUser)
+        val organizationsFlow = if (isSubscriber) {
+            remoteDataSource.fetchAllShortOrganization(targetUser)
         } else {
-            localDataSource.fetchOrganizationById(uid)
+            localDataSource.fetchAllShortOrganization()
         }
 
-        return organizationFlow.map { organizationData ->
-            organizationData.mapToDomain()
-        }
-    }
-
-    override suspend fun addOrUpdateOrganization(organization: Organization, targetUser: UID): UID {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateOrganization(organization.mapToData(), targetUser)
-        } else {
-            localDataSource.addOrUpdateOrganization(organization.mapToData())
+        return organizationsFlow.map { organizationListData ->
+            organizationListData.map { organization -> organization.mapToDomain() }
         }
     }
 }

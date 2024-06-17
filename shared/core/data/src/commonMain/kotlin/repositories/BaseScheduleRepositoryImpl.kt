@@ -87,7 +87,7 @@ class BaseScheduleRepositoryImpl(
 
     override suspend fun fetchSchedulesByTimeRange(
         timeRange: TimeRange,
-        numberOfWeek: NumberOfRepeatWeek,
+        numberOfWeek: NumberOfRepeatWeek?,
         targetUser: UID
     ): Flow<List<BaseSchedule>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()

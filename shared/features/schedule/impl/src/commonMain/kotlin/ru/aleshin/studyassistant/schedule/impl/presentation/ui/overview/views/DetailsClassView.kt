@@ -26,6 +26,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -44,22 +45,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import entities.subject.EventType
 import extensions.formatByTimeZone
-import extensions.pxToDp
 import functional.TimeRange
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
@@ -93,22 +89,17 @@ internal fun DetailsClassView(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.height(IntrinsicSize.Max),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        val density = LocalDensity.current
-        var infoViewHeight by remember { mutableStateOf(125.dp) }
-
         DetailsClassTime(
-            modifier = Modifier.height(infoViewHeight),
+            modifier = Modifier.fillMaxHeight(),
             isActive = isActive,
             progress = progress,
             timeRange = timeRange,
         )
         DetailsClassViewInfo(
-            modifier = Modifier.fillMaxWidth().onGloballyPositioned {
-                infoViewHeight = it.size.height.pxToDp(density)
-            },
+            modifier = Modifier.fillMaxWidth(),
             onClick = onClick,
             enabled = enabled,
             subject = subject,
@@ -305,18 +296,13 @@ internal fun DetailsClassViewInfo(
         color = MaterialTheme.colorScheme.surfaceContainer,
         interactionSource = interactionSource,
     ) {
-        Row(Modifier.fillMaxWidth()) {
-            val density = LocalDensity.current
-            var contentHeight by remember { mutableStateOf(125.dp) }
-
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max)) {
             DetailsClassColorIndicator(
-                modifier = Modifier.height(contentHeight),
+                modifier = Modifier.fillMaxHeight(),
                 indicatorColor = subject?.color?.let { Color(it) }
             )
             Column(
-                modifier = Modifier
-                    .onGloballyPositioned { contentHeight = it.size.height.pxToDp(density) }
-                    .padding(12.dp),
+                modifier = Modifier.padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -399,7 +385,7 @@ private fun DetailsClassViewInfoFooter(
             if (teacher != null) {
                 DetailsClassViewInfoFooterItem(
                     icon = painterResource(StudyAssistantRes.icons.employee),
-                    text = teacher.shortName()
+                    text = teacher.officialName()
                 )
             }
             if (organization?.isMain == false) {

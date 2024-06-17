@@ -20,6 +20,9 @@ import navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.ClassEditorScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.EmployeeEditorScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.HomeworkEditorScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.OrganizationEditorScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.ProfileEditorScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.ScheduleEditorScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.SubjectEditorScreen
 
@@ -48,6 +51,13 @@ internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen> {
                 employeeId = screen.employeeId,
                 organizationId = screen.organizationId,
             )
+            is EditorScreen.Homework -> HomeworkEditorScreen(
+                homeworkId = screen.homeworkId,
+            )
+            is EditorScreen.Organization -> OrganizationEditorScreen(
+                organizationId = screen.organizationId,
+            )
+            is EditorScreen.Profile -> ProfileEditorScreen()
         }
     }
 }

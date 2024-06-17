@@ -46,24 +46,13 @@ internal data class EmployeeUi(
     val locations: List<ContactInfoUi> = emptyList(),
     val webs: List<ContactInfoUi> = emptyList(),
 ) : Parcelable {
-    fun shortName(): String {
+    fun officialName(): String {
         return buildString {
-            if (secondName != null) {
-                append(secondName)
-                append(" ")
-                append(firstName.firstOrNull())
-            } else {
-                append(firstName)
-            }
+            append(firstName)
             if (patronymic != null) {
-                if (secondName != null) {
-                    append(".")
-                    append(patronymic.firstOrNull())
-                    append(".")
-                } else {
-                    append(" ")
-                    append(patronymic)
-                }
+                append(" ", patronymic)
+            } else if (secondName != null) {
+                append(" ", secondName)
             }
         }
     }

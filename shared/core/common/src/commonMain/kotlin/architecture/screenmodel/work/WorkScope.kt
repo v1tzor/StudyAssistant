@@ -15,19 +15,19 @@
  */
 package architecture.screenmodel.work
 
+import architecture.screenmodel.contract.BaseAction
+import architecture.screenmodel.contract.BaseEvent
+import architecture.screenmodel.contract.BaseUiEffect
+import architecture.screenmodel.contract.BaseViewState
+import architecture.screenmodel.store.BaseStore
+import functional.Either
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import functional.Either
 import managers.CoroutineBlock
-import architecture.screenmodel.contract.BaseAction
-import architecture.screenmodel.contract.BaseEvent
-import architecture.screenmodel.contract.BaseUiEffect
-import architecture.screenmodel.contract.BaseViewState
-import architecture.screenmodel.store.BaseStore
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.

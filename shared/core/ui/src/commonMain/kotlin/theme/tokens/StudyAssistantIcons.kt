@@ -17,7 +17,6 @@ package theme.tokens
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.core.ui.generated.resources.Res
 import studyassistant.shared.core.ui.generated.resources.ic_alert_circle_outline
 import studyassistant.shared.core.ui.generated.resources.ic_birthday
@@ -49,11 +48,13 @@ import studyassistant.shared.core.ui.generated.resources.ic_tasks_outline
 import studyassistant.shared.core.ui.generated.resources.ic_upload_circular
 import studyassistant.shared.core.ui.generated.resources.ic_web
 import studyassistant.shared.core.ui.generated.resources.ic_webinar
+import studyassistant.shared.core.ui.generated.resources.ic_church
+import studyassistant.shared.core.ui.generated.resources.ic_university
+import studyassistant.shared.core.ui.generated.resources.ic_additional_organization
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
  */
-@OptIn(ExperimentalResourceApi::class)
 data class StudyAssistantIcons(
     val logo: DrawableResource,
     val schedule: DrawableResource,
@@ -88,6 +89,9 @@ data class StudyAssistantIcons(
     val classesList: DrawableResource,
     val movements: DrawableResource,
     val tasksOutline: DrawableResource,
+    val seminary: DrawableResource,
+    val university: DrawableResource,
+    val additionalEducation: DrawableResource,
 ) {
     companion object {
         val BASE = StudyAssistantIcons(
@@ -124,6 +128,9 @@ data class StudyAssistantIcons(
             classesList = Res.drawable.ic_classes_column,
             movements = Res.drawable.ic_movements,
             tasksOutline = Res.drawable.ic_tasks_outline,
+            seminary = Res.drawable.ic_church,
+            university = Res.drawable.ic_university,
+            additionalEducation = Res.drawable.ic_additional_organization,
         )
     }
 }

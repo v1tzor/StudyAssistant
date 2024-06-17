@@ -16,9 +16,11 @@
 
 package ru.aleshin.studyassistant.navigation.impl.navigation
 
+import architecture.screens.EmptyScreen
 import cafe.adriel.voyager.core.screen.Screen
 import inject.MainScreen
-import architecture.screens.EmptyScreen
+import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
+import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
@@ -32,12 +34,13 @@ internal interface NavigationScreenProvider {
 
     fun provideTasksScreen(): Screen
 
-    fun provideInfoScreen(): Screen
+    fun provideInfoScreen(screen: InfoScreen): Screen
 
     fun provideProfileScreen(): Screen
 
     class Base(
         private val scheduleFeatureStarter: () -> ScheduleFeatureStarter,
+        private val infoFeatureStarter: () -> InfoFeatureStarter,
         private val profileFeatureStarter: () -> ProfileFeatureStarter,
     ) : NavigationScreenProvider {
 
@@ -50,9 +53,8 @@ internal interface NavigationScreenProvider {
             return EmptyScreen
         }
 
-        override fun provideInfoScreen(): Screen {
-            // TODO: Not yet implemented
-            return EmptyScreen
+        override fun provideInfoScreen(screen: InfoScreen): Screen {
+            return infoFeatureStarter().fetchFeatureScreen(screen)
         }
 
         override fun provideProfileScreen(): Screen {

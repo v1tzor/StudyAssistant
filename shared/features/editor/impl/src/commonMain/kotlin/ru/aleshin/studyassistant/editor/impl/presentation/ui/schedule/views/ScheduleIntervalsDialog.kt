@@ -64,7 +64,6 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import mappers.toMinutesOrHoursTitle
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
@@ -134,7 +133,6 @@ internal fun ScheduleIntervalsDialog(
 }
 
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun StartOfClassesField(
     modifier: Modifier = Modifier,
     startOfClassTime: Instant?,
@@ -213,7 +211,6 @@ internal fun ClassesAndBreaksIntervalsEditor(
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun ClassIntervalsEditor(
     modifier: Modifier = Modifier,
@@ -260,7 +257,6 @@ internal fun ClassIntervalsEditor(
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun BreakIntervalsEditor(
     modifier: Modifier = Modifier,
@@ -321,7 +317,9 @@ internal fun NumberedDurationsList(
     onChangeSpecificDurations: (List<NumberedDurationUi>) -> Unit,
 ) {
     Column(
-        modifier = modifier.animateContentSize(spring()).heightIn(max = 252.dp)
+        modifier = modifier
+            .animateContentSize(spring())
+            .heightIn(max = 252.dp)
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {

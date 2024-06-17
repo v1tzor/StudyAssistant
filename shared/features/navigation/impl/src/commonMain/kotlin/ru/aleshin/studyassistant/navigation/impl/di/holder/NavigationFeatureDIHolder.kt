@@ -20,10 +20,10 @@ import inject.BaseFeatureDIHolder
 import managers.CoroutineManager
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
-import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.navigation.api.di.NavigationFeatureApi
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.navigation.impl.di.NavigationFeatureDependencies
@@ -44,6 +44,7 @@ object NavigationFeatureDIHolder : BaseFeatureDIHolder<NavigationFeatureApi, Nav
                 importAll(presentationModule)
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<() -> ScheduleFeatureStarter> { dependencies.scheduleFeatureStarter }
+                bindSingleton<() -> InfoFeatureStarter> { dependencies.infoFeatureStarter }
                 bindSingleton<() -> ProfileFeatureStarter> { dependencies.profileFeatureStarter }
                 bindSingleton<NavigationFeatureApi> {
                     object : NavigationFeatureApi {

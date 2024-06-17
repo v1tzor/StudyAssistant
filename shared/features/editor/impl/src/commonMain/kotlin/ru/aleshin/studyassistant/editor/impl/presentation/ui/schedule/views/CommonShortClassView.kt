@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -35,20 +36,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import extensions.boldWeight
-import extensions.pxToDp
 import functional.TimeRange
 import mappers.format
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
@@ -78,6 +73,7 @@ internal fun CommonClassView(
     Row(
         modifier = modifier
             .padding(all = 4.dp)
+            .height(IntrinsicSize.Max)
             .clip(MaterialTheme.shapes.small)
             .clickable(
                 indication = LocalIndication.current,
@@ -88,11 +84,8 @@ internal fun CommonClassView(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val density = LocalDensity.current
-        var contentHeight by remember { mutableStateOf(52.dp) }
-
         CommonClassViewColorIndicator(
-            modifier = Modifier.height(contentHeight),
+            modifier = Modifier.fillMaxHeight(),
             number = number,
             indicatorColor = subject?.color?.let { Color(it) },
             numberColor = when (highlightContent) {
@@ -101,9 +94,7 @@ internal fun CommonClassView(
             },
         )
         CommonClassViewContent(
-            modifier = Modifier.weight(1f).onGloballyPositioned {
-                contentHeight = it.size.height.pxToDp(density)
-            },
+            modifier = Modifier.weight(1f),
             timeRange = timeRange,
             subject = subject?.name,
             office = office,

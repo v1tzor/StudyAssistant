@@ -40,7 +40,7 @@ fun <S : FeatureScreen> NestedFeatureNavigator(
         screen = screenProvider.provideFeatureScreen(startScreen),
         onBackPressed = onBackPressed,
         disposeBehavior = NavigatorDisposeBehavior(
-            disposeNestedNavigators = false,
+            disposeNestedNavigators = true,
             disposeSteps = true,
         ),
     ) { navigator ->

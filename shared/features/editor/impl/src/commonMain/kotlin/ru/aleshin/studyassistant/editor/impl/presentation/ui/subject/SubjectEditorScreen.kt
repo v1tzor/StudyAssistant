@@ -28,6 +28,7 @@ import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import functional.UID
+import navigation.nestedPop
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectEditorDeps
@@ -95,7 +96,7 @@ internal data class SubjectEditorScreen(
         handleEffect { effect ->
             when (effect) {
                 is SubjectEditorEffect.NavigateToLocal -> navigator?.push(effect.pushScreen)
-                is SubjectEditorEffect.NavigateToBack -> navigator?.pop()
+                is SubjectEditorEffect.NavigateToBack -> navigator?.nestedPop()
                 is SubjectEditorEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

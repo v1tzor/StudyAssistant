@@ -17,19 +17,32 @@
 package ru.aleshin.studyassistant.info.impl.di.modules
 
 import org.kodein.di.DI
+import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
+import org.kodein.di.instance
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
+import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
+import ru.aleshin.studyassistant.info.impl.navigation.InfoFeatureStarterImpl
+import ru.aleshin.studyassistant.info.impl.navigation.InfoScreenProvider
 import ru.aleshin.studyassistant.info.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.info.impl.presentation.ui.navigation.NavigationScreenModel
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenmodel.OrganizationsEffectCommunicator
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenmodel.OrganizationsScreenModel
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenmodel.OrganizationsStateCommunicator
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenmodel.OrganizationsWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
+    bindSingleton<InfoFeatureStarter> { InfoFeatureStarterImpl(instance(), instance(), instance()) }
+    bindSingleton<InfoScreenProvider> { InfoScreenProvider.Base(instance<() -> EditorFeatureStarter>()) }
+
     bindSingleton<NavigationScreenModel> { NavigationScreenModel() }
     bindSingleton<NavigationScreen> { NavigationScreen() }
 
-//    bindProvider<EmployeeEditorStateCommunicator> { EmployeeEditorStateCommunicator.Base() }
-//    bindProvider<EmployeeEditorEffectCommunicator> { EmployeeEditorEffectCommunicator.Base() }
-//    bindProvider<EmployeeEditorWorkProcessor> { EmployeeEditorWorkProcessor.Base(instance(), instance()) }
-//    bindProvider<EmployeeEditorScreenModel> { EmployeeEditorScreenModel(instance(), instance(), instance(), instance()) }
+    bindProvider<OrganizationsStateCommunicator> { OrganizationsStateCommunicator.Base() }
+    bindProvider<OrganizationsEffectCommunicator> { OrganizationsEffectCommunicator.Base() }
+    bindProvider<OrganizationsWorkProcessor> { OrganizationsWorkProcessor.Base(instance(), instance()) }
+    bindProvider<OrganizationsScreenModel> { OrganizationsScreenModel(instance(), instance(), instance(), instance(), instance()) }
 }

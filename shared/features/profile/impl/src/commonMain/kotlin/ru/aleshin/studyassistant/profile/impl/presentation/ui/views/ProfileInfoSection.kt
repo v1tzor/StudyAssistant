@@ -99,9 +99,8 @@ internal fun AvatarView(
             Box(contentAlignment = Alignment.Center) {
                 Text(
                     text = username?.substring(0, 2)?.uppercase() ?: "-",
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        fontWeight = FontWeight.Medium,
-                    ),
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.displaySmall,
                 )
             }
         }

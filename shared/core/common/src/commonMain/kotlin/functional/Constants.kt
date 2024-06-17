@@ -80,6 +80,10 @@ object Constants {
     object Placeholder {
         const val OVERVIEW_ITEMS = 8
         const val SCHEDULE_CLASSES_ITEMS = 3
+        const val CONTACT_INFO = 2
+        const val SHORT_EMPLOYEES = 9
+        const val SHORT_SUBJECTS = 9
+        const val EMPLOYEES_OR_SUBJECTS = 12
     }
 
     object Delay {

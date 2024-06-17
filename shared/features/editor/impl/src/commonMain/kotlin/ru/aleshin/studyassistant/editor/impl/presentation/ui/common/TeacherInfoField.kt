@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import entities.employee.EmployeePost
 import mappers.mapToString
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeUi
@@ -46,7 +45,6 @@ import views.dialog.SelectorDialogNotSelectedItemView
  * @author Stanislav Aleshin on 05.06.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun TeacherInfoField(
     modifier: Modifier = Modifier,
     enabledAddTeacher: Boolean,
@@ -57,10 +55,10 @@ internal fun TeacherInfoField(
     onAddTeacher: () -> Unit,
     onSelected: (EmployeeUi?) -> Unit,
 ) {
-    var isOpenTeacherSelector by remember { mutableStateOf(false) }
+    var teacherSelectorState by remember { mutableStateOf(false) }
 
     ClickableInfoTextField(
-        onClick = { isOpenTeacherSelector = true },
+        onClick = { teacherSelectorState = true },
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
         value = teacher?.fullName(),
@@ -69,23 +67,23 @@ internal fun TeacherInfoField(
         infoIcon = painterResource(StudyAssistantRes.icons.employee),
         trailingIcon = {
             ExpandedIcon(
-                isExpanded = isOpenTeacherSelector,
+                isExpanded = teacherSelectorState,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
     )
 
-    if (isOpenTeacherSelector) {
+    if (teacherSelectorState) {
         TeacherSelectorDialog(
             enabledAdd = enabledAddTeacher,
             selected = teacher,
             employees = allEmployee,
             subjects = allSubjects,
             onAddTeacher = onAddTeacher,
-            onDismiss = { isOpenTeacherSelector = false },
+            onDismiss = { teacherSelectorState = false },
             onConfirm = {
                 onSelected(it)
-                isOpenTeacherSelector = false
+                teacherSelectorState = false
             },
         )
     }
@@ -118,9 +116,8 @@ internal fun TeacherSelectorDialog(
                 onClick = { selectedTeacher = employee },
                 selected = employee.uid == selectedTeacher?.uid,
                 title = employee.fullName(),
-                label = subjects.find {
-                    it.teacher?.uid == employee.uid
-                }?.name ?: employee.post.mapToString(StudyAssistantRes.strings),
+                label = subjects.find { it.teacher?.uid == employee.uid }?.name
+                    ?: employee.post.mapToString(StudyAssistantRes.strings),
             )
         },
         addItemView = {

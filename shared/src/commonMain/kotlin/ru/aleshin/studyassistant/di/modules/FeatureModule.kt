@@ -40,6 +40,9 @@ import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.impl.di.EditorFeatureDependencies
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
+import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
+import ru.aleshin.studyassistant.info.impl.di.InfoFeatureDependencies
+import ru.aleshin.studyassistant.info.impl.di.holder.InfoFeatureDIHolder
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.navigation.impl.di.NavigationFeatureDependencies
 import ru.aleshin.studyassistant.navigation.impl.di.holder.NavigationFeatureDIHolder
@@ -61,6 +64,7 @@ val featureModule = DI.Module("Feature") {
         object : NavigationFeatureDependencies {
             override val profileFeatureStarter = provider<ProfileFeatureStarter>()
             override val scheduleFeatureStarter = provider<ScheduleFeatureStarter>()
+            override val infoFeatureStarter = provider<InfoFeatureStarter>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }
@@ -121,6 +125,24 @@ val featureModule = DI.Module("Feature") {
     }
     bindProvider<ScheduleFeatureStarter> {
         with(ScheduleFeatureDIHolder) {
+            init(instance())
+            fetchApi().fetchStarter()
+        }
+    }
+
+    bindEagerSingleton<InfoFeatureDependencies> {
+        object : InfoFeatureDependencies {
+            override val editorFeatureStarter = provider<EditorFeatureStarter>()
+            override val baseScheduleRepository = instance<BaseScheduleRepository>()
+            override val organizationsRepository = instance<OrganizationsRepository>()
+            override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val usersRepository = instance<UsersRepository>()
+            override val dateManager = instance<DateManager>()
+            override val coroutineManager = instance<CoroutineManager>()
+        }
+    }
+    bindProvider<InfoFeatureStarter> {
+        with(InfoFeatureDIHolder) {
             init(instance())
             fetchApi().fetchStarter()
         }

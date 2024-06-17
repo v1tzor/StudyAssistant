@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.editor.impl.domain.interactors
 import entities.organizations.Organization
 import entities.organizations.OrganizationShort
 import entities.organizations.convertToBase
-import entities.organizations.convertToShort
 import functional.FlowDomainResult
 import functional.UID
 import functional.UnitDomainResult
@@ -37,9 +36,7 @@ internal interface OrganizationInteractor {
 
     suspend fun fetchOrganizationById(uid: UID): FlowDomainResult<EditorFailures, Organization>
     suspend fun fetchAllOrganizations(): FlowDomainResult<EditorFailures, List<Organization>>
-
     suspend fun fetchAllShortOrganizations(): FlowDomainResult<EditorFailures, List<OrganizationShort>>
-
     suspend fun updateShortOrganization(organization: OrganizationShort): UnitDomainResult<EditorFailures>
 
     class Base(
@@ -52,7 +49,7 @@ internal interface OrganizationInteractor {
             get() = usersRepository.fetchCurrentUserOrError().uid
 
         override suspend fun fetchOrganizationById(uid: UID) = eitherWrapper.wrapFlow {
-            organizationsRepository.fetchOrganizationById(uid, targetUser)
+            organizationsRepository.fetchOrganizationById(uid, targetUser).map { checkNotNull(it) }
         }
 
         override suspend fun fetchAllOrganizations() = eitherWrapper.wrapFlow {
@@ -60,15 +57,13 @@ internal interface OrganizationInteractor {
         }
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {
-            organizationsRepository.fetchAllOrganization(targetUser).map { organizations ->
-                organizations.map { it.convertToShort() }
-            }
+            organizationsRepository.fetchAllShortOrganization(targetUser)
         }
 
         override suspend fun updateShortOrganization(organization: OrganizationShort) = eitherWrapper.wrapUnit {
             val baseUid = organization.uid
             val baseModel = organizationsRepository.fetchOrganizationById(baseUid, targetUser).first()
-            val updatedModel = organization.convertToBase(baseModel)
+            val updatedModel = organization.convertToBase(checkNotNull(baseModel))
 
             organizationsRepository.addOrUpdateOrganization(updatedModel, targetUser)
         }

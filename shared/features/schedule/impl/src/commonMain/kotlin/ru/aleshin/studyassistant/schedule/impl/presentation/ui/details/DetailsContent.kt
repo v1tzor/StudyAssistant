@@ -22,7 +22,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -81,12 +80,11 @@ internal fun DetailsContent(
                             onCustomSchedule = { it?.classes },
                         )
                         CommonScheduleView(
-                            modifier = Modifier.aspectRatio(0.5f).animateItemPlacement(),
+                            modifier = Modifier.animateItemPlacement(),
                             date = scheduleDate.dateTime().date,
                             isCurrentDay = currentDate.isCurrentDay(scheduleDate),
                             activeClass = activeClass,
                             classes = classes ?: emptyList(),
-                            userScrollEnabled = true,
                             onOpenSchedule = { onOpenSchedule(scheduleDate) },
                             onClassClick = {},
                         )

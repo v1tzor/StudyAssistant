@@ -14,8 +14,7 @@ CREATE TABLE subjectEntity (
 fetchSubjectsByOrganization:
 SELECT *
 FROM subjectEntity
-WHERE organization_id = ?
-LIMIT ?;
+WHERE organization_id = ?;
 
 fetchSubjectById:
 SELECT *

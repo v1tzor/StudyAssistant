@@ -21,6 +21,8 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoEitherWrapper
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoErrorHandler
+import ru.aleshin.studyassistant.info.impl.domain.interactors.ClassesInfoInteractor
+import ru.aleshin.studyassistant.info.impl.domain.interactors.OrganizationsInteractor
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -28,4 +30,7 @@ import ru.aleshin.studyassistant.info.impl.domain.common.InfoErrorHandler
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<InfoErrorHandler> { InfoErrorHandler.Base() }
     bindSingleton<InfoEitherWrapper> { InfoEitherWrapper.Base(instance()) }
+
+    bindSingleton<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<ClassesInfoInteractor> { ClassesInfoInteractor.Base(instance(), instance(), instance(), instance()) }
 }

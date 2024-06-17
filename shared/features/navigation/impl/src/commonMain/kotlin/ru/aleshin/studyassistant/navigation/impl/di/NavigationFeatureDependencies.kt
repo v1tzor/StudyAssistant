@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.navigation.impl.di
 
 import inject.BaseFeatureDependencies
 import managers.CoroutineManager
+import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 
@@ -26,6 +27,7 @@ import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
  */
 interface NavigationFeatureDependencies : BaseFeatureDependencies {
     val scheduleFeatureStarter: () -> ScheduleFeatureStarter
+    val infoFeatureStarter: () -> InfoFeatureStarter
     val profileFeatureStarter: () -> ProfileFeatureStarter
     val coroutineManager: CoroutineManager
 }

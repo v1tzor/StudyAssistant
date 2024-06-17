@@ -25,17 +25,16 @@ import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
  * @author Stanislav Aleshin on 27.05.2024.
  */
 sealed class EditorScreen : FeatureScreen {
-
     data class Schedule(val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE) : EditorScreen()
-
     data class Class(
         val classId: UID?,
         val scheduleId: UID?,
         val isCustomSchedule: Boolean,
         val weekDay: DayOfNumberedWeekUi,
     ) : EditorScreen()
-
     data class Subject(val subjectId: UID?, val organizationId: UID) : EditorScreen()
-
     data class Employee(val employeeId: UID?, val organizationId: UID) : EditorScreen()
+    data class Homework(val homeworkId: UID?) : EditorScreen()
+    data class Organization(val organizationId: UID?) : EditorScreen()
+    data object Profile : EditorScreen()
 }

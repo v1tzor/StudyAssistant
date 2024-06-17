@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 /**
  * @author Stanislav Aleshin on 27.01.2023.
  */
-val baseShapes = Shapes()
+val baseShapes = Shapes(
+    extraLarge = RoundedCornerShape(24.dp),
+)
 
 fun Shapes.full() = RoundedCornerShape(100.dp)

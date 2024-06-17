@@ -19,6 +19,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import functional.Constants.Date
 import functional.Constants.Date.DAYS_IN_WEEK
 import functional.TimeRange
+import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
@@ -336,3 +337,5 @@ private fun firstWeekInYearStart(year: Int): LocalDate {
         previousMonday.plus(1, DateTimeUnit.WEEK)
     }
 }
+
+fun DateTimePeriod.millis() = minutes.minutesToMillis()

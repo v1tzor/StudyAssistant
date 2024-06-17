@@ -53,7 +53,7 @@ interface BaseScheduleLocalDataSource {
     suspend fun addOrUpdateSchedule(schedule: BaseScheduleDetailsData): UID
     suspend fun fetchScheduleById(uid: UID): Flow<BaseScheduleDetailsData?>
     suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek): Flow<BaseScheduleDetailsData?>
-    suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant, numberOfWeek: NumberOfRepeatWeek): Flow<List<BaseScheduleDetailsData>>
+    suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant, numberOfWeek: NumberOfRepeatWeek?): Flow<List<BaseScheduleDetailsData>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<ClassDetailsData?>
 
     class Base(
@@ -108,13 +108,17 @@ interface BaseScheduleLocalDataSource {
         override suspend fun fetchSchedulesByTimeRange(
             from: Instant,
             to: Instant,
-            numberOfWeek: NumberOfRepeatWeek
+            numberOfWeek: NumberOfRepeatWeek?,
         ): Flow<List<BaseScheduleDetailsData>> {
             val fromMillis = from.toEpochMilliseconds()
             val toMillis = to.toEpochMilliseconds()
-            val week = numberOfWeek.toString()
+            val week = numberOfWeek?.toString()
 
-            val query = scheduleQueries.fetchSchedulesByTimeRange(week, fromMillis, toMillis)
+            val query = if (week == null) {
+                scheduleQueries.fetchSchedulesByTimeRange(fromMillis, toMillis)
+            } else {
+                scheduleQueries.fetchSchedulesByTimeRangeWithWeek(week, fromMillis, toMillis)
+            }
             val scheduleEntityListFlow = query.asFlow().mapToList(coroutineContext)
 
             return scheduleEntityListFlow.map { scheduleEntityList ->

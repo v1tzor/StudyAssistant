@@ -24,6 +24,7 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import managers.CoroutineManager
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
 import ru.aleshin.studyassistant.navigation.impl.di.holder.NavigationFeatureDIHolder
 import ru.aleshin.studyassistant.navigation.impl.navigation.NavigationScreenProvider
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsAction
@@ -67,7 +68,7 @@ internal class TabsScreenModel(
             provideTasksScreen()
         }
         TabsEvent.SelectedInfoBottomItem -> changeTabItem(TabsBottomBarItems.INFO) {
-            provideInfoScreen()
+            provideInfoScreen(InfoScreen.Organizations)
         }
         TabsEvent.SelectedProfileBottomItem -> changeTabItem(TabsBottomBarItems.PROFILE) {
             provideProfileScreen()

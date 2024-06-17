@@ -17,6 +17,8 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,7 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import entities.subject.EventType
+import mappers.mapToIcon
 import mappers.mapToString
+import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import theme.StudyAssistantRes
 import views.dialog.BaseSelectorDialog
@@ -56,6 +60,13 @@ internal fun EventTypeSelectorDialog(
                 selected = eventType == selectedEventType,
                 title = eventType.mapToString(StudyAssistantRes.strings),
                 label = null,
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(eventType.mapToIcon(StudyAssistantRes.icons)),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                },
             )
         },
         notSelectedItem = {

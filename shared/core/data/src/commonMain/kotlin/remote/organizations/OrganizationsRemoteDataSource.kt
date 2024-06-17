@@ -23,6 +23,7 @@ import extensions.exists
 import extensions.snapshotGet
 import functional.UID
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import mappers.organizations.mapToDetailsData
@@ -30,6 +31,7 @@ import mappers.organizations.mapToRemoteData
 import mappers.subjects.mapToDetailsData
 import models.organizations.OrganizationDetailsData
 import models.organizations.OrganizationPojo
+import models.organizations.OrganizationShortData
 import models.subjects.SubjectPojo
 import models.users.EmployeeDetailsData
 import remote.StudyAssistantFirestore.UserData
@@ -40,8 +42,9 @@ import remote.StudyAssistantFirestore.UserData
 interface OrganizationsRemoteDataSource {
 
     suspend fun addOrUpdateOrganization(organization: OrganizationDetailsData, targetUser: UID): UID
-    suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsData>
+    suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsData?>
     suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationDetailsData>>
+    suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShortData>>
 
     class Base(
         private val database: FirebaseFirestore,
@@ -67,8 +70,8 @@ interface OrganizationsRemoteDataSource {
             }
         }
 
-        override suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsData> {
-            require(uid.isNotEmpty())
+        override suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsData?> {
+            if (uid.isEmpty()) return flowOf(null)
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
@@ -127,6 +130,17 @@ interface OrganizationsRemoteDataSource {
                         subjects = subjectList,
                     )
                 }
+            }
+        }
+
+        override suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShortData>> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
+
+            return reference.snapshots.map { snapshot ->
+                snapshot.documents.map { it.data(serializer<OrganizationShortData>()) }
             }
         }
     }

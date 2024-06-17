@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import entities.users.Gender
 import functional.Constants
 import mappers.mapToSting
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
@@ -59,7 +58,6 @@ import views.dialog.BirthdayDatePicker
  * @author Stanislav Aleshin on 27.04.2024
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun ProfilePageInfo(
     modifier: Modifier = Modifier,
     profile: AppUserUi,

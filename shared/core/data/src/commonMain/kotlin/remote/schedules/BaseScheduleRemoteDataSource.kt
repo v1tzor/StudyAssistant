@@ -60,7 +60,7 @@ interface BaseScheduleRemoteDataSource {
     suspend fun fetchSchedulesByTimeRange(
         from: Instant,
         to: Instant,
-        numberOfWeek: NumberOfRepeatWeek,
+        numberOfWeek: NumberOfRepeatWeek?,
         targetUser: UID
     ): Flow<List<BaseScheduleDetailsData>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<ClassDetailsData?>
@@ -144,7 +144,7 @@ interface BaseScheduleRemoteDataSource {
         override suspend fun fetchSchedulesByTimeRange(
             from: Instant,
             to: Instant,
-            numberOfWeek: NumberOfRepeatWeek,
+            numberOfWeek: NumberOfRepeatWeek?,
             targetUser: UID
         ): Flow<List<BaseScheduleDetailsData>> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
@@ -152,13 +152,14 @@ interface BaseScheduleRemoteDataSource {
 
             val fromMillis = from.toEpochMilliseconds()
             val toMillis = to.toEpochMilliseconds()
-            val week = numberOfWeek.toString()
+            val week = numberOfWeek?.toString()
 
             val reference = userDataRoot.collection(UserData.BASE_SCHEDULES).where {
                 val toDateFilter = UserData.VERSION_TO greaterThanOrEqualTo fromMillis
                 val fromDateFilter = UserData.VERSION_FROM lessThanOrEqualTo toMillis
                 val weekFilter = UserData.WEEK equalTo week
-                return@where toDateFilter and fromDateFilter and weekFilter
+                val dateFilter = toDateFilter and fromDateFilter
+                return@where if (week != null) dateFilter and weekFilter else dateFilter
             }.orderBy(UserData.VERSION_TO, Direction.DESCENDING)
 
             val schedulePojoListFlow = reference.snapshots.map { snapshot ->

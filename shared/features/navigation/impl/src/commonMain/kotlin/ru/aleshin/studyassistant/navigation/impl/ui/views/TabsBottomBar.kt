@@ -18,8 +18,8 @@ package ru.aleshin.studyassistant.navigation.impl.ui.views
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import theme.StudyAssistantRes
 import views.BottomBarItem
 import views.BottomNavigationBar
@@ -39,20 +39,15 @@ internal fun TabsBottomNavigationBar(
         items = TabsBottomBarItems.entries.toTypedArray(),
         showLabel = false,
         onItemSelected = onItemSelected,
-        containerColor = if (selectedItem == TabsBottomBarItems.SCHEDULE) {
-            MaterialTheme.colorScheme.surfaceContainerLow
-        } else {
-            MaterialTheme.colorScheme.background
-        }
     )
 }
 
-@OptIn(ExperimentalResourceApi::class)
 internal enum class TabsBottomBarItems : BottomBarItem {
     SCHEDULE {
         override val label: String @Composable get() = StudyAssistantRes.strings.scheduleBottomItem
         override val enabledIcon: DrawableResource @Composable get() = StudyAssistantRes.icons.schedule
         override val disabledIcon: DrawableResource @Composable get() = StudyAssistantRes.icons.scheduleDisabled
+        override val containerColor: Color @Composable get() = MaterialTheme.colorScheme.surfaceContainerLow
     },
     TASKS {
         override val label: String @Composable get() = StudyAssistantRes.strings.tasksBottomItem
@@ -63,6 +58,7 @@ internal enum class TabsBottomBarItems : BottomBarItem {
         override val label: String @Composable get() = StudyAssistantRes.strings.infoBottomItem
         override val enabledIcon: DrawableResource @Composable get() = StudyAssistantRes.icons.information
         override val disabledIcon: DrawableResource @Composable get() = StudyAssistantRes.icons.informationDisabled
+        override val containerColor: Color @Composable get() = MaterialTheme.colorScheme.surfaceContainerLow
     },
     PROFILE {
         override val label: String @Composable get() = StudyAssistantRes.strings.profileBottomItem

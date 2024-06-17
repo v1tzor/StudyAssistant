@@ -31,7 +31,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import theme.StudyAssistantRes
 import theme.material.full
@@ -40,7 +39,6 @@ import theme.material.full
  * @author Stanislav Aleshin on 27.04.2024
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun SelectableAvatarView(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
