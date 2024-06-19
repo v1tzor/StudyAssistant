@@ -19,6 +19,7 @@ package remote.auth
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseUser
 import dev.gitlive.firebase.auth.GoogleAuthProvider
+import dev.gitlive.firebase.firestore.FirebaseFirestore
 import exceptions.FirebaseUserException
 
 /**
@@ -44,6 +45,7 @@ interface AuthRemoteDataSource {
 
     class Base(
         private val firebaseAuth: FirebaseAuth,
+        private val firestore: FirebaseFirestore,
     ) : AuthRemoteDataSource {
 
         override suspend fun createUserWithEmail(email: String, password: String): FirebaseUser? {

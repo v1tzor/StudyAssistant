@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2024 Stanislav Aleshin
  *
@@ -26,7 +25,7 @@ import managers.CoroutineManager
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
 import ru.aleshin.studyassistant.navigation.impl.di.holder.NavigationFeatureDIHolder
-import ru.aleshin.studyassistant.navigation.impl.navigation.NavigationScreenProvider
+import ru.aleshin.studyassistant.navigation.impl.navigation.TabScreenProvider
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsAction
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEffect
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEvent
@@ -38,7 +37,7 @@ import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
  * @author Stanislav Aleshin on 18.02.2023.
  */
 internal class TabsScreenModel(
-    private val screenProvider: NavigationScreenProvider,
+    private val tabScreenProvider: TabScreenProvider,
     stateCommunicator: TabsStateCommunicator,
     effectCommunicator: TabsEffectCommunicator,
     coroutineManager: CoroutineManager,
@@ -84,16 +83,20 @@ internal class TabsScreenModel(
         )
     }
 
+    override fun onDispose() {
+        super.onDispose()
+        NavigationFeatureDIHolder.clear()
+    }
+
     private suspend fun WorkScope<TabsViewState, TabsAction, TabsEffect>.changeTabItem(
         bottomItem: TabsBottomBarItems,
-        onAction: NavigationScreenProvider.() -> Screen,
+        onAction: TabScreenProvider.() -> Screen,
     ) = sendAction(TabsAction.ChangeNavItems(item = bottomItem)).apply {
-        sendEffect(TabsEffect.ReplaceScreen(screen = screenProvider.let(onAction)))
+        sendEffect(TabsEffect.ReplaceScreen(screen = tabScreenProvider.let(onAction)))
     }
 }
 
 @Composable
 internal fun Screen.rememberTabsScreenModel(): TabsScreenModel {
-    val di = NavigationFeatureDIHolder.fetchDI()
-    return rememberScreenModel { di.instance<TabsScreenModel>() }
+    return rememberScreenModel { NavigationFeatureDIHolder.fetchDI().instance<TabsScreenModel>() }
 }

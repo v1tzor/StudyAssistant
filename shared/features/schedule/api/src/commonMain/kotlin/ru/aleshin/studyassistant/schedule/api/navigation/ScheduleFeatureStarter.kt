@@ -21,4 +21,4 @@ import inject.FeatureStarter
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface ScheduleFeatureStarter : FeatureStarter<ScheduleScreen>
+interface ScheduleFeatureStarter : FeatureStarter.WithNestedNavigation<ScheduleScreen>

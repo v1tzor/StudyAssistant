@@ -23,35 +23,41 @@ import navigation.NavigatorManager
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface FeatureStarter<S : FeatureScreen> {
+interface FeatureStarter {
 
-    fun fetchFeatureScreen(screen: S): Screen
+    interface WithNestedNavigation<S : FeatureScreen> {
 
-    abstract class Navigation<S : FeatureScreen>(
-        private val featureNavScreen: Screen,
-        private val navigatorManager: NavigatorManager<S>,
-        private val screenProvider: FeatureScreenProvider<S>,
-    ) : FeatureStarter<S> {
+        fun fetchRootScreenAndNavigate(screen: S, isNavigate: Boolean = true): Screen
 
-        override fun fetchFeatureScreen(screen: S): Screen {
-            val featureScreen = screenProvider.provideFeatureScreen(screen)
-            val isSetStartScreen = navigatorManager.setStartScreen(screen)
-            if (!isSetStartScreen) {
-                navigatorManager.executeNavigation {
-                    val lastScreen = lastItemOrNull
-                    if (lastScreen?.key != featureScreen.key) push(featureScreen)
+        abstract class Abstract<S : FeatureScreen>(
+            private val featureNavScreen: Screen,
+            private val navigatorManager: NavigatorManager<S>,
+            private val screenProvider: FeatureScreenProvider<S>,
+        ) : WithNestedNavigation<S> {
+
+            override fun fetchRootScreenAndNavigate(screen: S, isNavigate: Boolean): Screen {
+                val featureScreen = screenProvider.provideFeatureScreen(screen)
+                val isSetStartScreen = navigatorManager.setStartScreen(screen)
+                if (!isSetStartScreen && isNavigate) {
+                    navigatorManager.executeNavigation {
+                        val lastScreen = lastItemOrNull
+                        if (lastScreen?.key != featureScreen.key) push(featureScreen)
+                    }
                 }
+                return featureNavScreen
             }
-            return featureNavScreen
         }
     }
 
-    abstract class SingleScreen(
-        private val mainScreen: Screen,
-    ) : FeatureStarter<MainScreen> {
+    interface WithSingleNavigation {
 
-        override fun fetchFeatureScreen(screen: MainScreen): Screen {
-            return mainScreen
+        fun fetchFeatureScreen(): Screen
+
+        abstract class Abstract(private val mainScreen: Screen) : WithSingleNavigation {
+
+            override fun fetchFeatureScreen(): Screen {
+                return mainScreen
+            }
         }
     }
 }

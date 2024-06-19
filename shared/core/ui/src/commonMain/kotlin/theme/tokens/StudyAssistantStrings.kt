@@ -112,6 +112,7 @@ data class StudyAssistantStrings(
     val avatarDesc: String,
     val contactInfoLabel: String,
     val contactInfoValue: String,
+    val noResultTitle: String,
 )
 
 internal val russianFamelString = StudyAssistantStrings(
@@ -205,6 +206,7 @@ internal val russianFamelString = StudyAssistantStrings(
     avatarDesc = "Выбрать фото профиля",
     contactInfoLabel = "Название",
     contactInfoValue = "Данные *",
+    noResultTitle = "Нет результатов",
 )
 
 internal val englishFamelString = StudyAssistantStrings(
@@ -298,6 +300,7 @@ internal val englishFamelString = StudyAssistantStrings(
     avatarDesc = "Select profile photo",
     contactInfoLabel = "Name",
     contactInfoValue = "Data *",
+    noResultTitle = "No results",
 )
 
 fun StudyAssistantStrings.monthNames() = MonthNames(

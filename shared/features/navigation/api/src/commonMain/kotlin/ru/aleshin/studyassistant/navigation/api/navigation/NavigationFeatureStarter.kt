@@ -17,9 +17,8 @@
 package ru.aleshin.studyassistant.navigation.api.navigation
 
 import inject.FeatureStarter
-import inject.MainScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-interface NavigationFeatureStarter : FeatureStarter<MainScreen>
+interface NavigationFeatureStarter : FeatureStarter.WithSingleNavigation

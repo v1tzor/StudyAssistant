@@ -18,8 +18,10 @@ package theme.tokens
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import studyassistant.shared.core.ui.generated.resources.Res
+import studyassistant.shared.core.ui.generated.resources.ic_additional_organization
 import studyassistant.shared.core.ui.generated.resources.ic_alert_circle_outline
 import studyassistant.shared.core.ui.generated.resources.ic_birthday
+import studyassistant.shared.core.ui.generated.resources.ic_church
 import studyassistant.shared.core.ui.generated.resources.ic_class
 import studyassistant.shared.core.ui.generated.resources.ic_classes_column
 import studyassistant.shared.core.ui.generated.resources.ic_clock_outline
@@ -39,18 +41,17 @@ import studyassistant.shared.core.ui.generated.resources.ic_profile
 import studyassistant.shared.core.ui.generated.resources.ic_profile_outline
 import studyassistant.shared.core.ui.generated.resources.ic_select_date
 import studyassistant.shared.core.ui.generated.resources.ic_seminar
+import studyassistant.shared.core.ui.generated.resources.ic_sorted_type
 import studyassistant.shared.core.ui.generated.resources.ic_study
 import studyassistant.shared.core.ui.generated.resources.ic_study_assistant
 import studyassistant.shared.core.ui.generated.resources.ic_study_outline
 import studyassistant.shared.core.ui.generated.resources.ic_tasks
 import studyassistant.shared.core.ui.generated.resources.ic_tasks_circular
 import studyassistant.shared.core.ui.generated.resources.ic_tasks_outline
+import studyassistant.shared.core.ui.generated.resources.ic_university
 import studyassistant.shared.core.ui.generated.resources.ic_upload_circular
 import studyassistant.shared.core.ui.generated.resources.ic_web
 import studyassistant.shared.core.ui.generated.resources.ic_webinar
-import studyassistant.shared.core.ui.generated.resources.ic_church
-import studyassistant.shared.core.ui.generated.resources.ic_university
-import studyassistant.shared.core.ui.generated.resources.ic_additional_organization
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
@@ -92,6 +93,7 @@ data class StudyAssistantIcons(
     val seminary: DrawableResource,
     val university: DrawableResource,
     val additionalEducation: DrawableResource,
+    val sortedType: DrawableResource,
 ) {
     companion object {
         val BASE = StudyAssistantIcons(
@@ -131,6 +133,7 @@ data class StudyAssistantIcons(
             seminary = Res.drawable.ic_church,
             university = Res.drawable.ic_university,
             additionalEducation = Res.drawable.ic_additional_organization,
+            sortedType = Res.drawable.ic_sorted_type,
         )
     }
 }

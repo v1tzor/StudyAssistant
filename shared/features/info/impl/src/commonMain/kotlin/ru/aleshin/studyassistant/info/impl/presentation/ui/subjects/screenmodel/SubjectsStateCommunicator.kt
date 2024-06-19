@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.info.api.navigation
+package ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel
 
-import inject.FeatureStarter
+import architecture.communications.state.StateCommunicator
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsViewState
 
 /**
- * @author Stanislav Aleshin on 16.06.2024.
+ * @author Stanislav Aleshin on 17.06.2024.
  */
-interface InfoFeatureStarter : FeatureStarter.WithNestedNavigation<InfoScreen>
+internal interface SubjectsStateCommunicator : StateCommunicator<SubjectsViewState> {
+    class Base : SubjectsStateCommunicator, StateCommunicator.Abstract<SubjectsViewState>(
+        defaultState = SubjectsViewState()
+    )
+}

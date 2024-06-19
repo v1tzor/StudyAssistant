@@ -27,7 +27,9 @@ import org.kodein.di.direct
 import org.kodein.di.instance
 import repositories.BaseScheduleRepository
 import repositories.CalendarSettingsRepository
+import repositories.EmployeeRepository
 import repositories.OrganizationsRepository
+import repositories.SubjectsRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.info.api.di.InfoFeatureApi
@@ -51,8 +53,10 @@ object InfoFeatureDIHolder : BaseFeatureDIHolder<InfoFeatureApi, InfoFeatureDepe
                 bindInstance<() -> EditorFeatureStarter> { dependencies.editorFeatureStarter }
                 bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
-                bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
+                bindSingleton<UsersRepository> { dependencies.usersRepository }
+                bindSingleton<SubjectsRepository> { dependencies.subjectsRepository }
+                bindSingleton<EmployeeRepository> { dependencies.employeeRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<InfoFeatureApi> {

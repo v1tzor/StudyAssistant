@@ -82,4 +82,3 @@ internal sealed class ProfileWorkCommand : WorkCommand {
     data object LoadProfileInfo : ProfileWorkCommand()
     data object SignOut : ProfileWorkCommand()
 }
-

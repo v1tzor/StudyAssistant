@@ -16,17 +16,113 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.ui.subjects
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import functional.UID
+import navigation.root
+import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsDeps
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsEffect
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsEvent
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsViewState
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.rememberSubjectsScreenModel
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.views.SubjectFiltersView
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.views.SubjectsSearchTopBar
+import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
+import views.ErrorSnackbar
 
 /**
- * @author Stanislav Aleshin on 16.06.2024.
+ * @author Stanislav Aleshin on 17.06.2024
  */
 internal data class SubjectsScreen(val organizationId: UID) : Screen {
 
     @Composable
-    override fun Content() {
-        TODO("Not yet implemented")
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun Content() = ScreenContent(
+        screenModel = rememberSubjectsScreenModel(),
+        initialState = SubjectsViewState(),
+        dependencies = SubjectsDeps(organizationId = organizationId),
+    ) { state ->
+        val strings = InfoThemeRes.strings
+        val navigator = LocalNavigator.currentOrThrow
+        val snackbarState = remember { SnackbarHostState() }
+
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            content = { paddingValues ->
+                SubjectsContent(
+                    state = state,
+                    modifier = Modifier.padding(paddingValues),
+                    onEditSubject = { dispatchEvent(SubjectsEvent.NavigateToEditor(it)) },
+                    onDeleteSubject = { dispatchEvent(SubjectsEvent.DeleteSubject(it)) }
+                )
+            },
+            topBar = {
+                Column {
+                    SubjectsSearchTopBar(
+                        isLoading = state.isLoading,
+                        onBackPress = { dispatchEvent(SubjectsEvent.NavigateToBack) },
+                        onSearch = { dispatchEvent(SubjectsEvent.SearchSubjects(it)) }
+                    )
+                    SubjectFiltersView(
+                        isLoading = state.isLoading,
+                        sortedType = state.sortedType,
+                        selectedOrganization = state.selectedOrganization,
+                        allOrganizations = state.organizations,
+                        onSelectOrganization = { dispatchEvent(SubjectsEvent.SelectedOrganization(it.uid)) },
+                        onSelectSortedType = { dispatchEvent(SubjectsEvent.SelectedSortedType(it)) },
+                    )
+                }
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { dispatchEvent(SubjectsEvent.NavigateToEditor(null)) },
+                    shape = MaterialTheme.shapes.large,
+                    backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            },
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarState,
+                    snackbar = { ErrorSnackbar(it) },
+                )
+            },
+        )
+
+        handleEffect { effect ->
+            when (effect) {
+                is SubjectsEffect.NavigateToGlobal -> navigator.root().push(effect.pushScreen)
+                is SubjectsEffect.NavigateToBack -> navigator.pop()
+                is SubjectsEffect.ShowError -> {
+                    snackbarState.showSnackbar(
+                        message = effect.failures.mapToMessage(strings),
+                        withDismissAction = true,
+                    )
+                }
+            }
+        }
     }
 }

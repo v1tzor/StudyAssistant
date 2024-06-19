@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.info.api.navigation
+package ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel
 
-import inject.FeatureStarter
+import architecture.communications.state.EffectCommunicator
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsEffect
 
 /**
- * @author Stanislav Aleshin on 16.06.2024.
+ * @author Stanislav Aleshin on 17.06.2024.
  */
-interface InfoFeatureStarter : FeatureStarter.WithNestedNavigation<InfoScreen>
+internal interface SubjectsEffectCommunicator : EffectCommunicator<SubjectsEffect> {
+    class Base : SubjectsEffectCommunicator, EffectCommunicator.Abstract<SubjectsEffect>()
+}

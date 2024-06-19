@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.info.api.navigation
+package ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract
 
-import inject.FeatureStarter
+import architecture.screenmodel.ScreenDependencies
+import dev.icerock.moko.parcelize.Parcelize
+import functional.UID
 
 /**
- * @author Stanislav Aleshin on 16.06.2024.
+ * @author Stanislav Aleshin on 17.06.2024.
  */
-interface InfoFeatureStarter : FeatureStarter.WithNestedNavigation<InfoScreen>
+@Parcelize
+internal data class SubjectsDeps(val organizationId: UID) : ScreenDependencies

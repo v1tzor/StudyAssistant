@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.navigation.impl.navigation
 
 import architecture.screens.EmptyScreen
 import cafe.adriel.voyager.core.screen.Screen
-import inject.MainScreen
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
@@ -28,7 +27,7 @@ import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-internal interface NavigationScreenProvider {
+internal interface TabScreenProvider {
 
     fun provideScheduleScreen(screen: ScheduleScreen): Screen
 
@@ -42,10 +41,10 @@ internal interface NavigationScreenProvider {
         private val scheduleFeatureStarter: () -> ScheduleFeatureStarter,
         private val infoFeatureStarter: () -> InfoFeatureStarter,
         private val profileFeatureStarter: () -> ProfileFeatureStarter,
-    ) : NavigationScreenProvider {
+    ) : TabScreenProvider {
 
         override fun provideScheduleScreen(screen: ScheduleScreen): Screen {
-            return scheduleFeatureStarter().fetchFeatureScreen(screen)
+            return scheduleFeatureStarter().fetchRootScreenAndNavigate(screen, isNavigate = false)
         }
 
         override fun provideTasksScreen(): Screen {
@@ -54,11 +53,11 @@ internal interface NavigationScreenProvider {
         }
 
         override fun provideInfoScreen(screen: InfoScreen): Screen {
-            return infoFeatureStarter().fetchFeatureScreen(screen)
+            return infoFeatureStarter().fetchRootScreenAndNavigate(screen, isNavigate = false)
         }
 
         override fun provideProfileScreen(): Screen {
-            return profileFeatureStarter().fetchFeatureScreen(MainScreen)
+            return profileFeatureStarter().fetchFeatureScreen()
         }
     }
 }

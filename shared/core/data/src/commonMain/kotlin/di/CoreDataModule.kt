@@ -64,7 +64,7 @@ import repositories.UsersRepositoryImpl
  * @author Stanislav Aleshin on 22.04.2024.
  */
 val coreDataModule = DI.Module("CoreData") {
-    bindSingleton<AuthRemoteDataSource> { AuthRemoteDataSource.Base(instance()) }
+    bindSingleton<AuthRemoteDataSource> { AuthRemoteDataSource.Base(instance(), instance()) }
     bindSingleton<AuthRepository> { AuthRepositoryImpl(instance()) }
     bindSingleton<ManageUserRepository> { ManageUserRepositoryImpl(instance()) }
 

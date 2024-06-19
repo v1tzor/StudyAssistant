@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
-import inject.MainScreen
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
@@ -48,23 +47,23 @@ interface GlobalScreenProvider {
     ) : GlobalScreenProvider {
 
         override fun providePreviewScreen(screen: PreviewScreen): Screen {
-            return previewStarter().fetchFeatureScreen(screen)
+            return previewStarter().fetchRootScreenAndNavigate(screen)
         }
 
         override fun provideAuthScreen(screen: AuthScreen): Screen {
-            return authStarter().fetchFeatureScreen(screen)
+            return authStarter().fetchRootScreenAndNavigate(screen)
         }
 
         override fun provideScheduleScreen(screen: ScheduleScreen): Screen {
-            return scheduleStarter().fetchFeatureScreen(screen)
+            return scheduleStarter().fetchRootScreenAndNavigate(screen)
         }
 
         override fun provideTabNavigationScreen(): Screen {
-            return navigationStarter().fetchFeatureScreen(MainScreen)
+            return navigationStarter().fetchFeatureScreen()
         }
 
         override fun provideEditorScreen(screen: EditorScreen): Screen {
-            return editorStarter().fetchFeatureScreen(screen)
+            return editorStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }

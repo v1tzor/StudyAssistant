@@ -82,7 +82,7 @@ fun InfoBadge(
         CompositionLocalProvider(
             LocalContentColor provides contentColor
         ) {
-            ProvideTextStyle(value = MaterialTheme.typography.labelSmall) {
+            ProvideTextStyle(value = MaterialTheme.typography.labelMedium) {
                 Row(
                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),

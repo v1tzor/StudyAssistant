@@ -21,4 +21,4 @@ import inject.FeatureStarter
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
-interface PreviewFeatureStarter : FeatureStarter<PreviewScreen>
+interface PreviewFeatureStarter : FeatureStarter.WithNestedNavigation<PreviewScreen>

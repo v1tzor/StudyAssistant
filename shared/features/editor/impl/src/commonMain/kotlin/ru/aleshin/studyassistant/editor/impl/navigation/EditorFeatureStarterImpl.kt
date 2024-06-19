@@ -28,7 +28,7 @@ internal class EditorFeatureStarterImpl(
     navScreen: NavigationScreen,
     navigatorManager: EditorNavigatorManager,
     screenProvider: EditorScreenProvider,
-) : EditorFeatureStarter, FeatureStarter.Navigation<EditorScreen>(
+) : EditorFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<EditorScreen>(
     featureNavScreen = navScreen,
     navigatorManager = navigatorManager,
     screenProvider = screenProvider,

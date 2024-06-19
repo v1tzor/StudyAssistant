@@ -41,7 +41,7 @@ internal interface ScheduleScreenProvider : FeatureScreenProvider<ScheduleScreen
         }
 
         override fun provideEditorScreen(screen: EditorScreen): Screen {
-            return editorFeatureStarter().fetchFeatureScreen(screen)
+            return editorFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }

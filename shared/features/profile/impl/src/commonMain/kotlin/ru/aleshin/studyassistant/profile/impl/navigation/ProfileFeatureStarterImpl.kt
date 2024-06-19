@@ -25,6 +25,6 @@ import ru.aleshin.studyassistant.profile.impl.presentation.ui.ProfileScreen
  */
 internal class ProfileFeatureStarterImpl(
     profileScreen: ProfileScreen,
-) : ProfileFeatureStarter, FeatureStarter.SingleScreen(
+) : ProfileFeatureStarter, FeatureStarter.WithSingleNavigation.Abstract(
     mainScreen = profileScreen,
 )

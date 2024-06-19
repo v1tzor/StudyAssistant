@@ -18,7 +18,6 @@ package repositories
 
 import dev.gitlive.firebase.auth.FirebaseUser
 import entities.auth.AuthCredentials
-import exceptions.FirebaseUserException
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.

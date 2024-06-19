@@ -39,7 +39,7 @@ internal interface ProfileScreenProvider : FeatureScreenProvider<MainScreen> {
         }
 
         override fun provideAuthScreen(screen: AuthScreen): Screen {
-            return authFeatureStarter().fetchFeatureScreen(screen)
+            return authFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }

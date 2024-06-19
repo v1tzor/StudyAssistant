@@ -21,7 +21,9 @@ import managers.CoroutineManager
 import managers.DateManager
 import repositories.BaseScheduleRepository
 import repositories.CalendarSettingsRepository
+import repositories.EmployeeRepository
 import repositories.OrganizationsRepository
+import repositories.SubjectsRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 
@@ -33,6 +35,8 @@ interface InfoFeatureDependencies : BaseFeatureDependencies {
     val baseScheduleRepository: BaseScheduleRepository
     val organizationsRepository: OrganizationsRepository
     val calendarSettingsRepository: CalendarSettingsRepository
+    val subjectsRepository: SubjectsRepository
+    val employeeRepository: EmployeeRepository
     val usersRepository: UsersRepository
     val dateManager: DateManager
     val coroutineManager: CoroutineManager

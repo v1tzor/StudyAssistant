@@ -87,12 +87,12 @@ internal class OrganizationsScreenModel(
             is OrganizationsEvent.NavigateToEmployees -> {
                 val featureScreen = InfoScreen.Employee(event.organizationId)
                 val screen = screenProvider.provideFeatureScreen(featureScreen)
-                sendEffect(OrganizationsEffect.NavigateToGlobal(screen))
+                sendEffect(OrganizationsEffect.NavigateToLocal(screen))
             }
             is OrganizationsEvent.NavigateToSubjects -> {
                 val featureScreen = InfoScreen.Subjects(event.organizationId)
                 val screen = screenProvider.provideFeatureScreen(featureScreen)
-                sendEffect(OrganizationsEffect.NavigateToGlobal(screen))
+                sendEffect(OrganizationsEffect.NavigateToLocal(screen))
             }
             is OrganizationsEvent.OpenEmployeeCard -> {
                 // TODO: Create contact feature

@@ -25,6 +25,6 @@ import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStar
  */
 internal class NavigationFeatureStarterImpl(
     tabsScreen: Screen,
-) : NavigationFeatureStarter, FeatureStarter.SingleScreen(
+) : NavigationFeatureStarter, FeatureStarter.WithSingleNavigation.Abstract(
     mainScreen = tabsScreen,
 )

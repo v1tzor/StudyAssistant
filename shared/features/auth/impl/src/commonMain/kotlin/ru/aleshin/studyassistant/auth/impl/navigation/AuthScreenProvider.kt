@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.auth.impl.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
-import inject.MainScreen
 import navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.ForgotScreen
@@ -48,11 +47,11 @@ internal interface AuthScreenProvider : FeatureScreenProvider<AuthScreen> {
         }
 
         override fun providePreviewScreen(screen: PreviewScreen): Screen {
-            return previewFeatureProvider().fetchFeatureScreen(screen)
+            return previewFeatureProvider().fetchRootScreenAndNavigate(screen)
         }
 
         override fun provideTabNavigationScreen(): Screen {
-            return navigationFeatureProvider().fetchFeatureScreen(MainScreen)
+            return navigationFeatureProvider().fetchFeatureScreen()
         }
     }
 }

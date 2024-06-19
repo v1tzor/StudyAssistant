@@ -68,6 +68,7 @@ internal fun ScheduleEditorContent(
         ) { loading ->
             if (!loading) {
                 LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
                     state = listState,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {

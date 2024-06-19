@@ -30,6 +30,10 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenm
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenmodel.OrganizationsScreenModel
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenmodel.OrganizationsStateCommunicator
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenmodel.OrganizationsWorkProcessor
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.SubjectsEffectCommunicator
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.SubjectsScreenModel
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.SubjectsStateCommunicator
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.SubjectsWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -45,4 +49,9 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<OrganizationsEffectCommunicator> { OrganizationsEffectCommunicator.Base() }
     bindProvider<OrganizationsWorkProcessor> { OrganizationsWorkProcessor.Base(instance(), instance()) }
     bindProvider<OrganizationsScreenModel> { OrganizationsScreenModel(instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<SubjectsStateCommunicator> { SubjectsStateCommunicator.Base() }
+    bindProvider<SubjectsEffectCommunicator> { SubjectsEffectCommunicator.Base() }
+    bindProvider<SubjectsWorkProcessor> { SubjectsWorkProcessor.Base(instance(), instance()) }
+    bindProvider<SubjectsScreenModel> { SubjectsScreenModel(instance(), instance(), instance(), instance(), instance()) }
 }

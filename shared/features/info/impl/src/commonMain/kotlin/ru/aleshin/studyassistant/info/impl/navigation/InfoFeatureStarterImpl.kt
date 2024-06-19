@@ -28,7 +28,7 @@ internal class InfoFeatureStarterImpl(
     navScreen: NavigationScreen,
     navigatorManager: InfoNavigatorManager,
     screenProvider: InfoScreenProvider,
-) : InfoFeatureStarter, FeatureStarter.Navigation<InfoScreen>(
+) : InfoFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<InfoScreen>(
     featureNavScreen = navScreen,
     navigatorManager = navigatorManager,
     screenProvider = screenProvider,

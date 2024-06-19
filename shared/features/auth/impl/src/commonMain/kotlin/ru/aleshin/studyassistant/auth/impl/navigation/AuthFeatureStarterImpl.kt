@@ -28,7 +28,7 @@ internal class AuthFeatureStarterImpl(
     navScreen: NavigationScreen,
     navigatorManager: AuthNavigatorManager,
     screenProvider: AuthScreenProvider,
-) : AuthFeatureStarter, FeatureStarter.Navigation<AuthScreen>(
+) : AuthFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<AuthScreen>(
     featureNavScreen = navScreen,
     navigatorManager = navigatorManager,
     screenProvider = screenProvider,

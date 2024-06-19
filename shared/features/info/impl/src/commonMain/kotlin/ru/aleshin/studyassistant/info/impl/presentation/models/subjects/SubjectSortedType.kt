@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.info.api.navigation
-
-import inject.FeatureStarter
+package ru.aleshin.studyassistant.info.impl.presentation.models.subjects
 
 /**
- * @author Stanislav Aleshin on 16.06.2024.
+ * @author Stanislav Aleshin on 18.06.2024.
  */
-interface InfoFeatureStarter : FeatureStarter.WithNestedNavigation<InfoScreen>
+internal enum class SubjectSortedType {
+    ALPHABETIC, TEACHER, EVENT_TYPE, OFFICE, LOCATION,
+}

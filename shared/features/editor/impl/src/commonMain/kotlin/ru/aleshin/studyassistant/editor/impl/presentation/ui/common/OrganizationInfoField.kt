@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mappers.mapToSting
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
@@ -43,7 +42,6 @@ import views.dialog.SelectorDialogNotSelectedItemView
  * @author Stanislav Aleshin on 05.06.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun OrganizationInfoField(
     modifier: Modifier = Modifier,
     isLoading: Boolean,

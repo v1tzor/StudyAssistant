@@ -28,7 +28,7 @@ internal class ScheduleFeatureStarterImpl(
     navScreen: NavigationScreen,
     navigatorManager: ScheduleNavigatorManager,
     screenProvider: ScheduleScreenProvider,
-) : ScheduleFeatureStarter, FeatureStarter.Navigation<ScheduleScreen>(
+) : ScheduleFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<ScheduleScreen>(
     featureNavScreen = navScreen,
     navigatorManager = navigatorManager,
     screenProvider = screenProvider,

@@ -75,8 +75,8 @@ fun <T> BaseSelectorDialog(
     header: String,
     title: String,
     itemView: @Composable LazyItemScope.(T) -> Unit,
-    notSelectedItem: @Composable LazyItemScope.() -> Unit,
-    addItemView: (@Composable LazyItemScope.() -> Unit)? = null,
+    notSelectedItem: @Composable (LazyItemScope.() -> Unit)? = null,
+    addItemView: @Composable (LazyItemScope.() -> Unit)? = null,
     properties: DialogProperties = DialogProperties(),
     sizes: SelectorDialogSizes = SelectorDialogSizes(),
     shadowElevation: Dp = 4.dp,
@@ -107,7 +107,9 @@ fun <T> BaseSelectorDialog(
                     ),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    item(content = notSelectedItem)
+                    if (notSelectedItem != null) {
+                        item(content = notSelectedItem)
+                    }
                     items(items = items, itemContent = itemView)
                     if (addItemView != null) {
                         item(content = addItemView)

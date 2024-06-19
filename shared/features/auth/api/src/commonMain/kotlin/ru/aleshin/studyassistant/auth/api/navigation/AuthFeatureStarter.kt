@@ -21,4 +21,4 @@ import inject.FeatureStarter
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-interface AuthFeatureStarter : FeatureStarter<AuthScreen>
+interface AuthFeatureStarter : FeatureStarter.WithNestedNavigation<AuthScreen>

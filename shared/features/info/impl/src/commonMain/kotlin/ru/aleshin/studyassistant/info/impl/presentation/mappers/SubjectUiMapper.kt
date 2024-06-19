@@ -17,7 +17,9 @@
 package ru.aleshin.studyassistant.info.impl.presentation.mappers
 
 import entities.subject.Subject
+import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectSortedType
 import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.tokens.InfoStrings
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -43,3 +45,11 @@ internal fun SubjectUi.mapToDomain() = Subject(
     color = color,
     location = location?.mapToDomain(),
 )
+
+internal fun SubjectSortedType.mapToString(strings: InfoStrings) = when (this) {
+    SubjectSortedType.ALPHABETIC -> strings.alphabeticSortedType
+    SubjectSortedType.TEACHER -> strings.teacherSortedType
+    SubjectSortedType.EVENT_TYPE -> strings.eventTypeSortedType
+    SubjectSortedType.OFFICE -> strings.officeSortedType
+    SubjectSortedType.LOCATION -> strings.locationSortedType
+}

@@ -21,4 +21,4 @@ import inject.FeatureStarter
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-interface EditorFeatureStarter : FeatureStarter<EditorScreen>
+interface EditorFeatureStarter : FeatureStarter.WithNestedNavigation<EditorScreen>

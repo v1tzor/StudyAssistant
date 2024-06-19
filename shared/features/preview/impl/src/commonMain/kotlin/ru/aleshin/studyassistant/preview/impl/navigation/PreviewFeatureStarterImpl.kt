@@ -28,7 +28,7 @@ internal class PreviewFeatureStarterImpl(
     navScreen: NavigationScreen,
     navigatorManager: PreviewNavigatorManager,
     screenProvider: PreviewScreenProvider,
-) : PreviewFeatureStarter, FeatureStarter.Navigation<PreviewScreen>(
+) : PreviewFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<PreviewScreen>(
     featureNavScreen = navScreen,
     navigatorManager = navigatorManager,
     screenProvider = screenProvider,

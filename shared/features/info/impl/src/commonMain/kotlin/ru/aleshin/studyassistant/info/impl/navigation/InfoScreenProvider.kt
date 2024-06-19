@@ -43,7 +43,7 @@ internal interface InfoScreenProvider : FeatureScreenProvider<InfoScreen> {
         }
 
         override fun provideEditorScreen(screen: EditorScreen): Screen {
-            return editorFeatureStarter().fetchFeatureScreen(screen)
+            return editorFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }
