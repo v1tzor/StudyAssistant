@@ -69,7 +69,10 @@ internal fun SubjectsSearchTopBar(
             query = it
             onSearch(it)
         },
-        onSearch = onSearch,
+        onSearch = {
+            focusManager.clearFocus()
+            onSearch(it)
+        },
         active = false,
         onActiveChange = {},
         modifier = modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp),
@@ -91,7 +94,13 @@ internal fun SubjectsSearchTopBar(
                 enter = fadeIn() + scaleIn(),
                 exit = fadeOut() + scaleOut(),
             ) {
-                IconButton(onClick = focusManager::clearFocus) {
+                IconButton(
+                    onClick = {
+                        query = ""
+                        onSearch("")
+                        focusManager.clearFocus()
+                    }
+                ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = StudyAssistantRes.strings.clearSearchBarDesk,
@@ -104,12 +113,7 @@ internal fun SubjectsSearchTopBar(
         content = {},
     )
 
-    LaunchedEffect(key1 = isFocus, key2 = isLoading) {
-        if (!isFocus && query.isNotBlank()) {
-            query = ""
-            onSearch("")
-        } else if (isLoading && query.isNotBlank()) {
-            query = ""
-        }
+    if (isLoading) {
+        LaunchedEffect(true) { if (query.isNotBlank()) { query = "" } }
     }
 }
