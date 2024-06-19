@@ -84,6 +84,12 @@ internal fun NoneEmployeeSubjectView(
             modifier = Modifier.height(IntrinsicSize.Max),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            Surface(
+                modifier = Modifier.padding(vertical = 4.dp).width(4.dp),
+                shape = MaterialTheme.shapes.small,
+                color = MaterialTheme.colorScheme.outlineVariant,
+                content = { Box(modifier = Modifier.fillMaxHeight()) }
+            )
             Box(modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
                 Text(
                     text = InfoThemeRes.strings.noneEmployeeSubjectTitle,

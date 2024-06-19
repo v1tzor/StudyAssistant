@@ -53,7 +53,7 @@ internal fun EmployeeAvatarView(
                 Text(
                     text = buildString {
                         append(firstName.first().uppercase())
-                        if (secondName != null) append(secondName.first().uppercase())
+                        if (!secondName.isNullOrBlank()) append(secondName.first().uppercase())
                     },
                     style = MaterialTheme.typography.titleMedium,
                 )

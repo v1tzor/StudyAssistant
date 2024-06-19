@@ -22,6 +22,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoEitherWrapper
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoErrorHandler
 import ru.aleshin.studyassistant.info.impl.domain.interactors.ClassesInfoInteractor
+import ru.aleshin.studyassistant.info.impl.domain.interactors.EmployeesInteractor
 import ru.aleshin.studyassistant.info.impl.domain.interactors.OrganizationsInteractor
 import ru.aleshin.studyassistant.info.impl.domain.interactors.SubjectsInteractor
 
@@ -34,5 +35,6 @@ internal val domainModule = DI.Module("Domain") {
 
     bindSingleton<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<SubjectsInteractor> { SubjectsInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<EmployeesInteractor> { EmployeesInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<ClassesInfoInteractor> { ClassesInfoInteractor.Base(instance(), instance(), instance(), instance()) }
 }

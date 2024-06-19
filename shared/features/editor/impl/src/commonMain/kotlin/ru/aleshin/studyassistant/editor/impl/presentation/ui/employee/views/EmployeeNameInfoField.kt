@@ -35,6 +35,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +45,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import functional.Constants.Text.DEFAULT_MAX_TEXT_LENGTH
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import theme.StudyAssistantRes
@@ -53,7 +53,6 @@ import theme.StudyAssistantRes
  * @author Stanislav Aleshin on 05.06.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun EmployeeNameInfoField(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
@@ -173,6 +172,12 @@ internal fun EmployeeNameInfoField(
                 ),
                 shape = MaterialTheme.shapes.large,
             )
+
+            LaunchedEffect(isLoading) {
+                if (editableFirstName != firstName) editableFirstName = firstName
+                if (editableSecondName != secondName) editableSecondName = secondName
+                if (editablePatronymic != patronymic) editablePatronymic = patronymic
+            }
         }
     }
 }

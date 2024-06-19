@@ -165,7 +165,7 @@ private fun NewOrganizationBottomItem(
                 modifier = Modifier.align(Alignment.Center),
                 text = InfoThemeRes.strings.newOrganizationBottomTitle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
     }

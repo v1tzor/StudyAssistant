@@ -47,7 +47,7 @@ internal data class EditEmployeeUi(
     val webs: List<ContactInfoUi> = emptyList(),
 ) : Parcelable {
 
-    fun isValid() = firstName != null && post != null
+    fun isValid() = !firstName.isNullOrBlank() && post != null
 
     companion object {
         fun createEditModel(

@@ -51,6 +51,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
@@ -61,6 +62,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import extensions.DISABLED_ALPHA
 import extensions.alphaByEnabled
 import functional.Constants.Placeholder
 import functional.UID
@@ -280,12 +282,15 @@ private fun OrganizationsEmployeesSection(
                 IconButton(
                     onClick = onShowAllEmployee,
                     modifier = Modifier.alphaByEnabled(!isLoading).size(32.dp),
-                    enabled = !isLoading,
+                    enabled = !isLoading && organizationData != null,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onBackground,
+                        disabledContentColor = MaterialTheme.colorScheme.onBackground.copy(alpha = DISABLED_ALPHA),
+                    ),
                 ) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground,
                     )
                 }
             }
@@ -362,12 +367,15 @@ private fun OrganizationsSubjectsSection(
                 IconButton(
                     onClick = onShowAllSubjects,
                     modifier = Modifier.alphaByEnabled(!isLoading).size(32.dp),
-                    enabled = !isLoading,
+                    enabled = !isLoading && organizationData != null,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onBackground,
+                        disabledContentColor = MaterialTheme.colorScheme.onBackground.copy(alpha = DISABLED_ALPHA),
+                    ),
                 ) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground,
                     )
                 }
             }

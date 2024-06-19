@@ -38,12 +38,14 @@ import functional.Constants
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
+const val DISABLED_ALPHA = 0.6F
+
 fun LazyGridScope.emptyItem(modifier: Modifier = Modifier) {
     item { Spacer(modifier = modifier.fillMaxWidth()) }
 }
 
 @Composable
-fun Modifier.alphaByEnabled(enabled: Boolean, disabledAlpha: Float = 0.6f): Modifier {
+fun Modifier.alphaByEnabled(enabled: Boolean, disabledAlpha: Float = DISABLED_ALPHA): Modifier {
     val value by animateFloatAsState(
         targetValue = if (enabled) 1f else disabledAlpha,
         animationSpec = tween(),

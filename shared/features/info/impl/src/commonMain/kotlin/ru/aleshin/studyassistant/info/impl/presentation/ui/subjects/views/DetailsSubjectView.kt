@@ -148,89 +148,125 @@ private fun DetailsSubjectView(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            painter = painterResource(eventType.mapToIcon(StudyAssistantRes.icons)),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-                        InfoBadge(containerColor = MaterialTheme.colorScheme.surfaceVariant) {
-                            Text(
-                                text = office,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                    }
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            text = eventType.mapToString(StudyAssistantRes.strings),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                        Text(
-                            text = name,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 4,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                    }
+                    DetailsSubjectViewHeader(
+                        eventType = eventType,
+                        office = office,
+                    )
+                    DetailsSubjectViewContent(
+                        eventType = eventType,
+                        name = name,
+                    )
                 }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(18.dp),
-                            painter = painterResource(StudyAssistantRes.icons.employee),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = teacher?.officialName() ?: StudyAssistantRes.strings.noneTitle,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    }
-                    if (location != null) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(18.dp),
-                                painter = painterResource(StudyAssistantRes.icons.location),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            Text(
-                                modifier = Modifier.weight(1f),
-                                text = location.label ?: location.value,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.labelMedium,
-                            )
-                        }
-                    }
-                }
+                DetailsSubjectViewFooter(
+                    teacher = teacher,
+                    location = location,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DetailsSubjectViewHeader(
+    modifier: Modifier = Modifier,
+    eventType: EventType,
+    office: String,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(eventType.mapToIcon(StudyAssistantRes.icons)),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        InfoBadge(containerColor = MaterialTheme.colorScheme.surfaceVariant) {
+            Text(
+                text = office,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+@Composable
+private fun DetailsSubjectViewContent(
+    modifier: Modifier = Modifier,
+    eventType: EventType,
+    name: String,
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = eventType.mapToString(StudyAssistantRes.strings),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.labelMedium,
+        )
+        Text(
+            text = name,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 4,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.titleMedium,
+        )
+    }
+}
+
+@Composable
+private fun DetailsSubjectViewFooter(
+    modifier: Modifier = Modifier,
+    teacher: EmployeeUi?,
+    location: ContactInfoUi?,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                modifier = Modifier.size(18.dp),
+                painter = painterResource(StudyAssistantRes.icons.employee),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                modifier = Modifier.weight(1f),
+                text = teacher?.officialName() ?: StudyAssistantRes.strings.noneTitle,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.labelMedium,
+            )
+        }
+        if (location != null) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    painter = painterResource(StudyAssistantRes.icons.location),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = location.label ?: location.value,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.labelMedium,
+                )
             }
         }
     }
