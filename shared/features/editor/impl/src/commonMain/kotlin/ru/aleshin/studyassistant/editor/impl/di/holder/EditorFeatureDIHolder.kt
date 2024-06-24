@@ -29,6 +29,7 @@ import repositories.BaseScheduleRepository
 import repositories.CalendarSettingsRepository
 import repositories.CustomScheduleRepository
 import repositories.EmployeeRepository
+import repositories.HomeworksRepository
 import repositories.OrganizationsRepository
 import repositories.SubjectsRepository
 import repositories.UsersRepository
@@ -55,6 +56,7 @@ object EditorFeatureDIHolder : BaseFeatureDIHolder<EditorFeatureApi, EditorFeatu
                 bindSingleton<EmployeeRepository> { dependencies.employeeRepository }
                 bindSingleton<SubjectsRepository> { dependencies.subjectsRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
+                bindSingleton<HomeworksRepository> { dependencies.homeworksRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<TimeOverlayManager> { dependencies.overlayManager }

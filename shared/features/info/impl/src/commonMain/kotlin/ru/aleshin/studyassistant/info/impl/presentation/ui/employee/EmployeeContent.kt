@@ -89,7 +89,7 @@ internal fun EmployeeContent(
                     state = listState,
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
-                    items(employees.toList()) { alphabeticEmployees ->
+                    items(employees.toList(), key = { it.first }) { alphabeticEmployees ->
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             Text(
                                 modifier = Modifier.padding(top = 16.dp),

@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mappers.pxToDp
+import theme.material.full
 
 /**
  * @author Stanislav Aleshin on 24.05.2024.
@@ -120,14 +121,29 @@ fun StickyBottomSheet(
 @Composable
 fun SmallDragHandle(
     modifier: Modifier = Modifier,
-    shape: Shape = MaterialTheme.shapes.extraLarge,
     color: Color = MaterialTheme.colorScheme.outlineVariant,
 ) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
         Surface(
             modifier = modifier.padding(top = 12.dp, bottom = 4.dp),
             color = color,
-            shape = shape
+            shape = MaterialTheme.shapes.full(),
+        ) {
+            Box(Modifier.size(width = 32.dp, height = 4.dp))
+        }
+    }
+}
+
+@Composable
+fun MediumDragHandle(
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.outlineVariant,
+) {
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+        Surface(
+            modifier = modifier.padding(vertical = 16.dp),
+            color = color,
+            shape = MaterialTheme.shapes.full(),
         ) {
             Box(Modifier.size(width = 32.dp, height = 4.dp))
         }

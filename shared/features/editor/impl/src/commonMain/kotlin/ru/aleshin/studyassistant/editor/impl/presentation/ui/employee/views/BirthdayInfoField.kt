@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import theme.StudyAssistantRes
@@ -37,17 +36,16 @@ import views.dialog.BirthdayDatePicker
  * @author Stanislav Aleshin on 06.06.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun BirthdayInfoField(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     birthday: String?,
     onSelected: (String?) -> Unit,
 ) {
-    var isOpenDatePickerDialog by remember { mutableStateOf(false) }
+    var datePickerState by remember { mutableStateOf(false) }
 
     ClickableInfoTextField(
-        onClick = { isOpenDatePickerDialog = true },
+        onClick = { datePickerState = true },
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
         value = birthday,
@@ -63,13 +61,13 @@ internal fun BirthdayInfoField(
         }
     )
 
-    if (isOpenDatePickerDialog) {
+    if (datePickerState) {
         BirthdayDatePicker(
             label = EditorThemeRes.strings.birthdayFieldLabel,
-            onDismiss = { isOpenDatePickerDialog = false },
+            onDismiss = { datePickerState = false },
             onSelectedDate = { selectedBirthday ->
                 onSelected(selectedBirthday)
-                isOpenDatePickerDialog = false
+                datePickerState = false
             }
         )
     }

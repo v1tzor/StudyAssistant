@@ -89,7 +89,7 @@ internal fun ScheduleEditorBottomSheet(
             EditorBottomSheetHeader(
                 isLoading = isLoading,
                 numberOfClasses = weekSchedule?.weekDaySchedules?.values?.sumOf { schedule ->
-                    schedule?.classes?.size ?: 0
+                    schedule.classes.size
                 } ?: 0,
                 maxNumberOfWeek = maxNumberOfWeek,
                 selectedWeek = selectedWeek,

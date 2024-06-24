@@ -93,7 +93,7 @@ internal fun SubjectsContent(
                     verticalItemSpacing = 12.dp,
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(subjects) { subject ->
+                    items(subjects, key = { it.uid }) { subject ->
                         DetailsSubjectViewItem(
                             modifier = Modifier.animateItemPlacement(),
                             eventType = subject.eventType,

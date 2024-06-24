@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import functional.UID
 import navigation.nestedPop
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
@@ -57,7 +58,7 @@ internal data class SubjectEditorScreen(
         )
     ) { state ->
         val strings = EditorThemeRes.strings
-        val navigator = LocalNavigator.current
+        val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -66,15 +67,15 @@ internal data class SubjectEditorScreen(
                 SubjectEditorContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
-                    onAddTeacher = { dispatchEvent(SubjectEditorEvent.NavigateToEmployeeEditor) },
-                    onUpdateLocations = { dispatchEvent(SubjectEditorEvent.UpdateLocations(it)) },
-                    onUpdateOffices = { dispatchEvent(SubjectEditorEvent.UpdateOffices(it)) },
+                    onAddTeacher = { dispatchEvent(SubjectEditorEvent.NavigateToEmployeeEditor(null)) },
+                    onUpdateLocations = { dispatchEvent(SubjectEditorEvent.UpdateOrganizationLocations(it)) },
+                    onUpdateOffices = { dispatchEvent(SubjectEditorEvent.UpdateOrganizationOffices(it)) },
                     onSelectEventType = { dispatchEvent(SubjectEditorEvent.SelectEventType(it)) },
-                    onPickColor = { dispatchEvent(SubjectEditorEvent.PickColor(it)) },
-                    onSelectTeacher = { dispatchEvent(SubjectEditorEvent.SelectTeacher(it)) },
+                    onPickColor = { dispatchEvent(SubjectEditorEvent.UpdateColor(it)) },
+                    onSelectTeacher = { dispatchEvent(SubjectEditorEvent.UpdateTeacher(it)) },
                     onEditName = { dispatchEvent(SubjectEditorEvent.EditName(it)) },
                     onSelectLocation = { location, office ->
-                        dispatchEvent(SubjectEditorEvent.SelectLocation(location, office))
+                        dispatchEvent(SubjectEditorEvent.UpdateLocation(location, office))
                     },
                 )
             },
@@ -95,8 +96,8 @@ internal data class SubjectEditorScreen(
 
         handleEffect { effect ->
             when (effect) {
-                is SubjectEditorEffect.NavigateToLocal -> navigator?.push(effect.pushScreen)
-                is SubjectEditorEffect.NavigateToBack -> navigator?.nestedPop()
+                is SubjectEditorEffect.NavigateToLocal -> navigator.push(effect.pushScreen)
+                is SubjectEditorEffect.NavigateToBack -> navigator.nestedPop()
                 is SubjectEditorEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

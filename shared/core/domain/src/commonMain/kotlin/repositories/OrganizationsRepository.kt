@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.Flow
 interface OrganizationsRepository {
     suspend fun addOrUpdateOrganization(organization: Organization, targetUser: UID): UID
     suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<Organization?>
+    suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShort?>
     suspend fun fetchAllOrganization(targetUser: UID): Flow<List<Organization>>
     suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShort>>
 }

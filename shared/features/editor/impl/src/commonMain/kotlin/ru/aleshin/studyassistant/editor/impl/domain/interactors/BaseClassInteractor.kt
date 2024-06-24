@@ -18,8 +18,8 @@ package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
 import entities.classes.Class
 import entities.common.DayOfNumberedWeek
-import entities.schedules.BaseSchedule
 import entities.schedules.DateVersion
+import entities.schedules.base.BaseSchedule
 import extensions.dateOfWeekDay
 import extensions.isCurrentDay
 import extensions.randomUUID
@@ -170,35 +170,6 @@ internal interface BaseClassInteractor {
                 )
                 scheduleRepository.addOrUpdateSchedule(actualSchedule, targetUser)
             }
-
-//            val scheduleId = targetClass.scheduleId
-//            val classSchedule = scheduleRepository.fetchScheduleById(scheduleId, targetUser).firstOrNull()
-//            val currentDate = dateManager.fetchBeginningCurrentDay()
-//            val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
-//
-//            if (scheduleId.isNotEmpty() && classSchedule != null) {
-//                val actualClasses = classSchedule.classes.toMutableList().apply {
-//                    remove(targetClass)
-//                }
-//                if (mondayDate.isCurrentDay(classSchedule.dateVersion.from)) {
-//                    val updatedSchedule = classSchedule.copy(classes = actualClasses)
-//                    scheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser)
-//                } else {
-//                    val deprecatedVersion = classSchedule.dateVersion.makeDeprecated(currentDate)
-//                    val deprecatedSchedule = classSchedule.copy(dateVersion = deprecatedVersion)
-//                    scheduleRepository.addOrUpdateSchedule(deprecatedSchedule, targetUser)
-//
-//                    val actualVersion = DateVersion.createNewVersion(currentDate)
-//                    val actualSchedule = classSchedule.copy(
-//                        uid = randomUUID(),
-//                        dateVersion = actualVersion,
-//                        classes = actualClasses,
-//                    )
-//                    scheduleRepository.addOrUpdateSchedule(actualSchedule, targetUser)
-//                }
-//            } else {
-//                throw NullPointerException("Base schedule is null")
-//            }
         }
     }
 }

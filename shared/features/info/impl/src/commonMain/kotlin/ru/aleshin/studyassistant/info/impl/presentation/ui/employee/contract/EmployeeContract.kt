@@ -56,12 +56,13 @@ internal sealed class EmployeeEffect : BaseUiEffect {
 }
 
 internal sealed class EmployeeAction : BaseAction {
+    data class UpdateEmployees(val employees: Map<Char, List<EmployeeAndSubjectsUi>>) : EmployeeAction()
+
     data class UpdateOrganizations(
         val selectedOrganization: UID?,
         val organizations: List<OrganizationShortUi>
     ) : EmployeeAction()
 
-    data class UpdateEmployees(val employees: Map<Char, List<EmployeeAndSubjectsUi>>) : EmployeeAction()
     data class UpdateSelectedOrganization(val organization: UID) : EmployeeAction()
     data class UpdateLoading(val isLoading: Boolean) : EmployeeAction()
 }

@@ -19,8 +19,6 @@ package remote.schedules
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.DocumentReference
 import dev.gitlive.firebase.firestore.FirebaseFirestore
-import dev.gitlive.firebase.firestore.orderBy
-import dev.gitlive.firebase.firestore.where
 import entities.common.NumberOfRepeatWeek
 import exceptions.FirebaseUserException
 import extensions.dateTime
@@ -57,7 +55,7 @@ interface BaseScheduleRemoteDataSource {
         numberOfWeek: NumberOfRepeatWeek,
         targetUser: UID
     ): Flow<BaseScheduleDetailsData?>
-    suspend fun fetchSchedulesByTimeRange(
+    suspend fun fetchSchedulesByVersion(
         from: Instant,
         to: Instant,
         numberOfWeek: NumberOfRepeatWeek?,
@@ -141,7 +139,7 @@ interface BaseScheduleRemoteDataSource {
             }
         }
 
-        override suspend fun fetchSchedulesByTimeRange(
+        override suspend fun fetchSchedulesByVersion(
             from: Instant,
             to: Instant,
             numberOfWeek: NumberOfRepeatWeek?,
@@ -206,7 +204,7 @@ interface BaseScheduleRemoteDataSource {
             }
 
             val organization = organizationReference.snapshotGet().data<OrganizationShortData>()
-            val subject = subjectReference?.snapshotGet()?.data<SubjectPojo>().let { subjectPojo ->
+            val subject = subjectReference?.snapshotGet()?.data(serializer<SubjectPojo?>()).let { subjectPojo ->
                 val employeeReference = subjectPojo?.teacherId?.let { employeeReferenceRoot.document(it) }
                 val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeeDetailsData?>())
                 subjectPojo?.mapToDetailsData(employee)

@@ -44,10 +44,10 @@ internal sealed class OrganizationsEvent : BaseEvent {
     data object Init : OrganizationsEvent()
     data class Refresh(val organizationId: UID) : OrganizationsEvent()
     data class ChangeOrganization(val organizationId: UID?) : OrganizationsEvent()
-    data class NavigateToOrganizationEditor(val organizationId: UID?) : OrganizationsEvent()
+    data class OpenEmployeeCard(val employeeId: UID, val organizationId: UID) : OrganizationsEvent()
     data class NavigateToEmployees(val organizationId: UID) : OrganizationsEvent()
     data class NavigateToSubjects(val organizationId: UID) : OrganizationsEvent()
-    data class OpenEmployeeCard(val employeeId: UID, val organizationId: UID) : OrganizationsEvent()
+    data class NavigateToOrganizationEditor(val organizationId: UID?) : OrganizationsEvent()
     data class NavigateToSubjectEditor(val subjectId: UID, val organizationId: UID) : OrganizationsEvent()
 }
 
@@ -59,10 +59,10 @@ internal sealed class OrganizationsEffect : BaseUiEffect {
 
 internal sealed class OrganizationsAction : BaseAction {
     data class UpdateShortOrganizations(val organizations: List<OrganizationShortUi>) : OrganizationsAction()
-    data class UpdateSelectedOrganization(val organizationId: UID?) : OrganizationsAction()
-    data class UpdateLoading(val isLoading: Boolean) : OrganizationsAction()
     data class UpdateOrganizationData(
         val data: OrganizationUi?,
         val classesInfo: OrganizationClassesInfoUi?,
     ) : OrganizationsAction()
+    data class UpdateSelectedOrganization(val organizationId: UID?) : OrganizationsAction()
+    data class UpdateLoading(val isLoading: Boolean) : OrganizationsAction()
 }

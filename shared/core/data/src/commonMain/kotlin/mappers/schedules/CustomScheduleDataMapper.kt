@@ -16,7 +16,7 @@
 
 package mappers.schedules
 
-import entities.schedules.CustomSchedule
+import entities.schedules.custom.CustomSchedule
 import extensions.mapEpochTimeToInstant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import functional.UID
 import navigation.nestedPop
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
@@ -46,6 +47,7 @@ import views.ErrorSnackbar
 internal class ClassEditorScreen(
     private val classId: UID?,
     private val scheduleId: UID?,
+    private val organizationId: UID?,
     private val customSchedule: Boolean,
     private val weekDay: DayOfNumberedWeekUi,
 ) : Screen {
@@ -54,10 +56,16 @@ internal class ClassEditorScreen(
     override fun Content() = ScreenContent(
         screenModel = rememberClassEditorScreenModel(),
         initialState = ClassEditorViewState(),
-        dependencies = ClassEditorDeps(classId, scheduleId, customSchedule, weekDay),
+        dependencies = ClassEditorDeps(
+            classId = classId,
+            scheduleId = scheduleId,
+            organizationId = organizationId,
+            customSchedule = customSchedule,
+            weekDay = weekDay,
+        ),
     ) { state ->
         val strings = EditorThemeRes.strings
-        val navigator = LocalNavigator.current
+        val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -67,21 +75,21 @@ internal class ClassEditorScreen(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
                     onAddOrganization = {},
-                    onAddSubject = { dispatchEvent(ClassEditorEvent.NavigateToSubjectEditor) },
-                    onAddTeacher = { dispatchEvent(ClassEditorEvent.NavigateToEmployeeEditor) },
-                    onUpdateLocations = { dispatchEvent(ClassEditorEvent.UpdateLocations(it)) },
-                    onUpdateOffices = { dispatchEvent(ClassEditorEvent.UpdateOffices(it)) },
-                    onSelectOrganization = { dispatchEvent(ClassEditorEvent.SelectOrganization(it)) },
-                    onSelectTeacher = { dispatchEvent(ClassEditorEvent.SelectTeacher(it)) },
-                    onChangeNotifyParams = { dispatchEvent(ClassEditorEvent.ChangeNotifyParams(it)) },
+                    onAddSubject = { dispatchEvent(ClassEditorEvent.NavigateToSubjectEditor(null)) },
+                    onAddTeacher = { dispatchEvent(ClassEditorEvent.NavigateToEmployeeEditor(null)) },
+                    onUpdateLocations = { dispatchEvent(ClassEditorEvent.UpdateOrganizationLocations(it)) },
+                    onUpdateOffices = { dispatchEvent(ClassEditorEvent.UpdateOrganizationOffices(it)) },
+                    onSelectOrganization = { dispatchEvent(ClassEditorEvent.UpdateOrganization(it)) },
+                    onSelectTeacher = { dispatchEvent(ClassEditorEvent.UpdateTeacher(it)) },
+                    onChangeNotifyParams = { dispatchEvent(ClassEditorEvent.UpdateNotifyParams(it)) },
                     onSelectSubject = { type, subject ->
-                        dispatchEvent(ClassEditorEvent.SelectSubject(type, subject))
+                        dispatchEvent(ClassEditorEvent.UpdateSubject(type, subject))
                     },
                     onSelectLocation = { location, office ->
-                        dispatchEvent(ClassEditorEvent.SelectLocation(location, office))
+                        dispatchEvent(ClassEditorEvent.UpdateLocation(location, office))
                     },
                     onSelectTime = { start, end ->
-                        dispatchEvent(ClassEditorEvent.SelectTime(start, end))
+                        dispatchEvent(ClassEditorEvent.UpdateTime(start, end))
                     },
                 )
             },
@@ -102,8 +110,8 @@ internal class ClassEditorScreen(
 
         handleEffect { effect ->
             when (effect) {
-                is ClassEditorEffect.NavigateToLocal -> navigator?.push(effect.pushScreen)
-                is ClassEditorEffect.NavigateToBack -> navigator?.nestedPop()
+                is ClassEditorEffect.NavigateToLocal -> navigator.push(effect.pushScreen)
+                is ClassEditorEffect.NavigateToBack -> navigator.nestedPop()
                 is ClassEditorEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

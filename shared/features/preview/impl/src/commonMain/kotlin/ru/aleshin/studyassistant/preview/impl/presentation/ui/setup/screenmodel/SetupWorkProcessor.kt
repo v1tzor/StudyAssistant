@@ -22,7 +22,7 @@ import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
 import functional.UID
 import functional.firstHandleAndGet
-import functional.firstHandleAndGetOrNull
+import functional.firstOrNullHandleAndGet
 import functional.handle
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.CalendarSettingsInteractor
@@ -59,12 +59,12 @@ internal interface SetupWorkProcessor : FlowWorkProcessor<SetupWorkCommand, Setu
                 onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
                 onRightAction = { user -> user?.mapToUi() },
             )
-            val mainOrganization = organizationsInteractor.fetchAllOrganization().firstHandleAndGetOrNull(
+            val mainOrganization = organizationsInteractor.fetchAllOrganization().firstOrNullHandleAndGet(
                 onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
                 onRightAction = { organizations ->
                     val mainOrganization = organizations.find { it.isMain }
                     val createdOrganization = mainOrganization ?: organizations.getOrNull(0)
-                    return@firstHandleAndGetOrNull createdOrganization?.mapToUi()
+                    return@firstOrNullHandleAndGet createdOrganization?.mapToUi()
                 }
             )
             val calendarSettings = calendarSettingsInteractor.fetchCalendarSettings().firstHandleAndGet(

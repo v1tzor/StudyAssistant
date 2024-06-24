@@ -21,7 +21,7 @@ import dev.icerock.moko.parcelize.Parcelize
 import entities.subject.EventType
 import functional.TimeRange
 import functional.UID
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.ContactInfoUi
@@ -44,5 +44,5 @@ internal data class ClassDetailsUi(
     val timeRange: TimeRange,
     val number: Int,
     val notification: Boolean = false,
-    val homework: HomeworkUi?,
+    val homework: HomeworkDetailsUi?,
 ) : Parcelable

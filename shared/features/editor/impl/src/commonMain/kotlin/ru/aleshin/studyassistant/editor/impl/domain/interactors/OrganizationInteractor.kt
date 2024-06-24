@@ -16,14 +16,13 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import entities.organizations.Organization
 import entities.organizations.OrganizationShort
 import entities.organizations.convertToBase
 import functional.FlowDomainResult
 import functional.UID
 import functional.UnitDomainResult
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import repositories.OrganizationsRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
@@ -34,8 +33,7 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
  */
 internal interface OrganizationInteractor {
 
-    suspend fun fetchOrganizationById(uid: UID): FlowDomainResult<EditorFailures, Organization>
-    suspend fun fetchAllOrganizations(): FlowDomainResult<EditorFailures, List<Organization>>
+    suspend fun fetchShortOrganizationById(uid: UID): FlowDomainResult<EditorFailures, OrganizationShort>
     suspend fun fetchAllShortOrganizations(): FlowDomainResult<EditorFailures, List<OrganizationShort>>
     suspend fun updateShortOrganization(organization: OrganizationShort): UnitDomainResult<EditorFailures>
 
@@ -48,12 +46,8 @@ internal interface OrganizationInteractor {
         private val targetUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid
 
-        override suspend fun fetchOrganizationById(uid: UID) = eitherWrapper.wrapFlow {
-            organizationsRepository.fetchOrganizationById(uid, targetUser).map { checkNotNull(it) }
-        }
-
-        override suspend fun fetchAllOrganizations() = eitherWrapper.wrapFlow {
-            organizationsRepository.fetchAllOrganization(targetUser)
+        override suspend fun fetchShortOrganizationById(uid: UID) = eitherWrapper.wrapFlow {
+            organizationsRepository.fetchShortOrganizationById(uid, targetUser).filterNotNull()
         }
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {

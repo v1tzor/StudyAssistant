@@ -201,7 +201,7 @@ fun LazyItemScope.SelectorDialogAddItemView(
     Surface(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.alphaByEnabled(enabled).animateItemPlacement().height(40.dp).fillMaxWidth(),
+        modifier = modifier.alphaByEnabled(enabled).fillMaxWidth().height(40.dp).animateItemPlacement(),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceVariant,
     ) {

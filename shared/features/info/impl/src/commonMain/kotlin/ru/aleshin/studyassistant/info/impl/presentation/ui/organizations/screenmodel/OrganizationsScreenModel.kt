@@ -79,10 +79,8 @@ internal class OrganizationsScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is OrganizationsEvent.NavigateToOrganizationEditor -> {
-                val featureScreen = EditorScreen.Organization(event.organizationId)
-                val screen = screenProvider.provideEditorScreen(featureScreen)
-                sendEffect(OrganizationsEffect.NavigateToGlobal(screen))
+            is OrganizationsEvent.OpenEmployeeCard -> {
+                // TODO: Create contact feature
             }
             is OrganizationsEvent.NavigateToEmployees -> {
                 val featureScreen = InfoScreen.Employee(event.organizationId)
@@ -94,8 +92,10 @@ internal class OrganizationsScreenModel(
                 val screen = screenProvider.provideFeatureScreen(featureScreen)
                 sendEffect(OrganizationsEffect.NavigateToLocal(screen))
             }
-            is OrganizationsEvent.OpenEmployeeCard -> {
-                // TODO: Create contact feature
+            is OrganizationsEvent.NavigateToOrganizationEditor -> {
+                val featureScreen = EditorScreen.Organization(event.organizationId)
+                val screen = screenProvider.provideEditorScreen(featureScreen)
+                sendEffect(OrganizationsEffect.NavigateToGlobal(screen))
             }
             is OrganizationsEvent.NavigateToSubjectEditor -> {
                 val featureScreen = EditorScreen.Subject(event.subjectId, event.organizationId)
@@ -112,13 +112,13 @@ internal class OrganizationsScreenModel(
         is OrganizationsAction.UpdateShortOrganizations -> currentState.copy(
             shortOrganizations = action.organizations,
         )
-        is OrganizationsAction.UpdateSelectedOrganization -> currentState.copy(
-            selectedOrganization = action.organizationId,
-        )
         is OrganizationsAction.UpdateOrganizationData -> currentState.copy(
             organizationData = action.data,
             classesInfo = action.classesInfo,
             isLoading = false,
+        )
+        is OrganizationsAction.UpdateSelectedOrganization -> currentState.copy(
+            selectedOrganization = action.organizationId,
         )
         is OrganizationsAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,

@@ -16,6 +16,9 @@
 
 package entities.schedules
 
+import entities.schedules.base.BaseScheduleDetails
+import entities.schedules.custom.CustomScheduleDetails
+
 /**
  * @author Stanislav Aleshin on 08.06.2024.
  */

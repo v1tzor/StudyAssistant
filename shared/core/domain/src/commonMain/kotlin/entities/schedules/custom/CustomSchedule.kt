@@ -14,31 +14,17 @@
  * limitations under the License.
  */
 
-package entities.schedules
+package entities.schedules.custom
 
 import entities.classes.Class
-import entities.classes.ClassDetails
-import entities.common.NumberOfRepeatWeek
 import functional.UID
-import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.Instant
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
-data class BaseScheduleDetails(
+data class CustomSchedule(
     val uid: UID,
-    val dateVersion: DateVersion,
-    val dayOfWeek: DayOfWeek,
-    val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
-    val classes: List<ClassDetails>,
-)
-
-fun BaseSchedule.convertToDetails(
-    classesMapper: (Class) -> ClassDetails,
-) = BaseScheduleDetails(
-    uid = uid,
-    dateVersion = dateVersion,
-    dayOfWeek = dayOfWeek,
-    week = week,
-    classes = classes.map { classesMapper(it) },
+    val date: Instant,
+    val classes: List<Class>,
 )

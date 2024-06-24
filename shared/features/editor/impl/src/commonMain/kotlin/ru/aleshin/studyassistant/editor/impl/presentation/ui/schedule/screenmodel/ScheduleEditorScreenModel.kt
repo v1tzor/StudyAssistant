@@ -91,21 +91,35 @@ internal class ScheduleEditorScreenModel(
                 val command = ScheduleEditorWorkCommand.UpdateOrganization(event.organization)
                 workProcessor.work(command).collectAndHandleWork()
             }
-            is ScheduleEditorEvent.CreateClass -> launchBackgroundWork(BackgroundKey.DELETE_CLASS) {
-                val featureScreen = EditorScreen.Class(null, event.schedule?.uid, false, event.weekDay)
+            is ScheduleEditorEvent.DeleteClass -> {
+                launchBackgroundWork(BackgroundKey.DELETE_CLASS) {
+                    val command = ScheduleEditorWorkCommand.DeleteClass(event.uid, event.schedule)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is ScheduleEditorEvent.CreateClassInEditor -> with(event) {
+                val featureScreen = EditorScreen.Class(
+                    classId = null,
+                    scheduleId = event.schedule?.uid,
+                    organizationId = null,
+                    isCustomSchedule = false,
+                    weekDay = weekDay,
+                )
                 val targetScreen = screenProvider.provideFeatureScreen(featureScreen)
                 sendEffect(ScheduleEditorEffect.NavigateToLocal(targetScreen))
             }
-            is ScheduleEditorEvent.EditClass -> with(event) {
-                val featureScreen = EditorScreen.Class(editClass.uid, editClass.scheduleId, false, weekDay)
+            is ScheduleEditorEvent.EditClassInEditor -> with(event) {
+                val featureScreen = EditorScreen.Class(
+                    classId = editClass.uid,
+                    scheduleId = editClass.scheduleId,
+                    organizationId = editClass.organization.uid,
+                    isCustomSchedule = false,
+                    weekDay = weekDay,
+                )
                 val targetScreen = screenProvider.provideFeatureScreen(featureScreen)
                 sendEffect(ScheduleEditorEffect.NavigateToLocal(targetScreen))
             }
-            is ScheduleEditorEvent.DeleteClass -> launchBackgroundWork(BackgroundKey.DELETE_CLASS) {
-                val command = ScheduleEditorWorkCommand.DeleteClass(event.uid, event.schedule)
-                workProcessor.work(command).collectAndHandleWork()
-            }
-            is ScheduleEditorEvent.SaveSchedule -> {
+            is ScheduleEditorEvent.NavigateToBack -> {
                 sendEffect(ScheduleEditorEffect.NavigateToBack)
             }
         }
@@ -115,12 +129,6 @@ internal class ScheduleEditorScreenModel(
         action: ScheduleEditorAction,
         currentState: ScheduleEditorViewState,
     ) = when (action) {
-        is ScheduleEditorAction.UpdateLoading -> currentState.copy(
-            isLoading = action.isLoading,
-        )
-        is ScheduleEditorAction.UpdateSelectedWeek -> currentState.copy(
-            selectedWeek = action.week,
-        )
         is ScheduleEditorAction.UpdateScheduleData -> currentState.copy(
             selectedWeek = action.week,
             weekSchedule = action.schedule,
@@ -129,6 +137,12 @@ internal class ScheduleEditorScreenModel(
         is ScheduleEditorAction.UpdateOrganizationData -> currentState.copy(
             organizations = action.organizations,
             calendarSettings = action.settings,
+        )
+        is ScheduleEditorAction.UpdateSelectedWeek -> currentState.copy(
+            selectedWeek = action.week,
+        )
+        is ScheduleEditorAction.UpdateLoading -> currentState.copy(
+            isLoading = action.isLoading,
         )
     }
 

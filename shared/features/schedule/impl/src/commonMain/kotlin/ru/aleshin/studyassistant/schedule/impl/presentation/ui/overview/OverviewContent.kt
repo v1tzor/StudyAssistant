@@ -43,11 +43,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import entities.tasks.HomeworkStatus
 import functional.Constants.Placeholder.OVERVIEW_ITEMS
+import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewViewState
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.DetailsClassView
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.DetailsClassHomeworkBadge
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.DetailsClassTestBadge
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.DetailsClassViewItem
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.DetailsClassViewPlaceholder
 
 /**
@@ -58,6 +63,8 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.De
 internal fun OverviewContent(
     state: OverviewViewState,
     modifier: Modifier = Modifier,
+    currentTime: Instant,
+    onShowClassInfo: (ClassDetailsUi) -> Unit,
     classListState: LazyListState = rememberLazyListState(),
 ) = with(state) {
     Column(modifier = modifier.padding(top = 12.dp)) {
@@ -74,18 +81,30 @@ internal fun OverviewContent(
                         contentPadding = PaddingValues(horizontal = 12.dp),
                     ) {
                         items(schedule.classes) { classModel ->
-                            DetailsClassView(
+                            DetailsClassViewItem(
                                 modifier = Modifier.fillMaxWidth().animateItemPlacement(),
-                                onClick = {},
+                                onClick = { onShowClassInfo(classModel) },
                                 isActive = activeClass?.uid == classModel.uid,
                                 progress = activeClass?.progress?.takeIf { activeClass.isStarted } ?: -1f,
                                 timeRange = classModel.timeRange,
                                 subject = classModel.subject,
                                 office = classModel.office,
                                 organization = classModel.organization,
-                                employee = classModel.teacher,
+                                teacher = classModel.teacher,
                                 location = classModel.location,
                                 headerBadge = {
+                                    if (classModel.homework != null) {
+                                        DetailsClassHomeworkBadge(
+                                            homeworkStatus = HomeworkStatus.calculate(
+                                                isDone = classModel.homework.isDone,
+                                                deadline = classModel.homework.deadline,
+                                                currentTime = currentTime,
+                                            )
+                                        )
+                                    }
+                                    if (classModel.homework?.test != null) {
+                                        DetailsClassTestBadge()
+                                    }
                                 }
                             )
                         }

@@ -57,14 +57,14 @@ internal sealed class SubjectsEffect : BaseUiEffect {
 }
 
 internal sealed class SubjectsAction : BaseAction {
-    data class UpdateOrganizations(
-        val selectedOrganization: UID?,
-        val organizations: List<OrganizationShortUi>
-    ) : SubjectsAction()
-
     data class UpdateSubjects(
         val subjects: List<SubjectUi>,
         val sortedType: SubjectSortedType
+    ) : SubjectsAction()
+
+    data class UpdateOrganizations(
+        val selectedOrganization: UID?,
+        val organizations: List<OrganizationShortUi>
     ) : SubjectsAction()
 
     data class UpdateSelectedOrganization(val organization: UID) : SubjectsAction()

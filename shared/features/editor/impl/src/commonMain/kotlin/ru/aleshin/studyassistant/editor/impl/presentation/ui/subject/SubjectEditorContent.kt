@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import entities.subject.EventType
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.TeacherInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectEditorViewState
@@ -50,7 +50,7 @@ internal fun SubjectEditorContent(
     onSelectEventType: (EventType?) -> Unit,
     onEditName: (String) -> Unit,
     onPickColor: (Int?) -> Unit,
-    onSelectTeacher: (EmployeeUi?) -> Unit,
+    onSelectTeacher: (EmployeeDetailsUi?) -> Unit,
     onSelectLocation: (ContactInfoUi?, String?) -> Unit,
 ) = with(state) {
     Column(
@@ -79,13 +79,12 @@ internal fun SubjectEditorContent(
                 enabledAddTeacher = editableSubject?.organizationId != null,
                 isLoading = isLoading,
                 teacher = editableSubject?.teacher,
-                allEmployee = organization?.employee ?: emptyList(),
-                allSubjects = organization?.subjects ?: emptyList(),
+                allEmployee = employees,
                 onAddTeacher = onAddTeacher,
                 onSelected = onSelectTeacher,
             )
             LocationInfoField(
-                enabledAddOffice = editableSubject?.organizationId != null,
+                enabledAdd = editableSubject?.organizationId != null,
                 isLoading = isLoading,
                 location = editableSubject?.location,
                 office = editableSubject?.office,

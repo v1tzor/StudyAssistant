@@ -48,15 +48,9 @@ internal data class EmployeeUi(
 ) : Parcelable {
     fun fullName(): String {
         return buildString {
-            if (secondName != null) {
-                append(secondName)
-                append(" ")
-            }
             append(firstName)
-            if (patronymic != null) {
-                append(" ")
-                append(patronymic)
-            }
+            if (patronymic != null) append(" ", patronymic)
+            if (secondName != null) append(" ", secondName)
         }
     }
 }

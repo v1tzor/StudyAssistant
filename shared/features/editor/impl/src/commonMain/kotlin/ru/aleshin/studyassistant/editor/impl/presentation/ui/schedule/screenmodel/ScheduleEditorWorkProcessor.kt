@@ -66,7 +66,7 @@ internal interface ScheduleEditorWorkProcessor :
             val currentDateTime = dateManager.fetchCurrentInstant().dateTime()
             val weekTimeRange = currentDateTime.weekTimeRange()
 
-            scheduleInteractor.fetchScheduleByTimeRange(weekTimeRange, week).collectAndHandle(
+            scheduleInteractor.fetchScheduleByDateVersion(weekTimeRange, week).collectAndHandle(
                 onLeftAction = { emit(EffectResult(ScheduleEditorEffect.ShowError(it))) },
                 onRightAction = { baseWeekSchedule ->
                     val weekSchedule = baseWeekSchedule.mapToUi()

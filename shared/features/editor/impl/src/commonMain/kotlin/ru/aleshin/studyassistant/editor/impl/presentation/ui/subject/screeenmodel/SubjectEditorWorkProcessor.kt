@@ -16,19 +16,22 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel
 
+import architecture.screenmodel.work.ActionResult
 import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
 import functional.UID
+import functional.collectAndHandle
+import functional.firstHandleAndGet
+import functional.firstOrNullHandleAndGet
 import functional.handle
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.EmployeeInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.SubjectInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.convertToShort
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.EditSubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.convertToBase
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.convertToEditModel
@@ -44,36 +47,70 @@ internal interface SubjectEditorWorkProcessor :
 
     class Base(
         private val subjectInteractor: SubjectInteractor,
+        private val employeeInteractor: EmployeeInteractor,
         private val organizationInteractor: OrganizationInteractor,
     ) : SubjectEditorWorkProcessor {
 
         override suspend fun work(command: SubjectEditorWorkCommand) = when (command) {
-            is SubjectEditorWorkCommand.LoadEditModel -> loadEditModelWork(command.subjectId, command.organizationId)
-            is SubjectEditorWorkCommand.SaveEditModel -> saveEditModelWork(command.editableSubject)
-            is SubjectEditorWorkCommand.UpdateOffices -> updateOfficesWork(command.organization, command.offices)
-            is SubjectEditorWorkCommand.UpdateLocations -> updateLocationsWork(command.organization, command.locations)
+            is SubjectEditorWorkCommand.LoadEditModel -> loadEditModelWork(
+                subjectId = command.subjectId,
+                organizationId = command.organizationId,
+            )
+            is SubjectEditorWorkCommand.LoadEmployees -> loadEmployeesWork(
+                organizationId = command.organizationId
+            )
+            is SubjectEditorWorkCommand.UpdateOrganizationOffices -> updateOfficesWork(
+                organization = command.organization,
+                offices = command.offices,
+            )
+            is SubjectEditorWorkCommand.UpdateOrganizationLocations -> updateLocationsWork(
+                organization = command.organization,
+                locations = command.locations,
+            )
+            is SubjectEditorWorkCommand.SaveEditModel -> saveEditModelWork(
+                editableSubject = command.editableSubject,
+            )
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
         private fun loadEditModelWork(subjectId: UID?, organizationId: UID) = flow {
-            val organizationsFlow = organizationInteractor.fetchOrganizationById(organizationId)
-            val subjectFlow = subjectInteractor.fetchSubjectById(subjectId ?: "")
+            val subject = subjectInteractor.fetchSubjectById(subjectId ?: "").firstOrNullHandleAndGet(
+                onLeftAction = { emit(EffectResult(SubjectEditorEffect.ShowError(it))).let { null } },
+                onRightAction = { subject -> subject?.mapToUi() }
+            )
+            val organization = organizationInteractor.fetchShortOrganizationById(organizationId).firstHandleAndGet(
+                onLeftAction = { error(it) },
+                onRightAction = { organization -> organization.mapToUi() }
+            )
 
-            subjectFlow.flatMapLatestWithResult(
-                secondFlow = organizationsFlow,
-                onError = { SubjectEditorEffect.ShowError(it) },
-                onData = { subjectModel, organizationModel ->
-                    val organization = organizationModel.mapToUi()
-                    val subject = subjectModel?.mapToUi()
-                    val editModel = subject?.convertToEditModel() ?: EditSubjectUi.createEditModel(
-                        uid = subjectId,
-                        organizationId = organizationId,
-                    )
-                    SubjectEditorAction.SetupEditModel(editModel, organization)
+            val editModel = subject?.convertToEditModel() ?: EditSubjectUi.createEditModel(
+                uid = subjectId,
+                organizationId = organizationId,
+            )
+            emit(ActionResult(SubjectEditorAction.SetupEditModel(editModel, organization)))
+        }
+
+        private fun loadEmployeesWork(organizationId: UID) = flow {
+            employeeInteractor.fetchAllDetailsEmployee(organizationId).collectAndHandle(
+                onLeftAction = { emit(EffectResult(SubjectEditorEffect.ShowError(it))) },
+                onRightAction = { employeeList ->
+                    val employees = employeeList.map { it.mapToUi() }
+                    emit(ActionResult(SubjectEditorAction.UpdateEmployees(employees)))
                 },
-            ).collect { result ->
-                emit(result)
-            }
+            )
+        }
+
+        private fun updateOfficesWork(organization: OrganizationShortUi, offices: List<String>) = flow {
+            val updatedOrganization = organization.copy(offices = offices)
+            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain()).handle(
+                onLeftAction = { emit(EffectResult(SubjectEditorEffect.ShowError(it))) },
+            )
+        }
+
+        private fun updateLocationsWork(organization: OrganizationShortUi, locations: List<ContactInfoUi>) = flow {
+            val updatedOrganization = organization.copy(locations = locations)
+            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain()).handle(
+                onLeftAction = { emit(EffectResult(SubjectEditorEffect.ShowError(it))) },
+            )
         }
 
         private fun saveEditModelWork(editableSubject: EditSubjectUi) = flow {
@@ -83,29 +120,21 @@ internal interface SubjectEditorWorkProcessor :
                 onRightAction = { emit(EffectResult(SubjectEditorEffect.NavigateToBack)) },
             )
         }
-
-        private fun updateOfficesWork(organization: OrganizationUi, offices: List<String>) = flow {
-            val updatedOrganization = organization.convertToShort().copy(offices = offices)
-            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain()).handle(
-                onLeftAction = { emit(EffectResult(SubjectEditorEffect.ShowError(it))) },
-            )
-        }
-
-        private fun updateLocationsWork(organization: OrganizationUi, locations: List<ContactInfoUi>) = flow {
-            val updatedOrganization = organization.convertToShort().copy(locations = locations)
-            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain()).handle(
-                onLeftAction = { emit(EffectResult(SubjectEditorEffect.ShowError(it))) },
-            )
-        }
     }
 }
 
 internal sealed class SubjectEditorWorkCommand : WorkCommand {
     data class LoadEditModel(val subjectId: UID?, val organizationId: UID) : SubjectEditorWorkCommand()
+    data class LoadEmployees(val organizationId: UID) : SubjectEditorWorkCommand()
     data class SaveEditModel(val editableSubject: EditSubjectUi) : SubjectEditorWorkCommand()
-    data class UpdateOffices(val organization: OrganizationUi, val offices: List<String>) : SubjectEditorWorkCommand()
-    data class UpdateLocations(
-        val organization: OrganizationUi,
+
+    data class UpdateOrganizationOffices(
+        val organization: OrganizationShortUi,
+        val offices: List<String>
+    ) : SubjectEditorWorkCommand()
+
+    data class UpdateOrganizationLocations(
+        val organization: OrganizationShortUi,
         val locations: List<ContactInfoUi>
     ) : SubjectEditorWorkCommand()
 }

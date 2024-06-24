@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package entities.schedules
+package ru.aleshin.studyassistant.tasks.impl.domain.entities
 
-import entities.classes.Class
-import functional.UID
-import kotlinx.datetime.Instant
+import functional.DomainFailures
 
 /**
- * @author Stanislav Aleshin on 04.05.2024.
+ * @author Stanislav Aleshin on 21.04.2024.
  */
-data class CustomSchedule(
-    val uid: UID,
-    val date: Instant,
-    val classes: List<Class>,
-)
+internal sealed class TasksFailures : DomainFailures {
+    data class OtherError(val throwable: Throwable) : TasksFailures()
+}

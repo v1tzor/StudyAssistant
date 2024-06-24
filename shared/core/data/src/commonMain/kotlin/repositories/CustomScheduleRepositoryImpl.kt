@@ -18,7 +18,7 @@ package repositories
 
 import database.schedules.CustomScheduleLocalDataSource
 import entities.classes.Class
-import entities.schedules.CustomSchedule
+import entities.schedules.custom.CustomSchedule
 import functional.TimeRange
 import functional.UID
 import kotlinx.coroutines.flow.Flow

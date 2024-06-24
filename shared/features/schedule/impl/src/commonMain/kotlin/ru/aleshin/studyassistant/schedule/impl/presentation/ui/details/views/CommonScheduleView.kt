@@ -215,7 +215,13 @@ private fun CommonScheduleViewContent(
                             SmallInfoBadge(
                                 containerColor = StudyAssistantRes.colors.accents.redContainer,
                                 contentColor = StudyAssistantRes.colors.accents.red,
-                                content = { Text(text = ScheduleThemeRes.strings.testLabel) },
+                                content = {
+                                    Text(
+                                        text = ScheduleThemeRes.strings.testLabel,
+                                        overflow = TextOverflow.Ellipsis,
+                                        maxLines = 1,
+                                    )
+                                },
                             )
                         }
                     } else {

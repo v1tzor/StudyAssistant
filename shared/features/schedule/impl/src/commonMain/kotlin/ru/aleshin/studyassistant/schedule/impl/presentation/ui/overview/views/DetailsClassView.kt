@@ -17,11 +17,9 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,13 +42,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -68,12 +63,13 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.Contact
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
 import theme.StudyAssistantRes
 import views.PlaceholderBox
+import views.VerticalLeftTimeProgress
 
 /**
  * @author Stanislav Aleshin on 12.06.2024.
  */
 @Composable
-internal fun DetailsClassView(
+internal fun DetailsClassViewItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -83,7 +79,7 @@ internal fun DetailsClassView(
     subject: SubjectUi?,
     office: String,
     organization: OrganizationShortUi?,
-    employee: EmployeeUi?,
+    teacher: EmployeeUi?,
     location: ContactInfoUi?,
     headerBadge: @Composable (RowScope.() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -98,14 +94,14 @@ internal fun DetailsClassView(
             progress = progress,
             timeRange = timeRange,
         )
-        DetailsClassViewInfo(
+        DetailsClassView(
             modifier = Modifier.fillMaxWidth(),
             onClick = onClick,
             enabled = enabled,
             subject = subject,
             office = office,
             organization = organization,
-            teacher = employee,
+            teacher = teacher,
             location = location,
             headerBadge = headerBadge,
             interactionSource = interactionSource,
@@ -199,7 +195,7 @@ private fun DetailsClassTime(
             transitionSpec = { fadeIn().togetherWith(fadeOut()) },
         ) { active ->
             if (active) {
-                DetailsClassLeftTimeProgress(
+                VerticalLeftTimeProgress(
                     modifier = Modifier.fillMaxHeight(),
                     leftTimeProgress = progress,
                 )
@@ -225,58 +221,7 @@ private fun DetailsClassTime(
 }
 
 @Composable
-private fun DetailsClassLeftTimeProgress(
-    modifier: Modifier = Modifier,
-    leftTimeProgress: Progress,
-    passTrackColor: Color = MaterialTheme.colorScheme.primary,
-    remindTrackColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    thumbColor: Color = MaterialTheme.colorScheme.primary,
-) {
-    val animatedProgress by animateFloatAsState(targetValue = leftTimeProgress ?: -1f)
-    Canvas(modifier = modifier.width(16.dp)) {
-        val canvasWidth = size.width
-        val canvasHeight = size.height
-
-        if (animatedProgress != -1f) {
-            val verticalPadding = 4.dp.toPx()
-            val thumbHeight = 4.dp.toPx()
-            val passTrackHeight = (canvasHeight - thumbHeight - 2 * verticalPadding) * animatedProgress
-
-            drawLine(
-                color = passTrackColor,
-                start = Offset(x = canvasWidth / 2f, y = 0f),
-                end = Offset(x = canvasWidth / 2F, y = passTrackHeight),
-                strokeWidth = 3.dp.toPx(),
-                cap = StrokeCap.Round,
-            )
-            drawLine(
-                color = thumbColor,
-                start = Offset(x = 0f, y = passTrackHeight + verticalPadding),
-                end = Offset(x = canvasWidth, y = passTrackHeight + verticalPadding),
-                strokeWidth = thumbHeight,
-                cap = StrokeCap.Round
-            )
-            drawLine(
-                color = remindTrackColor,
-                start = Offset(x = canvasWidth / 2f, y = passTrackHeight + 2 * verticalPadding + thumbHeight),
-                end = Offset(x = canvasWidth / 2f, y = canvasHeight),
-                strokeWidth = 3.dp.toPx(),
-                cap = StrokeCap.Round
-            )
-        } else {
-            drawLine(
-                color = remindTrackColor,
-                start = Offset(x = canvasWidth / 2f, y = 0f),
-                end = Offset(x = canvasWidth / 2f, y = canvasHeight),
-                strokeWidth = 3.dp.toPx(),
-                cap = StrokeCap.Round
-            )
-        }
-    }
-}
-
-@Composable
-internal fun DetailsClassViewInfo(
+private fun DetailsClassView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -306,13 +251,13 @@ internal fun DetailsClassViewInfo(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    DetailsClassViewInfoHeader(subject = subject, headerBadge = headerBadge)
-                    DetailsClassViewInfoContent(subject = subject)
+                    DetailsClassViewHeader(subject = subject, headerBadge = headerBadge)
+                    DetailsClassViewContent(subject = subject)
                 }
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    DetailsClassViewInfoFooter(
+                    DetailsClassViewFooter(
                         office = office,
-                        teacher = teacher,
+                        teacher = teacher ?: subject?.teacher,
                         organization = organization,
                         location = location,
                     )
@@ -323,7 +268,7 @@ internal fun DetailsClassViewInfo(
 }
 
 @Composable
-private fun DetailsClassViewInfoHeader(
+private fun DetailsClassViewHeader(
     modifier: Modifier = Modifier,
     subject: SubjectUi?,
     headerBadge: @Composable (RowScope.() -> Unit)?,
@@ -345,7 +290,7 @@ private fun DetailsClassViewInfoHeader(
 }
 
 @Composable
-private fun DetailsClassViewInfoContent(
+private fun DetailsClassViewContent(
     modifier: Modifier = Modifier,
     subject: SubjectUi?,
 ) {
@@ -367,7 +312,7 @@ private fun DetailsClassViewInfoContent(
 }
 
 @Composable
-private fun DetailsClassViewInfoFooter(
+private fun DetailsClassViewFooter(
     modifier: Modifier = Modifier,
     office: String,
     teacher: EmployeeUi?,
@@ -383,19 +328,19 @@ private fun DetailsClassViewInfoFooter(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             if (teacher != null) {
-                DetailsClassViewInfoFooterItem(
+                DetailsClassViewFooterItem(
                     icon = painterResource(StudyAssistantRes.icons.employee),
                     text = teacher.officialName()
                 )
             }
             if (organization?.isMain == false) {
-                DetailsClassViewInfoFooterItem(
+                DetailsClassViewFooterItem(
                     icon = painterResource(StudyAssistantRes.icons.organization),
                     text = organization.shortName,
                 )
             }
             if (location != null) {
-                DetailsClassViewInfoFooterItem(
+                DetailsClassViewFooterItem(
                     icon = painterResource(StudyAssistantRes.icons.location),
                     text = location.label ?: location.value,
                 )
@@ -416,7 +361,7 @@ private fun DetailsClassViewInfoFooter(
 }
 
 @Composable
-private fun DetailsClassViewInfoFooterItem(
+private fun DetailsClassViewFooterItem(
     modifier: Modifier = Modifier,
     icon: Painter,
     text: String,

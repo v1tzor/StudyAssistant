@@ -17,7 +17,6 @@
 package entities.employee
 
 import entities.common.ContactInfo
-import entities.subject.Subject
 import functional.TimeRange
 import functional.UID
 

@@ -105,7 +105,10 @@ internal fun ClassTimeRangeChooserPlaceholder(
         color = MaterialTheme.colorScheme.surfaceContainer,
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(modifier = Modifier.size(18.dp))
+            CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                strokeWidth = 3.dp,
+            )
         }
     }
 }

@@ -56,25 +56,15 @@ internal class EmployeeEditorScreenModel(
         event: EmployeeEditorEvent,
     ) {
         when (event) {
-            is EmployeeEditorEvent.Init -> launchBackgroundWork(BackgroundKey.LOAD_EMPLOYEE) {
-                val command = EmployeeEditorWorkCommand.LoadEditModel(event.employeeId, event.organizationId)
-                workProcessor.work(command).collectAndHandleWork()
-            }
-            is EmployeeEditorEvent.SelectPost -> with(state()) {
-                val updatedEmployee = editableEmployee?.copy(post = event.post)
-                sendAction(EmployeeEditorAction.UpdateEditModel(updatedEmployee))
+            is EmployeeEditorEvent.Init -> {
+                launchBackgroundWork(BackgroundKey.LOAD_EMPLOYEE) {
+                    val command = EmployeeEditorWorkCommand.LoadEditModel(event.employeeId, event.organizationId)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is EmployeeEditorEvent.UpdateAvatar -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(avatar = event.avatarUrl)
                 sendAction(EmployeeEditorAction.UpdateEditModel(updatedEmployee))
-            }
-            is EmployeeEditorEvent.SaveEmployee -> with(state()) {
-                launchBackgroundWork(BackgroundKey.SAVE_EMPLOYEE) {
-                    if (editableEmployee != null) {
-                        val command = EmployeeEditorWorkCommand.SaveEditModel(editableEmployee)
-                        workProcessor.work(command).collectAndHandleWork()
-                    }
-                }
             }
             is EmployeeEditorEvent.UpdateName -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(
@@ -84,14 +74,18 @@ internal class EmployeeEditorScreenModel(
                 )
                 sendAction(EmployeeEditorAction.UpdateEditModel(updatedEmployee))
             }
-            is EmployeeEditorEvent.SelectWorkTime -> with(state()) {
+            is EmployeeEditorEvent.UpdatePost -> with(state()) {
+                val updatedEmployee = editableEmployee?.copy(post = event.post)
+                sendAction(EmployeeEditorAction.UpdateEditModel(updatedEmployee))
+            }
+            is EmployeeEditorEvent.UpdateWorkTime -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(
                     workTimeStart = event.start,
                     workTimeEnd = event.end,
                 )
                 sendAction(EmployeeEditorAction.UpdateEditModel(updatedEmployee))
             }
-            is EmployeeEditorEvent.SelectBirthday -> with(state()) {
+            is EmployeeEditorEvent.UpdateBirthday -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(birthday = event.date)
                 sendAction(EmployeeEditorAction.UpdateEditModel(updatedEmployee))
             }
@@ -111,6 +105,13 @@ internal class EmployeeEditorScreenModel(
                 val updatedEmployee = editableEmployee?.copy(locations = event.locations)
                 sendAction(EmployeeEditorAction.UpdateEditModel(updatedEmployee))
             }
+            is EmployeeEditorEvent.SaveEmployee -> with(state()) {
+                launchBackgroundWork(BackgroundKey.SAVE_EMPLOYEE) {
+                    val employee = checkNotNull(editableEmployee)
+                    val command = EmployeeEditorWorkCommand.SaveEditModel(employee)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
             is EmployeeEditorEvent.NavigateToBack -> {
                 sendEffect(EmployeeEditorEffect.NavigateToBack)
             }
@@ -122,15 +123,15 @@ internal class EmployeeEditorScreenModel(
         currentState: EmployeeEditorViewState,
     ) = when (action) {
         is EmployeeEditorAction.SetupEditModel -> currentState.copy(
-            editableEmployee = action.editableEmployee,
+            editableEmployee = action.editModel,
             organization = action.organization,
             isLoading = false,
         )
+        is EmployeeEditorAction.UpdateEditModel -> currentState.copy(
+            editableEmployee = action.editModel,
+        )
         is EmployeeEditorAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
-        )
-        is EmployeeEditorAction.UpdateEditModel -> currentState.copy(
-            editableEmployee = action.editableEmployee,
         )
     }
 

@@ -46,6 +46,7 @@ interface OrganizationsLocalDataSource {
 
     suspend fun addOrUpdateOrganization(organization: OrganizationDetailsData): UID
     suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationDetailsData?>
+    suspend fun fetchShortOrganizationById(uid: UID): Flow<OrganizationShortData?>
     suspend fun fetchAllOrganization(): Flow<List<OrganizationDetailsData>>
     suspend fun fetchAllShortOrganization(): Flow<List<OrganizationShortData>>
 
@@ -90,6 +91,20 @@ interface OrganizationsLocalDataSource {
                     subjects = subjectList,
                 )
             }
+        }
+
+        override suspend fun fetchShortOrganizationById(uid: UID): Flow<OrganizationShortData?> {
+            val query = organizationQueries.fetchOrganizationById(
+                uid = uid,
+                mapper = { id, isMain, name, _, type, avatar, timeIntervalsModel, _, _, locationList, _, offices, _ ->
+                    val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsData>(timeIntervalsModel)
+                    val locations = locationList.map { Json.decodeFromString<ContactInfoData>(it) }
+                    OrganizationShortData(id, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
+                },
+            )
+            val organization = query.asFlow().mapToOneOrNull(coroutineContext)
+
+            return organization
         }
 
         override suspend fun fetchAllOrganization(): Flow<List<OrganizationDetailsData>> {

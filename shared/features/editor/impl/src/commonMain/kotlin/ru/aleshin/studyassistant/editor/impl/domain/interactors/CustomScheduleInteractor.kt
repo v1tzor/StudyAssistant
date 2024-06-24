@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import entities.schedules.CustomSchedule
+import entities.schedules.custom.CustomSchedule
 import functional.FlowDomainResult
 import functional.UID
 import repositories.CustomScheduleRepository

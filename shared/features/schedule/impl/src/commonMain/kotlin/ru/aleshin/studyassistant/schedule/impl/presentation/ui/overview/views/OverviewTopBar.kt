@@ -24,9 +24,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import theme.StudyAssistantRes
 import views.TopAppBarButton
 import views.TopAppBarEmptyButton
 import views.TopAppBarTitle
@@ -35,7 +35,7 @@ import views.TopAppBarTitle
  * @author Stanislav Aleshin on 09.06.2024.
  */
 @Composable
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 internal fun OverviewTopBar(
     modifier: Modifier = Modifier,
     onEditClick: () -> Unit,
@@ -63,7 +63,7 @@ internal fun OverviewTopBar(
         actions = {
             Row {
                 TopAppBarButton(
-                    imagePainter = painterResource(ScheduleThemeRes.icons.currentDayOrWeek),
+                    imagePainter = painterResource(StudyAssistantRes.icons.calendarToday),
                     imageDescription = null,
                     onButtonClick = onCurrentDay,
                 )

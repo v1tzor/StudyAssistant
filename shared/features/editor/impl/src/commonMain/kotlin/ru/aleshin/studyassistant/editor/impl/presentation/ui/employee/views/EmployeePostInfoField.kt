@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import entities.employee.EmployeePost
 import mappers.mapToString
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import theme.StudyAssistantRes
@@ -42,17 +41,16 @@ import views.dialog.SelectorDialogNotSelectedItemView
  * @author Stanislav Aleshin on 05.06.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun EmployeePostInfoField(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     post: EmployeePost?,
     onSelected: (EmployeePost?) -> Unit,
 ) {
-    var isOpenEmployeePostSelector by remember { mutableStateOf(false) }
+    var employeePostSelectorState by remember { mutableStateOf(false) }
 
     ClickableInfoTextField(
-        onClick = { isOpenEmployeePostSelector = true },
+        onClick = { employeePostSelectorState = true },
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
         value = post?.mapToString(StudyAssistantRes.strings),
@@ -61,19 +59,19 @@ internal fun EmployeePostInfoField(
         infoIcon = painterResource(EditorThemeRes.icons.employeePost),
         trailingIcon = {
             ExpandedIcon(
-                isExpanded = isOpenEmployeePostSelector,
+                isExpanded = employeePostSelectorState,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
     )
 
-    if (isOpenEmployeePostSelector) {
+    if (employeePostSelectorState) {
         EmployeePostSelectorDialog(
             selected = post,
-            onDismiss = { isOpenEmployeePostSelector = false },
+            onDismiss = { employeePostSelectorState = false },
             onConfirm = { selectedEventType ->
                 onSelected(selectedEventType)
-                isOpenEmployeePostSelector = false
+                employeePostSelectorState = false
             },
         )
     }

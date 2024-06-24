@@ -20,11 +20,13 @@ import architecture.screenmodel.work.ActionResult
 import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
+import entities.tasks.convertToBase
 import extensions.dateTimeByWeek
 import extensions.setHoursAndMinutes
 import functional.Constants.Delay.UPDATE_ACTIVE_CLASS
 import functional.TimeRange
 import functional.collectAndHandle
+import functional.handle
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.emitAll
@@ -34,9 +36,12 @@ import kotlinx.coroutines.isActive
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import managers.DateManager
+import ru.aleshin.studyassistant.schedule.impl.domain.interactors.HomeworkInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleInteractor
+import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.WeekScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsAction
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
@@ -49,11 +54,13 @@ internal interface DetailsWorkProcessor :
 
     class Base(
         private val scheduleInteractor: ScheduleInteractor,
+        private val homeworkInteractor: HomeworkInteractor,
         private val dateManager: DateManager,
     ) : DetailsWorkProcessor {
 
         override suspend fun work(command: DetailsWorkCommand) = when (command) {
             is DetailsWorkCommand.LoadWeekSchedule -> loadWeekScheduleWork(command.week)
+            is DetailsWorkCommand.UpdateIsHomeworkDone -> updateIsHomeworkDoneWork(command.homework, command.isDone)
         }
 
         private fun loadWeekScheduleWork(week: TimeRange) = flow {
@@ -67,6 +74,13 @@ internal interface DetailsWorkProcessor :
             )
         }.onStart {
             emit(ActionResult(DetailsAction.UpdateLoading(true)))
+        }
+
+        private fun updateIsHomeworkDoneWork(homework: HomeworkDetailsUi, isDone: Boolean) = flow {
+            val updatedHomework = homework.copy(isDone = isDone).mapToDomain().convertToBase()
+            homeworkInteractor.updateHomework(updatedHomework).handle(
+                onLeftAction = { emit(EffectResult(DetailsEffect.ShowError(it))) },
+            )
         }
 
         private fun cycleUpdateActiveClass(schedule: WeekScheduleDetailsUi) = flow {
@@ -109,4 +123,5 @@ internal interface DetailsWorkProcessor :
 
 internal sealed class DetailsWorkCommand : WorkCommand {
     data class LoadWeekSchedule(val week: TimeRange) : DetailsWorkCommand()
+    data class UpdateIsHomeworkDone(val homework: HomeworkDetailsUi, val isDone: Boolean) : DetailsWorkCommand()
 }

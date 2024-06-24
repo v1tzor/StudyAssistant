@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package entities.schedules
+package entities.schedules.base
 
 import entities.classes.Class
 import entities.common.DayOfNumberedWeek
 import entities.common.NumberOfRepeatWeek
+import entities.schedules.DateVersion
 import extensions.randomUUID
 import functional.UID
 import kotlinx.datetime.DayOfWeek

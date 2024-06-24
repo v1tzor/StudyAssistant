@@ -19,8 +19,11 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import studyassistant.shared.core.ui.generated.resources.Res
 import studyassistant.shared.core.ui.generated.resources.ic_additional_organization
+import studyassistant.shared.core.ui.generated.resources.ic_alert_circle
 import studyassistant.shared.core.ui.generated.resources.ic_alert_circle_outline
 import studyassistant.shared.core.ui.generated.resources.ic_birthday
+import studyassistant.shared.core.ui.generated.resources.ic_book_study
+import studyassistant.shared.core.ui.generated.resources.ic_calendar_today
 import studyassistant.shared.core.ui.generated.resources.ic_church
 import studyassistant.shared.core.ui.generated.resources.ic_class
 import studyassistant.shared.core.ui.generated.resources.ic_classes_column
@@ -37,6 +40,8 @@ import studyassistant.shared.core.ui.generated.resources.ic_organization_geo
 import studyassistant.shared.core.ui.generated.resources.ic_organization_geo_outline
 import studyassistant.shared.core.ui.generated.resources.ic_phone
 import studyassistant.shared.core.ui.generated.resources.ic_practice
+import studyassistant.shared.core.ui.generated.resources.ic_presentation
+import studyassistant.shared.core.ui.generated.resources.ic_priority_high
 import studyassistant.shared.core.ui.generated.resources.ic_profile
 import studyassistant.shared.core.ui.generated.resources.ic_profile_outline
 import studyassistant.shared.core.ui.generated.resources.ic_select_date
@@ -86,7 +91,8 @@ data class StudyAssistantIcons(
     val webinar: DrawableResource,
     val employee: DrawableResource,
     val homeworks: DrawableResource,
-    val tests: DrawableResource,
+    val testsOutline: DrawableResource,
+    val test: DrawableResource,
     val classesList: DrawableResource,
     val movements: DrawableResource,
     val tasksOutline: DrawableResource,
@@ -94,6 +100,11 @@ data class StudyAssistantIcons(
     val university: DrawableResource,
     val additionalEducation: DrawableResource,
     val sortedType: DrawableResource,
+    val theoreticalTasks: DrawableResource,
+    val practicalTasks: DrawableResource,
+    val presentationTasks: DrawableResource,
+    val calendarToday: DrawableResource,
+    val priorityHigh: DrawableResource,
 ) {
     companion object {
         val BASE = StudyAssistantIcons(
@@ -126,7 +137,8 @@ data class StudyAssistantIcons(
             webinar = Res.drawable.ic_webinar,
             employee = Res.drawable.ic_employee,
             homeworks = Res.drawable.ic_tasks_circular,
-            tests = Res.drawable.ic_alert_circle_outline,
+            testsOutline = Res.drawable.ic_alert_circle_outline,
+            test = Res.drawable.ic_alert_circle,
             classesList = Res.drawable.ic_classes_column,
             movements = Res.drawable.ic_movements,
             tasksOutline = Res.drawable.ic_tasks_outline,
@@ -134,6 +146,11 @@ data class StudyAssistantIcons(
             university = Res.drawable.ic_university,
             additionalEducation = Res.drawable.ic_additional_organization,
             sortedType = Res.drawable.ic_sorted_type,
+            theoreticalTasks = Res.drawable.ic_book_study,
+            practicalTasks = Res.drawable.ic_tasks_circular,
+            presentationTasks = Res.drawable.ic_presentation,
+            calendarToday = Res.drawable.ic_calendar_today,
+            priorityHigh = Res.drawable.ic_priority_high,
         )
     }
 }

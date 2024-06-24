@@ -18,9 +18,7 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.theme.tokens
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.features.schedule.impl.generated.resources.Res
-import studyassistant.shared.features.schedule.impl.generated.resources.ic_calendar_today
 import studyassistant.shared.features.schedule.impl.generated.resources.ic_format_columns
 import studyassistant.shared.features.schedule.impl.generated.resources.ic_format_grid
 import studyassistant.shared.features.schedule.impl.generated.resources.ic_list_edit
@@ -33,12 +31,10 @@ import studyassistant.shared.features.schedule.impl.generated.resources.il_free_
 /**
  * @author Stanislav Aleshin on 21.06.2023.
  */
-@OptIn(ExperimentalResourceApi::class)
 internal data class ScheduleIcons(
     val emptyClassesIllustration: DrawableResource,
     val openTable: DrawableResource,
     val openOverview: DrawableResource,
-    val currentDayOrWeek: DrawableResource,
     val editList: DrawableResource,
     val editTable: DrawableResource,
     val formatGrid: DrawableResource,
@@ -49,7 +45,6 @@ internal data class ScheduleIcons(
             emptyClassesIllustration = Res.drawable.il_free_time,
             openTable = Res.drawable.ic_open_table,
             openOverview = Res.drawable.ic_view_dashboard,
-            currentDayOrWeek = Res.drawable.ic_calendar_today,
             editList = Res.drawable.ic_list_edit,
             editTable = Res.drawable.ic_table_edit,
             formatColumns = Res.drawable.ic_format_columns,
@@ -59,7 +54,6 @@ internal data class ScheduleIcons(
             emptyClassesIllustration = Res.drawable.il_free_time_dark,
             openTable = Res.drawable.ic_open_table,
             openOverview = Res.drawable.ic_view_dashboard,
-            currentDayOrWeek = Res.drawable.ic_calendar_today,
             editList = Res.drawable.ic_list_edit,
             editTable = Res.drawable.ic_table_edit,
             formatColumns = Res.drawable.ic_format_columns,

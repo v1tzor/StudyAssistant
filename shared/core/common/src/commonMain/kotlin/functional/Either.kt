@@ -51,7 +51,7 @@ sealed class Either<out L, out R> {
     )
 }
 
-fun <L, R> Either<L, R>.rightOrElse(
+inline fun <L, R> Either<L, R>.rightOrElse(
     elseValue: R
 ): R = when (this) {
     is Either.Left -> elseValue
@@ -72,7 +72,7 @@ suspend fun <L, R> Flow<Either<L, R>>.firstRightOrNull(
     is Either.Right -> firstValue.data
 }
 
-fun <L, R> Either<L, R>.leftOrElse(
+inline fun <L, R> Either<L, R>.leftOrElse(
     elseValue: L
 ): L = when (this) {
     is Either.Left -> this.data
@@ -102,7 +102,7 @@ suspend fun <L, R, T> Either<L, R>.handleAndGet(
     is Either.Right -> onRightAction.invoke(this.data)
 }
 
-suspend fun <L, R, T> Flow<Either<L, R>>.firstHandleAndGetOrNull(
+suspend inline fun <L, R, T> Flow<Either<L, R>>.firstOrNullHandleAndGet(
     onLeftAction: suspend (L) -> T,
     onRightAction: suspend (R) -> T,
 ): T? = when (val firstValue = firstOrNull()) {

@@ -23,8 +23,10 @@ import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import extensions.mapEpochTimeToInstant
+import extensions.startThisDay
 import managers.CoroutineManager
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
 import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
 import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleScreenProvider
@@ -85,6 +87,38 @@ internal class OverviewScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+            is OverviewEvent.CompleteHomework -> {
+                launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
+                    val command = OverviewWorkCommand.UpdateIsHomeworkDone(event.homework, isDone = true)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.CancelCompleteHomework -> {
+                launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
+                    val command = OverviewWorkCommand.UpdateIsHomeworkDone(event.homework, isDone = false)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.EditHomeworkInEditor -> with(event) {
+                val featureScreen = EditorScreen.Homework(
+                    homeworkId = homework.uid,
+                    date = homework.date.toEpochMilliseconds(),
+                    subjectId = homework.subject?.uid,
+                    organizationId = homework.organization.uid,
+                )
+                val screen = screenProvider.provideEditorScreen(featureScreen)
+                sendEffect(OverviewEffect.NavigateToGlobal(screen))
+            }
+            is OverviewEvent.AddHomeworkInEditor -> with(event) {
+                val featureScreen = EditorScreen.Homework(
+                    homeworkId = null,
+                    date = date.startThisDay().toEpochMilliseconds(),
+                    subjectId = classModel.subject?.uid,
+                    organizationId = classModel.organization.uid,
+                )
+                val screen = screenProvider.provideEditorScreen(featureScreen)
+                sendEffect(OverviewEffect.NavigateToGlobal(screen))
+            }
             is OverviewEvent.NavigateToDetails -> {
                 val screen = screenProvider.provideFeatureScreen(ScheduleScreen.Details)
                 sendEffect(OverviewEffect.NavigateToLocal(screen))
@@ -119,7 +153,7 @@ internal class OverviewScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_ANALYSIS, LOAD_SCHEDULE,
+        LOAD_ANALYSIS, LOAD_SCHEDULE, HOMEWORK_ACTION,
     }
 }
 

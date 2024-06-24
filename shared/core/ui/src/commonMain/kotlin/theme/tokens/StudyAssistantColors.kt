@@ -28,12 +28,20 @@ import theme.material.greenDark
 import theme.material.greenLight
 import theme.material.onGreenContainerDark
 import theme.material.onGreenContainerLight
+import theme.material.onGreenDark
+import theme.material.onGreenLight
 import theme.material.onOrangeContainerDark
 import theme.material.onOrangeContainerLight
+import theme.material.onOrangeDark
+import theme.material.onOrangeLight
 import theme.material.onRedContainerDark
 import theme.material.onRedContainerLight
+import theme.material.onRedDark
+import theme.material.onRedLight
 import theme.material.onYellowContainerDark
 import theme.material.onYellowContainerLight
+import theme.material.onYellowDark
+import theme.material.onYellowLight
 import theme.material.orangeContainerDark
 import theme.material.orangeContainerLight
 import theme.material.orangeDark
@@ -58,71 +66,91 @@ data class StudyAssistantColors(
 data class ColorAccents(
     val red: Color,
     val redContainer: Color,
+    val onRed: Color,
     val onRedContainer: Color,
     val orange: Color,
     val orangeContainer: Color,
+    val onOrange: Color,
     val onOrangeContainer: Color,
     val yellow: Color,
     val yellowContainer: Color,
+    val onYellow: Color,
     val onYellowContainer: Color,
     val green: Color,
     val greenContainer: Color,
+    val onGreen: Color,
     val onGreenContainer: Color,
 )
 
 fun lightColorAccents(
     red: Color = redLight,
     redContainer: Color = redContainerLight,
+    onRed: Color = onRedLight,
     onRedContainer: Color = onRedContainerLight,
     orange: Color = orangeLight,
     orangeContainer: Color = orangeContainerLight,
+    onOrange: Color = onOrangeLight,
     onOrangeContainer: Color = onOrangeContainerLight,
     yellow: Color = yellowLight,
     yellowContainer: Color = yellowContainerLight,
+    onYellow: Color = onYellowLight,
     onYellowContainer: Color = onYellowContainerLight,
     green: Color = greenLight,
     greenContainer: Color = greenContainerLight,
+    onGreen: Color = onGreenLight,
     onGreenContainer: Color = onGreenContainerLight,
 ) = ColorAccents(
     red = red,
     redContainer = redContainer,
+    onRed = onRed,
     onRedContainer = onRedContainer,
     orange = orange,
     orangeContainer = orangeContainer,
+    onOrange = onOrange,
     onOrangeContainer = onOrangeContainer,
     yellow = yellow,
     yellowContainer = yellowContainer,
+    onYellow = onYellow,
     onYellowContainer = onYellowContainer,
     green = green,
     greenContainer = greenContainer,
+    onGreen = onGreen,
     onGreenContainer = onGreenContainer,
 )
 
 fun darkColorAccents(
     red: Color = redDark,
     redContainer: Color = redContainerDark,
+    onRed: Color = onRedDark,
     onRedContainer: Color = onRedContainerDark,
     orange: Color = orangeDark,
     orangeContainer: Color = orangeContainerDark,
+    onOrange: Color = onOrangeDark,
     onOrangeContainer: Color = onOrangeContainerDark,
     yellow: Color = yellowDark,
     yellowContainer: Color = yellowContainerDark,
+    onYellow: Color = onYellowDark,
     onYellowContainer: Color = onYellowContainerDark,
     green: Color = greenDark,
     greenContainer: Color = greenContainerDark,
+    onGreen: Color = onGreenDark,
     onGreenContainer: Color = onGreenContainerDark,
 ) = ColorAccents(
     red = red,
     redContainer = redContainer,
+    onRed = onRed,
     onRedContainer = onRedContainer,
     orange = orange,
     orangeContainer = orangeContainer,
+    onOrange = onOrange,
     onOrangeContainer = onOrangeContainer,
     yellow = yellow,
     yellowContainer = yellowContainer,
+    onYellow = onYellow,
     onYellowContainer = onYellowContainer,
     green = green,
     greenContainer = greenContainer,
+    onGreen = onGreen,
     onGreenContainer = onGreenContainer,
 )
 
@@ -148,6 +176,10 @@ enum class CustomColors(val dark: Long, val light: Long) {
 @Composable
 fun ColorAccents.contentColorFor(backgroundColor: Color): Color =
     when (backgroundColor) {
+        red -> onRed
+        orange -> onRed
+        yellow -> onYellow
+        green -> onGreen
         redContainer -> onRedContainer
         orangeContainer -> onOrangeContainer
         yellowContainer -> onYellowContainer

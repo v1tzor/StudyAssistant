@@ -40,10 +40,11 @@ fun HomeworkDetailsData.mapToDomain() = Homework(
     organization = organization.mapToDomain(),
     theoreticalTasks = theoreticalTasks,
     practicalTasks = practicalTasks,
-    presentations = presentations,
+    presentationsTasks = presentations,
     test = test,
     priority = TaskPriority.valueOf(priority),
     isDone = isDone,
+    completeDate = completeDate?.mapEpochTimeToInstant(),
 )
 
 fun Homework.mapToData() = HomeworkDetailsData(
@@ -54,10 +55,11 @@ fun Homework.mapToData() = HomeworkDetailsData(
     organization = organization.mapToData(),
     theoreticalTasks = theoreticalTasks,
     practicalTasks = practicalTasks,
-    presentations = presentations,
+    presentations = presentationsTasks,
     test = test,
     priority = priority.name,
     isDone = isDone,
+    completeDate = completeDate?.toEpochMilliseconds(),
 )
 
 fun HomeworkDetailsData.mapToLocalData() = HomeworkEntity(
@@ -72,6 +74,7 @@ fun HomeworkDetailsData.mapToLocalData() = HomeworkEntity(
     test = test,
     priority = priority,
     is_done = if (isDone) 1L else 0L,
+    complete_date = completeDate,
 )
 
 fun HomeworkEntity.mapToDetailsData(
@@ -89,6 +92,7 @@ fun HomeworkEntity.mapToDetailsData(
     test = test,
     priority = priority,
     isDone = is_done == 1L,
+    completeDate = complete_date,
 )
 
 fun HomeworkDetailsData.mapToRemoteData() = HomeworkPojo(
@@ -103,6 +107,7 @@ fun HomeworkDetailsData.mapToRemoteData() = HomeworkPojo(
     test = test,
     priority = priority,
     done = isDone,
+    completeDate = completeDate,
 )
 
 fun HomeworkPojo.mapToDetailsData(
@@ -120,4 +125,5 @@ fun HomeworkPojo.mapToDetailsData(
     test = test,
     priority = priority,
     isDone = done,
+    completeDate = completeDate,
 )

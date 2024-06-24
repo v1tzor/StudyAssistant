@@ -24,6 +24,7 @@ import extensions.endThisDay
 import extensions.shiftDay
 import extensions.startThisDay
 import functional.Constants.Date.MAX_DAYS_SHIFT
+import functional.TimeRange
 import kotlinx.datetime.DayOfWeek.MONDAY
 import kotlinx.datetime.Instant
 import platform.InstantParceler
@@ -36,6 +37,9 @@ data class DateVersion(
     @TypeParceler<Instant, InstantParceler> val from: Instant,
     @TypeParceler<Instant, InstantParceler> val to: Instant,
 ) : Parcelable {
+
+    fun containsDate(instant: Instant) = instant in from..to
+
     fun makeDeprecated(currentDate: Instant): DateVersion {
         return copy(to = currentDate.dateOfWeekDay(MONDAY).shiftDay(-1).endThisDay())
     }
@@ -47,3 +51,7 @@ data class DateVersion(
         )
     }
 }
+
+fun TimeRange.toDateVersion() = DateVersion(from, to)
+
+fun DateVersion.toTimeRange() = TimeRange(from, to)

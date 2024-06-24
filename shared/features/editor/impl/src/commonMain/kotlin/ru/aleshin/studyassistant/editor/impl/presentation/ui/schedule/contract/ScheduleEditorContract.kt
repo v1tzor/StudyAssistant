@@ -49,10 +49,10 @@ internal sealed class ScheduleEditorEvent : BaseEvent {
     data object Refresh : ScheduleEditorEvent()
     data class ChangeWeek(val numberOfWeek: NumberOfRepeatWeek) : ScheduleEditorEvent()
     data class UpdateOrganization(val organization: OrganizationShortUi) : ScheduleEditorEvent()
-    data class CreateClass(val weekDay: DayOfNumberedWeekUi, val schedule: BaseScheduleUi?) : ScheduleEditorEvent()
-    data class EditClass(val editClass: ClassUi, val weekDay: DayOfNumberedWeekUi) : ScheduleEditorEvent()
+    data class EditClassInEditor(val editClass: ClassUi, val weekDay: DayOfNumberedWeekUi) : ScheduleEditorEvent()
+    data class CreateClassInEditor(val weekDay: DayOfNumberedWeekUi, val schedule: BaseScheduleUi?) : ScheduleEditorEvent()
     data class DeleteClass(val uid: UID, val schedule: BaseScheduleUi) : ScheduleEditorEvent()
-    data object SaveSchedule : ScheduleEditorEvent()
+    data object NavigateToBack : ScheduleEditorEvent()
 }
 
 internal sealed class ScheduleEditorEffect : BaseUiEffect {
@@ -62,14 +62,17 @@ internal sealed class ScheduleEditorEffect : BaseUiEffect {
 }
 
 internal sealed class ScheduleEditorAction : BaseAction {
-    data class UpdateLoading(val isLoading: Boolean) : ScheduleEditorAction()
-    data class UpdateSelectedWeek(val week: NumberOfRepeatWeek) : ScheduleEditorAction()
     data class UpdateScheduleData(
         val week: NumberOfRepeatWeek,
         val schedule: BaseWeekScheduleUi
     ) : ScheduleEditorAction()
+
     data class UpdateOrganizationData(
         val organizations: List<OrganizationShortUi>,
         val settings: CalendarSettingsUi?,
     ) : ScheduleEditorAction()
+
+    data class UpdateSelectedWeek(val week: NumberOfRepeatWeek) : ScheduleEditorAction()
+
+    data class UpdateLoading(val isLoading: Boolean) : ScheduleEditorAction()
 }

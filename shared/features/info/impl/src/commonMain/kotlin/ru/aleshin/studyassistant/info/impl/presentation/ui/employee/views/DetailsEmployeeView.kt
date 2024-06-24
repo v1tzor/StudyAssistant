@@ -79,7 +79,6 @@ internal fun DetailsEmployeeViewItem(
                     onDelete()
                     true
                 }
-
                 SwipeToDismissBoxValue.StartToEnd -> false
                 SwipeToDismissBoxValue.Settled -> false
             }

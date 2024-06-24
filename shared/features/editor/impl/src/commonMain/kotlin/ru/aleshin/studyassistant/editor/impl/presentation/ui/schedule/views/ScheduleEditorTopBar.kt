@@ -16,38 +16,28 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views
 
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import views.TopAppBarEmptyButton
-import views.TopAppBarTitle
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ScheduleEditorTopBar(
     modifier: Modifier = Modifier,
 ) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         modifier = modifier,
-        title = {
-            TopAppBarTitle(
-                header = EditorThemeRes.strings.scheduleEditorHeader,
-                textAlign = TextAlign.Center,
-            )
-        },
-        navigationIcon = {
-            TopAppBarEmptyButton()
-        },
-        actions = {
-            TopAppBarEmptyButton()
-        },
-        backgroundColor = MaterialTheme.colorScheme.background,
-        elevation = 0.dp,
+        title = { Text(text = EditorThemeRes.strings.scheduleEditorHeader) },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+        ),
     )
 }

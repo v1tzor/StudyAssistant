@@ -37,4 +37,5 @@ data class HomeworkDetailsData(
     val test: String? = null,
     val priority: String,
     val isDone: Boolean = false,
+    val completeDate: Long? = null,
 )

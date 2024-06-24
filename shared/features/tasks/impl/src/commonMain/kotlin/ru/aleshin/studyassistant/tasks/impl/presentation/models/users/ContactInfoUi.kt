@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.impl.domain.entities
+package ru.aleshin.studyassistant.tasks.impl.presentation.models.users
 
-import entities.common.NumberOfRepeatWeek
-import entities.schedules.BaseSchedule
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.Instant
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 
 /**
- * @author Stanislav Aleshin on 30.05.2024.
+ * @author Stanislav Aleshin on 27.04.2024.
  */
-internal data class BaseWeekSchedule(
-    val from: Instant,
-    val to: Instant,
-    val numberOfWeek: NumberOfRepeatWeek,
-    val weekDaySchedules: Map<DayOfWeek, BaseSchedule?>,
-)
+@Parcelize
+data class ContactInfoUi(
+    val label: String? = null,
+    val value: String = "",
+) : Parcelable

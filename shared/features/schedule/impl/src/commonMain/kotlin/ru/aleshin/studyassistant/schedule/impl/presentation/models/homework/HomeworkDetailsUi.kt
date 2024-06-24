@@ -23,6 +23,7 @@ import entities.tasks.TaskPriority
 import functional.UID
 import kotlinx.datetime.Instant
 import platform.InstantParceler
+import platform.NullInstantParceler
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
 
@@ -30,11 +31,13 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.Subj
  * @author Stanislav Aleshin on 09.06.2024.
  */
 @Parcelize
-internal data class HomeworkUi(
+internal data class HomeworkDetailsUi(
     val uid: UID,
     val classId: UID? = null,
     @TypeParceler<Instant, InstantParceler>
     val date: Instant,
+    @TypeParceler<Instant?, NullInstantParceler>
+    val deadline: Instant?,
     val subject: SubjectUi? = null,
     val organization: OrganizationShortUi,
     val theoreticalTasks: String = "",
@@ -43,4 +46,6 @@ internal data class HomeworkUi(
     val test: String? = null,
     val priority: TaskPriority = TaskPriority.STANDARD,
     val isDone: Boolean = false,
+    @TypeParceler<Instant?, NullInstantParceler>
+    val completeDate: Instant?,
 ) : Parcelable

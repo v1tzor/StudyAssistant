@@ -27,6 +27,8 @@ import ru.aleshin.studyassistant.editor.impl.domain.interactors.CalendarSettings
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.CustomClassInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.CustomScheduleInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.EmployeeInteractor
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.HomeworkInteractor
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.LinkingClassInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.SubjectInteractor
 
@@ -41,8 +43,10 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<CustomScheduleInteractor> { CustomScheduleInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<BaseClassInteractor> { BaseClassInteractor.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<CustomClassInteractor> { CustomClassInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<EmployeeInteractor> { EmployeeInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<EmployeeInteractor> { EmployeeInteractor.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<SubjectInteractor> { SubjectInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<HomeworkInteractor> { HomeworkInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<LinkingClassInteractor> { LinkingClassInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance(), instance()) }
 }

@@ -34,5 +34,5 @@ internal data class BaseWeekScheduleUi(
     @TypeParceler<Instant, InstantParceler>
     val to: Instant,
     val numberOfWeek: NumberOfRepeatWeek,
-    val weekDaySchedules: Map<DayOfWeek, BaseScheduleUi?>,
+    val weekDaySchedules: Map<DayOfWeek, BaseScheduleUi>,
 ) : Parcelable

@@ -53,6 +53,8 @@ object Constants {
         const val SUBJECT_TEXT_LENGTH = 56
         const val DEFAULT_MAX_TEXT_LENGTH = 32
         const val USERNAME_LENGTH = 30
+        const val TASK_MAX_LENGTH = 120
+        const val TEST_TOPIC_MAX_LENGTH = 70
         const val MIN_PASSWORD_LENGTH = 6
         const val MIN_EMAIL_LENGTH = 5
     }

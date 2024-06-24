@@ -26,6 +26,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import entities.common.NumberOfRepeatWeek
 import extensions.dateTime
 import extensions.shiftWeek
+import extensions.startThisDay
 import extensions.weekTimeRange
 import managers.CoroutineManager
 import org.kodein.di.instance
@@ -37,6 +38,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEvent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsViewState
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewScreenModel
 
 /**
  * @author Stanislav Aleshin on 09.06.2024
@@ -94,6 +96,38 @@ internal class DetailsScreenModel(
             }
             is DetailsEvent.SelectedViewType -> {
                 sendAction(DetailsAction.UpdateViewType(event.scheduleView))
+            }
+            is DetailsEvent.CompleteHomework -> {
+                launchBackgroundWork(OverviewScreenModel.BackgroundKey.HOMEWORK_ACTION) {
+                    val command = DetailsWorkCommand.UpdateIsHomeworkDone(event.homework, isDone = true)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is DetailsEvent.CancelCompleteHomework -> {
+                launchBackgroundWork(OverviewScreenModel.BackgroundKey.HOMEWORK_ACTION) {
+                    val command = DetailsWorkCommand.UpdateIsHomeworkDone(event.homework, isDone = false)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is DetailsEvent.EditHomeworkInEditor -> with(event) {
+                val featureScreen = EditorScreen.Homework(
+                    homeworkId = homework.uid,
+                    date = homework.date.toEpochMilliseconds(),
+                    subjectId = homework.subject?.uid,
+                    organizationId = homework.organization.uid,
+                )
+                val screen = screenProvider.provideEditorScreen(featureScreen)
+                sendEffect(DetailsEffect.NavigateToGlobal(screen))
+            }
+            is DetailsEvent.AddHomeworkInEditor -> with(event) {
+                val featureScreen = EditorScreen.Homework(
+                    homeworkId = null,
+                    date = classModel?.timeRange?.from?.startThisDay()?.toEpochMilliseconds(),
+                    subjectId = classModel?.subject?.uid,
+                    organizationId = classModel?.organization?.uid,
+                )
+                val screen = screenProvider.provideEditorScreen(featureScreen)
+                sendEffect(DetailsEffect.NavigateToGlobal(screen))
             }
             is DetailsEvent.OpenOverviewSchedule -> {
                 val date = event.date.toEpochMilliseconds()

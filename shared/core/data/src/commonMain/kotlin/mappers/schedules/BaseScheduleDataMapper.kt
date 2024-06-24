@@ -17,7 +17,7 @@
 package mappers.schedules
 
 import entities.common.NumberOfRepeatWeek
-import entities.schedules.BaseSchedule
+import entities.schedules.base.BaseSchedule
 import entities.schedules.DateVersion
 import extensions.mapEpochTimeToInstant
 import functional.UID

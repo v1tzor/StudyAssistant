@@ -16,16 +16,17 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
-import entities.tasks.Homework
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkUi
+import entities.tasks.HomeworkDetails
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
  */
-internal fun Homework.mapToUi() = HomeworkUi(
+internal fun HomeworkDetails.mapToUi() = HomeworkDetailsUi(
     uid = uid,
     classId = classId,
     date = date,
+    deadline = deadline,
     subject = subject?.mapToUi(),
     organization = organization.mapToUi(),
     theoreticalTasks = theoreticalTasks,
@@ -34,12 +35,14 @@ internal fun Homework.mapToUi() = HomeworkUi(
     test = test,
     priority = priority,
     isDone = isDone,
+    completeDate = completeDate,
 )
 
-internal fun HomeworkUi.mapToDomain() = Homework(
+internal fun HomeworkDetailsUi.mapToDomain() = HomeworkDetails(
     uid = uid,
     classId = classId,
     date = date,
+    deadline = deadline,
     subject = subject?.mapToDomain(),
     organization = organization.mapToDomain(),
     theoreticalTasks = theoreticalTasks,
@@ -48,4 +51,5 @@ internal fun HomeworkUi.mapToDomain() = Homework(
     test = test,
     priority = priority,
     isDone = isDone,
+    completeDate = completeDate,
 )

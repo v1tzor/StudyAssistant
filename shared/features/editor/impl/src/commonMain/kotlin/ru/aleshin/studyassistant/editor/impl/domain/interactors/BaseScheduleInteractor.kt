@@ -17,7 +17,9 @@
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
 import entities.common.NumberOfRepeatWeek
-import entities.schedules.BaseSchedule
+import entities.schedules.base.BaseSchedule
+import entities.schedules.base.BaseWeekSchedule
+import extensions.dateTime
 import functional.FlowDomainResult
 import functional.TimeRange
 import functional.UID
@@ -26,7 +28,6 @@ import kotlinx.datetime.DayOfWeek
 import repositories.BaseScheduleRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
-import ru.aleshin.studyassistant.editor.impl.domain.entities.BaseWeekSchedule
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 
 /**
@@ -35,10 +36,8 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 internal interface BaseScheduleInteractor {
 
     suspend fun fetchScheduleById(uid: UID): FlowDomainResult<EditorFailures, BaseSchedule?>
-    suspend fun fetchScheduleByTimeRange(
-        timeRange: TimeRange,
-        numberOfWeek: NumberOfRepeatWeek
-    ): FlowDomainResult<EditorFailures, BaseWeekSchedule>
+
+    suspend fun fetchScheduleByDateVersion(timeRange: TimeRange, week: NumberOfRepeatWeek): FlowDomainResult<EditorFailures, BaseWeekSchedule>
 
     class Base(
         private val scheduleRepository: BaseScheduleRepository,
@@ -53,26 +52,24 @@ internal interface BaseScheduleInteractor {
             scheduleRepository.fetchScheduleById(uid, targetUser)
         }
 
-        override suspend fun fetchScheduleByTimeRange(
+        override suspend fun fetchScheduleByDateVersion(
             timeRange: TimeRange,
-            numberOfWeek: NumberOfRepeatWeek,
+            week: NumberOfRepeatWeek,
         ) = eitherWrapper.wrapFlow {
-            val weekDaySchedules = mutableMapOf<DayOfWeek, BaseSchedule?>().apply {
-                DayOfWeek.entries.forEach { put(it, null) }
-            }
-            val schedulesByTimeRange = scheduleRepository.fetchSchedulesByTimeRange(timeRange, numberOfWeek, targetUser)
+            val weekDaySchedules = mutableMapOf<DayOfWeek, BaseSchedule>()
+            val schedulesByVersion = scheduleRepository.fetchSchedulesByVersion(timeRange, week, targetUser)
 
-            return@wrapFlow schedulesByTimeRange.map { rawSchedules ->
+            return@wrapFlow schedulesByVersion.map { rawSchedules ->
                 rawSchedules.forEach { schedule ->
                     weekDaySchedules[schedule.dayOfWeek] = schedule.copy(
-                        classes = schedule.classes.sortedBy { it.timeRange.from },
+                        classes = schedule.classes.sortedBy { it.timeRange.from.dateTime().time },
                     )
                 }
 
                 BaseWeekSchedule(
                     from = timeRange.from,
                     to = timeRange.to,
-                    numberOfWeek = numberOfWeek,
+                    numberOfWeek = week,
                     weekDaySchedules = weekDaySchedules,
                 )
             }

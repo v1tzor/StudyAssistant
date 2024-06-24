@@ -16,6 +16,7 @@
 package theme.tokens
 
 import androidx.compose.runtime.staticCompositionLocalOf
+import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
 
 /**
@@ -77,12 +78,19 @@ data class StudyAssistantStrings(
     val novemberTitle: String,
     val decemberTitle: String,
     val mondayTitle: String,
+    val mondayShortTitle: String,
     val tuesdayTitle: String,
+    val tuesdayShortTitle: String,
     val wednesdayTitle: String,
+    val wednesdayShortTitle: String,
     val thursdayTitle: String,
+    val thursdayShortTitle: String,
     val fridayTitle: String,
+    val fridayShortTitle: String,
     val saturdayTitle: String,
+    val saturdayShortTitle: String,
     val sundayTitle: String,
+    val sundayShortTitle: String,
     val schoolOrganizationType: String,
     val lyceumOrganizationType: String,
     val seminaryOrganizationType: String,
@@ -112,6 +120,12 @@ data class StudyAssistantStrings(
     val avatarDesc: String,
     val contactInfoLabel: String,
     val contactInfoValue: String,
+    val standardPriorityTitle: String,
+    val mediumPriorityTitle: String,
+    val highPriorityTitle: String,
+    val theoreticalTasksTitle: String,
+    val practicalTasksTitle: String,
+    val presentationsTasksTitle: String,
     val noResultTitle: String,
 )
 
@@ -177,6 +191,13 @@ internal val russianFamelString = StudyAssistantStrings(
     fridayTitle = "Пятница",
     saturdayTitle = "Суббота",
     sundayTitle = "Воскресенье",
+    mondayShortTitle = "Пон",
+    tuesdayShortTitle = "Вто",
+    wednesdayShortTitle = "Сре",
+    thursdayShortTitle = "Чет",
+    fridayShortTitle = "Пят",
+    saturdayShortTitle = "Суб",
+    sundayShortTitle = "Вос",
     schoolOrganizationType = "Школа",
     lyceumOrganizationType = "Лицей",
     seminaryOrganizationType = "Семинария",
@@ -206,6 +227,12 @@ internal val russianFamelString = StudyAssistantStrings(
     avatarDesc = "Выбрать фото профиля",
     contactInfoLabel = "Название",
     contactInfoValue = "Данные *",
+    highPriorityTitle = "Очень важно",
+    mediumPriorityTitle = "Важно",
+    standardPriorityTitle = "Обычно",
+    theoreticalTasksTitle = "Теория",
+    practicalTasksTitle = "Практика",
+    presentationsTasksTitle = "Доклад",
     noResultTitle = "Нет результатов",
 )
 
@@ -271,6 +298,13 @@ internal val englishFamelString = StudyAssistantStrings(
     fridayTitle = "Friday",
     saturdayTitle = "Saturday",
     sundayTitle = "Sunday",
+    mondayShortTitle = "Mon",
+    tuesdayShortTitle = "Tue",
+    wednesdayShortTitle = "Wed",
+    thursdayShortTitle = "Thu",
+    fridayShortTitle = "Fri",
+    saturdayShortTitle = "Sat",
+    sundayShortTitle = "Sun",
     schoolOrganizationType = "School",
     lyceumOrganizationType = "Lyceum",
     seminaryOrganizationType = "Seminary",
@@ -300,6 +334,12 @@ internal val englishFamelString = StudyAssistantStrings(
     avatarDesc = "Select profile photo",
     contactInfoLabel = "Name",
     contactInfoValue = "Data *",
+    highPriorityTitle = "Very important",
+    mediumPriorityTitle = "Important",
+    standardPriorityTitle = "Usually",
+    theoreticalTasksTitle = "Theory",
+    practicalTasksTitle = "Practice",
+    presentationsTasksTitle = "Presentation",
     noResultTitle = "No results",
 )
 
@@ -316,6 +356,26 @@ fun StudyAssistantStrings.monthNames() = MonthNames(
     october = octoberTitle,
     november = novemberTitle,
     december = decemberTitle,
+)
+
+fun StudyAssistantStrings.dayOfWeekNames() = DayOfWeekNames(
+    monday = mondayTitle,
+    tuesday = tuesdayTitle,
+    wednesday = wednesdayTitle,
+    thursday = thursdayTitle,
+    friday = fridayTitle,
+    saturday = saturdayTitle,
+    sunday = sundayTitle,
+)
+
+fun StudyAssistantStrings.dayOfWeekShortNames() = DayOfWeekNames(
+    monday = mondayShortTitle,
+    tuesday = tuesdayShortTitle,
+    wednesday = wednesdayShortTitle,
+    thursday = thursdayShortTitle,
+    friday = fridayShortTitle,
+    saturday = saturdayShortTitle,
+    sunday = sundayShortTitle,
 )
 
 val LocalStudyAssistantStrings = staticCompositionLocalOf<StudyAssistantStrings> {

@@ -29,6 +29,8 @@ import kotlinx.datetime.Instant
 import platform.InstantParceler
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.WeekScheduleDetailsUi
 
@@ -51,8 +53,12 @@ internal sealed class DetailsEvent : BaseEvent {
     data object SelectedNextWeek : DetailsEvent()
     data object SelectedCurrentWeek : DetailsEvent()
     data object SelectedPreviousWeek : DetailsEvent()
-    data class OpenOverviewSchedule(val date: Instant) : DetailsEvent()
     data class SelectedViewType(val scheduleView: ScheduleViewType) : DetailsEvent()
+    data class CompleteHomework(val homework: HomeworkDetailsUi) : DetailsEvent()
+    data class CancelCompleteHomework(val homework: HomeworkDetailsUi) : DetailsEvent()
+    data class EditHomeworkInEditor(val homework: HomeworkDetailsUi) : DetailsEvent()
+    data class AddHomeworkInEditor(val classModel: ClassDetailsUi, val date: Instant) : DetailsEvent()
+    data class OpenOverviewSchedule(val date: Instant) : DetailsEvent()
     data object NavigateToOverview : DetailsEvent()
     data object NavigateToEditor : DetailsEvent()
 }

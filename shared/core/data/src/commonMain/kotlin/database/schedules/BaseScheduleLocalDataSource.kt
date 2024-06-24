@@ -53,7 +53,7 @@ interface BaseScheduleLocalDataSource {
     suspend fun addOrUpdateSchedule(schedule: BaseScheduleDetailsData): UID
     suspend fun fetchScheduleById(uid: UID): Flow<BaseScheduleDetailsData?>
     suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek): Flow<BaseScheduleDetailsData?>
-    suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant, numberOfWeek: NumberOfRepeatWeek?): Flow<List<BaseScheduleDetailsData>>
+    suspend fun fetchSchedulesByVersion(from: Instant, to: Instant, numberOfWeek: NumberOfRepeatWeek?): Flow<List<BaseScheduleDetailsData>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<ClassDetailsData?>
 
     class Base(
@@ -105,7 +105,7 @@ interface BaseScheduleLocalDataSource {
             }
         }
 
-        override suspend fun fetchSchedulesByTimeRange(
+        override suspend fun fetchSchedulesByVersion(
             from: Instant,
             to: Instant,
             numberOfWeek: NumberOfRepeatWeek?,

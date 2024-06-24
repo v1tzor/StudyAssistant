@@ -31,7 +31,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -96,8 +96,8 @@ internal fun OverviewTopSheet(
                 OverviewTopSheetClassTime(
                     isLoading = isLoading,
                     activeClass = activeClass,
-                    homeworksProgress = currentAnalysis?.numberOfHomeworks ?: emptyList(),
-                    tasksProgress = currentAnalysis?.numberOfTasks ?: emptyList(),
+                    homeworksProgressList = currentAnalysis?.numberOfHomeworks ?: emptyList(),
+                    tasksProgressList = currentAnalysis?.numberOfTasks ?: emptyList(),
                 )
             }
             OverviewTopSheetAnalysis(
@@ -151,8 +151,8 @@ private fun OverviewTopSheetClassTime(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     activeClass: ActiveClassUi?,
-    homeworksProgress: List<Boolean>,
-    tasksProgress: List<Boolean>,
+    homeworksProgressList: List<Boolean>,
+    tasksProgressList: List<Boolean>,
 ) {
     Crossfade(
         modifier = modifier,
@@ -164,14 +164,17 @@ private fun OverviewTopSheetClassTime(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
+                val homeworksProgress = homeworksProgressList.count { it } / homeworksProgressList.size.toFloat()
+                val tasksProgress = tasksProgressList.count { it } / tasksProgressList.size.toFloat()
+
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
                         modifier = Modifier.weight(1f),
                         text = when {
                             activeClass?.isStarted == true -> ScheduleThemeRes.strings.untilEndClassTitle
                             activeClass?.isStarted == false -> ScheduleThemeRes.strings.untilStartClassTitle
-                            homeworksProgress.isNotEmpty() -> ScheduleThemeRes.strings.tasksProgressTitle
-                            tasksProgress.isNotEmpty() -> ScheduleThemeRes.strings.tasksProgressTitle
+                            homeworksProgressList.isNotEmpty() -> ScheduleThemeRes.strings.tasksProgressTitle
+                            tasksProgressList.isNotEmpty() -> ScheduleThemeRes.strings.tasksProgressTitle
                             else -> ScheduleThemeRes.strings.completeScheduleTitle
                         },
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -182,13 +185,11 @@ private fun OverviewTopSheetClassTime(
                     Text(
                         text = when {
                             activeClass != null -> activeClass.duration.toMinutesAndHoursString()
-                            homeworksProgress.isNotEmpty() -> buildString {
-                                append(homeworksProgress.count { it } / homeworksProgress.size)
-                                append("%")
+                            homeworksProgressList.isNotEmpty() -> buildString {
+                                append((homeworksProgress * 100).toInt(), "%")
                             }
-                            tasksProgress.isNotEmpty() -> buildString {
-                                append(tasksProgress.count { it } / tasksProgress.size)
-                                append("%")
+                            tasksProgressList.isNotEmpty() -> buildString {
+                                append((tasksProgress * 100).toInt(), "%")
                             }
                             else -> ""
                         },
@@ -201,8 +202,8 @@ private fun OverviewTopSheetClassTime(
                     modifier = Modifier.fillMaxWidth().height(10.dp),
                     progress = when {
                         activeClass?.progress != null -> activeClass.progress
-                        homeworksProgress.isNotEmpty() -> homeworksProgress.count { it } / homeworksProgress.size.toFloat()
-                        tasksProgress.isNotEmpty() -> tasksProgress.count { it } / tasksProgress.size.toFloat()
+                        homeworksProgressList.isNotEmpty() -> homeworksProgress
+                        tasksProgressList.isNotEmpty() -> tasksProgress
                         else -> 0f
                     },
                     backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -310,7 +311,7 @@ private fun OverviewTopSheetAnalysis(
             )
             OverviewTopSheetAnalysisItem(
                 isLoading = isLoading,
-                icon = painterResource(StudyAssistantRes.icons.tests),
+                icon = painterResource(StudyAssistantRes.icons.testsOutline),
                 label = ScheduleThemeRes.strings.analysisTestsLabel,
                 value = analysis?.numberOfTests?.toString(),
                 valueColor = if (analysis?.numberOfTests == 0) {

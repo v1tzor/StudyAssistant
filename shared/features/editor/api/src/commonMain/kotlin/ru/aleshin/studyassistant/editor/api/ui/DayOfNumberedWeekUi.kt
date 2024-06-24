@@ -29,3 +29,5 @@ data class DayOfNumberedWeekUi(
     val dayOfWeek: DayOfWeek,
     val week: NumberOfRepeatWeek,
 ) : Parcelable
+
+// TODO: Not parcelize

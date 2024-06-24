@@ -40,6 +40,7 @@ internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen> {
             is EditorScreen.Class -> ClassEditorScreen(
                 classId = screen.classId,
                 scheduleId = screen.scheduleId,
+                organizationId = screen.organizationId,
                 customSchedule = screen.isCustomSchedule,
                 weekDay = screen.weekDay,
             )
@@ -53,6 +54,9 @@ internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen> {
             )
             is EditorScreen.Homework -> HomeworkEditorScreen(
                 homeworkId = screen.homeworkId,
+                date = screen.date,
+                subjectId = screen.subjectId,
+                organizationId = screen.organizationId,
             )
             is EditorScreen.Organization -> OrganizationEditorScreen(
                 organizationId = screen.organizationId,

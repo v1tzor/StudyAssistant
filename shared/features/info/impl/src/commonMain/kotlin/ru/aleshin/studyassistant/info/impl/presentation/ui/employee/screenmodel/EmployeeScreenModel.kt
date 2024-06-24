@@ -105,13 +105,13 @@ internal class EmployeeScreenModel(
         action: EmployeeAction,
         currentState: EmployeeViewState,
     ) = when (action) {
-        is EmployeeAction.UpdateOrganizations -> currentState.copy(
-            organizations = action.organizations,
-            selectedOrganization = action.selectedOrganization,
-        )
         is EmployeeAction.UpdateEmployees -> currentState.copy(
             employees = action.employees,
             isLoading = false,
+        )
+        is EmployeeAction.UpdateOrganizations -> currentState.copy(
+            organizations = action.organizations,
+            selectedOrganization = action.selectedOrganization,
         )
         is EmployeeAction.UpdateSelectedOrganization -> currentState.copy(
             selectedOrganization = action.organization,

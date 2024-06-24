@@ -19,19 +19,30 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import entities.organizations.Millis
+import managers.DateManager
 import navigation.root
+import org.kodein.di.compose.localDI
+import org.kodein.di.direct
+import org.kodein.di.instance
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.ClassBottomSheet
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewDeps
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewEvent
@@ -48,6 +59,7 @@ import views.ErrorSnackbar
 internal data class OverviewScreen(val firstDay: Millis?) : Screen {
 
     @Composable
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun Content() = ScreenContent(
         screenModel = rememberOverviewScreenModel(),
         initialState = OverviewViewState(),
@@ -55,7 +67,12 @@ internal data class OverviewScreen(val firstDay: Millis?) : Screen {
     ) { state ->
         val strings = ScheduleThemeRes.strings
         val navigator = LocalNavigator.current
+        val di = localDI().direct
+        val dateManager = remember { di.instance<DateManager>() }
         val snackbarState = remember { SnackbarHostState() }
+        val classSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        var selectedSheetClass by remember { mutableStateOf<ClassDetailsUi?>(null) }
+        var showClassBottomSheet by remember { mutableStateOf(false) }
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -63,6 +80,11 @@ internal data class OverviewScreen(val firstDay: Millis?) : Screen {
                 OverviewContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
+                    currentTime = dateManager.fetchCurrentInstant(),
+                    onShowClassInfo = {
+                        selectedSheetClass = it
+                        showClassBottomSheet = true
+                    }
                 )
             },
             topBar = {
@@ -94,6 +116,27 @@ internal data class OverviewScreen(val firstDay: Millis?) : Screen {
                 )
             },
         )
+
+        val sheetClass = selectedSheetClass
+        if (showClassBottomSheet && sheetClass != null) {
+            ClassBottomSheet(
+                sheetState = classSheetState,
+                currentTime = dateManager.fetchCurrentInstant(),
+                activeClass = state.activeClass,
+                classModel = sheetClass,
+                classDate = state.currentDate,
+                onEditHomework = { dispatchEvent(OverviewEvent.EditHomeworkInEditor(it)) },
+                onAddHomework = { homework, date ->
+                    dispatchEvent(OverviewEvent.AddHomeworkInEditor(homework, date))
+                },
+                onAgainHomework = { dispatchEvent(OverviewEvent.CancelCompleteHomework(it)) },
+                onCompleteHomework = { dispatchEvent(OverviewEvent.CompleteHomework(it)) },
+                onDismissRequest = {
+                    showClassBottomSheet = false
+                    selectedSheetClass = null
+                },
+            )
+        }
 
         handleEffect { effect ->
             when (effect) {

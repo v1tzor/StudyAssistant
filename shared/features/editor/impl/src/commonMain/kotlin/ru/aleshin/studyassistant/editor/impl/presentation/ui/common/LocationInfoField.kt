@@ -36,7 +36,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import functional.Constants
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
@@ -54,10 +53,9 @@ import views.dialog.SelectorDialogTextField
  * @author Stanislav Aleshin on 05.06.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun LocationInfoField(
     modifier: Modifier = Modifier,
-    enabledAddOffice: Boolean,
+    enabledAdd: Boolean,
     isLoading: Boolean,
     location: ContactInfoUi?,
     office: String?,
@@ -116,6 +114,7 @@ internal fun LocationInfoField(
 
     if (isOpenLocationSelector) {
         LocationSelectorDialog(
+            enabledAdd = enabledAdd,
             selected = location,
             locations = allLocations,
             onUpdateLocations = onUpdateLocations,
@@ -129,7 +128,7 @@ internal fun LocationInfoField(
 
     if (isOpenOfficeSelector) {
         OfficeSelectorDialog(
-            enabledAdd = enabledAddOffice,
+            enabledAdd = enabledAdd,
             selected = office,
             offices = allOffices,
             onUpdateOffices = onUpdateOffices,
@@ -145,6 +144,7 @@ internal fun LocationInfoField(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun LocationSelectorDialog(
+    enabledAdd: Boolean,
     modifier: Modifier = Modifier,
     selected: ContactInfoUi?,
     locations: List<ContactInfoUi>,
@@ -172,6 +172,7 @@ internal fun LocationSelectorDialog(
         },
         addItemView = {
             SelectorDialogAddItemView(
+                enabled = enabledAdd,
                 onClick = { contactInfoEditorDialogState = true }
             )
         },

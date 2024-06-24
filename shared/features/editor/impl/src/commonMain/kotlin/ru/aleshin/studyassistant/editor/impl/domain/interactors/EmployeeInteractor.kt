@@ -17,10 +17,16 @@
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
 import entities.employee.Employee
+import entities.employee.EmployeeDetails
+import entities.employee.convertToDetails
 import functional.DomainResult
 import functional.FlowDomainResult
 import functional.UID
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import repositories.EmployeeRepository
+import repositories.SubjectsRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
@@ -31,11 +37,12 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 internal interface EmployeeInteractor {
 
     suspend fun addOrUpdateEmployee(employee: Employee): DomainResult<EditorFailures, UID>
-    suspend fun fetchAllEmployeeByOrganization(organizationId: UID): FlowDomainResult<EditorFailures, List<Employee>>
+    suspend fun fetchAllDetailsEmployee(organizationId: UID): FlowDomainResult<EditorFailures, List<EmployeeDetails>>
     suspend fun fetchEmployeeById(uid: UID): FlowDomainResult<EditorFailures, Employee?>
 
     class Base(
         private val employeeRepository: EmployeeRepository,
+        private val subjectsRepository: SubjectsRepository,
         private val usersRepository: UsersRepository,
         private val eitherWrapper: EditorEitherWrapper,
     ) : EmployeeInteractor {
@@ -47,8 +54,20 @@ internal interface EmployeeInteractor {
             employeeRepository.addOrUpdateEmployee(employee, targetUser)
         }
 
-        override suspend fun fetchAllEmployeeByOrganization(organizationId: UID) = eitherWrapper.wrapFlow {
-            employeeRepository.fetchAllEmployeeByOrganization(organizationId, targetUser)
+        @OptIn(ExperimentalCoroutinesApi::class)
+        override suspend fun fetchAllDetailsEmployee(organizationId: UID) = eitherWrapper.wrapFlow {
+            val subjectsFlow = subjectsRepository.fetchAllSubjectsByOrganization(organizationId, targetUser)
+            val employeesFlow = employeeRepository.fetchAllEmployeeByOrganization(organizationId, targetUser)
+
+            return@wrapFlow employeesFlow.flatMapLatest { employeeList ->
+                subjectsFlow.map { subjects ->
+                    val groupedSubjectsByTeacher = subjects.groupBy { it.teacher?.uid }
+                    employeeList.map { employee ->
+                        val employeeSubjects = groupedSubjectsByTeacher[employee.uid] ?: emptyList()
+                        employee.convertToDetails(subjects = employeeSubjects)
+                    }
+                }
+            }
         }
 
         override suspend fun fetchEmployeeById(uid: UID) = eitherWrapper.wrapFlow {

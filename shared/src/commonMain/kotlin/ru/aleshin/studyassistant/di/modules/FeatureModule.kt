@@ -55,6 +55,9 @@ import ru.aleshin.studyassistant.profile.impl.di.holder.ProfileFeatureDIHolder
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
 import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
+import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
+import ru.aleshin.studyassistant.tasks.impl.di.TasksFeatureDependencies
+import ru.aleshin.studyassistant.tasks.impl.di.holder.TasksFeatureDIHolder
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
@@ -130,6 +133,26 @@ val featureModule = DI.Module("Feature") {
         }
     }
 
+    bindEagerSingleton<TasksFeatureDependencies> {
+        object : TasksFeatureDependencies {
+            override val editorFeatureStarter = provider<EditorFeatureStarter>()
+            override val baseScheduleRepository = instance<BaseScheduleRepository>()
+            override val customScheduleRepository = instance<CustomScheduleRepository>()
+            override val organizationsRepository = instance<OrganizationsRepository>()
+            override val homeworkRepository = instance<HomeworksRepository>()
+            override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val usersRepository = instance<UsersRepository>()
+            override val dateManager = instance<DateManager>()
+            override val coroutineManager = instance<CoroutineManager>()
+        }
+    }
+    bindProvider<TasksFeatureStarter> {
+        with(TasksFeatureDIHolder) {
+            init(instance())
+            fetchApi().fetchStarter()
+        }
+    }
+
     bindEagerSingleton<InfoFeatureDependencies> {
         object : InfoFeatureDependencies {
             override val editorFeatureStarter = provider<EditorFeatureStarter>()
@@ -172,6 +195,7 @@ val featureModule = DI.Module("Feature") {
             override val subjectsRepository = instance<SubjectsRepository>()
             override val employeeRepository = instance<EmployeeRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
+            override val homeworksRepository = instance<HomeworksRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val usersRepository = instance<UsersRepository>()
             override val dateManager = instance<DateManager>()

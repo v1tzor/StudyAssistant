@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import entities.employee.EmployeePost
 import mappers.mapToString
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import theme.StudyAssistantRes
@@ -50,10 +50,9 @@ internal fun TeacherInfoField(
     enabledAddTeacher: Boolean,
     isLoading: Boolean,
     teacher: EmployeeUi?,
-    allEmployee: List<EmployeeUi>,
-    allSubjects: List<SubjectUi>,
+    allEmployee: List<EmployeeDetailsUi>,
     onAddTeacher: () -> Unit,
-    onSelected: (EmployeeUi?) -> Unit,
+    onSelected: (EmployeeDetailsUi?) -> Unit,
 ) {
     var teacherSelectorState by remember { mutableStateOf(false) }
 
@@ -78,7 +77,6 @@ internal fun TeacherInfoField(
             enabledAdd = enabledAddTeacher,
             selected = teacher,
             employees = allEmployee,
-            subjects = allSubjects,
             onAddTeacher = onAddTeacher,
             onDismiss = { teacherSelectorState = false },
             onConfirm = {
@@ -95,15 +93,15 @@ internal fun TeacherSelectorDialog(
     modifier: Modifier = Modifier,
     enabledAdd: Boolean,
     selected: EmployeeUi?,
-    employees: List<EmployeeUi>,
-    subjects: List<SubjectUi>,
+    employees: List<EmployeeDetailsUi>,
     onAddTeacher: () -> Unit,
     onDismiss: () -> Unit,
-    onConfirm: (EmployeeUi?) -> Unit,
+    onConfirm: (EmployeeDetailsUi?) -> Unit,
 ) {
+    val selectedEmployee by derivedStateOf { employees.find { it.uid == selected?.uid } }
     val teachers by remember { derivedStateOf { employees.filter { it.post == EmployeePost.TEACHER } } }
     val otherEmployee by remember { derivedStateOf { employees.filter { it.post != EmployeePost.TEACHER } } }
-    var selectedTeacher by remember { mutableStateOf(selected) }
+    var selectedTeacher by remember { mutableStateOf(selectedEmployee) }
 
     BaseSelectorDialog(
         modifier = modifier,
@@ -116,8 +114,7 @@ internal fun TeacherSelectorDialog(
                 onClick = { selectedTeacher = employee },
                 selected = employee.uid == selectedTeacher?.uid,
                 title = employee.fullName(),
-                label = subjects.find { it.teacher?.uid == employee.uid }?.name
-                    ?: employee.post.mapToString(StudyAssistantRes.strings),
+                label = employee.subjects.firstOrNull()?.name ?: employee.post.mapToString(StudyAssistantRes.strings),
             )
         },
         addItemView = {

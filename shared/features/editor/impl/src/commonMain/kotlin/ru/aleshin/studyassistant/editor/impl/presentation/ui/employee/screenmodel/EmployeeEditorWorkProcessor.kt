@@ -16,12 +16,14 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel
 
+import architecture.screenmodel.work.ActionResult
 import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
 import functional.UID
+import functional.firstHandleAndGet
+import functional.firstOrNullHandleAndGet
 import functional.handle
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.EmployeeInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
@@ -49,26 +51,21 @@ internal interface EmployeeEditorWorkProcessor :
             is EmployeeEditorWorkCommand.SaveEditModel -> saveEditModelWork(command.editableEmployee)
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
         private fun loadEditModelWork(employeeId: UID?, organizationId: UID) = flow {
-            val organizationFlow = organizationInteractor.fetchOrganizationById(organizationId)
-            val employeeFlow = employeeInteractor.fetchEmployeeById(employeeId ?: "")
+            val employee = employeeInteractor.fetchEmployeeById(employeeId ?: "").firstOrNullHandleAndGet(
+                onLeftAction = { emit(EffectResult(EmployeeEditorEffect.ShowError(it))).let { null } },
+                onRightAction = { employee -> employee?.mapToUi() },
+            )
+            val organization = organizationInteractor.fetchShortOrganizationById(organizationId).firstHandleAndGet(
+                onLeftAction = { error(it) },
+                onRightAction = { organization -> organization.mapToUi() }
+            )
 
-            employeeFlow.flatMapLatestWithResult(
-                secondFlow = organizationFlow,
-                onError = { EmployeeEditorEffect.ShowError(it) },
-                onData = { employeeModel, organizationModel ->
-                    val organization = organizationModel.mapToUi()
-                    val employee = employeeModel?.mapToUi()
-                    val editModel = employee?.convertToEdit() ?: EditEmployeeUi.createEditModel(
-                        uid = employeeId,
-                        organizationId = organizationId,
-                    )
-                    EmployeeEditorAction.SetupEditModel(editModel, organization)
-                },
-            ).collect { result ->
-                emit(result)
-            }
+            val editModel = employee?.convertToEdit() ?: EditEmployeeUi.createEditModel(
+                uid = employeeId,
+                organizationId = organizationId,
+            )
+            emit(ActionResult(EmployeeEditorAction.SetupEditModel(editModel, organization)))
         }
 
         private fun saveEditModelWork(editableEmployee: EditEmployeeUi) = flow {

@@ -22,6 +22,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleErrorHandler
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.AnalysisInteractor
+import ru.aleshin.studyassistant.schedule.impl.domain.interactors.HomeworkInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleInteractor
 
 /**
@@ -32,5 +33,6 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<ScheduleEitherWrapper> { ScheduleEitherWrapper.Base(instance()) }
 
     bindSingleton<ScheduleInteractor> { ScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<HomeworkInteractor> { HomeworkInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<AnalysisInteractor> { AnalysisInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
 }

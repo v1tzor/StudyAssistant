@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel
 
+import architecture.screenmodel.work.ActionResult
 import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
@@ -23,14 +24,12 @@ import extensions.isCurrentDay
 import extensions.setHoursAndMinutes
 import extensions.shiftMillis
 import functional.Constants.Class
-import functional.Either
 import functional.TimeRange
 import functional.UID
+import functional.collectAndHandle
+import functional.firstHandleAndGet
 import functional.handle
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import managers.TimeOverlayManager
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.api.ui.mapToDomain
@@ -38,7 +37,9 @@ import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseClassInterac
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseScheduleInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.CustomClassInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.CustomScheduleInteractor
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.EmployeeInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.SubjectInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.EditClassUi
@@ -46,7 +47,6 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.convert
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.convertToEditModel
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.convertToShort
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.ScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEditorAction
@@ -64,6 +64,8 @@ internal interface ClassEditorWorkProcessor :
         private val baseClassInteractor: BaseClassInteractor,
         private val customClassInteractor: CustomClassInteractor,
         private val organizationInteractor: OrganizationInteractor,
+        private val subjectsInteractor: SubjectInteractor,
+        private val employeeInteractor: EmployeeInteractor,
         private val overlayManager: TimeOverlayManager,
     ) : ClassEditorWorkProcessor {
 
@@ -71,13 +73,16 @@ internal interface ClassEditorWorkProcessor :
             is ClassEditorWorkCommand.LoadEditModel -> loadEditModelWork(
                 classId = command.classId,
                 scheduleId = command.scheduleId,
+                organizationId = command.organizationId,
                 isCustom = command.isCustomSchedule,
                 weekDay = command.weekDay,
             )
-            is ClassEditorWorkCommand.SaveEditModel -> saveEditModelWork(
-                editModel = command.editModel,
-                command.schedule,
-                weekDay = command.weekDay,
+            is ClassEditorWorkCommand.LoadOrganizations -> loadOrganizationsWork()
+            is ClassEditorWorkCommand.LoadEmployees -> loadEmployeesWork(
+                organizationId = command.organizationId,
+            )
+            is ClassEditorWorkCommand.LoadSubjects -> loadSubjectsWork(
+                organizationId = command.organizationId,
             )
             is ClassEditorWorkCommand.UpdateOffices -> updateOfficesWork(
                 organization = command.organization,
@@ -87,64 +92,122 @@ internal interface ClassEditorWorkProcessor :
                 organization = command.organization,
                 locations = command.locations,
             )
+            is ClassEditorWorkCommand.SaveEditModel -> saveEditModelWork(
+                editModel = command.editModel,
+                schedule = command.schedule,
+                weekDay = command.weekDay,
+            )
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
         private fun loadEditModelWork(
             classId: UID?,
             scheduleId: UID?,
+            organizationId: UID?,
             isCustom: Boolean,
             weekDay: DayOfNumberedWeekUi,
         ) = flow {
-            val organizationsFlow = organizationInteractor.fetchAllOrganizations()
-            val scheduleFlow = if (scheduleId != null) {
+            val schedule = if (scheduleId != null) {
                 if (isCustom) {
-                    customScheduleInteractor.fetchScheduleById(scheduleId).map { scheduleEither ->
-                        scheduleEither.mapRight { ScheduleUi.Custom(it?.mapToUi()) }
-                    }
+                    customScheduleInteractor.fetchScheduleById(scheduleId).firstHandleAndGet(
+                        onLeftAction = { emit(EffectResult(ClassEditorEffect.ShowError(it))).let { null } },
+                        onRightAction = { schedule -> ScheduleUi.Custom(schedule?.mapToUi()) },
+                    )
                 } else {
-                    baseScheduleInteractor.fetchScheduleById(scheduleId).map { scheduleEither ->
-                        scheduleEither.mapRight { ScheduleUi.Base(it?.mapToUi()) }
-                    }
+                    baseScheduleInteractor.fetchScheduleById(scheduleId).firstHandleAndGet(
+                        onLeftAction = { emit(EffectResult(ClassEditorEffect.ShowError(it))).let { null } },
+                        onRightAction = { schedule -> ScheduleUi.Base(schedule?.mapToUi()) },
+                    )
                 }
             } else {
-                val scheduleEither = if (isCustom) ScheduleUi.Custom(null) else ScheduleUi.Base(null)
-                flowOf(Either.Right(scheduleEither))
+                if (isCustom) ScheduleUi.Custom(null) else ScheduleUi.Base(null)
             }
-            scheduleFlow.flatMapLatestWithResult(
-                secondFlow = organizationsFlow,
-                onError = { ClassEditorEffect.ShowError(it) },
-                onData = { schedule, organizationList ->
+            val classOrganization = organizationId?.let { organizationId ->
+                organizationInteractor.fetchShortOrganizationById(organizationId).firstHandleAndGet(
+                    onLeftAction = { error(it) },
+                    onRightAction = { organization -> organization.mapToUi() }
+                )
+            }
+
+            val scheduleClasses = schedule.blockMapToValue(
+                onBaseSchedule = { baseSchedule -> baseSchedule?.classes },
+                onCustomSchedule = { customSchedule -> customSchedule?.classes },
+            )
+            val classModel = scheduleClasses?.find { it.uid == classId }
+
+            val freeTimeRanges = calculateFreeClassTimeRanges(
+                timeIntervals = classOrganization?.scheduleTimeIntervals,
+                existClasses = scheduleClasses?.map { it.timeRange },
+            )
+
+            val editModel = classModel?.convertToEditModel() ?: EditClassUi.createEditModel(
+                uid = classId,
+                scheduleId = scheduleId,
+                organization = classOrganization,
+                timeRange = freeTimeRanges?.toList()?.find { it.second }?.first
+            )
+            val action = ClassEditorAction.SetupEditModel(
+                editModel = editModel,
+                schedule = schedule,
+                freeClassTimeRanges = freeTimeRanges,
+                weekDay = weekDay,
+            )
+            emit(ActionResult(action))
+        }
+
+        private fun loadOrganizationsWork() = flow {
+            organizationInteractor.fetchAllShortOrganizations().collectAndHandle(
+                onLeftAction = { emit(EffectResult(ClassEditorEffect.ShowError(it))) },
+                onRightAction = { organizationList ->
                     val organizations = organizationList.map { it.mapToUi() }
-                    val scheduleClasses = schedule.blockMapToValue(
-                        onBaseSchedule = { baseSchedule -> baseSchedule?.classes },
-                        onCustomSchedule = { customSchedule -> customSchedule?.classes },
-                    )
-                    val classModel = scheduleClasses?.find { it.uid == classId }
-                    val selectedOrganization = classModel?.organization ?: organizations.run {
-                        find { it.isMain } ?: getOrNull(0)
-                    }?.convertToShort()
-                    val freeTimeRanges = calculateFreeClassTimeRanges(
-                        timeIntervals = selectedOrganization?.scheduleTimeIntervals,
-                        existClasses = scheduleClasses?.map { it.timeRange },
-                    )
-                    val editModel = classModel?.convertToEditModel() ?: EditClassUi.createEditModel(
-                        uid = classId,
-                        scheduleId = scheduleId,
-                        organization = selectedOrganization,
-                        timeRange = freeTimeRanges?.toList()?.find { it.second }?.first
-                    )
-                    ClassEditorAction.SetupEditModel(
-                        editModel,
-                        schedule,
-                        freeTimeRanges,
-                        weekDay,
-                        organizations
-                    )
+                    emit(ActionResult(ClassEditorAction.UpdateOrganizations(organizations)))
                 },
-            ).collect { result ->
-                emit(result)
+            )
+        }
+
+        private fun loadSubjectsWork(organizationId: UID?) = flow {
+            if (organizationId == null) {
+                return@flow emit(ActionResult(ClassEditorAction.UpdateSubjects(emptyList())))
             }
+            subjectsInteractor.fetchAllSubjectsByOrganization(organizationId).collectAndHandle(
+                onLeftAction = { emit(EffectResult(ClassEditorEffect.ShowError(it))) },
+                onRightAction = { subjectsList ->
+                    val subjects = subjectsList.map { it.mapToUi() }
+                    emit(ActionResult(ClassEditorAction.UpdateSubjects(subjects)))
+                },
+            )
+        }
+
+        private fun loadEmployeesWork(organizationId: UID?) = flow {
+            if (organizationId == null) {
+                return@flow emit(ActionResult(ClassEditorAction.UpdateEmployees(emptyList())))
+            }
+            employeeInteractor.fetchAllDetailsEmployee(organizationId).collectAndHandle(
+                onLeftAction = { emit(EffectResult(ClassEditorEffect.ShowError(it))) },
+                onRightAction = { employeeList ->
+                    val employees = employeeList.map { it.mapToUi() }
+                    emit(ActionResult(ClassEditorAction.UpdateEmployees(employees)))
+                },
+            )
+        }
+
+        private fun updateOfficesWork(
+            organization: OrganizationShortUi,
+            offices: List<String>
+        ) = flow {
+            val updatedOrganization = organization.copy(offices = offices)
+            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain()).handle(
+                onLeftAction = { emit(EffectResult(ClassEditorEffect.ShowError(it))) },
+            )
+        }
+
+        private fun updateLocationsWork(
+            organization: OrganizationShortUi,
+            locations: List<ContactInfoUi>
+        ) = flow {
+            val updatedOrganization = organization.copy(locations = locations)
+            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain()).handle(
+                onLeftAction = { emit(EffectResult(ClassEditorEffect.ShowError(it))) },
+            )
         }
 
         private fun saveEditModelWork(
@@ -172,7 +235,6 @@ internal interface ClassEditorWorkProcessor :
                         onRightAction = { emit(EffectResult(ClassEditorEffect.NavigateToBack)) },
                     )
                 }
-
                 is ScheduleUi.Custom -> if (classModel.uid.isEmpty()) {
                     customClassInteractor.addClass(classModel).handle(
                         onLeftAction = { emit(EffectResult(ClassEditorEffect.ShowError(it))) },
@@ -185,23 +247,6 @@ internal interface ClassEditorWorkProcessor :
                     )
                 }
             }
-        }
-
-        private fun updateOfficesWork(organization: OrganizationShortUi, offices: List<String>) = flow {
-            val updatedOrganization = organization.copy(offices = offices)
-            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain()).handle(
-                onLeftAction = { emit(EffectResult(ClassEditorEffect.ShowError(it))) },
-            )
-        }
-
-        private fun updateLocationsWork(
-            organization: OrganizationShortUi,
-            locations: List<ContactInfoUi>
-        ) = flow {
-            val updatedOrganization = organization.copy(locations = locations)
-            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain()).handle(
-                onLeftAction = { emit(EffectResult(ClassEditorEffect.ShowError(it))) },
-            )
         }
 
         private fun calculateFreeClassTimeRanges(
@@ -242,17 +287,23 @@ internal interface ClassEditorWorkProcessor :
 }
 
 internal sealed class ClassEditorWorkCommand : WorkCommand {
+
     data class LoadEditModel(
         val classId: UID?,
         val scheduleId: UID?,
+        val organizationId: UID?,
         val isCustomSchedule: Boolean,
         val weekDay: DayOfNumberedWeekUi
     ) : ClassEditorWorkCommand()
 
-    data class SaveEditModel(
-        val editModel: EditClassUi,
-        val schedule: ScheduleUi,
-        val weekDay: DayOfNumberedWeekUi
+    data object LoadOrganizations : ClassEditorWorkCommand()
+
+    data class LoadEmployees(
+        val organizationId: UID?,
+    ) : ClassEditorWorkCommand()
+
+    data class LoadSubjects(
+        val organizationId: UID?,
     ) : ClassEditorWorkCommand()
 
     data class UpdateOffices(
@@ -263,5 +314,11 @@ internal sealed class ClassEditorWorkCommand : WorkCommand {
     data class UpdateLocations(
         val organization: OrganizationShortUi,
         val locations: List<ContactInfoUi>
+    ) : ClassEditorWorkCommand()
+
+    data class SaveEditModel(
+        val editModel: EditClassUi,
+        val schedule: ScheduleUi,
+        val weekDay: DayOfNumberedWeekUi
     ) : ClassEditorWorkCommand()
 }

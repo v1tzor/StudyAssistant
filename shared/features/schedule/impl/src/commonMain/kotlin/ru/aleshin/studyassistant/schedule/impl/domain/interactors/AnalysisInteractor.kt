@@ -56,7 +56,7 @@ internal interface AnalysisInteractor {
         override suspend fun fetchWeekAnalysis(week: TimeRange) = eitherWrapper.wrap {
             val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
             val currentNumberOfWeek = week.from.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
-            val baseSchedules = baseScheduleRepository.fetchSchedulesByTimeRange(week, currentNumberOfWeek, targetUser).first()
+            val baseSchedules = baseScheduleRepository.fetchSchedulesByVersion(week, currentNumberOfWeek, targetUser).first()
             val customSchedules = customScheduleRepository.fetchSchedulesByTimeRange(week, targetUser).first()
             val homeworks = homeworksRepository.fetchHomeworksByTimeRange(week, targetUser).first().groupBy {
                 it.date.startThisDay()
@@ -96,7 +96,7 @@ internal interface AnalysisInteractor {
                 val numberOfHomeworks = dailyHomeworks?.map { it.isDone } ?: emptyList()
                 val numberOfTheories = dailyHomeworks?.sumOf { it.theoreticalTasks.split(',').size } ?: 0
                 val numberOfPractices = dailyHomeworks?.sumOf { it.practicalTasks.split(',').size } ?: 0
-                val numberOfPresentations = dailyHomeworks?.sumOf { it.presentations.split(',').size } ?: 0
+                val numberOfPresentations = dailyHomeworks?.sumOf { it.presentationsTasks.split(',').size } ?: 0
                 val homeworksRate = (numberOfTheories * theoryRate) + (numberOfPractices * practiceRate) + (numberOfPresentations * presentationRate)
 
                 val numberOfTasks = dailyTasks ?: emptyList()
@@ -118,30 +118,5 @@ internal interface AnalysisInteractor {
 
             return@wrap weekAnalysis
         }
-
-//        private fun countRate(
-//
-//        ): Int {
-//            val numberOfClasses = classes?.size ?: 0
-//            val classesDuration = classes?.map { it.timeRange.duration() }?.sumOf { it.minutes } ?: 0
-//            val classesRate = classesDuration * classMinuteDurationRate
-//
-//            val numberOfTests = dailyHomeworks?.count { it.test != null } ?: 0
-//            val testsRate = numberOfTests * testRate
-//
-//            val numberOfMovements = locations?.map { it.value.count() }?.sum() ?: 0
-//            val movementsRate = numberOfMovements * moveRate
-//
-//            val numberOfHomeworks = dailyHomeworks?.map { it.isDone } ?: emptyList()
-//            val numberOfTheories = dailyHomeworks?.sumOf { it.theoreticalTasks.split(',').size } ?: 0
-//            val numberOfPractices = dailyHomeworks?.sumOf { it.practicalTasks.split(',').size } ?: 0
-//            val numberOfPresentations = dailyHomeworks?.sumOf { it.presentations.split(',').size } ?: 0
-//            val homeworksRate = (numberOfTheories * theoryRate) + (numberOfPractices * practiceRate) + (numberOfPresentations * presentationRate)
-//
-//            val numberOfTasks = dailyTasks ?: emptyList()
-//            val tasksRate = numberOfTasks.size * taskRation
-//
-//            val commonRate = classesRate + testsRate + movementsRate + homeworksRate + tasksRate
-//        }
     }
 }

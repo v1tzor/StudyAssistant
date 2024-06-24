@@ -19,7 +19,9 @@ package ru.aleshin.studyassistant.schedule.impl.domain.interactors
 import entities.classes.convertToDetails
 import entities.common.numberOfRepeatWeek
 import entities.schedules.ScheduleDetails
-import entities.schedules.convertToDetails
+import entities.schedules.WeekScheduleDetails
+import entities.schedules.base.convertToDetails
+import entities.schedules.custom.convertToDetails
 import extensions.dateTime
 import functional.FlowDomainResult
 import functional.TimeRange
@@ -35,7 +37,6 @@ import repositories.HomeworksRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
-import ru.aleshin.studyassistant.schedule.impl.domain.entities.WeekScheduleDetails
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
@@ -61,13 +62,11 @@ internal interface ScheduleInteractor {
             val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
             val numberOfWeek = week.from.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
 
-            val baseSchedules = baseScheduleRepository.fetchSchedulesByTimeRange(week, numberOfWeek, targetUser).first()
+            val baseSchedules = baseScheduleRepository.fetchSchedulesByVersion(week, numberOfWeek, targetUser).first()
             val customSchedules = customScheduleRepository.fetchSchedulesByTimeRange(week, targetUser).first()
             val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(week, targetUser)
 
-            val weekDaySchedules = mutableMapOf<DayOfWeek, ScheduleDetails?>().apply {
-                DayOfWeek.entries.forEach { put(it, null) }
-            }
+            val weekDaySchedules = mutableMapOf<DayOfWeek, ScheduleDetails>()
 
             homeworksFlow.map { homeworks ->
                 customSchedules.forEach { customSchedule ->
@@ -78,7 +77,9 @@ internal interface ScheduleInteractor {
                         }
                     )
                     weekDaySchedules[dayOfWeek] = ScheduleDetails.Custom(
-                        detailsSchedule.copy(classes = detailsSchedule.classes.sortedBy { it.timeRange.from })
+                        detailsSchedule.copy(
+                            classes = detailsSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
+                        )
                     )
                 }
                 baseSchedules.forEach { baseSchedule ->
@@ -90,7 +91,9 @@ internal interface ScheduleInteractor {
                             }
                         )
                         weekDaySchedules[dayOfWeek] = ScheduleDetails.Base(
-                            detailsSchedule.copy(classes = detailsSchedule.classes.sortedBy { it.timeRange.from })
+                            detailsSchedule.copy(
+                                classes = detailsSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
+                            )
                         )
                     }
                 }
@@ -120,7 +123,9 @@ internal interface ScheduleInteractor {
                         }
                     )
                     ScheduleDetails.Custom(
-                        detailsSchedule.copy(classes = detailsSchedule.classes.sortedBy { it.timeRange.from })
+                        detailsSchedule.copy(
+                            classes = detailsSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
+                        )
                     )
                 } else {
                     val detailsSchedule = baseSchedule?.convertToDetails(
@@ -129,7 +134,9 @@ internal interface ScheduleInteractor {
                         }
                     )
                     ScheduleDetails.Base(
-                        detailsSchedule?.copy(classes = detailsSchedule.classes.sortedBy { it.timeRange.from })
+                        detailsSchedule?.copy(
+                            classes = detailsSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
+                        )
                     )
                 }
             }

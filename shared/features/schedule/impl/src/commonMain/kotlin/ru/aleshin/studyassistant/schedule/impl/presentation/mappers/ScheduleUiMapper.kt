@@ -16,11 +16,11 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
-import entities.schedules.BaseScheduleDetails
-import entities.schedules.CustomScheduleDetails
 import entities.schedules.DateVersion
 import entities.schedules.ScheduleDetails
-import ru.aleshin.studyassistant.schedule.impl.domain.entities.WeekScheduleDetails
+import entities.schedules.WeekScheduleDetails
+import entities.schedules.base.BaseScheduleDetails
+import entities.schedules.custom.CustomScheduleDetails
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.BaseScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.CustomScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.DateVersionUi
@@ -65,7 +65,7 @@ internal fun WeekScheduleDetails.mapToUi() = WeekScheduleDetailsUi(
     from = from,
     to = to,
     numberOfWeek = numberOfWeek,
-    weekDaySchedules = weekDaySchedules.mapValues { it.value?.mapToUi() },
+    weekDaySchedules = weekDaySchedules.mapValues { it.value.mapToUi() },
 )
 
 internal fun DateVersion.mapToUi() = DateVersionUi(

@@ -29,12 +29,20 @@ sealed class EditorScreen : FeatureScreen {
     data class Class(
         val classId: UID?,
         val scheduleId: UID?,
+        val organizationId: UID?,
         val isCustomSchedule: Boolean,
         val weekDay: DayOfNumberedWeekUi,
     ) : EditorScreen()
+
     data class Subject(val subjectId: UID?, val organizationId: UID) : EditorScreen()
     data class Employee(val employeeId: UID?, val organizationId: UID) : EditorScreen()
-    data class Homework(val homeworkId: UID?) : EditorScreen()
+    data class Homework(
+        val homeworkId: UID?,
+        val date: Long?,
+        val subjectId: UID?,
+        val organizationId: UID?
+    ) : EditorScreen()
+
     data class Organization(val organizationId: UID?) : EditorScreen()
     data object Profile : EditorScreen()
 }

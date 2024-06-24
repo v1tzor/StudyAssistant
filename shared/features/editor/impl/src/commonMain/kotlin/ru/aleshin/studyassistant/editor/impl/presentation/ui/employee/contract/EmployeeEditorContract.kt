@@ -25,7 +25,7 @@ import entities.employee.EmployeePost
 import functional.UID
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EditEmployeeUi
 
@@ -36,20 +36,20 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EditEmplo
 internal data class EmployeeEditorViewState(
     val isLoading: Boolean = true,
     val editableEmployee: EditEmployeeUi? = null,
-    val organization: OrganizationUi? = null,
+    val organization: OrganizationShortUi? = null,
 ) : BaseViewState
 
 internal sealed class EmployeeEditorEvent : BaseEvent {
     data class Init(val employeeId: UID?, val organizationId: UID) : EmployeeEditorEvent()
     data class UpdateAvatar(val avatarUrl: String?) : EmployeeEditorEvent()
     data class UpdateName(val first: String?, val second: String?, val patronymic: String?) : EmployeeEditorEvent()
-    data class SelectPost(val post: EmployeePost?) : EmployeeEditorEvent()
-    data class SelectWorkTime(val start: Instant?, val end: Instant?) : EmployeeEditorEvent()
-    data class SelectBirthday(val date: String?) : EmployeeEditorEvent()
+    data class UpdatePost(val post: EmployeePost?) : EmployeeEditorEvent()
+    data class UpdateWorkTime(val start: Instant?, val end: Instant?) : EmployeeEditorEvent()
+    data class UpdateBirthday(val date: String?) : EmployeeEditorEvent()
     data class UpdateEmails(val emails: List<ContactInfoUi>) : EmployeeEditorEvent()
     data class UpdatePhones(val phones: List<ContactInfoUi>) : EmployeeEditorEvent()
-    data class UpdateLocations(val locations: List<ContactInfoUi>) : EmployeeEditorEvent()
     data class UpdateWebs(val webs: List<ContactInfoUi>) : EmployeeEditorEvent()
+    data class UpdateLocations(val locations: List<ContactInfoUi>) : EmployeeEditorEvent()
     data object SaveEmployee : EmployeeEditorEvent()
     data object NavigateToBack : EmployeeEditorEvent()
 }
@@ -61,10 +61,10 @@ internal sealed class EmployeeEditorEffect : BaseUiEffect {
 
 internal sealed class EmployeeEditorAction : BaseAction {
     data class SetupEditModel(
-        val editableEmployee: EditEmployeeUi,
-        val organization: OrganizationUi,
+        val editModel: EditEmployeeUi,
+        val organization: OrganizationShortUi,
     ) : EmployeeEditorAction()
 
+    data class UpdateEditModel(val editModel: EditEmployeeUi?) : EmployeeEditorAction()
     data class UpdateLoading(val isLoading: Boolean) : EmployeeEditorAction()
-    data class UpdateEditModel(val editableEmployee: EditEmployeeUi?) : EmployeeEditorAction()
 }

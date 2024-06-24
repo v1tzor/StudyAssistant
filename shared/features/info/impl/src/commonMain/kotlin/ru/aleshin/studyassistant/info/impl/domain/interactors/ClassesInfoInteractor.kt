@@ -47,7 +47,7 @@ internal interface ClassesInfoInteractor {
 
         override suspend fun fetchClassesInfo(organizationId: UID) = eitherWrapper.wrap {
             val currentWeek = dateManager.fetchCurrentWeek()
-            val schedules = scheduleRepository.fetchSchedulesByTimeRange(currentWeek, null, targetUser)
+            val schedules = scheduleRepository.fetchSchedulesByVersion(currentWeek, null, targetUser)
             val classes = schedules.first().groupBy { it.week }.mapValues { entry ->
                 entry.value.map { schedule -> schedule.classes }.extractAllItem()
             }

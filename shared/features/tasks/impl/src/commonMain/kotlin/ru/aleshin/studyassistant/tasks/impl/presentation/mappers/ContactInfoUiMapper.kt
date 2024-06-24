@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package entities.schedules
+package ru.aleshin.studyassistant.tasks.impl.presentation.mappers
 
-import entities.classes.Class
-import entities.classes.ClassDetails
-import functional.UID
-import kotlinx.datetime.Instant
+import entities.common.ContactInfo
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.ContactInfoUi
 
 /**
- * @author Stanislav Aleshin on 04.05.2024.
+ * @author Stanislav Aleshin on 29.04.2024.
  */
-data class CustomScheduleDetails(
-    val uid: UID,
-    val date: Instant,
-    val classes: List<ClassDetails>,
+internal fun ContactInfo.mapToUi() = ContactInfoUi(
+    label = label,
+    value = value,
 )
 
-fun CustomSchedule.convertToDetails(
-    classesMapper: (Class) -> ClassDetails,
-) = CustomScheduleDetails(
-    uid = uid,
-    date = date,
-    classes = classes.map { classesMapper(it) },
+internal fun ContactInfoUi.mapToDomain() = ContactInfo(
+    label = label,
+    value = value,
 )

@@ -111,14 +111,14 @@ internal class SubjectsScreenModel(
         action: SubjectsAction,
         currentState: SubjectsViewState,
     ) = when (action) {
-        is SubjectsAction.UpdateOrganizations -> currentState.copy(
-            organizations = action.organizations,
-            selectedOrganization = action.selectedOrganization,
-        )
         is SubjectsAction.UpdateSubjects -> currentState.copy(
             subjects = action.subjects,
             sortedType = action.sortedType,
             isLoading = false,
+        )
+        is SubjectsAction.UpdateOrganizations -> currentState.copy(
+            organizations = action.organizations,
+            selectedOrganization = action.selectedOrganization,
         )
         is SubjectsAction.UpdateSelectedOrganization -> currentState.copy(
             selectedOrganization = action.organization,

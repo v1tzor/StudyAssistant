@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.schedule.impl.domain.entities
+package ru.aleshin.studyassistant.tasks.api.navigation
 
-import entities.common.NumberOfRepeatWeek
-import entities.schedules.ScheduleDetails
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.Instant
+import inject.FeatureStarter
 
 /**
- * @author Stanislav Aleshin on 30.05.2024.
+ * @author Stanislav Aleshin on 19.06.2024.
  */
-internal data class WeekScheduleDetails(
-    val from: Instant,
-    val to: Instant,
-    val numberOfWeek: NumberOfRepeatWeek,
-    val weekDaySchedules: Map<DayOfWeek, ScheduleDetails?>,
-)
+interface TasksFeatureStarter : FeatureStarter.WithNestedNavigation<TasksScreen>

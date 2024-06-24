@@ -27,6 +27,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
 import ru.aleshin.studyassistant.editor.impl.navigation.EditorScreenProvider
+import ru.aleshin.studyassistant.editor.impl.presentation.models.users.convertToBase
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectEditorAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectEditorDeps
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectEditorEffect
@@ -59,24 +60,14 @@ internal class SubjectEditorScreenModel(
         event: SubjectEditorEvent,
     ) {
         when (event) {
-            is SubjectEditorEvent.Init -> launchBackgroundWork(BackgroundKey.LOAD_SUBJECT) {
-                val command = SubjectEditorWorkCommand.LoadEditModel(event.subjectId, event.organizationId)
-                workProcessor.work(command).collectAndHandleWork()
-            }
-            is SubjectEditorEvent.UpdateOffices -> with(state()) {
-                launchBackgroundWork(BackgroundKey.UPDATE_LOCATIONS) {
-                    if (organization != null) {
-                        val command = SubjectEditorWorkCommand.UpdateOffices(organization, event.offices)
-                        workProcessor.work(command).collectAndHandleWork()
-                    }
+            is SubjectEditorEvent.Init -> {
+                launchBackgroundWork(BackgroundKey.LOAD_EMPLOYEES) {
+                    val command = SubjectEditorWorkCommand.LoadEmployees(event.organizationId)
+                    workProcessor.work(command).collectAndHandleWork()
                 }
-            }
-            is SubjectEditorEvent.UpdateLocations -> with(state()) {
-                launchBackgroundWork(BackgroundKey.UPDATE_LOCATIONS) {
-                    if (organization != null) {
-                        val command = SubjectEditorWorkCommand.UpdateLocations(organization, event.locations)
-                        workProcessor.work(command).collectAndHandleWork()
-                    }
+                launchBackgroundWork(BackgroundKey.LOAD_SUBJECT) {
+                    val command = SubjectEditorWorkCommand.LoadEditModel(event.subjectId, event.organizationId)
+                    workProcessor.work(command).collectAndHandleWork()
                 }
             }
             is SubjectEditorEvent.SelectEventType -> with(state()) {
@@ -87,32 +78,44 @@ internal class SubjectEditorScreenModel(
                 val updatedSubject = editableSubject?.copy(name = event.name)
                 sendAction(SubjectEditorAction.UpdateEditModel(updatedSubject))
             }
-            is SubjectEditorEvent.PickColor -> with(state()) {
+            is SubjectEditorEvent.UpdateColor -> with(state()) {
                 val updatedSubject = editableSubject?.copy(color = event.color)
                 sendAction(SubjectEditorAction.UpdateEditModel(updatedSubject))
             }
-            is SubjectEditorEvent.SelectTeacher -> with(state()) {
-                val updatedSubject = editableSubject?.copy(teacher = event.teacher)
+            is SubjectEditorEvent.UpdateTeacher -> with(state()) {
+                val updatedSubject = editableSubject?.copy(teacher = event.teacher?.convertToBase())
                 sendAction(SubjectEditorAction.UpdateEditModel(updatedSubject))
             }
-            is SubjectEditorEvent.SelectLocation -> with(state()) {
+            is SubjectEditorEvent.UpdateLocation -> with(state()) {
                 val updatedSubject = editableSubject?.copy(location = event.location, office = event.office)
                 sendAction(SubjectEditorAction.UpdateEditModel(updatedSubject))
             }
+            is SubjectEditorEvent.UpdateOrganizationOffices -> with(state()) {
+                launchBackgroundWork(BackgroundKey.UPDATE_LOCATIONS) {
+                    val organization = checkNotNull(organization)
+                    val command = SubjectEditorWorkCommand.UpdateOrganizationOffices(organization, event.offices)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is SubjectEditorEvent.UpdateOrganizationLocations -> with(state()) {
+                launchBackgroundWork(BackgroundKey.UPDATE_LOCATIONS) {
+                    val organization = checkNotNull(organization)
+                    val command = SubjectEditorWorkCommand.UpdateOrganizationLocations(organization, event.locations)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
             is SubjectEditorEvent.SaveSubject -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SAVE_SUBJECT) {
-                    if (editableSubject != null) {
-                        val command = SubjectEditorWorkCommand.SaveEditModel(editableSubject)
-                        workProcessor.work(command).collectAndHandleWork()
-                    }
+                    val subject = checkNotNull(editableSubject)
+                    val command = SubjectEditorWorkCommand.SaveEditModel(subject)
+                    workProcessor.work(command).collectAndHandleWork()
                 }
             }
             is SubjectEditorEvent.NavigateToEmployeeEditor -> with(state()) {
-                if (editableSubject?.organizationId != null) {
-                    val featureScreen = EditorScreen.Employee(null, editableSubject.organizationId)
-                    val targetScreen = screenProvider.provideFeatureScreen(featureScreen)
-                    sendEffect(SubjectEditorEffect.NavigateToLocal(targetScreen))
-                }
+                val organization = checkNotNull(organization)
+                val featureScreen = EditorScreen.Employee(event.employeeId, organization.uid)
+                val targetScreen = screenProvider.provideFeatureScreen(featureScreen)
+                sendEffect(SubjectEditorEffect.NavigateToLocal(targetScreen))
             }
             is SubjectEditorEvent.NavigateToBack -> {
                 sendEffect(SubjectEditorEffect.NavigateToBack)
@@ -125,20 +128,23 @@ internal class SubjectEditorScreenModel(
         currentState: SubjectEditorViewState,
     ) = when (action) {
         is SubjectEditorAction.SetupEditModel -> currentState.copy(
-            editableSubject = action.editableSubject,
+            editableSubject = action.editModel,
             organization = action.organization,
             isLoading = false,
+        )
+        is SubjectEditorAction.UpdateEditModel -> currentState.copy(
+            editableSubject = action.editModel,
+        )
+        is SubjectEditorAction.UpdateEmployees -> currentState.copy(
+            employees = action.employees,
         )
         is SubjectEditorAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )
-        is SubjectEditorAction.UpdateEditModel -> currentState.copy(
-            editableSubject = action.editableSubject,
-        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_SUBJECT, UPDATE_LOCATIONS, SAVE_SUBJECT
+        LOAD_SUBJECT, LOAD_EMPLOYEES, UPDATE_LOCATIONS, SAVE_SUBJECT
     }
 }
 

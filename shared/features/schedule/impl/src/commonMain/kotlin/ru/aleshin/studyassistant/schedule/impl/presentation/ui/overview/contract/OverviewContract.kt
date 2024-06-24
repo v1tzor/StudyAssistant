@@ -31,6 +31,8 @@ import platform.NullInstantParceler
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.analysis.DailyAnalysisUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleDetailsUi
 
 /**
@@ -53,6 +55,10 @@ internal sealed class OverviewEvent : BaseEvent {
     data class Init(val firstDay: Instant?) : OverviewEvent()
     data class SelectedDate(val date: Instant) : OverviewEvent()
     data object SelectedCurrentDay : OverviewEvent()
+    data class CompleteHomework(val homework: HomeworkDetailsUi) : OverviewEvent()
+    data class CancelCompleteHomework(val homework: HomeworkDetailsUi) : OverviewEvent()
+    data class EditHomeworkInEditor(val homework: HomeworkDetailsUi) : OverviewEvent()
+    data class AddHomeworkInEditor(val classModel: ClassDetailsUi, val date: Instant) : OverviewEvent()
     data object NavigateToDetails : OverviewEvent()
 }
 

@@ -19,7 +19,9 @@ package repositories
 import database.schedules.BaseScheduleLocalDataSource
 import entities.classes.Class
 import entities.common.NumberOfRepeatWeek
-import entities.schedules.BaseSchedule
+import entities.common.numberOfRepeatWeek
+import entities.schedules.base.BaseSchedule
+import extensions.dateTime
 import functional.TimeRange
 import functional.UID
 import kotlinx.coroutines.flow.Flow
@@ -85,21 +87,51 @@ class BaseScheduleRepositoryImpl(
         }
     }
 
-    override suspend fun fetchSchedulesByTimeRange(
-        timeRange: TimeRange,
+    override suspend fun fetchSchedulesByVersion(
+        version: TimeRange,
         numberOfWeek: NumberOfRepeatWeek?,
         targetUser: UID
     ): Flow<List<BaseSchedule>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         val scheduleListFlow = if (isSubscriber) {
-            remoteDataSource.fetchSchedulesByTimeRange(timeRange.from, timeRange.to, numberOfWeek, targetUser)
+            remoteDataSource.fetchSchedulesByVersion(version.from, version.to, numberOfWeek, targetUser)
         } else {
-            localDataSource.fetchSchedulesByTimeRange(timeRange.from, timeRange.to, numberOfWeek)
+            localDataSource.fetchSchedulesByVersion(version.from, version.to, numberOfWeek)
         }
 
         return scheduleListFlow.map { scheduleList ->
             scheduleList.map { it.mapToDomain() }
+        }
+    }
+
+    override suspend fun fetchSchedulesByTimeRange(
+        timeRange: TimeRange,
+        maxNumberOfWeek: NumberOfRepeatWeek,
+        targetUser: UID
+    ): Flow<Map<Instant, List<BaseSchedule>>> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        val scheduleListFlow = if (isSubscriber) {
+            remoteDataSource.fetchSchedulesByVersion(timeRange.from, timeRange.to, null, targetUser)
+        } else {
+            localDataSource.fetchSchedulesByVersion(timeRange.from, timeRange.to, null)
+        }
+
+        return scheduleListFlow.map { scheduleList ->
+            val schedules = scheduleList.map { it.mapToDomain() }
+            return@map buildMap<Instant, List<BaseSchedule>> {
+                timeRange.periodDates().forEach { targetDate ->
+                    val targetWeekDay = targetDate.dateTime().dayOfWeek
+                    val targetWeek = targetDate.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
+                    val schedulesByDate = schedules.filter { schedule ->
+                        val versionFilter = schedule.dateVersion.containsDate(targetDate)
+                        val dateFilter = schedule.week == targetWeek && schedule.dayOfWeek == targetWeekDay
+                        return@filter versionFilter && dateFilter
+                    }
+                    put(targetDate, schedulesByDate)
+                }
+            }
         }
     }
 

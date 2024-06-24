@@ -31,6 +31,10 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmode
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorStateCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorStateCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorEffectCommunicator
@@ -59,16 +63,21 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<ClassEditorStateCommunicator> { ClassEditorStateCommunicator.Base() }
     bindProvider<ClassEditorEffectCommunicator> { ClassEditorEffectCommunicator.Base() }
-    bindProvider<ClassEditorWorkProcessor> { ClassEditorWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<ClassEditorWorkProcessor> { ClassEditorWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindProvider<ClassEditorScreenModel> { ClassEditorScreenModel(instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<SubjectEditorStateCommunicator> { SubjectEditorStateCommunicator.Base() }
     bindProvider<SubjectEditorEffectCommunicator> { SubjectEditorEffectCommunicator.Base() }
-    bindProvider<SubjectEditorWorkProcessor> { SubjectEditorWorkProcessor.Base(instance(), instance()) }
+    bindProvider<SubjectEditorWorkProcessor> { SubjectEditorWorkProcessor.Base(instance(), instance(), instance()) }
     bindProvider<SubjectEditorScreenModel> { SubjectEditorScreenModel(instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<EmployeeEditorStateCommunicator> { EmployeeEditorStateCommunicator.Base() }
     bindProvider<EmployeeEditorEffectCommunicator> { EmployeeEditorEffectCommunicator.Base() }
     bindProvider<EmployeeEditorWorkProcessor> { EmployeeEditorWorkProcessor.Base(instance(), instance()) }
     bindProvider<EmployeeEditorScreenModel> { EmployeeEditorScreenModel(instance(), instance(), instance(), instance()) }
+
+    bindProvider<HomeworkEditorStateCommunicator> { HomeworkEditorStateCommunicator.Base() }
+    bindProvider<HomeworkEditorEffectCommunicator> { HomeworkEditorEffectCommunicator.Base() }
+    bindProvider<HomeworkEditorWorkProcessor> { HomeworkEditorWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<HomeworkEditorScreenModel> { HomeworkEditorScreenModel(instance(), instance(), instance(), instance(), instance()) }
 }

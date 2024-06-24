@@ -24,17 +24,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import entities.subject.EventType
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEditorViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.NotifyParameter
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.SubjectInfoField
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.SubjectAndEventTypeInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.TimeInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.OrganizationInfoField
@@ -53,9 +55,9 @@ internal fun ClassEditorContent(
     onAddTeacher: () -> Unit,
     onUpdateLocations: (List<ContactInfoUi>) -> Unit,
     onUpdateOffices: (List<String>) -> Unit,
-    onSelectOrganization: (OrganizationUi?) -> Unit,
+    onSelectOrganization: (OrganizationShortUi?) -> Unit,
     onSelectSubject: (EventType?, SubjectUi?) -> Unit,
-    onSelectTeacher: (EmployeeUi?) -> Unit,
+    onSelectTeacher: (EmployeeDetailsUi?) -> Unit,
     onSelectLocation: (ContactInfoUi?, String?) -> Unit,
     onSelectTime: (Instant?, Instant?) -> Unit,
     onChangeNotifyParams: (Boolean) -> Unit,
@@ -64,7 +66,9 @@ internal fun ClassEditorContent(
         modifier = modifier.fillMaxSize().padding(top = 20.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        val selectedOrganization = organizations.find { it.uid == editableClass?.organization?.uid }
+        val selectedOrganization by derivedStateOf {
+            organizations.find { it.uid == editableClass?.organization?.uid }
+        }
         OrganizationInfoField(
             isLoading = isLoading,
             organization = selectedOrganization,
@@ -72,11 +76,12 @@ internal fun ClassEditorContent(
             onAddOrganization = onAddOrganization,
             onSelected = onSelectOrganization,
         )
-        SubjectInfoField(
+        SubjectAndEventTypeInfoField(
+            enabledAddSubject = editableClass?.organization != null,
             isLoading = isLoading,
             subject = editableClass?.subject,
             eventType = editableClass?.eventType,
-            allSubjects = selectedOrganization?.subjects ?: emptyList(),
+            allSubjects = subjects,
             onAddSubject = onAddSubject,
             onSelectedEventType = { onSelectSubject(it, editableClass?.subject) },
             onSelectedSubject = { onSelectSubject(it?.eventType, it) },
@@ -85,13 +90,12 @@ internal fun ClassEditorContent(
             enabledAddTeacher = editableClass?.organization != null,
             isLoading = isLoading,
             teacher = editableClass?.teacher,
-            allEmployee = selectedOrganization?.employee ?: emptyList(),
-            allSubjects = selectedOrganization?.subjects ?: emptyList(),
+            allEmployee = employees,
             onAddTeacher = onAddTeacher,
             onSelected = onSelectTeacher,
         )
         LocationInfoField(
-            enabledAddOffice = editableClass?.organization != null,
+            enabledAdd = editableClass?.organization != null,
             isLoading = isLoading,
             location = editableClass?.location,
             office = editableClass?.office,

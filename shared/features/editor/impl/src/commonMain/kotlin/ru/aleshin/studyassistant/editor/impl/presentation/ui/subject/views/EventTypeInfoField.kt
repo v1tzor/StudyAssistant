@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import entities.subject.EventType
 import mappers.mapToString
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EventTypeSelectorDialog
@@ -39,7 +38,6 @@ import views.ExpandedIcon
  * @author Stanislav Aleshin on 05.06.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun EventTypeInfoField(
     modifier: Modifier = Modifier,
     isLoading: Boolean,

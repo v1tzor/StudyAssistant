@@ -17,7 +17,9 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
 import entities.employee.Employee
+import entities.employee.EmployeeDetails
 import functional.TimeRange
+import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeUi
 
 /**
@@ -40,6 +42,24 @@ internal fun Employee.mapToUi() = EmployeeUi(
     webs = webs.map { it.mapToUi() },
 )
 
+internal fun EmployeeDetails.mapToUi() = EmployeeDetailsUi(
+    uid = uid,
+    organizationId = organizationId,
+    firstName = firstName,
+    secondName = secondName,
+    patronymic = patronymic,
+    post = post,
+    subjects = subjects.map { it.mapToUi() },
+    avatar = avatar,
+    birthday = birthday,
+    workTimeStart = workTime?.from,
+    workTimeEnd = workTime?.to,
+    emails = emails.map { it.mapToUi() },
+    phones = phones.map { it.mapToUi() },
+    locations = locations.map { it.mapToUi() },
+    webs = webs.map { it.mapToUi() },
+)
+
 internal fun EmployeeUi.mapToDomain() = Employee(
     uid = uid,
     organizationId = organizationId,
@@ -47,6 +67,23 @@ internal fun EmployeeUi.mapToDomain() = Employee(
     secondName = secondName,
     patronymic = patronymic,
     post = post,
+    avatar = avatar,
+    birthday = birthday,
+    workTime = if (workTimeStart != null && workTimeEnd != null) TimeRange(workTimeStart, workTimeEnd) else null,
+    emails = emails.map { it.mapToDomain() },
+    phones = phones.map { it.mapToDomain() },
+    locations = locations.map { it.mapToDomain() },
+    webs = webs.map { it.mapToDomain() },
+)
+
+internal fun EmployeeDetailsUi.mapToDomain() = EmployeeDetails(
+    uid = uid,
+    organizationId = organizationId,
+    firstName = firstName,
+    secondName = secondName,
+    patronymic = patronymic,
+    post = post,
+    subjects = subjects.map { it.mapToDomain() },
     avatar = avatar,
     birthday = birthday,
     workTime = if (workTimeStart != null && workTimeEnd != null) TimeRange(workTimeStart, workTimeEnd) else null,

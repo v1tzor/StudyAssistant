@@ -76,9 +76,9 @@ interface StartScreenHolder<S : FeatureScreen> {
         }
 
         override fun setStartScreen(screen: S): Boolean {
-            return (screen == null).also {
-                this.screen = screen
-            }
+            val isSet = this.screen == null
+            this.screen = screen
+            return isSet
         }
     }
 }

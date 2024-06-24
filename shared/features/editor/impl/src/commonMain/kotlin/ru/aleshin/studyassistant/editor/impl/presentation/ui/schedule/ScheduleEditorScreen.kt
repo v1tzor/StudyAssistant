@@ -93,7 +93,7 @@ internal data class ScheduleEditorScreen(val week: NumberOfRepeatWeek) : Screen 
                         organizations = state.organizations,
                         maxNumberOfWeek = state.calendarSettings?.numberOfWeek,
                         selectedWeek = state.selectedWeek,
-                        onSaveClick = { dispatchEvent(ScheduleEditorEvent.SaveSchedule) },
+                        onSaveClick = { dispatchEvent(ScheduleEditorEvent.NavigateToBack) },
                         onUpdateOrganization = { dispatchEvent(ScheduleEditorEvent.UpdateOrganization(it)) },
                         onSelectedWeek = { dispatchEvent(ScheduleEditorEvent.ChangeWeek(it)) },
                     )
@@ -104,10 +104,10 @@ internal data class ScheduleEditorScreen(val week: NumberOfRepeatWeek) : Screen 
                         modifier = Modifier.padding(paddingValues),
                         onRefresh = { dispatchEvent(ScheduleEditorEvent.Refresh) },
                         onCreateClass = { weekDay, schedule ->
-                            dispatchEvent(ScheduleEditorEvent.CreateClass(weekDay, schedule))
+                            dispatchEvent(ScheduleEditorEvent.CreateClassInEditor(weekDay, schedule))
                         },
                         onEditClass = { editClass, weekDay ->
-                            dispatchEvent(ScheduleEditorEvent.EditClass(editClass, weekDay))
+                            dispatchEvent(ScheduleEditorEvent.EditClassInEditor(editClass, weekDay))
                         },
                         onDeleteClass = { uid, schedule ->
                             dispatchEvent(ScheduleEditorEvent.DeleteClass(uid, schedule))

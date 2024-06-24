@@ -48,6 +48,7 @@ import views.dialog.SelectorDialogNotSelectedItemView
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun SubjectSelectorDialog(
+    enabledAdd: Boolean,
     modifier: Modifier = Modifier,
     eventType: EventType?,
     selected: SubjectUi?,
@@ -83,7 +84,10 @@ internal fun SubjectSelectorDialog(
             )
         },
         addItemView = {
-            SelectorDialogAddItemView(onClick = onAddSubject)
+            SelectorDialogAddItemView(
+                enabled = enabledAdd,
+                onClick = onAddSubject
+            )
         },
         notSelectedItem = {
             SelectorDialogNotSelectedItemView(

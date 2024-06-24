@@ -43,6 +43,7 @@ interface OrganizationsRemoteDataSource {
 
     suspend fun addOrUpdateOrganization(organization: OrganizationDetailsData, targetUser: UID): UID
     suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsData?>
+    suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShortData?>
     suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationDetailsData>>
     suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShortData>>
 
@@ -89,15 +90,30 @@ interface OrganizationsRemoteDataSource {
                     UserData.ORGANIZATION_ID equalTo organizationPojo.uid
                 }
 
-                val employeeList = employeeReference.snapshotGet().map { it.data<EmployeeDetailsData>() }
-                val subjectList = subjectsReference.snapshotGet().map { it.data<SubjectPojo>() }.map { subjectPojo ->
-                    subjectPojo.mapToDetailsData(employeeList.find { it.uid == subjectPojo.teacherId })
+                val employeeList = employeeReference.snapshotGet().map { snapshot ->
+                    snapshot.data(serializer<EmployeeDetailsData?>())
+                }
+                val subjectList = subjectsReference.snapshotGet().map { snapshot ->
+                    snapshot.data(serializer<SubjectPojo?>())
+                }.map { subjectPojo ->
+                    subjectPojo?.mapToDetailsData(employeeList.find { it?.uid == subjectPojo.teacherId })
                 }
 
                 organizationPojo.mapToDetailsData(
-                    subjects = subjectList,
-                    employee = employeeList,
+                    subjects = subjectList.filterNotNull(),
+                    employee = employeeList.filterNotNull(),
                 )
+            }
+        }
+
+        override suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShortData?> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.ORGANIZATIONS).document(uid)
+
+            return reference.snapshots.map { snapshot ->
+                snapshot.data(serializer<OrganizationShortData>())
             }
         }
 
@@ -120,14 +136,18 @@ interface OrganizationsRemoteDataSource {
                         UserData.ORGANIZATION_ID equalTo organizationPojo.uid
                     }
 
-                    val employeeList = employeeReference.snapshotGet().map { it.data<EmployeeDetailsData>() }
-                    val subjectList = subjectsReference.snapshotGet().map { it.data<SubjectPojo>() }.map { subjectPojo ->
-                        subjectPojo.mapToDetailsData(employeeList.find { it.uid == subjectPojo.teacherId })
+                    val employeeList = employeeReference.snapshotGet().map { snapshot ->
+                        snapshot.data(serializer<EmployeeDetailsData?>())
+                    }
+                    val subjectList = subjectsReference.snapshotGet().map { snapshot ->
+                        snapshot.data(serializer<SubjectPojo?>())
+                    }.map { subjectPojo ->
+                        subjectPojo?.mapToDetailsData(employeeList.find { it?.uid == subjectPojo.teacherId })
                     }
 
                     organizationPojo.mapToDetailsData(
-                        employee = employeeList,
-                        subjects = subjectList,
+                        employee = employeeList.filterNotNull(),
+                        subjects = subjectList.filterNotNull(),
                     )
                 }
             }

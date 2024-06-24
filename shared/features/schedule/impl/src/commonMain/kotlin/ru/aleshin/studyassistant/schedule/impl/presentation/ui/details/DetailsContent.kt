@@ -39,6 +39,7 @@ import extensions.dateTimeByWeek
 import extensions.isCurrentDay
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsViewState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.CommonScheduleView
@@ -53,6 +54,7 @@ internal fun DetailsContent(
     state: DetailsViewState,
     modifier: Modifier = Modifier,
     onOpenSchedule: (Instant) -> Unit,
+    onShowClassInfo: (ClassDetailsUi, Instant) -> Unit,
 ) = with(state) {
     Crossfade(
         modifier = modifier,
@@ -86,7 +88,7 @@ internal fun DetailsContent(
                             activeClass = activeClass,
                             classes = classes ?: emptyList(),
                             onOpenSchedule = { onOpenSchedule(scheduleDate) },
-                            onClassClick = {},
+                            onClassClick = { onShowClassInfo(it, scheduleDate) },
                         )
                     }
                 } else {
@@ -118,7 +120,7 @@ internal fun DetailsContent(
                                 onCustomSchedule = { it?.classes },
                             ) ?: emptyList(),
                             onOpenSchedule = { onOpenSchedule(scheduleDate) },
-                            onClassClick = {},
+                            onClassClick = { onShowClassInfo(it, scheduleDate) },
                         )
                     }
                 } else {

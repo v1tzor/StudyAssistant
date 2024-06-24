@@ -18,11 +18,16 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
@@ -30,9 +35,16 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import extensions.dateTime
 import extensions.weekTimeRange
+import kotlinx.datetime.Instant
+import managers.DateManager
 import navigation.root
+import org.kodein.di.compose.localDI
+import org.kodein.di.direct
+import org.kodein.di.instance
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.ClassBottomSheet
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEvent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsViewState
@@ -47,6 +59,7 @@ import views.ErrorSnackbar
 internal class DetailsScreen : Screen {
 
     @Composable
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun Content() = ScreenContent(
         screenModel = rememberDetailsScreenModel(),
         initialState = DetailsViewState(),
@@ -54,6 +67,11 @@ internal class DetailsScreen : Screen {
         val strings = ScheduleThemeRes.strings
         val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
+        val di = localDI().direct
+        val dateManager = remember { di.instance<DateManager>() }
+        val classSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        var selectedSheetClass by remember { mutableStateOf<Pair<ClassDetailsUi, Instant>?>(null) }
+        var showClassBottomSheet by remember { mutableStateOf(false) }
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -62,6 +80,10 @@ internal class DetailsScreen : Screen {
                     state = state,
                     modifier = Modifier.padding(paddingValues),
                     onOpenSchedule = { dispatchEvent(DetailsEvent.OpenOverviewSchedule(it)) },
+                    onShowClassInfo = { classModel, classDate ->
+                        selectedSheetClass = Pair(classModel, classDate)
+                        showClassBottomSheet = true
+                    },
                 )
             },
             topBar = {
@@ -88,6 +110,27 @@ internal class DetailsScreen : Screen {
                 )
             },
         )
+
+        val sheetClass = selectedSheetClass
+        if (showClassBottomSheet && sheetClass != null) {
+            ClassBottomSheet(
+                sheetState = classSheetState,
+                currentTime = dateManager.fetchCurrentInstant(),
+                activeClass = state.activeClass,
+                classModel = sheetClass.first,
+                classDate = sheetClass.second,
+                onEditHomework = { dispatchEvent(DetailsEvent.EditHomeworkInEditor(it)) },
+                onAddHomework = { homework, date ->
+                    dispatchEvent(DetailsEvent.AddHomeworkInEditor(homework, date))
+                },
+                onAgainHomework = { dispatchEvent(DetailsEvent.CancelCompleteHomework(it)) },
+                onCompleteHomework = { dispatchEvent(DetailsEvent.CompleteHomework(it)) },
+                onDismissRequest = {
+                    showClassBottomSheet = false
+                    selectedSheetClass = null
+                },
+            )
+        }
 
         handleEffect { effect ->
             when (effect) {

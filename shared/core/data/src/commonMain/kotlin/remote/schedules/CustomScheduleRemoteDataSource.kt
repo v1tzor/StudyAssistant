@@ -19,8 +19,6 @@ package remote.schedules
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.DocumentReference
 import dev.gitlive.firebase.firestore.FirebaseFirestore
-import dev.gitlive.firebase.firestore.orderBy
-import dev.gitlive.firebase.firestore.where
 import exceptions.FirebaseUserException
 import extensions.exists
 import extensions.snapshotGet
@@ -175,7 +173,7 @@ interface CustomScheduleRemoteDataSource {
             }
 
             val organization = organizationReference.snapshotGet().data<OrganizationShortData>()
-            val subject = subjectReference?.snapshotGet()?.data<SubjectPojo>().let { subjectPojo ->
+            val subject = subjectReference?.snapshotGet()?.data(serializer<SubjectPojo>()).let { subjectPojo ->
                 val employeeReference = subjectPojo?.teacherId?.let { employeeReferenceRoot.document(it) }
                 val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeeDetailsData?>())
                 subjectPojo?.mapToDetailsData(employee)

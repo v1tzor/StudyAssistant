@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import theme.StudyAssistantRes
 import views.TopAppBarButton
 import views.TopAppBarEmptyButton
 import views.TopAppBarTitle
@@ -63,7 +64,7 @@ internal fun DetailsTopBar(
         actions = {
             Row {
                 TopAppBarButton(
-                    imagePainter = painterResource(ScheduleThemeRes.icons.currentDayOrWeek),
+                    imagePainter = painterResource(StudyAssistantRes.icons.calendarToday),
                     imageDescription = null,
                     onButtonClick = onCurrentWeek,
                 )

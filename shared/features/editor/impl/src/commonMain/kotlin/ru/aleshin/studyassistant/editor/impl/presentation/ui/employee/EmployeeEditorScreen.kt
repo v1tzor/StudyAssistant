@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import functional.UID
 import navigation.nestedPop
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
@@ -42,7 +43,7 @@ import views.ErrorSnackbar
 /**
  * @author Stanislav Aleshin on 06.06.2024
  */
-internal class EmployeeEditorScreen(
+internal data class EmployeeEditorScreen(
     private val employeeId: UID?,
     private val organizationId: UID,
 ) : Screen {
@@ -57,7 +58,7 @@ internal class EmployeeEditorScreen(
         )
     ) { state ->
         val strings = EditorThemeRes.strings
-        val navigator = LocalNavigator.current
+        val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -67,14 +68,14 @@ internal class EmployeeEditorScreen(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
                     onUpdateAvatar = { dispatchEvent(EmployeeEditorEvent.UpdateAvatar(it)) },
-                    onEmployeePostSelected = { dispatchEvent(EmployeeEditorEvent.SelectPost(it)) },
-                    omBirthdaySelected = { dispatchEvent(EmployeeEditorEvent.SelectBirthday(it)) },
+                    onEmployeePostSelected = { dispatchEvent(EmployeeEditorEvent.UpdatePost(it)) },
+                    omBirthdaySelected = { dispatchEvent(EmployeeEditorEvent.UpdateBirthday(it)) },
                     onUpdateEmails = { dispatchEvent(EmployeeEditorEvent.UpdateEmails(it)) },
                     onUpdatePhones = { dispatchEvent(EmployeeEditorEvent.UpdatePhones(it)) },
                     onUpdateWebs = { dispatchEvent(EmployeeEditorEvent.UpdateWebs(it)) },
                     onUpdateLocations = { dispatchEvent(EmployeeEditorEvent.UpdateLocations(it)) },
                     omWorkTimeSelected = { start, end ->
-                        dispatchEvent(EmployeeEditorEvent.SelectWorkTime(start, end))
+                        dispatchEvent(EmployeeEditorEvent.UpdateWorkTime(start, end))
                     },
                     onUpdateName = { first, second, patronymic ->
                         dispatchEvent(EmployeeEditorEvent.UpdateName(first, second, patronymic))
@@ -98,7 +99,7 @@ internal class EmployeeEditorScreen(
 
         handleEffect { effect ->
             when (effect) {
-                is EmployeeEditorEffect.NavigateToBack -> navigator?.nestedPop()
+                is EmployeeEditorEffect.NavigateToBack -> navigator.nestedPop()
                 is EmployeeEditorEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

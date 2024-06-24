@@ -59,6 +59,19 @@ class OrganizationsRepositoryImpl(
         }
     }
 
+    override suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShort?> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val organizationFlow = if (isSubscriber) {
+            remoteDataSource.fetchShortOrganizationById(uid, targetUser)
+        } else {
+            localDataSource.fetchShortOrganizationById(uid)
+        }
+
+        return organizationFlow.map { organizationData ->
+            organizationData?.mapToDomain()
+        }
+    }
+
     override suspend fun fetchAllOrganization(targetUser: UID): Flow<List<Organization>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
         val organizationsFlow = if (isSubscriber) {

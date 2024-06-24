@@ -38,4 +38,5 @@ data class HomeworkPojo(
     val test: String? = null,
     val priority: String = TaskPriority.STANDARD.name,
     val done: Boolean = false,
+    val completeDate: Long? = null,
 )
