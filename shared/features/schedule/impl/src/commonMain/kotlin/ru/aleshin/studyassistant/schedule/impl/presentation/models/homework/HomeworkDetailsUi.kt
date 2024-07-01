@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.models.homework
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
+import entities.tasks.HomeworkStatus
 import entities.tasks.TaskPriority
 import functional.UID
 import kotlinx.datetime.Instant
@@ -35,17 +36,16 @@ internal data class HomeworkDetailsUi(
     val uid: UID,
     val classId: UID? = null,
     @TypeParceler<Instant, InstantParceler>
-    val date: Instant,
-    @TypeParceler<Instant?, NullInstantParceler>
-    val deadline: Instant?,
+    val deadline: Instant,
     val subject: SubjectUi? = null,
     val organization: OrganizationShortUi,
-    val theoreticalTasks: String = "",
-    val practicalTasks: String = "",
-    val presentations: String = "",
+    val theoreticalTasks: HomeworkTasksUi,
+    val practicalTasks: HomeworkTasksUi,
+    val presentationTasks: HomeworkTasksUi,
     val test: String? = null,
     val priority: TaskPriority = TaskPriority.STANDARD,
     val isDone: Boolean = false,
+    val status: HomeworkStatus,
     @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant?,
 ) : Parcelable

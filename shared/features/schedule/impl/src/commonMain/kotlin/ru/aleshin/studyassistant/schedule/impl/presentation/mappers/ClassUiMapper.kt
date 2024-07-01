@@ -17,12 +17,17 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
 import entities.classes.ClassDetails
+import entities.tasks.Homework
+import entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
  */
-internal fun ClassDetails.mapToUi(number: Int) = ClassDetailsUi(
+internal inline fun ClassDetails.mapToUi(
+    number: Int,
+    homeworkStatus: (Homework) -> HomeworkStatus,
+) = ClassDetailsUi(
     uid = uid,
     scheduleId = scheduleId,
     organization = organization.mapToUi(),
@@ -35,5 +40,5 @@ internal fun ClassDetails.mapToUi(number: Int) = ClassDetailsUi(
     timeRange = timeRange,
     notification = notification,
     number = number,
-    homework = homeWork?.mapToUi(),
+    homework = homework?.let { it.mapToUi(status = homeworkStatus(it)) },
 )

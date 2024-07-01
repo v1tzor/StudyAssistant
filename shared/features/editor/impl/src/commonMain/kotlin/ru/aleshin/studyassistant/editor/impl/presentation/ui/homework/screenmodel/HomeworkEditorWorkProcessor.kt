@@ -110,12 +110,11 @@ internal interface HomeworkEditorWorkProcessor :
                 EditHomeworkUi.createEditModel(
                     uid = homeworkId,
                     organization = homeworkOrganization,
-                    date = date?.startThisDay(),
+                    deadline = date?.startThisDay(),
                     subject = subject,
                 )
             }
-
-            emit(ActionResult(HomeworkEditorAction.UpdateEditModel(editModel)))
+            emit(ActionResult(HomeworkEditorAction.SetupEditModel(editModel)))
         }
 
         private fun loadOrganizationsWork() = flow {

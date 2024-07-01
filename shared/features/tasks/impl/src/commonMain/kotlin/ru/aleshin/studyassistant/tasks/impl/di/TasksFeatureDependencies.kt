@@ -24,6 +24,7 @@ import repositories.CalendarSettingsRepository
 import repositories.CustomScheduleRepository
 import repositories.HomeworksRepository
 import repositories.OrganizationsRepository
+import repositories.TodoRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 
@@ -37,6 +38,7 @@ interface TasksFeatureDependencies : BaseFeatureDependencies {
     val organizationsRepository: OrganizationsRepository
     val calendarSettingsRepository: CalendarSettingsRepository
     val homeworkRepository: HomeworksRepository
+    val todoRepository: TodoRepository
     val usersRepository: UsersRepository
     val dateManager: DateManager
     val coroutineManager: CoroutineManager

@@ -37,6 +37,7 @@ kotlin {
             api(libs.kotlin.serialization)
             api(libs.moko.parcelize)
             api(libs.bignumn)
+            api(libs.logger)
 
             api(libs.kodein.core)
             implementation(libs.kodein.compose)

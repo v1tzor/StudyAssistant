@@ -16,31 +16,33 @@
 
 package entities.tasks
 
-import functional.Constants.Date
+import extensions.shiftDay
+import extensions.startThisDay
+import functional.TimeRange
 import kotlinx.datetime.Instant
 
 /**
  * @author Stanislav Aleshin on 21.06.2024.
  */
 enum class HomeworkStatus {
-    COMPLETE, WAIT, IN_FUTURE, NOT_COMPLETE;
+    COMPLETE, WAIT, IN_FUTURE, SKIPPED, NOT_COMPLETE;
 
     companion object {
-        fun calculate(isDone: Boolean, deadline: Instant?, currentTime: Instant): HomeworkStatus {
-            return if (isDone) {
-                COMPLETE
+        fun calculate(
+            isDone: Boolean,
+            completeDate: Instant?,
+            deadline: Instant,
+            currentTime: Instant
+        ): HomeworkStatus {
+            val isComplete = completeDate != null
+            val currentDate = currentTime.startThisDay()
+            return if (isComplete) {
+                if (isDone) COMPLETE else SKIPPED
             } else {
-                if (deadline != null) {
-                    val duration = deadline - currentTime
-                    if (duration.isPositive()) {
-                        if (duration.inWholeMilliseconds <= Date.MILLIS_IN_DAY) {
-                            WAIT
-                        } else {
-                            IN_FUTURE
-                        }
-                    } else {
-                        NOT_COMPLETE
-                    }
+                val duration = deadline - currentTime
+                if (duration.isPositive()) {
+                    val timeRange = TimeRange(currentDate, currentDate.shiftDay(1))
+                    if (timeRange.containsDate(deadline)) WAIT else IN_FUTURE
                 } else {
                     NOT_COMPLETE
                 }

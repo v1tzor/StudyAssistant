@@ -16,13 +16,14 @@
 
 package ru.aleshin.studyassistant.navigation.impl.navigation
 
-import architecture.screens.EmptyScreen
 import cafe.adriel.voyager.core.screen.Screen
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
+import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
+import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
@@ -31,7 +32,7 @@ internal interface TabScreenProvider {
 
     fun provideScheduleScreen(screen: ScheduleScreen): Screen
 
-    fun provideTasksScreen(): Screen
+    fun provideTasksScreen(screen: TasksScreen): Screen
 
     fun provideInfoScreen(screen: InfoScreen): Screen
 
@@ -39,6 +40,7 @@ internal interface TabScreenProvider {
 
     class Base(
         private val scheduleFeatureStarter: () -> ScheduleFeatureStarter,
+        private val tasksFeatureStarter: () -> TasksFeatureStarter,
         private val infoFeatureStarter: () -> InfoFeatureStarter,
         private val profileFeatureStarter: () -> ProfileFeatureStarter,
     ) : TabScreenProvider {
@@ -47,9 +49,8 @@ internal interface TabScreenProvider {
             return scheduleFeatureStarter().fetchRootScreenAndNavigate(screen, isNavigate = false)
         }
 
-        override fun provideTasksScreen(): Screen {
-            // TODO: Not yet implemented
-            return EmptyScreen
+        override fun provideTasksScreen(screen: TasksScreen): Screen {
+            return tasksFeatureStarter().fetchRootScreenAndNavigate(screen, isNavigate = false)
         }
 
         override fun provideInfoScreen(screen: InfoScreen): Screen {

@@ -39,10 +39,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import entities.tasks.TaskPriority
-import entities.tasks.toHomeworkTask
-import functional.Either
 import mappers.mapToString
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkTaskComponentUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkTasksUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 import theme.StudyAssistantRes
 
@@ -52,9 +52,9 @@ import theme.StudyAssistantRes
 @Composable
 internal fun SheetHomeworkView(
     modifier: Modifier = Modifier,
-    theoreticalTasks: String,
-    practicalTasks: String,
-    presentations: String,
+    theoreticalTasks: HomeworkTasksUi,
+    practicalTasks: HomeworkTasksUi,
+    presentationTasks: HomeworkTasksUi,
     priority: TaskPriority
 ) {
     Surface(
@@ -66,7 +66,7 @@ internal fun SheetHomeworkView(
             modifier = Modifier.padding(vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            if (theoreticalTasks.isNotBlank()) {
+            if (theoreticalTasks.components.isNotEmpty()) {
                 HomeworkTaskView(
                     icon = painterResource(StudyAssistantRes.icons.theoreticalTasks),
                     title = StudyAssistantRes.strings.theoreticalTasksTitle,
@@ -74,10 +74,10 @@ internal fun SheetHomeworkView(
                     tasks = theoreticalTasks,
                 )
             }
-            if (theoreticalTasks.isNotBlank() && practicalTasks.isNotBlank()) {
+            if (theoreticalTasks.components.isNotEmpty() && practicalTasks.components.isNotEmpty()) {
                 HorizontalDivider()
             }
-            if (practicalTasks.isNotBlank()) {
+            if (practicalTasks.components.isNotEmpty()) {
                 HomeworkTaskView(
                     icon = painterResource(StudyAssistantRes.icons.practicalTasks),
                     title = StudyAssistantRes.strings.practicalTasksTitle,
@@ -85,15 +85,17 @@ internal fun SheetHomeworkView(
                     tasks = practicalTasks,
                 )
             }
-            if (presentations.isNotBlank() && (theoreticalTasks.isNotBlank() || practicalTasks.isNotBlank())) {
+            if (presentationTasks.components.isNotEmpty() &&
+                (theoreticalTasks.components.isNotEmpty() || practicalTasks.components.isNotEmpty())
+            ) {
                 HorizontalDivider()
             }
-            if (presentations.isNotBlank()) {
+            if (presentationTasks.components.isNotEmpty()) {
                 HomeworkTaskView(
                     icon = painterResource(StudyAssistantRes.icons.presentationTasks),
                     title = StudyAssistantRes.strings.presentationsTasksTitle,
                     priority = priority,
-                    tasks = presentations,
+                    tasks = presentationTasks,
                 )
             }
         }
@@ -173,7 +175,7 @@ private fun HomeworkTaskView(
     icon: Painter,
     title: String,
     priority: TaskPriority,
-    tasks: String,
+    tasks: HomeworkTasksUi,
 ) {
     Column(
         modifier = modifier.padding(horizontal = 12.dp),
@@ -214,24 +216,25 @@ private fun HomeworkTaskView(
 @OptIn(ExperimentalLayoutApi::class)
 private fun HomeworkTaskRow(
     modifier: Modifier = Modifier,
-    tasks: String,
+    tasks: HomeworkTasksUi,
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        tasks.toHomeworkTask().forEach { homeworkTask ->
+        tasks.components.forEach { homeworkTask ->
             when (homeworkTask) {
-                is Either.Left -> {
+                is HomeworkTaskComponentUi.Label -> {
                     Text(
                         modifier = Modifier.padding(vertical = 2.dp),
-                        text = buildString { append(homeworkTask.data, ": ") },
+                        text = buildString { append(homeworkTask.text, ": ") },
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }
-                is Either.Right -> homeworkTask.data.forEach { taskText ->
+
+                is HomeworkTaskComponentUi.Tasks -> homeworkTask.taskList.forEach { taskText ->
                     Surface(
                         shape = RoundedCornerShape(6.dp),
                         color = MaterialTheme.colorScheme.surfaceVariant,

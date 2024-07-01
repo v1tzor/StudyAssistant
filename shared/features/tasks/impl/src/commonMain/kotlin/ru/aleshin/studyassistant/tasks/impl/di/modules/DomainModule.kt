@@ -21,6 +21,9 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksErrorHandler
+import ru.aleshin.studyassistant.tasks.impl.domain.interactors.HomeworksInteractor
+import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ScheduleInteractor
+import ru.aleshin.studyassistant.tasks.impl.domain.interactors.TodoInteractor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -28,4 +31,8 @@ import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksErrorHandler
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<TasksErrorHandler> { TasksErrorHandler.Base() }
     bindSingleton<TasksEitherWrapper> { TasksEitherWrapper.Base(instance()) }
+
+    bindSingleton<HomeworksInteractor> { HomeworksInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<TodoInteractor> { TodoInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<ScheduleInteractor> { ScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
 }

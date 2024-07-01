@@ -29,6 +29,8 @@ interface HomeworksRepository {
     suspend fun addOrUpdateHomework(homework: Homework, targetUser: UID): UID
     suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<Homework?>
     suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>>
+    suspend fun fetchOverdueHomeworks(currentDate: Instant, targetUser: UID): Flow<List<Homework>>
+    suspend fun fetchActiveLinkedHomeworks(currentDate: Instant, targetUser: UID): Flow<List<Homework>>
     suspend fun fetchHomeworksByDate(date: Instant, targetUser: UID): Flow<List<Homework>>
     suspend fun deleteHomework(uid: UID, targetUser: UID)
 }

@@ -58,6 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import extensions.formatByTimeZone
+import extensions.isCurrentDay
 import extensions.mapEpochTimeToInstant
 import functional.UID
 import kotlinx.datetime.Instant
@@ -80,7 +81,7 @@ import views.ClickableTextField
 internal fun LinkedClassInfoField(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    date: Instant?,
+    selectedDate: Instant?,
     linkedClass: UID?,
     classesForLinked: ClassesForLinkedUi,
     onSelectedDate: (Instant?) -> Unit,
@@ -111,7 +112,7 @@ internal fun LinkedClassInfoField(
             ClickableTextField(
                 onClick = { datePickerState = true },
                 enabled = !isLoading,
-                value = date?.formatByTimeZone(dateFormat),
+                value = selectedDate?.formatByTimeZone(dateFormat),
                 label = EditorThemeRes.strings.homeworkDateFieldLabel,
                 placeholder = EditorThemeRes.strings.homeworkDateFieldPlaceholder,
                 trailingIcon = {
@@ -124,6 +125,7 @@ internal fun LinkedClassInfoField(
             )
             LinkClassView(
                 isLoading = isLoading,
+                selectedDate = selectedDate,
                 linkedClass = linkedClass,
                 classesForLinked = classesForLinked,
                 onSelectedClass = onSelectedClass,
@@ -146,6 +148,7 @@ private fun LinkClassView(
     modifier: Modifier = Modifier,
     gridState: LazyGridState = rememberLazyGridState(),
     isLoading: Boolean,
+    selectedDate: Instant?,
     linkedClass: UID?,
     classesForLinked: ClassesForLinkedUi,
     onSelectedClass: (ClassUi?, Instant?) -> Unit,
@@ -199,7 +202,8 @@ private fun LinkClassView(
                         items(classes) { dateClassModel ->
                             LinkClassItem(
                                 onClick = { onSelectedClass(dateClassModel.second, dateClassModel.first) },
-                                selected = linkedClass == dateClassModel.second.uid,
+                                selected = linkedClass == dateClassModel.second.uid &&
+                                    dateClassModel.first.isCurrentDay(selectedDate),
                                 date = dateClassModel.first,
                                 numberOfClass = dateClassModel.second.number,
                             )

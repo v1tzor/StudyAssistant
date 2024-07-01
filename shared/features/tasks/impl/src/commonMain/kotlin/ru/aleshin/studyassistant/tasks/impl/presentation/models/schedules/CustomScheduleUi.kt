@@ -14,38 +14,22 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.tasks.impl.presentation.models.homework
+package ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
-import entities.tasks.TaskPriority
 import functional.UID
 import kotlinx.datetime.Instant
 import platform.InstantParceler
-import platform.NullInstantParceler
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
 
 /**
- * @author Stanislav Aleshin on 09.06.2024.
+ * @author Stanislav Aleshin on 29.06.2024.
  */
 @Parcelize
-internal data class HomeworkDetailsUi(
+internal data class CustomScheduleUi(
     val uid: UID,
-    val classId: UID? = null,
     @TypeParceler<Instant, InstantParceler>
     val date: Instant,
-    @TypeParceler<Instant?, NullInstantParceler>
-    val deadline: Instant?,
-    val subject: SubjectUi? = null,
-    val organization: OrganizationShortUi,
-    val theoreticalTasks: String = "",
-    val practicalTasks: String = "",
-    val presentations: String = "",
-    val test: String? = null,
-    val priority: TaskPriority = TaskPriority.STANDARD,
-    val isDone: Boolean = false,
-    @TypeParceler<Instant?, NullInstantParceler>
-    val completeDate: Instant?,
+    val classes: List<ClassUi>,
 ) : Parcelable

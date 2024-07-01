@@ -32,6 +32,7 @@ object StudyAssistantFirestore {
 
         const val ORGANIZATIONS = "organizations"
         const val HOMEWORKS = "homeworks"
+        const val TODOS = "todos"
         const val BASE_SCHEDULES = "baseSchedules"
         const val CUSTOM_SCHEDULES = "customSchedules"
         const val SUBJECTS = "subjects"
@@ -42,7 +43,13 @@ object StudyAssistantFirestore {
 
         const val UID = "uid"
         const val SCHEDULE_CLASSES = "classes"
-        const val HOMEWORK_DATE = "date"
+        const val HOMEWORK_DEADLINE = "deadline"
+        const val HOMEWORK_CLASS_ID = "classId"
+        const val HOMEWORK_DONE = "done"
+        const val HOMEWORK_COMPLETE_DATE = "completeDate"
+        const val TODO_DEADLINE = "deadline"
+        const val TODO_DONE = "done"
+        const val TODO_COMPLETE_DATE = "completeDate"
         const val VERSION_FROM = "dateVersionFrom"
         const val VERSION_TO = "dateVersionTo"
         const val CLASS_SCHEDULE_ID = "scheduleId"

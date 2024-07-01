@@ -16,17 +16,29 @@
 
 package entities.tasks
 
-import functional.UID
 import kotlinx.datetime.Instant
 
 /**
- * @author Stanislav Aleshin on 20.06.2024.
+ * @author Stanislav Aleshin on 01.07.2024.
  */
-data class Task(
-    val uid: UID,
-    val deadline: Instant?,
-    val name: String,
-    val isDone: Boolean,
-    val completeDate: Instant?,
-    val priority: TaskPriority,
-)
+enum class TodoStatus {
+    COMPLETE, IN_PROGRESS, NOT_COMPLETE;
+
+    companion object {
+        fun calculate(
+            isDone: Boolean,
+            deadline: Instant?,
+            currentTime: Instant
+        ): TodoStatus {
+            return if (isDone) {
+                COMPLETE
+            } else {
+                if (deadline != null) {
+                    if (deadline >= currentTime) IN_PROGRESS else NOT_COMPLETE
+                } else {
+                    IN_PROGRESS
+                }
+            }
+        }
+    }
+}

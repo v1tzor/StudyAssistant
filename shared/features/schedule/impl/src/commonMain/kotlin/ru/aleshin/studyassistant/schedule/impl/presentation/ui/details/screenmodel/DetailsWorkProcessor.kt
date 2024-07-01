@@ -20,7 +20,6 @@ import architecture.screenmodel.work.ActionResult
 import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
-import entities.tasks.convertToBase
 import extensions.dateTimeByWeek
 import extensions.setHoursAndMinutes
 import functional.Constants.Delay.UPDATE_ACTIVE_CLASS
@@ -67,7 +66,8 @@ internal interface DetailsWorkProcessor :
             scheduleInteractor.fetchDetailsWeekSchedule(week).collectAndHandle(
                 onLeftAction = { emit(EffectResult(DetailsEffect.ShowError(it))) },
                 onRightAction = { weekScheduleDetails ->
-                    val weekSchedule = weekScheduleDetails.mapToUi()
+                    val currentTime = dateManager.fetchCurrentInstant()
+                    val weekSchedule = weekScheduleDetails.mapToUi(currentTime)
                     emit(ActionResult(DetailsAction.UpdateWeekSchedule(weekSchedule)))
                     emitAll(cycleUpdateActiveClass(weekSchedule))
                 }
@@ -77,8 +77,12 @@ internal interface DetailsWorkProcessor :
         }
 
         private fun updateIsHomeworkDoneWork(homework: HomeworkDetailsUi, isDone: Boolean) = flow {
-            val updatedHomework = homework.copy(isDone = isDone).mapToDomain().convertToBase()
-            homeworkInteractor.updateHomework(updatedHomework).handle(
+            val currentDate = dateManager.fetchCurrentInstant()
+            val updatedHomework = homework.copy(
+                isDone = isDone,
+                completeDate = currentDate.takeIf { isDone },
+            )
+            homeworkInteractor.updateHomework(updatedHomework.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(DetailsEffect.ShowError(it))) },
             )
         }

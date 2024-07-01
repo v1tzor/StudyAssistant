@@ -61,10 +61,8 @@ internal fun DetailsContent(
         targetState = scheduleView,
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
     ) { scheduleViewType ->
-        val gridState = rememberLazyGridState()
-        val listState = rememberLazyListState()
-
         if (scheduleViewType == ScheduleViewType.COMMON) {
+            val gridState = rememberLazyGridState()
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize().padding(top = 8.dp),
@@ -100,6 +98,7 @@ internal fun DetailsContent(
                 }
             }
         } else {
+            val listState = rememberLazyListState()
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(top = 8.dp),
                 state = listState,

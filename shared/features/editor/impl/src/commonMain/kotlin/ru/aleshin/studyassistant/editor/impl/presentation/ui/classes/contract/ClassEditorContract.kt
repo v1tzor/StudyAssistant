@@ -91,6 +91,7 @@ internal sealed class ClassEditorAction : BaseAction {
     ) : ClassEditorAction()
     data class UpdateEditModel(val editModel: EditClassUi?) : ClassEditorAction()
     data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : ClassEditorAction()
+    data class UpdateFreeClasses(val freeClassTimeRanges: Map<TimeRange, Boolean>?) : ClassEditorAction()
     data class UpdateSubjects(val subjects: List<SubjectUi>) : ClassEditorAction()
     data class UpdateEmployees(val employees: List<EmployeeDetailsUi>) : ClassEditorAction()
     data class UpdateLoading(val isLoading: Boolean) : ClassEditorAction()

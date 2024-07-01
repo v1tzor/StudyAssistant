@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import entities.organizations.Millis
 import managers.DateManager
 import navigation.root
@@ -66,11 +67,12 @@ internal data class OverviewScreen(val firstDay: Millis?) : Screen {
         dependencies = OverviewDeps(firstDay = firstDay),
     ) { state ->
         val strings = ScheduleThemeRes.strings
-        val navigator = LocalNavigator.current
-        val di = localDI().direct
-        val dateManager = remember { di.instance<DateManager>() }
+        val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
         val classSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+        val localDI = localDI().direct
+        val dateManager = remember { localDI.instance<DateManager>() }
         var selectedSheetClass by remember { mutableStateOf<ClassDetailsUi?>(null) }
         var showClassBottomSheet by remember { mutableStateOf(false) }
 
@@ -80,7 +82,6 @@ internal data class OverviewScreen(val firstDay: Millis?) : Screen {
                 OverviewContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
-                    currentTime = dateManager.fetchCurrentInstant(),
                     onShowClassInfo = {
                         selectedSheetClass = it
                         showClassBottomSheet = true
@@ -124,7 +125,7 @@ internal data class OverviewScreen(val firstDay: Millis?) : Screen {
                 currentTime = dateManager.fetchCurrentInstant(),
                 activeClass = state.activeClass,
                 classModel = sheetClass,
-                classDate = state.currentDate,
+                classDate = checkNotNull(state.selectedDate),
                 onEditHomework = { dispatchEvent(OverviewEvent.EditHomeworkInEditor(it)) },
                 onAddHomework = { homework, date ->
                     dispatchEvent(OverviewEvent.AddHomeworkInEditor(homework, date))
@@ -140,8 +141,8 @@ internal data class OverviewScreen(val firstDay: Millis?) : Screen {
 
         handleEffect { effect ->
             when (effect) {
-                is OverviewEffect.NavigateToLocal -> navigator?.push(effect.pushScreen)
-                is OverviewEffect.NavigateToGlobal -> navigator?.root()?.push(effect.pushScreen)
+                is OverviewEffect.NavigateToLocal -> navigator.push(effect.pushScreen)
+                is OverviewEffect.NavigateToGlobal -> navigator.root()?.push(effect.pushScreen)
                 is OverviewEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

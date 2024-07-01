@@ -44,9 +44,11 @@ import kotlin.coroutines.CoroutineContext
  */
 interface HomeworksLocalDataSource {
 
-    suspend fun fetchHomeworksByTime(from: Long, to: Long): Flow<List<HomeworkDetailsData>>
-    suspend fun fetchHomeworkById(uid: UID): Flow<HomeworkDetailsData?>
     suspend fun addOrUpdateHomework(homework: HomeworkDetailsData): UID
+    suspend fun fetchHomeworkById(uid: UID): Flow<HomeworkDetailsData?>
+    suspend fun fetchHomeworksByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsData>>
+    suspend fun fetchOverdueHomeworks(currentDate: Long): Flow<List<HomeworkDetailsData>>
+    suspend fun fetchActiveLinkedHomeworks(currentDate: Long): Flow<List<HomeworkDetailsData>>
     suspend fun deleteHomework(uid: UID)
 
     class Base(
@@ -60,7 +62,47 @@ interface HomeworksLocalDataSource {
         private val coroutineContext: CoroutineContext
             get() = coroutineManager.backgroundDispatcher
 
-        override suspend fun fetchHomeworksByTime(from: Long, to: Long): Flow<List<HomeworkDetailsData>> {
+        override suspend fun addOrUpdateHomework(homework: HomeworkDetailsData): UID {
+            val uid = homework.uid.ifEmpty { randomUUID() }
+            val homeworkEntity = homework.mapToLocalData()
+            homeworkQueries.addOrUpdateHomeworks(homeworkEntity.copy(uid = uid))
+
+            return uid
+        }
+
+        override suspend fun fetchHomeworkById(uid: UID): Flow<HomeworkDetailsData?> {
+            val query = homeworkQueries.fetchHomeworkById(uid)
+            val homeworkEntityFlow = query.asFlow().mapToOneOrNull(coroutineContext)
+
+            return homeworkEntityFlow.map { homeworkEntity ->
+                if (homeworkEntity == null) return@map null
+
+                val subjectQuery = homeworkEntity.subject_id?.let { subjectQueries.fetchSubjectById(it) }
+                val organizationQuery = organizationsQueries.fetchOrganizationById(
+                    uid = homeworkEntity.organization_id,
+                    mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel,
+                               _, _, locationList, _, offices, _ ->
+                        val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsData>(timeIntervalsModel)
+                        val locations = locationList.map { Json.decodeFromString<ContactInfoData>(it) }
+                        OrganizationShortData(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
+                    },
+                )
+
+                val organization = organizationQuery.executeAsOne()
+                val subject = subjectQuery?.executeAsOneOrNull().let { subjectEntity ->
+                    val employeeQuery = subjectEntity?.teacher_id?.let { employeeQueries.fetchEmployeeById(it) }
+                    val employee = employeeQuery?.executeAsOneOrNull()?.mapToDetailsData()
+                    subjectEntity?.mapToDetailsData(employee)
+                }
+
+                homeworkEntity.mapToDetailsData(
+                    organization = organization,
+                    subject = subject,
+                )
+            }
+        }
+
+        override suspend fun fetchHomeworksByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsData>> {
             val query = homeworkQueries.fetchHomeworksByTimeRange(from, to)
             val homeworkEntityListFlow = query.asFlow().mapToList(coroutineContext)
 
@@ -68,7 +110,8 @@ interface HomeworksLocalDataSource {
                 homeworks.map { homeworkEntity ->
                     val organizationQuery = organizationsQueries.fetchOrganizationById(
                         uid = homeworkEntity.organization_id,
-                        mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel, _, _, locationList, _, offices, _ ->
+                        mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel,
+                                   _, _, locationList, _, offices, _ ->
                             val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsData>(timeIntervalsModel)
                             val locations = locationList.map { Json.decodeFromString<ContactInfoData>(it) }
                             OrganizationShortData(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
@@ -91,43 +134,68 @@ interface HomeworksLocalDataSource {
             }
         }
 
-        override suspend fun fetchHomeworkById(uid: UID): Flow<HomeworkDetailsData?> {
-            val query = homeworkQueries.fetchHomeworkById(uid)
-            val homeworkEntityFlow = query.asFlow().mapToOneOrNull(coroutineContext)
+        override suspend fun fetchOverdueHomeworks(currentDate: Long): Flow<List<HomeworkDetailsData>> {
+            val query = homeworkQueries.fetchOverdueHomeworks(currentDate)
+            val homeworkEntityListFlow = query.asFlow().mapToList(coroutineContext)
 
-            return homeworkEntityFlow.map { homeworkEntity ->
-                if (homeworkEntity == null) return@map null
+            return homeworkEntityListFlow.map { homeworks ->
+                homeworks.map { homeworkEntity ->
+                    val organizationQuery = organizationsQueries.fetchOrganizationById(
+                        uid = homeworkEntity.organization_id,
+                        mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel,
+                                   _, _, locationList, _, offices, _ ->
+                            val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsData>(timeIntervalsModel)
+                            val locations = locationList.map { Json.decodeFromString<ContactInfoData>(it) }
+                            OrganizationShortData(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
+                        },
+                    )
+                    val subjectQuery = homeworkEntity.subject_id?.let { subjectQueries.fetchSubjectById(it) }
 
-                val subjectQuery = homeworkEntity.subject_id?.let { subjectQueries.fetchSubjectById(it) }
-                val organizationQuery = organizationsQueries.fetchOrganizationById(
-                    uid = homeworkEntity.organization_id,
-                    mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel, _, _, locationList, _, offices, _ ->
-                        val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsData>(timeIntervalsModel)
-                        val locations = locationList.map { Json.decodeFromString<ContactInfoData>(it) }
-                        OrganizationShortData(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
-                    },
-                )
+                    val organization = organizationQuery.executeAsOne()
+                    val subject = subjectQuery?.executeAsOne().let { subjectEntity ->
+                        val employeeQuery = subjectEntity?.teacher_id?.let { employeeQueries.fetchEmployeeById(it) }
+                        val employee = employeeQuery?.executeAsOne()?.mapToDetailsData()
+                        subjectEntity?.mapToDetailsData(employee)
+                    }
 
-                val organization = organizationQuery.executeAsOne()
-                val subject = subjectQuery?.executeAsOneOrNull().let { subjectEntity ->
-                    val employeeQuery = subjectEntity?.teacher_id?.let { employeeQueries.fetchEmployeeById(it) }
-                    val employee = employeeQuery?.executeAsOneOrNull()?.mapToDetailsData()
-                    subjectEntity?.mapToDetailsData(employee)
+                    homeworkEntity.mapToDetailsData(
+                        organization = organization,
+                        subject = subject,
+                    )
                 }
-
-                homeworkEntity.mapToDetailsData(
-                    organization = organization,
-                    subject = subject,
-                )
             }
         }
 
-        override suspend fun addOrUpdateHomework(homework: HomeworkDetailsData): UID {
-            val uid = homework.uid.ifEmpty { randomUUID() }
-            val homeworkEntity = homework.mapToLocalData()
-            homeworkQueries.addOrUpdateHomeworks(homeworkEntity.copy(uid = uid))
+        override suspend fun fetchActiveLinkedHomeworks(currentDate: Long): Flow<List<HomeworkDetailsData>> {
+            val query = homeworkQueries.fetchActiveAndLinkedHomeworks(currentDate)
+            val homeworkEntityListFlow = query.asFlow().mapToList(coroutineContext)
 
-            return uid
+            return homeworkEntityListFlow.map { homeworks ->
+                homeworks.map { homeworkEntity ->
+                    val organizationQuery = organizationsQueries.fetchOrganizationById(
+                        uid = homeworkEntity.organization_id,
+                        mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel,
+                                   _, _, locationList, _, offices, _ ->
+                            val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsData>(timeIntervalsModel)
+                            val locations = locationList.map { Json.decodeFromString<ContactInfoData>(it) }
+                            OrganizationShortData(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
+                        },
+                    )
+                    val subjectQuery = homeworkEntity.subject_id?.let { subjectQueries.fetchSubjectById(it) }
+
+                    val organization = organizationQuery.executeAsOne()
+                    val subject = subjectQuery?.executeAsOne().let { subjectEntity ->
+                        val employeeQuery = subjectEntity?.teacher_id?.let { employeeQueries.fetchEmployeeById(it) }
+                        val employee = employeeQuery?.executeAsOne()?.mapToDetailsData()
+                        subjectEntity?.mapToDetailsData(employee)
+                    }
+
+                    homeworkEntity.mapToDetailsData(
+                        organization = organization,
+                        subject = subject,
+                    )
+                }
+            }
         }
 
         override suspend fun deleteHomework(uid: UID) {

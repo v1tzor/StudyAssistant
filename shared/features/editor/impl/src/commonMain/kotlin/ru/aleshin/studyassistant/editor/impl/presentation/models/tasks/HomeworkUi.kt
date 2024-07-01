@@ -35,7 +35,7 @@ internal data class HomeworkUi(
     val uid: UID,
     val classId: UID? = null,
     @TypeParceler<Instant, InstantParceler>
-    val date: Instant,
+    val deadline: Instant,
     val subject: SubjectUi? = null,
     val organization: OrganizationShortUi,
     val theoreticalTasks: String = "",

@@ -22,8 +22,6 @@ import entities.organizations.OrganizationShort
 import entities.subject.EventType
 import entities.subject.Subject
 import entities.tasks.Homework
-import entities.tasks.HomeworkDetails
-import entities.tasks.convertToDetails
 import functional.TimeRange
 import functional.UID
 
@@ -42,10 +40,10 @@ data class ClassDetails(
     val location: ContactInfo?,
     val timeRange: TimeRange,
     val notification: Boolean = false,
-    val homeWork: HomeworkDetails? = null,
+    val homework: Homework? = null,
 )
 
-fun Class.convertToDetails(homeWork: Homework?) = ClassDetails(
+fun Class.convertToDetails(homework: Homework?) = ClassDetails(
     uid = uid,
     scheduleId = scheduleId,
     organization = organization,
@@ -57,5 +55,5 @@ fun Class.convertToDetails(homeWork: Homework?) = ClassDetails(
     location = location,
     timeRange = timeRange,
     notification = notification,
-    homeWork = homeWork?.convertToDetails(deadline = timeRange.from),
+    homework = homework,
 )

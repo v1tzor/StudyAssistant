@@ -14,17 +14,29 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.tasks.impl.presentation.models.homework
+package ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import functional.UID
 
 /**
- * @author Stanislav Aleshin on 20.06.2024.
+ * @author Stanislav Aleshin on 29.06.2024.
  */
 @Parcelize
-internal data class TasksAnalysis(
-    val tomorrowHomeworks: List<UID>,
-    val weekHomeworks: List<UID>,
-) : Parcelable
+internal sealed class ScheduleUi : Parcelable {
+
+    data class Base(val data: BaseScheduleUi?) : ScheduleUi()
+
+    data class Custom(val data: CustomScheduleUi?) : ScheduleUi()
+
+    val classes: List<ClassUi>
+        get() = mapToValue(onBaseSchedule = { it?.classes }, onCustomSchedule = { it?.classes }) ?: emptyList()
+
+    inline fun <T> mapToValue(
+        onBaseSchedule: (BaseScheduleUi?) -> T,
+        onCustomSchedule: (CustomScheduleUi?) -> T,
+    ) = when (this) {
+        is Base -> onBaseSchedule(data)
+        is Custom -> onCustomSchedule(data)
+    }
+}

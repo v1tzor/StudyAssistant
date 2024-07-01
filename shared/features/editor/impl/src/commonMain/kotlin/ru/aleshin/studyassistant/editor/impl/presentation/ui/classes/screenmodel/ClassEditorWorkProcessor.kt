@@ -78,6 +78,10 @@ internal interface ClassEditorWorkProcessor :
                 weekDay = command.weekDay,
             )
             is ClassEditorWorkCommand.LoadOrganizations -> loadOrganizationsWork()
+            is ClassEditorWorkCommand.LoadFreeClasses -> loadFreeClassesWork(
+                organization = command.organization,
+                schedule = command.schedule,
+            )
             is ClassEditorWorkCommand.LoadEmployees -> loadEmployeesWork(
                 organizationId = command.organizationId,
             )
@@ -162,6 +166,27 @@ internal interface ClassEditorWorkProcessor :
                     emit(ActionResult(ClassEditorAction.UpdateOrganizations(organizations)))
                 },
             )
+        }
+
+        private fun loadFreeClassesWork(
+            organization: OrganizationShortUi?,
+            schedule: ScheduleUi?
+        ) = flow {
+            if (organization == null) {
+                return@flow emit(ActionResult(ClassEditorAction.UpdateFreeClasses(emptyMap())))
+            }
+
+            val scheduleClasses = schedule?.blockMapToValue(
+                onBaseSchedule = { baseSchedule -> baseSchedule?.classes },
+                onCustomSchedule = { customSchedule -> customSchedule?.classes },
+            )
+
+            val freeTimeRanges = calculateFreeClassTimeRanges(
+                timeIntervals = organization.scheduleTimeIntervals,
+                existClasses = scheduleClasses?.map { it.timeRange },
+            )
+
+            emit(ActionResult(ClassEditorAction.UpdateFreeClasses(freeTimeRanges)))
         }
 
         private fun loadSubjectsWork(organizationId: UID?) = flow {
@@ -297,6 +322,11 @@ internal sealed class ClassEditorWorkCommand : WorkCommand {
     ) : ClassEditorWorkCommand()
 
     data object LoadOrganizations : ClassEditorWorkCommand()
+
+    data class LoadFreeClasses(
+        val organization: OrganizationShortUi?,
+        val schedule: ScheduleUi?,
+    ) : ClassEditorWorkCommand()
 
     data class LoadEmployees(
         val organizationId: UID?,

@@ -23,7 +23,7 @@ import kotlin.random.Random
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
-fun <T> List<List<T>>.extractAllItem() = mutableListOf<T>().apply {
+inline fun <T> List<List<T>>.extractAllItem() = buildList {
     this@extractAllItem.forEach { addAll(it) }
 }
 
@@ -33,4 +33,8 @@ fun generateSevenDigitCode(): String {
 
 inline fun <T> Iterable<T>.forEachWith(action: T.() -> Unit) {
     for (element in this) action(element)
+}
+
+inline fun <T> List<T>.limitSize(maxSize: Int): List<T> {
+    return if (size >= maxSize) subList(fromIndex = 0, toIndex = maxSize - 1) else this
 }

@@ -50,6 +50,14 @@ fun Instant.formatByTimeZone(
     return format(format = format, offset = offset)
 }
 
+fun Instant.shiftWeek(amount: Int, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
+    return if (amount < 0) {
+        this.minus(value = -amount, unit = DateTimeUnit.WEEK, timeZone = timeZone)
+    } else {
+        this.plus(value = amount, unit = DateTimeUnit.WEEK, timeZone = timeZone)
+    }
+}
+
 fun Instant.shiftDay(amount: Int, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
     return if (amount < 0) {
         this.minus(value = -amount, unit = DateTimeUnit.DAY, timeZone = timeZone)
@@ -97,6 +105,11 @@ fun Instant.isCurrentDay(date: LocalDate?, timeZone: TimeZone = TimeZone.current
 
 fun Instant.isCurrentDay(date: Instant?, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {
     return isCurrentDay(date?.toLocalDateTime(timeZone)?.date)
+}
+
+fun Instant.isCurrentWeek(date: Instant?, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {
+    val weekTimeRange = dateTime().weekTimeRange()
+    return date?.let { weekTimeRange.containsDate(it) } ?: false
 }
 
 fun Instant.compareByHoursAndMinutes(compareDate: Instant): Boolean {
@@ -255,41 +268,6 @@ fun Long.toMinutesAndHoursString(): String {
     }
 }
 
-//fun Date.setZeroSecond(): Date {
-//    val calendar = Calendar.getInstance().apply {
-//        time = this@setZeroSecond
-//        set(Calendar.SECOND, 0)
-//    }
-//
-//    return calendar.time
-//}
-
-//fun TimeRange.isIncludeTime(time: Date?): Boolean {
-//    if (time == null) return false
-//    return time >= this.from && time <= this.to
-//}
-//
-//fun Date.toMonthAndDayTitle(): String {
-//    val calendar = Calendar.getInstance().apply { time = this@toMonthAndDayTitle }
-//    val month = String.format(Locale.getDefault(), "%02d", calendar.get(Calendar.MONTH) + 1)
-//    val day = String.format(Locale.getDefault(), "%02d", calendar.get(Calendar.DAY_OF_MONTH))
-//    return "$day.$month"
-//}
-//
-//fun TimeRange.toDaysTitle(): String {
-//    val calendar = Calendar.getInstance()
-//    val dayStart = calendar.apply { time = from }.get(Calendar.DAY_OF_MONTH)
-//    val dayEnd = calendar.apply { time = to }.get(Calendar.DAY_OF_MONTH)
-//    return "$dayStart-$dayEnd"
-//}
-//
-//fun TimeRange.toMonthTitle(): String {
-//    val calendar = Calendar.getInstance()
-//    val monthStart = calendar.apply { time = from }.get(Calendar.MONTH) + 1
-//    val monthEnd = calendar.apply { time = to }.get(Calendar.MONTH) + 1
-//    return "$monthStart-$monthEnd"
-//}
-
 fun countWeeksByDays(days: Int): Int {
     return BigDecimal.fromDouble(days.toDouble() / DAYS_IN_WEEK).ceil().intValue()
 }
@@ -298,18 +276,23 @@ fun countMonthByDays(days: Int): Int {
     return BigDecimal.fromDouble(days.toDouble() / Date.DAYS_IN_MONTH).ceil().intValue()
 }
 
-fun Instant.dateOfWeekDay(dayOfWeek: DayOfWeek, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
+fun Instant.startOfWeek(timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
     val dateTime = toLocalDateTime(timeZone)
-    val startOfWeek = shiftDay(-dateTime.dayOfWeek.ordinal, timeZone)
-    val shiftedDate = startOfWeek.shiftDay(dayOfWeek.ordinal, timeZone)
-    return shiftedDate
+    return shiftDay(-dateTime.dayOfWeek.ordinal, timeZone).startThisDay(timeZone)
+}
+
+fun Instant.endOfWeek(timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
+    val dateTime = toLocalDateTime(timeZone)
+    return shiftDay(DayOfWeek.entries.lastIndex - dateTime.dayOfWeek.ordinal, timeZone).endThisDay()
+}
+
+fun Instant.dateOfWeekDay(dayOfWeek: DayOfWeek, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
+    return startOfWeek(timeZone).shiftDay(dayOfWeek.ordinal, timeZone)
 }
 
 fun LocalDateTime.weekTimeRange(timeZone: TimeZone = TimeZone.currentSystemDefault()): TimeRange {
     val instant = toInstant(timeZone)
-    val startOfWeek = instant.shiftDay(-dayOfWeek.ordinal, timeZone)
-    val endOfWeek = instant.shiftDay(DayOfWeek.entries.lastIndex - dayOfWeek.ordinal, timeZone)
-    return TimeRange(startOfWeek.startThisDay(timeZone), endOfWeek.endThisDay(timeZone))
+    return TimeRange(from = instant.startOfWeek(timeZone), to = instant.endOfWeek(timeZone))
 }
 
 fun DayOfWeek.dateTimeByWeek(mondayDate: Instant, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {

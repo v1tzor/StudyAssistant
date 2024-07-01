@@ -20,10 +20,8 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,27 +29,34 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.aay.compose.baseComponents.model.GridOrientation
-import com.aay.compose.baseComponents.model.LegendPosition
-import com.aay.compose.lineChart.LineChart
-import com.aay.compose.lineChart.model.LineParameters
-import com.aay.compose.lineChart.model.LineType
 import extensions.dateTime
 import extensions.isCurrentDay
 import extensions.toMinutesAndHoursString
 import functional.Constants.Animations.FADE_SLOW
+import io.github.koalaplot.core.line.AreaBaseline
+import io.github.koalaplot.core.line.AreaPlot
+import io.github.koalaplot.core.style.AreaStyle
+import io.github.koalaplot.core.style.LineStyle
+import io.github.koalaplot.core.util.ExperimentalKoalaPlotApi
+import io.github.koalaplot.core.xygraph.CategoryAxisModel
+import io.github.koalaplot.core.xygraph.DefaultPoint
+import io.github.koalaplot.core.xygraph.XYGraph
+import io.github.koalaplot.core.xygraph.rememberFloatLinearAxisModel
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.analysis.DailyAnalysisUi
@@ -110,38 +115,41 @@ internal fun OverviewTopSheet(
 }
 
 @Composable
+@OptIn(ExperimentalKoalaPlotApi::class)
 private fun OverviewTopSheetChart(
     modifier: Modifier = Modifier,
     weekAnalysis: List<DailyAnalysisUi>?,
 ) {
-    val analysisParameters = listOf(
-        LineParameters(
-            label = ScheduleThemeRes.strings.analysisDayTitle,
-            data = weekAnalysis?.map { it.generalAssessment.toDouble() } ?: listOf(0.0),
-            lineColor = MaterialTheme.colorScheme.primary,
-            lineType = LineType.CURVED_LINE,
-            lineShadow = true,
-        )
-    )
-
-    Box(modifier.fillMaxWidth().height(130.dp)) {
-        LineChart(
-            modifier = Modifier.fillMaxSize(),
-            linesParameters = analysisParameters,
-            gridColor = MaterialTheme.colorScheme.outlineVariant,
-            xAxisData = weekAnalysis?.map { it.date.dateTime().dayOfMonth.toString() }
-                ?: listOf(" "),
-            animateChart = true,
-            yAxisStyle = MaterialTheme.typography.labelSmall.copy(
-                color = MaterialTheme.colorScheme.onSurface,
+    val xAxisDate = weekAnalysis?.map { it.date.dateTime().dayOfMonth.toString() } ?: listOf("")
+    val yAxisData = weekAnalysis?.map { it.generalAssessment } ?: listOf(0f)
+    val axisPoints = buildList {
+        for (i in 0..(weekAnalysis?.lastIndex ?: 0)) {
+            add(DefaultPoint(xAxisDate[i], yAxisData[i]))
+        }
+    }
+    XYGraph(
+        xAxisModel = CategoryAxisModel(
+            categories = xAxisDate,
+            firstCategoryIsZero = true,
+        ),
+        yAxisModel = rememberFloatLinearAxisModel(
+            range = 0f..10f,
+            minorTickCount = 0,
+            minimumMajorTickSpacing = 16.dp,
+        ),
+        modifier = modifier.fillMaxWidth().height(130.dp),
+    ) {
+        AreaPlot(
+            data = axisPoints,
+            lineStyle = LineStyle(
+                brush = SolidColor(MaterialTheme.colorScheme.primary),
+                strokeWidth = 2.dp
             ),
-            xAxisStyle = MaterialTheme.typography.labelSmall.copy(
-                color = MaterialTheme.colorScheme.onSurface,
+            areaStyle = AreaStyle(
+                brush = SolidColor(MaterialTheme.colorScheme.primaryContainer),
+                alpha = 0.5f,
             ),
-            showXAxis = false,
-            yAxisRange = 4,
-            legendPosition = LegendPosition.DISAPPEAR,
-            gridOrientation = GridOrientation.GRID,
+            areaBaseline = AreaBaseline.ConstantLine(0f),
         )
     }
 }
@@ -164,8 +172,12 @@ private fun OverviewTopSheetClassTime(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                val homeworksProgress = homeworksProgressList.count { it } / homeworksProgressList.size.toFloat()
-                val tasksProgress = tasksProgressList.count { it } / tasksProgressList.size.toFloat()
+                val homeworksProgress by derivedStateOf {
+                    homeworksProgressList.count { it } / homeworksProgressList.size.toFloat()
+                }
+                val tasksProgress by derivedStateOf {
+                    tasksProgressList.count { it } / tasksProgressList.size.toFloat()
+                }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(

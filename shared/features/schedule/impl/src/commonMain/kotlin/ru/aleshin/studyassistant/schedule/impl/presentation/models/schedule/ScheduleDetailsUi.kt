@@ -33,7 +33,7 @@ internal sealed class ScheduleDetailsUi : Parcelable {
     val classes: List<ClassDetailsUi>
         get() = mapToValue(onBaseSchedule = { it?.classes }, onCustomSchedule = { it?.classes }) ?: emptyList()
 
-    fun <T> mapToValue(
+    inline fun <T> mapToValue(
         onBaseSchedule: (BaseScheduleDetailsUi?) -> T,
         onCustomSchedule: (CustomScheduleDetailsUi?) -> T,
     ) = when (this) {

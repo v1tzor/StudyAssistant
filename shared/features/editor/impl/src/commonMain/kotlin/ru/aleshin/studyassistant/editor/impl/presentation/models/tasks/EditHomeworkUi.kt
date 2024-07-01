@@ -34,7 +34,7 @@ internal data class EditHomeworkUi(
     val uid: UID,
     val classId: UID? = null,
     @TypeParceler<Instant?, NullInstantParceler>
-    val date: Instant? = null,
+    val deadline: Instant? = null,
     val subject: SubjectUi? = null,
     val organization: OrganizationShortUi? = null,
     val theoreticalTasks: String = "",
@@ -48,19 +48,19 @@ internal data class EditHomeworkUi(
     val completeDate: Instant? = null,
 ) : Parcelable {
 
-    fun isValid() = date != null && subject != null && organization != null &&
+    fun isValid() = deadline != null && subject != null && organization != null &&
         (theoreticalTasks.isNotEmpty() || practicalTasks.isNotEmpty() || presentationTasks.isNotEmpty())
 
     companion object {
         fun createEditModel(
             uid: UID?,
             organization: OrganizationShortUi? = null,
-            date: Instant? = null,
+            deadline: Instant? = null,
             subject: SubjectUi? = null,
         ) = EditHomeworkUi(
             uid = uid ?: "",
             organization = organization,
-            date = date,
+            deadline = deadline,
             subject = subject,
         )
     }
@@ -69,7 +69,7 @@ internal data class EditHomeworkUi(
 internal fun HomeworkUi.convertToEdit() = EditHomeworkUi(
     uid = uid,
     classId = classId,
-    date = date,
+    deadline = deadline,
     subject = subject,
     organization = organization,
     theoreticalTasks = theoreticalTasks,
@@ -85,7 +85,7 @@ internal fun HomeworkUi.convertToEdit() = EditHomeworkUi(
 internal fun EditHomeworkUi.convertToBase() = HomeworkUi(
     uid = uid,
     classId = classId,
-    date = checkNotNull(date),
+    deadline = checkNotNull(deadline),
     subject = subject,
     organization = checkNotNull(organization),
     theoreticalTasks = theoreticalTasks,

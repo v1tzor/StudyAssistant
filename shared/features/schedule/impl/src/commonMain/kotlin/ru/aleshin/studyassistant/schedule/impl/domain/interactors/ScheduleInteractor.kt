@@ -82,6 +82,7 @@ internal interface ScheduleInteractor {
                         )
                     )
                 }
+
                 baseSchedules.forEach { baseSchedule ->
                     val dayOfWeek = baseSchedule.dayOfWeek
                     if (weekDaySchedules[dayOfWeek] == null) {

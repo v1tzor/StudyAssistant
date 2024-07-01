@@ -19,7 +19,6 @@ package entities.tasks
 import entities.organizations.OrganizationShort
 import entities.subject.Subject
 import extensions.startThisDay
-import functional.Either
 import functional.UID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -30,30 +29,28 @@ import kotlinx.datetime.Instant
 data class Homework(
     val uid: UID,
     val classId: UID? = null,
-    val date: Instant = Clock.System.now().startThisDay(),
+    val deadline: Instant = Clock.System.now().startThisDay(),
     val subject: Subject? = null,
     val organization: OrganizationShort,
     val theoreticalTasks: String = "",
     val practicalTasks: String = "",
-    val presentationsTasks: String = "",
+    val presentationTasks: String = "",
     val test: String? = null,
     val priority: TaskPriority = TaskPriority.STANDARD,
     val isDone: Boolean = false,
     val completeDate: Instant?,
 )
 
-typealias HomeworkTask = Either<String, List<String>>
-
-fun String.toHomeworkTask() = buildList<HomeworkTask> {
+fun String.toHomeworkComponents() = buildList<HomeworkTaskComponent> {
     if (isBlank()) return@buildList
     val labelsAndText = split(":", ";", ".", "|")
     labelsAndText.forEachIndexed { index, value ->
         val isLabel = index % 2 == 0
         if (isLabel && labelsAndText.size > 1) {
-            add(Either.Left(value.trim()))
+            add(HomeworkTaskComponent.Label(value.trim()))
         } else {
             val tasks = value.split(",").map { it.trim() }
-            add(Either.Right(tasks))
+            add(HomeworkTaskComponent.Tasks(tasks))
         }
     }
 }

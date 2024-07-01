@@ -36,6 +36,7 @@ gms-auth = "21.2.0"
 networkchecker = "1.2.0"
 kmpauth-google = "1.3.0"
 charts = "Beta-0.0.5"
+koalaplot-charts = "0.6.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -79,6 +80,7 @@ mokoResources-compose = { module = "dev.icerock.moko:resources-compose", version
 logger = { module = "co.touchlab:kermit", version.ref = "loggerKermit" }
 networkcheker = { module = "com.github.ln-12:multiplatform-connectivity-status", version.ref = "networkchecker" }
 charts = { module = "io.github.thechance101:chart", version.ref = "charts" }
+koalaplot-charts = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot-charts" }
 
 [bundles]
 mokoResources = ["mokoResources-core", "mokoResources-compose"]

@@ -36,7 +36,7 @@ kotlin {
             implementation(project(":shared:core:ui"))
 
             implementation(compose.components.resources)
-            implementation(libs.charts)
+            implementation(libs.koalaplot.charts)
         }
     }
 

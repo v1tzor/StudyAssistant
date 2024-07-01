@@ -46,6 +46,7 @@ kotlin {
 
             api(libs.google.accompanist)
             api(libs.placeholder)
+            api(libs.koalaplot.charts)
         }
     }
 

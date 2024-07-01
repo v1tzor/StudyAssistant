@@ -16,40 +16,58 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
-import entities.tasks.HomeworkDetails
+import entities.tasks.Homework
+import entities.tasks.HomeworkStatus
+import entities.tasks.HomeworkTaskComponent
+import entities.tasks.toHomeworkComponents
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkTaskComponentUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkTasksUi
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
  */
-internal fun HomeworkDetails.mapToUi() = HomeworkDetailsUi(
+internal fun Homework.mapToUi(status: HomeworkStatus) = HomeworkDetailsUi(
     uid = uid,
     classId = classId,
-    date = date,
     deadline = deadline,
     subject = subject?.mapToUi(),
     organization = organization.mapToUi(),
-    theoreticalTasks = theoreticalTasks,
-    practicalTasks = practicalTasks,
-    presentations = presentations,
+    theoreticalTasks = HomeworkTasksUi(
+        origin = theoreticalTasks,
+        components = theoreticalTasks.toHomeworkComponents().map { it.mapToUi() }
+    ),
+    practicalTasks = HomeworkTasksUi(
+        origin = practicalTasks,
+        components = practicalTasks.toHomeworkComponents().map { it.mapToUi() }
+    ),
+    presentationTasks = HomeworkTasksUi(
+        origin = presentationTasks,
+        components = presentationTasks.toHomeworkComponents().map { it.mapToUi() }
+    ),
+    test = test,
+    priority = priority,
+    isDone = isDone,
+    status = status,
+    completeDate = completeDate,
+)
+
+internal fun HomeworkDetailsUi.mapToDomain() = Homework(
+    uid = uid,
+    classId = classId,
+    deadline = deadline,
+    subject = subject?.mapToDomain(),
+    organization = organization.mapToDomain(),
+    theoreticalTasks = theoreticalTasks.origin,
+    practicalTasks = practicalTasks.origin,
+    presentationTasks = presentationTasks.origin,
     test = test,
     priority = priority,
     isDone = isDone,
     completeDate = completeDate,
 )
 
-internal fun HomeworkDetailsUi.mapToDomain() = HomeworkDetails(
-    uid = uid,
-    classId = classId,
-    date = date,
-    deadline = deadline,
-    subject = subject?.mapToDomain(),
-    organization = organization.mapToDomain(),
-    theoreticalTasks = theoreticalTasks,
-    practicalTasks = practicalTasks,
-    presentations = presentations,
-    test = test,
-    priority = priority,
-    isDone = isDone,
-    completeDate = completeDate,
-)
+internal fun HomeworkTaskComponent.mapToUi() = when (this) {
+    is HomeworkTaskComponent.Label -> HomeworkTaskComponentUi.Label(text)
+    is HomeworkTaskComponent.Tasks -> HomeworkTaskComponentUi.Tasks(taskList)
+}

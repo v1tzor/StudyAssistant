@@ -33,6 +33,7 @@ import repositories.HomeworksRepository
 import repositories.ManageUserRepository
 import repositories.OrganizationsRepository
 import repositories.SubjectsRepository
+import repositories.TodoRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
@@ -65,9 +66,10 @@ import ru.aleshin.studyassistant.tasks.impl.di.holder.TasksFeatureDIHolder
 val featureModule = DI.Module("Feature") {
     bindEagerSingleton<NavigationFeatureDependencies> {
         object : NavigationFeatureDependencies {
-            override val profileFeatureStarter = provider<ProfileFeatureStarter>()
             override val scheduleFeatureStarter = provider<ScheduleFeatureStarter>()
+            override val tasksFeatureStarter = provider<TasksFeatureStarter>()
             override val infoFeatureStarter = provider<InfoFeatureStarter>()
+            override val profileFeatureStarter = provider<ProfileFeatureStarter>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }
@@ -120,6 +122,7 @@ val featureModule = DI.Module("Feature") {
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val homeworkRepository = instance<HomeworksRepository>()
+            override val todoRepository = instance<TodoRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val usersRepository = instance<UsersRepository>()
             override val dateManager = instance<DateManager>()
@@ -140,6 +143,7 @@ val featureModule = DI.Module("Feature") {
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val homeworkRepository = instance<HomeworksRepository>()
+            override val todoRepository = instance<TodoRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val usersRepository = instance<UsersRepository>()
             override val dateManager = instance<DateManager>()

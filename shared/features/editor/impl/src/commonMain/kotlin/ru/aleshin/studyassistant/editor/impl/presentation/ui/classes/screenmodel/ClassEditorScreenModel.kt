@@ -99,6 +99,10 @@ internal class ClassEditorScreenModel(
                     val command = ClassEditorWorkCommand.LoadSubjects(event.organization?.uid)
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_FREE_CLASSES) {
+                    val command = ClassEditorWorkCommand.LoadFreeClasses(event.organization, schedule)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
                 launchBackgroundWork(BackgroundKey.LOAD_EMPLOYEES) {
                     val command = ClassEditorWorkCommand.LoadEmployees(event.organization?.uid)
                     workProcessor.work(command).collectAndHandleWork()
@@ -196,6 +200,9 @@ internal class ClassEditorScreenModel(
         is ClassEditorAction.UpdateOrganizations -> currentState.copy(
             organizations = action.organizations,
         )
+        is ClassEditorAction.UpdateFreeClasses -> currentState.copy(
+            freeClassTimeRanges = action.freeClassTimeRanges,
+        )
         is ClassEditorAction.UpdateSubjects -> currentState.copy(
             subjects = action.subjects,
         )
@@ -208,7 +215,7 @@ internal class ClassEditorScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_CLASS, LOAD_ORGANIZATIONS, LOAD_EMPLOYEES, LOAD_SUBJECTS, UPDATE_LOCATIONS, SAVE_CLASS
+        LOAD_CLASS, LOAD_ORGANIZATIONS, LOAD_FREE_CLASSES, LOAD_EMPLOYEES, LOAD_SUBJECTS, UPDATE_LOCATIONS, SAVE_CLASS
     }
 }
 

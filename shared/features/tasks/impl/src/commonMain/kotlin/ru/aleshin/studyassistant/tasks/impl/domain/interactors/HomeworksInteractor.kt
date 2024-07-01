@@ -16,17 +16,26 @@
 
 package ru.aleshin.studyassistant.tasks.impl.domain.interactors
 
-import entities.tasks.HomeworkDetails
-import entities.tasks.convertToDetails
+import entities.common.numberOfRepeatWeek
+import entities.tasks.Homework
+import extensions.dateTime
+import extensions.startThisDay
 import functional.FlowDomainResult
 import functional.TimeRange
 import functional.UID
+import functional.UnitDomainResult
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Instant
 import repositories.BaseScheduleRepository
+import repositories.CalendarSettingsRepository
 import repositories.CustomScheduleRepository
 import repositories.HomeworksRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
+import ru.aleshin.studyassistant.tasks.impl.domain.entities.HomeworkErrors
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 
 /**
@@ -34,12 +43,15 @@ import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
  */
 internal interface HomeworksInteractor {
 
-    suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange): FlowDomainResult<TasksFailures, List<HomeworkDetails>>
+    suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange): FlowDomainResult<TasksFailures, List<Homework>>
+    suspend fun fetchHomeworkErrors(targetDate: Instant): FlowDomainResult<TasksFailures, HomeworkErrors>
+    suspend fun updateHomework(homework: Homework): UnitDomainResult<TasksFailures>
 
     class Base(
         private val homeworksRepository: HomeworksRepository,
         private val baseScheduleRepository: BaseScheduleRepository,
         private val customScheduleRepository: CustomScheduleRepository,
+        private val calendarSettingsRepository: CalendarSettingsRepository,
         private val usersRepository: UsersRepository,
         private val eitherWrapper: TasksEitherWrapper,
     ) : HomeworksInteractor {
@@ -48,12 +60,42 @@ internal interface HomeworksInteractor {
             get() = usersRepository.fetchCurrentUserOrError().uid
 
         override suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange) = eitherWrapper.wrapFlow {
-//            val baseSchedules = baseScheduleRepository.fetchSchedulesByTimeRange(timeRange, null, targetUser).first()
-//            val customSchedules = customScheduleRepository.fetchSchedulesByTimeRange(timeRange, targetUser).first()
-            val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(timeRange, targetUser).map { homeworks ->
-                homeworks.map { it.convertToDetails(null) }
+            homeworksRepository.fetchHomeworksByTimeRange(timeRange, targetUser).map { homeworkList ->
+                homeworkList.sortedBy { homework -> homework.deadline }
             }
-            homeworksFlow
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        override suspend fun fetchHomeworkErrors(targetDate: Instant) = eitherWrapper.wrapFlow {
+            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
+
+            val overdueHomeworksFlow = homeworksRepository.fetchOverdueHomeworks(targetDate, targetUser)
+            val activeLinkedHomeworksFlow = homeworksRepository.fetchActiveLinkedHomeworks(targetDate, targetUser)
+
+            return@wrapFlow overdueHomeworksFlow.flatMapLatest { overdueHomeworks ->
+                activeLinkedHomeworksFlow.map { activeLinkedHomeworks ->
+                    val detachedActiveTasks = buildList {
+                        activeLinkedHomeworks.forEach { homework ->
+                            val homeworkDate = homework.deadline.startThisDay()
+                            val homeworkNumberOfWeek = homeworkDate.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
+                            val customScheduleByDate = customScheduleRepository.fetchScheduleByDate(homeworkDate, targetUser).first()
+                            val classesByDate = customScheduleByDate?.classes
+                                ?: baseScheduleRepository.fetchScheduleByDate(homeworkDate, homeworkNumberOfWeek, targetUser).first()?.classes
+                            if (classesByDate?.find { it.uid == homework.classId } == null) {
+                                add(homework)
+                            }
+                        }
+                    }
+                    HomeworkErrors(
+                        overdueTasks = overdueHomeworks,
+                        detachedActiveTasks = detachedActiveTasks,
+                    )
+                }
+            }
+        }
+
+        override suspend fun updateHomework(homework: Homework) = eitherWrapper.wrapUnit {
+            homeworksRepository.addOrUpdateHomework(homework, targetUser)
         }
     }
 }

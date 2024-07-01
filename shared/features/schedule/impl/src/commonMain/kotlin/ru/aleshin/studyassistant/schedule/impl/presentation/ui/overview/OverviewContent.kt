@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
@@ -43,9 +42,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import entities.tasks.HomeworkStatus
 import functional.Constants.Placeholder.OVERVIEW_ITEMS
-import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
@@ -63,9 +60,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.De
 internal fun OverviewContent(
     state: OverviewViewState,
     modifier: Modifier = Modifier,
-    currentTime: Instant,
     onShowClassInfo: (ClassDetailsUi) -> Unit,
-    classListState: LazyListState = rememberLazyListState(),
 ) = with(state) {
     Column(modifier = modifier.padding(top = 12.dp)) {
         Crossfade(
@@ -75,6 +70,7 @@ internal fun OverviewContent(
         ) { loading ->
             if (!loading && schedule != null) {
                 if (schedule.classes.isNotEmpty()) {
+                    val classListState = rememberLazyListState()
                     LazyColumn(
                         state = classListState,
                         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -95,11 +91,7 @@ internal fun OverviewContent(
                                 headerBadge = {
                                     if (classModel.homework != null) {
                                         DetailsClassHomeworkBadge(
-                                            homeworkStatus = HomeworkStatus.calculate(
-                                                isDone = classModel.homework.isDone,
-                                                deadline = classModel.homework.deadline,
-                                                currentTime = currentTime,
-                                            )
+                                            homeworkStatus = classModel.homework.status,
                                         )
                                     }
                                     if (classModel.homework?.test != null) {
@@ -115,7 +107,6 @@ internal fun OverviewContent(
                 }
             } else {
                 LazyColumn(
-                    state = classListState,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp),
                 ) {

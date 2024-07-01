@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.tasks.impl.presentation.ui.tasks
+package entities.tasks
 
-import androidx.compose.runtime.Composable
-import cafe.adriel.voyager.core.screen.Screen
+import extensions.extractAllItem
 
 /**
- * @author Stanislav Aleshin on 19.06.2024.
+ * @author Stanislav Aleshin on 01.07.2024.
  */
-internal class TasksDetailsScreen : Screen {
+sealed class HomeworkTaskComponent {
+    data class Label(val text: String) : HomeworkTaskComponent()
+    data class Tasks(val taskList: List<String>) : HomeworkTaskComponent()
+}
 
-    @Composable
-    override fun Content() {
-        // TODO Not yet implemented
+typealias HomeworkTasks = List<HomeworkTaskComponent>
+
+fun HomeworkTasks.fetchAllTasks(): List<String> {
+    val tasks = map { taskComponent ->
+        if (taskComponent is HomeworkTaskComponent.Tasks) taskComponent.taskList else emptyList()
     }
+    return tasks.extractAllItem()
 }

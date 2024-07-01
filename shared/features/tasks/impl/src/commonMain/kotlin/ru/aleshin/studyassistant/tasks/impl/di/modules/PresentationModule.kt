@@ -26,6 +26,10 @@ import ru.aleshin.studyassistant.tasks.impl.navigation.TasksFeatureStarterImpl
 import ru.aleshin.studyassistant.tasks.impl.navigation.TasksScreenProvider
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.navigation.NavigationScreenModel
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewEffectCommunicator
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewScreenModel
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewStateCommunicator
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -37,8 +41,8 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<TasksFeatureStarter> { TasksFeatureStarterImpl(instance(), instance(), instance()) }
     bindProvider<TasksScreenProvider> { TasksScreenProvider.Base(instance<() -> EditorFeatureStarter>()) }
 
-//    bindProvider<OverviewStateCommunicator> { OverviewStateCommunicator.Base() }
-//    bindProvider<OverviewEffectCommunicator> { OverviewEffectCommunicator.Base() }
-//    bindProvider<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance(), instance()) }
-//    bindProvider<OverviewScreenModel> { OverviewScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<OverviewStateCommunicator> { OverviewStateCommunicator.Base() }
+    bindProvider<OverviewEffectCommunicator> { OverviewEffectCommunicator.Base() }
+    bindProvider<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance(), instance(), instance()) }
+    bindProvider<OverviewScreenModel> { OverviewScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
 }

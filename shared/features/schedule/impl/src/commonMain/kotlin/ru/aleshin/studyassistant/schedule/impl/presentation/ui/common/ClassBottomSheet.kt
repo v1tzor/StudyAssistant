@@ -225,16 +225,12 @@ private fun ClassBottomSheetFooter(
                 SheetHomeworkView(
                     theoreticalTasks = homework.theoreticalTasks,
                     practicalTasks = homework.practicalTasks,
-                    presentations = homework.presentations,
+                    presentationTasks = homework.presentationTasks,
                     priority = homework.priority,
                 )
             }
             ClassBottomSheetActions(
-                homeworkStatus = HomeworkStatus.calculate(
-                    isDone = homework.isDone,
-                    deadline = homework.deadline,
-                    currentTime = currentTime,
-                ),
+                homeworkStatus = homework.status,
                 onEditHomework = { onEditHomework(homework) },
                 onAddHomework = onAddHomework,
                 onCompleteHomework = { onCompleteHomework(homework) },
@@ -283,7 +279,6 @@ private fun ClassBottomSheetActions(
                         text = ScheduleThemeRes.strings.againHomeworkTitle,
                     )
                 }
-
                 HomeworkStatus.WAIT -> {
                     ClassBottomSheetActionView(
                         modifier = Modifier.weight(1f),
@@ -296,7 +291,6 @@ private fun ClassBottomSheetActions(
                         text = ScheduleThemeRes.strings.completeHomeworkTitle,
                     )
                 }
-
                 HomeworkStatus.IN_FUTURE -> {
                     ClassBottomSheetActionView(
                         modifier = Modifier.weight(1f),
@@ -308,12 +302,23 @@ private fun ClassBottomSheetActions(
                         text = ScheduleThemeRes.strings.completeHomeworkTitle,
                     )
                 }
-
                 HomeworkStatus.NOT_COMPLETE -> {
                     ClassBottomSheetActionView(
                         modifier = Modifier.weight(1f),
                         text = ScheduleThemeRes.strings.homeworkIsNotCompleteTitle,
                         color = StudyAssistantRes.colors.accents.red,
+                    )
+                    ClassBottomSheetActionButton(
+                        onClick = onCompleteHomework,
+                        text = ScheduleThemeRes.strings.completeHomeworkTitle,
+                    )
+                }
+                HomeworkStatus.SKIPPED -> {
+                    ClassBottomSheetActionView(
+                        modifier = Modifier.weight(1f),
+                        text = ScheduleThemeRes.strings.homeworkIsSkippedTitle,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
                     )
                     ClassBottomSheetActionButton(
                         onClick = onCompleteHomework,

@@ -38,6 +38,8 @@ data class DateVersion(
     @TypeParceler<Instant, InstantParceler> val to: Instant,
 ) : Parcelable {
 
+    fun duration() = to - from
+
     fun containsDate(instant: Instant) = instant in from..to
 
     fun makeDeprecated(currentDate: Instant): DateVersion {

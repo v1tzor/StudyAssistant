@@ -1,0 +1,34 @@
+CREATE TABLE todoEntity (
+    uid TEXT PRIMARY KEY NOT NULL,
+    deadline INTEGER,
+    name TEXT NOT NULL,
+    priority TEXT NOT NULL,
+    notification INTEGER NOT NULL,
+    is_done INTEGER NOT NULL,
+    complete_date INTEGER
+);
+
+fetchTodosByTimeRange:
+SELECT *
+FROM todoEntity
+WHERE deadline BETWEEN ? AND ?
+ORDER BY deadline DESC;
+
+fetchOverdueTodos:
+SELECT *
+FROM todoEntity
+WHERE deadline < ? AND is_done = 0 AND complete_date IS NULL
+ORDER BY deadline DESC;
+
+fetchTodoById:
+SELECT *
+FROM todoEntity
+WHERE uid = ?;
+
+addOrUpdateTodo:
+INSERT OR REPLACE INTO todoEntity (uid, deadline, name, priority, notification, is_done, complete_date)
+VALUES ?;
+
+deleteTodo:
+DELETE FROM todoEntity
+WHERE uid = ?;

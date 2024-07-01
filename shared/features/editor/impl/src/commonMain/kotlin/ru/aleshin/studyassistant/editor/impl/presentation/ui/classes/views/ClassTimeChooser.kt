@@ -68,7 +68,7 @@ internal fun ClassTimeRangeChooser(
         verticalAlignment = Alignment.CenterVertically,
         userScrollEnabled = enabled,
     ) {
-        if (freeClassTimeRanges != null) {
+        if (!freeClassTimeRanges.isNullOrEmpty()) {
             items(freeClassTimeRanges.keys.toList()) { timeRange ->
                 ClassTimeRangeItem(
                     enabled = enabled,

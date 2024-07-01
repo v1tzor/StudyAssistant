@@ -21,12 +21,14 @@ import managers.CoroutineManager
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
+import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
 interface NavigationFeatureDependencies : BaseFeatureDependencies {
     val scheduleFeatureStarter: () -> ScheduleFeatureStarter
+    val tasksFeatureStarter: () -> TasksFeatureStarter
     val infoFeatureStarter: () -> InfoFeatureStarter
     val profileFeatureStarter: () -> ProfileFeatureStarter
     val coroutineManager: CoroutineManager

@@ -43,6 +43,8 @@ sealed class EditorScreen : FeatureScreen {
         val organizationId: UID?
     ) : EditorScreen()
 
+    data class Todo(val todoId: UID?) : EditorScreen()
+
     data class Organization(val organizationId: UID?) : EditorScreen()
     data object Profile : EditorScreen()
 }

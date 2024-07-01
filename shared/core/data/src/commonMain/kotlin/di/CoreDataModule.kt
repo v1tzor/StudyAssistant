@@ -24,6 +24,7 @@ import database.settings.CalendarSettingsLocalDataSource
 import database.settings.GeneralSettingsLocalDataSource
 import database.subjects.SubjectsLocalDataSource
 import database.tasks.HomeworksLocalDataSource
+import database.tasks.TodoLocalDataSource
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
@@ -36,6 +37,7 @@ import remote.schedules.CustomScheduleRemoteDataSource
 import remote.settings.CalendarSettingsRemoteDataSource
 import remote.subjects.SubjectsRemoteDataSource
 import remote.tasks.HomeworksRemoteDataSource
+import remote.tasks.TodoRemoteDataSource
 import remote.users.UsersRemoteDataSource
 import repositories.AuthRepository
 import repositories.AuthRepositoryImpl
@@ -57,6 +59,8 @@ import repositories.OrganizationsRepository
 import repositories.OrganizationsRepositoryImpl
 import repositories.SubjectsRepository
 import repositories.SubjectsRepositoryImpl
+import repositories.TodoRepository
+import repositories.TodoRepositoryImpl
 import repositories.UsersRepository
 import repositories.UsersRepositoryImpl
 
@@ -71,12 +75,22 @@ val coreDataModule = DI.Module("CoreData") {
     bindSingleton<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance()) }
     bindSingleton<UsersRepository> { UsersRepositoryImpl(instance()) }
 
-    bindSingleton<GeneralSettingsLocalDataSource> { GeneralSettingsLocalDataSource.Base(instance(), instance()) }
-    bindProvider<GeneralSettingsRepository> { GeneralSettingsRepositoryImpl(instance()) }
+    bindSingleton<GeneralSettingsLocalDataSource> {
+        GeneralSettingsLocalDataSource.Base(instance(), instance())
+    }
+    bindProvider<GeneralSettingsRepository> {
+        GeneralSettingsRepositoryImpl(instance())
+    }
 
-    bindSingleton<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance()) }
-    bindSingleton<CalendarSettingsLocalDataSource> { CalendarSettingsLocalDataSource.Base(instance(), instance()) }
-    bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance(), instance()) }
+    bindSingleton<CalendarSettingsRemoteDataSource> {
+        CalendarSettingsRemoteDataSource.Base(instance())
+    }
+    bindSingleton<CalendarSettingsLocalDataSource> {
+        CalendarSettingsLocalDataSource.Base(instance(), instance())
+    }
+    bindProvider<CalendarSettingsRepository> {
+        CalendarSettingsRepositoryImpl(instance(), instance(), instance())
+    }
 
     bindSingleton<BaseScheduleLocalDataSource> {
         BaseScheduleLocalDataSource.Base(instance(), instance(), instance(), instance(), instance())
@@ -126,6 +140,16 @@ val coreDataModule = DI.Module("CoreData") {
     }
     bindProvider<HomeworksRepository> {
         HomeworksRepositoryImpl(instance(), instance(), instance())
+    }
+
+    bindSingleton<TodoLocalDataSource> {
+        TodoLocalDataSource.Base(instance(), instance())
+    }
+    bindSingleton<TodoRemoteDataSource> {
+        TodoRemoteDataSource.Base(instance())
+    }
+    bindProvider<TodoRepository> {
+        TodoRepositoryImpl(instance(), instance(), instance())
     }
 
     bindSingleton<OrganizationsLocalDataSource> {

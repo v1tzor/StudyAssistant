@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.navigation.impl.di.NavigationFeatureDependencie
 import ru.aleshin.studyassistant.navigation.impl.di.modules.presentationModule
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
+import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
@@ -44,6 +45,7 @@ object NavigationFeatureDIHolder : BaseFeatureDIHolder<NavigationFeatureApi, Nav
                 importAll(presentationModule)
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<() -> ScheduleFeatureStarter> { dependencies.scheduleFeatureStarter }
+                bindSingleton<() -> TasksFeatureStarter> { dependencies.tasksFeatureStarter }
                 bindSingleton<() -> InfoFeatureStarter> { dependencies.infoFeatureStarter }
                 bindSingleton<() -> ProfileFeatureStarter> { dependencies.profileFeatureStarter }
                 bindSingleton<NavigationFeatureApi> {

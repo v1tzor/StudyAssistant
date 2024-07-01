@@ -16,40 +16,70 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.mappers
 
-import entities.tasks.HomeworkDetails
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.homework.HomeworkDetailsUi
+import entities.tasks.Homework
+import entities.tasks.HomeworkStatus
+import entities.tasks.HomeworkTaskComponent
+import entities.tasks.toHomeworkComponents
+import ru.aleshin.studyassistant.tasks.impl.domain.entities.HomeworkErrors
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTaskComponentUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTasksUi
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
  */
-internal fun HomeworkDetails.mapToUi() = HomeworkDetailsUi(
+internal fun Homework.mapToUi(status: HomeworkStatus) = HomeworkDetailsUi(
     uid = uid,
     classId = classId,
-    date = date,
     deadline = deadline,
     subject = subject?.mapToUi(),
     organization = organization.mapToUi(),
-    theoreticalTasks = theoreticalTasks,
-    practicalTasks = practicalTasks,
-    presentations = presentations,
+    theoreticalTasks = HomeworkTasksUi(
+        origin = theoreticalTasks,
+        components = theoreticalTasks.toHomeworkComponents().map { it.mapToUi() }
+    ),
+    practicalTasks = HomeworkTasksUi(
+        origin = practicalTasks,
+        components = practicalTasks.toHomeworkComponents().map { it.mapToUi() }
+    ),
+    presentationTasks = HomeworkTasksUi(
+        origin = presentationTasks,
+        components = presentationTasks.toHomeworkComponents().map { it.mapToUi() }
+    ),
+    test = test,
+    priority = priority,
+    isDone = isDone,
+    status = status,
+    completeDate = completeDate,
+)
+
+internal fun HomeworkErrors.mapToUi() = HomeworkErrorsUi(
+    overdueTasks = overdueTasks.map { it.mapToUi(HomeworkStatus.NOT_COMPLETE) },
+    detachedActiveTasks = detachedActiveTasks.map { it.mapToUi(HomeworkStatus.WAIT) },
+)
+
+internal fun HomeworkDetailsUi.mapToDomain() = Homework(
+    uid = uid,
+    classId = classId,
+    deadline = deadline,
+    subject = subject?.mapToDomain(),
+    organization = organization.mapToDomain(),
+    theoreticalTasks = theoreticalTasks.origin,
+    practicalTasks = practicalTasks.origin,
+    presentationTasks = presentationTasks.origin,
     test = test,
     priority = priority,
     isDone = isDone,
     completeDate = completeDate,
 )
 
-internal fun HomeworkDetailsUi.mapToDomain() = HomeworkDetails(
-    uid = uid,
-    classId = classId,
-    date = date,
-    deadline = deadline,
-    subject = subject?.mapToDomain(),
-    organization = organization.mapToDomain(),
-    theoreticalTasks = theoreticalTasks,
-    practicalTasks = practicalTasks,
-    presentations = presentations,
-    test = test,
-    priority = priority,
-    isDone = isDone,
-    completeDate = completeDate,
-)
+internal fun HomeworkTaskComponent.mapToUi() = when (this) {
+    is HomeworkTaskComponent.Label -> HomeworkTaskComponentUi.Label(text)
+    is HomeworkTaskComponent.Tasks -> HomeworkTaskComponentUi.Tasks(taskList)
+}
+
+internal fun HomeworkTaskComponentUi.mapToDomain() = when (this) {
+    is HomeworkTaskComponentUi.Label -> HomeworkTaskComponent.Label(text)
+    is HomeworkTaskComponentUi.Tasks -> HomeworkTaskComponent.Tasks(taskList)
+}

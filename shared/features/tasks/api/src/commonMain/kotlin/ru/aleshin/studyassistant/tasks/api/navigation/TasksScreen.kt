@@ -24,5 +24,5 @@ import inject.FeatureScreen
 sealed class TasksScreen : FeatureScreen {
     data object Overview : TasksScreen()
     data class Homeworks(val targetDate: Long? = null) : TasksScreen()
-    data object Tasks : TasksScreen()
+    data object Todos : TasksScreen()
 }

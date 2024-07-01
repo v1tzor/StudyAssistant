@@ -30,6 +30,7 @@ import repositories.CalendarSettingsRepository
 import repositories.CustomScheduleRepository
 import repositories.HomeworksRepository
 import repositories.OrganizationsRepository
+import repositories.TodoRepository
 import repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.tasks.api.di.TasksFeatureApi
@@ -56,6 +57,7 @@ object TasksFeatureDIHolder : BaseFeatureDIHolder<TasksFeatureApi, TasksFeatureD
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<HomeworksRepository> { dependencies.homeworkRepository }
+                bindSingleton<TodoRepository> { dependencies.todoRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }

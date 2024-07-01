@@ -71,7 +71,7 @@ class HomeworksRepositoryImpl(
         val homeworksFlow = if (isSubscriber) {
             remoteDataSource.fetchHomeworksByTimeRange(timeStart, timeEnd, targetUser)
         } else {
-            localDataSource.fetchHomeworksByTime(timeStart, timeEnd)
+            localDataSource.fetchHomeworksByTimeRange(timeStart, timeEnd)
         }
 
         return homeworksFlow.map { homeworkListData ->
@@ -87,7 +87,36 @@ class HomeworksRepositoryImpl(
         val homeworksFlow = if (isSubscriber) {
             remoteDataSource.fetchHomeworksByTimeRange(timeStart, timeEnd, targetUser)
         } else {
-            localDataSource.fetchHomeworksByTime(timeStart, timeEnd)
+            localDataSource.fetchHomeworksByTimeRange(timeStart, timeEnd)
+        }
+
+        return homeworksFlow.map { homeworkListData ->
+            homeworkListData.map { it.mapToDomain() }
+        }
+    }
+
+    override suspend fun fetchOverdueHomeworks(currentDate: Instant, targetUser: UID): Flow<List<Homework>> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val date = currentDate.endThisDay().toEpochMilliseconds()
+
+        val homeworksFlow = if (isSubscriber) {
+            remoteDataSource.fetchOverdueHomeworks(date, targetUser)
+        } else {
+            localDataSource.fetchOverdueHomeworks(date)
+        }
+
+        return homeworksFlow.map { homeworkListData ->
+            homeworkListData.map { it.mapToDomain() }
+        }
+    }
+
+    override suspend fun fetchActiveLinkedHomeworks(currentDate: Instant, targetUser: UID): Flow<List<Homework>> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        val homeworksFlow = if (isSubscriber) {
+            remoteDataSource.fetchActiveLinkedHomeworks(currentDate.toEpochMilliseconds(), targetUser)
+        } else {
+            localDataSource.fetchActiveLinkedHomeworks(currentDate.toEpochMilliseconds())
         }
 
         return homeworksFlow.map { homeworkListData ->

@@ -109,7 +109,7 @@ internal class HomeworkEditorScreenModel(
                 sendAction(HomeworkEditorAction.UpdateEditModel(updatedClass))
                 launchBackgroundWork(BackgroundKey.LOAD_CLASSES) {
                     val subjectId = event.subject?.uid
-                    val instant = editableHomework?.date
+                    val instant = editableHomework?.deadline
                     val currentHomework = editableHomework?.uid?.ifEmpty { null }
                     val command = HomeworkEditorWorkCommand.LoadClassesForLinked(subjectId, instant, currentHomework)
                     workProcessor.work(command).collectAndHandleWork()
@@ -117,7 +117,7 @@ internal class HomeworkEditorScreenModel(
             }
             is HomeworkEditorEvent.UpdateDate -> with(state()) {
                 val updatedClass = editableHomework?.copy(
-                    date = event.date,
+                    deadline = event.date,
                     classId = null,
                 )
                 sendAction(HomeworkEditorAction.UpdateEditModel(updatedClass))
@@ -132,7 +132,7 @@ internal class HomeworkEditorScreenModel(
             is HomeworkEditorEvent.UpdateLinkedClass -> with(state()) {
                 val updatedClass = editableHomework?.copy(
                     classId = event.classId,
-                    date = event.date,
+                    deadline = event.date,
                 )
                 sendAction(HomeworkEditorAction.UpdateEditModel(updatedClass))
             }

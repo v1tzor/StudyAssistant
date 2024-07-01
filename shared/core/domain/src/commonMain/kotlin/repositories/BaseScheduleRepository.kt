@@ -32,6 +32,6 @@ interface BaseScheduleRepository {
     suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<BaseSchedule?>
     suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek, targetUser: UID): Flow<BaseSchedule?>
     suspend fun fetchSchedulesByVersion(version: TimeRange, numberOfWeek: NumberOfRepeatWeek?, targetUser: UID): Flow<List<BaseSchedule>>
-    suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, maxNumberOfWeek: NumberOfRepeatWeek, targetUser: UID): Flow<Map<Instant, List<BaseSchedule>>>
+    suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, maxNumberOfWeek: NumberOfRepeatWeek, targetUser: UID): Flow<Map<Instant, BaseSchedule?>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<Class?>
 }

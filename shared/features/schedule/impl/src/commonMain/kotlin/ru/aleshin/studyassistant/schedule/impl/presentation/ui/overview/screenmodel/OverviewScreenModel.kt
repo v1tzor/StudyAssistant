@@ -102,7 +102,7 @@ internal class OverviewScreenModel(
             is OverviewEvent.EditHomeworkInEditor -> with(event) {
                 val featureScreen = EditorScreen.Homework(
                     homeworkId = homework.uid,
-                    date = homework.date.toEpochMilliseconds(),
+                    date = homework.deadline.startThisDay().toEpochMilliseconds(),
                     subjectId = homework.subject?.uid,
                     organizationId = homework.organization.uid,
                 )

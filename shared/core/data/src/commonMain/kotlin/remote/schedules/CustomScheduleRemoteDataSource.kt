@@ -30,7 +30,6 @@ import kotlinx.serialization.serializer
 import mappers.schedules.mapToDetailsData
 import mappers.schedules.mapToRemoteData
 import mappers.subjects.mapToDetailsData
-import mappers.tasks.mapToDetailsData
 import models.classes.ClassData
 import models.classes.ClassDetailsData
 import models.organizations.OrganizationShortData

@@ -15,7 +15,14 @@
 */
 package functional
 
+import co.touchlab.kermit.Logger
+import functional.Constants.App.LOG
+
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
 interface DomainFailures
+
+inline fun <reified T : DomainFailures> T.log(tag: String = LOG) = this.apply {
+    Logger.e(tag) { "Fail with business logic: $this" }
+}

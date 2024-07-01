@@ -29,7 +29,7 @@ import kotlinx.serialization.Serializable
 data class HomeworkPojo(
     val uid: UID = "",
     val classId: UID? = null,
-    val date: Long = Clock.System.now().startThisDay().toEpochMilliseconds(),
+    val deadline: Long = Clock.System.now().startThisDay().toEpochMilliseconds(),
     val subjectId: UID? = null,
     val organizationId: UID = "",
     val theoreticalTasks: String = "",

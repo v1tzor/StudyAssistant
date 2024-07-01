@@ -28,7 +28,7 @@ import models.subjects.SubjectDetailsData
 data class HomeworkDetailsData(
     val uid: UID,
     val classId: UID? = null,
-    val date: Long,
+    val deadline: Long,
     val subject: SubjectDetailsData? = null,
     val organization: OrganizationShortData,
     val theoreticalTasks: String = "",

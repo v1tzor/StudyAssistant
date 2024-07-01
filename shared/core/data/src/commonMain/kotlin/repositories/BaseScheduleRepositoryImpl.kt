@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import mappers.schedules.mapToData
 import mappers.schedules.mapToDomain
-import mappers.tasks.mapToDomain
 import payments.SubscriptionChecker
 import remote.schedules.BaseScheduleRemoteDataSource
 
@@ -109,7 +108,7 @@ class BaseScheduleRepositoryImpl(
         timeRange: TimeRange,
         maxNumberOfWeek: NumberOfRepeatWeek,
         targetUser: UID
-    ): Flow<Map<Instant, List<BaseSchedule>>> {
+    ): Flow<Map<Instant, BaseSchedule?>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         val scheduleListFlow = if (isSubscriber) {
@@ -120,14 +119,14 @@ class BaseScheduleRepositoryImpl(
 
         return scheduleListFlow.map { scheduleList ->
             val schedules = scheduleList.map { it.mapToDomain() }
-            return@map buildMap<Instant, List<BaseSchedule>> {
+            return@map buildMap<Instant, BaseSchedule?> {
                 timeRange.periodDates().forEach { targetDate ->
                     val targetWeekDay = targetDate.dateTime().dayOfWeek
                     val targetWeek = targetDate.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
-                    val schedulesByDate = schedules.filter { schedule ->
+                    val schedulesByDate = schedules.find { schedule ->
                         val versionFilter = schedule.dateVersion.containsDate(targetDate)
                         val dateFilter = schedule.week == targetWeek && schedule.dayOfWeek == targetWeekDay
-                        return@filter versionFilter && dateFilter
+                        return@find versionFilter && dateFilter
                     }
                     put(targetDate, schedulesByDate)
                 }

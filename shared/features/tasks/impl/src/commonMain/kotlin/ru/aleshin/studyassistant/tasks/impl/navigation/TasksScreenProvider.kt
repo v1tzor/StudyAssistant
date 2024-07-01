@@ -23,7 +23,7 @@ import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.HomeworksScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.OverviewScreen
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.tasks.TasksDetailsScreen
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.TodosScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -39,7 +39,7 @@ internal interface TasksScreenProvider : FeatureScreenProvider<TasksScreen> {
         override fun provideFeatureScreen(screen: TasksScreen) = when (screen) {
             is TasksScreen.Overview -> OverviewScreen()
             is TasksScreen.Homeworks -> HomeworksScreen(screen.targetDate)
-            is TasksScreen.Tasks -> TasksDetailsScreen()
+            is TasksScreen.Todos -> TodosScreen()
         }
 
         override fun provideEditorScreen(screen: EditorScreen): Screen {

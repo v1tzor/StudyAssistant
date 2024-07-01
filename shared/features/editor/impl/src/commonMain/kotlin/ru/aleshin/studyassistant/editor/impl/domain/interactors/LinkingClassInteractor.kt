@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
 import entities.classes.Class
-import extensions.extractAllItem
 import extensions.shiftDay
 import functional.FlowDomainResult
 import functional.TimeRange
@@ -92,10 +91,8 @@ internal interface LinkingClassInteractor {
                                     it.value.sortedBy { classModel -> classModel.timeRange.from }
                                 }
                                 val subjectClasses = customSchedule.classes.filter { classModel ->
-                                    val foundHomework = homeworks.find { it.classId == classModel.uid }
                                     val subjectFilter = classModel.subject?.uid == subject
-                                    val homeworkFilter = foundHomework?.uid == currentHomework || foundHomework == null
-                                    return@filter subjectFilter && homeworkFilter
+                                    return@filter subjectFilter
                                 }
                                 val subjectNumberedClasses = subjectClasses.map { classModel ->
                                     val organizationClasses = groupedClasses[classModel.organization.uid]
@@ -108,26 +105,22 @@ internal interface LinkingClassInteractor {
 
                         val availableBaseSchedules = baseSchedules.filter { !containsKey(it.key) }
 
-                        availableBaseSchedules.values.toList().extractAllItem().forEach { baseSchedule ->
-                            if (baseSchedule.classes.isNotEmpty()) {
+                        availableBaseSchedules.toList().forEach { baseScheduleEntry ->
+                            val baseSchedule = baseScheduleEntry.second
+                            if (baseSchedule?.classes?.isNotEmpty() == true) {
                                 val groupedClasses = baseSchedule.classes.groupBy { it.organization.uid }.mapValues {
                                     it.value.sortedBy { classModel -> classModel.timeRange.from }
                                 }
                                 val subjectClasses = baseSchedule.classes.filter { classModel ->
-                                    val foundHomework = homeworks.find { it.classId == classModel.uid }
                                     val subjectFilter = classModel.subject?.uid == subject
-                                    val homeworkFilter = foundHomework?.uid == currentHomework || foundHomework == null
-                                    return@filter subjectFilter && homeworkFilter
+                                    return@filter subjectFilter
                                 }
                                 val subjectNumberedClasses = subjectClasses.map { classModel ->
                                     val organizationClasses = groupedClasses[classModel.organization.uid]
                                     val number = organizationClasses?.indexOf(classModel)?.inc() ?: 0
                                     Pair(number, classModel)
                                 }
-                                val targetDate = availableBaseSchedules.entries.find { entry ->
-                                    entry.value.contains(baseSchedule)
-                                }?.key
-                                if (targetDate != null) put(targetDate, subjectNumberedClasses)
+                                put(baseScheduleEntry.first, subjectNumberedClasses)
                             }
                         }
                     }

@@ -24,6 +24,7 @@ object Constants {
     object App {
         const val SPLASH_NAME = "STUDY\nASSISTANT"
         const val NAME = "Study Assistant"
+        const val LOG = "study_assistant"
         const val DEVELOPER = "Stanislav Aleshin"
         const val LICENCE = "Apache Licence v2.0"
         const val GITHUB_URI = "https://github.com/v1tzor/StudyAssistant"
@@ -86,6 +87,8 @@ object Constants {
         const val SHORT_EMPLOYEES = 9
         const val SHORT_SUBJECTS = 9
         const val EMPLOYEES_OR_SUBJECTS = 12
+        const val HOMEWORKS = 7
+        const val TODOS = 6
     }
 
     object Delay {
@@ -93,6 +96,7 @@ object Constants {
         const val SPLASH_LOGO = 300L
         const val SPLASH_TEXT = 600L
         const val UPDATE_ACTIVE_CLASS = 5000L
+        const val UPDATE_TASK_STATUS = 5000L
         const val PULL_REFRESH = 180L
     }
 

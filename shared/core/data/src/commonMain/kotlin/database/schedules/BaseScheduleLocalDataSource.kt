@@ -31,7 +31,6 @@ import managers.CoroutineManager
 import mappers.schedules.mapToDetailsData
 import mappers.schedules.mapToLocalData
 import mappers.subjects.mapToDetailsData
-import mappers.tasks.mapToDetailsData
 import mappers.users.mapToDetailsData
 import models.classes.ClassData
 import models.classes.ClassDetailsData

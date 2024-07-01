@@ -20,7 +20,6 @@ import architecture.screenmodel.work.ActionResult
 import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
-import entities.tasks.convertToBase
 import extensions.isCurrentDay
 import extensions.setHoursAndMinutes
 import extensions.shiftMinutes
@@ -70,7 +69,8 @@ internal interface OverviewWorkProcessor :
             scheduleInteractor.fetchDetailsScheduleByDate(date).collectAndHandle(
                 onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
                 onRightAction = { scheduleDetails ->
-                    val schedule = scheduleDetails.mapToUi()
+                    val currentTime = dateManager.fetchCurrentInstant()
+                    val schedule = scheduleDetails.mapToUi(currentTime)
                     emit(ActionResult(OverviewAction.UpdateSchedule(schedule)))
                     emitAll(cycleUpdateActiveClass(schedule, date))
                 }
@@ -93,8 +93,12 @@ internal interface OverviewWorkProcessor :
         }
 
         private fun updateIsHomeworkDoneWork(homework: HomeworkDetailsUi, isDone: Boolean) = flow {
-            val updatedHomework = homework.copy(isDone = isDone).mapToDomain().convertToBase()
-            homeworkInteractor.updateHomework(updatedHomework).handle(
+            val currentDate = dateManager.fetchCurrentInstant()
+            val updatedHomework = homework.copy(
+                isDone = isDone,
+                completeDate = currentDate.takeIf { isDone },
+            )
+            homeworkInteractor.updateHomework(updatedHomework.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
             )
         }

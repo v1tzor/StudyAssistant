@@ -27,6 +27,7 @@ import models.organizations.OrganizationShortData
 import models.subjects.SubjectDetailsData
 import models.tasks.HomeworkDetailsData
 import models.tasks.HomeworkPojo
+import ru.aleshin.studyassistant.sqldelight.tasks.FetchActiveAndLinkedHomeworks
 import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkEntity
 
 /**
@@ -35,12 +36,12 @@ import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkEntity
 fun HomeworkDetailsData.mapToDomain() = Homework(
     uid = uid,
     classId = classId,
-    date = date.mapEpochTimeToInstant(),
+    deadline = deadline.mapEpochTimeToInstant(),
     subject = subject?.mapToDomain(),
     organization = organization.mapToDomain(),
     theoreticalTasks = theoreticalTasks,
     practicalTasks = practicalTasks,
-    presentationsTasks = presentations,
+    presentationTasks = presentations,
     test = test,
     priority = TaskPriority.valueOf(priority),
     isDone = isDone,
@@ -50,12 +51,12 @@ fun HomeworkDetailsData.mapToDomain() = Homework(
 fun Homework.mapToData() = HomeworkDetailsData(
     uid = uid,
     classId = classId,
-    date = date.toEpochMilliseconds(),
+    deadline = deadline.toEpochMilliseconds(),
     subject = subject?.mapToData(),
     organization = organization.mapToData(),
     theoreticalTasks = theoreticalTasks,
     practicalTasks = practicalTasks,
-    presentations = presentationsTasks,
+    presentations = presentationTasks,
     test = test,
     priority = priority.name,
     isDone = isDone,
@@ -65,7 +66,7 @@ fun Homework.mapToData() = HomeworkDetailsData(
 fun HomeworkDetailsData.mapToLocalData() = HomeworkEntity(
     uid = uid,
     class_id = classId,
-    date = date,
+    deadline = deadline,
     subject_id = subject?.uid,
     organization_id = organization.uid,
     theoretical_tasks = theoreticalTasks,
@@ -83,7 +84,25 @@ fun HomeworkEntity.mapToDetailsData(
 ) = HomeworkDetailsData(
     uid = uid,
     classId = class_id,
-    date = date,
+    deadline = deadline,
+    subject = subject,
+    organization = organization,
+    theoreticalTasks = theoretical_tasks,
+    practicalTasks = practical_tasks,
+    presentations = presentations,
+    test = test,
+    priority = priority,
+    isDone = is_done == 1L,
+    completeDate = complete_date,
+)
+
+fun FetchActiveAndLinkedHomeworks.mapToDetailsData(
+    organization: OrganizationShortData,
+    subject: SubjectDetailsData?,
+) = HomeworkDetailsData(
+    uid = uid,
+    classId = class_id,
+    deadline = deadline,
     subject = subject,
     organization = organization,
     theoreticalTasks = theoretical_tasks,
@@ -98,7 +117,7 @@ fun HomeworkEntity.mapToDetailsData(
 fun HomeworkDetailsData.mapToRemoteData() = HomeworkPojo(
     uid = uid,
     classId = classId,
-    date = date,
+    deadline = deadline,
     subjectId = subject?.uid,
     organizationId = organization.uid,
     theoreticalTasks = theoreticalTasks,
@@ -116,7 +135,7 @@ fun HomeworkPojo.mapToDetailsData(
 ) = HomeworkDetailsData(
     uid = uid,
     classId = classId,
-    date = date,
+    deadline = deadline,
     subject = subject,
     organization = organization,
     theoreticalTasks = theoreticalTasks,

@@ -38,6 +38,15 @@ data class TimeRange(
     @TypeParceler<Instant, InstantParceler> val to: Instant
 ) : Parcelable {
 
+    fun containsDate(instant: Instant) = instant in from..to
+
+    fun containsTime(instant: Instant): Boolean {
+        val targetTime = instant.dateTime().time
+        val fromTime = from.dateTime().time
+        val toTime = to.dateTime().time
+        return targetTime in fromTime..toTime
+    }
+
     fun timeEquals(other: TimeRange?): Boolean {
         val fromTime = from.dateTime().time
         val endTime = from.dateTime().time

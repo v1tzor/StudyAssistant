@@ -27,6 +27,6 @@ data class DailyAnalysis(
     val numberOfClasses: Int,
     val numberOfTests: Int,
     val numberOfMovements: Int,
-    val numberOfHomeworks: List<Boolean>,
-    val numberOfTasks: List<Boolean>,
+    val homeworksProgress: List<Boolean>,
+    val todosProgress: List<Boolean>,
 )

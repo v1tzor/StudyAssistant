@@ -26,6 +26,5 @@ internal data class HomeworksScreen(val targetDate: Long?) : Screen {
 
     @Composable
     override fun Content() {
-        // TODO Not yet implemented
     }
 }

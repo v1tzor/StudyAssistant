@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mappers.tasks
+package mappers.schedules
 
 import entities.classes.Class
 import entities.subject.EventType

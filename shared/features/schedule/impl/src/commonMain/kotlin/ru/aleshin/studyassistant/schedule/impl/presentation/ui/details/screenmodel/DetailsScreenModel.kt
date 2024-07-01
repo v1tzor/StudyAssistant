@@ -112,7 +112,7 @@ internal class DetailsScreenModel(
             is DetailsEvent.EditHomeworkInEditor -> with(event) {
                 val featureScreen = EditorScreen.Homework(
                     homeworkId = homework.uid,
-                    date = homework.date.toEpochMilliseconds(),
+                    date = homework.deadline.startThisDay().toEpochMilliseconds(),
                     subjectId = homework.subject?.uid,
                     organizationId = homework.organization.uid,
                 )
@@ -122,9 +122,9 @@ internal class DetailsScreenModel(
             is DetailsEvent.AddHomeworkInEditor -> with(event) {
                 val featureScreen = EditorScreen.Homework(
                     homeworkId = null,
-                    date = classModel?.timeRange?.from?.startThisDay()?.toEpochMilliseconds(),
-                    subjectId = classModel?.subject?.uid,
-                    organizationId = classModel?.organization?.uid,
+                    date = event.date.startThisDay().toEpochMilliseconds(),
+                    subjectId = classModel.subject?.uid,
+                    organizationId = classModel.organization.uid,
                 )
                 val screen = screenProvider.provideEditorScreen(featureScreen)
                 sendEffect(DetailsEffect.NavigateToGlobal(screen))

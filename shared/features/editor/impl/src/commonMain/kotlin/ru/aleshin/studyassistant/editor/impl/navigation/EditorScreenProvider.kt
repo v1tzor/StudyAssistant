@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.navigation
 
+import architecture.screens.EmptyScreen
 import navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.ClassEditorScreen
@@ -62,6 +63,7 @@ internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen> {
                 organizationId = screen.organizationId,
             )
             is EditorScreen.Profile -> ProfileEditorScreen()
+            is EditorScreen.Todo -> EmptyScreen
         }
     }
 }

@@ -21,6 +21,8 @@ import entities.schedules.ScheduleDetails
 import entities.schedules.WeekScheduleDetails
 import entities.schedules.base.BaseScheduleDetails
 import entities.schedules.custom.CustomScheduleDetails
+import entities.tasks.HomeworkStatus
+import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.BaseScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.CustomScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.DateVersionUi
@@ -30,42 +32,46 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.Week
 /**
  * @author Stanislav Aleshin on 09.06.2024.
  */
-internal fun BaseScheduleDetails.mapToUi(): BaseScheduleDetailsUi {
+internal fun BaseScheduleDetails.mapToUi(currentTime: Instant): BaseScheduleDetailsUi {
     val groupedClasses = classes.groupBy { it.organization.uid }
     return BaseScheduleDetailsUi(
         uid = uid,
         dateVersion = dateVersion.mapToUi(),
         dayOfWeek = dayOfWeek,
         week = week,
-        classes = classes.map {
-            val number = groupedClasses[it.organization.uid]?.indexOf(it)?.inc() ?: 0
-            it.mapToUi(number)
+        classes = classes.map { classModel ->
+            val number = groupedClasses[classModel.organization.uid]?.indexOf(classModel)?.inc() ?: 0
+            classModel.mapToUi(number) { homework ->
+                HomeworkStatus.calculate(homework.isDone, homework.completeDate, homework.deadline, currentTime)
+            }
         },
     )
 }
 
-internal fun CustomScheduleDetails.mapToUi(): CustomScheduleDetailsUi {
+internal fun CustomScheduleDetails.mapToUi(currentTime: Instant): CustomScheduleDetailsUi {
     val groupedClasses = classes.groupBy { it.organization.uid }
     return CustomScheduleDetailsUi(
         uid = uid,
         date = date,
-        classes = classes.map {
-            val number = groupedClasses[it.organization.uid]?.indexOf(it)?.inc() ?: 0
-            it.mapToUi(number)
+        classes = classes.map { classModel ->
+            val number = groupedClasses[classModel.organization.uid]?.indexOf(classModel)?.inc() ?: 0
+            classModel.mapToUi(number) { homework ->
+                HomeworkStatus.calculate(homework.isDone, homework.completeDate, homework.deadline, currentTime)
+            }
         },
     )
 }
 
-internal fun ScheduleDetails.mapToUi() = when (this) {
-    is ScheduleDetails.Base -> ScheduleDetailsUi.Base(data?.mapToUi())
-    is ScheduleDetails.Custom -> ScheduleDetailsUi.Custom(data?.mapToUi())
+internal fun ScheduleDetails.mapToUi(currentTime: Instant) = when (this) {
+    is ScheduleDetails.Base -> ScheduleDetailsUi.Base(data?.mapToUi(currentTime))
+    is ScheduleDetails.Custom -> ScheduleDetailsUi.Custom(data?.mapToUi(currentTime))
 }
 
-internal fun WeekScheduleDetails.mapToUi() = WeekScheduleDetailsUi(
+internal fun WeekScheduleDetails.mapToUi(currentTime: Instant) = WeekScheduleDetailsUi(
     from = from,
     to = to,
     numberOfWeek = numberOfWeek,
-    weekDaySchedules = weekDaySchedules.mapValues { it.value.mapToUi() },
+    weekDaySchedules = weekDaySchedules.mapValues { it.value.mapToUi(currentTime) },
 )
 
 internal fun DateVersion.mapToUi() = DateVersionUi(

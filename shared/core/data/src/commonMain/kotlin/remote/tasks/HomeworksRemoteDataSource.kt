@@ -45,6 +45,8 @@ interface HomeworksRemoteDataSource {
     suspend fun addOrUpdateHomework(homework: HomeworkDetailsData, targetUser: UID): UID
     suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<HomeworkDetailsData?>
     suspend fun fetchHomeworksByTimeRange(from: Long, to: Long, targetUser: UID): Flow<List<HomeworkDetailsData>>
+    suspend fun fetchOverdueHomeworks(currentDate: Long, targetUser: UID): Flow<List<HomeworkDetailsData>>
+    suspend fun fetchActiveLinkedHomeworks(currentDate: Long, targetUser: UID): Flow<List<HomeworkDetailsData>>
     suspend fun deleteHomework(uid: UID, targetUser: UID)
 
     class Base(
@@ -94,8 +96,56 @@ interface HomeworksRemoteDataSource {
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.HOMEWORKS).where {
-                (UserData.HOMEWORK_DATE greaterThanOrEqualTo from) and (UserData.HOMEWORK_DATE lessThanOrEqualTo to)
-            }.orderBy(UserData.HOMEWORK_DATE, Direction.DESCENDING)
+                val fromDeadlineFilter = UserData.HOMEWORK_DEADLINE greaterThanOrEqualTo from
+                val toDeadlineFilter = UserData.HOMEWORK_DEADLINE lessThanOrEqualTo to
+                return@where fromDeadlineFilter and toDeadlineFilter
+            }.orderBy(UserData.HOMEWORK_DEADLINE, Direction.DESCENDING)
+
+            val homeworkPojoListFlow = reference.snapshots.map { snapshot ->
+                snapshot.documents.map { it.data(serializer<HomeworkPojo>()) }
+            }
+
+            return homeworkPojoListFlow.map { homeworks ->
+                homeworks.map { homeworkPojo -> homeworkPojo.mapToDetails(userDataRoot) }
+            }
+        }
+
+        override suspend fun fetchOverdueHomeworks(
+            currentDate: Long,
+            targetUser: UID,
+        ): Flow<List<HomeworkDetailsData>> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.HOMEWORKS).where {
+                val deadlineFilter = UserData.HOMEWORK_DEADLINE lessThan currentDate
+                val doneFilter = UserData.HOMEWORK_DONE equalTo false
+                val completeDateFilter = UserData.HOMEWORK_COMPLETE_DATE equalTo null
+                return@where deadlineFilter and doneFilter and completeDateFilter
+            }.orderBy(UserData.HOMEWORK_DEADLINE, Direction.DESCENDING)
+
+            val homeworkPojoListFlow = reference.snapshots.map { snapshot ->
+                snapshot.documents.map { it.data(serializer<HomeworkPojo>()) }
+            }
+
+            return homeworkPojoListFlow.map { homeworks ->
+                homeworks.map { homeworkPojo -> homeworkPojo.mapToDetails(userDataRoot) }
+            }
+        }
+
+        override suspend fun fetchActiveLinkedHomeworks(
+            currentDate: Long,
+            targetUser: UID,
+        ): Flow<List<HomeworkDetailsData>> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.HOMEWORKS).where {
+                val deadlineFilter = UserData.HOMEWORK_DEADLINE greaterThanOrEqualTo currentDate
+                val classIdFilter = UserData.HOMEWORK_CLASS_ID notEqualTo null
+                val doneFilter = UserData.HOMEWORK_DONE equalTo false
+                return@where deadlineFilter and classIdFilter and doneFilter
+            }.orderBy(UserData.HOMEWORK_DEADLINE, Direction.DESCENDING)
 
             val homeworkPojoListFlow = reference.snapshots.map { snapshot ->
                 snapshot.documents.map { it.data(serializer<HomeworkPojo>()) }

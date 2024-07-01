@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEvent
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsViewState
 import ru.aleshin.studyassistant.navigation.impl.ui.views.TabsBottomBarItems
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
+import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
 
 /**
  * @author Stanislav Aleshin on 18.02.2023.
@@ -64,7 +65,7 @@ internal class TabsScreenModel(
             provideScheduleScreen(ScheduleScreen.Overview(null))
         }
         TabsEvent.SelectedTasksBottomItem -> changeTabItem(TabsBottomBarItems.TASKS) {
-            provideTasksScreen()
+            provideTasksScreen(TasksScreen.Overview)
         }
         TabsEvent.SelectedInfoBottomItem -> changeTabItem(TabsBottomBarItems.INFO) {
             provideInfoScreen(InfoScreen.Organizations)

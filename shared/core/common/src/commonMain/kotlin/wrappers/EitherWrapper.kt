@@ -15,12 +15,12 @@
  */
 package wrappers
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
 import functional.DomainFailures
 import functional.Either
 import handlers.ErrorHandler
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.

@@ -28,6 +28,6 @@ internal fun DailyAnalysis.mapToUi() = DailyAnalysisUi(
     numberOfClasses = numberOfClasses,
     numberOfTests = numberOfTests,
     numberOfMovements = numberOfMovements,
-    numberOfHomeworks = numberOfHomeworks,
-    numberOfTasks = numberOfTasks,
+    numberOfHomeworks = homeworksProgress,
+    numberOfTasks = todosProgress,
 )

@@ -21,10 +21,11 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,7 +55,6 @@ internal fun ScheduleEditorContent(
     state: ScheduleEditorViewState,
     modifier: Modifier = Modifier,
     refreshState: PullToRefreshState = rememberPullToRefreshState(),
-    listState: LazyListState = rememberLazyListState(),
     onRefresh: () -> Unit,
     onCreateClass: (DayOfNumberedWeekUi, BaseScheduleUi?) -> Unit,
     onEditClass: (ClassUi, DayOfNumberedWeekUi) -> Unit,
@@ -67,6 +67,7 @@ internal fun ScheduleEditorContent(
             animationSpec = spring(stiffness = Spring.StiffnessLow),
         ) { loading ->
             if (!loading) {
+                val listState = rememberLazyListState()
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     state = listState,
@@ -88,12 +89,10 @@ internal fun ScheduleEditorContent(
                             },
                         )
                     }
+                    item { Spacer(modifier = Modifier.height(60.dp)) }
                 }
             } else {
-                LazyColumn(
-                    state = listState,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(DayOfWeek.entries.size) { ScheduleViewPlaceholder() }
                 }
             }

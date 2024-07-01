@@ -90,6 +90,19 @@ internal fun DetailsClassHomeworkBadge(
             containerColor = StudyAssistantRes.colors.accents.redContainer,
             content = { Text(text = ScheduleThemeRes.strings.homeworkIsNotCompleteShortTitle) }
         )
+        HomeworkStatus.SKIPPED -> InfoBadge(
+            modifier = modifier,
+            leadingIcon = {
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    painter = painterResource(StudyAssistantRes.icons.tasksOutline),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            },
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            content = { Text(text = ScheduleThemeRes.strings.homeworkIsSkippedShortTitle) }
+        )
     }
 }
 
