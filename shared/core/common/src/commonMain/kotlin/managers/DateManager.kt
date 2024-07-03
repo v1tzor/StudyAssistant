@@ -18,7 +18,7 @@ package managers
 import extensions.dateTime
 import extensions.endThisDay
 import extensions.epochTimeDuration
-import extensions.isCurrentDay
+import extensions.equalsDay
 import extensions.startThisDay
 import extensions.toMinutes
 import extensions.weekTimeRange
@@ -62,7 +62,7 @@ interface DateManager {
         }
 
         override fun isCurrentDay(date: Instant): Boolean {
-            return fetchCurrentInstant().isCurrentDay(date, timeZone)
+            return fetchCurrentInstant().equalsDay(date, timeZone)
         }
 
         override fun calculateLeftDateTime(endDateTime: Instant): Long {

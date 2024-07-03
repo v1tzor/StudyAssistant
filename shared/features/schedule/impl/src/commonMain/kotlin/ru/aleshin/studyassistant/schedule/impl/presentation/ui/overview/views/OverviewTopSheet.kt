@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,6 +37,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
@@ -45,7 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import extensions.dateTime
-import extensions.isCurrentDay
+import extensions.equalsDay
 import extensions.toMinutesAndHoursString
 import functional.Constants.Animations.FADE_SLOW
 import io.github.koalaplot.core.line.AreaBaseline
@@ -81,15 +82,15 @@ internal fun OverviewTopSheet(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
         shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Row(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val currentAnalysis = weekAnalysis?.find { it.date.isCurrentDay(selectedDate) }
+            val currentAnalysis = weekAnalysis?.find { it.date.equalsDay(selectedDate) }
 
             Column(
                 modifier = Modifier.weight(0.6f),
@@ -178,6 +179,12 @@ private fun OverviewTopSheetClassTime(
                 val tasksProgress by derivedStateOf {
                     tasksProgressList.count { it } / tasksProgressList.size.toFloat()
                 }
+                val progress = when {
+                    activeClass?.progress != null -> activeClass.progress
+                    homeworksProgressList.isNotEmpty() -> homeworksProgress
+                    tasksProgressList.isNotEmpty() -> tasksProgress
+                    else -> 0f
+                }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
@@ -211,15 +218,12 @@ private fun OverviewTopSheetClassTime(
                     )
                 }
                 LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth().height(10.dp),
-                    progress = when {
-                        activeClass?.progress != null -> activeClass.progress
-                        homeworksProgressList.isNotEmpty() -> homeworksProgress
-                        tasksProgressList.isNotEmpty() -> tasksProgress
-                        else -> 0f
-                    },
-                    backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    strokeCap = StrokeCap.Round,
+                    modifier = Modifier.height(10.dp).fillMaxWidth(1f).clip(MaterialTheme.shapes.full()),
+                    progress = { progress },
+                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    strokeCap = StrokeCap.Square,
+                    gapSize = 0.dp,
+                    drawStopIndicator = {},
                 )
             }
         } else {

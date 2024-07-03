@@ -24,6 +24,10 @@ import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 import ru.aleshin.studyassistant.tasks.impl.navigation.TasksFeatureStarterImpl
 import ru.aleshin.studyassistant.tasks.impl.navigation.TasksScreenProvider
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksEffectCommunicator
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksScreenModel
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksStateCommunicator
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksWorkProcessor
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.navigation.NavigationScreenModel
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewEffectCommunicator
@@ -45,4 +49,9 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<OverviewEffectCommunicator> { OverviewEffectCommunicator.Base() }
     bindProvider<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance(), instance(), instance()) }
     bindProvider<OverviewScreenModel> { OverviewScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<HomeworksStateCommunicator> { HomeworksStateCommunicator.Base() }
+    bindProvider<HomeworksEffectCommunicator> { HomeworksEffectCommunicator.Base() }
+    bindProvider<HomeworksWorkProcessor> { HomeworksWorkProcessor.Base(instance(), instance(), instance()) }
+    bindProvider<HomeworksScreenModel> { HomeworksScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
 }

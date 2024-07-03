@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -43,7 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import extensions.dateTime
-import extensions.isCurrentDay
+import extensions.equalsDay
 import extensions.shiftDay
 import functional.Constants.Date.OVERVIEW_FIRST_ITEM
 import functional.Constants.Date.OVERVIEW_NEXT_DAYS
@@ -57,7 +56,6 @@ import theme.StudyAssistantRes
  * @author Stanislav Aleshin on 12.06.2024.
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 internal fun OverviewBottomBar(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -86,17 +84,17 @@ internal fun OverviewBottomBar(
         ) {
             items(dateList) { date ->
                 ScheduleDateItem(
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier.animateItem(),
                     enabled = enabled,
                     date = date,
-                    selected = date.isCurrentDay(selectedDate),
-                    isCurrentDay = date.isCurrentDay(currentDate),
+                    selected = date.equalsDay(selectedDate),
+                    isCurrentDay = date.equalsDay(currentDate),
                     onClick = { onSelectedDate(date) },
                 )
             }
         }
         LaunchedEffect(selectedDate) {
-            var index = dateList.indexOfFirst { it.isCurrentDay(selectedDate) }
+            var index = dateList.indexOfFirst { it.equalsDay(selectedDate) }
             if (index != -1) {
                 if (index == dateList.lastIndex || index == 0) {
                     val from = dateList[index].shiftDay(-OVERVIEW_PREVIOUS_DAYS)

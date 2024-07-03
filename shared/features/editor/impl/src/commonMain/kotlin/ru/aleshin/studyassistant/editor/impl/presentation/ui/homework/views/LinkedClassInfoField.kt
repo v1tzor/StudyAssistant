@@ -58,7 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import extensions.formatByTimeZone
-import extensions.isCurrentDay
+import extensions.equalsDay
 import extensions.mapEpochTimeToInstant
 import functional.UID
 import kotlinx.datetime.Instant
@@ -203,7 +203,7 @@ private fun LinkClassView(
                             LinkClassItem(
                                 onClick = { onSelectedClass(dateClassModel.second, dateClassModel.first) },
                                 selected = linkedClass == dateClassModel.second.uid &&
-                                    dateClassModel.first.isCurrentDay(selectedDate),
+                                    dateClassModel.first.equalsDay(selectedDate),
                                 date = dateClassModel.first,
                                 numberOfClass = dateClassModel.second.number,
                             )

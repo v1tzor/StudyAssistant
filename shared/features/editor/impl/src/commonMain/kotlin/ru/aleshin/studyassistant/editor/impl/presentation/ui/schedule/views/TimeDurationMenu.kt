@@ -62,6 +62,7 @@ internal fun NumberDropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
         modifier = modifier.size(210.dp, 200.dp),
+        shape = MaterialTheme.shapes.large,
         offset = DpOffset(0.dp, 6.dp),
     ) {
         BackMenuItem(onClick = onDismiss)
@@ -98,6 +99,7 @@ internal fun NumberedDurationCreatorDropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
         modifier = modifier.size(230.dp, 200.dp),
+        shape = MaterialTheme.shapes.large,
         offset = DpOffset(0.dp, 6.dp),
     ) {
         var isOpenDurationPickerDialog by remember { mutableStateOf(false) }

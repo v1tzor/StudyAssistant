@@ -20,7 +20,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -29,12 +28,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import functional.UID
 import kotlinx.datetime.DayOfWeek
@@ -44,7 +42,6 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseS
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.ScheduleView
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.ScheduleViewPlaceholder
-import views.PullToRefreshContainer
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -60,7 +57,12 @@ internal fun ScheduleEditorContent(
     onEditClass: (ClassUi, DayOfNumberedWeekUi) -> Unit,
     onDeleteClass: (UID, BaseScheduleUi) -> Unit,
 ) = with(state) {
-    Box(modifier = modifier.nestedScroll(refreshState.nestedScrollConnection)) {
+    PullToRefreshBox(
+        modifier = modifier,
+        isRefreshing = isLoading,
+        onRefresh = onRefresh,
+        state = refreshState,
+    ) {
         Crossfade(
             modifier = Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, end = 16.dp),
             targetState = isLoading,
@@ -97,11 +99,5 @@ internal fun ScheduleEditorContent(
                 }
             }
         }
-        PullToRefreshContainer(
-            state = refreshState,
-            modifier = Modifier.align(Alignment.TopCenter),
-            isLoading = isLoading,
-            onRefresh = onRefresh,
-        )
     }
 }

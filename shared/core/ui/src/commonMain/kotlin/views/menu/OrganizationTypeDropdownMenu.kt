@@ -46,6 +46,7 @@ fun OrganizationTypeDropdownMenu(
         expanded = isExpanded,
         onDismissRequest = onDismiss,
         modifier = modifier.sizeIn(maxHeight = 200.dp).clip(MaterialTheme.shapes.large),
+        shape = MaterialTheme.shapes.large,
         offset = DpOffset(0.dp, 6.dp),
     ) {
         OrganizationType.entries.forEach { type ->

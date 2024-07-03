@@ -20,7 +20,7 @@ import architecture.screenmodel.work.ActionResult
 import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
-import extensions.isCurrentDay
+import extensions.equalsDay
 import extensions.setHoursAndMinutes
 import extensions.shiftMillis
 import functional.Constants.Class
@@ -300,7 +300,7 @@ internal interface ClassEditorWorkProcessor :
                             numberedDuration.number == number + 1
                         }?.duration ?: classDuration
                     )
-                    if (endClassTime.isCurrentDay(startRange)) {
+                    if (endClassTime.equalsDay(startRange)) {
                         val classTimeRange = TimeRange(startClassTime, endClassTime)
                         val isOverlay = overlayManager.isOverlay(classTimeRange, existClasses ?: emptyList()).isOverlay
                         put(classTimeRange, !isOverlay)

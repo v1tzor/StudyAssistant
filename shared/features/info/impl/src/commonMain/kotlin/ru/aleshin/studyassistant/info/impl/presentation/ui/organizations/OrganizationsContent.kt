@@ -26,13 +26,11 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -54,13 +52,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import extensions.DISABLED_ALPHA
 import extensions.alphaByEnabled
@@ -82,7 +80,6 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
 import theme.StudyAssistantRes
 import theme.material.full
 import views.PlaceholderBox
-import views.PullToRefreshContainer
 
 /**
  * @author Stanislav Aleshin on 16.06.2024
@@ -103,7 +100,12 @@ internal fun OrganizationsContent(
     onShowAllSubjects: () -> Unit,
     onShowSubjectEditor: (UID) -> Unit,
 ) = with(state) {
-    Box(modifier = modifier.fillMaxSize().nestedScroll(refreshState.nestedScrollConnection)) {
+    PullToRefreshBox(
+        modifier = modifier,
+        isRefreshing = isLoading,
+        onRefresh = onRefresh,
+        state = refreshState,
+    ) {
         Column(
             modifier = Modifier.verticalScroll(scrollState).padding(top = 8.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -134,12 +136,6 @@ internal fun OrganizationsContent(
             )
             Spacer(modifier = Modifier.height(60.dp))
         }
-        PullToRefreshContainer(
-            state = refreshState,
-            modifier = Modifier.align(Alignment.TopCenter),
-            isLoading = isLoading,
-            onRefresh = onRefresh,
-        )
     }
 }
 

@@ -21,7 +21,7 @@ import entities.common.DayOfNumberedWeek
 import entities.schedules.DateVersion
 import entities.schedules.base.BaseSchedule
 import extensions.dateOfWeekDay
-import extensions.isCurrentDay
+import extensions.equalsDay
 import extensions.randomUUID
 import functional.DomainResult
 import functional.FlowDomainResult
@@ -74,7 +74,7 @@ internal interface BaseClassInteractor {
                 val actualClasses = schedule.classes.toMutableList().apply {
                     add(createClassModel)
                 }
-                if (mondayDate.isCurrentDay(schedule.dateVersion.from)) {
+                if (mondayDate.equalsDay(schedule.dateVersion.from)) {
                     val updatedSchedule = schedule.copy(classes = actualClasses)
                     scheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser)
                 } else {
@@ -127,7 +127,7 @@ internal interface BaseClassInteractor {
                     set(indexOf(oldModel), classModel)
                 }
             }
-            if (mondayDate.isCurrentDay(schedule.dateVersion.from)) {
+            if (mondayDate.equalsDay(schedule.dateVersion.from)) {
                 val updatedSchedule = schedule.copy(classes = actualClasses)
                 scheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser)
             } else {
@@ -154,7 +154,7 @@ internal interface BaseClassInteractor {
             val actualClasses = schedule.classes.toMutableList().apply {
                 removeAll { it.uid == uid }
             }
-            if (mondayDate.isCurrentDay(schedule.dateVersion.from)) {
+            if (mondayDate.equalsDay(schedule.dateVersion.from)) {
                 val updatedSchedule = schedule.copy(classes = actualClasses)
                 scheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser)
             } else {

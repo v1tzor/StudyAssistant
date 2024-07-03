@@ -36,7 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import extensions.dateTime
 import extensions.dateTimeByWeek
-import extensions.isCurrentDay
+import extensions.equalsDay
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
@@ -80,9 +80,9 @@ internal fun DetailsContent(
                             onCustomSchedule = { it?.classes },
                         )
                         CommonScheduleView(
-                            modifier = Modifier.animateItemPlacement(),
+                            modifier = Modifier.animateItem(),
                             date = scheduleDate.dateTime().date,
-                            isCurrentDay = currentDate.isCurrentDay(scheduleDate),
+                            isCurrentDay = currentDate.equalsDay(scheduleDate),
                             activeClass = activeClass,
                             classes = classes ?: emptyList(),
                             onOpenSchedule = { onOpenSchedule(scheduleDate) },
@@ -92,7 +92,7 @@ internal fun DetailsContent(
                 } else {
                     items(DayOfWeek.entries.size) {
                         CommonScheduleViewPlaceholder(
-                            modifier = Modifier.animateItemPlacement(),
+                            modifier = Modifier.animateItem(),
                         )
                     }
                 }
@@ -110,9 +110,9 @@ internal fun DetailsContent(
                         val schedule = weekSchedule.weekDaySchedules[dayOfWeek]
                         val scheduleDate = dayOfWeek.dateTimeByWeek(weekSchedule.from)
                         CommonScheduleView(
-                            modifier = Modifier.animateItemPlacement(),
+                            modifier = Modifier.animateItem(),
                             date = scheduleDate.dateTime().date,
-                            isCurrentDay = currentDate.isCurrentDay(scheduleDate),
+                            isCurrentDay = currentDate.equalsDay(scheduleDate),
                             activeClass = activeClass,
                             classes = schedule?.mapToValue(
                                 onBaseSchedule = { it?.classes },
@@ -125,7 +125,7 @@ internal fun DetailsContent(
                 } else {
                     items(DayOfWeek.entries.size) {
                         CommonScheduleViewPlaceholder(
-                            modifier = Modifier.animateItemPlacement(),
+                            modifier = Modifier.animateItem(),
                         )
                     }
                 }

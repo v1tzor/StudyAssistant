@@ -27,7 +27,7 @@ import entities.tasks.Todo
 import entities.tasks.fetchAllTasks
 import entities.tasks.toHomeworkComponents
 import extensions.dateTime
-import extensions.isCurrentDay
+import extensions.equalsDay
 import extensions.startThisDay
 import functional.DomainResult
 import functional.TimeRange
@@ -86,7 +86,7 @@ internal interface AnalysisInteractor {
 
             return@wrap buildList<DailyAnalysis> {
                 weekTimeRange.periodDates().forEach { instant ->
-                    val customSchedule = customSchedules.find { it.date.isCurrentDay(instant) }
+                    val customSchedule = customSchedules.find { it.date.equalsDay(instant) }
                     val classes = customSchedule?.classes
                         ?: baseSchedules.find { it.dayOfWeek == instant.dateTime().dayOfWeek }?.classes
                     val movementMap = classes?.groupBy { it.organization }?.mapValues { classEntry ->
@@ -94,7 +94,7 @@ internal interface AnalysisInteractor {
                     }
 
                     val dailyHomeworks = groupedHomeworks[instant]
-                    val dailyTodos = todos.filter { it.deadline?.isCurrentDay(instant) == true }
+                    val dailyTodos = todos.filter { it.deadline?.equalsDay(instant) == true }
 
                     val homeworksNumberAndRate = fetchNumberAndRateOfTests(dailyHomeworks)
                     val classesNumberAndRate = fetchNumberAndRateOfClasses(classes)

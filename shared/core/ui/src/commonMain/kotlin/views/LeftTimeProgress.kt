@@ -16,7 +16,6 @@
 
 package views
 
-import androidx.annotation.FloatRange
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.height
@@ -37,7 +36,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun VerticalLeftTimeProgress(
     modifier: Modifier = Modifier,
-    @FloatRange(0.0, 1.0) leftTimeProgress: Float?,
+    leftTimeProgress: Float?,
     trackWidth: Dp = 3.dp,
     thumbHeight: Dp = 4.dp,
     verticalSpacing: Dp = 4.dp,
@@ -92,7 +91,7 @@ fun VerticalLeftTimeProgress(
 @Composable
 fun HorizontalLeftTimeProgress(
     modifier: Modifier = Modifier,
-    @FloatRange(0.0, 1.0) leftTimeProgress: Float?,
+    leftTimeProgress: Float?,
     trackHeight: Dp = 3.dp,
     thumbWidth: Dp = 4.dp,
     horizontalSpacing: Dp = 4.dp,

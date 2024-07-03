@@ -20,7 +20,7 @@ import architecture.screenmodel.work.ActionResult
 import architecture.screenmodel.work.EffectResult
 import architecture.screenmodel.work.FlowWorkProcessor
 import architecture.screenmodel.work.WorkCommand
-import extensions.isCurrentDay
+import extensions.equalsDay
 import extensions.setHoursAndMinutes
 import extensions.shiftMinutes
 import functional.Constants.Delay.UPDATE_ACTIVE_CLASS
@@ -111,7 +111,7 @@ internal interface OverviewWorkProcessor :
                     onBaseSchedule = { it?.classes },
                     onCustomSchedule = { it?.classes }
                 )
-                if (classesDate.isCurrentDay(currentInstant) && scheduleClasses != null) {
+                if (classesDate.equalsDay(currentInstant) && scheduleClasses != null) {
                     val activeClass = scheduleClasses.find { classModel ->
                         val endInstant = classesDate.setHoursAndMinutes(classModel.timeRange.to)
                         return@find currentInstant <= endInstant

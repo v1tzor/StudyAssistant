@@ -22,22 +22,25 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -48,16 +51,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import extensions.isCurrentDay
+import extensions.equalsDay
 import extensions.limitSize
 import functional.Constants.Placeholder
 import kotlinx.datetime.Instant
@@ -75,7 +78,6 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.Homew
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TasksProgressView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TodoViewItem
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TodoViewItemPlaceholder
-import views.PullToRefreshContainer
 
 /**
  * @author Stanislav Aleshin on 29.06.2024
@@ -98,7 +100,12 @@ internal fun OverviewContent(
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
 ) = with(state) {
-    Box(modifier = modifier.fillMaxSize().nestedScroll(refreshState.nestedScrollConnection)) {
+    PullToRefreshBox(
+        modifier = modifier,
+        isRefreshing = isLoadingHomeworks || isLoadingErrors || isLoadingTasks,
+        onRefresh = onRefresh,
+        state = refreshState,
+    ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(top = 8.dp).verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -134,12 +141,6 @@ internal fun OverviewContent(
                 onChangeTodoDone = onChangeTodoDone,
             )
         }
-        PullToRefreshContainer(
-            state = refreshState,
-            modifier = Modifier.align(Alignment.TopCenter),
-            isLoading = isLoadingHomeworks || isLoadingErrors || isLoadingTasks,
-            onRefresh = onRefresh,
-        )
     }
 }
 
@@ -268,7 +269,7 @@ private fun HomeworksSection(
                 ) {
                     items(homeworksMapList, key = { it.first.toString() }) { homeworksEntry ->
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            val isCurrent = currentDate.isCurrentDay(homeworksEntry.first)
+                            val isCurrent = currentDate.equalsDay(homeworksEntry.first)
                             if (isCurrent) {
                                 VerticalDivider(
                                     modifier = Modifier.padding(vertical = 16.dp),
@@ -297,7 +298,7 @@ private fun HomeworksSection(
                 }
                 LaunchedEffect(homeworks) {
                     val currentDateIndex =
-                        homeworksMapList.indexOfFirst { currentDate.isCurrentDay(it.first) }
+                        homeworksMapList.indexOfFirst { currentDate.equalsDay(it.first) }
                     if (currentDateIndex != -1) listState.animateScrollToItem(currentDateIndex)
                 }
             } else {
@@ -355,12 +356,15 @@ private fun TodosSection(
         ) { loading ->
             if (!loading) {
                 val limitedTodos = todos.limitSize(12)
-                FlowColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                val state = rememberLazyStaggeredGridState()
+                LazyHorizontalStaggeredGrid(
+                    rows = StaggeredGridCells.Fixed(2),
+                    state = state,
+                    modifier = Modifier.heightIn(min = 170.dp, max = 400.dp),
+                    horizontalItemSpacing = 12.dp,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    limitedTodos.forEach { todo ->
+                    items(limitedTodos, key = { it.uid }) { todo ->
                         TodoViewItem(
                             modifier = Modifier.wrapContentSize(),
                             onClick = { onOpenTodoTask(todo) },
@@ -374,12 +378,15 @@ private fun TodosSection(
                     }
                 }
             } else {
-                FlowColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                val state = rememberLazyStaggeredGridState()
+                LazyHorizontalStaggeredGrid(
+                    rows = StaggeredGridCells.Fixed(2),
+                    state = state,
+                    modifier = Modifier.heightIn(max = 500.dp),
+                    horizontalItemSpacing = 12.dp,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    repeat(Placeholder.TODOS) {
+                    items(Placeholder.TODOS) {
                         TodoViewItemPlaceholder()
                     }
                 }

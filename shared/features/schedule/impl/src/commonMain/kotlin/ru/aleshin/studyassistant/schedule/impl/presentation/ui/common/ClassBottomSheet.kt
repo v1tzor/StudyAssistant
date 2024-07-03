@@ -95,7 +95,7 @@ internal fun ClassBottomSheet(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         dragHandle = { MediumDragHandle() },
-        windowInsets = WindowInsets.navigationBars,
+        contentWindowInsets = { WindowInsets.navigationBars },
         tonalElevation = 0.dp,
     ) {
         Column(

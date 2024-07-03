@@ -77,11 +77,7 @@ internal class OrganizationsScreen : Screen {
                     modifier = Modifier.padding(paddingValues),
                     refreshState = refreshState,
                     onRefresh = {
-                        if (organizationId != null) {
-                            dispatchEvent(OrganizationsEvent.Refresh(organizationId!!))
-                        } else {
-                            refreshState.endRefresh()
-                        }
+                        dispatchEvent(OrganizationsEvent.Refresh(organizationId!!))
                     },
                     onAddOrganization = {
                         dispatchEvent(OrganizationsEvent.NavigateToOrganizationEditor(null))

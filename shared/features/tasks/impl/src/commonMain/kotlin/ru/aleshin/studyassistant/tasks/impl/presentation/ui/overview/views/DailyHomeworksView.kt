@@ -112,7 +112,6 @@ internal fun DailyHomeworksView(
                 if (homeworks.isNotEmpty()) {
                     items(homeworks, key = { it.uid }) { homework ->
                         ShortHomeworkViewItem(
-                            modifier = Modifier.animateItemPlacement(),
                             status = homework.status,
                             subject = homework.subject,
                             theoreticalTasks = homework.theoreticalTasks.components,
@@ -432,7 +431,6 @@ private fun ShortHomeworkTaskCountView(
     painter: Painter,
     count: Int,
     description: String? = null,
-    color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     Row(
         modifier = modifier,
@@ -443,11 +441,11 @@ private fun ShortHomeworkTaskCountView(
             modifier = Modifier.size(18.dp),
             painter = painter,
             contentDescription = description,
-            tint = color
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = count.toString(),
-            color = color,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
             style = MaterialTheme.typography.labelMedium,

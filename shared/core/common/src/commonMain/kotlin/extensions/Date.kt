@@ -95,16 +95,16 @@ fun TimeRange.shiftWeek(value: Int, timeZone: TimeZone = TimeZone.currentSystemD
     )
 }
 
-fun LocalDate.isCurrentDay(date: LocalDate?): Boolean {
+fun LocalDate.equalsDay(date: LocalDate?): Boolean {
     return dayOfYear == date?.dayOfYear
 }
 
-fun Instant.isCurrentDay(date: LocalDate?, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {
-    return toLocalDateTime(timeZone).date.isCurrentDay(date)
+fun Instant.equalsDay(date: LocalDate?, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {
+    return toLocalDateTime(timeZone).date.equalsDay(date)
 }
 
-fun Instant.isCurrentDay(date: Instant?, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {
-    return isCurrentDay(date?.toLocalDateTime(timeZone)?.date)
+fun Instant.equalsDay(date: Instant?, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {
+    return equalsDay(date?.toLocalDateTime(timeZone)?.date)
 }
 
 fun Instant.isCurrentWeek(date: Instant?, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {

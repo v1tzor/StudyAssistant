@@ -17,7 +17,6 @@
 package views.dialog
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -127,7 +126,6 @@ fun <T> BaseSelectorDialog(
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 fun LazyItemScope.SelectorDialogItemView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -140,7 +138,7 @@ fun LazyItemScope.SelectorDialogItemView(
     Surface(
         onClick = { if (!selected) onClick() },
         enabled = enabled,
-        modifier = modifier.alphaByEnabled(enabled).animateItemPlacement().fillMaxWidth(),
+        modifier = modifier.alphaByEnabled(enabled).fillMaxWidth().animateItem(),
         shape = MaterialTheme.shapes.large,
         color = when (selected) {
             true -> MaterialTheme.colorScheme.primaryContainer
@@ -192,16 +190,16 @@ fun LazyItemScope.SelectorDialogItemView(
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 fun LazyItemScope.SelectorDialogAddItemView(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
+    modifier.alphaByEnabled(enabled).fillMaxWidth().height(40.dp)
     Surface(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.alphaByEnabled(enabled).fillMaxWidth().height(40.dp).animateItemPlacement(),
+        modifier = Modifier.animateItem(),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceVariant,
     ) {

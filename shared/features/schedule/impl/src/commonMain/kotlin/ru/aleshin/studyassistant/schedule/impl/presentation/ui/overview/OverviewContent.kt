@@ -77,11 +77,13 @@ internal fun OverviewContent(
                         contentPadding = PaddingValues(horizontal = 12.dp),
                     ) {
                         items(schedule.classes) { classModel ->
+                            Modifier.fillMaxWidth()
                             DetailsClassViewItem(
-                                modifier = Modifier.fillMaxWidth().animateItemPlacement(),
+                                modifier = Modifier.animateItem(),
                                 onClick = { onShowClassInfo(classModel) },
                                 isActive = activeClass?.uid == classModel.uid,
-                                progress = activeClass?.progress?.takeIf { activeClass.isStarted } ?: -1f,
+                                progress = activeClass?.progress?.takeIf { activeClass.isStarted }
+                                    ?: -1f,
                                 timeRange = classModel.timeRange,
                                 subject = classModel.subject,
                                 office = classModel.office,

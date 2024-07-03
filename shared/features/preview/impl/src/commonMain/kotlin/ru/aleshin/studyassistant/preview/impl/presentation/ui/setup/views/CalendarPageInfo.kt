@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -46,7 +45,6 @@ import theme.StudyAssistantRes
  * @author Stanislav Aleshin on 27.04.2024
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 internal fun CalendarPageInfo(
     modifier: Modifier = Modifier,
     calendarSettings: CalendarSettingsUi,
@@ -58,7 +56,7 @@ internal fun CalendarPageInfo(
     ) {
         items(NumberOfRepeatWeek.entries) { week ->
             NumberOfWeekView(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 selected = week == calendarSettings.numberOfWeek,
                 week = week,
                 onSelected = { onUpdateCalendarSettings(calendarSettings.copy(numberOfWeek = week)) },

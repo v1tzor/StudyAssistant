@@ -20,9 +20,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.HorizontalDivider
@@ -71,7 +72,7 @@ internal fun TodoViewItem(
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.widthIn(min = 240.dp),
+        modifier = modifier.width(260.dp),
         enabled = enabled,
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -98,7 +99,7 @@ internal fun TodoViewItemPlaceholder(
     modifier: Modifier = Modifier,
 ) {
     PlaceholderBox(
-        modifier = modifier.size(240.dp, 130.dp),
+        modifier = modifier.width(260.dp).height(130.dp),
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainer,
     )

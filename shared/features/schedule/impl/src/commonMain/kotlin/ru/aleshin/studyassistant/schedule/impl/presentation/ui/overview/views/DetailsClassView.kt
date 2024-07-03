@@ -85,7 +85,7 @@ internal fun DetailsClassViewItem(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     Row(
-        modifier = modifier.height(IntrinsicSize.Max),
+        modifier = modifier.height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         DetailsClassTime(
@@ -241,7 +241,7 @@ private fun DetailsClassView(
         color = MaterialTheme.colorScheme.surfaceContainer,
         interactionSource = interactionSource,
     ) {
-        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max)) {
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
             DetailsClassColorIndicator(
                 modifier = Modifier.fillMaxHeight(),
                 indicatorColor = subject?.color?.let { Color(it) }

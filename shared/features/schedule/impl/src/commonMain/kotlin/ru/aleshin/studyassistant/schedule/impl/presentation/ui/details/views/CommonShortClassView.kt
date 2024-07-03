@@ -75,7 +75,7 @@ internal fun CommonClassView(
     Row(
         modifier = modifier
             .padding(all = 4.dp)
-            .height(IntrinsicSize.Max)
+            .height(IntrinsicSize.Min)
             .clip(MaterialTheme.shapes.small)
             .clickable(
                 indication = LocalIndication.current,

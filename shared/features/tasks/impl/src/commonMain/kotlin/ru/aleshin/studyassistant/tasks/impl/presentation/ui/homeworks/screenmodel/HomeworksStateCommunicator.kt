@@ -13,21 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package views
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarData
-import androidx.compose.runtime.Composable
+package ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel
+
+import architecture.communications.state.StateCommunicator
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksViewState
 
 /**
- * @author Stanislav Aleshin on 13.04.2024.
+ * @author Stanislav Aleshin on 27.06.2024.
  */
-@Composable
-fun ErrorSnackbar(snackbarData: SnackbarData) = Snackbar(
-    snackbarData = snackbarData,
-    containerColor = MaterialTheme.colorScheme.errorContainer,
-    contentColor = MaterialTheme.colorScheme.onErrorContainer,
-    actionColor = MaterialTheme.colorScheme.error,
-    dismissActionContentColor = MaterialTheme.colorScheme.onSurface,
-)
+internal interface HomeworksStateCommunicator : StateCommunicator<HomeworksViewState> {
+    class Base : HomeworksStateCommunicator, StateCommunicator.Abstract<HomeworksViewState>(
+        defaultState = HomeworksViewState()
+    )
+}

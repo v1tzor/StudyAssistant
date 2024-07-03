@@ -44,9 +44,10 @@ internal data class TasksStrings(
     val totalTodosSuffix: String,
     val showAllTodosTitle: String,
     val untilDeadlineDateSuffix: String,
+    val overallHomeworksProgress: String,
+    val homeworkTestLabel: String,
     val otherErrorMessage: String,
 ) {
-
     companion object {
         val RUSSIAN = TasksStrings(
             overviewHeader = "Обзор заданий",
@@ -70,6 +71,8 @@ internal data class TasksStrings(
             totalTodosSuffix = "Всего",
             showAllTodosTitle = "Показать все",
             untilDeadlineDateSuffix = "До",
+            overallHomeworksProgress = "Общий прогресс",
+            homeworkTestLabel = "Тест",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = TasksStrings(
@@ -94,6 +97,8 @@ internal data class TasksStrings(
             totalTodosSuffix = "Total",
             showAllTodosTitle = "Show all",
             untilDeadlineDateSuffix = "Until",
+            overallHomeworksProgress = "Overall progress",
+            homeworkTestLabel = "Test",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

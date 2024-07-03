@@ -127,6 +127,9 @@ data class StudyAssistantStrings(
     val practicalTasksTitle: String,
     val presentationsTasksTitle: String,
     val noResultTitle: String,
+    val todayTitle: String,
+    val tomorrowTitle: String,
+    val yesterdayTitle: String,
 )
 
 internal val russianFamelString = StudyAssistantStrings(
@@ -234,6 +237,9 @@ internal val russianFamelString = StudyAssistantStrings(
     practicalTasksTitle = "Практика",
     presentationsTasksTitle = "Доклад",
     noResultTitle = "Нет результатов",
+    todayTitle = "Сегодня",
+    tomorrowTitle = "Завтра",
+    yesterdayTitle = "Вчера",
 )
 
 internal val englishFamelString = StudyAssistantStrings(
@@ -341,6 +347,9 @@ internal val englishFamelString = StudyAssistantStrings(
     practicalTasksTitle = "Practice",
     presentationsTasksTitle = "Presentation",
     noResultTitle = "No results",
+    todayTitle = "Today",
+    tomorrowTitle = "Tomorrow",
+    yesterdayTitle = "Yesterday",
 )
 
 fun StudyAssistantStrings.monthNames() = MonthNames(
