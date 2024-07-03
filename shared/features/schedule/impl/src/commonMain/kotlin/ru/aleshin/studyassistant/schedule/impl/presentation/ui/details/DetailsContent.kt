@@ -48,8 +48,8 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.Com
 /**
  * @author Stanislav Aleshin on 09.06.2024
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 internal fun DetailsContent(
     state: DetailsViewState,
     modifier: Modifier = Modifier,
@@ -80,7 +80,7 @@ internal fun DetailsContent(
                             onCustomSchedule = { it?.classes },
                         )
                         CommonScheduleView(
-                            modifier = Modifier.animateItem(),
+                            modifier = Modifier.animateItemPlacement(),
                             date = scheduleDate.dateTime().date,
                             isCurrentDay = currentDate.equalsDay(scheduleDate),
                             activeClass = activeClass,
@@ -92,7 +92,7 @@ internal fun DetailsContent(
                 } else {
                     items(DayOfWeek.entries.size) {
                         CommonScheduleViewPlaceholder(
-                            modifier = Modifier.animateItem(),
+                            modifier = Modifier.animateItemPlacement(),
                         )
                     }
                 }
@@ -110,7 +110,7 @@ internal fun DetailsContent(
                         val schedule = weekSchedule.weekDaySchedules[dayOfWeek]
                         val scheduleDate = dayOfWeek.dateTimeByWeek(weekSchedule.from)
                         CommonScheduleView(
-                            modifier = Modifier.animateItem(),
+                            modifier = Modifier.animateItemPlacement(),
                             date = scheduleDate.dateTime().date,
                             isCurrentDay = currentDate.equalsDay(scheduleDate),
                             activeClass = activeClass,
@@ -125,7 +125,7 @@ internal fun DetailsContent(
                 } else {
                     items(DayOfWeek.entries.size) {
                         CommonScheduleViewPlaceholder(
-                            modifier = Modifier.animateItem(),
+                            modifier = Modifier.animateItemPlacement(),
                         )
                     }
                 }

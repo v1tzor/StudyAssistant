@@ -136,7 +136,7 @@ private fun DetailsSubjectView(
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
-        Row(modifier = Modifier.height(IntrinsicSize.Max)) {
+        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
             Surface(
                 modifier = Modifier.width(4.dp).padding(vertical = 16.dp),
                 shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),

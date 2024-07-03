@@ -93,7 +93,7 @@ internal fun OrganizationView(
                 }
             }
             Row(
-                modifier = Modifier.height(IntrinsicSize.Max),
+                modifier = Modifier.height(IntrinsicSize.Min),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {

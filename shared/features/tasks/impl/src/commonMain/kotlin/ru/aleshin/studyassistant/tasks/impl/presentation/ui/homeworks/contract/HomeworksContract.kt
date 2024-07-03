@@ -47,7 +47,7 @@ internal data class HomeworksViewState(
 ) : BaseViewState
 
 internal sealed class HomeworksEvent : BaseEvent {
-    data class Init(val targetDate: Instant?) : HomeworksEvent()
+    data object Init : HomeworksEvent()
     data object Refresh : HomeworksEvent()
     data object NextTimeRange : HomeworksEvent()
     data object PreviousTimeRange : HomeworksEvent()

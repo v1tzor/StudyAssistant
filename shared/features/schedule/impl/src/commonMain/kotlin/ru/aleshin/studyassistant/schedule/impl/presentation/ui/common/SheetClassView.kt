@@ -88,7 +88,7 @@ private fun SheetClassViewHeader(
     office: String,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Max),
+        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Column(modifier = Modifier.weight(1f)) {

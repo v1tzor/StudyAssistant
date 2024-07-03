@@ -67,7 +67,7 @@ internal fun HomeworkTestInfoField(
         var editableTestTopicTheory by remember { mutableStateOf(testTopic) }
 
         InfoTextField(
-            enabled = !isLoading,
+            enabled = !isLoading && isTest,
             modifier = Modifier.weight(1f),
             value = editableTestTopicTheory,
             maxLength = TEST_TOPIC_MAX_LENGTH,

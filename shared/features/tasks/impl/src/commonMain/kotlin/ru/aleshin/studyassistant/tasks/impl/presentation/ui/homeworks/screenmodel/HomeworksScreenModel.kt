@@ -23,7 +23,6 @@ import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import extensions.endOfWeek
-import extensions.mapEpochTimeToInstant
 import extensions.shiftWeek
 import extensions.startOfWeek
 import extensions.startThisDay
@@ -60,7 +59,7 @@ internal class HomeworksScreenModel(
     override fun init(deps: HomeworksDeps) {
         if (!isInitialize) {
             super.init(deps)
-            dispatchEvent(HomeworksEvent.Init(deps.targetDate?.mapEpochTimeToInstant()))
+            dispatchEvent(HomeworksEvent.Init)
         }
     }
 
@@ -68,9 +67,9 @@ internal class HomeworksScreenModel(
         event: HomeworksEvent,
     ) {
         when (event) {
-            is HomeworksEvent.Init, HomeworksEvent.Refresh -> with(state()) {
+            is HomeworksEvent.Init, HomeworksEvent.Refresh -> {
                 val currentDate = dateManager.fetchBeginningCurrentInstant()
-                val targetTimeRange = selectedTimeRange ?: TimeRange(
+                val targetTimeRange = TimeRange(
                     from = currentDate.startOfWeek().shiftWeek(-1),
                     to = currentDate.endOfWeek().shiftWeek(+1),
                 )

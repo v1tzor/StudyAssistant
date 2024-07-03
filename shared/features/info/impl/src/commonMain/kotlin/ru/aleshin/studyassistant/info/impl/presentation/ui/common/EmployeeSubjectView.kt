@@ -49,7 +49,7 @@ internal fun EmployeeSubjectView(
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Row(
-            modifier = Modifier.height(IntrinsicSize.Max),
+            modifier = Modifier.height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Surface(
@@ -81,7 +81,7 @@ internal fun NoneEmployeeSubjectView(
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Row(
-            modifier = Modifier.height(IntrinsicSize.Max),
+            modifier = Modifier.height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Surface(

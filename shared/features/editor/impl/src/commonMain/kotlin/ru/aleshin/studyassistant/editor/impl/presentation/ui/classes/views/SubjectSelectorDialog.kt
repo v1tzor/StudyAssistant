@@ -75,7 +75,7 @@ internal fun SubjectSelectorDialog(
                 label = subject.eventType.mapToString(StudyAssistantRes.strings),
                 leadingIcon = {
                     Surface(
-                        modifier = Modifier.height(IntrinsicSize.Max),
+                        modifier = Modifier.height(IntrinsicSize.Min),
                         shape = MaterialTheme.shapes.full(),
                         color = Color(subject.color),
                         content = { Box(modifier = Modifier.size(8.dp, 24.dp)) },

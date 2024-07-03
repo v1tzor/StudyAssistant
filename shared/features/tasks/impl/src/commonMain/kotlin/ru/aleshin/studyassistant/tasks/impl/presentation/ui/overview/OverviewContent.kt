@@ -56,6 +56,10 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -155,7 +159,7 @@ private fun TasksProgressControlSection(
     homeworkErrors: HomeworkErrorsUi?,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Max).padding(horizontal = 16.dp),
+        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         TasksProgressView(
@@ -253,6 +257,7 @@ private fun HomeworksSection(
                 )
             }
         }
+        var isShowTargetDay by rememberSaveable { mutableStateOf(true) }
         Crossfade(
             targetState = isLoading,
             animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
@@ -296,10 +301,14 @@ private fun HomeworksSection(
                         }
                     }
                 }
-                LaunchedEffect(homeworks) {
-                    val currentDateIndex =
-                        homeworksMapList.indexOfFirst { currentDate.equalsDay(it.first) }
-                    if (currentDateIndex != -1) listState.animateScrollToItem(currentDateIndex)
+                LaunchedEffect(true) {
+                    if (isShowTargetDay) {
+                        val currentDateIndex = homeworksMapList.indexOfFirst { currentDate.equalsDay(it.first) }
+                        if (currentDateIndex != -1) {
+                            listState.animateScrollToItem(currentDateIndex)
+                            isShowTargetDay = false
+                        }
+                    }
                 }
             } else {
                 LazyRow(

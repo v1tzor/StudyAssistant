@@ -35,6 +35,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import extensions.extractAllItem
+import extensions.mapEpochTimeToInstant
 import navigation.root
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
@@ -70,6 +71,7 @@ internal data class HomeworksScreen(val targetDate: Long?) : Screen {
                 HomeworksContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
+                    targetDate = targetDate?.mapEpochTimeToInstant() ?: state.currentDate,
                     onEditHomework = { dispatchEvent(HomeworksEvent.NavigateToHomeworkEditor(it)) },
                     onDoHomework = { dispatchEvent(HomeworksEvent.DoHomework(it)) },
                     onRepeatHomework = { dispatchEvent(HomeworksEvent.RepeatHomework(it)) },

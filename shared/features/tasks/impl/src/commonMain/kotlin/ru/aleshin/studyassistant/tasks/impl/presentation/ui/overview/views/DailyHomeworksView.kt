@@ -321,7 +321,7 @@ private fun ShortHomeworkView(
 ) {
     Row(
         modifier = modifier
-            .height(IntrinsicSize.Max)
+            .height(IntrinsicSize.Min)
             .clip(MaterialTheme.shapes.small)
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .padding(all = 4.dp)

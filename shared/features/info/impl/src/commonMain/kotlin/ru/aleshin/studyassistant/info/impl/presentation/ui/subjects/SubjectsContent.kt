@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.info.impl.presentation.ui.subjects
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,6 +48,7 @@ import views.PlaceholderBox
  * @author Stanislav Aleshin on 17.06.2024
  */
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 internal fun SubjectsContent(
     state: SubjectsViewState,
     modifier: Modifier,
@@ -63,7 +65,6 @@ internal fun SubjectsContent(
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Adaptive(160.dp),
                 modifier = Modifier.fillMaxSize(),
-                state = gridState,
                 verticalItemSpacing = 12.dp,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
@@ -85,7 +86,7 @@ internal fun SubjectsContent(
             ) {
                 items(subjects, key = { it.uid }) { subject ->
                     DetailsSubjectViewItem(
-                        modifier = Modifier.animateItem(),
+                        modifier = Modifier.animateItemPlacement(),
                         eventType = subject.eventType,
                         office = subject.office,
                         color = Color(subject.color),

@@ -99,7 +99,7 @@ internal fun ShortSubjectView(
                 )
             }
             Row(
-                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max).padding(end = 8.dp),
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(end = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {

@@ -70,13 +70,14 @@ import kotlin.time.Duration.Companion.days
 internal fun HomeworksContent(
     state: HomeworksViewState,
     modifier: Modifier,
+    targetDate: Instant,
     listState: LazyListState = rememberLazyListState(),
     onEditHomework: (HomeworkDetailsUi) -> Unit,
     onDoHomework: (HomeworkDetailsUi) -> Unit,
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
     onRepeatHomework: (HomeworkDetailsUi) -> Unit,
 ) = with(state) {
-    var isShowCurrentDay by rememberSaveable { mutableStateOf(true) }
+    var isShowTargetDay by rememberSaveable { mutableStateOf(true) }
     Crossfade(
         modifier = modifier,
         targetState = isLoading,
@@ -131,10 +132,15 @@ internal fun HomeworksContent(
                 }
             }
             LaunchedEffect(true) {
-                if (isShowCurrentDay && selectedTimeRange?.containsDate(currentDate) == true) {
-                    val index = homeworks.keys.indexOfFirst { it.equalsDay(currentDate) }
+                if (isShowTargetDay && selectedTimeRange?.containsDate(targetDate) == true) {
+                    val index = homeworks.toList().filter { it.first < targetDate }.sumOf {
+                        val header = 1
+                        val homeworks = it.second.size.takeIf { size -> size > 0 } ?: 1
+                        val divider = if (it.first.endOfWeek().equalsDay(it.first)) 1 else 0
+                        return@sumOf header + homeworks + divider
+                    }
                     listState.animateScrollToItem(index)
-                    isShowCurrentDay = false
+                    isShowTargetDay = false
                 }
             }
         } else {

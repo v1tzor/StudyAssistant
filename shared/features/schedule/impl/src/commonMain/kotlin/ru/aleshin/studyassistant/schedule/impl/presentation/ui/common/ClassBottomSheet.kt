@@ -144,7 +144,7 @@ private fun ClassBottomSheetHeader(
     classModel: ClassDetailsUi,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Max),
+        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Surface(

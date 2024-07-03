@@ -79,11 +79,10 @@ internal fun OverviewContent(
                         items(schedule.classes) { classModel ->
                             Modifier.fillMaxWidth()
                             DetailsClassViewItem(
-                                modifier = Modifier.animateItem(),
+                                modifier = Modifier.animateItemPlacement(),
                                 onClick = { onShowClassInfo(classModel) },
                                 isActive = activeClass?.uid == classModel.uid,
-                                progress = activeClass?.progress?.takeIf { activeClass.isStarted }
-                                    ?: -1f,
+                                progress = activeClass?.progress?.takeIf { activeClass.isStarted } ?: -1f,
                                 timeRange = classModel.timeRange,
                                 subject = classModel.subject,
                                 office = classModel.office,
