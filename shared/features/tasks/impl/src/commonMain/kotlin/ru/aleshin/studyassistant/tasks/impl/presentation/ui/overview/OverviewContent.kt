@@ -24,23 +24,19 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -399,15 +395,11 @@ private fun TodosSection(
         ) { loading ->
             if (!loading) {
                 val limitedTodos = todos.limitSize(12)
-                val state = rememberLazyStaggeredGridState()
-                LazyHorizontalStaggeredGrid(
-                    rows = StaggeredGridCells.Fixed(2),
-                    state = state,
-                    modifier = Modifier.heightIn(min = 170.dp, max = 400.dp),
-                    horizontalItemSpacing = 12.dp,
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(limitedTodos, key = { it.uid }) { todo ->
+                    limitedTodos.forEach { todo ->
                         TodoViewItem(
                             modifier = Modifier.wrapContentSize(),
                             onClick = { onOpenTodoTask(todo) },
@@ -421,15 +413,11 @@ private fun TodosSection(
                     }
                 }
             } else {
-                val state = rememberLazyStaggeredGridState()
-                LazyHorizontalStaggeredGrid(
-                    rows = StaggeredGridCells.Fixed(2),
-                    state = state,
-                    modifier = Modifier.heightIn(max = 500.dp),
-                    horizontalItemSpacing = 12.dp,
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(Placeholder.TODOS) {
+                    repeat(Placeholder.TODOS) {
                         TodoViewItemPlaceholder()
                     }
                 }

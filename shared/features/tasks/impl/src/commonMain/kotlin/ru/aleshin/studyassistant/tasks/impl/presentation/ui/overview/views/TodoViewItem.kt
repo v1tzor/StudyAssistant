@@ -18,12 +18,14 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.HorizontalDivider
@@ -72,7 +74,7 @@ internal fun TodoViewItem(
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.width(260.dp),
+        modifier = modifier.width(IntrinsicSize.Max),
         enabled = enabled,
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -99,7 +101,7 @@ internal fun TodoViewItemPlaceholder(
     modifier: Modifier = Modifier,
 ) {
     PlaceholderBox(
-        modifier = modifier.width(260.dp).height(130.dp),
+        modifier = modifier.fillMaxWidth().height(130.dp),
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainer,
     )
@@ -131,11 +133,11 @@ private fun TodoViewHeader(
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.widthIn(max = 400.dp).weight(1f),
                 text = todoText,
                 color = MaterialTheme.colorScheme.onSurface,
                 textDecoration = if (isDone) {
@@ -194,7 +196,8 @@ private fun TodoViewFooter(
                             text = buildString {
                                 append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
                                 append(deadline.formatByTimeZone(deadlineDateFormat))
-                            }
+                            },
+                            maxLines = 1,
                         )
                     }
                 )
@@ -214,7 +217,8 @@ private fun TodoViewFooter(
                             text = buildString {
                                 append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
                                 append(deadline.formatByTimeZone(deadlineDateFormat))
-                            }
+                            },
+                            maxLines = 1,
                         )
                     }
                 )
@@ -234,7 +238,8 @@ private fun TodoViewFooter(
                             text = buildString {
                                 append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
                                 append(deadline.formatByTimeZone(deadlineDateFormat))
-                            }
+                            },
+                            maxLines = 1,
                         )
                     }
                 )
