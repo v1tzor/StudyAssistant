@@ -339,7 +339,7 @@ private fun ShortHomeworkView(
             color = subject?.color?.let { Color(it) } ?: MaterialTheme.colorScheme.outline,
             content = { Box(modifier = Modifier.fillMaxHeight()) }
         )
-        ShortHomeworkViewContent(
+        ErrorHomeworkViewContent(
             modifier = Modifier.weight(1f),
             subject = subject?.name,
             theoreticalTasks = theoreticalTasks,
@@ -390,7 +390,7 @@ private fun ShortHomeworkView(
 }
 
 @Composable
-private fun ShortHomeworkViewContent(
+private fun ErrorHomeworkViewContent(
     modifier: Modifier = Modifier,
     subject: String?,
     theoreticalTasks: List<HomeworkTaskComponentUi>,
@@ -409,15 +409,15 @@ private fun ShortHomeworkViewContent(
             style = MaterialTheme.typography.titleSmall,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            ShortHomeworkTaskCountView(
+            ErrorHomeworkTaskCountView(
                 painter = painterResource(StudyAssistantRes.icons.theoreticalTasks),
                 count = theoreticalTasks.fetchAllTasks().size,
             )
-            ShortHomeworkTaskCountView(
+            ErrorHomeworkTaskCountView(
                 painter = painterResource(StudyAssistantRes.icons.practicalTasks),
                 count = practicalTasks.fetchAllTasks().size,
             )
-            ShortHomeworkTaskCountView(
+            ErrorHomeworkTaskCountView(
                 painter = painterResource(StudyAssistantRes.icons.presentationTasks),
                 count = presentationTasks.fetchAllTasks().size,
             )
@@ -426,7 +426,7 @@ private fun ShortHomeworkViewContent(
 }
 
 @Composable
-private fun ShortHomeworkTaskCountView(
+private fun ErrorHomeworkTaskCountView(
     modifier: Modifier = Modifier,
     painter: Painter,
     count: Int,

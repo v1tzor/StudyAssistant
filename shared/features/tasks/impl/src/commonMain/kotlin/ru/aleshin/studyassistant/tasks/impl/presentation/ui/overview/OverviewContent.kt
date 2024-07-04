@@ -54,10 +54,12 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -73,12 +75,14 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDe
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewViewState
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.DailyHomeworksView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.DailyHomeworksViewPlaceholder
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.HomeworkErrorsView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.HomeworkTasksChart
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TaskErrorsBottomSheet
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TasksProgressView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TodoViewItem
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TodoViewItemPlaceholder
@@ -121,6 +125,11 @@ internal fun OverviewContent(
                 homeworks = homeworks,
                 todos = todos,
                 homeworkErrors = homeworkErrors,
+                todoErrors = todoErrors,
+                onEditHomework = onOpenHomeworkTasks,
+                onDoHomework = onDoHomework,
+                onSkipHomework = onSkipHomework,
+                onChangeTodoDone = { todo, done -> onChangeTodoDone(todo, done) },
             )
             HomeworkAnalyticsSection(
                 isLoading = isLoadingHomeworks,
@@ -149,6 +158,7 @@ internal fun OverviewContent(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 private fun TasksProgressControlSection(
     modifier: Modifier = Modifier,
     isLoadingHomeworks: Boolean,
@@ -157,7 +167,17 @@ private fun TasksProgressControlSection(
     homeworks: Map<Instant, List<HomeworkDetailsUi>>,
     todos: List<TodoDetailsUi>,
     homeworkErrors: HomeworkErrorsUi?,
+    todoErrors: TodoErrorsUi?,
+    onEditHomework: (HomeworkDetailsUi) -> Unit,
+    onDoHomework: (HomeworkDetailsUi) -> Unit,
+    onSkipHomework: (HomeworkDetailsUi) -> Unit,
+    onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
 ) {
+    var taskErrorsSheetState by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+    )
+
     Row(
         modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -176,10 +196,24 @@ private fun TasksProgressControlSection(
             HomeworkErrorsView(
                 modifier = Modifier.fillMaxWidth(),
                 isLoading = isLoadingErrors,
-                errors = homeworkErrors,
-                onShowHomeworks = {},
+                homeworkErrors = homeworkErrors,
+                todoErrors = todoErrors,
+                onShowErrors = { taskErrorsSheetState = true },
             )
         }
+    }
+
+    if (taskErrorsSheetState) {
+        TaskErrorsBottomSheet(
+            sheetState = sheetState,
+            homeworkErrors = homeworkErrors,
+            todoErrors = todoErrors,
+            onDismissRequest = { taskErrorsSheetState = false },
+            onEditHomework = onEditHomework,
+            onDoHomework = onDoHomework,
+            onSkipHomework = onSkipHomework,
+            onChangeTodoDone = { todo, done -> onChangeTodoDone(todo, done) },
+        )
     }
 }
 

@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 import views.PlaceholderBox
 
@@ -49,8 +50,9 @@ import views.PlaceholderBox
 internal fun HomeworkErrorsView(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    errors: HomeworkErrorsUi?,
-    onShowHomeworks: () -> Unit,
+    homeworkErrors: HomeworkErrorsUi?,
+    todoErrors: TodoErrorsUi?,
+    onShowErrors: () -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -95,10 +97,14 @@ internal fun HomeworkErrorsView(
                             modifier = Modifier.animateContentSize(),
                             targetState = isLoading,
                         ) { loading ->
-                            if (!loading && errors != null) {
-                                val countErrors = errors.overdueTasks.count() + errors.detachedActiveTasks.count()
+                            if (!loading && homeworkErrors != null && todoErrors != null) {
+                                val errors = listOf(
+                                    homeworkErrors.overdueTasks.count(),
+                                    homeworkErrors.detachedActiveTasks.count(),
+                                    todoErrors.overdueTodos.count(),
+                                )
                                 Text(
-                                    text = countErrors.toString(),
+                                    text = errors.sum().toString(),
                                     color = MaterialTheme.colorScheme.onErrorContainer,
                                     fontWeight = FontWeight.Bold,
                                     overflow = TextOverflow.Ellipsis,
@@ -116,7 +122,7 @@ internal fun HomeworkErrorsView(
                     }
                 }
                 Button(
-                    onClick = onShowHomeworks,
+                    onClick = onShowErrors,
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !isLoading,
                     contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),

@@ -46,6 +46,10 @@ internal data class TasksStrings(
     val untilDeadlineDateSuffix: String,
     val overallHomeworksProgress: String,
     val homeworkTestLabel: String,
+    val overdueHomeworksHeader: String,
+    val detachedActiveHomeworksHeader: String,
+    val overdueTodosHeader: String,
+    val noneErrorsTitle: String,
     val otherErrorMessage: String,
 ) {
     companion object {
@@ -73,6 +77,10 @@ internal data class TasksStrings(
             untilDeadlineDateSuffix = "До",
             overallHomeworksProgress = "Общий прогресс",
             homeworkTestLabel = "Тест",
+            overdueHomeworksHeader = "Пропущенные задания",
+            detachedActiveHomeworksHeader = "Активные открепленные задания",
+            overdueTodosHeader = "Пропущенные задачи",
+            noneErrorsTitle = "Ошибки отсутствуют",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = TasksStrings(
@@ -99,6 +107,10 @@ internal data class TasksStrings(
             untilDeadlineDateSuffix = "Until",
             overallHomeworksProgress = "Overall progress",
             homeworkTestLabel = "Test",
+            overdueHomeworksHeader = "Missed tasks",
+            detachedActiveHomeworksHeader = "Active detached tasks",
+            overdueTodosHeader = "Missed todos",
+            noneErrorsTitle = "There are no errors",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

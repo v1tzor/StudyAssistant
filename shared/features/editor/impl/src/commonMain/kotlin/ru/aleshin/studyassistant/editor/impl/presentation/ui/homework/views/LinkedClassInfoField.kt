@@ -57,8 +57,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import extensions.formatByTimeZone
 import extensions.equalsDay
+import extensions.formatByTimeZone
 import extensions.mapEpochTimeToInstant
 import functional.UID
 import kotlinx.datetime.Instant
@@ -105,9 +105,9 @@ internal fun LinkedClassInfoField(
             val dateFormat = DateTimeComponents.Format {
                 dayOfWeek(strings.dayOfWeekShortNames())
                 chars(", ")
-                monthName(strings.monthNames())
-                char(' ')
                 dayOfMonth(Padding.NONE)
+                char(' ')
+                monthName(strings.monthNames())
             }
             ClickableTextField(
                 onClick = { datePickerState = true },
