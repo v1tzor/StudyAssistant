@@ -122,7 +122,7 @@ internal fun OrganizationPageInfo(
                 value = type.mapToSting(StudyAssistantRes.strings),
                 label = PreviewThemeRes.strings.organizationTypeLabel,
                 placeholder = PreviewThemeRes.strings.organizationTypePlaceholder,
-                infoIcon = painterResource(PreviewThemeRes.icons.organization),
+                infoIcon = painterResource(StudyAssistantRes.icons.organizationType),
                 trailingIcon = {
                     ExpandedIcon(
                         isExpanded = isExpandedTypeMenu,

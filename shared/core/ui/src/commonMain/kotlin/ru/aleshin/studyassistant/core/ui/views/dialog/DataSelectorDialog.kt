@@ -73,7 +73,7 @@ fun <T> BaseSelectorDialog(
     selected: T?,
     items: List<T>,
     header: String,
-    title: String,
+    title: String?,
     itemView: @Composable LazyItemScope.(T) -> Unit,
     notSelectedItem: @Composable (LazyItemScope.() -> Unit)? = null,
     addItemView: @Composable (LazyItemScope.() -> Unit)? = null,

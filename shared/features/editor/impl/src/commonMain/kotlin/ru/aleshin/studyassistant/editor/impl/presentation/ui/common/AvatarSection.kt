@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views
+package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,7 +42,7 @@ import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
  * @author Stanislav Aleshin on 06.06.2024
  */
 @Composable
-internal fun EmployeeAvatarSection(
+internal fun AvatarSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     firstName: String?,
@@ -56,13 +54,9 @@ internal fun EmployeeAvatarSection(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center,
     ) {
-        AnimatedContent(
+        Crossfade(
             targetState = isLoading,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(300)).togetherWith(
-                    fadeOut(animationSpec = tween(300))
-                )
-            },
+            animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         ) { loading ->
             if (loading) {
                 AvatarViewPlaceholder()

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee
+package ru.aleshin.studyassistant.editor.impl.presentation.ui.organization
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ScrollState
@@ -34,8 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.AvatarSection
@@ -43,29 +42,27 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EmailInfoFie
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationsInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.PhoneInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.WebInfoFields
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract.EmployeeEditorViewState
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.BirthdayInfoField
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeeNameInfoField
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeePostInfoField
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.WorkTimeInfoField
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contract.OrganizationEditorViewState
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.views.OrganizationNameInfoField
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.views.OrganizationStatusChooser
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.views.OrganizationTypeInfoField
 
 /**
- * @author Stanislav Aleshin on 06.06.2024
+ * @author Stanislav Aleshin on 08.07.2024.
  */
 @Composable
-internal fun EmployeeEditorContent(
-    state: EmployeeEditorViewState,
-    modifier: Modifier = Modifier,
+internal fun OrganizationEditorContent(
+    state: OrganizationEditorViewState,
+    modifier: Modifier,
     scrollState: ScrollState = rememberScrollState(),
     onUpdateAvatar: (String?) -> Unit,
-    onUpdateName: (first: String?, second: String?, patronymic: String?) -> Unit,
-    onEmployeePostSelected: (EmployeePost?) -> Unit,
-    omWorkTimeSelected: (Instant?, Instant?) -> Unit,
-    omBirthdaySelected: (String?) -> Unit,
+    onSelectedType: (OrganizationType?) -> Unit,
+    onUpdateName: (short: String?, full: String?) -> Unit,
     onUpdateEmails: (List<ContactInfoUi>) -> Unit,
     onUpdatePhones: (List<ContactInfoUi>) -> Unit,
     onUpdateWebs: (List<ContactInfoUi>) -> Unit,
     onUpdateLocations: (List<ContactInfoUi>) -> Unit,
+    onStatusChange: (Boolean) -> Unit,
 ) = with(state) {
     Column(
         modifier = modifier.fillMaxSize().padding(top = 24.dp).verticalScroll(scrollState),
@@ -73,35 +70,22 @@ internal fun EmployeeEditorContent(
     ) {
         AvatarSection(
             isLoading = isLoading,
-            firstName = editableEmployee?.firstName,
-            secondName = editableEmployee?.patronymic ?: editableEmployee?.secondName,
-            avatar = editableEmployee?.avatar,
+            firstName = editableOrganization?.shortName?.split(' ')?.getOrNull(0),
+            secondName = editableOrganization?.shortName?.split(' ')?.getOrNull(1),
+            avatar = editableOrganization?.avatar,
             onUpdate = onUpdateAvatar,
         )
-        EmployeeNameInfoField(
+        OrganizationTypeInfoField(
             isLoading = isLoading,
-            firstName = editableEmployee?.firstName,
-            secondName = editableEmployee?.secondName,
-            patronymic = editableEmployee?.patronymic,
-            onUpdateFirstName = { onUpdateName(it, editableEmployee?.secondName, editableEmployee?.patronymic) },
-            onUpdateSecondName = { onUpdateName(editableEmployee?.firstName, it, editableEmployee?.patronymic) },
-            onUpdatePatronymic = { onUpdateName(editableEmployee?.firstName, editableEmployee?.secondName, it) },
+            type = editableOrganization?.type,
+            onSelected = onSelectedType,
         )
-        EmployeePostInfoField(
+        OrganizationNameInfoField(
             isLoading = isLoading,
-            post = editableEmployee?.post,
-            onSelected = onEmployeePostSelected,
-        )
-        WorkTimeInfoField(
-            isLoading = isLoading,
-            startTime = editableEmployee?.workTimeStart,
-            endTime = editableEmployee?.workTimeEnd,
-            onSelected = omWorkTimeSelected,
-        )
-        BirthdayInfoField(
-            isLoading = isLoading,
-            birthday = editableEmployee?.birthday,
-            onSelected = omBirthdaySelected,
+            shortName = editableOrganization?.shortName,
+            fullName = editableOrganization?.fullName,
+            onUpdateShortName = { onUpdateName(it, editableOrganization?.fullName) },
+            onUpdateFullName = { onUpdateName(editableOrganization?.shortName, it) },
         )
         Column(
             modifier = Modifier.animateContentSize(),
@@ -121,25 +105,30 @@ internal fun EmployeeEditorContent(
             }
             EmailInfoFields(
                 isLoading = isLoading,
-                emails = editableEmployee?.emails ?: emptyList(),
+                emails = editableOrganization?.emails ?: emptyList(),
                 onUpdate = onUpdateEmails,
             )
             PhoneInfoFields(
                 isLoading = isLoading,
-                phones = editableEmployee?.phones ?: emptyList(),
+                phones = editableOrganization?.phones ?: emptyList(),
                 onUpdate = onUpdatePhones,
             )
             WebInfoFields(
                 isLoading = isLoading,
-                webs = editableEmployee?.webs ?: emptyList(),
+                webs = editableOrganization?.webs ?: emptyList(),
                 onUpdate = onUpdateWebs,
             )
             LocationsInfoFields(
                 isLoading = isLoading,
-                locations = editableEmployee?.locations ?: emptyList(),
+                locations = editableOrganization?.locations ?: emptyList(),
                 onUpdate = onUpdateLocations,
             )
         }
+        OrganizationStatusChooser(
+            isLoading = isLoading,
+            isMain = editableOrganization?.isMain ?: false,
+            onStatusChange = onStatusChange,
+        )
         Spacer(modifier = Modifier.height(56.dp))
     }
 }

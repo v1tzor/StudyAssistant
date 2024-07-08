@@ -24,7 +24,7 @@ enum class OrganizationType {
     LYCEUM,
     SEMINARY,
     GYMNASIUM,
-    COLLEGE ,
+    COLLEGE,
     UNIVERSITY,
     ADDITIONAL_EDUCATION,
     COURSES

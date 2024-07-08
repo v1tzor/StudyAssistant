@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views
 
-import androidx.annotation.FloatRange
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
@@ -250,7 +249,6 @@ private const val MAX_ANGLE = 360f
 private fun InfoProgressViewIndicator(
     modifier: Modifier = Modifier,
     icon: Painter?,
-    @FloatRange(0.0, 1.0)
     progress: Float,
     accentColor: Color,
     trackColor: Color = MaterialTheme.colorScheme.surfaceVariant,

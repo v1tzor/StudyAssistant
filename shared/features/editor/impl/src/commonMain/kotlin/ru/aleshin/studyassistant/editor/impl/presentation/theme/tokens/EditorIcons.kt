@@ -28,6 +28,7 @@ import studyassistant.shared.features.editor.impl.generated.resources.ic_color
 import studyassistant.shared.features.editor.impl.generated.resources.ic_employee_post
 import studyassistant.shared.features.editor.impl.generated.resources.ic_notify
 import studyassistant.shared.features.editor.impl.generated.resources.ic_number
+import studyassistant.shared.features.editor.impl.generated.resources.ic_star_circle_outline
 import studyassistant.shared.features.editor.impl.generated.resources.ic_subject_name
 import studyassistant.shared.features.editor.impl.generated.resources.ic_worktime
 
@@ -46,6 +47,7 @@ internal data class EditorIcons(
     val pickColor: DrawableResource,
     val employeePost: DrawableResource,
     val workTime: DrawableResource,
+    val organizationStatus: DrawableResource,
 ) {
     companion object {
         val LIGHT = EditorIcons(
@@ -59,6 +61,7 @@ internal data class EditorIcons(
             pickColor = Res.drawable.ic_circle_edit_outline,
             employeePost = Res.drawable.ic_employee_post,
             workTime = Res.drawable.ic_worktime,
+            organizationStatus = Res.drawable.ic_star_circle_outline
         )
         val DARK = EditorIcons(
             breaks = Res.drawable.ic_break,
@@ -71,6 +74,7 @@ internal data class EditorIcons(
             pickColor = Res.drawable.ic_circle_edit_outline,
             employeePost = Res.drawable.ic_employee_post,
             workTime = Res.drawable.ic_worktime,
+            organizationStatus = Res.drawable.ic_star_circle_outline
         )
     }
 }

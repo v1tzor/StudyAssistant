@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views
+package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
@@ -46,11 +45,10 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
  * @author Stanislav Aleshin on 06.06.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
-internal fun EmailInfoFields(
+internal fun PhoneInfoFields(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    emails: List<ContactInfoUi>,
+    phones: List<ContactInfoUi>,
     onUpdate: (List<ContactInfoUi>) -> Unit,
 ) {
     var contactInfoEditorDialogState by remember { mutableStateOf(false) }
@@ -63,28 +61,28 @@ internal fun EmailInfoFields(
         Box(modifier = Modifier.height(61.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(StudyAssistantRes.icons.email),
+                painter = painterResource(StudyAssistantRes.icons.phone),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            val mainEmail = emails.getOrNull(0)
-            val additionalEmails = emails.filter { it != mainEmail }
+            val mainPhone = phones.getOrNull(0)
+            val additionalPhones = phones.filter { it != mainPhone }
             Row(
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 ClickableTextField(
                     onClick = {
-                        editableContactInfo = mainEmail
+                        editableContactInfo = mainPhone
                         contactInfoEditorDialogState = true
                     },
                     enabled = !isLoading,
                     modifier = Modifier.height(61.dp).weight(1f),
-                    value = mainEmail?.value,
-                    label = EditorThemeRes.strings.emailFieldLabel,
-                    placeholder = EditorThemeRes.strings.emailFieldPlaceholder,
+                    value = mainPhone?.value,
+                    label = EditorThemeRes.strings.phoneFieldLabel,
+                    placeholder = EditorThemeRes.strings.phoneFieldPlaceholder,
                     trailingIcon = {
                         ExpandedIcon(
                             isExpanded = contactInfoEditorDialogState,
@@ -93,25 +91,25 @@ internal fun EmailInfoFields(
                     },
                     singleLine = true,
                 )
-                if (mainEmail != null) {
+                if (mainPhone != null) {
                     AddContactInfoItem(onClick = { contactInfoEditorDialogState = true })
                 }
             }
-            additionalEmails.forEach { additionalEmail ->
+            additionalPhones.forEach { additionalPhone ->
                 Row(
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     ClickableTextField(
                         onClick = {
-                            editableContactInfo = additionalEmail
+                            editableContactInfo = additionalPhone
                             contactInfoEditorDialogState = true
                         },
                         enabled = !isLoading,
                         modifier = Modifier.height(61.dp).weight(1f),
-                        value = additionalEmail.value,
+                        value = additionalPhone.value,
                         label = null,
-                        placeholder = EditorThemeRes.strings.emailFieldPlaceholder,
+                        placeholder = EditorThemeRes.strings.phoneFieldPlaceholder,
                         trailingIcon = {
                             ExpandedIcon(
                                 isExpanded = contactInfoEditorDialogState,
@@ -122,10 +120,10 @@ internal fun EmailInfoFields(
                     )
                     DeleteContactInfoItem(
                         onClick = {
-                            val updatedEmails = emails.toMutableList().apply {
-                                remove(additionalEmail)
+                            val updatedPhones = phones.toMutableList().apply {
+                                remove(additionalPhone)
                             }
-                            onUpdate(updatedEmails)
+                            onUpdate(updatedPhones)
                         }
                     )
                 }
@@ -135,7 +133,7 @@ internal fun EmailInfoFields(
 
     if (contactInfoEditorDialogState) {
         ContactInfoEditorDialog(
-            header = EditorThemeRes.strings.emailFieldLabel,
+            header = EditorThemeRes.strings.phoneFieldLabel,
             label = editableContactInfo?.label,
             value = editableContactInfo?.value,
             onDismiss = {
@@ -143,27 +141,27 @@ internal fun EmailInfoFields(
                 contactInfoEditorDialogState = false
             },
             onConfirm = { label, value ->
-                val email = (editableContactInfo ?: ContactInfoUi()).copy(
+                val phone = (editableContactInfo ?: ContactInfoUi()).copy(
                     label = label,
                     value = value
                 )
-                val updatedEmails = emails.toMutableList().apply {
+                val updatedPhones = phones.toMutableList().apply {
                     if (editableContactInfo != null) {
-                        set(indexOf(editableContactInfo), email)
+                        set(indexOf(editableContactInfo), phone)
                     } else {
-                        add(email)
+                        add(phone)
                     }
                 }
-                onUpdate(updatedEmails)
+                onUpdate(updatedPhones)
 
                 editableContactInfo = null
                 contactInfoEditorDialogState = false
             },
             onDelete = {
-                val updatedEmails = emails.toMutableList().apply {
+                val updatedPhones = phones.toMutableList().apply {
                     if (editableContactInfo != null) remove(editableContactInfo)
                 }
-                onUpdate(updatedEmails)
+                onUpdate(updatedPhones)
 
                 editableContactInfo = null
                 contactInfoEditorDialogState = false

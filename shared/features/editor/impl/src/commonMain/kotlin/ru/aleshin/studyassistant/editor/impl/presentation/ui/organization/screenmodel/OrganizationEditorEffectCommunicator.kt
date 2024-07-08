@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.navigation
+package ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel
 
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
-import cafe.adriel.voyager.navigator.Navigator
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.EffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contract.OrganizationEditorEffect
 
 /**
- * @author Stanislav Aleshin on 21.04.2024.
+ * @author Stanislav Aleshin on 08.07.2024.
  */
-tailrec fun Navigator.root(): Navigator {
-    return if (level == 0) this else checkNotNull(parent).root()
-}
-
-@OptIn(InternalVoyagerApi::class)
-tailrec fun Navigator.nestedPop() {
-    if (canPop) {
-        pop()
-    } else {
-        dispose(lastItem)
-        parent?.nestedPop()
-    }
+internal interface OrganizationEditorEffectCommunicator : EffectCommunicator<OrganizationEditorEffect> {
+    class Base : OrganizationEditorEffectCommunicator, EffectCommunicator.Abstract<OrganizationEditorEffect>()
 }

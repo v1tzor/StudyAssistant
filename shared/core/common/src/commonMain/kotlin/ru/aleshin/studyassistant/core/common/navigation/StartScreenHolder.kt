@@ -16,22 +16,29 @@
 
 package ru.aleshin.studyassistant.core.common.navigation
 
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
-import cafe.adriel.voyager.navigator.Navigator
+import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
 
 /**
- * @author Stanislav Aleshin on 21.04.2024.
+ * @author Stanislav Aleshin on 08.07.2024.
  */
-tailrec fun Navigator.root(): Navigator {
-    return if (level == 0) this else checkNotNull(parent).root()
-}
+interface StartScreenHolder<S : FeatureScreen> {
 
-@OptIn(InternalVoyagerApi::class)
-tailrec fun Navigator.nestedPop() {
-    if (canPop) {
-        pop()
-    } else {
-        dispose(lastItem)
-        parent?.nestedPop()
+    fun fetchStartScreen(): S
+
+    fun setStartScreen(screen: S): Boolean
+
+    abstract class Abstract<S : FeatureScreen> : StartScreenHolder<S> {
+
+        private var screen: S? = null
+
+        override fun fetchStartScreen(): S {
+            return checkNotNull(screen)
+        }
+
+        override fun setStartScreen(screen: S): Boolean {
+            val isSet = this.screen == null
+            this.screen = screen
+            return isSet
+        }
     }
 }

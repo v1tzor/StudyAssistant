@@ -16,11 +16,13 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.entities.organizations.convertToBase
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
@@ -33,6 +35,8 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
  */
 internal interface OrganizationInteractor {
 
+    suspend fun addOrUpdateOrganization(organization: Organization): DomainResult<EditorFailures, UID>
+    suspend fun fetchOrganizationById(uid: UID): FlowDomainResult<EditorFailures, Organization>
     suspend fun fetchShortOrganizationById(uid: UID): FlowDomainResult<EditorFailures, OrganizationShort>
     suspend fun fetchAllShortOrganizations(): FlowDomainResult<EditorFailures, List<OrganizationShort>>
     suspend fun updateShortOrganization(organization: OrganizationShort): UnitDomainResult<EditorFailures>
@@ -46,8 +50,20 @@ internal interface OrganizationInteractor {
         private val targetUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid
 
+        override suspend fun addOrUpdateOrganization(organization: Organization) = eitherWrapper.wrap {
+            organizationsRepository.addOrUpdateOrganization(organization, targetUser)
+        }
+
+        override suspend fun fetchOrganizationById(uid: UID) = eitherWrapper.wrapFlow {
+            organizationsRepository.fetchOrganizationById(uid, targetUser).map { organization ->
+                checkNotNull(organization)
+            }
+        }
+
         override suspend fun fetchShortOrganizationById(uid: UID) = eitherWrapper.wrapFlow {
-            organizationsRepository.fetchShortOrganizationById(uid, targetUser).filterNotNull()
+            organizationsRepository.fetchShortOrganizationById(uid, targetUser).map { organization ->
+                checkNotNull(organization)
+            }
         }
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {

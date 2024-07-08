@@ -22,7 +22,6 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.features.preview.impl.generated.resources.Res
 import studyassistant.shared.features.preview.impl.generated.resources.ic_description
 import studyassistant.shared.features.preview.impl.generated.resources.ic_gender
-import studyassistant.shared.features.preview.impl.generated.resources.ic_organization_type
 import studyassistant.shared.features.preview.impl.generated.resources.ic_textbox
 import studyassistant.shared.features.preview.impl.generated.resources.il_analytics
 import studyassistant.shared.features.preview.impl.generated.resources.il_analytics_dark
@@ -47,7 +46,6 @@ internal data class PreviewIcons(
     val scheduleIllustration: DrawableResource,
     val name: DrawableResource,
     val description: DrawableResource,
-    val organization: DrawableResource,
     val gender: DrawableResource,
 ) {
     companion object {
@@ -60,7 +58,6 @@ internal data class PreviewIcons(
             name = Res.drawable.ic_textbox,
             description = Res.drawable.ic_description,
             gender = Res.drawable.ic_gender,
-            organization = Res.drawable.ic_organization_type
         )
         val DARK = PreviewIcons(
             studyIllustration = Res.drawable.il_study_dark,
@@ -71,7 +68,6 @@ internal data class PreviewIcons(
             name = Res.drawable.ic_textbox,
             description = Res.drawable.ic_description,
             gender = Res.drawable.ic_gender,
-            organization = Res.drawable.ic_organization_type,
         )
     }
 }

@@ -38,6 +38,7 @@ import studyassistant.shared.core.ui.generated.resources.ic_online_lesson
 import studyassistant.shared.core.ui.generated.resources.ic_organization
 import studyassistant.shared.core.ui.generated.resources.ic_organization_geo
 import studyassistant.shared.core.ui.generated.resources.ic_organization_geo_outline
+import studyassistant.shared.core.ui.generated.resources.ic_organization_type
 import studyassistant.shared.core.ui.generated.resources.ic_phone
 import studyassistant.shared.core.ui.generated.resources.ic_practice
 import studyassistant.shared.core.ui.generated.resources.ic_presentation
@@ -105,6 +106,7 @@ data class StudyAssistantIcons(
     val presentationTasks: DrawableResource,
     val calendarToday: DrawableResource,
     val priorityHigh: DrawableResource,
+    val organizationType: DrawableResource,
 ) {
     companion object {
         val BASE = StudyAssistantIcons(
@@ -151,6 +153,7 @@ data class StudyAssistantIcons(
             presentationTasks = Res.drawable.ic_presentation,
             calendarToday = Res.drawable.ic_calendar_today,
             priorityHigh = Res.drawable.ic_priority_high,
+            organizationType = Res.drawable.ic_organization_type
         )
     }
 }

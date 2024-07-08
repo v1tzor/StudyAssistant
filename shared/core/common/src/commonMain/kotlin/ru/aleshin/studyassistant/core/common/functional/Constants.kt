@@ -53,6 +53,7 @@ object Constants {
         const val MAX_PROFILE_DESC_LENGTH = 120
         const val SUBJECT_TEXT_LENGTH = 56
         const val DEFAULT_MAX_TEXT_LENGTH = 32
+        const val FULL_ORG_NAME_LENGTH = 80
         const val USERNAME_LENGTH = 30
         const val TASK_MAX_LENGTH = 120
         const val TEST_TOPIC_MAX_LENGTH = 70

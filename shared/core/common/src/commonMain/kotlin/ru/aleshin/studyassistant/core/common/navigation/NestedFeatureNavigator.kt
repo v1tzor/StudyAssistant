@@ -18,17 +18,20 @@ package ru.aleshin.studyassistant.core.common.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorContent
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import cafe.adriel.voyager.navigator.OnBackPressed
+import cafe.adriel.voyager.navigator.internal.BackHandler
 import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
 @Composable
+@OptIn(InternalVoyagerApi::class)
 fun <S : FeatureScreen> NestedFeatureNavigator(
     screenProvider: FeatureScreenProvider<S>,
     navigatorManager: NavigatorManager<S>,
@@ -36,18 +39,37 @@ fun <S : FeatureScreen> NestedFeatureNavigator(
     content: NavigatorContent = { CurrentScreen() },
 ) {
     val startScreen = navigatorManager.fetchStartScreen()
+
     Navigator(
         screen = screenProvider.provideFeatureScreen(startScreen),
-        onBackPressed = onBackPressed,
+        onBackPressed = { false },
         disposeBehavior = NavigatorDisposeBehavior(
             disposeNestedNavigators = true,
             disposeSteps = true,
         ),
     ) { navigator ->
+        NestedNavigatorBackHandler(
+            navigator = navigator,
+            onBackPressed = onBackPressed,
+        )
         DisposableEffect(Unit) {
             navigatorManager.attachNavigator(navigator)
             onDispose { navigatorManager.detachNavigator() }
         }
         content.invoke(navigator)
+    }
+}
+
+@Composable
+@InternalVoyagerApi
+fun NestedNavigatorBackHandler(
+    navigator: Navigator,
+    onBackPressed: OnBackPressed
+) {
+    if (onBackPressed != null) {
+        BackHandler(
+            enabled = navigator.canPop || navigator.parent?.canPop ?: false,
+            onBack = { if (onBackPressed(navigator.lastItem)) navigator.nestedPop() },
+        )
     }
 }

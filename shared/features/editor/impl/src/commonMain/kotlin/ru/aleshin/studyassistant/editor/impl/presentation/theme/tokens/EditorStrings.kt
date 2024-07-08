@@ -27,6 +27,7 @@ internal data class EditorStrings(
     val classEditorHeader: String,
     val subjectEditorHeader: String,
     val employeeEditorHeader: String,
+    val organizationEditorHeader: String,
     val homeworkEditorHeader: String,
     val saveButtonTitle: String,
     val numberOfClassesLabel: String,
@@ -111,6 +112,12 @@ internal data class EditorStrings(
     val highPriorityItemTitle: String,
     val numberOfClassSuffix: String,
     val taskTitle: String,
+    val shortNameFieldLabel: String,
+    val fullNameFieldLabel: String,
+    val orgTypeFieldLabel: String,
+    val orgTypeSelectorHeader: String,
+    val orgTypeFieldPlaceholder: String,
+    val organizationStatusTitle: String,
     val otherErrorMessage: String,
 ) {
 
@@ -120,6 +127,7 @@ internal data class EditorStrings(
             classEditorHeader = "Редактор событий",
             subjectEditorHeader = "Редактор предметов",
             employeeEditorHeader = "Редактор сотрудника",
+            organizationEditorHeader = "Редактор организации",
             homeworkEditorHeader = "Редактор заданий",
             saveButtonTitle = "Сохранить",
             numberOfClassesLabel = "Количество занятий",
@@ -204,6 +212,12 @@ internal data class EditorStrings(
             highPriorityItemTitle = "Макс.",
             numberOfClassSuffix = "занятие",
             taskTitle = "Задание",
+            shortNameFieldLabel = "Краткое название *",
+            fullNameFieldLabel = "Полное название",
+            orgTypeFieldLabel = "Вид организации *",
+            orgTypeFieldPlaceholder = "Укажите вид организации",
+            orgTypeSelectorHeader = "Вид организации",
+            organizationStatusTitle = "Основная организация",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = EditorStrings(
@@ -211,6 +225,7 @@ internal data class EditorStrings(
             classEditorHeader = "Event editor",
             subjectEditorHeader = "Subject editor",
             employeeEditorHeader = "Employee editor",
+            organizationEditorHeader = "Organization editor",
             homeworkEditorHeader = "Task editor",
             saveButtonTitle = "Save",
             numberOfClassesLabel = "Number of classes",
@@ -295,6 +310,12 @@ internal data class EditorStrings(
             highPriorityItemTitle = "Max",
             numberOfClassSuffix = "class",
             taskTitle = "Task",
+            shortNameFieldLabel = "Short name *",
+            fullNameFieldLabel = "Full name",
+            orgTypeFieldLabel = "Type of organization *",
+            orgTypeSelectorHeader = "Type of organization",
+            orgTypeFieldPlaceholder = "Specify type of organization",
+            organizationStatusTitle = "The main organization",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

@@ -31,12 +31,16 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmode
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorStateCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorWorkProcessor
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorEffectCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorWorkProcessor
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationEditorEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationEditorScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationEditorStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationEditorWorkProcessor
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorEffectCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorStateCommunicator
@@ -80,4 +84,9 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<HomeworkEditorEffectCommunicator> { HomeworkEditorEffectCommunicator.Base() }
     bindProvider<HomeworkEditorWorkProcessor> { HomeworkEditorWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindProvider<HomeworkEditorScreenModel> { HomeworkEditorScreenModel(instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<OrganizationEditorStateCommunicator> { OrganizationEditorStateCommunicator.Base() }
+    bindProvider<OrganizationEditorEffectCommunicator> { OrganizationEditorEffectCommunicator.Base() }
+    bindProvider<OrganizationEditorWorkProcessor> { OrganizationEditorWorkProcessor.Base(instance()) }
+    bindProvider<OrganizationEditorScreenModel> { OrganizationEditorScreenModel(instance(), instance(), instance(), instance()) }
 }

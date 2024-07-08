@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views
+package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,10 +47,10 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
  */
 @Composable
 @OptIn(ExperimentalResourceApi::class)
-internal fun LocationsInfoFields(
+internal fun WebInfoFields(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    locations: List<ContactInfoUi>,
+    webs: List<ContactInfoUi>,
     onUpdate: (List<ContactInfoUi>) -> Unit,
 ) {
     var contactInfoEditorDialogState by remember { mutableStateOf(false) }
@@ -63,28 +63,28 @@ internal fun LocationsInfoFields(
         Box(modifier = Modifier.height(61.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(StudyAssistantRes.icons.location),
+                painter = painterResource(StudyAssistantRes.icons.website),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            val mainLocation = locations.getOrNull(0)
-            val additionalLocations = locations.filter { it != mainLocation }
+            val mainWeb = webs.getOrNull(0)
+            val additionalWebs = webs.filter { it != mainWeb }
             Row(
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 ClickableTextField(
                     onClick = {
-                        editableContactInfo = mainLocation
+                        editableContactInfo = mainWeb
                         contactInfoEditorDialogState = true
                     },
                     enabled = !isLoading,
                     modifier = Modifier.height(61.dp).weight(1f),
-                    value = mainLocation?.value,
-                    label = EditorThemeRes.strings.locationFieldLabel,
-                    placeholder = EditorThemeRes.strings.locationFieldPlaceholder,
+                    value = mainWeb?.value,
+                    label = EditorThemeRes.strings.webFieldLabel,
+                    placeholder = EditorThemeRes.strings.webFieldPlaceholder,
                     trailingIcon = {
                         ExpandedIcon(
                             isExpanded = contactInfoEditorDialogState,
@@ -93,25 +93,25 @@ internal fun LocationsInfoFields(
                     },
                     singleLine = true,
                 )
-                if (mainLocation != null) {
+                if (mainWeb != null) {
                     AddContactInfoItem(onClick = { contactInfoEditorDialogState = true })
                 }
             }
-            additionalLocations.forEach { additionalLocation ->
+            additionalWebs.forEach { additionalWeb ->
                 Row(
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     ClickableTextField(
                         onClick = {
-                            editableContactInfo = additionalLocation
+                            editableContactInfo = additionalWeb
                             contactInfoEditorDialogState = true
                         },
                         enabled = !isLoading,
                         modifier = Modifier.height(61.dp).weight(1f),
-                        value = additionalLocation.value,
+                        value = additionalWeb.value,
                         label = null,
-                        placeholder = EditorThemeRes.strings.locationFieldPlaceholder,
+                        placeholder = EditorThemeRes.strings.webFieldPlaceholder,
                         trailingIcon = {
                             ExpandedIcon(
                                 isExpanded = contactInfoEditorDialogState,
@@ -122,10 +122,10 @@ internal fun LocationsInfoFields(
                     )
                     DeleteContactInfoItem(
                         onClick = {
-                            val updatedLocations = locations.toMutableList().apply {
-                                remove(additionalLocation)
+                            val updatedWebs = webs.toMutableList().apply {
+                                remove(additionalWeb)
                             }
-                            onUpdate(updatedLocations)
+                            onUpdate(updatedWebs)
                         }
                     )
                 }
@@ -135,7 +135,7 @@ internal fun LocationsInfoFields(
 
     if (contactInfoEditorDialogState) {
         ContactInfoEditorDialog(
-            header = EditorThemeRes.strings.locationFieldLabel,
+            header = EditorThemeRes.strings.webFieldLabel,
             label = editableContactInfo?.label,
             value = editableContactInfo?.value,
             onDismiss = {
@@ -143,27 +143,27 @@ internal fun LocationsInfoFields(
                 contactInfoEditorDialogState = false
             },
             onConfirm = { label, value ->
-                val location = (editableContactInfo ?: ContactInfoUi()).copy(
+                val web = (editableContactInfo ?: ContactInfoUi()).copy(
                     label = label,
                     value = value
                 )
-                val updatedLocations = locations.toMutableList().apply {
+                val updatedWebs = webs.toMutableList().apply {
                     if (editableContactInfo != null) {
-                        set(indexOf(editableContactInfo), location)
+                        set(indexOf(editableContactInfo), web)
                     } else {
-                        add(location)
+                        add(web)
                     }
                 }
-                onUpdate(updatedLocations)
+                onUpdate(updatedWebs)
 
                 editableContactInfo = null
                 contactInfoEditorDialogState = false
             },
             onDelete = {
-                val updatedLocations = locations.toMutableList().apply {
+                val updatedWebs = webs.toMutableList().apply {
                     if (editableContactInfo != null) remove(editableContactInfo)
                 }
-                onUpdate(updatedLocations)
+                onUpdate(updatedWebs)
 
                 editableContactInfo = null
                 contactInfoEditorDialogState = false

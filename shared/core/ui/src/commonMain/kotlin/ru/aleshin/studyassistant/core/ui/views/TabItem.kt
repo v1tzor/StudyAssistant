@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.navigation
+package ru.aleshin.studyassistant.core.ui.views
 
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
-import cafe.adriel.voyager.navigator.Navigator
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
 
 /**
- * @author Stanislav Aleshin on 21.04.2024.
+ * @author Stanislav Aleshin on 08.07.2024.
  */
-tailrec fun Navigator.root(): Navigator {
-    return if (level == 0) this else checkNotNull(parent).root()
-}
-
-@OptIn(InternalVoyagerApi::class)
-tailrec fun Navigator.nestedPop() {
-    if (canPop) {
-        pop()
-    } else {
-        dispose(lastItem)
-        parent?.nestedPop()
-    }
+interface TabItem {
+    val index: Int
+    val title: String @Composable get
+    val icon: Painter? @Composable get
 }

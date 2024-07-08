@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views
+package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,10 +47,10 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
  */
 @Composable
 @OptIn(ExperimentalResourceApi::class)
-internal fun WebInfoFields(
+internal fun EmailInfoFields(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    webs: List<ContactInfoUi>,
+    emails: List<ContactInfoUi>,
     onUpdate: (List<ContactInfoUi>) -> Unit,
 ) {
     var contactInfoEditorDialogState by remember { mutableStateOf(false) }
@@ -63,28 +63,28 @@ internal fun WebInfoFields(
         Box(modifier = Modifier.height(61.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(StudyAssistantRes.icons.website),
+                painter = painterResource(StudyAssistantRes.icons.email),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            val mainWeb = webs.getOrNull(0)
-            val additionalWebs = webs.filter { it != mainWeb }
+            val mainEmail = emails.getOrNull(0)
+            val additionalEmails = emails.filter { it != mainEmail }
             Row(
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 ClickableTextField(
                     onClick = {
-                        editableContactInfo = mainWeb
+                        editableContactInfo = mainEmail
                         contactInfoEditorDialogState = true
                     },
                     enabled = !isLoading,
                     modifier = Modifier.height(61.dp).weight(1f),
-                    value = mainWeb?.value,
-                    label = EditorThemeRes.strings.webFieldLabel,
-                    placeholder = EditorThemeRes.strings.webFieldPlaceholder,
+                    value = mainEmail?.value,
+                    label = EditorThemeRes.strings.emailFieldLabel,
+                    placeholder = EditorThemeRes.strings.emailFieldPlaceholder,
                     trailingIcon = {
                         ExpandedIcon(
                             isExpanded = contactInfoEditorDialogState,
@@ -93,25 +93,25 @@ internal fun WebInfoFields(
                     },
                     singleLine = true,
                 )
-                if (mainWeb != null) {
+                if (mainEmail != null) {
                     AddContactInfoItem(onClick = { contactInfoEditorDialogState = true })
                 }
             }
-            additionalWebs.forEach { additionalWeb ->
+            additionalEmails.forEach { additionalEmail ->
                 Row(
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     ClickableTextField(
                         onClick = {
-                            editableContactInfo = additionalWeb
+                            editableContactInfo = additionalEmail
                             contactInfoEditorDialogState = true
                         },
                         enabled = !isLoading,
                         modifier = Modifier.height(61.dp).weight(1f),
-                        value = additionalWeb.value,
+                        value = additionalEmail.value,
                         label = null,
-                        placeholder = EditorThemeRes.strings.webFieldPlaceholder,
+                        placeholder = EditorThemeRes.strings.emailFieldPlaceholder,
                         trailingIcon = {
                             ExpandedIcon(
                                 isExpanded = contactInfoEditorDialogState,
@@ -122,10 +122,10 @@ internal fun WebInfoFields(
                     )
                     DeleteContactInfoItem(
                         onClick = {
-                            val updatedWebs = webs.toMutableList().apply {
-                                remove(additionalWeb)
+                            val updatedEmails = emails.toMutableList().apply {
+                                remove(additionalEmail)
                             }
-                            onUpdate(updatedWebs)
+                            onUpdate(updatedEmails)
                         }
                     )
                 }
@@ -135,7 +135,7 @@ internal fun WebInfoFields(
 
     if (contactInfoEditorDialogState) {
         ContactInfoEditorDialog(
-            header = EditorThemeRes.strings.webFieldLabel,
+            header = EditorThemeRes.strings.emailFieldLabel,
             label = editableContactInfo?.label,
             value = editableContactInfo?.value,
             onDismiss = {
@@ -143,27 +143,27 @@ internal fun WebInfoFields(
                 contactInfoEditorDialogState = false
             },
             onConfirm = { label, value ->
-                val web = (editableContactInfo ?: ContactInfoUi()).copy(
+                val email = (editableContactInfo ?: ContactInfoUi()).copy(
                     label = label,
                     value = value
                 )
-                val updatedWebs = webs.toMutableList().apply {
+                val updatedEmails = emails.toMutableList().apply {
                     if (editableContactInfo != null) {
-                        set(indexOf(editableContactInfo), web)
+                        set(indexOf(editableContactInfo), email)
                     } else {
-                        add(web)
+                        add(email)
                     }
                 }
-                onUpdate(updatedWebs)
+                onUpdate(updatedEmails)
 
                 editableContactInfo = null
                 contactInfoEditorDialogState = false
             },
             onDelete = {
-                val updatedWebs = webs.toMutableList().apply {
+                val updatedEmails = emails.toMutableList().apply {
                     if (editableContactInfo != null) remove(editableContactInfo)
                 }
-                onUpdate(updatedWebs)
+                onUpdate(updatedEmails)
 
                 editableContactInfo = null
                 contactInfoEditorDialogState = false

@@ -61,28 +61,6 @@ interface NavigatorHolder {
     fun detachNavigator()
 }
 
-interface StartScreenHolder<S : FeatureScreen> {
-
-    fun fetchStartScreen(): S
-
-    fun setStartScreen(screen: S): Boolean
-
-    abstract class Abstract<S : FeatureScreen> : StartScreenHolder<S> {
-
-        private var screen: S? = null
-
-        override fun fetchStartScreen(): S {
-            return checkNotNull(screen)
-        }
-
-        override fun setStartScreen(screen: S): Boolean {
-            val isSet = this.screen == null
-            this.screen = screen
-            return isSet
-        }
-    }
-}
-
 @Composable
 inline fun <reified T : NavigatorManager<S>, S : FeatureScreen> Screen.rememberNavigatorManager(): T {
     val di = localDI().direct
