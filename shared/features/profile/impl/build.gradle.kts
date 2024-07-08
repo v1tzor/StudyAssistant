@@ -29,6 +29,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":shared:features:auth:api"))
             implementation(project(":shared:features:profile:api"))
+            implementation(project(":shared:features:settings:api"))
 
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:data"))

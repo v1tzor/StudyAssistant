@@ -22,6 +22,8 @@ import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.core.common.inject.MainScreen
 import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.ProfileScreen
+import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
+import ru.aleshin.studyassistant.settings.api.navigation.SettingsScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -30,8 +32,11 @@ internal interface ProfileScreenProvider : FeatureScreenProvider<MainScreen> {
 
     fun provideAuthScreen(screen: AuthScreen): Screen
 
+    fun provideSettingsScreen(screen: SettingsScreen): Screen
+
     class Base(
-        private val authFeatureStarter: () -> AuthFeatureStarter
+        private val authFeatureStarter: () -> AuthFeatureStarter,
+        private val settingsFeatureStarter: () -> SettingsFeatureStarter,
     ) : ProfileScreenProvider {
 
         override fun provideFeatureScreen(screen: MainScreen): Screen {
@@ -40,6 +45,10 @@ internal interface ProfileScreenProvider : FeatureScreenProvider<MainScreen> {
 
         override fun provideAuthScreen(screen: AuthScreen): Screen {
             return authFeatureStarter().fetchRootScreenAndNavigate(screen)
+        }
+
+        override fun provideSettingsScreen(screen: SettingsScreen): Screen {
+            return settingsFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }

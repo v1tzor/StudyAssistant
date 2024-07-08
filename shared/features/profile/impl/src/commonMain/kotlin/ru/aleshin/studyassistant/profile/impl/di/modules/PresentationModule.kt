@@ -29,6 +29,7 @@ import ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel.Profil
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel.ProfileScreenModel
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel.ProfileStateCommunicator
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel.ProfileWorkProcessor
+import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -37,7 +38,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<ProfileScreen> { ProfileScreen() }
 
     bindProvider<ProfileFeatureStarter> { ProfileFeatureStarterImpl(instance()) }
-    bindProvider<ProfileScreenProvider> { ProfileScreenProvider.Base(instance<() -> AuthFeatureStarter>()) }
+    bindProvider<ProfileScreenProvider> { ProfileScreenProvider.Base(instance<() -> AuthFeatureStarter>(), instance<() -> SettingsFeatureStarter>()) }
 
     bindSingleton<ProfileStateCommunicator> { ProfileStateCommunicator.Base() }
     bindSingleton<ProfileEffectCommunicator> { ProfileEffectCommunicator.Base() }

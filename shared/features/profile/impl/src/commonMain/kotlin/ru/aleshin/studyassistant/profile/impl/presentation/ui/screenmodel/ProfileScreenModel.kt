@@ -30,13 +30,14 @@ import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileAc
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileEffect
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileEvent
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileViewState
+import ru.aleshin.studyassistant.settings.api.navigation.SettingsScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024
  */
 internal class ProfileScreenModel(
-    private val screenProvider: ProfileScreenProvider,
     private val workProcessor: ProfileWorkProcessor,
+    private val screenProvider: ProfileScreenProvider,
     stateCommunicator: ProfileStateCommunicator,
     effectCommunicator: ProfileEffectCommunicator,
     coroutineManager: CoroutineManager,
@@ -57,21 +58,33 @@ internal class ProfileScreenModel(
         event: ProfileEvent,
     ) {
         when (event) {
-            ProfileEvent.Init -> launchBackgroundWork(ProfileWorkCommand.LoadProfileInfo) {
+            is ProfileEvent.Init -> launchBackgroundWork(ProfileWorkCommand.LoadProfileInfo) {
                 val command = ProfileWorkCommand.LoadProfileInfo
                 workProcessor.work(command).collectAndHandleWork()
             }
-            ProfileEvent.SignOut -> launchBackgroundWork(ProfileWorkCommand.SignOut) {
+            is ProfileEvent.SignOut -> launchBackgroundWork(ProfileWorkCommand.SignOut) {
                 val command = ProfileWorkCommand.SignOut
                 workProcessor.work(command).collectAndHandleWork()
             }
-            ProfileEvent.EditProfile -> {}
-            ProfileEvent.NavigateToCalendarSettings -> {}
-            ProfileEvent.NavigateToGeneralSettings -> {}
-            ProfileEvent.NavigateToFriends -> {}
-            ProfileEvent.NavigateToNotifySettings -> {}
-            ProfileEvent.NavigateToPaymentsSettings -> {}
-            ProfileEvent.NavigateToPrivacySettings -> {}
+            is ProfileEvent.NavigateToPrivacySettings -> {}
+            is ProfileEvent.NavigateToFriends -> {}
+            is ProfileEvent.NavigateToGeneralSettings -> {
+                val screen = screenProvider.provideSettingsScreen(SettingsScreen.General)
+                sendEffect(ProfileEffect.PushGlobalScreen(screen))
+            }
+            is ProfileEvent.NavigateToNotifySettings -> {
+                val screen = screenProvider.provideSettingsScreen(SettingsScreen.Notification)
+                sendEffect(ProfileEffect.PushGlobalScreen(screen))
+            }
+            is ProfileEvent.NavigateToCalendarSettings -> {
+                val screen = screenProvider.provideSettingsScreen(SettingsScreen.Calendar)
+                sendEffect(ProfileEffect.PushGlobalScreen(screen))
+            }
+            is ProfileEvent.NavigateToPaymentsSettings -> {
+                val screen = screenProvider.provideSettingsScreen(SettingsScreen.Subscription)
+                sendEffect(ProfileEffect.PushGlobalScreen(screen))
+            }
+            is ProfileEvent.EditProfile -> {}
         }
     }
 

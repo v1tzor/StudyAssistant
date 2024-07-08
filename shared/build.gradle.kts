@@ -42,6 +42,8 @@ kotlin {
             implementation(project(":shared:features:info:impl"))
             implementation(project(":shared:features:profile:api"))
             implementation(project(":shared:features:profile:impl"))
+            implementation(project(":shared:features:settings:api"))
+            implementation(project(":shared:features:settings:impl"))
             implementation(project(":shared:features:editor:api"))
             implementation(project(":shared:features:editor:impl"))
 

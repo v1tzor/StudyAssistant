@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.profile.impl.di
+package ru.aleshin.studyassistant.settings.impl.navigation
 
-import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
-import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
-import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
+import ru.aleshin.studyassistant.settings.api.navigation.SettingsScreen
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.TabNavigationScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface ProfileFeatureDependencies : BaseFeatureDependencies {
-    val authFeatureStarter: () -> AuthFeatureStarter
-    val settingsFeatureStarter: () -> SettingsFeatureStarter
-    val authRepository: AuthRepository
-    val usersRepository: UsersRepository
-    val coroutineManager: CoroutineManager
-}
+internal class SettingsFeatureStarterImpl(
+    navScreen: TabNavigationScreen,
+    navigatorManager: SettingsNavigatorManager,
+    screenProvider: SettingsScreenProvider,
+) : SettingsFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<SettingsScreen>(
+    featureNavScreen = navScreen,
+    navigatorManager = navigatorManager,
+    screenProvider = screenProvider,
+)

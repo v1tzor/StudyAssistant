@@ -31,6 +31,7 @@ import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
 import ru.aleshin.studyassistant.profile.impl.di.ProfileFeatureDependencies
 import ru.aleshin.studyassistant.profile.impl.di.modules.domainModule
 import ru.aleshin.studyassistant.profile.impl.di.modules.presentationModule
+import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -44,6 +45,7 @@ object ProfileFeatureDIHolder : BaseFeatureDIHolder<ProfileFeatureApi, ProfileFe
             val di = DI {
                 importAll(presentationModule, domainModule)
                 bindSingleton<() -> AuthFeatureStarter> { dependencies.authFeatureStarter }
+                bindSingleton<() -> SettingsFeatureStarter> { dependencies.settingsFeatureStarter }
                 bindSingleton<AuthRepository> { dependencies.authRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }

@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.profile.impl.di
+package ru.aleshin.studyassistant.settings.impl.di
 
-import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
+import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface ProfileFeatureDependencies : BaseFeatureDependencies {
-    val authFeatureStarter: () -> AuthFeatureStarter
-    val settingsFeatureStarter: () -> SettingsFeatureStarter
-    val authRepository: AuthRepository
-    val usersRepository: UsersRepository
+interface SettingsFeatureDependencies : BaseFeatureDependencies {
+    val generalSettingsRepository: GeneralSettingsRepository
+    val calendarSettingsRepository: CalendarSettingsRepository
+    val dateManager: DateManager
     val coroutineManager: CoroutineManager
 }

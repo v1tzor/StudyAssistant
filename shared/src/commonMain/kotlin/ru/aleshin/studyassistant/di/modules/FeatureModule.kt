@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
+import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
@@ -56,6 +57,9 @@ import ru.aleshin.studyassistant.profile.impl.di.holder.ProfileFeatureDIHolder
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
 import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
+import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
+import ru.aleshin.studyassistant.settings.impl.di.SettingsFeatureDependencies
+import ru.aleshin.studyassistant.settings.impl.di.holder.SettingsFeatureDIHolder
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 import ru.aleshin.studyassistant.tasks.impl.di.TasksFeatureDependencies
 import ru.aleshin.studyassistant.tasks.impl.di.holder.TasksFeatureDIHolder
@@ -180,6 +184,7 @@ val featureModule = DI.Module("Feature") {
     bindEagerSingleton<ProfileFeatureDependencies> {
         object : ProfileFeatureDependencies {
             override val authFeatureStarter = provider<AuthFeatureStarter>()
+            override val settingsFeatureStarter = provider<SettingsFeatureStarter>()
             override val authRepository = instance<AuthRepository>()
             override val usersRepository = instance<UsersRepository>()
             override val coroutineManager = instance<CoroutineManager>()
@@ -209,6 +214,21 @@ val featureModule = DI.Module("Feature") {
     }
     bindProvider<EditorFeatureStarter> {
         with(EditorFeatureDIHolder) {
+            init(instance())
+            fetchApi().fetchStarter()
+        }
+    }
+
+    bindEagerSingleton<SettingsFeatureDependencies> {
+        object : SettingsFeatureDependencies {
+            override val generalSettingsRepository = instance<GeneralSettingsRepository>()
+            override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val dateManager = instance<DateManager>()
+            override val coroutineManager = instance<CoroutineManager>()
+        }
+    }
+    bindProvider<SettingsFeatureStarter> {
+        with(SettingsFeatureDIHolder) {
             init(instance())
             fetchApi().fetchStarter()
         }
