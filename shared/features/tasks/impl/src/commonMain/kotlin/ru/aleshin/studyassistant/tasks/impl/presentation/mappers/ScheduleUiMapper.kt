@@ -16,10 +16,10 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.mappers
 
-import entities.schedules.DateVersion
-import entities.schedules.Schedule
-import entities.schedules.base.BaseSchedule
-import entities.schedules.custom.CustomSchedule
+import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
+import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
+import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.BaseScheduleUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.CustomScheduleUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.DateVersionUi

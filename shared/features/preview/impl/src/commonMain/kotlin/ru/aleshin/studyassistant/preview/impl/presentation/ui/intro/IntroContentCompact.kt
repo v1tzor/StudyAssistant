@@ -38,10 +38,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.views.CircularStepsRow
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.AuthActionsSection
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.IntroPage
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.NavActionsSection
-import views.CircularStepsRow
 
 /**
  * @author Stanislav Aleshin on 19.04.2024.

@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.api.di
 
-import inject.BaseFeatureApi
+import ru.aleshin.studyassistant.core.common.inject.BaseFeatureApi
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 
 /**

@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.organizations.Millis
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.

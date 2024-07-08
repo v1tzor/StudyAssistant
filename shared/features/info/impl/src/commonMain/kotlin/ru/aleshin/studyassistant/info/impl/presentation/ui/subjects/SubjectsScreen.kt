@@ -31,12 +31,13 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import functional.UID
-import navigation.root
+import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.navigation.root
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsDeps
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsEffect
@@ -46,7 +47,6 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.views.SubjectFiltersView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.views.SubjectsSearchTopBar
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
-import views.ErrorSnackbar
 
 /**
  * @author Stanislav Aleshin on 17.06.2024

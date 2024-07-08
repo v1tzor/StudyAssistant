@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.api.ui
 
-import entities.common.DayOfNumberedWeek
+import ru.aleshin.studyassistant.core.domain.entities.common.DayOfNumberedWeek
 
 /**
  * @author Stanislav Aleshin on 31.05.2024.

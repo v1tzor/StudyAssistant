@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.serialization)
-    alias(libs.plugins.sqlitedelight)
 }
 
 kotlin {
@@ -26,23 +25,16 @@ kotlin {
     }
 
     sourceSets {
-        androidMain.dependencies {
-            implementation(libs.sqldelight.android)
-        }
         commonMain.dependencies {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:domain"))
+            implementation(project(":shared:core:database"))
+            implementation(project(":shared:core:remote"))
 
             api(libs.bundles.firebase)
-            implementation(libs.sqldelight.core)
-            implementation(libs.sqldelight.prmimitiveAdapters)
-            implementation(libs.sqldelight.coroutines)
+
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
-            implementation(libs.logger)
-        }
-        iosMain.dependencies {
-            implementation(libs.sqldelight.native)
         }
     }
 
@@ -64,13 +56,5 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-}
-
-sqldelight {
-    databases {
-        create("Database") {
-            packageName.set("ru.aleshin.studyassistant.core.data")
-        }
     }
 }

@@ -32,8 +32,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import theme.StudyAssistantRes
-import theme.material.full
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.material.full
 
 /**
  * @author Stanislav Aleshin on 27.04.2024

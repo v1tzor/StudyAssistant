@@ -16,21 +16,21 @@
 
 package ru.aleshin.studyassistant.info.impl.di.holder
 
-import inject.BaseFeatureDIHolder
-import managers.CoroutineManager
-import managers.DateManager
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
 import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
-import repositories.BaseScheduleRepository
-import repositories.CalendarSettingsRepository
-import repositories.EmployeeRepository
-import repositories.OrganizationsRepository
-import repositories.SubjectsRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.info.api.di.InfoFeatureApi
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter

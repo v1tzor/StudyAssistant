@@ -16,17 +16,6 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel
 
-import architecture.screenmodel.work.ActionResult
-import architecture.screenmodel.work.EffectResult
-import architecture.screenmodel.work.FlowWorkProcessor
-import architecture.screenmodel.work.WorkCommand
-import extensions.equalsDay
-import extensions.setHoursAndMinutes
-import extensions.shiftMinutes
-import functional.Constants.Delay.UPDATE_ACTIVE_CLASS
-import functional.DomainResult
-import functional.collectAndHandle
-import functional.handle
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.emitAll
@@ -34,7 +23,18 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.Instant
-import managers.DateManager
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
+import ru.aleshin.studyassistant.core.common.extensions.shiftMinutes
+import ru.aleshin.studyassistant.core.common.functional.Constants.Delay.UPDATE_ACTIVE_CLASS
+import ru.aleshin.studyassistant.core.common.functional.DomainResult
+import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
+import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.AnalysisInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.HomeworkInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleInteractor

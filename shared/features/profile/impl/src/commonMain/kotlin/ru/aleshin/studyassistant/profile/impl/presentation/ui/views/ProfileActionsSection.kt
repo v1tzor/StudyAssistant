@@ -48,10 +48,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.profile.impl.presentation.models.AppUserUi
 import ru.aleshin.studyassistant.profile.impl.presentation.models.FriendRequestsUi
 import ru.aleshin.studyassistant.profile.impl.presentation.theme.ProfileThemeRes
-import views.PlaceholderBox
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.

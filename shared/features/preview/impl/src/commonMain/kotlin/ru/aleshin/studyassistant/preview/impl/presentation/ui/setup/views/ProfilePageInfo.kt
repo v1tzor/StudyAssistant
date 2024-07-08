@@ -41,18 +41,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import entities.users.Gender
-import functional.Constants
-import mappers.mapToSting
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.functional.Constants
+import ru.aleshin.studyassistant.core.domain.entities.users.Gender
+import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
+import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.core.ui.views.GenderDropdownMenu
+import ru.aleshin.studyassistant.core.ui.views.InfoTextField
+import ru.aleshin.studyassistant.core.ui.views.dialog.BirthdayDatePicker
 import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
-import theme.StudyAssistantRes
-import views.ClickableInfoTextField
-import views.ExpandedIcon
-import views.GenderDropdownMenu
-import views.InfoTextField
-import views.dialog.BirthdayDatePicker
 
 /**
  * @author Stanislav Aleshin on 27.04.2024

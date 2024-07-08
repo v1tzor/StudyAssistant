@@ -16,21 +16,21 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel
 
-import architecture.screenmodel.work.ActionResult
-import architecture.screenmodel.work.EffectResult
-import architecture.screenmodel.work.FlowWorkProcessor
-import architecture.screenmodel.work.WorkCommand
-import extensions.equalsDay
-import extensions.setHoursAndMinutes
-import extensions.shiftMillis
-import functional.Constants.Class
-import functional.TimeRange
-import functional.UID
-import functional.collectAndHandle
-import functional.firstHandleAndGet
-import functional.handle
 import kotlinx.coroutines.flow.flow
-import managers.TimeOverlayManager
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
+import ru.aleshin.studyassistant.core.common.extensions.shiftMillis
+import ru.aleshin.studyassistant.core.common.functional.Constants.Class
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
+import ru.aleshin.studyassistant.core.common.functional.firstHandleAndGet
+import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.api.ui.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseClassInteractor

@@ -60,12 +60,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import extensions.DISABLED_ALPHA
-import extensions.alphaByEnabled
-import functional.Constants.Placeholder
-import functional.UID
-import mappers.mapToIcon
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.DISABLED_ALPHA
+import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
+import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.material.full
+import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationClassesInfoUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.users.ContactInfoUi
@@ -77,9 +80,6 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.O
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.ShortEmployeeView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.ShortSubjectView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
-import theme.StudyAssistantRes
-import theme.material.full
-import views.PlaceholderBox
 
 /**
  * @author Stanislav Aleshin on 16.06.2024

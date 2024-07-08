@@ -27,8 +27,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 23.06.2024.

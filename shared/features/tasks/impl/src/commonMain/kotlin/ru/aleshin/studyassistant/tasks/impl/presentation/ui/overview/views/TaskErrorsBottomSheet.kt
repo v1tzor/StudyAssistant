@@ -53,11 +53,15 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import extensions.formatByTimeZone
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.tokens.dayOfWeekShortNames
+import ru.aleshin.studyassistant.core.ui.theme.tokens.monthNames
+import ru.aleshin.studyassistant.core.ui.views.MediumDragHandle
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
@@ -66,10 +70,6 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetail
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.fetchAllTasks
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
-import theme.StudyAssistantRes
-import theme.tokens.dayOfWeekShortNames
-import theme.tokens.monthNames
-import views.MediumDragHandle
 
 /**
  * @author Stanislav Aleshin on 04.07.2024.

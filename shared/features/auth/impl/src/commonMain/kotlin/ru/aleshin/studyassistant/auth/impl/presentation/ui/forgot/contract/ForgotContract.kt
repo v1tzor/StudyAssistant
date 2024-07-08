@@ -16,19 +16,21 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract
 
-import architecture.screenmodel.contract.BaseAction
-import architecture.screenmodel.contract.BaseEvent
-import architecture.screenmodel.contract.BaseUiEffect
-import architecture.screenmodel.contract.BaseViewState
+import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.ForgotCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.EmailValidError
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.
  */
+@Immutable
 @Parcelize
 internal data class ForgotViewState(
     val isLoading: Boolean = false,
@@ -41,11 +43,11 @@ internal sealed class ForgotEvent : BaseEvent {
 }
 
 internal sealed class ForgotEffect : BaseUiEffect {
-    data class PushScreen(val screen: Screen) : ForgotEffect()
     data class ShowError(val failures: AuthFailures) : ForgotEffect()
+    data class NavigateToLocal(val pushScreen: Screen) : ForgotEffect()
 }
 
 internal sealed class ForgotAction : BaseAction {
-    data class UpdateLoading(val isLoading: Boolean) : ForgotAction()
     data class UpdateValidError(val email: EmailValidError?) : ForgotAction()
+    data class UpdateLoading(val isLoading: Boolean) : ForgotAction()
 }

@@ -18,9 +18,9 @@ package ru.aleshin.studyassistant.editor.impl.presentation.models.schedules
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.common.NumberOfRepeatWeek
-import functional.UID
 import kotlinx.datetime.DayOfWeek
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 
 /**

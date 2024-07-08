@@ -49,8 +49,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import entities.common.NumberOfRepeatWeek
-import mappers.toMinutesOrHoursTitle
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
@@ -58,10 +58,10 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseW
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.NumberOfWeekItem
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.toItem
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
-import views.PlaceholderBox
-import views.SegmentedButtons
-import views.StickyBottomSheet
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
+import ru.aleshin.studyassistant.core.ui.views.SegmentedButtons
+import ru.aleshin.studyassistant.core.ui.views.StickyBottomSheet
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.

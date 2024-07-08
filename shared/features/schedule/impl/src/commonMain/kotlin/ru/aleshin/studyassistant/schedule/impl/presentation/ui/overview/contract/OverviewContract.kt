@@ -16,18 +16,19 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract
 
-import architecture.screenmodel.contract.BaseAction
-import architecture.screenmodel.contract.BaseEvent
-import architecture.screenmodel.contract.BaseUiEffect
-import architecture.screenmodel.contract.BaseViewState
+import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
-import extensions.startThisDay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import platform.InstantParceler
-import platform.NullInstantParceler
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.analysis.DailyAnalysisUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
@@ -39,6 +40,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.Sche
  * @author Stanislav Aleshin on 09.06.2024
  */
 @Parcelize
+@Immutable
 internal data class OverviewViewState(
     val isScheduleLoading: Boolean = true,
     val isAnalyticsLoading: Boolean = true,

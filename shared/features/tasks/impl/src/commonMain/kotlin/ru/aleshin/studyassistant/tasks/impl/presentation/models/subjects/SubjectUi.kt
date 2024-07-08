@@ -18,8 +18,8 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.subject.EventType
-import functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.EmployeeUi
 

@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract
 
-import architecture.screenmodel.ScreenDependencies
 import dev.icerock.moko.parcelize.Parcelize
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.ScreenDependencies
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.

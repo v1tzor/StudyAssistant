@@ -37,16 +37,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import extensions.forEachWith
-import functional.Constants.Placeholder
 import kotlinx.datetime.DayOfWeek
-import mappers.mapToSting
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.forEachWith
+import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
+import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
-import views.PlaceholderBox
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.

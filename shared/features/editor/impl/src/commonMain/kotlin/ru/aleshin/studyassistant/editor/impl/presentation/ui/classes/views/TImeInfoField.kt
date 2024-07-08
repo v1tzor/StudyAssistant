@@ -37,16 +37,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import extensions.formatByTimeZone
-import functional.TimeRange
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
+import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.core.ui.views.dialog.BaseTimePickerDialog
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import views.ClickableTextField
-import views.ExpandedIcon
-import views.dialog.BaseTimePickerDialog
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.

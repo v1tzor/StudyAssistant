@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.mappers
 
-import entities.subject.Subject
+import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectSortedType
 import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.tokens.InfoStrings

@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.profile.impl.navigation
 
-import inject.FeatureStarter
+import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.ProfileScreen
 

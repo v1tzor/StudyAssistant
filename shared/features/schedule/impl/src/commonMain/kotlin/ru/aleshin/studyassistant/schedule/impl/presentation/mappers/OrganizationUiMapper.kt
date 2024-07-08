@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
-import entities.organizations.OrganizationShort
+import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
 
 /**

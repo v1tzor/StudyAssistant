@@ -45,10 +45,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import extensions.dateTime
-import extensions.equalsDay
-import extensions.toMinutesAndHoursString
-import functional.Constants.Animations.FADE_SLOW
 import io.github.koalaplot.core.line.AreaBaseline
 import io.github.koalaplot.core.line.AreaPlot
 import io.github.koalaplot.core.style.AreaStyle
@@ -60,13 +56,17 @@ import io.github.koalaplot.core.xygraph.XYGraph
 import io.github.koalaplot.core.xygraph.rememberFloatLinearAxisModel
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.extensions.toMinutesAndHoursString
+import ru.aleshin.studyassistant.core.common.functional.Constants.Animations.FADE_SLOW
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.material.full
+import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
+import ru.aleshin.studyassistant.core.ui.views.SmallInfoBadge
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.analysis.DailyAnalysisUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
-import theme.StudyAssistantRes
-import theme.material.full
-import views.PlaceholderBox
-import views.SmallInfoBadge
 import kotlin.math.roundToInt
 
 /**

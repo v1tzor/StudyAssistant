@@ -18,8 +18,8 @@ package ru.aleshin.studyassistant.profile.impl.presentation.models
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.users.Gender
-import functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.

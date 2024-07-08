@@ -26,8 +26,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
-import theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 03.07.2024.

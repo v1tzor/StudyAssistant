@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
-import entities.analytics.DailyAnalysis
+import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.analysis.DailyAnalysisUi
 
 /**

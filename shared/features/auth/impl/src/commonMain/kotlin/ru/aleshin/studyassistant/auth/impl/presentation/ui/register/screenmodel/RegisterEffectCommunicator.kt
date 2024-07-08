@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel
 
-import architecture.communications.state.EffectCommunicator
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEffect
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.EffectCommunicator
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.

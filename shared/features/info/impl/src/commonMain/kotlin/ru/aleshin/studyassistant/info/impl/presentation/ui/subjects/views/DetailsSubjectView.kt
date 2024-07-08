@@ -46,15 +46,15 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import entities.subject.EventType
-import mappers.mapToIcon
-import mappers.mapToString
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
+import ru.aleshin.studyassistant.core.ui.mappers.mapToString
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.InfoBadge
+import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
 import ru.aleshin.studyassistant.info.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.users.EmployeeUi
-import theme.StudyAssistantRes
-import views.InfoBadge
-import views.SwipeToDismissBackground
 
 /**
  * @author Stanislav Aleshin on 18.06.2024.

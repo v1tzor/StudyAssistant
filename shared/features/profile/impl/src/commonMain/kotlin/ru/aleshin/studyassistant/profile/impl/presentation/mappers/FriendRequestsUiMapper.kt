@@ -16,14 +16,14 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.mappers
 
-import models.requests.FriendRequestsPojo
+import ru.aleshin.studyassistant.core.domain.entities.requests.FriendRequests
 import ru.aleshin.studyassistant.profile.impl.presentation.models.FriendRequestsUi
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
-internal fun FriendRequestsPojo.mapToUi() = FriendRequestsUi(
-    received = received,
-    send = send,
-    lastAccepted = lastAccepted,
+internal fun FriendRequests.mapToUi() = FriendRequestsUi(
+    received = received.map { it.uid },
+    send = send.map { it.uid },
+    lastAccepted = lastAccepted.map { it.uid },
 )

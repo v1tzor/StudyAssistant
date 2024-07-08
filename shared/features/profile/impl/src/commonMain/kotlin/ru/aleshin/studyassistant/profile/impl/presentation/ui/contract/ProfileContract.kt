@@ -16,12 +16,13 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.ui.contract
 
-import architecture.screenmodel.contract.BaseAction
-import architecture.screenmodel.contract.BaseEvent
-import architecture.screenmodel.contract.BaseUiEffect
-import architecture.screenmodel.contract.BaseViewState
+import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 import ru.aleshin.studyassistant.profile.impl.presentation.models.AppUserUi
 import ru.aleshin.studyassistant.profile.impl.presentation.models.FriendRequestsUi
@@ -29,6 +30,7 @@ import ru.aleshin.studyassistant.profile.impl.presentation.models.FriendRequests
 /**
  * @author Stanislav Aleshin on 21.04.2024
  */
+@Immutable
 @Parcelize
 internal data class ProfileViewState(
     val myProfile: AppUserUi? = null,

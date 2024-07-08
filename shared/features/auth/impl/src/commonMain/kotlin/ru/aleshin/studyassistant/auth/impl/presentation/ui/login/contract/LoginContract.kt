@@ -16,20 +16,22 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract
 
-import architecture.screenmodel.contract.BaseAction
-import architecture.screenmodel.contract.BaseEvent
-import architecture.screenmodel.contract.BaseUiEffect
-import architecture.screenmodel.contract.BaseViewState
+import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.LoginCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.EmailValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.PasswordValidError
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
 
 /**
  * @author Stanislav Aleshin on 16.04.2024
  */
+@Immutable
 @Parcelize
 internal data class LoginViewState(
     val isLoading: Boolean = false,
@@ -45,15 +47,15 @@ internal sealed class LoginEvent : BaseEvent {
 }
 
 internal sealed class LoginEffect : BaseUiEffect {
-    data class PushScreen(val screen: Screen) : LoginEffect()
-    data class ReplaceGlobalScreen(val screen: Screen) : LoginEffect()
     data class ShowError(val failure: AuthFailures) : LoginEffect()
+    data class NavigateToLocal(val pushScreen: Screen) : LoginEffect()
+    data class ReplaceGlobalScreen(val screen: Screen) : LoginEffect()
 }
 
 internal sealed class LoginAction : BaseAction {
-    data class UpdateLoading(val isLoading: Boolean) : LoginAction()
     data class UpdateValidErrors(
         val email: EmailValidError?,
         val password: PasswordValidError?
     ) : LoginAction()
+    data class UpdateLoading(val isLoading: Boolean) : LoginAction()
 }

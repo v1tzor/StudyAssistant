@@ -16,11 +16,11 @@
 
 package ru.aleshin.studyassistant.di.modules
 
-import DriverFactory
 import android.content.Context
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.database.datasource.DriverFactory
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 
 /**

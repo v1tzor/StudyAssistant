@@ -24,11 +24,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import navigation.root
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.RegisterCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
@@ -36,8 +34,10 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.Reg
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEvent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterViewState
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.rememberRegisterScreenModel
-import theme.tokens.LocalWindowSize
-import views.ErrorSnackbar
+import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.navigation.root
+import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 
 /**
  * @author Stanislav Aleshin on 16.04.2024
@@ -79,7 +79,7 @@ internal class RegisterScreen : Screen {
 
         handleEffect { effect ->
             when (effect) {
-                is RegisterEffect.PushScreen -> navigator.push(effect.screen)
+                is RegisterEffect.NavigateToLocal -> navigator.push(effect.pushScreen)
                 is RegisterEffect.ReplaceGlobalScreen -> navigator.root().replaceAll(effect.screen)
                 is RegisterEffect.ShowError -> {
                     snackbarState.showSnackbar(

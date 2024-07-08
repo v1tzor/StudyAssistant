@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.info.impl.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
-import navigation.FeatureScreenProvider
+import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen

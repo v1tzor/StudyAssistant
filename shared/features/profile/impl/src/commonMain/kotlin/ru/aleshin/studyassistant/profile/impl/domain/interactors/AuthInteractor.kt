@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.profile.impl.domain.interactors
 
-import functional.UnitDomainResult
-import repositories.AuthRepository
+import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.profile.impl.domain.common.ProfileEitherWrapper
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 

@@ -16,14 +16,14 @@
 
 package ru.aleshin.studyassistant.info.impl.domain.interactors
 
-import extensions.extractAllItem
-import extensions.millis
-import functional.DomainResult
-import functional.UID
 import kotlinx.coroutines.flow.first
-import managers.DateManager
-import repositories.BaseScheduleRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
+import ru.aleshin.studyassistant.core.common.extensions.millis
+import ru.aleshin.studyassistant.core.common.functional.DomainResult
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoEitherWrapper
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
 import ru.aleshin.studyassistant.info.impl.domain.entities.OrganizationClassesInfo

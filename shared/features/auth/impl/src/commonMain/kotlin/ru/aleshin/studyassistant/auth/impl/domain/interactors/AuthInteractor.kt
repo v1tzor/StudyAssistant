@@ -16,20 +16,20 @@
 
 package ru.aleshin.studyassistant.auth.impl.domain.interactors
 
-import entities.auth.AuthCredentials
-import entities.auth.ForgotCredentials
-import entities.users.AppUser
-import exceptions.FirebaseDataAuthException
-import exceptions.FirebaseUserException
-import functional.DomainResult
-import functional.UnitDomainResult
 import kotlinx.coroutines.flow.firstOrNull
-import repositories.AuthRepository
-import repositories.ManageUserRepository
-import repositories.UsersRepository
 import ru.aleshin.studyassistant.auth.impl.domain.common.AuthEitherWrapper
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthResult
+import ru.aleshin.studyassistant.core.common.exceptions.FirebaseDataAuthException
+import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.functional.DomainResult
+import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.auth.AuthCredentials
+import ru.aleshin.studyassistant.core.domain.entities.auth.ForgotCredentials
+import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
+import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.

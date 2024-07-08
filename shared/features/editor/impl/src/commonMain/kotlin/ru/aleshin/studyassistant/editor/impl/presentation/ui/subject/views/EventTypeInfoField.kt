@@ -25,14 +25,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import entities.subject.EventType
-import mappers.mapToString
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import ru.aleshin.studyassistant.core.ui.mappers.mapToString
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
+import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EventTypeSelectorDialog
-import theme.StudyAssistantRes
-import views.ClickableInfoTextField
-import views.ExpandedIcon
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.

@@ -16,13 +16,12 @@
 
 package ru.aleshin.studyassistant.preview.impl.domain.interactors
 
-import entities.organizations.Organization
-import functional.DomainResult
-import functional.FlowDomainResult
-import functional.UID
-import functional.UnitDomainResult
-import repositories.OrganizationsRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.functional.DomainResult
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.preview.impl.domain.common.PreviewEitherWrapper
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 

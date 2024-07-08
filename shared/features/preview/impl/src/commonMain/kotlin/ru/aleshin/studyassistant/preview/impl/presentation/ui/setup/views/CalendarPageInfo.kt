@@ -36,11 +36,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import entities.common.NumberOfRepeatWeek
-import extensions.alphaByEnabled
-import mappers.mapToSting
+import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
-import theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 27.04.2024

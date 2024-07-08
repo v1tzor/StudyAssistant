@@ -18,8 +18,8 @@ package ru.aleshin.studyassistant.preview.impl.presentation.models.organizations
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.organizations.OrganizationType
-import functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
 import ru.aleshin.studyassistant.preview.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.preview.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.preview.impl.presentation.models.users.EmployeeUi

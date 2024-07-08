@@ -40,22 +40,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import entities.tasks.TaskPriority
-import entities.tasks.TaskPriority.HIGH
-import entities.tasks.TaskPriority.MEDIUM
-import entities.tasks.TaskPriority.STANDARD
-import entities.tasks.TodoStatus
-import extensions.formatByTimeZone
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
-import mappers.mapToString
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.HIGH
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.MEDIUM
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.STANDARD
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
+import ru.aleshin.studyassistant.core.ui.mappers.mapToString
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.tokens.monthNames
+import ru.aleshin.studyassistant.core.ui.views.InfoBadge
+import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
-import theme.StudyAssistantRes
-import theme.tokens.monthNames
-import views.InfoBadge
-import views.PlaceholderBox
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.

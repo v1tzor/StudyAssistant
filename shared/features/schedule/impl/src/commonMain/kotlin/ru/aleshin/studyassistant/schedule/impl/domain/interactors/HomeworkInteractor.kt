@@ -16,11 +16,11 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.interactors
 
-import entities.tasks.Homework
-import functional.UID
-import functional.UnitDomainResult
-import repositories.HomeworksRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
+import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 

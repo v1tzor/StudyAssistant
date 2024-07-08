@@ -35,12 +35,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
+import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.core.ui.views.dialog.ContactInfoEditorDialog
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
-import views.ClickableTextField
-import views.ExpandedIcon
-import views.dialog.ContactInfoEditorDialog
 
 /**
  * @author Stanislav Aleshin on 06.06.2024.

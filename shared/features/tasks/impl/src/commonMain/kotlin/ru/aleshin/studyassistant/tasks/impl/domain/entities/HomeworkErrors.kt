@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.impl.domain.entities
 
-import entities.tasks.Homework
+import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 
 /**
  * @author Stanislav Aleshin on 27.06.2024.

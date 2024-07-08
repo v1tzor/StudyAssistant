@@ -18,8 +18,8 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.models.classes
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.organizations.Millis
-import functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.Progress
 
 /**

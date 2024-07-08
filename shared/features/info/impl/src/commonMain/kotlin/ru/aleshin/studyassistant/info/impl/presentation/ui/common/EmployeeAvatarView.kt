@@ -26,7 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import theme.material.full
+import ru.aleshin.studyassistant.core.ui.theme.material.full
 
 /**
  * @author Stanislav Aleshin on 17.06.2024.

@@ -25,9 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarButton
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 import ru.aleshin.studyassistant.profile.impl.presentation.theme.ProfileThemeRes
-import views.TopAppBarButton
-import views.TopAppBarTitle
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.

@@ -22,7 +22,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.theme.tokens.LocalAuthIc
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.tokens.LocalAuthStrings
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.tokens.fetchAuthIcons
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.tokens.fetchAuthStrings
-import theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 07.04.2024.

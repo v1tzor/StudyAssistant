@@ -16,11 +16,11 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel
 
-import architecture.screenmodel.work.ActionResult
-import architecture.screenmodel.work.EffectResult
-import architecture.screenmodel.work.FlowWorkProcessor
-import architecture.screenmodel.work.WorkCommand
-import functional.handle
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.functional.handle
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
@@ -33,7 +33,8 @@ import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, LoginAction, LoginEffect> {
+internal interface LoginWorkProcessor :
+    FlowWorkProcessor<LoginWorkCommand, LoginAction, LoginEffect> {
 
     class Base(
         private val authInteractor: AuthInteractor,

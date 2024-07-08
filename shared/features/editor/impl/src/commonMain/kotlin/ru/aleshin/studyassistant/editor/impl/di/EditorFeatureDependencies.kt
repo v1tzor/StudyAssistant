@@ -16,18 +16,18 @@
 
 package ru.aleshin.studyassistant.editor.impl.di
 
-import inject.BaseFeatureDependencies
-import managers.CoroutineManager
-import managers.DateManager
-import managers.TimeOverlayManager
-import repositories.BaseScheduleRepository
-import repositories.CalendarSettingsRepository
-import repositories.CustomScheduleRepository
-import repositories.EmployeeRepository
-import repositories.HomeworksRepository
-import repositories.OrganizationsRepository
-import repositories.SubjectsRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
+import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.

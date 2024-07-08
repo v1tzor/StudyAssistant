@@ -17,13 +17,8 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.screenmodel
 
 import androidx.compose.runtime.Composable
-import architecture.screenmodel.BaseScreenModel
-import architecture.screenmodel.EmptyDeps
-import architecture.screenmodel.work.BackgroundWorkKey
-import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import managers.CoroutineManager
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
@@ -33,6 +28,11 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.Forgo
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEvent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotViewState
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import validation.operateValidate
 
 /**
@@ -73,7 +73,7 @@ internal class ForgotScreenModel(
             }
             is ForgotEvent.NavigateToLogin -> {
                 val screen = screenProvider.provideFeatureScreen(AuthScreen.Login)
-                sendEffect(ForgotEffect.PushScreen(screen))
+                sendEffect(ForgotEffect.NavigateToLocal(screen))
             }
         }
     }
@@ -82,13 +82,13 @@ internal class ForgotScreenModel(
         action: ForgotAction,
         currentState: ForgotViewState,
     ) = when (action) {
-        is ForgotAction.UpdateLoading -> currentState.copy(
-            isLoading = action.isLoading,
-            emailValidError = null,
-        )
         is ForgotAction.UpdateValidError -> currentState.copy(
             isLoading = false,
             emailValidError = action.email,
+        )
+        is ForgotAction.UpdateLoading -> currentState.copy(
+            isLoading = action.isLoading,
+            emailValidError = null,
         )
     }
 

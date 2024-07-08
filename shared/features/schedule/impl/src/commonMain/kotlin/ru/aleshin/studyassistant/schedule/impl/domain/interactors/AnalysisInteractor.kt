@@ -16,29 +16,29 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.interactors
 
-import entities.analytics.DailyAnalysis
-import entities.classes.Class
-import entities.common.ContactInfo
-import entities.common.numberOfRepeatWeek
-import entities.organizations.OrganizationShort
-import entities.tasks.Homework
-import entities.tasks.TaskPriority
-import entities.tasks.Todo
-import entities.tasks.fetchAllTasks
-import entities.tasks.toHomeworkComponents
-import extensions.dateTime
-import extensions.equalsDay
-import extensions.startThisDay
-import functional.DomainResult
-import functional.TimeRange
-import functional.UID
 import kotlinx.coroutines.flow.first
-import repositories.BaseScheduleRepository
-import repositories.CalendarSettingsRepository
-import repositories.CustomScheduleRepository
-import repositories.HomeworksRepository
-import repositories.TodoRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.functional.DomainResult
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis
+import ru.aleshin.studyassistant.core.domain.entities.classes.Class
+import ru.aleshin.studyassistant.core.domain.entities.common.ContactInfo
+import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
+import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
+import ru.aleshin.studyassistant.core.domain.entities.tasks.fetchAllTasks
+import ru.aleshin.studyassistant.core.domain.entities.tasks.toHomeworkComponents
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 
@@ -110,15 +110,16 @@ internal interface AnalysisInteractor {
                         todosProgressAndRate.second,
                     )
 
-                    val analysis = DailyAnalysis(
-                        date = instant,
-                        generalAssessment = rateList.sum() / MAX_RATE,
-                        numberOfClasses = classesNumberAndRate.first,
-                        numberOfTests = homeworksNumberAndRate.first,
-                        numberOfMovements = movementsNumberAndRate.first,
-                        homeworksProgress = homeworksProgressAndRate.first,
-                        todosProgress = todosProgressAndRate.first,
-                    )
+                    val analysis =
+                        DailyAnalysis(
+                            date = instant,
+                            generalAssessment = rateList.sum() / MAX_RATE,
+                            numberOfClasses = classesNumberAndRate.first,
+                            numberOfTests = homeworksNumberAndRate.first,
+                            numberOfMovements = movementsNumberAndRate.first,
+                            homeworksProgress = homeworksProgressAndRate.first,
+                            todosProgress = todosProgressAndRate.first,
+                        )
                     add(analysis)
                 }
             }

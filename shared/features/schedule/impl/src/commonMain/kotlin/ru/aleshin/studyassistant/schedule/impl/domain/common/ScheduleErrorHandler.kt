@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.common
 
-import handlers.ErrorHandler
+import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 
 /**

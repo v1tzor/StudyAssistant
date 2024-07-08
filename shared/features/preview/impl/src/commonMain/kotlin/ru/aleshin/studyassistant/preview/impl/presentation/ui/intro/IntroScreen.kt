@@ -26,11 +26,14 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import navigation.root
+import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.navigation.root
+import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
+import ru.aleshin.studyassistant.core.ui.theme.tokens.WindowSize
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroEffect
@@ -38,9 +41,6 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.Int
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroViewState
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.screenmodel.rememberIntroScreenModel
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.IntroPage
-import theme.tokens.LocalWindowSize
-import theme.tokens.WindowSize
-import views.ErrorSnackbar
 
 /**
  * @author Stanislav Aleshin on 14.04.2024

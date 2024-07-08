@@ -16,15 +16,15 @@
 
 package ru.aleshin.studyassistant.tasks.impl.domain.interactors
 
-import entities.tasks.Todo
-import functional.FlowDomainResult
-import functional.TimeRange
-import functional.UID
-import functional.UnitDomainResult
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
-import repositories.TodoRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
+import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TodoErrors

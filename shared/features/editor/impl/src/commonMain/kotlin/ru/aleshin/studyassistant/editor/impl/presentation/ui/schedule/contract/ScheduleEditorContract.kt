@@ -16,14 +16,15 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract
 
-import architecture.screenmodel.contract.BaseAction
-import architecture.screenmodel.contract.BaseEvent
-import architecture.screenmodel.contract.BaseUiEffect
-import architecture.screenmodel.contract.BaseViewState
+import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
-import entities.common.NumberOfRepeatWeek
-import functional.UID
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
@@ -35,6 +36,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.settings.Calend
 /**
  * @author Stanislav Aleshin on 05.05.2024
  */
+@Immutable
 @Parcelize
 internal data class ScheduleEditorViewState(
     val isLoading: Boolean = true,

@@ -16,11 +16,11 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
-import entities.settings.PrivacySettings
-import entities.users.AppUser
-import entities.users.SocialNetwork
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.AppUserUi
+import ru.aleshin.studyassistant.core.domain.entities.settings.PrivacySettings
+import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
+import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetwork
 import ru.aleshin.studyassistant.editor.impl.presentation.models.settings.PrivacySettingsUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.SocialNetworkUi
 
 /**

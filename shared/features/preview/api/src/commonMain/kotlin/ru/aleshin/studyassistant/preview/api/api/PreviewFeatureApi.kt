@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.preview.api.api
 
-import inject.BaseFeatureApi
+import ru.aleshin.studyassistant.core.common.inject.BaseFeatureApi
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 
 /**

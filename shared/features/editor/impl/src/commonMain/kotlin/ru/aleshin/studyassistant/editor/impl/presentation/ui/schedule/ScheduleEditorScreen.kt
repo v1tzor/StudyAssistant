@@ -38,14 +38,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import entities.common.NumberOfRepeatWeek
-import extensions.navigationBarsInDp
-import extensions.safeNavigationBarsInPx
-import navigation.nestedPop
+import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.extensions.navigationBarsInDp
+import ru.aleshin.studyassistant.core.common.extensions.safeNavigationBarsInPx
+import ru.aleshin.studyassistant.core.common.navigation.nestedPop
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.BottomSheetScaffold
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorDeps
@@ -55,9 +58,6 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.S
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.rememberScheduleEditorScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.ScheduleEditorBottomSheet
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.ScheduleEditorTopBar
-import theme.StudyAssistantRes
-import views.BottomSheetScaffold
-import views.ErrorSnackbar
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.

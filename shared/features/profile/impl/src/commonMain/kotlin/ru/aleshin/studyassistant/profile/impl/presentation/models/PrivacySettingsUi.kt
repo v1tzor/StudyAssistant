@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.profile.impl.presentation.models
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.settings.AccessType
+import ru.aleshin.studyassistant.core.domain.entities.settings.AccessType
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.

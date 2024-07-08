@@ -18,9 +18,9 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.models.classes
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.subject.EventType
-import functional.TimeRange
-import functional.UID
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi

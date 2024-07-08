@@ -33,9 +33,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import theme.StudyAssistantRes
-import views.TopAppBarButton
-import views.TopAppBarEmptyButton
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarButton
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarEmptyButton
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.

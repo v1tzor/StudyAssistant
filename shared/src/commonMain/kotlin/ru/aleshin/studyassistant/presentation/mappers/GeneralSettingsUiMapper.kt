@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.presentation.mappers
 
-import entities.settings.GeneralSettings
-import mappers.mapToUi
+import ru.aleshin.studyassistant.core.domain.entities.settings.GeneralSettings
+import ru.aleshin.studyassistant.core.ui.mappers.mapToUi
 import ru.aleshin.studyassistant.presentation.models.GeneralSettingsUi
 
 /**

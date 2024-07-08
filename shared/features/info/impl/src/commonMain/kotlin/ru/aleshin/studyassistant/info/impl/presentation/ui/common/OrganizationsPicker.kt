@@ -38,15 +38,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import functional.UID
-import mappers.mapToSting
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
-import theme.StudyAssistantRes
-import views.ExpandedIcon
-import views.dialog.BaseSelectorDialog
-import views.dialog.SelectorDialogItemView
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.

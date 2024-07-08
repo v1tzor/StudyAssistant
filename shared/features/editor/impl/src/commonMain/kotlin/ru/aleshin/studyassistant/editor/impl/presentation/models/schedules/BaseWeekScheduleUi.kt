@@ -19,10 +19,10 @@ package ru.aleshin.studyassistant.editor.impl.presentation.models.schedules
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
-import entities.common.NumberOfRepeatWeek
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
-import platform.InstantParceler
+import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 
 /**
  * @author Stanislav Aleshin on 30.05.2024.

@@ -57,22 +57,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import extensions.equalsDay
-import extensions.formatByTimeZone
-import extensions.mapEpochTimeToInstant
-import functional.UID
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.tokens.dayOfWeekShortNames
+import ru.aleshin.studyassistant.core.ui.theme.tokens.monthNames
+import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassesForLinkedUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
-import theme.tokens.dayOfWeekShortNames
-import theme.tokens.monthNames
-import views.ClickableTextField
 
 /**
  * @author Stanislav Aleshin on 23.06.2024.

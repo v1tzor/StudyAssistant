@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.preview.impl.navigation
 
-import inject.FeatureStarter
+import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.nav.NavigationScreen

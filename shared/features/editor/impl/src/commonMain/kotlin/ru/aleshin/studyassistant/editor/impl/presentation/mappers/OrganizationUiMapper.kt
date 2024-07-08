@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
-import entities.organizations.Organization
-import entities.organizations.OrganizationShort
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
+import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationUi
 

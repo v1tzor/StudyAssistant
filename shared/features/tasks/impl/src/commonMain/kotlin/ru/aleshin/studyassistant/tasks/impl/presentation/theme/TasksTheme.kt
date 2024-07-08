@@ -18,11 +18,11 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.tokens.LocalTasksIcons
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.tokens.LocalTasksStrings
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.tokens.fetchTasksIcons
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.tokens.fetchTasksStrings
-import theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 16.06.2024.

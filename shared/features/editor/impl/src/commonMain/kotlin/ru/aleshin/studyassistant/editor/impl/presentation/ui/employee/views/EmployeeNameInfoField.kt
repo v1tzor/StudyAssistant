@@ -44,10 +44,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import functional.Constants.Text.DEFAULT_MAX_TEXT_LENGTH
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.functional.Constants.Text.DEFAULT_MAX_TEXT_LENGTH
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.

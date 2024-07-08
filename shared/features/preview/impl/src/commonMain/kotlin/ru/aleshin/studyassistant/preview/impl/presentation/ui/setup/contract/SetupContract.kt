@@ -16,13 +16,14 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract
 
-import architecture.screenmodel.contract.BaseAction
-import architecture.screenmodel.contract.BaseEvent
-import architecture.screenmodel.contract.BaseUiEffect
-import architecture.screenmodel.contract.BaseViewState
+import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
-import functional.UID
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
 import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
@@ -33,6 +34,7 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupP
  * @author Stanislav Aleshin on 17.04.2024
  */
 @Parcelize
+@Immutable
 internal data class SetupViewState(
     val currentPage: SetupPage = SetupPage.PROFILE,
     val profile: AppUserUi? = null,

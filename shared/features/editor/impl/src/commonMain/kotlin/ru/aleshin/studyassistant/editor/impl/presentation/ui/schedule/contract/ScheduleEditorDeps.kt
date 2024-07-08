@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract
 
-import architecture.screenmodel.ScreenDependencies
 import dev.icerock.moko.parcelize.Parcelize
-import entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.ScreenDependencies
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 
 /**
  * @author Stanislav Aleshin on 15.06.2024.

@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.preview.impl.domain.entities
 
-import functional.DomainFailures
+import ru.aleshin.studyassistant.core.common.functional.DomainFailures
 
 /**
  * @author Stanislav Aleshin on 07.04.2024.

@@ -16,11 +16,11 @@
 
 package ru.aleshin.studyassistant.auth.impl.di
 
-import inject.BaseFeatureDependencies
-import managers.CoroutineManager
-import repositories.AuthRepository
-import repositories.ManageUserRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 

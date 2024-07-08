@@ -16,24 +16,24 @@
 
 package ru.aleshin.studyassistant.tasks.impl.domain.interactors
 
-import entities.common.numberOfRepeatWeek
-import entities.tasks.Homework
-import extensions.dateTime
-import extensions.startThisDay
-import functional.FlowDomainResult
-import functional.TimeRange
-import functional.UID
-import functional.UnitDomainResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
-import repositories.BaseScheduleRepository
-import repositories.CalendarSettingsRepository
-import repositories.CustomScheduleRepository
-import repositories.HomeworksRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.HomeworkErrors
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures

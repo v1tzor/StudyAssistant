@@ -17,11 +17,11 @@
 package ru.aleshin.studyassistant.auth.impl.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
-import navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.ForgotScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.LoginScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.RegisterScreen
+import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen

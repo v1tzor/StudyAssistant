@@ -23,11 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import entities.tasks.HomeworkStatus
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.InfoBadge
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
-import theme.StudyAssistantRes
-import views.InfoBadge
 
 /**
  * @author Stanislav Aleshin on 21.06.2024.

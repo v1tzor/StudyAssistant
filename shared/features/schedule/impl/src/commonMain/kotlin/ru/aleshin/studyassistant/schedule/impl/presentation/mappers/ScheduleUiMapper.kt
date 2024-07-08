@@ -16,13 +16,13 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
-import entities.schedules.DateVersion
-import entities.schedules.ScheduleDetails
-import entities.schedules.WeekScheduleDetails
-import entities.schedules.base.BaseScheduleDetails
-import entities.schedules.custom.CustomScheduleDetails
-import entities.tasks.HomeworkStatus
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
+import ru.aleshin.studyassistant.core.domain.entities.schedules.ScheduleDetails
+import ru.aleshin.studyassistant.core.domain.entities.schedules.WeekScheduleDetails
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseScheduleDetails
+import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomScheduleDetails
+import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.BaseScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.CustomScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.DateVersionUi

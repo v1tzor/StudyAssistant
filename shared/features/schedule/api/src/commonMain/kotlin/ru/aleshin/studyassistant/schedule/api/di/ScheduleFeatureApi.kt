@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.api.di
 
-import inject.BaseFeatureApi
+import ru.aleshin.studyassistant.core.common.inject.BaseFeatureApi
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 
 /**

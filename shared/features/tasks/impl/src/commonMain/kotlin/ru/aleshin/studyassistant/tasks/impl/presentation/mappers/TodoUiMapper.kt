@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.mappers
 
-import entities.tasks.Todo
-import entities.tasks.TodoStatus
+import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TodoErrors
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi

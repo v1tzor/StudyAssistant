@@ -20,13 +20,13 @@ import com.mmk.kmpauth.google.GoogleAuthCredentials
 import com.mmk.kmpauth.google.GoogleAuthProvider
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
-import di.coreDataModule
-import di.coreDatabaseModule
-import di.coreModule
-import functional.Constants.App.WEB_CLIENT_ID
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
+import ru.aleshin.studyassistant.core.common.di.coreModule
+import ru.aleshin.studyassistant.core.common.functional.Constants.App.WEB_CLIENT_ID
+import ru.aleshin.studyassistant.core.data.di.coreDataModule
+import ru.aleshin.studyassistant.core.data.di.coreDatabaseModule
 import ru.aleshin.studyassistant.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.aleshin.studyassistant.di.modules.domainModule

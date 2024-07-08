@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.editor.impl.presentation.models.settings
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.

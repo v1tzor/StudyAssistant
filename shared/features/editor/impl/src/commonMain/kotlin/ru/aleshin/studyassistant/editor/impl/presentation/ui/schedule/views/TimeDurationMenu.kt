@@ -33,17 +33,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import entities.organizations.Millis
-import extensions.alphaByEnabled
-import functional.Constants.Class.MAX_NUMBER
-import mappers.toMinutesOrHoursTitle
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
+import ru.aleshin.studyassistant.core.common.functional.Constants.Class.MAX_NUMBER
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
+import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.dialog.DurationPickerDialog
+import ru.aleshin.studyassistant.core.ui.views.menu.BackMenuItem
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
-import views.dialog.DurationPickerDialog
-import views.menu.BackMenuItem
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.

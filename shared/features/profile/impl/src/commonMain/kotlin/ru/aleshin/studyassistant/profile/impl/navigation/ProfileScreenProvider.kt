@@ -17,10 +17,10 @@
 package ru.aleshin.studyassistant.profile.impl.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
-import inject.MainScreen
-import navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
+import ru.aleshin.studyassistant.core.common.inject.MainScreen
+import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.ProfileScreen
 
 /**

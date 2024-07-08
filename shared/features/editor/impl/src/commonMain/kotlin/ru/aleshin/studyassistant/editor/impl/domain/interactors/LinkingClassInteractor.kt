@@ -16,21 +16,21 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import entities.classes.Class
-import extensions.shiftDay
-import functional.FlowDomainResult
-import functional.TimeRange
-import functional.UID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
-import repositories.BaseScheduleRepository
-import repositories.CalendarSettingsRepository
-import repositories.CustomScheduleRepository
-import repositories.HomeworksRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.extensions.shiftDay
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.classes.Class
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.ClassesForLinked
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures

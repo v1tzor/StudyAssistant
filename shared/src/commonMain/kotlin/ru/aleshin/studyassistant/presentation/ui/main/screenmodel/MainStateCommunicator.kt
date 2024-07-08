@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.presentation.ui.main.screenmodel
 
-import architecture.communications.state.StateCommunicator
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.StateCommunicator
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainViewState
 
 /**

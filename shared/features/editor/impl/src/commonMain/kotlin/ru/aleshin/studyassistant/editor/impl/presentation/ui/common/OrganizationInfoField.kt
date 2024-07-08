@@ -26,17 +26,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mappers.mapToSting
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
+import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogAddItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
-import views.ClickableInfoTextField
-import views.ExpandedIcon
-import views.dialog.BaseSelectorDialog
-import views.dialog.SelectorDialogAddItemView
-import views.dialog.SelectorDialogItemView
-import views.dialog.SelectorDialogNotSelectedItemView
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.

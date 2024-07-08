@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel
 
-import architecture.communications.state.EffectCommunicator
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.EffectCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectEditorEffect
 
 /**

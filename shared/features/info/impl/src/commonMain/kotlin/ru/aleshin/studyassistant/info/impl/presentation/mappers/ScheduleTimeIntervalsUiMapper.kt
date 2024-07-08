@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.mappers
 
-import entities.organizations.NumberedDuration
-import entities.organizations.ScheduleTimeIntervals
+import ru.aleshin.studyassistant.core.domain.entities.organizations.NumberedDuration
+import ru.aleshin.studyassistant.core.domain.entities.organizations.ScheduleTimeIntervals
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.NumberedDurationUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
 

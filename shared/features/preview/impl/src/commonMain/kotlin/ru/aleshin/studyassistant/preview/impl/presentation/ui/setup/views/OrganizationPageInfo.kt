@@ -41,18 +41,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import mappers.mapToSting
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
+import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.core.ui.views.VerticalInfoTextField
+import ru.aleshin.studyassistant.core.ui.views.dialog.ContactInfoEditorDialog
+import ru.aleshin.studyassistant.core.ui.views.menu.OrganizationTypeDropdownMenu
 import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
 import ru.aleshin.studyassistant.preview.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
-import theme.StudyAssistantRes
-import views.ClickableInfoTextField
-import views.ExpandedIcon
-import views.VerticalInfoTextField
-import views.dialog.ContactInfoEditorDialog
-import views.menu.OrganizationTypeDropdownMenu
 
 /**
  * @author Stanislav Aleshin on 27.04.2024

@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.di.modules
 
-import DriverFactory
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
+import ru.aleshin.studyassistant.core.database.datasource.DriverFactory
 
 /**
  * @author Stanislav Aleshin on 24.04.2024.

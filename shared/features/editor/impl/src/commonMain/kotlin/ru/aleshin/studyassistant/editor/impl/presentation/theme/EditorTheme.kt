@@ -22,7 +22,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.tokens.LocalEdit
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.tokens.LocalEditorStrings
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.tokens.fetchEditorIcons
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.tokens.fetchEditorStrings
-import theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.

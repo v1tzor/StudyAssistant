@@ -38,17 +38,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import extensions.dateTime
-import extensions.formatByTimeZone
-import extensions.isoWeekNumber
-import functional.TimeRange
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.common.extensions.isoWeekNumber
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
-import theme.material.full
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.

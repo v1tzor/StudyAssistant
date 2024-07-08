@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
-import entities.classes.Class
+import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 
 /**

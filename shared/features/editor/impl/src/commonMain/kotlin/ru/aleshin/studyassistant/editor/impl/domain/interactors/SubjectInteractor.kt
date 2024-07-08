@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import entities.subject.Subject
-import functional.DomainResult
-import functional.FlowDomainResult
-import functional.UID
-import repositories.SubjectsRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.functional.DomainResult
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
+import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 

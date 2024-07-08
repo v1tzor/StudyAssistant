@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.validation
 
-import functional.Constants.Text.MIN_EMAIL_LENGTH
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.EmailValidError
+import ru.aleshin.studyassistant.core.common.functional.Constants.Text.MIN_EMAIL_LENGTH
 import validation.ValidateResult
 import validation.Validator
 

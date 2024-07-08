@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.preview.impl.domain.interactors
 
-import entities.settings.CalendarSettings
-import functional.FlowDomainResult
-import functional.UID
-import functional.UnitDomainResult
-import repositories.CalendarSettingsRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
+import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.preview.impl.domain.common.PreviewEitherWrapper
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 

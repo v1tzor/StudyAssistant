@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.api.navigation
 
-import inject.FeatureScreen
+import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.

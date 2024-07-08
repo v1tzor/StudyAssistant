@@ -16,18 +16,6 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel
 
-import architecture.screenmodel.work.ActionResult
-import architecture.screenmodel.work.EffectResult
-import architecture.screenmodel.work.FlowWorkProcessor
-import architecture.screenmodel.work.WorkCommand
-import architecture.screenmodel.work.WorkResult
-import entities.tasks.HomeworkStatus
-import extensions.extractAllItem
-import extensions.startThisDay
-import functional.Constants.Delay
-import functional.TimeRange
-import functional.collectAndHandle
-import functional.handle
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.emitAll
@@ -35,7 +23,19 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.Instant
-import managers.DateManager
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
+import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
+import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.functional.Constants.Delay
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
+import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.HomeworksInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ScheduleInteractor
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain

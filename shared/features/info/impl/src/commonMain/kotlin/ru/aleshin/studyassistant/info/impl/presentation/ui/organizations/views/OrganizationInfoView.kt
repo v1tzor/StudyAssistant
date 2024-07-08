@@ -41,12 +41,12 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import mappers.mapToSting
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationClassesInfoUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
-import theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 17.06.2024.

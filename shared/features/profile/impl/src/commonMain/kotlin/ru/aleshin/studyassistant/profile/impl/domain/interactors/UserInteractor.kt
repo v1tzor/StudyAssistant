@@ -16,10 +16,10 @@
 
 package ru.aleshin.studyassistant.profile.impl.domain.interactors
 
-import entities.users.AppUser
-import functional.FlowDomainResult
 import kotlinx.coroutines.flow.map
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.profile.impl.domain.common.ProfileEitherWrapper
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 

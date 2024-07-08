@@ -28,18 +28,18 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import entities.subject.EventType
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEditorViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.NotifyParameter
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.SubjectAndEventTypeInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.TimeInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.OrganizationInfoField
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.SubjectAndEventTypeInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.TeacherInfoField
 
 /**

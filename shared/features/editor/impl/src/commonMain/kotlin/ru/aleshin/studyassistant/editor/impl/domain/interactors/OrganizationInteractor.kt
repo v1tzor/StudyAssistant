@@ -16,15 +16,15 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import entities.organizations.OrganizationShort
-import entities.organizations.convertToBase
-import functional.FlowDomainResult
-import functional.UID
-import functional.UnitDomainResult
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import repositories.OrganizationsRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
+import ru.aleshin.studyassistant.core.domain.entities.organizations.convertToBase
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 

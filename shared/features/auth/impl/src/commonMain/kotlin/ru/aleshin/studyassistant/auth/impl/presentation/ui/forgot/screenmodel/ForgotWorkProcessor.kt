@@ -16,11 +16,6 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.screenmodel
 
-import architecture.screenmodel.work.ActionResult
-import architecture.screenmodel.work.EffectResult
-import architecture.screenmodel.work.FlowWorkProcessor
-import architecture.screenmodel.work.WorkCommand
-import functional.handle
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
@@ -29,11 +24,17 @@ import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.ForgotCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotAction
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEffect
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.functional.handle
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-internal interface ForgotWorkProcessor : FlowWorkProcessor<ForgotWorkCommand, ForgotAction, ForgotEffect> {
+internal interface ForgotWorkProcessor :
+    FlowWorkProcessor<ForgotWorkCommand, ForgotAction, ForgotEffect> {
 
     class Base(
         private val screenProvider: AuthScreenProvider,
@@ -50,7 +51,7 @@ internal interface ForgotWorkProcessor : FlowWorkProcessor<ForgotWorkCommand, Fo
                 onLeftAction = { emit(EffectResult(ForgotEffect.ShowError(it))) },
                 onRightAction = {
                     val targetScreen = screenProvider.provideFeatureScreen(AuthScreen.Login)
-                    emit(EffectResult(ForgotEffect.PushScreen(targetScreen)))
+                    emit(EffectResult(ForgotEffect.NavigateToLocal(targetScreen)))
                 },
             )
             emit(ActionResult(ForgotAction.UpdateLoading(false)))

@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.entities
 
-import entities.classes.Class
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 
 /**
  * @author Stanislav Aleshin on 23.06.2024.

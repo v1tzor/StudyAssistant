@@ -42,16 +42,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import extensions.dateTime
-import extensions.equalsDay
-import extensions.shiftDay
-import functional.Constants.Date.OVERVIEW_FIRST_ITEM
-import functional.Constants.Date.OVERVIEW_NEXT_DAYS
-import functional.Constants.Date.OVERVIEW_PREVIOUS_DAYS
-import functional.TimeRange
 import kotlinx.datetime.Instant
-import mappers.mapToSting
-import theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.extensions.shiftDay
+import ru.aleshin.studyassistant.core.common.functional.Constants.Date.OVERVIEW_FIRST_ITEM
+import ru.aleshin.studyassistant.core.common.functional.Constants.Date.OVERVIEW_NEXT_DAYS
+import ru.aleshin.studyassistant.core.common.functional.Constants.Date.OVERVIEW_PREVIOUS_DAYS
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 12.06.2024.

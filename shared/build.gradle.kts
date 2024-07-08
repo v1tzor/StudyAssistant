@@ -46,6 +46,8 @@ kotlin {
             implementation(project(":shared:features:editor:impl"))
 
             implementation(project(":shared:core:domain"))
+            implementation(project(":shared:core:database"))
+            implementation(project(":shared:core:remote"))
             implementation(project(":shared:core:data"))
             api(project(":shared:core:common"))
             api(project(":shared:core:ui"))

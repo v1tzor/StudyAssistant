@@ -17,14 +17,14 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.screenmodel
 
 import androidx.compose.runtime.Composable
-import architecture.screenmodel.BaseScreenModel
-import architecture.screenmodel.EmptyDeps
-import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import managers.CoroutineManager
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
 import ru.aleshin.studyassistant.preview.impl.navigation.PreviewScreenProvider
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroAction

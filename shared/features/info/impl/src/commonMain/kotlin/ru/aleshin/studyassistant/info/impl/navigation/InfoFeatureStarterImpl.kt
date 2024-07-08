@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.info.impl.navigation
 
-import inject.FeatureStarter
+import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
 import ru.aleshin.studyassistant.info.impl.presentation.ui.navigation.NavigationScreen

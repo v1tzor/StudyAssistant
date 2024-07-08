@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.navigation
 
-import inject.FeatureStarter
+import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation.NavigationScreen

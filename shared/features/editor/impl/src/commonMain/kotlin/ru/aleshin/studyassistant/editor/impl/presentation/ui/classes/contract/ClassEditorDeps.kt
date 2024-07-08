@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract
 
-import architecture.screenmodel.ScreenDependencies
 import dev.icerock.moko.parcelize.Parcelize
-import functional.UID
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.ScreenDependencies
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
 
 /**

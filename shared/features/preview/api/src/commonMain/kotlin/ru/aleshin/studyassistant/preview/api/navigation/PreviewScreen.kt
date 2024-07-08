@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.preview.api.navigation
 
-import functional.UID
-import inject.FeatureScreen
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
 
 /**
  * @author Stanislav Aleshin on 07.04.2024.

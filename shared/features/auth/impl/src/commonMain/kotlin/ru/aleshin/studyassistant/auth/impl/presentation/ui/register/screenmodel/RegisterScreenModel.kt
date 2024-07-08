@@ -17,13 +17,8 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel
 
 import androidx.compose.runtime.Composable
-import architecture.screenmodel.BaseScreenModel
-import architecture.screenmodel.EmptyDeps
-import architecture.screenmodel.work.BackgroundWorkKey
-import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import managers.CoroutineManager
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
@@ -35,6 +30,11 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.Reg
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.PasswordValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.UsernameValidator
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import validation.operateValidate
 
 /**
@@ -83,7 +83,7 @@ internal class RegisterScreenModel(
             }
             is RegisterEvent.NavigateToLogin -> {
                 val screen = screenProvider.provideFeatureScreen(AuthScreen.Login)
-                sendEffect(RegisterEffect.PushScreen(screen))
+                sendEffect(RegisterEffect.NavigateToLocal(screen))
             }
         }
     }
@@ -92,17 +92,17 @@ internal class RegisterScreenModel(
         action: RegisterAction,
         currentState: RegisterViewState,
     ) = when (action) {
-        is RegisterAction.UpdateLoading -> currentState.copy(
-            isLoading = action.isLoading,
-            usernameValidError = null,
-            emailValidError = null,
-            passwordValidError = null,
-        )
         is RegisterAction.UpdateValidErrors -> currentState.copy(
             isLoading = false,
             usernameValidError = action.username,
             emailValidError = action.email,
             passwordValidError = action.password,
+        )
+        is RegisterAction.UpdateLoading -> currentState.copy(
+            isLoading = action.isLoading,
+            usernameValidError = null,
+            emailValidError = null,
+            passwordValidError = null,
         )
     }
 

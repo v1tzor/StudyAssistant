@@ -16,22 +16,22 @@
 
 package ru.aleshin.studyassistant.tasks.impl.di.holder
 
-import inject.BaseFeatureDIHolder
-import managers.CoroutineManager
-import managers.DateManager
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
 import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
-import repositories.BaseScheduleRepository
-import repositories.CalendarSettingsRepository
-import repositories.CustomScheduleRepository
-import repositories.HomeworksRepository
-import repositories.OrganizationsRepository
-import repositories.TodoRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.tasks.api.di.TasksFeatureApi
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter

@@ -27,10 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
+import ru.aleshin.studyassistant.core.ui.views.dialog.BirthdayDatePicker
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
-import views.ClickableInfoTextField
-import views.dialog.BirthdayDatePicker
 
 /**
  * @author Stanislav Aleshin on 06.06.2024.

@@ -20,9 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.DrawableResource
-import theme.StudyAssistantRes
-import views.BottomBarItem
-import views.BottomNavigationBar
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.BottomBarItem
+import ru.aleshin.studyassistant.core.ui.views.BottomNavigationBar
 
 /**
  * @author Stanislav Aleshin on 08.02.2024.

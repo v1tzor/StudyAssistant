@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.mappers
 
-import entities.organizations.Organization
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
 
 /**

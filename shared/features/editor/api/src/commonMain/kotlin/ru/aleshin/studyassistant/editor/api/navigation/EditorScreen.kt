@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.editor.api.navigation
 
-import entities.common.NumberOfRepeatWeek
-import functional.UID
-import inject.FeatureScreen
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
 
 /**

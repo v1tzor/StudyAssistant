@@ -16,17 +16,17 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import entities.common.NumberOfRepeatWeek
-import entities.schedules.base.BaseSchedule
-import entities.schedules.base.BaseWeekSchedule
-import extensions.dateTime
-import functional.FlowDomainResult
-import functional.TimeRange
-import functional.UID
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.DayOfWeek
-import repositories.BaseScheduleRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseWeekSchedule
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 

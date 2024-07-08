@@ -17,20 +17,18 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.nav
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
-import di.withDirectDI
-import navigation.NestedFeatureNavigator
-import navigation.rememberNavigatorManager
-import navigation.rememberScreenProvider
-import org.kodein.di.compose.withDI
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
 import ru.aleshin.studyassistant.auth.impl.navigation.AuthNavigatorManager
 import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthTheme
+import ru.aleshin.studyassistant.core.common.di.withDirectDI
+import ru.aleshin.studyassistant.core.common.navigation.NestedFeatureNavigator
+import ru.aleshin.studyassistant.core.common.navigation.rememberNavigatorManager
+import ru.aleshin.studyassistant.core.common.navigation.rememberScreenProvider
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.

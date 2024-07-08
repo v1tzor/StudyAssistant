@@ -17,8 +17,8 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.models.schedules
 
 import androidx.compose.runtime.Composable
-import entities.common.NumberOfRepeatWeek
-import views.SegmentedButtonItem
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.ui.views.SegmentedButtonItem
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.

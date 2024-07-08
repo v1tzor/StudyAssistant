@@ -58,23 +58,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import entities.organizations.Millis
-import extensions.formatByTimeZone
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
-import mappers.toMinutesOrHoursTitle
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
+import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.material.full
+import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
+import ru.aleshin.studyassistant.core.ui.views.DialogButtons
+import ru.aleshin.studyassistant.core.ui.views.DialogHeader
+import ru.aleshin.studyassistant.core.ui.views.dialog.BaseTimePickerDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.DurationPickerDialog
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
-import theme.material.full
-import views.ClickableTextField
-import views.DialogButtons
-import views.DialogHeader
-import views.dialog.BaseTimePickerDialog
-import views.dialog.DurationPickerDialog
 
 /**
  * @author Stanislav Aleshin on 26.05.2024.

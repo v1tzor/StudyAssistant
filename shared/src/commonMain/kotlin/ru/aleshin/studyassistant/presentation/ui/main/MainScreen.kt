@@ -17,15 +17,15 @@
 package ru.aleshin.studyassistant.presentation.ui.main
 
 import androidx.compose.runtime.Composable
-import architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
-import cafe.adriel.voyager.transitions.FadeTransition
+import cafe.adriel.voyager.transitions.CrossfadeTransition
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainViewState
 import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.rememberMainScreenModel
 import ru.aleshin.studyassistant.presentation.ui.splash.SplashScreen
-import theme.StudyAssistantTheme
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantTheme
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
@@ -46,7 +46,7 @@ fun MainScreen() = ScreenContent(
                 disposeSteps = true,
             ),
         ) { navigator ->
-            FadeTransition(navigator = navigator)
+            CrossfadeTransition(navigator = navigator)
 
             handleEffect { effect ->
                 when (effect) {

@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.navigation.impl.di.holder
 
-import inject.BaseFeatureDIHolder
-import managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
 import org.kodein.di.bindSingleton
@@ -35,7 +35,8 @@ import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-object NavigationFeatureDIHolder : BaseFeatureDIHolder<NavigationFeatureApi, NavigationFeatureDependencies> {
+object NavigationFeatureDIHolder :
+    BaseFeatureDIHolder<NavigationFeatureApi, NavigationFeatureDependencies> {
 
     private var directDI: DirectDI? = null
 

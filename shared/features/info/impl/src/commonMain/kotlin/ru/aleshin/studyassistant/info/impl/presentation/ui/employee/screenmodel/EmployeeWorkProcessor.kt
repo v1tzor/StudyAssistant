@@ -16,17 +16,17 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.ui.employee.screenmodel
 
-import architecture.screenmodel.work.ActionResult
-import architecture.screenmodel.work.EffectResult
-import architecture.screenmodel.work.FlowWorkProcessor
-import architecture.screenmodel.work.WorkCommand
-import architecture.screenmodel.work.WorkResult
-import functional.UID
-import functional.collectAndHandle
-import functional.handle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
+import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.info.impl.domain.interactors.EmployeesInteractor
 import ru.aleshin.studyassistant.info.impl.domain.interactors.OrganizationsInteractor
 import ru.aleshin.studyassistant.info.impl.domain.interactors.SubjectsInteractor

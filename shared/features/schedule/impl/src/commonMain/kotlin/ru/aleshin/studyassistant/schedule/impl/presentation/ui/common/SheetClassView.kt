@@ -38,14 +38,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import entities.subject.EventType
-import mappers.mapToString
+import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
-import theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 21.06.2024.

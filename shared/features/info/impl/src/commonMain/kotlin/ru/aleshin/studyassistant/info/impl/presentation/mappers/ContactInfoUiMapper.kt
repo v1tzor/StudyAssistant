@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.mappers
 
-import entities.common.ContactInfo
+import ru.aleshin.studyassistant.core.domain.entities.common.ContactInfo
 import ru.aleshin.studyassistant.info.impl.presentation.models.users.ContactInfoUi
 
 /**

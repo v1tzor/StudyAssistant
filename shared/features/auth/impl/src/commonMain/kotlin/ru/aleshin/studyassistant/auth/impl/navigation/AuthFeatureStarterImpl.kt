@@ -16,10 +16,10 @@
 
 package ru.aleshin.studyassistant.auth.impl.navigation
 
-import inject.FeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.nav.NavigationScreen
+import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.

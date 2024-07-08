@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel
 
-import architecture.communications.state.EffectCommunicator
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.EffectCommunicator
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksEffect
 
 /**

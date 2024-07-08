@@ -27,19 +27,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import entities.employee.EmployeePost
-import mappers.mapToString
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.ui.mappers.mapToString
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
+import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogAddItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
-import views.ClickableInfoTextField
-import views.ExpandedIcon
-import views.dialog.BaseSelectorDialog
-import views.dialog.SelectorDialogAddItemView
-import views.dialog.SelectorDialogItemView
-import views.dialog.SelectorDialogNotSelectedItemView
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -114,7 +114,8 @@ internal fun TeacherSelectorDialog(
                 onClick = { selectedTeacher = employee },
                 selected = employee.uid == selectedTeacher?.uid,
                 title = employee.fullName(),
-                label = employee.subjects.firstOrNull()?.name ?: employee.post.mapToString(StudyAssistantRes.strings),
+                label = employee.subjects.firstOrNull()?.name ?: employee.post.mapToString(
+                    StudyAssistantRes.strings),
             )
         },
         addItemView = {

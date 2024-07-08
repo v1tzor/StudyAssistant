@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel
 
-import architecture.communications.state.EffectCommunicator
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginEffect
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.EffectCommunicator
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.

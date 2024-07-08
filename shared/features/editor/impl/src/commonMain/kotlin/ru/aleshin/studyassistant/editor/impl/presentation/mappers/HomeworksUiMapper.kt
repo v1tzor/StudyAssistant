@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
-import entities.tasks.Homework
+import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.HomeworkUi
 
 /**

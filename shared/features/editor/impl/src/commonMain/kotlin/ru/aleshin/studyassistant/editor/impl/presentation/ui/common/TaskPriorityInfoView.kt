@@ -29,12 +29,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import entities.tasks.TaskPriority
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.SegmentedButtonItem
+import ru.aleshin.studyassistant.core.ui.views.SegmentedButtons
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
-import views.SegmentedButtonItem
-import views.SegmentedButtons
 
 /**
  * @author Stanislav Aleshin on 23.06.2024.

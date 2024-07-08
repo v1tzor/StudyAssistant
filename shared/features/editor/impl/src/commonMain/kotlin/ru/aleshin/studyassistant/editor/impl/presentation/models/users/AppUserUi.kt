@@ -18,8 +18,8 @@ package ru.aleshin.studyassistant.editor.impl.presentation.models.users
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.users.Gender
-import functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.editor.impl.presentation.models.settings.PrivacySettingsUi
 
 /**

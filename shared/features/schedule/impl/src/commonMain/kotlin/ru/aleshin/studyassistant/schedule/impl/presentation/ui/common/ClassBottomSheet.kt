@@ -55,18 +55,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import entities.tasks.HomeworkStatus
-import extensions.toMinutesAndHoursString
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.extensions.toMinutesAndHoursString
+import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.tokens.contentColorFor
+import ru.aleshin.studyassistant.core.ui.views.HorizontalLeftTimeProgress
+import ru.aleshin.studyassistant.core.ui.views.MediumDragHandle
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
-import theme.StudyAssistantRes
-import theme.tokens.contentColorFor
-import views.HorizontalLeftTimeProgress
-import views.MediumDragHandle
 import kotlin.math.roundToInt
 
 /**

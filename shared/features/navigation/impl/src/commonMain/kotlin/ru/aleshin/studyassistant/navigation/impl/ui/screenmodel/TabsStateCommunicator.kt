@@ -15,7 +15,7 @@
  */
 package ru.aleshin.studyassistant.navigation.impl.ui.screenmodel
 
-import architecture.communications.state.StateCommunicator
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.StateCommunicator
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsViewState
 
 /**

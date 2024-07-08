@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.api.navigation
 
-import inject.FeatureStarter
+import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.

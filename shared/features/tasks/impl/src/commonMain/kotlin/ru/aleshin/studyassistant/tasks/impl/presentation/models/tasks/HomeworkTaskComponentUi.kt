@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.tasks.fetchAllTasks
+import ru.aleshin.studyassistant.core.domain.entities.tasks.fetchAllTasks
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
 
 /**

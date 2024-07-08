@@ -36,10 +36,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import ru.aleshin.studyassistant.core.ui.theme.material.full
+import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
+import ru.aleshin.studyassistant.core.ui.views.UserCodeView
 import ru.aleshin.studyassistant.profile.impl.presentation.models.AppUserUi
-import theme.material.full
-import views.PlaceholderBox
-import views.UserCodeView
 
 /**
  * @author Stanislav Aleshin on 21.04.2024

@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.impl.navigation
 
-import inject.FeatureStarter
+import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.navigation.NavigationScreen

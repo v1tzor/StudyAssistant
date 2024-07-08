@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.theme.tokens
 
 import androidx.compose.runtime.staticCompositionLocalOf
-import theme.tokens.StudyAssistantLanguage
+import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantLanguage
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.

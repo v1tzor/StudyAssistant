@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel
 
-import architecture.communications.state.StateCommunicator
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.StateCommunicator
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginViewState
 
 /**

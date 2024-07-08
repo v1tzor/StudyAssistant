@@ -15,17 +15,19 @@
  */
 package ru.aleshin.studyassistant.navigation.impl.ui.contract
 
-import architecture.screenmodel.contract.BaseAction
-import architecture.screenmodel.contract.BaseEvent
-import architecture.screenmodel.contract.BaseUiEffect
-import architecture.screenmodel.contract.BaseViewState
+import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
 import ru.aleshin.studyassistant.navigation.impl.ui.views.TabsBottomBarItems
 
 /**
  * @author Stanislav Aleshin on 18.02.2023.
  */
+@Immutable
 @Parcelize
 internal data class TabsViewState(
     val bottomBarItem: TabsBottomBarItems = TabsBottomBarItems.SCHEDULE,

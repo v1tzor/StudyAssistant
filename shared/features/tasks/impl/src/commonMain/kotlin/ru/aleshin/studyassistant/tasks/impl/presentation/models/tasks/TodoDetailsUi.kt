@@ -19,11 +19,11 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
-import entities.tasks.TaskPriority
-import entities.tasks.TodoStatus
-import functional.UID
 import kotlinx.datetime.Instant
-import platform.NullInstantParceler
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
 
 /**
  * @author Stanislav Aleshin on 27.06.2024.

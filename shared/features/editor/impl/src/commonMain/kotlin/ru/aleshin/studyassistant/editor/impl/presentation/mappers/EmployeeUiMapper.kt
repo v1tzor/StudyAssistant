@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
-import entities.employee.Employee
-import entities.employee.EmployeeDetails
-import functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
+import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeeDetails
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeUi
 

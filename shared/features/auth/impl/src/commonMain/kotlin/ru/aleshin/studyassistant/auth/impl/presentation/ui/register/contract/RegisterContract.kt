@@ -16,10 +16,7 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract
 
-import architecture.screenmodel.contract.BaseAction
-import architecture.screenmodel.contract.BaseEvent
-import architecture.screenmodel.contract.BaseUiEffect
-import architecture.screenmodel.contract.BaseViewState
+import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
@@ -27,10 +24,15 @@ import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.Regis
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.EmailValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.PasswordValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.UsernameValidError
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.
  */
+@Immutable
 @Parcelize
 internal data class RegisterViewState(
     val isLoading: Boolean = false,
@@ -45,16 +47,18 @@ internal sealed class RegisterEvent : BaseEvent {
 }
 
 internal sealed class RegisterEffect : BaseUiEffect {
-    data class PushScreen(val screen: Screen) : RegisterEffect()
-    data class ReplaceGlobalScreen(val screen: Screen) : RegisterEffect()
     data class ShowError(val failures: AuthFailures) : RegisterEffect()
+    data class NavigateToLocal(val pushScreen: Screen) : RegisterEffect()
+    data class ReplaceGlobalScreen(val screen: Screen) : RegisterEffect()
 }
 
 internal sealed class RegisterAction : BaseAction {
-    data class UpdateLoading(val isLoading: Boolean) : RegisterAction()
+
     data class UpdateValidErrors(
         val username: UsernameValidError?,
         val email: EmailValidError?,
         val password: PasswordValidError?,
     ) : RegisterAction()
+
+    data class UpdateLoading(val isLoading: Boolean) : RegisterAction()
 }

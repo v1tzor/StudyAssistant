@@ -18,8 +18,8 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.models.organization
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.organizations.OrganizationType
-import functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.ContactInfoUi
 
 /**

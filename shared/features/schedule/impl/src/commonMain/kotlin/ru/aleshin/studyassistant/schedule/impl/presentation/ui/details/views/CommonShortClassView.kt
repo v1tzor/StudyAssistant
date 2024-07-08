@@ -41,12 +41,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import extensions.boldWeight
-import functional.TimeRange
-import mappers.format
+import ru.aleshin.studyassistant.core.common.extensions.boldWeight
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.ui.mappers.format
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
-import theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 25.05.2024.

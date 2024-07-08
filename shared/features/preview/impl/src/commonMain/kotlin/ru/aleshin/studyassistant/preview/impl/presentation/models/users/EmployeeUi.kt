@@ -19,10 +19,10 @@ package ru.aleshin.studyassistant.preview.impl.presentation.models.users
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
-import entities.employee.EmployeePost
-import functional.UID
 import kotlinx.datetime.Instant
-import platform.NullInstantParceler
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
+import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.

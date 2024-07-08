@@ -16,10 +16,10 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.mappers
 
-import entities.tasks.Homework
-import entities.tasks.HomeworkStatus
-import entities.tasks.HomeworkTaskComponent
-import entities.tasks.toHomeworkComponents
+import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
+import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
+import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkTaskComponent
+import ru.aleshin.studyassistant.core.domain.entities.tasks.toHomeworkComponents
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.HomeworkErrors
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi

@@ -25,15 +25,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import entities.subject.EventType
-import mappers.mapToIcon
-import mappers.mapToString
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
+import ru.aleshin.studyassistant.core.ui.mappers.mapToString
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
-import views.dialog.BaseSelectorDialog
-import views.dialog.SelectorDialogItemView
-import views.dialog.SelectorDialogNotSelectedItemView
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.

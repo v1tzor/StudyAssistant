@@ -16,18 +16,18 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import entities.employee.Employee
-import entities.employee.EmployeeDetails
-import entities.employee.convertToDetails
-import functional.DomainResult
-import functional.FlowDomainResult
-import functional.UID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import repositories.EmployeeRepository
-import repositories.SubjectsRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.functional.DomainResult
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
+import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeeDetails
+import ru.aleshin.studyassistant.core.domain.entities.employee.convertToDetails
+import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 

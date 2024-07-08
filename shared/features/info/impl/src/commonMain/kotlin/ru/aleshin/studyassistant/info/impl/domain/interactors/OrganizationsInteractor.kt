@@ -16,13 +16,13 @@
 
 package ru.aleshin.studyassistant.info.impl.domain.interactors
 
-import entities.organizations.Organization
-import entities.organizations.OrganizationShort
-import functional.FlowDomainResult
-import functional.UID
 import kotlinx.coroutines.flow.map
-import repositories.OrganizationsRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
+import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoEitherWrapper
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
 

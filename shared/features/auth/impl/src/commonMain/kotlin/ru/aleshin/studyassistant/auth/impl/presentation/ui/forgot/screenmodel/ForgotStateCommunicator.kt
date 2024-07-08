@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.screenmodel
 
-import architecture.communications.state.StateCommunicator
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotViewState
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.StateCommunicator
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.

@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
-import entities.classes.ClassDetails
-import entities.tasks.Homework
-import entities.tasks.HomeworkStatus
+import ru.aleshin.studyassistant.core.domain.entities.classes.ClassDetails
+import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
+import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 
 /**

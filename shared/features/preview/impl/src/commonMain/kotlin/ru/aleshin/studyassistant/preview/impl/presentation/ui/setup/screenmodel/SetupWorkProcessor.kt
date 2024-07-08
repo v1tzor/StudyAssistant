@@ -16,15 +16,15 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel
 
-import architecture.screenmodel.work.ActionResult
-import architecture.screenmodel.work.EffectResult
-import architecture.screenmodel.work.FlowWorkProcessor
-import architecture.screenmodel.work.WorkCommand
-import functional.UID
-import functional.firstHandleAndGet
-import functional.firstOrNullHandleAndGet
-import functional.handle
 import kotlinx.coroutines.flow.flow
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.firstHandleAndGet
+import ru.aleshin.studyassistant.core.common.functional.firstOrNullHandleAndGet
+import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.CalendarSettingsInteractor
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.OrganizationsInteractor
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.UsersInteractor
@@ -39,7 +39,8 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.Set
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
-internal interface SetupWorkProcessor : FlowWorkProcessor<SetupWorkCommand, SetupAction, SetupEffect> {
+internal interface SetupWorkProcessor :
+    FlowWorkProcessor<SetupWorkCommand, SetupAction, SetupEffect> {
 
     class Base(
         private val usersInteractor: UsersInteractor,

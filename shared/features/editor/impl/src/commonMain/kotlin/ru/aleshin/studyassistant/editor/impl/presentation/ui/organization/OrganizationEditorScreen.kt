@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.editor.impl.presentation.ui.organization
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.screen.Screen
-import functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UID
 
 /**
  * @author Stanislav Aleshin on 16.06.2024.

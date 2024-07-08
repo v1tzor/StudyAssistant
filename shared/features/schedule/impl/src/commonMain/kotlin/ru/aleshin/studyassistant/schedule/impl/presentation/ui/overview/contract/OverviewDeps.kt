@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract
 
-import architecture.screenmodel.ScreenDependencies
 import dev.icerock.moko.parcelize.Parcelize
-import entities.organizations.Millis
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.ScreenDependencies
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
  * @author Stanislav Aleshin on 12.06.2024.

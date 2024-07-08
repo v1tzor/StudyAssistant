@@ -20,10 +20,10 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
-import di.withDirectDI
-import navigation.NestedFeatureNavigator
-import navigation.rememberNavigatorManager
-import navigation.rememberScreenProvider
+import ru.aleshin.studyassistant.core.common.di.withDirectDI
+import ru.aleshin.studyassistant.core.common.navigation.NestedFeatureNavigator
+import ru.aleshin.studyassistant.core.common.navigation.rememberNavigatorManager
+import ru.aleshin.studyassistant.core.common.navigation.rememberScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
 import ru.aleshin.studyassistant.editor.impl.navigation.EditorNavigatorManager

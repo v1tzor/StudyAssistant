@@ -16,11 +16,11 @@
 
 package ru.aleshin.studyassistant.editor.impl.di.modules
 
-import navigation.CommandBuffer
 import org.kodein.di.DI
 import org.kodein.di.bindEagerSingleton
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.navigation.CommandBuffer
 import ru.aleshin.studyassistant.editor.impl.navigation.EditorNavigatorManager
 
 /**

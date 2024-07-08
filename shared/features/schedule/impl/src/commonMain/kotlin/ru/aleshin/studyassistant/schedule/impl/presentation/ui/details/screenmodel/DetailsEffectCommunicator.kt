@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel
 
-import architecture.communications.state.EffectCommunicator
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.EffectCommunicator
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
 
 /**

@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.auth.impl.domain.entites
 
-import entities.users.AppUser
+import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.

@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.editor.impl.navigation
 
-import architecture.screens.EmptyScreen
-import navigation.FeatureScreenProvider
+import ru.aleshin.studyassistant.core.common.architecture.screen.EmptyScreen
+import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.ClassEditorScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.EmployeeEditorScreen

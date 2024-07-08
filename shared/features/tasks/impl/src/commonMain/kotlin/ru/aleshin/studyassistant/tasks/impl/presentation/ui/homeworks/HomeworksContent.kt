@@ -42,24 +42,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import extensions.dateTime
-import extensions.endOfWeek
-import extensions.equalsDay
-import extensions.formatByTimeZone
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
-import mappers.mapToSting
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.endOfWeek
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.tokens.dayOfWeekShortNames
+import ru.aleshin.studyassistant.core.ui.theme.tokens.monthNames
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksViewState
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.HomeworksDetailsViewItem
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.HomeworksDetailsViewNoneItem
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.HomeworksDetailsViewPlaceholder
-import theme.StudyAssistantRes
-import theme.tokens.dayOfWeekShortNames
-import theme.tokens.monthNames
 import kotlin.time.Duration.Companion.days
 
 /**

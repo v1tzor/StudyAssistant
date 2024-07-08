@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel
 
-import architecture.communications.state.StateCommunicator
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.StateCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.ScheduleEditorViewState
 
 /**

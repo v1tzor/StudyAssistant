@@ -16,13 +16,13 @@
 package ru.aleshin.studyassistant.navigation.impl.ui.screenmodel
 
 import androidx.compose.runtime.Composable
-import architecture.screenmodel.BaseScreenModel
-import architecture.screenmodel.EmptyDeps
-import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import managers.CoroutineManager
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
 import ru.aleshin.studyassistant.navigation.impl.di.holder.NavigationFeatureDIHolder
 import ru.aleshin.studyassistant.navigation.impl.navigation.TabScreenProvider

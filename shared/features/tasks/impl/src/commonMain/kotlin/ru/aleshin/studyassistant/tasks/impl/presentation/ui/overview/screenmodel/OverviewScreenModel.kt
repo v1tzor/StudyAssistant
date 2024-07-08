@@ -17,16 +17,16 @@
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel
 
 import androidx.compose.runtime.Composable
-import architecture.screenmodel.BaseScreenModel
-import architecture.screenmodel.EmptyDeps
-import architecture.screenmodel.work.BackgroundWorkKey
-import architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import extensions.startThisDay
-import managers.CoroutineManager
-import managers.DateManager
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
+import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
 import ru.aleshin.studyassistant.tasks.impl.di.holder.TasksFeatureDIHolder

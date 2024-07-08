@@ -18,9 +18,9 @@ package ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import entities.common.NumberOfRepeatWeek
-import entities.organizations.Millis
-import extensions.toHorses
+import ru.aleshin.studyassistant.core.common.extensions.toHorses
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
  * @author Stanislav Aleshin on 16.06.2024.

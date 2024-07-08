@@ -29,18 +29,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import extensions.dateTime
-import extensions.weekTimeRange
 import kotlinx.datetime.Instant
-import managers.DateManager
-import navigation.root
 import org.kodein.di.compose.localDI
 import org.kodein.di.direct
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
+import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.navigation.root
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
@@ -51,7 +52,6 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel.rememberDetailsScreenModel
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.DetailsBottomBar
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.DetailsTopBar
-import views.ErrorSnackbar
 
 /**
  * @author Stanislav Aleshin on 09.06.2024

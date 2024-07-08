@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.editor.impl.navigation
 
-import navigation.CommandBuffer
-import navigation.NavigatorManager
+import ru.aleshin.studyassistant.core.common.navigation.CommandBuffer
+import ru.aleshin.studyassistant.core.common.navigation.NavigatorManager
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 
 /**

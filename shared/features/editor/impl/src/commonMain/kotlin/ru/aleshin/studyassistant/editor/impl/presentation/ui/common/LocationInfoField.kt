@@ -35,19 +35,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
-import functional.Constants
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.functional.Constants
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
+import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.ContactInfoEditorDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogAddItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogTextField
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.StudyAssistantRes
-import views.ClickableTextField
-import views.ExpandedIcon
-import views.dialog.BaseSelectorDialog
-import views.dialog.ContactInfoEditorDialog
-import views.dialog.SelectorDialogAddItemView
-import views.dialog.SelectorDialogItemView
-import views.dialog.SelectorDialogNotSelectedItemView
-import views.dialog.SelectorDialogTextField
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.

@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.mappers
 
-import entities.classes.Class
+import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.ClassUi
 
 /**

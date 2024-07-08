@@ -16,10 +16,10 @@
 
 package ru.aleshin.studyassistant.domain.interactors
 
-import entities.settings.GeneralSettings
-import functional.FlowDomainResult
-import functional.UnitDomainResult
-import repositories.GeneralSettingsRepository
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.settings.GeneralSettings
+import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.domain.common.MainEitherWrapper
 import ru.aleshin.studyassistant.domain.entities.MainFailures
 

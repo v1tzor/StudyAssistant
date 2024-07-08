@@ -18,11 +18,11 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.tokens.LocalScheduleIcons
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.tokens.LocalScheduleStrings
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.tokens.fetchScheduleIcons
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.tokens.fetchScheduleStrings
-import theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 07.04.2024.

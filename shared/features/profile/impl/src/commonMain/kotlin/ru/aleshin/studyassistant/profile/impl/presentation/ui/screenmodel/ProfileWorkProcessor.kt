@@ -16,13 +16,13 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel
 
-import architecture.screenmodel.work.EffectResult
-import architecture.screenmodel.work.FlowWorkProcessor
-import architecture.screenmodel.work.WorkCommand
-import functional.handle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.FriendsInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.UserInteractor
@@ -34,7 +34,8 @@ import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileEf
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-internal interface ProfileWorkProcessor : FlowWorkProcessor<ProfileWorkCommand, ProfileAction, ProfileEffect> {
+internal interface ProfileWorkProcessor :
+    FlowWorkProcessor<ProfileWorkCommand, ProfileAction, ProfileEffect> {
 
     class Base(
         private val userInteractor: UserInteractor,

@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.presentation.models
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import models.ThemeUiType
-import theme.tokens.LanguageUiType
+import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.

@@ -16,14 +16,14 @@
 
 package ru.aleshin.studyassistant.presentation.ui.main.screenmodel
 
-import architecture.screenmodel.work.ActionResult
-import architecture.screenmodel.work.EffectResult
-import architecture.screenmodel.work.FlowWorkProcessor
-import architecture.screenmodel.work.WorkCommand
-import extensions.delayedAction
-import functional.Constants.Delay.SPLASH_NAV
-import functional.Either
-import functional.collectAndHandle
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.extensions.delayedAction
+import ru.aleshin.studyassistant.core.common.functional.Constants.Delay.SPLASH_NAV
+import ru.aleshin.studyassistant.core.common.functional.Either
+import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen

@@ -24,12 +24,13 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import functional.UID
-import navigation.nestedPop
+import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.navigation.nestedPop
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
@@ -39,7 +40,6 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.Cl
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEditorViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.rememberClassEditorScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.ClassEditorTopBar
-import views.ErrorSnackbar
 
 /**
  * @author Stanislav Aleshin on 02.06.2024

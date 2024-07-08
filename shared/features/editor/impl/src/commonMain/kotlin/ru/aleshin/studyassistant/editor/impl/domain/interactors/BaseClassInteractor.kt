@@ -16,21 +16,21 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import entities.classes.Class
-import entities.common.DayOfNumberedWeek
-import entities.schedules.DateVersion
-import entities.schedules.base.BaseSchedule
-import extensions.dateOfWeekDay
-import extensions.equalsDay
-import extensions.randomUUID
-import functional.DomainResult
-import functional.FlowDomainResult
-import functional.UID
-import functional.UnitDomainResult
 import kotlinx.datetime.DayOfWeek
-import managers.DateManager
-import repositories.BaseScheduleRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.extensions.dateOfWeekDay
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.functional.DomainResult
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.entities.classes.Class
+import ru.aleshin.studyassistant.core.domain.entities.common.DayOfNumberedWeek
+import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 

@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
-import entities.subject.Subject
+import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
 
 /**

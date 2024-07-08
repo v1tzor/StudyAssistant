@@ -51,12 +51,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
-import extensions.alphaByEnabled
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
+import ru.aleshin.studyassistant.core.ui.theme.material.full
+import ru.aleshin.studyassistant.core.ui.theme.tokens.CustomColors
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import theme.material.full
-import theme.tokens.CustomColors
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.

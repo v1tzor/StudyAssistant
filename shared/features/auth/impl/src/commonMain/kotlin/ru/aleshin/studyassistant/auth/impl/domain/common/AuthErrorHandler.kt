@@ -18,10 +18,10 @@ package ru.aleshin.studyassistant.auth.impl.domain.common
 
 import dev.gitlive.firebase.auth.FirebaseAuthException
 import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
-import exceptions.FirebaseDataAuthException
-import handlers.ErrorHandler
-import exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
+import ru.aleshin.studyassistant.core.common.exceptions.FirebaseDataAuthException
+import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 
 /**
  * @author Stanislav Aleshin on 16.04.2024

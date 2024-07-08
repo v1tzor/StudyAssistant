@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
-import entities.settings.CalendarSettings
+import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
 import ru.aleshin.studyassistant.editor.impl.presentation.models.settings.CalendarSettingsUi
 
 /**

@@ -16,11 +16,11 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import entities.schedules.custom.CustomSchedule
-import functional.FlowDomainResult
-import functional.UID
-import repositories.CustomScheduleRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
+import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 

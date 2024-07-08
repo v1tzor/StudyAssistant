@@ -44,8 +44,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
-import theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 18.06.2024.

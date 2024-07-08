@@ -19,9 +19,9 @@ package ru.aleshin.studyassistant.editor.impl.presentation.models.schedules
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
-import functional.UID
 import kotlinx.datetime.Instant
-import platform.InstantParceler
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 
 /**

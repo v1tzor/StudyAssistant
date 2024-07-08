@@ -30,12 +30,13 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import architecture.screen.ScreenContent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import co.touchlab.kermit.Logger
-import navigation.root
+import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.navigation.root
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEffect
@@ -43,7 +44,6 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.Ov
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewViewState
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.rememberOverviewScreenModel
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.OverviewTopBar
-import views.ErrorSnackbar
 
 /**
  * @author Stanislav Aleshin on 29.06.2024

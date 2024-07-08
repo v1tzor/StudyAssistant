@@ -37,12 +37,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import functional.Constants.Placeholder
-import functional.UID
+import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsViewState
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.views.DetailsSubjectViewItem
-import theme.StudyAssistantRes
-import views.PlaceholderBox
 
 /**
  * @author Stanislav Aleshin on 17.06.2024

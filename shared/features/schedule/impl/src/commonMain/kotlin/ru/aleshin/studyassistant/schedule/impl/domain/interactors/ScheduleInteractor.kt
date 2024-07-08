@@ -16,25 +16,25 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.interactors
 
-import entities.classes.convertToDetails
-import entities.common.numberOfRepeatWeek
-import entities.schedules.ScheduleDetails
-import entities.schedules.WeekScheduleDetails
-import entities.schedules.base.convertToDetails
-import entities.schedules.custom.convertToDetails
-import extensions.dateTime
-import functional.FlowDomainResult
-import functional.TimeRange
-import functional.UID
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
-import repositories.BaseScheduleRepository
-import repositories.CalendarSettingsRepository
-import repositories.CustomScheduleRepository
-import repositories.HomeworksRepository
-import repositories.UsersRepository
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.classes.convertToDetails
+import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.schedules.ScheduleDetails
+import ru.aleshin.studyassistant.core.domain.entities.schedules.WeekScheduleDetails
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.convertToDetails
+import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.convertToDetails
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 

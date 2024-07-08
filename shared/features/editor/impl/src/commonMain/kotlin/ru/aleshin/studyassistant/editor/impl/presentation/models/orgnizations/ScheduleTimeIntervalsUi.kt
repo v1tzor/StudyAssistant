@@ -19,11 +19,11 @@ package ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
-import entities.organizations.Millis
-import extensions.max
-import extensions.min
 import kotlinx.datetime.Instant
-import platform.NullInstantParceler
+import ru.aleshin.studyassistant.core.common.extensions.max
+import ru.aleshin.studyassistant.core.common.extensions.min
+import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.

@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.info.impl.domain.entities
 
-import entities.common.NumberOfRepeatWeek
-import entities.organizations.Millis
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
  * @author Stanislav Aleshin on 16.06.2024.

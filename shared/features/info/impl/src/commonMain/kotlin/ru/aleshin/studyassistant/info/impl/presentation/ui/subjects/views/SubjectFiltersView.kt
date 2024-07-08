@@ -40,16 +40,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import functional.UID
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
 import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToString
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectSortedType
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.OrganizationPicker
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
-import theme.StudyAssistantRes
-import views.dialog.BaseSelectorDialog
-import views.dialog.SelectorDialogItemView
 
 /**
  * @author Stanislav Aleshin on 18.06.2024.

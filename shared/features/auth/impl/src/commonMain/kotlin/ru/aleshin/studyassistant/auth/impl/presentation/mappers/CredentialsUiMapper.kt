@@ -16,27 +16,30 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.mappers
 
-import entities.auth.AuthCredentials
-import entities.auth.ForgotCredentials
 import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.ForgotCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.LoginCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.RegisterCredentialsUi
+import ru.aleshin.studyassistant.core.domain.entities.auth.AuthCredentials
+import ru.aleshin.studyassistant.core.domain.entities.auth.ForgotCredentials
 
 /**
  * @author Stanislav Aleshin on 10.06.2024.
  */
-internal fun LoginCredentialsUi.mapToDomain() = AuthCredentials(
-    username = null,
-    email = email,
-    password = password,
-)
+internal fun LoginCredentialsUi.mapToDomain() =
+    AuthCredentials(
+        username = null,
+        email = email,
+        password = password,
+    )
 
-internal fun RegisterCredentialsUi.mapToDomain() = AuthCredentials(
-    username = username,
-    email = email,
-    password = password,
-)
+internal fun RegisterCredentialsUi.mapToDomain() =
+    AuthCredentials(
+        username = username,
+        email = email,
+        password = password,
+    )
 
-internal fun ForgotCredentialsUi.mapToDomain() = ForgotCredentials(
-    email = email,
-)
+internal fun ForgotCredentialsUi.mapToDomain() =
+    ForgotCredentials(
+        email = email,
+    )

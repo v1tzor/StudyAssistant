@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.ui.employee.screenmodel
 
-import architecture.communications.state.StateCommunicator
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.StateCommunicator
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeViewState
 
 /**

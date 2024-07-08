@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.auth.impl.di.modules
 
-import navigation.CommandBuffer
 import org.kodein.di.DI
 import org.kodein.di.bindEagerSingleton
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.impl.navigation.AuthNavigatorManager
+import ru.aleshin.studyassistant.core.common.navigation.CommandBuffer
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.

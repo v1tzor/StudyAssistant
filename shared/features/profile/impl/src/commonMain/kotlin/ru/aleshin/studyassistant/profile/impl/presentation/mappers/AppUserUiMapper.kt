@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.mappers
 
-import entities.settings.PrivacySettings
-import entities.users.AppUser
-import entities.users.SocialNetwork
+import ru.aleshin.studyassistant.core.domain.entities.settings.PrivacySettings
+import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
+import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetwork
 import ru.aleshin.studyassistant.profile.impl.presentation.models.AppUserUi
 import ru.aleshin.studyassistant.profile.impl.presentation.models.PrivacySettingsUi
 import ru.aleshin.studyassistant.profile.impl.presentation.models.SocialNetworkUi
