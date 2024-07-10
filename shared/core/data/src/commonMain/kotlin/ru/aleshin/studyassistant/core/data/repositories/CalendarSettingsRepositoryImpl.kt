@@ -49,6 +49,7 @@ class CalendarSettingsRepositoryImpl(
 
     override suspend fun updateSettings(settings: CalendarSettings, targetUser: UID) {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
         return if (isSubscriber) {
             remoteDataSource.addOrUpdateSettings(settings.mapToRemoteData(), targetUser)
         } else {

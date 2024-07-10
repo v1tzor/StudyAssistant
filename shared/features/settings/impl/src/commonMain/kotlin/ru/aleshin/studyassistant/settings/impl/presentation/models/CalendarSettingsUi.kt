@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.ui.mappers
+package ru.aleshin.studyassistant.settings.impl.presentation.models
 
-import ru.aleshin.studyassistant.core.domain.entities.settings.LanguageType
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 
 /**
- * @author Stanislav Aleshin on 25.04.2024.
+ * @author Stanislav Aleshin on 29.04.2024.
  */
-fun LanguageUiType.mapToDomain() = when(this) {
-    LanguageUiType.DEFAULT -> LanguageType.DEFAULT
-    LanguageUiType.EN -> LanguageType.EN
-    LanguageUiType.RU -> LanguageType.RU
-}
-
-fun LanguageType.mapToUi() = when(this) {
-    LanguageType.DEFAULT -> LanguageUiType.DEFAULT
-    LanguageType.EN -> LanguageUiType.EN
-    LanguageType.RU -> LanguageUiType.RU
-}
+@Parcelize
+internal data class CalendarSettingsUi(
+    val numberOfWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
+    val weekScheduleViewType: WeekScheduleViewType = WeekScheduleViewType.COMMON,
+) : Parcelable

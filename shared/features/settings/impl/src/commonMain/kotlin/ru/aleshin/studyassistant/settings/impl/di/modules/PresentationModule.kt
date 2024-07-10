@@ -23,6 +23,14 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
 import ru.aleshin.studyassistant.settings.impl.navigation.SettingsFeatureStarterImpl
 import ru.aleshin.studyassistant.settings.impl.navigation.SettingsScreenProvider
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.screenmodel.CalendarEffectCommunicator
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.screenmodel.CalendarScreenModel
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.screenmodel.CalendarStateCommunicator
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.screenmodel.CalendarWorkProcessor
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel.GeneralEffectCommunicator
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel.GeneralScreenModel
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel.GeneralStateCommunicator
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel.GeneralWorkProcessor
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.TabNavigationScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.screenmodel.TabNavigationEffectCommunicator
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.screenmodel.TabNavigationScreenModel
@@ -40,4 +48,14 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<TabNavigationStateCommunicator> { TabNavigationStateCommunicator.Base() }
     bindProvider<TabNavigationEffectCommunicator> { TabNavigationEffectCommunicator.Base() }
     bindProvider<TabNavigationScreenModel> { TabNavigationScreenModel(instance(), instance(), instance(), instance()) }
+
+    bindSingleton<GeneralStateCommunicator> { GeneralStateCommunicator.Base() }
+    bindSingleton<GeneralEffectCommunicator> { GeneralEffectCommunicator.Base() }
+    bindSingleton<GeneralWorkProcessor> { GeneralWorkProcessor.Base(instance()) }
+    bindSingleton<GeneralScreenModel> { GeneralScreenModel(instance(), instance(), instance(), instance()) }
+
+    bindSingleton<CalendarStateCommunicator> { CalendarStateCommunicator.Base() }
+    bindSingleton<CalendarEffectCommunicator> { CalendarEffectCommunicator.Base() }
+    bindSingleton<CalendarWorkProcessor> { CalendarWorkProcessor.Base(instance()) }
+    bindSingleton<CalendarScreenModel> { CalendarScreenModel(instance(), instance(), instance(), instance()) }
 }

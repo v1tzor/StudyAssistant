@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule
+package ru.aleshin.studyassistant.settings.impl.presentation.mappers
+
+import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
+import ru.aleshin.studyassistant.settings.impl.presentation.theme.tokens.SettingsStrings
 
 /**
- * @author Stanislav Aleshin on 09.06.2024.
+ * @author Stanislav Aleshin on 16.04.2024.
  */
-internal enum class ScheduleViewType {
-    COMMON, VERTICAL
+internal fun SettingsFailures.mapToMessage(strings: SettingsStrings) = when (this) {
+    is SettingsFailures.OtherError -> strings.otherErrorMessage
 }

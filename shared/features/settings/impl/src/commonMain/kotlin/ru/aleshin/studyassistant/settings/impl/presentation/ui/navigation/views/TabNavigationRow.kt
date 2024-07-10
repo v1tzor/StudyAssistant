@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.views
 
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
@@ -40,9 +39,9 @@ internal fun TabNavigationRow(
 ) {
     ScrollableTabRow(
         selectedTabIndex = selectedItem.index,
-        modifier = modifier.statusBarsPadding(),
+        modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
-        edgePadding = 32.dp,
+        edgePadding = 8.dp,
         indicator = { tabPositions ->
             TabRowDefaults.PrimaryIndicator(Modifier.tabIndicatorOffset(tabPositions[selectedItem.index]))
         },
@@ -63,7 +62,9 @@ internal fun TabNavigationRow(
                     }
                 } else {
                     null
-                }
+                },
+                selectedContentColor = MaterialTheme.colorScheme.primary,
+                unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

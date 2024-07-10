@@ -28,11 +28,11 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.WeekScheduleDetailsUi
 
 /**
@@ -47,7 +47,7 @@ internal data class DetailsViewState(
     val weekSchedule: WeekScheduleDetailsUi? = null,
     val selectedWeek: TimeRange? = null,
     val activeClass: ActiveClassUi? = null,
-    val scheduleView: ScheduleViewType = ScheduleViewType.COMMON,
+    val scheduleView: WeekScheduleViewType = WeekScheduleViewType.COMMON,
 ) : BaseViewState
 
 internal sealed class DetailsEvent : BaseEvent {
@@ -55,7 +55,7 @@ internal sealed class DetailsEvent : BaseEvent {
     data object SelectedNextWeek : DetailsEvent()
     data object SelectedCurrentWeek : DetailsEvent()
     data object SelectedPreviousWeek : DetailsEvent()
-    data class SelectedViewType(val scheduleView: ScheduleViewType) : DetailsEvent()
+    data class SelectedViewType(val scheduleView: WeekScheduleViewType) : DetailsEvent()
     data class CompleteHomework(val homework: HomeworkDetailsUi) : DetailsEvent()
     data class CancelCompleteHomework(val homework: HomeworkDetailsUi) : DetailsEvent()
     data class EditHomeworkInEditor(val homework: HomeworkDetailsUi) : DetailsEvent()
@@ -75,6 +75,6 @@ internal sealed class DetailsAction : BaseAction {
     data class UpdateWeekSchedule(val schedule: WeekScheduleDetailsUi) : DetailsAction()
     data class UpdateSelectedWeek(val week: TimeRange?) : DetailsAction()
     data class UpdateActiveClass(val activeClass: ActiveClassUi?) : DetailsAction()
-    data class UpdateViewType(val scheduleView: ScheduleViewType) : DetailsAction()
+    data class UpdateViewType(val scheduleView: WeekScheduleViewType) : DetailsAction()
     data class UpdateLoading(val isLoading: Boolean) : DetailsAction()
 }

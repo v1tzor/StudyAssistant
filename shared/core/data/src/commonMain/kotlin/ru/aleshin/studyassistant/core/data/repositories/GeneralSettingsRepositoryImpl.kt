@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.core.data.repositories
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.data.mappers.settings.mapToDomain
-import ru.aleshin.studyassistant.core.data.mappers.settings.mapToRemoteData
+import ru.aleshin.studyassistant.core.data.mappers.settings.mapToLocalData
 import ru.aleshin.studyassistant.core.database.datasource.settings.GeneralSettingsLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.settings.GeneralSettings
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
@@ -36,6 +36,6 @@ class GeneralSettingsRepositoryImpl(
     }
 
     override suspend fun updateSettings(settings: GeneralSettings) {
-        localDataSource.updateSettings(settings.mapToRemoteData())
+        localDataSource.updateSettings(settings.mapToLocalData())
     }
 }

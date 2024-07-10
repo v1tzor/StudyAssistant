@@ -28,8 +28,12 @@ internal data class SettingsStrings(
     val notificationsTabHeader: String,
     val calendarTabHeader: String,
     val subscriptionTabHeader: String,
+    val languageChooserViewTitle: String,
+    val themeChooserViewTitle: String,
+    val numberOfRepeatWeekViewTitle: String,
     val otherErrorMessage: String,
 ) {
+
     companion object {
         val RUSSIAN = SettingsStrings(
             settingsHeader = "Настройки",
@@ -37,6 +41,9 @@ internal data class SettingsStrings(
             notificationsTabHeader = "Уведомления",
             calendarTabHeader = "Каленарь",
             subscriptionTabHeader = "Подписка и данные",
+            languageChooserViewTitle = "Язык приложения",
+            themeChooserViewTitle = "Тема",
+            numberOfRepeatWeekViewTitle = "Недель в расписании",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = SettingsStrings(
@@ -45,6 +52,9 @@ internal data class SettingsStrings(
             notificationsTabHeader = "Notification",
             calendarTabHeader = "Calendar",
             subscriptionTabHeader = "Subscription and data",
+            languageChooserViewTitle = "App language",
+            themeChooserViewTitle = "Theme",
+            numberOfRepeatWeekViewTitle = "Weeks in the schedule",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

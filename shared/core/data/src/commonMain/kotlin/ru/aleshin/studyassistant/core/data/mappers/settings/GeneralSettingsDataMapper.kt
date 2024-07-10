@@ -30,9 +30,9 @@ fun GeneralSettingsEntity.mapToDomain() = GeneralSettings(
     languageType = LanguageType.valueOf(language),
 )
 
-fun GeneralSettings.mapToRemoteData() = GeneralSettingsEntity(
-    id = 1,
-    is_first_start = if (isFirstStart) 1 else 0,
+fun GeneralSettings.mapToLocalData() = GeneralSettingsEntity(
+    id = 1L,
+    is_first_start = if (isFirstStart) 1L else 0L,
     theme = themeType.name,
     language = languageType.name,
 )

@@ -31,10 +31,10 @@ internal interface SettingsScreenProvider : FeatureScreenProvider<SettingsScreen
     class Base : SettingsScreenProvider {
 
         override fun provideFeatureScreen(screen: SettingsScreen) = when (screen) {
-            SettingsScreen.General -> GeneralScreen()
-            SettingsScreen.Calendar -> CalendarScreen()
-            SettingsScreen.Notification -> NotificationScreen()
-            SettingsScreen.Subscription -> SubscriptionScreen()
+            is SettingsScreen.General -> GeneralScreen()
+            is SettingsScreen.Notification -> NotificationScreen()
+            is SettingsScreen.Calendar -> CalendarScreen()
+            is SettingsScreen.Subscription -> SubscriptionScreen()
         }
     }
 }

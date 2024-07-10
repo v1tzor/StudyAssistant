@@ -17,9 +17,9 @@
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,6 +28,7 @@ import cafe.adriel.voyager.navigator.CurrentScreen
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.di.withDirectDI
 import ru.aleshin.studyassistant.core.common.navigation.NestedFeatureNavigator
+import ru.aleshin.studyassistant.core.common.navigation.nestedPop
 import ru.aleshin.studyassistant.core.common.navigation.rememberNavigatorManager
 import ru.aleshin.studyassistant.core.common.navigation.rememberScreenProvider
 import ru.aleshin.studyassistant.core.ui.views.TabItem
@@ -44,6 +45,7 @@ import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.contra
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.contract.TabNavigationViewState
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.screenmodel.rememberTabNavigationScreenModel
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.views.TabNavigationRow
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.views.TabNavigationTopBar
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.NotificationScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.SubscriptionScreen
 
@@ -72,38 +74,44 @@ internal class TabNavigationScreen : Screen {
                     }
 
                     Scaffold(
+                        modifier = Modifier.fillMaxSize(),
                         content = { paddingValues ->
                             Box(modifier = Modifier.padding(paddingValues)) {
                                 CurrentScreen()
                             }
                         },
                         topBar = {
-                            TabNavigationRow(
-                                selectedItem = selectedItem,
-                                onSelect = { tabItem ->
-                                    when (tabItem) {
-                                        SettingsTabItem.GENERAL -> {
-                                            dispatchEvent(TabNavigationEvent.NavigateToGeneral)
+                            Column {
+                                TabNavigationTopBar(
+                                    onBackClick = { dispatchEvent(TabNavigationEvent.NavigateToBack) },
+                                )
+                                TabNavigationRow(
+                                    selectedItem = selectedItem,
+                                    onSelect = { tabItem ->
+                                        when (tabItem) {
+                                            SettingsTabItem.GENERAL -> {
+                                                dispatchEvent(TabNavigationEvent.NavigateToGeneral)
+                                            }
+                                            SettingsTabItem.NOTIFICATION -> {
+                                                dispatchEvent(TabNavigationEvent.NavigateToNotification)
+                                            }
+                                            SettingsTabItem.CALENDAR -> {
+                                                dispatchEvent(TabNavigationEvent.NavigateToCalendar)
+                                            }
+                                            SettingsTabItem.SUBSCRIPTION -> {
+                                                dispatchEvent(TabNavigationEvent.NavigateToSubscription)
+                                            }
                                         }
-                                        SettingsTabItem.NOTIFICATION -> {
-                                            dispatchEvent(TabNavigationEvent.NavigateToNotification)
-                                        }
-                                        SettingsTabItem.CALENDAR -> {
-                                            dispatchEvent(TabNavigationEvent.NavigateToCalendar)
-                                        }
-                                        SettingsTabItem.SUBSCRIPTION -> {
-                                            dispatchEvent(TabNavigationEvent.NavigateToSubscription)
-                                        }
-                                    }
-                                }
-                            )
+                                    },
+                                )
+                            }
                         },
-                        contentWindowInsets = WindowInsets.safeContent,
                     )
 
                     handleEffect { effect ->
                         when (effect) {
                             is TabNavigationEffect.ReplaceScreen -> navigator.replaceAll(effect.screen)
+                            is TabNavigationEffect.NavigateToBack -> navigator.nestedPop()
                         }
                     }
                 }

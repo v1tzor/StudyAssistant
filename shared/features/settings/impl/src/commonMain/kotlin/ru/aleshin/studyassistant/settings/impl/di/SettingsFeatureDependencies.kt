@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -28,6 +29,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsReposit
 interface SettingsFeatureDependencies : BaseFeatureDependencies {
     val generalSettingsRepository: GeneralSettingsRepository
     val calendarSettingsRepository: CalendarSettingsRepository
+    val usersRepository: UsersRepository
     val dateManager: DateManager
     val coroutineManager: CoroutineManager
 }

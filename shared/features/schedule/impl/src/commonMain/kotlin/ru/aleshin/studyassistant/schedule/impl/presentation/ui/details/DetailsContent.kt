@@ -39,8 +39,8 @@ import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.dateTimeByWeek
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsViewState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.CommonScheduleView
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.CommonScheduleViewPlaceholder
@@ -61,7 +61,7 @@ internal fun DetailsContent(
         targetState = scheduleView,
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
     ) { scheduleViewType ->
-        if (scheduleViewType == ScheduleViewType.COMMON) {
+        if (scheduleViewType == WeekScheduleViewType.COMMON) {
             val gridState = rememberLazyGridState()
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),

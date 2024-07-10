@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.remote.models.settings
 
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
@@ -25,6 +26,7 @@ import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 @Serializable
 data class CalendarSettingsPojo(
     val numberOfWeek: String = NumberOfRepeatWeek.ONE.name,
+    val weekScheduleViewType: String = WeekScheduleViewType.COMMON.name,
 ) {
     companion object {
         fun default() = CalendarSettingsPojo()

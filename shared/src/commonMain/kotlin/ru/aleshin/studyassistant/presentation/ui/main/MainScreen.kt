@@ -35,17 +35,17 @@ fun MainScreen() = ScreenContent(
     screenModel = rememberMainScreenModel(),
     initialState = MainViewState(),
 ) { state ->
-    StudyAssistantTheme(
-        themeType = state.generalSettings.themeType,
-        languageType = state.generalSettings.languageType,
-    ) {
-        Navigator(
-            screen = SplashScreen(),
-            disposeBehavior = NavigatorDisposeBehavior(
-                disposeNestedNavigators = false,
-                disposeSteps = true,
-            ),
-        ) { navigator ->
+    Navigator(
+        screen = SplashScreen(),
+        disposeBehavior = NavigatorDisposeBehavior(
+            disposeNestedNavigators = false,
+            disposeSteps = true,
+        ),
+    ) { navigator ->
+        StudyAssistantTheme(
+            themeType = state.generalSettings.themeType,
+            languageType = state.generalSettings.languageType,
+        ) {
             CrossfadeTransition(navigator = navigator)
 
             handleEffect { effect ->

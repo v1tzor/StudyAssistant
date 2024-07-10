@@ -16,16 +16,64 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.general
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
+import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralEffect
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralEvent
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralViewState
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel.rememberGeneralScreenModel
 
 /**
- * @author Stanislav Aleshin on 08.07.2024.
+ * @author Stanislav Aleshin on 10.07.2024
  */
 internal class GeneralScreen : Screen {
 
     @Composable
-    override fun Content() {
-        TODO()
+    override fun Content() = ScreenContent(
+        screenModel = rememberGeneralScreenModel(),
+        initialState = GeneralViewState(),
+    ) { state ->
+        val strings = SettingsThemeRes.strings
+        val snackbarState = remember { SnackbarHostState() }
+
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            content = { paddingValues ->
+                GeneralContent(
+                    state = state,
+                    modifier = Modifier.padding(paddingValues),
+                    onSelectedLanguage = { dispatchEvent(GeneralEvent.ChangeLanguage(it)) },
+                    onSelectedTheme = { dispatchEvent(GeneralEvent.ChangeTheme(it)) },
+                )
+            },
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarState,
+                    snackbar = { ErrorSnackbar(it) },
+                )
+            },
+        )
+
+        handleEffect { effect ->
+            when (effect) {
+                is GeneralEffect.ShowError -> {
+                    snackbarState.showSnackbar(
+                        message = effect.failures.mapToMessage(strings),
+                        withDismissAction = true,
+                    )
+                }
+            }
+        }
     }
 }

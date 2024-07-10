@@ -23,4 +23,5 @@ import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
  */
 data class CalendarSettings(
     val numberOfWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
+    val weekScheduleViewType: WeekScheduleViewType = WeekScheduleViewType.COMMON,
 )

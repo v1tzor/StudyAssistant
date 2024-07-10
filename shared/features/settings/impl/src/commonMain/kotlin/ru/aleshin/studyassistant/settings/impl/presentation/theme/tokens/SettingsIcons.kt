@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.settings.impl.presentation.theme.tokens
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import studyassistant.shared.features.settings.impl.generated.resources.Res
+import studyassistant.shared.features.settings.impl.generated.resources.ic_calendar_week
 import studyassistant.shared.features.settings.impl.generated.resources.ic_language
 import studyassistant.shared.features.settings.impl.generated.resources.ic_palette
 
@@ -28,15 +29,18 @@ import studyassistant.shared.features.settings.impl.generated.resources.ic_palet
 internal data class SettingsIcons(
     val theme: DrawableResource,
     val language: DrawableResource,
+    val numberOfWeek: DrawableResource,
 ) {
     companion object {
         val LIGHT = SettingsIcons(
             theme = Res.drawable.ic_palette,
             language = Res.drawable.ic_language,
+            numberOfWeek = Res.drawable.ic_calendar_week,
         )
         val DARK = SettingsIcons(
             theme = Res.drawable.ic_palette,
             language = Res.drawable.ic_language,
+            numberOfWeek = Res.drawable.ic_calendar_week,
         )
     }
 }

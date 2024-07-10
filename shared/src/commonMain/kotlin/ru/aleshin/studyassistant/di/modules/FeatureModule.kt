@@ -223,6 +223,7 @@ val featureModule = DI.Module("Feature") {
         object : SettingsFeatureDependencies {
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val usersRepository = instance<UsersRepository>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
         }

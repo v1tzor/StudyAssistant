@@ -36,10 +36,12 @@ internal sealed class TabNavigationEvent : BaseEvent {
     data object NavigateToNotification : TabNavigationEvent()
     data object NavigateToCalendar : TabNavigationEvent()
     data object NavigateToSubscription : TabNavigationEvent()
+    data object NavigateToBack : TabNavigationEvent()
 }
 
 internal sealed class TabNavigationEffect : BaseUiEffect {
     data class ReplaceScreen(val screen: Screen) : TabNavigationEffect()
+    data object NavigateToBack : TabNavigationEffect()
 }
 
 internal object TabNavigationAction : BaseAction

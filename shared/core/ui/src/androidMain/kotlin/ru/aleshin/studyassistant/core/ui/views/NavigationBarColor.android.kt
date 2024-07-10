@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.core.ui.views
 
 import android.app.Activity
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
@@ -28,8 +28,10 @@ import androidx.core.view.WindowCompat
 @Composable
 internal actual fun NavigationBarColor(isDarkTheme: Boolean) {
     val view = LocalView.current
-    SideEffect {
-        val window = (view.context as Activity).window
+    val window = (view.context as Activity).window
+
+    LaunchedEffect(isDarkTheme) {
         WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !isDarkTheme
+        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDarkTheme
     }
 }

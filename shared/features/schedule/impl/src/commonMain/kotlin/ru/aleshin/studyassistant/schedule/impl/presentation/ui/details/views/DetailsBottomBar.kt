@@ -46,8 +46,8 @@ import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.isoWeekNumber
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 import ru.aleshin.studyassistant.core.ui.theme.material.full
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 
 /**
@@ -58,10 +58,10 @@ internal fun DetailsBottomBar(
     modifier: Modifier = Modifier,
     currentWeek: TimeRange?,
     selectedWeek: TimeRange?,
-    viewType: ScheduleViewType,
+    viewType: WeekScheduleViewType,
     onNextWeek: () -> Unit,
     onPreviousWeek: () -> Unit,
-    onViewTypeSelected: (ScheduleViewType) -> Unit,
+    onViewTypeSelected: (WeekScheduleViewType) -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -160,14 +160,14 @@ internal fun WeekPickerView(
 internal fun ScheduleViewTypePicker(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    selectedType: ScheduleViewType,
-    onSelected: (ScheduleViewType) -> Unit,
+    selectedType: WeekScheduleViewType,
+    onSelected: (WeekScheduleViewType) -> Unit,
 ) {
     Surface(
         onClick = {
             val viewType = when (selectedType) {
-                ScheduleViewType.COMMON -> ScheduleViewType.VERTICAL
-                ScheduleViewType.VERTICAL -> ScheduleViewType.COMMON
+                WeekScheduleViewType.COMMON -> WeekScheduleViewType.VERTICAL
+                WeekScheduleViewType.VERTICAL -> WeekScheduleViewType.COMMON
             }
             onSelected(viewType)
         },
@@ -183,8 +183,8 @@ internal fun ScheduleViewTypePicker(
         ) {
             Text(
                 text = when (selectedType) {
-                    ScheduleViewType.COMMON -> ScheduleThemeRes.strings.commonScheduleViewType
-                    ScheduleViewType.VERTICAL -> ScheduleThemeRes.strings.verticalScheduleViewType
+                    WeekScheduleViewType.COMMON -> ScheduleThemeRes.strings.commonScheduleViewType
+                    WeekScheduleViewType.VERTICAL -> ScheduleThemeRes.strings.verticalScheduleViewType
                 },
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
@@ -193,8 +193,8 @@ internal fun ScheduleViewTypePicker(
             Icon(
                 modifier = Modifier.size(18.dp),
                 painter = when (selectedType) {
-                    ScheduleViewType.COMMON -> painterResource(ScheduleThemeRes.icons.formatGrid)
-                    ScheduleViewType.VERTICAL -> painterResource(ScheduleThemeRes.icons.formatColumns)
+                    WeekScheduleViewType.COMMON -> painterResource(ScheduleThemeRes.icons.formatGrid)
+                    WeekScheduleViewType.VERTICAL -> painterResource(ScheduleThemeRes.icons.formatColumns)
                 },
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface,

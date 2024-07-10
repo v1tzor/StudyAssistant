@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.ui.mappers
+package ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel
 
-import models.ThemeUiType
-import ru.aleshin.studyassistant.core.domain.entities.settings.ThemeType
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.StateCommunicator
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralViewState
 
 /**
- * @author Stanislav Aleshin on 25.04.2024.
+ * @author Stanislav Aleshin on 10.07.2024.
  */
-fun ThemeUiType.mapToDomain() = when(this) {
-    ThemeUiType.DEFAULT -> ThemeType.DEFAULT
-    ThemeUiType.LIGHT -> ThemeType.LIGHT
-    ThemeUiType.DARK -> ThemeType.DARK
-}
-
-fun ThemeType.mapToUi() = when(this) {
-    ThemeType.DEFAULT -> ThemeUiType.DEFAULT
-    ThemeType.LIGHT -> ThemeUiType.LIGHT
-    ThemeType.DARK -> ThemeUiType.DARK
+internal interface GeneralStateCommunicator : StateCommunicator<GeneralViewState> {
+    class Base : GeneralStateCommunicator, StateCommunicator.Abstract<GeneralViewState>(
+        defaultState = GeneralViewState()
+    )
 }

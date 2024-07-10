@@ -21,6 +21,8 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.settings.impl.domain.common.SettingsEitherWrapper
 import ru.aleshin.studyassistant.settings.impl.domain.common.SettingsErrorHandler
+import ru.aleshin.studyassistant.settings.impl.domain.interactors.CalendarSettingsInteractor
+import ru.aleshin.studyassistant.settings.impl.domain.interactors.GeneralSettingsInteractor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -28,4 +30,7 @@ import ru.aleshin.studyassistant.settings.impl.domain.common.SettingsErrorHandle
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<SettingsErrorHandler> { SettingsErrorHandler.Base() }
     bindSingleton<SettingsEitherWrapper> { SettingsEitherWrapper.Base(instance()) }
+
+    bindSingleton<GeneralSettingsInteractor> { GeneralSettingsInteractor.Base(instance(), instance()) }
+    bindSingleton<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance(), instance()) }
 }

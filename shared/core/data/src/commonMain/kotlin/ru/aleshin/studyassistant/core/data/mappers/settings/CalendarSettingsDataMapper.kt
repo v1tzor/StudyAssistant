@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.data.mappers.settings
 
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
+import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 import ru.aleshin.studyassistant.core.remote.models.settings.CalendarSettingsPojo
 import ru.aleshin.studyassistant.sqldelight.settings.CalendarSettingsEntity
 
@@ -26,17 +27,21 @@ import ru.aleshin.studyassistant.sqldelight.settings.CalendarSettingsEntity
  */
 fun CalendarSettingsPojo.mapToDomain() = CalendarSettings(
     numberOfWeek = NumberOfRepeatWeek.valueOf(numberOfWeek),
+    weekScheduleViewType = WeekScheduleViewType.valueOf(weekScheduleViewType),
 )
 
 fun CalendarSettingsEntity.mapToDomain() = CalendarSettings(
     numberOfWeek = NumberOfRepeatWeek.valueOf(number_of_week),
+    weekScheduleViewType = WeekScheduleViewType.valueOf(week_schedule_view_type),
 )
 
 fun CalendarSettings.mapToRemoteData() = CalendarSettingsPojo(
     numberOfWeek = numberOfWeek.name,
+    weekScheduleViewType = weekScheduleViewType.name,
 )
 
 fun CalendarSettings.mapToLocalData() = CalendarSettingsEntity(
     id = 1L,
     number_of_week = numberOfWeek.name,
+    week_schedule_view_type = weekScheduleViewType.name,
 )

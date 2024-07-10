@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.settings.api.di.SettingsFeatureApi
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
 import ru.aleshin.studyassistant.settings.impl.di.SettingsFeatureDependencies
@@ -47,6 +48,7 @@ object SettingsFeatureDIHolder :
                 importAll(navigationModule, presentationModule, domainModule)
                 bindSingleton<GeneralSettingsRepository> { dependencies.generalSettingsRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
+                bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<SettingsFeatureApi> {
