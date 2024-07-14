@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.core.remote.models.users
 
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.entities.settings.AccessType
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
@@ -36,8 +35,6 @@ data class AppUserPojo(
     val birthday: String? = null,
     val gender: String? = null,
     val friends: List<UID> = emptyList(),
+    val subscribePeriod: Long? = null,
     val socialNetworks: List<SocialNetworkPojo> = emptyList(),
-    val privateProfile: Boolean = false,
-    val showBirthday: String = AccessType.FRIENDS.name,
-    val showCity: String = AccessType.FRIENDS.name,
 )

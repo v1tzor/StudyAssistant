@@ -16,13 +16,14 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.requests
 
-import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
+import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.functional.UID
 
 /**
- * @author Stanislav Aleshin on 21.04.2024.
+ * @author Stanislav Aleshin on 30.04.2024.
  */
 data class FriendRequests(
-    val received: List<AppUser> = emptyList(),
-    val send: List<AppUser> = emptyList(),
-    val lastAccepted: List<AppUser> = emptyList(),
+    val received: Map<UID, Instant> = emptyMap(),
+    val send: Map<UID, Instant> = emptyMap(),
+    val lastActions: Map<UID, Boolean> = emptyMap(),
 )

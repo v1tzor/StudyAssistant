@@ -42,16 +42,13 @@ fun <S : FeatureScreen> NestedFeatureNavigator(
 
     Navigator(
         screen = screenProvider.provideFeatureScreen(startScreen),
-        onBackPressed = { false },
+        onBackPressed = null,
         disposeBehavior = NavigatorDisposeBehavior(
             disposeNestedNavigators = true,
             disposeSteps = true,
         ),
     ) { navigator ->
-        NestedNavigatorBackHandler(
-            navigator = navigator,
-            onBackPressed = onBackPressed,
-        )
+        NestedNavigatorBackHandler(navigator, onBackPressed)
         DisposableEffect(Unit) {
             navigatorManager.attachNavigator(navigator)
             onDispose { navigatorManager.detachNavigator() }
@@ -69,7 +66,9 @@ fun NestedNavigatorBackHandler(
     if (onBackPressed != null) {
         BackHandler(
             enabled = navigator.canPop || navigator.parent?.canPop ?: false,
-            onBack = { if (onBackPressed(navigator.lastItem)) navigator.nestedPop() },
+            onBack = {
+                if (onBackPressed(navigator.lastItem)) navigator.nestedPop()
+            },
         )
     }
 }

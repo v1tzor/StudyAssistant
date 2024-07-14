@@ -132,7 +132,7 @@ internal interface ClassEditorWorkProcessor :
                 )
             }
 
-            val scheduleClasses = schedule.blockMapToValue(
+            val scheduleClasses = schedule?.blockMapToValue(
                 onBaseSchedule = { baseSchedule -> baseSchedule?.classes },
                 onCustomSchedule = { customSchedule -> customSchedule?.classes },
             )
@@ -151,7 +151,7 @@ internal interface ClassEditorWorkProcessor :
             )
             val action = ClassEditorAction.SetupEditModel(
                 editModel = editModel,
-                schedule = schedule,
+                schedule = checkNotNull(schedule),
                 freeClassTimeRanges = freeTimeRanges,
                 weekDay = weekDay,
             )
@@ -261,12 +261,18 @@ internal interface ClassEditorWorkProcessor :
                     )
                 }
                 is ScheduleUi.Custom -> if (classModel.uid.isEmpty()) {
-                    customClassInteractor.addClass(classModel).handle(
+                    customClassInteractor.addClassBySchedule(
+                        classModel = classModel,
+                        schedule = checkNotNull(schedule.data).mapToDomain(),
+                    ).handle(
                         onLeftAction = { emit(EffectResult(ClassEditorEffect.ShowError(it))) },
                         onRightAction = { emit(EffectResult(ClassEditorEffect.NavigateToBack)) },
                     )
                 } else {
-                    customClassInteractor.updateClass(classModel).handle(
+                    customClassInteractor.updateClassBySchedule(
+                        classModel = classModel,
+                        schedule = checkNotNull(schedule.data).mapToDomain(),
+                    ).handle(
                         onLeftAction = { emit(EffectResult(ClassEditorEffect.ShowError(it))) },
                         onRightAction = { emit(EffectResult(ClassEditorEffect.NavigateToBack)) },
                     )

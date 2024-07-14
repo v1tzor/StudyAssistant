@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.parcelize)
 }
 
@@ -35,6 +36,7 @@ kotlin {
             implementation(project(":shared:core:ui"))
 
             implementation(compose.components.resources)
+            implementation(libs.dragAndDrop)
         }
     }
 

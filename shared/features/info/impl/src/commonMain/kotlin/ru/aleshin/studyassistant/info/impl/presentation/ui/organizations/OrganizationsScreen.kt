@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.ui.organizations
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
@@ -55,7 +54,7 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
 internal class OrganizationsScreen : Screen {
 
     @Composable
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun Content() = ScreenContent(
         screenModel = rememberOrganizationsScreenModel(),
         initialState = OrganizationsViewState(),
@@ -92,8 +91,8 @@ internal class OrganizationsScreen : Screen {
                     onShowAllEmployee = {
                         dispatchEvent(OrganizationsEvent.NavigateToEmployees(checkNotNull(organizationId)))
                     },
-                    onShowEmployeeCard = {
-                        dispatchEvent(OrganizationsEvent.OpenEmployeeCard(it, checkNotNull(organizationId)))
+                    onShowEmployeeProfile = {
+                        dispatchEvent(OrganizationsEvent.OpenEmployeeProfile(it))
                     },
                     onShowAllSubjects = {
                         dispatchEvent(OrganizationsEvent.NavigateToSubjects(checkNotNull(organizationId)))

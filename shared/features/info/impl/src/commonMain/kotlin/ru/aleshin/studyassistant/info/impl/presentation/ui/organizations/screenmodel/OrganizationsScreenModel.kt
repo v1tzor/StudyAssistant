@@ -33,6 +33,7 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contrac
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEffect
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEvent
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsViewState
+import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 
 /**
  * @author Stanislav Aleshin on 16.06.2024
@@ -79,8 +80,10 @@ internal class OrganizationsScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is OrganizationsEvent.OpenEmployeeCard -> {
-                // TODO: Create contact feature
+            is OrganizationsEvent.OpenEmployeeProfile -> {
+                val featureScreen = UsersScreen.EmployeeProfile(event.employeeId)
+                val screen = screenProvider.provideUsersScreen(featureScreen)
+                sendEffect(OrganizationsEffect.NavigateToGlobal(screen))
             }
             is OrganizationsEvent.NavigateToEmployees -> {
                 val featureScreen = InfoScreen.Employee(event.organizationId)

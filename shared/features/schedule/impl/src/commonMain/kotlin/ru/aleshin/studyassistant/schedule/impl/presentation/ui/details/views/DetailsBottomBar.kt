@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
@@ -48,6 +47,7 @@ import ru.aleshin.studyassistant.core.common.extensions.isoWeekNumber
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 import ru.aleshin.studyassistant.core.ui.theme.material.full
+import ru.aleshin.studyassistant.core.ui.theme.material.topSide
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 
 /**
@@ -65,7 +65,7 @@ internal fun DetailsBottomBar(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+        shape = MaterialTheme.shapes.extraLarge.topSide,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Row(
@@ -106,7 +106,7 @@ internal fun WeekPickerView(
     }
     Surface(
         modifier = modifier.animateContentSize().height(36.dp),
-        shape = MaterialTheme.shapes.full(),
+        shape = MaterialTheme.shapes.full,
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Row(
@@ -173,7 +173,7 @@ internal fun ScheduleViewTypePicker(
         },
         modifier = modifier,
         enabled = enabled,
-        shape = MaterialTheme.shapes.full(),
+        shape = MaterialTheme.shapes.full,
         color = Color.Transparent,
     ) {
         Row(

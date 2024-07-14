@@ -15,7 +15,9 @@
  */
 package ru.aleshin.studyassistant.core.ui.theme.material
 
+import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material3.Shapes
 import androidx.compose.ui.unit.dp
 
@@ -26,4 +28,37 @@ val baseShapes = Shapes(
     extraLarge = RoundedCornerShape(24.dp),
 )
 
-fun Shapes.full() = RoundedCornerShape(100.dp)
+val Shapes.full: RoundedCornerShape
+    get() = RoundedCornerShape(100.dp)
+
+val CornerBasedShape.topSide
+    get() = RoundedCornerShape(
+        topStart = topStart,
+        bottomStart = ZeroCornerSize,
+        topEnd = topEnd,
+        bottomEnd = ZeroCornerSize
+    )
+
+val CornerBasedShape.bottomSide
+    get() = RoundedCornerShape(
+        topStart = ZeroCornerSize,
+        bottomStart = bottomStart,
+        topEnd = ZeroCornerSize,
+        bottomEnd = bottomEnd
+    )
+
+val CornerBasedShape.startSide
+    get() = RoundedCornerShape(
+        topStart = topStart,
+        bottomStart = bottomStart,
+        topEnd = ZeroCornerSize,
+        bottomEnd = ZeroCornerSize
+    )
+
+val CornerBasedShape.endSide
+    get() = RoundedCornerShape(
+        topStart = ZeroCornerSize,
+        bottomStart = ZeroCornerSize,
+        topEnd = topEnd,
+        bottomEnd = bottomEnd
+    )

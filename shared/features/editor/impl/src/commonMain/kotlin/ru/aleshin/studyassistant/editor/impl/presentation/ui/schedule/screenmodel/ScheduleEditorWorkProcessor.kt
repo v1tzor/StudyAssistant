@@ -90,8 +90,8 @@ internal interface ScheduleEditorWorkProcessor :
                     val settings = calendarSettings.mapToUi()
                     ScheduleEditorAction.UpdateOrganizationData(organizations, settings)
                 }
-            ).collect { result ->
-                emit(result)
+            ).collect { workResult ->
+                emit(workResult)
             }
         }
 

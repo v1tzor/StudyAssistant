@@ -70,6 +70,7 @@ internal data class EmployeeScreen(val organizationId: UID) : Screen {
                 EmployeeContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
+                    onOpenEmployeeProfile = { dispatchEvent(EmployeeEvent.NavigateToProfile(it)) },
                     onEditEmployee = { dispatchEvent(EmployeeEvent.NavigateToEditor(it)) },
                     onDeleteEmployee = { dispatchEvent(EmployeeEvent.DeleteEmployee(it)) }
                 )

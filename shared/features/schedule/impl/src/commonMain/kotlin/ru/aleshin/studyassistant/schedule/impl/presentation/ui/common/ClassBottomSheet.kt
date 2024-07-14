@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
@@ -60,6 +59,8 @@ import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.toMinutesAndHoursString
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.material.endSide
+import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.theme.tokens.contentColorFor
 import ru.aleshin.studyassistant.core.ui.views.HorizontalLeftTimeProgress
 import ru.aleshin.studyassistant.core.ui.views.MediumDragHandle
@@ -149,9 +150,8 @@ private fun ClassBottomSheetHeader(
     ) {
         Surface(
             modifier = Modifier.fillMaxHeight().width(5.dp),
-            shape = RoundedCornerShape(topEnd = 100.dp, bottomEnd = 100.dp),
-            color = classModel.subject?.color?.let { Color(it) }
-                ?: MaterialTheme.colorScheme.outlineVariant,
+            shape = MaterialTheme.shapes.full.endSide,
+            color = classModel.subject?.color?.let { Color(it) } ?: MaterialTheme.colorScheme.outlineVariant,
             content = { Box(modifier = Modifier.fillMaxHeight()) }
         )
         Column(

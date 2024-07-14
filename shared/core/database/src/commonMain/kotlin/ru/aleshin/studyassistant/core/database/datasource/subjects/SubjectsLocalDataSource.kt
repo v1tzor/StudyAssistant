@@ -39,6 +39,7 @@ interface SubjectsLocalDataSource {
     suspend fun addOrUpdateSubject(subject: SubjectEntity): UID
     suspend fun fetchSubjectById(uid: UID): Flow<SubjectDetailsEntity?>
     suspend fun fetchAllSubjectsByOrganization(organizationId: UID): Flow<List<SubjectDetailsEntity>>
+    suspend fun fetchSubjectsByEmployee(employeeId: UID): Flow<List<SubjectDetailsEntity>>
     suspend fun deleteSubject(targetId: UID)
 
     class Base(
@@ -72,6 +73,21 @@ interface SubjectsLocalDataSource {
 
         override suspend fun fetchAllSubjectsByOrganization(organizationId: UID): Flow<List<SubjectDetailsEntity>> {
             val query = subjectQueries.fetchSubjectsByOrganization(organizationId)
+            val subjectEntityListFlow = query.asFlow().mapToList(coroutineContext)
+
+            return subjectEntityListFlow.map { subjectEntityList ->
+                subjectEntityList.map { subjectEntity ->
+                    val employee = subjectEntity.teacher_id?.let { teacherId ->
+                        val employeeQuery = employeeQueries.fetchEmployeeById(teacherId)
+                        employeeQuery.executeAsOneOrNull()
+                    }
+                    subjectEntity.mapToDetails(employee = employee)
+                }
+            }
+        }
+
+        override suspend fun fetchSubjectsByEmployee(employeeId: UID): Flow<List<SubjectDetailsEntity>> {
+            val query = subjectQueries.fetchSubjectsByEmployee(employeeId)
             val subjectEntityListFlow = query.asFlow().mapToList(coroutineContext)
 
             return subjectEntityListFlow.map { subjectEntityList ->

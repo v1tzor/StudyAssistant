@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.remote.datasources.users
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseUser
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.firestore.Source
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
@@ -37,14 +38,11 @@ interface UsersRemoteDataSource {
      * @return [Boolean] if the user is created for the first time, it returns true
      */
     suspend fun addOrUpdateUser(user: AppUserPojo): Boolean
-
     fun fetchCurrentFirebaseUser(): FirebaseUser?
-
     suspend fun fetchUserById(uid: UID): Flow<AppUserPojo?>
-
-    suspend fun fetchUsersByName(query: String): Flow<List<AppUserPojo>>
-
-    suspend fun fetchUsersByCode(code: String): Flow<List<AppUserPojo>>
+    suspend fun fetchRealtimeAppUserById(uid: UID): AppUserPojo?
+    suspend fun fetchAppUserFriends(uid: UID): Flow<List<AppUserPojo>>
+    suspend fun findUsersByCode(code: String): Flow<List<AppUserPojo>>
 
     class Base(
         private val auth: FirebaseAuth,
@@ -77,21 +75,33 @@ interface UsersRemoteDataSource {
             }
         }
 
-        override suspend fun fetchUsersByName(query: String): Flow<List<AppUserPojo>> {
+        override suspend fun fetchRealtimeAppUserById(uid: UID): AppUserPojo? {
+            if (uid.isEmpty()) throw FirebaseUserException()
+
+            val reference = database.collection(Users.ROOT).document(uid)
+
+            return reference.get(Source.SERVER).data(serializer<AppUserPojo?>())
+        }
+
+        override suspend fun fetchAppUserFriends(uid: UID): Flow<List<AppUserPojo>> {
+            require(uid.isNotEmpty())
+
             val queryReference = database.collection(Users.ROOT).where {
-                Users.USERNAME greaterThanOrEqualTo query
+                Users.FRIENDS containsAny listOf(uid)
             }
+
             return queryReference.snapshots.map { snapshot ->
-                snapshot.documents.map { documentSnapshot -> documentSnapshot.data<AppUserPojo>() }
+                snapshot.documents.map { it.data<AppUserPojo>() }
             }
         }
 
-        override suspend fun fetchUsersByCode(code: String): Flow<List<AppUserPojo>> {
+        override suspend fun findUsersByCode(code: String): Flow<List<AppUserPojo>> {
             val queryReference = database.collection(Users.ROOT).where {
                 Users.CODE equalTo code
             }
+
             return queryReference.snapshots.map { snapshot ->
-                snapshot.documents.map { documentSnapshot -> documentSnapshot.data<AppUserPojo>() }
+                snapshot.documents.map { it.data<AppUserPojo>() }
             }
         }
     }

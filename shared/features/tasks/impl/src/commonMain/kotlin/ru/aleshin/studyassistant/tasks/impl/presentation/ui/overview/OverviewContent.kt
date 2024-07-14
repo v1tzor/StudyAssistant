@@ -82,6 +82,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TaskE
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TasksProgressView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TodoViewItem
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TodoViewItemPlaceholder
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TodoViewNoneItem
 
 /**
  * @author Stanislav Aleshin on 29.06.2024
@@ -399,17 +400,21 @@ private fun TodosSection(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    limitedTodos.forEach { todo ->
-                        TodoViewItem(
-                            modifier = Modifier.wrapContentSize(),
-                            onClick = { onOpenTodoTask(todo) },
-                            isDone = todo.isDone,
-                            todoText = todo.name,
-                            status = todo.status,
-                            deadline = todo.deadline,
-                            priority = todo.priority,
-                            onChangeDone = { onChangeTodoDone(todo, it) }
-                        )
+                    if (limitedTodos.isNotEmpty()) {
+                        limitedTodos.forEach { todo ->
+                            TodoViewItem(
+                                modifier = Modifier.wrapContentSize(),
+                                onClick = { onOpenTodoTask(todo) },
+                                isDone = todo.isDone,
+                                todoText = todo.name,
+                                status = todo.status,
+                                deadline = todo.deadline,
+                                priority = todo.priority,
+                                onChangeDone = { onChangeTodoDone(todo, it) }
+                            )
+                        }
+                    } else {
+                        TodoViewNoneItem()
                     }
                 }
             } else {

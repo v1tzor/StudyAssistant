@@ -70,7 +70,7 @@ internal interface AuthInteractor {
                     username = checkNotNull(firebaseUser.displayName ?: firebaseUser.email),
                     email = checkNotNull(firebaseUser.email),
                 )
-                val createdResult = usersRepository.createOrUpdateAppUser(newUserInfo)
+                val createdResult = usersRepository.addOrUpdateAppUser(newUserInfo)
                 if (createdResult) {
                     AuthResult(user = newUserInfo, isNewUser = true)
                 } else {
@@ -86,7 +86,7 @@ internal interface AuthInteractor {
                 username = credentials.username ?: credentials.email,
                 email = credentials.email,
             )
-            val createdResult = usersRepository.createOrUpdateAppUser(newUserInfo)
+            val createdResult = usersRepository.addOrUpdateAppUser(newUserInfo)
 
             return@wrap if (createdResult) {
                 newUserInfo

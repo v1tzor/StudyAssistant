@@ -20,24 +20,18 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,7 +40,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,9 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
@@ -64,9 +55,7 @@ import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
-import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
 import ru.aleshin.studyassistant.core.ui.views.DialogHeader
@@ -75,6 +64,8 @@ import ru.aleshin.studyassistant.core.ui.views.dialog.DurationPickerDialog
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.AddNumberedDurationView
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.NumberedDurationView
 
 /**
  * @author Stanislav Aleshin on 26.05.2024.
@@ -115,7 +106,7 @@ internal fun ScheduleIntervalsDialog(
                             editableIntervals = editableIntervals.copy(firstClassTime = it)
                         }
                     )
-                    ClassesAndBreaksIntervalsEditor(
+                    ClassesAndBreaksIntervalsView(
                         intervals = editableIntervals,
                         onChangeIntervals = { editableIntervals = it },
                     )
@@ -133,7 +124,7 @@ internal fun ScheduleIntervalsDialog(
 }
 
 @Composable
-internal fun StartOfClassesField(
+private fun StartOfClassesField(
     modifier: Modifier = Modifier,
     startOfClassTime: Instant?,
     onChangeTime: (Instant?) -> Unit,
@@ -177,7 +168,7 @@ internal fun StartOfClassesField(
 }
 
 @Composable
-internal fun ClassesAndBreaksIntervalsEditor(
+private fun ClassesAndBreaksIntervalsView(
     modifier: Modifier = Modifier,
     intervals: ScheduleTimeIntervalsUi,
     onChangeIntervals: (ScheduleTimeIntervalsUi) -> Unit,
@@ -186,7 +177,7 @@ internal fun ClassesAndBreaksIntervalsEditor(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        ClassIntervalsEditor(
+        ClassIntervalsView(
             modifier = Modifier.weight(1f),
             baseClassDuration = intervals.baseClassDuration,
             specificClassDurations = intervals.specificClassDuration,
@@ -197,7 +188,7 @@ internal fun ClassesAndBreaksIntervalsEditor(
                 onChangeIntervals(intervals.copy(specificClassDuration = it))
             },
         )
-        BreakIntervalsEditor(
+        BreakIntervalsView(
             modifier = Modifier.weight(1f),
             baseBreakDuration = intervals.baseBreakDuration,
             specificBreakDurations = intervals.specificBreakDuration,
@@ -212,7 +203,7 @@ internal fun ClassesAndBreaksIntervalsEditor(
 }
 
 @Composable
-internal fun ClassIntervalsEditor(
+private fun ClassIntervalsView(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     baseClassDuration: Millis?,
@@ -258,7 +249,7 @@ internal fun ClassIntervalsEditor(
 }
 
 @Composable
-internal fun BreakIntervalsEditor(
+private fun BreakIntervalsView(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     baseBreakDuration: Millis?,
@@ -306,7 +297,7 @@ internal fun BreakIntervalsEditor(
 }
 
 @Composable
-internal fun NumberedDurationsList(
+private fun NumberedDurationsList(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     baseDuration: Millis?,
@@ -389,9 +380,7 @@ internal fun NumberedDurationsList(
         }
         Column {
             var isOpenNumberedDurationCreatorMenu by remember { mutableStateOf(false) }
-            NumberedDurationCreator(
-                onClick = { isOpenNumberedDurationCreatorMenu = true },
-            )
+            AddNumberedDurationView(onClick = { isOpenNumberedDurationCreatorMenu = true })
             NumberedDurationCreatorDropdownMenu(
                 expanded = isOpenNumberedDurationCreatorMenu,
                 specificDurations = specificDurations,
@@ -413,103 +402,7 @@ internal fun NumberedDurationsList(
 }
 
 @Composable
-internal fun NumberedDurationView(
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    number: String,
-    duration: Millis?,
-    onNumberClick: (() -> Unit)?,
-    onDurationClick: (() -> Unit)?,
-    numberedContainerColor: Color = MaterialTheme.colorScheme.primary,
-    durationContainerColor: Color = MaterialTheme.colorScheme.primaryContainer,
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .animateContentSize()
-                .height(32.dp)
-                .clip(RoundedCornerShape(100.dp, 0.dp, 0.dp, 100.dp))
-                .background(numberedContainerColor)
-                .clickable(
-                    enabled = enabled && onNumberClick != null,
-                    onClick = { if (onNumberClick != null) onNumberClick() },
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 12.dp),
-                text = number,
-                color = MaterialTheme.colorScheme.contentColorFor(numberedContainerColor),
-                style = MaterialTheme.typography.titleSmall,
-            )
-        }
-        Box(
-            modifier = Modifier
-                .height(32.dp)
-                .weight(1f)
-                .clip(RoundedCornerShape(0.dp, 100.dp, 100.dp, 0.dp))
-                .background(durationContainerColor)
-                .clickable(
-                    enabled = enabled && onDurationClick != null,
-                    onClick = { if (onDurationClick != null) onDurationClick() },
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (duration != null) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    text = duration.toMinutesOrHoursTitle(),
-                    color = MaterialTheme.colorScheme.contentColorFor(durationContainerColor),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            } else {
-                Text(
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    text = StudyAssistantRes.strings.specifyTitle,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-internal fun NumberedDurationCreator(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
-    contentColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth().height(28.dp),
-        enabled = enabled,
-        shape = MaterialTheme.shapes.full(),
-        color = containerColor,
-        interactionSource = interactionSource,
-    ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(
-                text = EditorThemeRes.strings.addTitle,
-                color = contentColor,
-                style = MaterialTheme.typography.labelLarge,
-            )
-        }
-    }
-}
-
-@Composable
-internal fun ExceptLine(
+private fun ExceptLine(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues = PaddingValues(horizontal = 4.dp),
 ) {

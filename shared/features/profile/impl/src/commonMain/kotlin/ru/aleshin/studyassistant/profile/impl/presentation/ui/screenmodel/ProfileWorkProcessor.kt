@@ -24,7 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowW
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.AuthInteractor
-import ru.aleshin.studyassistant.profile.impl.domain.interactors.FriendsInteractor
+import ru.aleshin.studyassistant.profile.impl.domain.interactors.FriendRequestsInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.UserInteractor
 import ru.aleshin.studyassistant.profile.impl.navigation.ProfileScreenProvider
 import ru.aleshin.studyassistant.profile.impl.presentation.mappers.mapToUi
@@ -39,7 +39,7 @@ internal interface ProfileWorkProcessor :
 
     class Base(
         private val userInteractor: UserInteractor,
-        private val friendsInteractor: FriendsInteractor,
+        private val friendRequestsInteractor: FriendRequestsInteractor,
         private val authInteractor: AuthInteractor,
         private val screenProvider: ProfileScreenProvider,
     ) : ProfileWorkProcessor {
@@ -52,7 +52,7 @@ internal interface ProfileWorkProcessor :
         @OptIn(ExperimentalCoroutinesApi::class)
         private fun loadProfileInfoWork() = flow {
             val userInfoFlow = userInteractor.fetchCurrentAppUser()
-            val friendsRequestsFlow = friendsInteractor.fetchAllFriendRequests()
+            val friendsRequestsFlow = friendRequestsInteractor.fetchAllFriendRequests()
 
             userInfoFlow.flatMapLatestWithResult(
                 secondFlow = friendsRequestsFlow,

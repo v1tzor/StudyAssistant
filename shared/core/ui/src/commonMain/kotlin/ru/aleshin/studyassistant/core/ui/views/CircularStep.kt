@@ -84,7 +84,7 @@ fun CircularStepView(
             width = if (!active) size.width else size.width * 2,
             height = size.height
         ),
-        shape = MaterialTheme.shapes.full(),
+        shape = MaterialTheme.shapes.full,
         color = color,
         content = { Box(modifier = Modifier.fillMaxSize()) }
     )

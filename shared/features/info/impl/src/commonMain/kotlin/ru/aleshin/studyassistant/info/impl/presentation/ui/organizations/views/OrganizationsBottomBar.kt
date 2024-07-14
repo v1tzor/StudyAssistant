@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,7 +30,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -51,6 +49,7 @@ import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
+import ru.aleshin.studyassistant.core.ui.theme.material.topSide
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
 
@@ -58,7 +57,6 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
  * @author Stanislav Aleshin on 16.06.2024.
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 internal fun OrganizationsBottomBar(
     modifier: Modifier = Modifier,
     allOrganizations: List<OrganizationShortUi>?,
@@ -68,7 +66,7 @@ internal fun OrganizationsBottomBar(
 ) {
     Surface(
         modifier = modifier.animateContentSize(tween()),
-        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+        shape = MaterialTheme.shapes.extraLarge.topSide,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         HorizontalPager(
@@ -120,7 +118,7 @@ private fun OrganizationBottomItem(
             Surface(
                 modifier = Modifier.size(56.dp, 36.dp),
                 color = MaterialTheme.colorScheme.secondary,
-                shape = MaterialTheme.shapes.full(),
+                shape = MaterialTheme.shapes.full,
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Icon(

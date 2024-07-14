@@ -46,7 +46,7 @@ internal sealed class OrganizationsEvent : BaseEvent {
     data object Init : OrganizationsEvent()
     data class Refresh(val organizationId: UID) : OrganizationsEvent()
     data class ChangeOrganization(val organizationId: UID?) : OrganizationsEvent()
-    data class OpenEmployeeCard(val employeeId: UID, val organizationId: UID) : OrganizationsEvent()
+    data class OpenEmployeeProfile(val employeeId: UID) : OrganizationsEvent()
     data class NavigateToEmployees(val organizationId: UID) : OrganizationsEvent()
     data class NavigateToSubjects(val organizationId: UID) : OrganizationsEvent()
     data class NavigateToOrganizationEditor(val organizationId: UID?) : OrganizationsEvent()

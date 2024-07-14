@@ -107,27 +107,13 @@ internal fun ProfileActionsSection(
                         }
                     }
                 },
-                badge = {
-                    AnimatedContent(
-                        targetState = profile == null,
-                        transitionSpec = {
-                            fadeIn(animationSpec = tween(500, delayMillis = 180)).togetherWith(
-                                fadeOut(animationSpec = tween(500))
-                            )
-                        },
-                    ) { loading ->
-                        if (loading) {
-                            PlaceholderBox(
-                                modifier = Modifier.size(25.dp, 16.dp),
-                                shape = RoundedCornerShape(6.dp),
-                                color = MaterialTheme.colorScheme.error,
-                                highlight = null,
-                            )
-                        } else if (requests != null) {
-                            NewFriendBadge(count = requests.received.size)
-                        }
+                badge = if (requests?.received?.isNotEmpty() == true) {
+                    {
+                        NewFriendBadge(count = requests.received.size)
                     }
-                },
+                } else {
+                    null
+                }
             )
         }
         item {

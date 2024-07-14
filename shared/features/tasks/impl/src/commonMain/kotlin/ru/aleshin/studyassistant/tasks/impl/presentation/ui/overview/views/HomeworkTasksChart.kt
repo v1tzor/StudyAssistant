@@ -100,7 +100,7 @@ internal fun HomeworkTasksChart(
             itemCount = taskTypes.size,
             symbol = {
                 Symbol(
-                    shape = MaterialTheme.shapes.full(),
+                    shape = MaterialTheme.shapes.full,
                     fillBrush = SolidColor(taskTypeColors[it]),
                 )
             },

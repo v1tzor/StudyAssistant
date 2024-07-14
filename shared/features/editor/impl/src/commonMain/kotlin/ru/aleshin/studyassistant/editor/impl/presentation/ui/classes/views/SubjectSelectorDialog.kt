@@ -76,7 +76,7 @@ internal fun SubjectSelectorDialog(
                 leadingIcon = {
                     Surface(
                         modifier = Modifier.height(IntrinsicSize.Min),
-                        shape = MaterialTheme.shapes.full(),
+                        shape = MaterialTheme.shapes.full,
                         color = Color(subject.color),
                         content = { Box(modifier = Modifier.size(8.dp, 24.dp)) },
                     )

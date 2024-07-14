@@ -26,12 +26,14 @@ import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepositor
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 16.06.2024.
  */
 interface InfoFeatureDependencies : BaseFeatureDependencies {
     val editorFeatureStarter: () -> EditorFeatureStarter
+    val usersFeatureStarter: () -> UsersFeatureStarter
     val baseScheduleRepository: BaseScheduleRepository
     val organizationsRepository: OrganizationsRepository
     val calendarSettingsRepository: CalendarSettingsRepository

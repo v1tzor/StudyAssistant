@@ -141,7 +141,7 @@ internal fun ColorView(
 ) = Box(
     modifier = modifier
         .size(28.dp)
-        .clip(MaterialTheme.shapes.full())
+        .clip(MaterialTheme.shapes.full)
         .background(color)
         .clickable(
             interactionSource = interactionSource,

@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.core.ui.mappers
 
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantIcons
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
@@ -35,7 +34,6 @@ fun EventType.mapToString(strings: StudyAssistantStrings): String = when (this) 
     EventType.WEBINAR -> strings.eventTypeWebinar
 }
 
-@OptIn(ExperimentalResourceApi::class)
 fun EventType.mapToIcon(icons: StudyAssistantIcons): DrawableResource = when (this) {
     EventType.LESSON -> icons.lesson
     EventType.LECTURE -> icons.lecture

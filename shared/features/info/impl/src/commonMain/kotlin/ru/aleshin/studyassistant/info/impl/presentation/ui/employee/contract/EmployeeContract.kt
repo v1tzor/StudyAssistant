@@ -47,6 +47,7 @@ internal sealed class EmployeeEvent : BaseEvent {
     data class SearchEmployee(val query: String) : EmployeeEvent()
     data class SelectedOrganization(val organization: UID) : EmployeeEvent()
     data class DeleteEmployee(val employeeId: UID) : EmployeeEvent()
+    data class NavigateToProfile(val employeeId: UID) : EmployeeEvent()
     data class NavigateToEditor(val employeeId: UID?) : EmployeeEvent()
     data object NavigateToBack : EmployeeEvent()
 }

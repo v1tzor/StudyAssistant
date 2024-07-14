@@ -75,7 +75,7 @@ internal fun EmployeeSearchTopBar(
         },
         active = false,
         onActiveChange = {},
-        modifier = modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp),
+        modifier = modifier.fillMaxWidth().padding(top = 8.dp, start = 16.dp, end = 16.dp),
         placeholder = {
             Text(text = InfoThemeRes.strings.employeeSearchBarPlaceholder)
         },

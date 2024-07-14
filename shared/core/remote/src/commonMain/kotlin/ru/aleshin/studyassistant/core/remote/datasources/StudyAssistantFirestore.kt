@@ -23,8 +23,9 @@ object StudyAssistantFirestore {
 
     object Users {
         const val ROOT = "users"
-        const val USERNAME = "username"
+        const val UID = "uid"
         const val CODE = "code"
+        const val FRIENDS = "friends"
     }
 
     object UserData {
@@ -47,6 +48,7 @@ object StudyAssistantFirestore {
         const val HOMEWORK_CLASS_ID = "classId"
         const val HOMEWORK_DONE = "done"
         const val HOMEWORK_COMPLETE_DATE = "completeDate"
+        const val SUBJECT_TEACHER_ID = "teacherId"
         const val TODO_DEADLINE = "deadline"
         const val TODO_DONE = "done"
         const val TODO_COMPLETE_DATE = "completeDate"
@@ -57,6 +59,10 @@ object StudyAssistantFirestore {
         const val WEEK = "week"
         const val DAY_OF_WEEK = "weekDayOfWeek"
         const val ORGANIZATION_ID = "organizationId"
+    }
+
+    object Requests {
+        const val ROOT = "requests"
     }
 
     object LIMITS {

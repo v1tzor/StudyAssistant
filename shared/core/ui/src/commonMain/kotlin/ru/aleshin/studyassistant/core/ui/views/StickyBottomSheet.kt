@@ -127,7 +127,7 @@ fun SmallDragHandle(
         Surface(
             modifier = modifier.padding(top = 12.dp, bottom = 4.dp),
             color = color,
-            shape = MaterialTheme.shapes.full(),
+            shape = MaterialTheme.shapes.full,
         ) {
             Box(Modifier.size(width = 32.dp, height = 4.dp))
         }
@@ -143,7 +143,7 @@ fun MediumDragHandle(
         Surface(
             modifier = modifier.padding(vertical = 16.dp),
             color = color,
-            shape = MaterialTheme.shapes.full(),
+            shape = MaterialTheme.shapes.full,
         ) {
             Box(Modifier.size(width = 32.dp, height = 4.dp))
         }

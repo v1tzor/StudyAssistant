@@ -23,7 +23,7 @@ import ru.aleshin.studyassistant.profile.impl.presentation.models.FriendRequests
  * @author Stanislav Aleshin on 30.04.2024.
  */
 internal fun FriendRequests.mapToUi() = FriendRequestsUi(
-    received = received.map { it.uid },
-    send = send.map { it.uid },
-    lastAccepted = lastAccepted.map { it.uid },
+    received = received,
+    send = send,
+    lastActions = lastActions,
 )

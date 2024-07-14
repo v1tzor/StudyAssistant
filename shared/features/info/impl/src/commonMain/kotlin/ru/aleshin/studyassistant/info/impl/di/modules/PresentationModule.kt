@@ -38,13 +38,14 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.SubjectsScreenModel
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.SubjectsStateCommunicator
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.SubjectsWorkProcessor
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<InfoFeatureStarter> { InfoFeatureStarterImpl(instance(), instance(), instance()) }
-    bindSingleton<InfoScreenProvider> { InfoScreenProvider.Base(instance<() -> EditorFeatureStarter>()) }
+    bindSingleton<InfoScreenProvider> { InfoScreenProvider.Base(instance<() -> EditorFeatureStarter>(), instance<() -> UsersFeatureStarter>()) }
 
     bindSingleton<NavigationScreenModel> { NavigationScreenModel() }
     bindSingleton<NavigationScreen> { NavigationScreen() }

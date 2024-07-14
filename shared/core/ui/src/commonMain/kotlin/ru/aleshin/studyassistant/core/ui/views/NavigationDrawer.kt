@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -43,9 +42,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.core.common.managers.DrawerItem
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.managers.DrawerItem
+import ru.aleshin.studyassistant.core.ui.theme.material.endSide
+import ru.aleshin.studyassistant.core.ui.theme.material.full
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
@@ -171,7 +172,7 @@ fun DrawerItem(
     icon: (@Composable () -> Unit)? = null,
     label: @Composable () -> Unit,
     badge: (@Composable () -> Unit)? = null,
-    shape: Shape = RoundedCornerShape(topEnd = 100.dp, bottomEnd = 100.dp),
+    shape: Shape = MaterialTheme.shapes.full.endSide,
     colors: NavigationDrawerItemColors = NavigationDrawerItemDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {

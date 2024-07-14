@@ -16,11 +16,9 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.mappers
 
-import ru.aleshin.studyassistant.core.domain.entities.settings.PrivacySettings
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetwork
 import ru.aleshin.studyassistant.profile.impl.presentation.models.AppUserUi
-import ru.aleshin.studyassistant.profile.impl.presentation.models.PrivacySettingsUi
 import ru.aleshin.studyassistant.profile.impl.presentation.models.SocialNetworkUi
 
 /**
@@ -38,8 +36,8 @@ internal fun AppUser.mapToUi() = AppUserUi(
     birthday = birthday,
     gender = gender,
     friends = friends,
+    subscribePeriod = subscribePeriod,
     socialNetworks = socialNetworks.map { it.mapToUi() },
-    privacy = privacy.mapToUi(),
 )
 
 internal fun AppUserUi.mapToDomain() = AppUser(
@@ -54,20 +52,8 @@ internal fun AppUserUi.mapToDomain() = AppUser(
     birthday = birthday,
     gender = gender,
     friends = friends,
+    subscribePeriod = subscribePeriod,
     socialNetworks = socialNetworks.map { it.mapToDomain() },
-    privacy = privacy.mapToDomain(),
-)
-
-internal fun PrivacySettings.mapToUi() = PrivacySettingsUi(
-    isPrivateProfile = isPrivateProfile,
-    showBirthday = showBirthday,
-    showCity = showCity,
-)
-
-internal fun PrivacySettingsUi.mapToDomain() = PrivacySettings(
-    isPrivateProfile = isPrivateProfile,
-    showBirthday = showBirthday,
-    showCity = showCity
 )
 
 internal fun SocialNetwork.mapToUi() = SocialNetworkUi(

@@ -28,8 +28,9 @@ import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 interface UsersRepository {
     fun fetchCurrentUser(): FirebaseUser?
     fun fetchCurrentUserOrError() = fetchCurrentUser() ?: throw FirebaseUserException()
-    suspend fun createOrUpdateAppUser(user: AppUser): Boolean
+    suspend fun addOrUpdateAppUser(user: AppUser): Boolean
     suspend fun fetchAppUserById(uid: UID): Flow<AppUser?>
-    suspend fun fetchAppUsersByName(query: String): Flow<List<AppUser>>
-    suspend fun fetchAppUsersByCode(code: String): Flow<List<AppUser>>
+    suspend fun fetchRealtimeAppUserById(uid: UID): AppUser?
+    suspend fun fetchAppUserFriends(uid: UID): Flow<List<AppUser>>
+    suspend fun findAppUsersByCode(code: String): Flow<List<AppUser>>
 }

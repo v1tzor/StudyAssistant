@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.data.repositories.BaseScheduleRepositoryIm
 import ru.aleshin.studyassistant.core.data.repositories.CalendarSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.CustomScheduleRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.EmployeeRepositoryImpl
+import ru.aleshin.studyassistant.core.data.repositories.FriendRequestsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.GeneralSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.HomeworksRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ManageUserRepositoryImpl
@@ -46,6 +47,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
+import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
@@ -56,6 +58,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.organizations.OrganizationsRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.requests.FriendRequestsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.schedules.BaseScheduleRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.schedules.CustomScheduleRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.settings.CalendarSettingsRemoteDataSource
@@ -74,6 +77,9 @@ val coreDataModule = DI.Module("CoreData") {
 
     bindSingleton<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance()) }
     bindSingleton<UsersRepository> { UsersRepositoryImpl(instance()) }
+
+    bindSingleton<FriendRequestsRemoteDataSource> { FriendRequestsRemoteDataSource.Base(instance()) }
+    bindSingleton<FriendRequestsRepository> { FriendRequestsRepositoryImpl(instance()) }
 
     bindSingleton<GeneralSettingsLocalDataSource> {
         GeneralSettingsLocalDataSource.Base(instance(), instance())

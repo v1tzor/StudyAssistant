@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
@@ -47,6 +46,7 @@ import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.ui.mappers.format
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
@@ -65,7 +65,7 @@ internal fun HomeworksTopSheet(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
+        shape = MaterialTheme.shapes.extraLarge.bottomSide,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Row(
@@ -98,7 +98,7 @@ internal fun HomeworksTimeRangeSelector(
 ) {
     Surface(
         modifier = modifier,
-        shape = MaterialTheme.shapes.full(),
+        shape = MaterialTheme.shapes.full,
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Row(
@@ -169,7 +169,7 @@ private fun HomeworksProgressView(
         ) {
             if (!isLoading) {
                 LinearProgressIndicator(
-                    modifier = Modifier.height(10.dp).weight(1f).clip(MaterialTheme.shapes.full()),
+                    modifier = Modifier.height(10.dp).weight(1f).clip(MaterialTheme.shapes.full),
                     progress = { progressList.count { it } / progressList.size.toFloat() },
                     trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                     strokeCap = StrokeCap.Square,
@@ -188,7 +188,7 @@ private fun HomeworksProgressView(
             } else {
                 PlaceholderBox(
                     modifier = Modifier.fillMaxWidth().height(10.dp),
-                    shape = MaterialTheme.shapes.full(),
+                    shape = MaterialTheme.shapes.full,
                     color = MaterialTheme.colorScheme.primary,
                 )
             }

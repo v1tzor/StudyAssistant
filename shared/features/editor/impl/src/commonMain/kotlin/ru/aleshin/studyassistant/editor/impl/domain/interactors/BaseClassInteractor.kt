@@ -113,17 +113,17 @@ internal interface BaseClassInteractor {
             val currentDate = dateManager.fetchBeginningCurrentInstant()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
-            val createClassId: UID
+            val updatedClassId: UID
             val oldModel = schedule.classes.find { it.uid == classId }
             val actualClasses = schedule.classes.toMutableList().apply {
                 if (classModel.subject?.uid != oldModel?.subject?.uid ||
                     classModel.organization.uid != oldModel?.organization?.uid
                 ) {
-                    createClassId = randomUUID()
+                    updatedClassId = randomUUID()
                     remove(oldModel)
-                    add(classModel.copy(uid = createClassId))
+                    add(classModel.copy(uid = updatedClassId))
                 } else {
-                    createClassId = classId
+                    updatedClassId = classId
                     set(indexOf(oldModel), classModel)
                 }
             }
@@ -142,7 +142,7 @@ internal interface BaseClassInteractor {
                     classes = actualClasses,
                 )
                 scheduleRepository.addOrUpdateSchedule(actualSchedule, targetUser).let {
-                    return@let createClassId
+                    return@let updatedClassId
                 }
             }
         }

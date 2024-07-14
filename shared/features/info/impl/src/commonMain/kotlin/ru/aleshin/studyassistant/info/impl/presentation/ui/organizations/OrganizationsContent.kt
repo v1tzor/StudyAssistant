@@ -96,7 +96,7 @@ internal fun OrganizationsContent(
     onEditOrganization: () -> Unit,
     onCopyContactInfo: (ContactInfoUi) -> Unit,
     onShowAllEmployee: () -> Unit,
-    onShowEmployeeCard: (UID) -> Unit,
+    onShowEmployeeProfile: (UID) -> Unit,
     onShowAllSubjects: () -> Unit,
     onShowSubjectEditor: (UID) -> Unit,
 ) = with(state) {
@@ -126,7 +126,7 @@ internal fun OrganizationsContent(
                 isLoading = isLoading,
                 organizationData = organizationData,
                 onShowAllEmployee = onShowAllEmployee,
-                onShowEmployeeCard = onShowEmployeeCard,
+                onShowEmployeeProfile = onShowEmployeeProfile,
             )
             OrganizationsSubjectsSection(
                 isLoading = isLoading,
@@ -186,7 +186,7 @@ private fun OrganizationsInfoSection(
                 )
                 PlaceholderBox(
                     modifier = Modifier.fillMaxWidth().height(40.dp),
-                    shape = MaterialTheme.shapes.full(),
+                    shape = MaterialTheme.shapes.full,
                     color = MaterialTheme.colorScheme.primaryContainer,
                 )
             }
@@ -254,14 +254,13 @@ private fun OrganizationsContactSection(
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun OrganizationsEmployeesSection(
     modifier: Modifier = Modifier,
     gridState: LazyGridState = rememberLazyGridState(),
     isLoading: Boolean,
     organizationData: OrganizationUi?,
     onShowAllEmployee: () -> Unit,
-    onShowEmployeeCard: (UID) -> Unit,
+    onShowEmployeeProfile: (UID) -> Unit,
 ) {
     Crossfade(
         targetState = isLoading,
@@ -305,7 +304,7 @@ private fun OrganizationsEmployeesSection(
                                 it.teacher?.uid == employee.uid
                             }
                             ShortEmployeeView(
-                                onClick = { onShowEmployeeCard(employee.uid) },
+                                onClick = { onShowEmployeeProfile(employee.uid) },
                                 avatar = employee.avatar,
                                 post = employee.post,
                                 firstName = employee.firstName,

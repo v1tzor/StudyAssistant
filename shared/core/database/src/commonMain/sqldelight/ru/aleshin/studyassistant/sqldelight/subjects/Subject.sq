@@ -16,6 +16,11 @@ SELECT *
 FROM subjectEntity
 WHERE organization_id = ?;
 
+fetchSubjectsByEmployee:
+SELECT *
+FROM subjectEntity
+WHERE teacher_id = ?;
+
 fetchSubjectById:
 SELECT *
 FROM subjectEntity

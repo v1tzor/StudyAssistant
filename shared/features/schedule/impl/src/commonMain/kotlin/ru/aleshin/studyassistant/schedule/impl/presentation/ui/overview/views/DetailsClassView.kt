@@ -36,7 +36,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -58,6 +57,8 @@ import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.material.endSide
+import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.VerticalLeftTimeProgress
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
@@ -396,7 +397,7 @@ private fun DetailsClassColorIndicator(
 ) {
     Surface(
         modifier = modifier.fillMaxHeight().width(4.dp).padding(vertical = 16.dp),
-        shape = RoundedCornerShape(topEnd = 100.dp, bottomEnd = 100.dp),
+        shape = MaterialTheme.shapes.full.endSide,
         color = indicatorColor ?: MaterialTheme.colorScheme.outline,
         content = { Box(modifier = Modifier.fillMaxHeight()) }
     )

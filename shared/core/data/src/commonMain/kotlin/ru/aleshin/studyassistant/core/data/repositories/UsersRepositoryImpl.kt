@@ -37,7 +37,7 @@ class UsersRepositoryImpl(
         return remoteDataSource.fetchCurrentFirebaseUser()
     }
 
-    override suspend fun createOrUpdateAppUser(user: AppUser): Boolean {
+    override suspend fun addOrUpdateAppUser(user: AppUser): Boolean {
         return remoteDataSource.addOrUpdateUser(user.mapToRemote())
     }
 
@@ -45,18 +45,18 @@ class UsersRepositoryImpl(
         return remoteDataSource.fetchUserById(uid).map { userPojo -> userPojo?.mapToDomain() }
     }
 
-    override suspend fun fetchAppUsersByName(query: String): Flow<List<AppUser>> {
-        val userListFlow = remoteDataSource.fetchUsersByName(query)
+    override suspend fun fetchRealtimeAppUserById(uid: UID): AppUser? {
+        return remoteDataSource.fetchRealtimeAppUserById(uid)?.mapToDomain()
+    }
 
-        return userListFlow.map { users ->
+    override suspend fun fetchAppUserFriends(uid: UID): Flow<List<AppUser>> {
+        return remoteDataSource.fetchAppUserFriends(uid).map { users ->
             users.map { userPojo -> userPojo.mapToDomain() }
         }
     }
 
-    override suspend fun fetchAppUsersByCode(code: String): Flow<List<AppUser>> {
-        val userListFlow = remoteDataSource.fetchUsersByCode(code)
-
-        return userListFlow.map { users ->
+    override suspend fun findAppUsersByCode(code: String): Flow<List<AppUser>> {
+        return remoteDataSource.findUsersByCode(code).map { users ->
             users.map { userPojo -> userPojo.mapToDomain() }
         }
     }

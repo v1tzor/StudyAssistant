@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.core.ui.views
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.common.functional.TimeFormat
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
+import ru.aleshin.studyassistant.core.ui.theme.material.topSide
 
 /**
  * @author Stanislav Aleshin on 26.05.2024.
@@ -48,7 +49,7 @@ fun TimeFormatSelector(
             TextButton(
                 modifier = Modifier.weight(1f),
                 onClick = { onChangeFormat(TimeFormat.AM) },
-                shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+                shape = MaterialTheme.shapes.small.topSide,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                 colors = ButtonDefaults.textButtonColors(
                     containerColor = when (format) {
@@ -69,7 +70,7 @@ fun TimeFormatSelector(
             TextButton(
                 modifier = Modifier.weight(1f),
                 onClick = { onChangeFormat(TimeFormat.PM) },
-                shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp),
+                shape = MaterialTheme.shapes.small.bottomSide,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                 colors = ButtonDefaults.textButtonColors(
                     containerColor = when (format) {

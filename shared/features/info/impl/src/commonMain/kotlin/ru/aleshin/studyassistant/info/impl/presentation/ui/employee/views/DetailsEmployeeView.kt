@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -69,6 +70,7 @@ internal fun DetailsEmployeeViewItem(
     isHavePhone: Boolean,
     isHaveEmail: Boolean,
     isHaveWebsite: Boolean,
+    onOpenProfile: () -> Unit,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
 ) {
@@ -79,7 +81,10 @@ internal fun DetailsEmployeeViewItem(
                     onDelete()
                     true
                 }
-                SwipeToDismissBoxValue.StartToEnd -> false
+                SwipeToDismissBoxValue.StartToEnd -> {
+                    onEdit()
+                    false
+                }
                 SwipeToDismissBoxValue.Settled -> false
             }
         },
@@ -97,14 +102,21 @@ internal fun DetailsEmployeeViewItem(
                         contentDescription = null,
                     )
                 },
+                startToEndContent = {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                    )
+                },
                 endToStartColor = MaterialTheme.colorScheme.errorContainer,
+                startToEndColor = StudyAssistantRes.colors.accents.orangeContainer,
             )
         },
         enableDismissFromEndToStart = enabled,
-        enableDismissFromStartToEnd = false,
+        enableDismissFromStartToEnd = enabled,
     ) {
         DetailsEmployeeView(
-            onClick = onEdit,
+            onClick = onOpenProfile,
             avatar = avatar,
             post = post,
             firstName = firstName,

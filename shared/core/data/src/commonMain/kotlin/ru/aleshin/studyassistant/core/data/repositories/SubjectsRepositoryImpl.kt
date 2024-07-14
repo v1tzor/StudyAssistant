@@ -70,6 +70,20 @@ class SubjectsRepositoryImpl(
         }
     }
 
+    override suspend fun fetchSubjectsByEmployee(employeeId: UID, targetUser: UID): Flow<List<Subject>> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.fetchSubjectsByEmployee(employeeId, targetUser).map { subjects ->
+                subjects.map { subjectPojo -> subjectPojo.mapToDomain() }
+            }
+        } else {
+            localDataSource.fetchSubjectsByEmployee(employeeId).map { subjects ->
+                subjects.map { subjectEntity -> subjectEntity.mapToDomain() }
+            }
+        }
+    }
+
     override suspend fun deleteSubject(targetId: UID, targetUser: UID) {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 

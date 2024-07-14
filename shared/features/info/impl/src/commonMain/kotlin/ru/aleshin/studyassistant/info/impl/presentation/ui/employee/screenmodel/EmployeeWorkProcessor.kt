@@ -81,8 +81,8 @@ internal interface EmployeeWorkProcessor :
                     val groupedEmployees = sortedEmployees.groupBy { it.data.firstName.first() }
                     EmployeeAction.UpdateEmployees(groupedEmployees)
                 },
-            ).collect { result ->
-                emit(result)
+            ).collect { workResult ->
+                emit(workResult)
             }
         }.onStart {
             emit(ActionResult(EmployeeAction.UpdateLoading(true)))
@@ -116,8 +116,8 @@ internal interface EmployeeWorkProcessor :
                     val groupedEmployees = sortedEmployees.groupBy { it.data.firstName.first() }
                     EmployeeAction.UpdateEmployees(groupedEmployees)
                 },
-            ).collect { result ->
-                emit(result)
+            ).collect { workResult ->
+                emit(workResult)
             }
         }
 

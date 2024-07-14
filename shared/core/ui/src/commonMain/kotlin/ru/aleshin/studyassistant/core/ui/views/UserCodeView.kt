@@ -39,7 +39,7 @@ fun UserCodeView(
     contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
     contentColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     backgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer,
-    shape: Shape = MaterialTheme.shapes.full(),
+    shape: Shape = MaterialTheme.shapes.full,
 ) {
     Surface(
         modifier = modifier,

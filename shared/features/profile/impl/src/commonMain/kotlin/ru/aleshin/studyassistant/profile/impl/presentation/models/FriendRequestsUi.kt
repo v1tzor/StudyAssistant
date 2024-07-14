@@ -18,14 +18,19 @@ package ru.aleshin.studyassistant.profile.impl.presentation.models
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import dev.icerock.moko.parcelize.TypeParceler
+import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 @Parcelize
 internal data class FriendRequestsUi(
-    val received: List<UID> = emptyList(),
-    val send: List<UID> = emptyList(),
-    val lastAccepted: List<UID> = emptyList(),
+    @TypeParceler<Instant, InstantParceler>
+    val received: Map<UID, Instant> = emptyMap(),
+    @TypeParceler<Instant, InstantParceler>
+    val send: Map<UID, Instant> = emptyMap(),
+    val lastActions: Map<UID, Boolean> = emptyMap(),
 ) : Parcelable

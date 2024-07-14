@@ -88,7 +88,7 @@ internal fun SelectableAvatarView(
             onClick = onClick,
             modifier = modifier.size(90.dp, 90.dp),
             enabled = enabled,
-            shape = MaterialTheme.shapes.full(),
+            shape = MaterialTheme.shapes.full,
             color = containerColor,
             contentColor = contentColor,
         ) {
@@ -111,7 +111,7 @@ internal fun SelectableAvatarView(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .size(24.dp)
-                .clip(MaterialTheme.shapes.full())
+                .clip(MaterialTheme.shapes.full)
                 .border(2.dp, MaterialTheme.colorScheme.surfaceContainerLow),
             painter = painterResource(StudyAssistantRes.icons.upload),
             contentDescription = StudyAssistantRes.strings.avatarDesc,
@@ -126,7 +126,7 @@ internal fun AvatarViewPlaceholder(
 ) {
     PlaceholderBox(
         modifier = modifier.size(90.dp),
-        shape = MaterialTheme.shapes.full(),
+        shape = MaterialTheme.shapes.full,
         highlight = null,
     )
 }

@@ -59,6 +59,7 @@ object Constants {
         const val TEST_TOPIC_MAX_LENGTH = 70
         const val MIN_PASSWORD_LENGTH = 6
         const val MIN_EMAIL_LENGTH = 5
+        const val USER_CODE_LENGTH = 7
     }
 
     object Notification {
@@ -89,7 +90,11 @@ object Constants {
         const val SHORT_SUBJECTS = 9
         const val EMPLOYEES_OR_SUBJECTS = 12
         const val HOMEWORKS = 7
+        const val EMPLOYEE_CONTACT_INFO = 4
         const val TODOS = 6
+        const val OVERVIEW_FRIEND_REQUESTS = 3
+        const val FULL_FRIEND_REQUESTS = 10
+        const val FRIENDS = 10
     }
 
     object Delay {
@@ -105,6 +110,7 @@ object Constants {
         const val FADE_FAST = 500
         const val FADE_SLOW = 800
         const val FADE_DELAY = 200
+        const val STANDARD_TWEEN = 300
     }
 
     object Date {

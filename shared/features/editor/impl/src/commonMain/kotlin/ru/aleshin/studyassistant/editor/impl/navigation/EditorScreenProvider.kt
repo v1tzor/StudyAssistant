@@ -38,6 +38,7 @@ internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen> {
             is EditorScreen.Schedule -> ScheduleEditorScreen(
                 week = screen.week,
             )
+            is EditorScreen.CustomSchedule -> EmptyScreen
             is EditorScreen.Class -> ClassEditorScreen(
                 classId = screen.classId,
                 scheduleId = screen.scheduleId,

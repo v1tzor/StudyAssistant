@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
+import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
@@ -63,6 +64,9 @@ import ru.aleshin.studyassistant.settings.impl.di.holder.SettingsFeatureDIHolder
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 import ru.aleshin.studyassistant.tasks.impl.di.TasksFeatureDependencies
 import ru.aleshin.studyassistant.tasks.impl.di.holder.TasksFeatureDIHolder
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
+import ru.aleshin.studyassistant.users.impl.di.UsersFeatureDependencies
+import ru.aleshin.studyassistant.users.impl.di.holder.UsersFeatureDIHolder
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
@@ -164,6 +168,7 @@ val featureModule = DI.Module("Feature") {
     bindEagerSingleton<InfoFeatureDependencies> {
         object : InfoFeatureDependencies {
             override val editorFeatureStarter = provider<EditorFeatureStarter>()
+            override val usersFeatureStarter = provider<UsersFeatureStarter>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
@@ -184,14 +189,34 @@ val featureModule = DI.Module("Feature") {
     bindEagerSingleton<ProfileFeatureDependencies> {
         object : ProfileFeatureDependencies {
             override val authFeatureStarter = provider<AuthFeatureStarter>()
+            override val usersFeatureStarter = provider<UsersFeatureStarter>()
             override val settingsFeatureStarter = provider<SettingsFeatureStarter>()
             override val authRepository = instance<AuthRepository>()
             override val usersRepository = instance<UsersRepository>()
+            override val friendRequestsRepository = instance<FriendRequestsRepository>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }
     bindProvider<ProfileFeatureStarter> {
         with(ProfileFeatureDIHolder) {
+            init(instance())
+            fetchApi().fetchStarter()
+        }
+    }
+
+    bindEagerSingleton<UsersFeatureDependencies> {
+        object : UsersFeatureDependencies {
+            override val editorFeatureStarter = provider<EditorFeatureStarter>()
+            override val employeeRepository = instance<EmployeeRepository>()
+            override val subjectsRepository = instance<SubjectsRepository>()
+            override val friendRequestsRepository = instance<FriendRequestsRepository>()
+            override val usersRepository = instance<UsersRepository>()
+            override val dateManager = instance<DateManager>()
+            override val coroutineManager = instance<CoroutineManager>()
+        }
+    }
+    bindProvider<UsersFeatureStarter> {
+        with(UsersFeatureDIHolder) {
             init(instance())
             fetchApi().fetchStarter()
         }

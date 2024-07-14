@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.common.functional.Constants.Class.MAX_NUMBER
@@ -85,7 +84,6 @@ internal fun NumberDropdownMenu(
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun NumberedDurationCreatorDropdownMenu(
     modifier: Modifier = Modifier,

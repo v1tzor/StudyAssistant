@@ -17,8 +17,8 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation
 
 import androidx.compose.runtime.Composable
-import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.CurrentScreen
 import ru.aleshin.studyassistant.core.common.di.withDirectDI
 import ru.aleshin.studyassistant.core.common.navigation.NestedFeatureNavigator
@@ -37,9 +37,9 @@ internal class NavigationScreen : Screen {
 
     @Composable
     override fun Content() = withDirectDI(directDI = { EditorFeatureDIHolder.fetchDI() }) {
-        val screenModel = rememberScreenModel { NavigationScreenModel() }
         val screenProvider = rememberScreenProvider<EditorScreenProvider, EditorScreen>()
         val navigatorManager = rememberNavigatorManager<EditorNavigatorManager, EditorScreen>()
+        val screenModel = rememberScreenModel<NavigationScreenModel>()
 
         NestedFeatureNavigator(
             screenProvider = screenProvider,

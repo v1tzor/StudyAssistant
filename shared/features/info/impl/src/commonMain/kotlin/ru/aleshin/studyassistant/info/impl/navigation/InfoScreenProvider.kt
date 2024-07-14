@@ -24,6 +24,8 @@ import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.EmployeeScreen
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.OrganizationsScreen
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.SubjectsScreen
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
+import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -32,8 +34,11 @@ internal interface InfoScreenProvider : FeatureScreenProvider<InfoScreen> {
 
     fun provideEditorScreen(screen: EditorScreen): Screen
 
+    fun provideUsersScreen(screen: UsersScreen): Screen
+
     class Base(
         private val editorFeatureStarter: () -> EditorFeatureStarter,
+        private val usersFeatureStarter: () -> UsersFeatureStarter,
     ) : InfoScreenProvider {
 
         override fun provideFeatureScreen(screen: InfoScreen) = when (screen) {
@@ -44,6 +49,10 @@ internal interface InfoScreenProvider : FeatureScreenProvider<InfoScreen> {
 
         override fun provideEditorScreen(screen: EditorScreen): Screen {
             return editorFeatureStarter().fetchRootScreenAndNavigate(screen)
+        }
+
+        override fun provideUsersScreen(screen: UsersScreen): Screen {
+            return usersFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }

@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import co.touchlab.kermit.Logger
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
@@ -31,6 +32,7 @@ import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileEf
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileEvent
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileViewState
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsScreen
+import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024
@@ -66,8 +68,12 @@ internal class ProfileScreenModel(
                 val command = ProfileWorkCommand.SignOut
                 workProcessor.work(command).collectAndHandleWork()
             }
-            is ProfileEvent.NavigateToPrivacySettings -> {}
-            is ProfileEvent.NavigateToFriends -> {}
+            is ProfileEvent.NavigateToPrivacySettings -> {
+            }
+            is ProfileEvent.NavigateToFriends -> {
+                val screen = screenProvider.provideUsersScreen(UsersScreen.Friends)
+                sendEffect(ProfileEffect.PushGlobalScreen(screen))
+            }
             is ProfileEvent.NavigateToGeneralSettings -> {
                 val screen = screenProvider.provideSettingsScreen(SettingsScreen.General)
                 sendEffect(ProfileEffect.PushGlobalScreen(screen))
@@ -96,6 +102,12 @@ internal class ProfileScreenModel(
             myProfile = action.profile,
             myFriendRequest = action.requests,
         )
+    }
+
+    override fun onDispose() {
+        super.onDispose()
+        Logger.i("test") { "onDispose -> profile" }
+        ProfileFeatureDIHolder.clear()
     }
 }
 

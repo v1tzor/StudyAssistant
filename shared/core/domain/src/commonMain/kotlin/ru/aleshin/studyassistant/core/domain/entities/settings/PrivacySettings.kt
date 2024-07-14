@@ -20,7 +20,5 @@ package ru.aleshin.studyassistant.core.domain.entities.settings
  * @author Stanislav Aleshin on 21.04.2024.
  */
 data class PrivacySettings(
-    val isPrivateProfile: Boolean = false,
-    val showBirthday: AccessType = AccessType.FRIENDS,
-    val showCity: AccessType = AccessType.FRIENDS,
+    val allowHomeworkRequest: Boolean = true,
 )

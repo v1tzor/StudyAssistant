@@ -46,7 +46,7 @@ internal fun SelectableAvatarView(
     imageUrl: String?,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.primary,
-    shape: Shape = MaterialTheme.shapes.full(),
+    shape: Shape = MaterialTheme.shapes.full,
 ) {
     Box {
         Surface(
@@ -71,7 +71,7 @@ internal fun SelectableAvatarView(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .size(24.dp)
-                .clip(MaterialTheme.shapes.full())
+                .clip(MaterialTheme.shapes.full)
                 .border(2.dp, MaterialTheme.colorScheme.surfaceContainerLow),
             painter = painterResource(StudyAssistantRes.icons.upload),
             contentDescription = StudyAssistantRes.strings.avatarDesc,

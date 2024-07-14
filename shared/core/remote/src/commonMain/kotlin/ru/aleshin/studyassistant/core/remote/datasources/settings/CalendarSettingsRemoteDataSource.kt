@@ -40,8 +40,10 @@ interface CalendarSettingsRemoteDataSource {
         override suspend fun addOrUpdateSettings(settings: CalendarSettingsPojo, targetUser: UID) {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
             val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
-            reference.set(settings)
+
+            return reference.set(settings)
         }
 
         override suspend fun fetchSettings(targetUser: UID): Flow<CalendarSettingsPojo> {

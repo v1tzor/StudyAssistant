@@ -16,8 +16,7 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.users
 
-import ru.aleshin.studyassistant.core.domain.entities.settings.AccessType
-import ru.aleshin.studyassistant.core.domain.entities.settings.PrivacySettings
+import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetwork
@@ -39,10 +38,8 @@ fun AppUser.mapToRemote() = AppUserPojo(
     birthday = birthday,
     gender = gender?.name,
     friends = friends,
+    subscribePeriod = subscribePeriod?.toEpochMilliseconds(),
     socialNetworks = socialNetworks.map { it.mapToRemote() },
-    privateProfile = privacy.isPrivateProfile,
-    showBirthday = privacy.showBirthday.name,
-    showCity = privacy.showCity.name,
 )
 
 fun AppUserPojo.mapToDomain() = AppUser(
@@ -57,12 +54,8 @@ fun AppUserPojo.mapToDomain() = AppUser(
     birthday = birthday,
     gender = gender?.let { Gender.valueOf(it) },
     friends = friends,
+    subscribePeriod = subscribePeriod?.mapEpochTimeToInstant(),
     socialNetworks = socialNetworks.map { it.mapToDomain() },
-    privacy = PrivacySettings(
-        isPrivateProfile = privateProfile,
-        showBirthday = AccessType.valueOf(showBirthday),
-        showCity = AccessType.valueOf(showCity),
-    ),
 )
 
 fun SocialNetwork.mapToRemote() = SocialNetworkPojo(

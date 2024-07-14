@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,6 +50,7 @@ import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.material.endSide
 import ru.aleshin.studyassistant.core.ui.views.InfoBadge
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
 import ru.aleshin.studyassistant.info.impl.presentation.models.users.ContactInfoUi
@@ -139,7 +139,7 @@ private fun DetailsSubjectView(
         Row(modifier = Modifier.height(IntrinsicSize.Min)) {
             Surface(
                 modifier = Modifier.width(4.dp).padding(vertical = 16.dp),
-                shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
+                shape = MaterialTheme.shapes.small.endSide,
                 color = color,
                 content = { Box(modifier = Modifier.fillMaxHeight()) }
             )

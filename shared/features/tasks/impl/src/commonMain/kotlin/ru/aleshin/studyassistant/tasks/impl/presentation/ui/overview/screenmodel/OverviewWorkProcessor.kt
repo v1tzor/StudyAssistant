@@ -108,14 +108,15 @@ internal interface OverviewWorkProcessor :
         private fun loadTaskErrorsWork(currentDate: Instant) = flow {
             val homeworkErrorsFlow = homeworksInteractor.fetchHomeworkErrors(currentDate)
             val todoErrorsFlow = todoInteractor.fetchTodoErrors(currentDate)
+
             homeworkErrorsFlow.flatMapLatestWithResult(
                 secondFlow = todoErrorsFlow,
                 onError = { OverviewEffect.ShowError(it) },
                 onData = { homeworkErrors, todoErrors ->
                     OverviewAction.UpdateTaskErrors(homeworkErrors.mapToUi(), todoErrors.mapToUi())
                 },
-            ).collect { result ->
-                emit(result)
+            ).collect { workResult ->
+                emit(workResult)
             }
         }.onStart {
             emit(ActionResult(OverviewAction.UpdateErrorsLoading(true)))

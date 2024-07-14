@@ -16,11 +16,13 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
+import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
@@ -31,10 +33,10 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
  */
 internal interface CustomClassInteractor {
 
-    suspend fun addClass(classModel: Class): DomainResult<EditorFailures, UID>
+    suspend fun addClassBySchedule(classModel: Class, schedule: CustomSchedule): DomainResult<EditorFailures, UID>
     suspend fun fetchClass(classId: UID, scheduleId: UID): FlowDomainResult<EditorFailures, Class?>
-    suspend fun updateClass(classModel: Class): DomainResult<EditorFailures, UID>
-    suspend fun deleteClass(targetClass: Class): UnitDomainResult<EditorFailures>
+    suspend fun updateClassBySchedule(classModel: Class, schedule: CustomSchedule): DomainResult<EditorFailures, UID>
+    suspend fun deleteClassBySchedule(targetClass: Class, schedule: CustomSchedule): UnitDomainResult<EditorFailures>
 
     class Base(
         private val customScheduleRepository: CustomScheduleRepository,
@@ -45,20 +47,56 @@ internal interface CustomClassInteractor {
         private val targetUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid
 
-        override suspend fun addClass(classModel: Class) = eitherWrapper.wrap {
-            TODO("Not yet implemented")
+        override suspend fun addClassBySchedule(
+            classModel: Class,
+            schedule: CustomSchedule,
+        ) = eitherWrapper.wrap {
+            val createClassModel = classModel.copy(uid = randomUUID())
+            val updatedClasses = schedule.classes.toMutableList().apply { add(createClassModel) }
+            val updatedSchedule = schedule.copy(classes = updatedClasses)
+
+            customScheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser).let {
+                createClassModel.uid
+            }
         }
 
         override suspend fun fetchClass(classId: UID, scheduleId: UID) = eitherWrapper.wrapFlow {
             customScheduleRepository.fetchClassById(classId, scheduleId, targetUser)
         }
 
-        override suspend fun updateClass(classModel: Class) = eitherWrapper.wrap {
-            TODO("Not yet implemented")
+        override suspend fun updateClassBySchedule(
+            classModel: Class,
+            schedule: CustomSchedule,
+        ) = eitherWrapper.wrap {
+            val updatedClassId: UID
+            val oldModel = schedule.classes.find { it.uid == classModel.uid }
+            val updatedClasses = schedule.classes.toMutableList().apply {
+                if (classModel.subject?.uid != oldModel?.subject?.uid ||
+                    classModel.organization.uid != oldModel?.organization?.uid
+                ) {
+                    updatedClassId = randomUUID()
+                    remove(oldModel)
+                    add(classModel.copy(uid = updatedClassId))
+                } else {
+                    updatedClassId = classModel.uid
+                    set(indexOf(oldModel), classModel)
+                }
+            }
+            val updatedSchedule = schedule.copy(classes = updatedClasses)
+
+            customScheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser).let {
+                updatedClassId
+            }
         }
 
-        override suspend fun deleteClass(targetClass: Class) = eitherWrapper.wrapUnit {
-            TODO("Not yet implemented")
+        override suspend fun deleteClassBySchedule(
+            targetClass: Class,
+            schedule: CustomSchedule,
+        ) = eitherWrapper.wrapUnit {
+            val updatedClasses = schedule.classes.toMutableList().apply { remove(targetClass) }
+            val updatedSchedule = schedule.copy(classes = updatedClasses)
+
+            customScheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser)
         }
     }
 }

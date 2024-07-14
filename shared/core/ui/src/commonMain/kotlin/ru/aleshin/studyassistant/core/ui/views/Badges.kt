@@ -66,6 +66,32 @@ fun SmallInfoBadge(
 }
 
 @Composable
+fun MediumInfoBadge(
+    modifier: Modifier = Modifier,
+    containerColor: Color = StudyAssistantRes.colors.accents.redContainer,
+    contentColor: Color = StudyAssistantRes.colors.accents.contentColorFor(containerColor),
+    content: @Composable () -> Unit,
+) {
+    Surface(
+        modifier = modifier.animateContentSize(),
+        shape = RoundedCornerShape(6.dp),
+        color = containerColor,
+    ) {
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor
+        ) {
+            ProvideTextStyle(value = MaterialTheme.typography.labelLarge) {
+                Box(
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                    contentAlignment = Alignment.Center,
+                    content = { content() },
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun InfoBadge(
     modifier: Modifier = Modifier,
     leadingIcon: (@Composable () -> Unit)? = null,

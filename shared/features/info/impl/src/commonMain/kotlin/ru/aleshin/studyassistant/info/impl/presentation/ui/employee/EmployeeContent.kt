@@ -52,6 +52,7 @@ internal fun EmployeeContent(
     state: EmployeeViewState,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
+    onOpenEmployeeProfile: (UID) -> Unit,
     onEditEmployee: (UID) -> Unit,
     onDeleteEmployee: (UID) -> Unit,
 ) = with(state) {
@@ -102,6 +103,7 @@ internal fun EmployeeContent(
                                     isHavePhone = employee.data.phones.isNotEmpty(),
                                     isHaveEmail = employee.data.emails.isNotEmpty(),
                                     isHaveWebsite = employee.data.webs.isNotEmpty(),
+                                    onOpenProfile = { onOpenEmployeeProfile(employee.data.uid) },
                                     onEdit = { onEditEmployee(employee.data.uid) },
                                     onDelete = { onDeleteEmployee(employee.data.uid) }
                                 )

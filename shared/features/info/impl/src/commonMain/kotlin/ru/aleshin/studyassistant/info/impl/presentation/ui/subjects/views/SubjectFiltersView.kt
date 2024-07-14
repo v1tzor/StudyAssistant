@@ -66,7 +66,7 @@ internal fun SubjectFiltersView(
 ) {
     Column(modifier = modifier) {
         Row(
-            modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp, top = 4.dp),
+            modifier = Modifier.padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {

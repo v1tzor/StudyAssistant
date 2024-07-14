@@ -43,7 +43,7 @@ internal interface UsersInteractor {
         }
 
         override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {
-            usersRepository.createOrUpdateAppUser(user)
+            usersRepository.addOrUpdateAppUser(user)
         }
     }
 }

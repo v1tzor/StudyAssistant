@@ -38,6 +38,7 @@ import ru.aleshin.studyassistant.info.impl.di.InfoFeatureDependencies
 import ru.aleshin.studyassistant.info.impl.di.modules.domainModule
 import ru.aleshin.studyassistant.info.impl.di.modules.navigationModule
 import ru.aleshin.studyassistant.info.impl.di.modules.presentationModule
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 16.06.2024.
@@ -51,6 +52,7 @@ object InfoFeatureDIHolder : BaseFeatureDIHolder<InfoFeatureApi, InfoFeatureDepe
             val di = DI {
                 importAll(navigationModule, presentationModule, domainModule)
                 bindInstance<() -> EditorFeatureStarter> { dependencies.editorFeatureStarter }
+                bindInstance<() -> UsersFeatureStarter> { dependencies.usersFeatureStarter }
                 bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }

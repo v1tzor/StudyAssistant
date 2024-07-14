@@ -18,9 +18,11 @@ package ru.aleshin.studyassistant.preview.impl.presentation.models.users
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import dev.icerock.moko.parcelize.TypeParceler
+import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
-import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.PrivacySettingsUi
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -37,10 +39,10 @@ internal data class AppUserUi(
     val city: String? = null,
     val birthday: String? = null,
     val gender: Gender? = null,
-    val isSubscriber: Boolean = false,
+    @TypeParceler<Instant?, NullInstantParceler>
+    val subscribePeriod: Instant? = null,
     val socialNetworks: List<SocialNetworkUi> = emptyList(),
     val friends: List<UID> = emptyList(),
-    val privacy: PrivacySettingsUi = PrivacySettingsUi(),
 ) : Parcelable {
     companion object {
         fun createEmpty(uid: UID) = AppUserUi(

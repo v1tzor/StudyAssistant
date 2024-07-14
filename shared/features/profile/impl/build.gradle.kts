@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.parcelize)
 }
 
@@ -29,6 +30,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":shared:features:auth:api"))
             implementation(project(":shared:features:profile:api"))
+            implementation(project(":shared:features:users:api"))
             implementation(project(":shared:features:settings:api"))
 
             implementation(project(":shared:core:common"))

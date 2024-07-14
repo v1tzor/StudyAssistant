@@ -55,7 +55,7 @@ internal data class EmployeeEditorScreen(
         dependencies = EmployeeEditorDeps(
             employeeId = employeeId,
             organizationId = organizationId,
-        )
+        ),
     ) { state ->
         val strings = EditorThemeRes.strings
         val navigator = LocalNavigator.currentOrThrow

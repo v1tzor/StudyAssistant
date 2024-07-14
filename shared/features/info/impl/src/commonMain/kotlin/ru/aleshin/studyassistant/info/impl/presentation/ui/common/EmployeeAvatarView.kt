@@ -42,7 +42,7 @@ internal fun EmployeeAvatarView(
 ) {
     Surface(
         modifier = modifier.size(40.dp),
-        shape = MaterialTheme.shapes.full(),
+        shape = MaterialTheme.shapes.full,
         color = containerColor,
         contentColor = contentColor,
     ) {

@@ -61,6 +61,7 @@ import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.toMinutesAndHoursString
 import ru.aleshin.studyassistant.core.common.functional.Constants.Animations.FADE_SLOW
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.SmallInfoBadge
@@ -82,7 +83,7 @@ internal fun OverviewTopSheet(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
+        shape = MaterialTheme.shapes.extraLarge.bottomSide,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Row(
@@ -218,7 +219,7 @@ private fun OverviewTopSheetClassTime(
                     )
                 }
                 LinearProgressIndicator(
-                    modifier = Modifier.height(10.dp).fillMaxWidth(1f).clip(MaterialTheme.shapes.full()),
+                    modifier = Modifier.height(10.dp).fillMaxWidth(1f).clip(MaterialTheme.shapes.full),
                     progress = { progress },
                     trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                     strokeCap = StrokeCap.Square,
@@ -235,7 +236,7 @@ private fun OverviewTopSheetClassTime(
                 )
                 PlaceholderBox(
                     modifier = Modifier.height(10.dp).fillMaxWidth(),
-                    shape = MaterialTheme.shapes.full(),
+                    shape = MaterialTheme.shapes.full,
                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 )
             }

@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
+import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.profile.api.di.ProfileFeatureApi
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
@@ -32,6 +33,7 @@ import ru.aleshin.studyassistant.profile.impl.di.ProfileFeatureDependencies
 import ru.aleshin.studyassistant.profile.impl.di.modules.domainModule
 import ru.aleshin.studyassistant.profile.impl.di.modules.presentationModule
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -45,9 +47,11 @@ object ProfileFeatureDIHolder : BaseFeatureDIHolder<ProfileFeatureApi, ProfileFe
             val di = DI {
                 importAll(presentationModule, domainModule)
                 bindSingleton<() -> AuthFeatureStarter> { dependencies.authFeatureStarter }
+                bindSingleton<() -> UsersFeatureStarter> { dependencies.usersFeatureStarter }
                 bindSingleton<() -> SettingsFeatureStarter> { dependencies.settingsFeatureStarter }
                 bindSingleton<AuthRepository> { dependencies.authRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
+                bindSingleton<FriendRequestsRepository> { dependencies.friendRequestsRepository }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<ProfileFeatureApi> {
                     object : ProfileFeatureApi {

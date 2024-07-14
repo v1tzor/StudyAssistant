@@ -39,6 +39,7 @@ interface SubjectsRemoteDataSource {
     suspend fun addOrUpdateSubject(subject: SubjectPojo, targetUser: UID): UID
     suspend fun fetchSubjectById(uid: UID, targetUser: UID): Flow<SubjectDetailsPojo?>
     suspend fun fetchAllSubjectsByOrganization(organizationId: UID, targetUser: UID): Flow<List<SubjectDetailsPojo>>
+    suspend fun fetchSubjectsByEmployee(employeeId: UID, targetUser: UID): Flow<List<SubjectDetailsPojo>>
     suspend fun deleteSubject(targetId: UID, targetUser: UID)
 
     class Base(
@@ -95,6 +96,33 @@ interface SubjectsRemoteDataSource {
             val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).where {
                 UserData.ORGANIZATION_ID equalTo organizationId
             }
+
+            val subjectPojoListFlow = subjectsReference.snapshots.map { snapshot ->
+                snapshot.documents.map { it.data(serializer<SubjectPojo>()) }
+            }
+
+            return subjectPojoListFlow.map { subjectPojoList ->
+                subjectPojoList.map { subjectPojo ->
+                    val employeeReferenceRoot = userDataRoot.collection(UserData.EMPLOYEE)
+
+                    val employeeReference = subjectPojo.teacherId?.let { employeeReferenceRoot.document(it) }
+                    val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeePojo?>())
+
+                    subjectPojo.mapToDetails(employee = employee)
+                }
+            }
+        }
+
+        override suspend fun fetchSubjectsByEmployee(
+            employeeId: UID,
+            targetUser: UID
+        ): Flow<List<SubjectDetailsPojo>> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).where {
+                UserData.SUBJECT_TEACHER_ID equalTo employeeId
+            }.orderBy(UserData.SUBJECT_TEACHER_ID)
 
             val subjectPojoListFlow = subjectsReference.snapshots.map { snapshot ->
                 snapshot.documents.map { it.data(serializer<SubjectPojo>()) }

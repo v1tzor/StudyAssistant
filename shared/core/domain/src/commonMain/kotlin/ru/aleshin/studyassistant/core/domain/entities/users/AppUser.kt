@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.users
 
+import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.generateSevenDigitCode
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.entities.settings.PrivacySettings
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
@@ -35,8 +35,8 @@ data class AppUser(
     val birthday: String? = null,
     val gender: Gender? = null,
     val friends: List<UID> = emptyList(),
+    val subscribePeriod: Instant? = null,
     val socialNetworks: List<SocialNetwork> = emptyList(),
-    val privacy: PrivacySettings = PrivacySettings(),
 ) {
     companion object {
         fun createNewUser(uid: UID, username: String, email: String) = AppUser(

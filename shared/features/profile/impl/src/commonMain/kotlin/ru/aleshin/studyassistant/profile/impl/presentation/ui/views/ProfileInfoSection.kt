@@ -89,7 +89,7 @@ internal fun AvatarView(
 ) {
     Surface(
         modifier = modifier.size(120.dp),
-        shape = MaterialTheme.shapes.full(),
+        shape = MaterialTheme.shapes.full,
         color = containerColor,
         contentColor = contentColor,
     ) {
@@ -135,7 +135,7 @@ internal fun AvatarViewPlaceholder(
 ) {
     PlaceholderBox(
         modifier = modifier.size(120.dp),
-        shape = MaterialTheme.shapes.full(),
+        shape = MaterialTheme.shapes.full,
         highlight = null,
     )
 }
@@ -155,7 +155,7 @@ internal fun ContactInfoViewPlaceholder(
         )
         PlaceholderBox(
             modifier = Modifier.size(93.dp, 24.dp),
-            shape = MaterialTheme.shapes.full(),
+            shape = MaterialTheme.shapes.full,
             color = MaterialTheme.colorScheme.secondary,
             highlight = null,
         )

@@ -20,16 +20,20 @@ import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
+import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 interface ProfileFeatureDependencies : BaseFeatureDependencies {
     val authFeatureStarter: () -> AuthFeatureStarter
+    val usersFeatureStarter: () -> UsersFeatureStarter
     val settingsFeatureStarter: () -> SettingsFeatureStarter
     val authRepository: AuthRepository
     val usersRepository: UsersRepository
+    val friendRequestsRepository: FriendRequestsRepository
     val coroutineManager: CoroutineManager
 }

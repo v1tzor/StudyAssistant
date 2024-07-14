@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.Emp
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeEffect
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeEvent
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeViewState
+import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 
 /**
  * @author Stanislav Aleshin on 17.06.2024
@@ -93,6 +94,11 @@ internal class EmployeeScreenModel(
                 val organization = checkNotNull(selectedOrganization)
                 val featureScreen = EditorScreen.Employee(event.employeeId, organization)
                 val screen = screenProvider.provideEditorScreen(featureScreen)
+                sendEffect(EmployeeEffect.NavigateToGlobal(screen))
+            }
+            is EmployeeEvent.NavigateToProfile -> {
+                val featureScreen = UsersScreen.EmployeeProfile(event.employeeId)
+                val screen = screenProvider.provideUsersScreen(featureScreen)
                 sendEffect(EmployeeEffect.NavigateToGlobal(screen))
             }
             is EmployeeEvent.NavigateToBack -> {

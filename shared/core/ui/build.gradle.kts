@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.parcelize)
 }
 
@@ -42,11 +43,12 @@ kotlin {
             api(compose.materialIconsExtended)
             api(compose.components.resources)
 
-            api(libs.logger)
-
             api(libs.google.accompanist)
             api(libs.placeholder)
+
             api(libs.koalaplot.charts)
+
+            api(libs.bundles.sketch)
         }
     }
 

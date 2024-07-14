@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.parcelize)
 }
 
@@ -44,6 +45,8 @@ kotlin {
             implementation(project(":shared:features:profile:impl"))
             implementation(project(":shared:features:settings:api"))
             implementation(project(":shared:features:settings:impl"))
+            implementation(project(":shared:features:users:api"))
+            implementation(project(":shared:features:users:impl"))
             implementation(project(":shared:features:editor:api"))
             implementation(project(":shared:features:editor:impl"))
 

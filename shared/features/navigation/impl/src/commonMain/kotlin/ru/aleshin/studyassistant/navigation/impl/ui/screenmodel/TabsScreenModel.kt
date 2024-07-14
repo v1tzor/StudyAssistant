@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.navigation.impl.ui.screenmodel
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import co.touchlab.kermit.Logger
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
@@ -86,6 +87,7 @@ internal class TabsScreenModel(
 
     override fun onDispose() {
         super.onDispose()
+        Logger.i("test") { "onDispose -> tabs" }
         NavigationFeatureDIHolder.clear()
     }
 

@@ -35,17 +35,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.SubjectSelectorDialog
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.SubjectSelectorDialog
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -86,7 +86,7 @@ internal fun SubjectAndEventTypeInfoField(
                 placeholder = EditorThemeRes.strings.subjectFieldPlaceholder,
                 leadingIcon = {
                     Surface(
-                        shape = MaterialTheme.shapes.full(),
+                        shape = MaterialTheme.shapes.full,
                         color = subject?.color?.let { Color(it) }
                             ?: MaterialTheme.colorScheme.outlineVariant,
                         content = { Box(modifier = Modifier.size(8.dp, 24.dp)) },
@@ -166,9 +166,8 @@ internal fun SubjectInfoField(
         placeholder = EditorThemeRes.strings.subjectFieldPlaceholder,
         leadingIcon = {
             Surface(
-                shape = MaterialTheme.shapes.full(),
-                color = subject?.color?.let { Color(it) }
-                    ?: MaterialTheme.colorScheme.outlineVariant,
+                shape = MaterialTheme.shapes.full,
+                color = subject?.color?.let { Color(it) } ?: MaterialTheme.colorScheme.outlineVariant,
                 content = { Box(modifier = Modifier.size(8.dp, 24.dp)) },
             )
         },
