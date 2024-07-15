@@ -62,7 +62,8 @@ internal sealed class EmployeeEffect : BaseUiEffect {
 }
 
 internal sealed class EmployeeAction : BaseAction {
-    data class SetupEditModel(val editModel: EditEmployeeUi, val organization: OrganizationShortUi) : EmployeeAction()
+    data class SetupEditModel(val editModel: EditEmployeeUi) : EmployeeAction()
     data class UpdateEditModel(val editModel: EditEmployeeUi?) : EmployeeAction()
+    data class UpdateOrganization(val organization: OrganizationShortUi) : EmployeeAction()
     data class UpdateLoading(val isLoading: Boolean) : EmployeeAction()
 }

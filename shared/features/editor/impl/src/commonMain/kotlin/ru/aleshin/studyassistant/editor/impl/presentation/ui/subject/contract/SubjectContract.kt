@@ -64,8 +64,9 @@ internal sealed class SubjectEffect : BaseUiEffect {
 }
 
 internal sealed class SubjectAction : BaseAction {
-    data class SetupEditModel(val editModel: EditSubjectUi, val organization: OrganizationShortUi) : SubjectAction()
+    data class SetupEditModel(val editModel: EditSubjectUi) : SubjectAction()
     data class UpdateEditModel(val editModel: EditSubjectUi?) : SubjectAction()
+    data class UpdateOrganization(val organization: OrganizationShortUi) : SubjectAction()
     data class UpdateEmployees(val employees: List<EmployeeDetailsUi>) : SubjectAction()
     data class UpdateLoading(val isLoading: Boolean) : SubjectAction()
 }

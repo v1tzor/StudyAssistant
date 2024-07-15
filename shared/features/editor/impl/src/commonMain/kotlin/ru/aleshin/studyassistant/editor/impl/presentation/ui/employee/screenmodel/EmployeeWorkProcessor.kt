@@ -48,6 +48,7 @@ internal interface EmployeeWorkProcessor :
 
         override suspend fun work(command: EmployeeWorkCommand) = when (command) {
             is EmployeeWorkCommand.LoadEditModel -> loadEditModelWork(command.employeeId, command.organizationId)
+            is EmployeeWorkCommand.LoadOrganization -> loadOrganizationWork(command.organizationId)
             is EmployeeWorkCommand.SaveEditModel -> saveEditModelWork(command.editableEmployee)
         }
 
@@ -56,16 +57,20 @@ internal interface EmployeeWorkProcessor :
                 onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))).let { null } },
                 onRightAction = { employee -> employee?.mapToUi() },
             )
-            val organization = organizationInteractor.fetchShortOrganizationById(organizationId).firstHandleAndGet(
-                onLeftAction = { error(it) },
-                onRightAction = { organization -> organization.mapToUi() }
-            )
-
             val editModel = employee?.convertToEdit() ?: EditEmployeeUi.createEditModel(
                 uid = employeeId,
                 organizationId = organizationId,
             )
-            emit(ActionResult(EmployeeAction.SetupEditModel(editModel, organization)))
+            emit(ActionResult(EmployeeAction.SetupEditModel(editModel)))
+        }
+
+        private fun loadOrganizationWork(organizationId: UID) = flow {
+            organizationInteractor.fetchShortOrganizationById(organizationId).firstHandleAndGet(
+                onLeftAction = { error(it) },
+                onRightAction = { organization ->
+                    emit(ActionResult(EmployeeAction.UpdateOrganization(organization.mapToUi())))
+                }
+            )
         }
 
         private fun saveEditModelWork(editableEmployee: EditEmployeeUi) = flow {
@@ -80,5 +85,6 @@ internal interface EmployeeWorkProcessor :
 
 internal sealed class EmployeeWorkCommand : WorkCommand {
     data class LoadEditModel(val employeeId: UID?, val organizationId: UID) : EmployeeWorkCommand()
+    data class LoadOrganization(val organizationId: UID) : EmployeeWorkCommand()
     data class SaveEditModel(val editableEmployee: EditEmployeeUi) : EmployeeWorkCommand()
 }

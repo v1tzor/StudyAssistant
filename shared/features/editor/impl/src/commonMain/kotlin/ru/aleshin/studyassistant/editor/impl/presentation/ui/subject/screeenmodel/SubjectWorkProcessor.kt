@@ -23,7 +23,6 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowW
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
-import ru.aleshin.studyassistant.core.common.functional.firstHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.firstOrNullHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.EmployeeInteractor
@@ -53,7 +52,10 @@ internal interface SubjectWorkProcessor :
 
         override suspend fun work(command: SubjectWorkCommand) = when (command) {
             is SubjectWorkCommand.LoadEditModel -> loadEditModelWork(
+                organizationId = command.organizationId,
                 subjectId = command.subjectId,
+            )
+            is SubjectWorkCommand.LoadOrganization -> loadOrganizationWork(
                 organizationId = command.organizationId,
             )
             is SubjectWorkCommand.LoadEmployees -> loadEmployeesWork(
@@ -77,16 +79,20 @@ internal interface SubjectWorkProcessor :
                 onLeftAction = { emit(EffectResult(SubjectEffect.ShowError(it))).let { null } },
                 onRightAction = { subject -> subject?.mapToUi() }
             )
-            val organization = organizationInteractor.fetchShortOrganizationById(organizationId).firstHandleAndGet(
-                onLeftAction = { error(it) },
-                onRightAction = { organization -> organization.mapToUi() }
-            )
-
             val editModel = subject?.convertToEditModel() ?: EditSubjectUi.createEditModel(
                 uid = subjectId,
                 organizationId = organizationId,
             )
-            emit(ActionResult(SubjectAction.SetupEditModel(editModel, organization)))
+            emit(ActionResult(SubjectAction.SetupEditModel(editModel)))
+        }
+
+        private fun loadOrganizationWork(organizationId: UID) = flow {
+            organizationInteractor.fetchShortOrganizationById(organizationId).collectAndHandle(
+                onLeftAction = { emit(EffectResult(SubjectEffect.ShowError(it))) },
+                onRightAction = { organization ->
+                    emit(ActionResult(SubjectAction.UpdateOrganization(organization.mapToUi())))
+                },
+            )
         }
 
         private fun loadEmployeesWork(organizationId: UID) = flow {
@@ -125,6 +131,7 @@ internal interface SubjectWorkProcessor :
 
 internal sealed class SubjectWorkCommand : WorkCommand {
     data class LoadEditModel(val subjectId: UID?, val organizationId: UID) : SubjectWorkCommand()
+    data class LoadOrganization(val organizationId: UID) : SubjectWorkCommand()
     data class LoadEmployees(val organizationId: UID) : SubjectWorkCommand()
     data class SaveEditModel(val editableSubject: EditSubjectUi) : SubjectWorkCommand()
 

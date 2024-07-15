@@ -65,6 +65,10 @@ internal class SubjectScreenModel(
                     val command = SubjectWorkCommand.LoadEmployees(event.organizationId)
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_ORGANIZATION) {
+                    val command = SubjectWorkCommand.LoadOrganization(event.organizationId)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
                 launchBackgroundWork(BackgroundKey.LOAD_SUBJECT) {
                     val command = SubjectWorkCommand.LoadEditModel(event.subjectId, event.organizationId)
                     workProcessor.work(command).collectAndHandleWork()
@@ -129,8 +133,10 @@ internal class SubjectScreenModel(
     ) = when (action) {
         is SubjectAction.SetupEditModel -> currentState.copy(
             editableSubject = action.editModel,
-            organization = action.organization,
             isLoading = false,
+        )
+        is SubjectAction.UpdateOrganization -> currentState.copy(
+            organization = action.organization,
         )
         is SubjectAction.UpdateEditModel -> currentState.copy(
             editableSubject = action.editModel,
@@ -144,7 +150,7 @@ internal class SubjectScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_SUBJECT, LOAD_EMPLOYEES, UPDATE_LOCATIONS, SAVE_SUBJECT
+        LOAD_SUBJECT, LOAD_ORGANIZATION, LOAD_EMPLOYEES, UPDATE_LOCATIONS, SAVE_SUBJECT
     }
 }
 

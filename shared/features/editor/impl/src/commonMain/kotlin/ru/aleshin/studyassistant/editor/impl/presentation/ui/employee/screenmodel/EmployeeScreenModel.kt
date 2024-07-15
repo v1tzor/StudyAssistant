@@ -57,6 +57,10 @@ internal class EmployeeScreenModel(
     ) {
         when (event) {
             is EmployeeEvent.Init -> {
+                launchBackgroundWork(BackgroundKey.LOAD_ORGANIZATION) {
+                    val command = EmployeeWorkCommand.LoadOrganization(event.organizationId)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
                 launchBackgroundWork(BackgroundKey.LOAD_EMPLOYEE) {
                     val command = EmployeeWorkCommand.LoadEditModel(event.employeeId, event.organizationId)
                     workProcessor.work(command).collectAndHandleWork()
@@ -124,11 +128,13 @@ internal class EmployeeScreenModel(
     ) = when (action) {
         is EmployeeAction.SetupEditModel -> currentState.copy(
             editableEmployee = action.editModel,
-            organization = action.organization,
             isLoading = false,
         )
         is EmployeeAction.UpdateEditModel -> currentState.copy(
             editableEmployee = action.editModel,
+        )
+        is EmployeeAction.UpdateOrganization -> currentState.copy(
+            organization = action.organization,
         )
         is EmployeeAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
@@ -136,7 +142,7 @@ internal class EmployeeScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_EMPLOYEE, SAVE_EMPLOYEE
+        LOAD_EMPLOYEE, LOAD_ORGANIZATION, SAVE_EMPLOYEE
     }
 }
 
