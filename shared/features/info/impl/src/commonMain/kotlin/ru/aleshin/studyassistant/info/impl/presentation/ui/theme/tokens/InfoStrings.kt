@@ -64,7 +64,7 @@ internal data class InfoStrings(
             organizationStatusLabel = "Статус",
             mainOrganizationStatus = "Главная",
             classesDurationInWeekLabel = "Часов в неделю",
-            numberOfClassesInWeekLabel = "Уроков в неделю",
+            numberOfClassesInWeekLabel = "Занятий в неделю",
             contactInfoSectionTitle = "Общая информация",
             emailTitle = "Email",
             phoneTitle = "Телефон",

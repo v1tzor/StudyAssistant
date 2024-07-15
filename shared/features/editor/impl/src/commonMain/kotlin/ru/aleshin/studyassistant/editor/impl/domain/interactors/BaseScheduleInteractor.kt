@@ -37,7 +37,7 @@ internal interface BaseScheduleInteractor {
 
     suspend fun fetchScheduleById(uid: UID): FlowDomainResult<EditorFailures, BaseSchedule?>
 
-    suspend fun fetchScheduleByDateVersion(timeRange: TimeRange, week: NumberOfRepeatWeek): FlowDomainResult<EditorFailures, BaseWeekSchedule>
+    suspend fun fetchWeekScheduleByVersion(timeRange: TimeRange, week: NumberOfRepeatWeek): FlowDomainResult<EditorFailures, BaseWeekSchedule>
 
     class Base(
         private val scheduleRepository: BaseScheduleRepository,
@@ -49,10 +49,12 @@ internal interface BaseScheduleInteractor {
             get() = usersRepository.fetchCurrentUserOrError().uid
 
         override suspend fun fetchScheduleById(uid: UID) = eitherWrapper.wrapFlow {
-            scheduleRepository.fetchScheduleById(uid, targetUser)
+            scheduleRepository.fetchScheduleById(uid, targetUser).map { schedule ->
+                schedule?.copy(classes = schedule.classes.sortedBy { it.timeRange.from.dateTime().time })
+            }
         }
 
-        override suspend fun fetchScheduleByDateVersion(
+        override suspend fun fetchWeekScheduleByVersion(
             timeRange: TimeRange,
             week: NumberOfRepeatWeek,
         ) = eitherWrapper.wrapFlow {

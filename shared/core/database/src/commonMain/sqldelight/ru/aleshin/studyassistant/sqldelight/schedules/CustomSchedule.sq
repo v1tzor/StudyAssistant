@@ -24,6 +24,10 @@ FROM customScheduleEntity
 WHERE date >= ? AND date <= ?
 ORDER BY date DESC;
 
+deleteScheduleById:
+DELETE FROM customScheduleEntity
+WHERE uid = ?;
+
 addOrUpdateSchedule:
 INSERT OR REPLACE INTO customScheduleEntity (uid, date, classes)
 VALUES ?;

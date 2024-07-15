@@ -36,7 +36,7 @@ internal interface CustomClassInteractor {
     suspend fun addClassBySchedule(classModel: Class, schedule: CustomSchedule): DomainResult<EditorFailures, UID>
     suspend fun fetchClass(classId: UID, scheduleId: UID): FlowDomainResult<EditorFailures, Class?>
     suspend fun updateClassBySchedule(classModel: Class, schedule: CustomSchedule): DomainResult<EditorFailures, UID>
-    suspend fun deleteClassBySchedule(targetClass: Class, schedule: CustomSchedule): UnitDomainResult<EditorFailures>
+    suspend fun deleteClassBySchedule(uid: UID, schedule: CustomSchedule): UnitDomainResult<EditorFailures>
 
     class Base(
         private val customScheduleRepository: CustomScheduleRepository,
@@ -90,10 +90,10 @@ internal interface CustomClassInteractor {
         }
 
         override suspend fun deleteClassBySchedule(
-            targetClass: Class,
+            uid: UID,
             schedule: CustomSchedule,
         ) = eitherWrapper.wrapUnit {
-            val updatedClasses = schedule.classes.toMutableList().apply { remove(targetClass) }
+            val updatedClasses = schedule.classes.toMutableList().apply { removeAll { it.uid == uid } }
             val updatedSchedule = schedule.copy(classes = updatedClasses)
 
             customScheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser)

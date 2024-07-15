@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,7 +48,6 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.Com
  * @author Stanislav Aleshin on 09.06.2024
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 internal fun DetailsContent(
     state: DetailsViewState,
     modifier: Modifier = Modifier,
@@ -80,7 +78,7 @@ internal fun DetailsContent(
                             onCustomSchedule = { it?.classes },
                         )
                         CommonScheduleView(
-                            modifier = Modifier.animateItemPlacement(),
+                            modifier = Modifier.animateItem(),
                             date = scheduleDate.dateTime().date,
                             isCurrentDay = currentDate.equalsDay(scheduleDate),
                             activeClass = activeClass,
@@ -91,9 +89,7 @@ internal fun DetailsContent(
                     }
                 } else {
                     items(DayOfWeek.entries.size) {
-                        CommonScheduleViewPlaceholder(
-                            modifier = Modifier.animateItemPlacement(),
-                        )
+                        CommonScheduleViewPlaceholder()
                     }
                 }
             }
@@ -110,7 +106,7 @@ internal fun DetailsContent(
                         val schedule = weekSchedule.weekDaySchedules[dayOfWeek]
                         val scheduleDate = dayOfWeek.dateTimeByWeek(weekSchedule.from)
                         CommonScheduleView(
-                            modifier = Modifier.animateItemPlacement(),
+                            modifier = Modifier.animateItem(),
                             date = scheduleDate.dateTime().date,
                             isCurrentDay = currentDate.equalsDay(scheduleDate),
                             activeClass = activeClass,
@@ -124,9 +120,7 @@ internal fun DetailsContent(
                     }
                 } else {
                     items(DayOfWeek.entries.size) {
-                        CommonScheduleViewPlaceholder(
-                            modifier = Modifier.animateItemPlacement(),
-                        )
+                        CommonScheduleViewPlaceholder()
                     }
                 }
             }

@@ -61,6 +61,7 @@ internal sealed class OverviewEvent : BaseEvent {
     data class CancelCompleteHomework(val homework: HomeworkDetailsUi) : OverviewEvent()
     data class EditHomeworkInEditor(val homework: HomeworkDetailsUi) : OverviewEvent()
     data class AddHomeworkInEditor(val classModel: ClassDetailsUi, val date: Instant) : OverviewEvent()
+    data object NavigateToDailyScheduleEditor : OverviewEvent()
     data object NavigateToDetails : OverviewEvent()
 }
 

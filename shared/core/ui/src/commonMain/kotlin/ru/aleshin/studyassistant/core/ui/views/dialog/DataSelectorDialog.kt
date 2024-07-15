@@ -116,7 +116,7 @@ fun <T> BaseSelectorDialog(
                     }
                 }
                 DialogButtons(
-                    confirmEnabled = confirmEnabled,
+                    enabledConfirm = confirmEnabled,
                     confirmTitle = StudyAssistantRes.strings.selectConfirmTitle,
                     onCancelClick = onDismiss,
                     onConfirmClick = { onConfirm(selected) },

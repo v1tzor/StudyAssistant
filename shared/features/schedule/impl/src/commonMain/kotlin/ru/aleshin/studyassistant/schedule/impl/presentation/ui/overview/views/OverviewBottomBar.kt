@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -57,7 +56,6 @@ import ru.aleshin.studyassistant.core.ui.theme.material.topSide
  * @author Stanislav Aleshin on 12.06.2024.
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 internal fun OverviewBottomBar(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -84,9 +82,8 @@ internal fun OverviewBottomBar(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            items(dateList) { date ->
+            items(dateList, key = { it.toString() }) { date ->
                 ScheduleDateItem(
-                    modifier = Modifier.animateItemPlacement(),
                     enabled = enabled,
                     date = date,
                     selected = date.equalsDay(selectedDate),

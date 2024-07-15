@@ -16,23 +16,18 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -41,13 +36,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
@@ -60,12 +56,10 @@ import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
 import ru.aleshin.studyassistant.core.ui.views.DialogHeader
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseTimePickerDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.DurationPickerDialog
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.AddNumberedDurationView
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.NumberedDurationView
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.NumberedDurationsList
 
 /**
  * @author Stanislav Aleshin on 26.05.2024.
@@ -79,7 +73,7 @@ internal fun ScheduleIntervalsDialog(
     onDismiss: () -> Unit,
     onConfirm: (ScheduleTimeIntervalsUi) -> Unit,
 ) {
-    var editableIntervals by remember { mutableStateOf(intervals) }
+    val editableIntervals = remember { mutableStateOf(intervals) }
 
     BasicAlertDialog(onDismissRequest = onDismiss, modifier = modifier) {
         Surface(
@@ -101,21 +95,39 @@ internal fun ScheduleIntervalsDialog(
                 ) {
                     StartOfClassesField(
                         modifier = Modifier.padding(top = 12.dp),
-                        startOfClassTime = editableIntervals.firstClassTime,
+                        startOfClassTime = editableIntervals.value.firstClassTime,
                         onChangeTime = {
-                            editableIntervals = editableIntervals.copy(firstClassTime = it)
+                            editableIntervals.value = editableIntervals.value.copy(firstClassTime = it)
                         }
                     )
                     ClassesAndBreaksIntervalsView(
-                        intervals = editableIntervals,
-                        onChangeIntervals = { editableIntervals = it },
+                        baseClassDuration = editableIntervals.value.baseClassDuration,
+                        baseBreakDuration = editableIntervals.value.baseBreakDuration,
+                        specificClassDuration = remember {
+                            derivedStateOf { editableIntervals.value.specificClassDuration }
+                        },
+                        specificBreakDuration = remember {
+                            derivedStateOf { editableIntervals.value.specificBreakDuration }
+                        },
+                        onChangeBaseClassDuration = {
+                            editableIntervals.value = editableIntervals.value.copy(baseClassDuration = it)
+                        },
+                        onChangeSpecificClassDurations = {
+                            editableIntervals.value = editableIntervals.value.copy(specificClassDuration = it)
+                        },
+                        onChangeBaseBreakDuration = {
+                            editableIntervals.value = editableIntervals.value.copy(baseBreakDuration = it)
+                        },
+                        onChangeSpecificBreakDurations = {
+                            editableIntervals.value = editableIntervals.value.copy(specificBreakDuration = it)
+                        },
                     )
                 }
                 DialogButtons(
                     confirmTitle = StudyAssistantRes.strings.saveConfirmTitle,
                     onCancelClick = onDismiss,
                     onConfirmClick = {
-                        onConfirm(editableIntervals)
+                        onConfirm(editableIntervals.value)
                     },
                 )
             }
@@ -124,7 +136,7 @@ internal fun ScheduleIntervalsDialog(
 }
 
 @Composable
-private fun StartOfClassesField(
+internal fun StartOfClassesField(
     modifier: Modifier = Modifier,
     startOfClassTime: Instant?,
     onChangeTime: (Instant?) -> Unit,
@@ -170,8 +182,14 @@ private fun StartOfClassesField(
 @Composable
 private fun ClassesAndBreaksIntervalsView(
     modifier: Modifier = Modifier,
-    intervals: ScheduleTimeIntervalsUi,
-    onChangeIntervals: (ScheduleTimeIntervalsUi) -> Unit,
+    baseClassDuration: Millis?,
+    baseBreakDuration: Millis?,
+    specificClassDuration: State<List<NumberedDurationUi>>,
+    specificBreakDuration: State<List<NumberedDurationUi>>,
+    onChangeBaseClassDuration: (Millis?) -> Unit,
+    onChangeSpecificClassDurations: (List<NumberedDurationUi>) -> Unit,
+    onChangeBaseBreakDuration: (Millis?) -> Unit,
+    onChangeSpecificBreakDurations: (List<NumberedDurationUi>) -> Unit,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -179,25 +197,17 @@ private fun ClassesAndBreaksIntervalsView(
     ) {
         ClassIntervalsView(
             modifier = Modifier.weight(1f),
-            baseClassDuration = intervals.baseClassDuration,
-            specificClassDurations = intervals.specificClassDuration,
-            onChangeBaseDuration = {
-                onChangeIntervals(intervals.copy(baseClassDuration = it))
-            },
-            onChangeSpecificDurations = {
-                onChangeIntervals(intervals.copy(specificClassDuration = it))
-            },
+            baseClassDuration = baseClassDuration,
+            specificClassDurations = specificClassDuration,
+            onChangeBaseDuration = onChangeBaseClassDuration,
+            onChangeSpecificDurations = onChangeSpecificClassDurations,
         )
         BreakIntervalsView(
             modifier = Modifier.weight(1f),
-            baseBreakDuration = intervals.baseBreakDuration,
-            specificBreakDurations = intervals.specificBreakDuration,
-            onChangeBaseDuration = {
-                onChangeIntervals(intervals.copy(baseBreakDuration = it))
-            },
-            onChangeSpecificDurations = {
-                onChangeIntervals(intervals.copy(specificBreakDuration = it))
-            },
+            baseBreakDuration = baseBreakDuration,
+            specificBreakDurations = specificBreakDuration,
+            onChangeBaseDuration = onChangeBaseBreakDuration,
+            onChangeSpecificDurations = onChangeSpecificBreakDurations,
         )
     }
 }
@@ -207,7 +217,7 @@ private fun ClassIntervalsView(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     baseClassDuration: Millis?,
-    specificClassDurations: List<NumberedDurationUi>,
+    specificClassDurations: State<List<NumberedDurationUi>>,
     onChangeBaseDuration: (Millis?) -> Unit,
     onChangeSpecificDurations: (List<NumberedDurationUi>) -> Unit,
 ) {
@@ -253,7 +263,7 @@ private fun BreakIntervalsView(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     baseBreakDuration: Millis?,
-    specificBreakDurations: List<NumberedDurationUi>,
+    specificBreakDurations: State<List<NumberedDurationUi>>,
     onChangeBaseDuration: (Millis?) -> Unit,
     onChangeSpecificDurations: (List<NumberedDurationUi>) -> Unit,
 ) {
@@ -293,130 +303,5 @@ private fun BreakIntervalsView(
                 durationContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
             )
         }
-    }
-}
-
-@Composable
-private fun NumberedDurationsList(
-    modifier: Modifier = Modifier,
-    scrollState: ScrollState = rememberScrollState(),
-    baseDuration: Millis?,
-    specificDurations: List<NumberedDurationUi>,
-    numberedContainerColor: Color = MaterialTheme.colorScheme.primary,
-    durationContainerColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    onChangeBaseDuration: (Millis?) -> Unit,
-    onChangeSpecificDurations: (List<NumberedDurationUi>) -> Unit,
-) {
-    Column(
-        modifier = modifier
-            .animateContentSize(spring())
-            .heightIn(max = 252.dp)
-            .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Column {
-            var isOpenDurationPickerDialog by remember { mutableStateOf(false) }
-            NumberedDurationView(
-                number = EditorThemeRes.strings.allTitle,
-                duration = baseDuration,
-                onNumberClick = null,
-                onDurationClick = { isOpenDurationPickerDialog = true },
-                numberedContainerColor = numberedContainerColor,
-                durationContainerColor = durationContainerColor,
-            )
-            if (isOpenDurationPickerDialog) {
-                DurationPickerDialog(
-                    headerTitle = EditorThemeRes.strings.durationTitle,
-                    duration = baseDuration,
-                    onDismiss = { isOpenDurationPickerDialog = false },
-                    onSelectedDuration = {
-                        onChangeBaseDuration(it)
-                        isOpenDurationPickerDialog = false
-                    }
-                )
-            }
-        }
-        ExceptLine()
-        specificDurations.sortedBy { it.number }.forEach { numberedDuration ->
-            Column {
-                var isOpenNumberChooserMenu by remember { mutableStateOf(false) }
-                var isOpenDurationPickerDialog by remember { mutableStateOf(false) }
-                NumberedDurationView(
-                    number = numberedDuration.number.toString(),
-                    duration = numberedDuration.duration,
-                    onNumberClick = { isOpenNumberChooserMenu = true },
-                    onDurationClick = { isOpenDurationPickerDialog = true },
-                    numberedContainerColor = numberedContainerColor,
-                    durationContainerColor = durationContainerColor,
-                )
-                if (isOpenDurationPickerDialog) {
-                    DurationPickerDialog(
-                        headerTitle = EditorThemeRes.strings.durationTitle,
-                        duration = numberedDuration.duration,
-                        onDismiss = { isOpenDurationPickerDialog = false },
-                        onSelectedDuration = {
-                            val updatedDurations = specificDurations.toMutableList().apply {
-                                set(indexOf(numberedDuration), numberedDuration.copy(duration = it))
-                            }
-                            onChangeSpecificDurations(updatedDurations)
-                            isOpenDurationPickerDialog = false
-                        }
-                    )
-                }
-                NumberDropdownMenu(
-                    expanded = isOpenNumberChooserMenu,
-                    enabled = { number -> specificDurations.find { it.number == number } == null },
-                    currentNumber = numberedDuration.number,
-                    onDismiss = { isOpenNumberChooserMenu = false },
-                    onConfirm = {
-                        val updatedDurations = specificDurations.toMutableList().apply {
-                            set(indexOf(numberedDuration), numberedDuration.copy(number = it))
-                        }
-                        onChangeSpecificDurations(updatedDurations)
-                        isOpenNumberChooserMenu = false
-                    },
-                )
-            }
-        }
-        Column {
-            var isOpenNumberedDurationCreatorMenu by remember { mutableStateOf(false) }
-            AddNumberedDurationView(onClick = { isOpenNumberedDurationCreatorMenu = true })
-            NumberedDurationCreatorDropdownMenu(
-                expanded = isOpenNumberedDurationCreatorMenu,
-                specificDurations = specificDurations,
-                onDismiss = { isOpenNumberedDurationCreatorMenu = false },
-                onCreate = { numberedDuration ->
-                    val updatedDurations = specificDurations.toMutableList().apply {
-                        if (specificDurations.find { it.number == numberedDuration.number } == null) {
-                            add(numberedDuration)
-                        } else {
-                            set(indexOfFirst { it.number == numberedDuration.number }, numberedDuration)
-                        }
-                    }
-                    onChangeSpecificDurations(updatedDurations)
-                    isOpenNumberedDurationCreatorMenu = false
-                },
-            )
-        }
-    }
-}
-
-@Composable
-private fun ExceptLine(
-    modifier: Modifier = Modifier,
-    paddingValues: PaddingValues = PaddingValues(horizontal = 4.dp),
-) {
-    Row(
-        modifier = modifier.padding(paddingValues),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        HorizontalDivider(modifier = Modifier.weight(1f))
-        Text(
-            text = EditorThemeRes.strings.exceptTitle,
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodySmall,
-        )
-        HorizontalDivider(modifier = Modifier.weight(1f))
     }
 }

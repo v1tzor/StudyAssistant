@@ -43,7 +43,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.extensions.durationOrZero
+import ru.aleshin.studyassistant.core.common.extensions.dateTimeDurationOrZero
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
@@ -131,7 +131,7 @@ internal fun RequestsReceivedTab(
                                 Text(text = UsersThemeRes.strings.receivedFriendRequestLabel)
                             },
                             trailingIcon = {
-                                val duration = durationOrZero(currentTime, user.second)
+                                val duration = dateTimeDurationOrZero(currentTime, user.second)
                                 Text(text = duration.toMinutesOrHoursTitle())
                             },
                             actions = {
@@ -249,7 +249,7 @@ internal fun RequestsSentTab(
                                 Text(text = UsersThemeRes.strings.sentFriendRequestLabel)
                             },
                             trailingIcon = {
-                                val duration = durationOrZero(currentTime, user.second)
+                                val duration = dateTimeDurationOrZero(currentTime, user.second)
                                 Text(text = duration.toMinutesOrHoursTitle())
                             },
                             actions = {

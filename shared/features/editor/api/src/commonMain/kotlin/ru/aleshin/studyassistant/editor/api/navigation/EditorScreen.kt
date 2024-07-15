@@ -26,9 +26,10 @@ import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
  */
 sealed class EditorScreen : FeatureScreen {
 
-    data class Schedule(val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE) : EditorScreen()
+    data class WeekSchedule(val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE) : EditorScreen()
 
-    data class CustomSchedule(
+    data class DailySchedule(
+        val date: Long,
         val customScheduleId: UID?,
         val baseScheduleId: UID?,
     ) : EditorScreen()

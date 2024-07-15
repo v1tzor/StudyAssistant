@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
-import ru.aleshin.studyassistant.core.common.extensions.exists
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirestore.UserData
@@ -48,6 +48,7 @@ interface CustomScheduleRemoteDataSource {
     suspend fun fetchScheduleByDate(date: Instant, targetUser: UID): Flow<CustomScheduleDetailsPojo?>
     suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant, targetUser: UID): Flow<List<CustomScheduleDetailsPojo>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<ClassDetailsPojo?>
+    suspend fun deleteScheduleById(scheduleId: UID, targetUser: UID)
 
     class Base(
         private val database: FirebaseFirestore,
@@ -62,16 +63,10 @@ interface CustomScheduleRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES)
 
-            return database.runTransaction {
-                val isExist = schedule.uid.isNotEmpty() && reference.document(schedule.uid).exists()
-                if (isExist) {
-                    reference.document(schedule.uid).set(data = schedule)
-                    return@runTransaction schedule.uid
-                } else {
-                    val uid = reference.add(schedule).id
-                    reference.document(uid).update(UserData.UID to uid)
-                    return@runTransaction uid
-                }
+            val scheduleId = schedule.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+
+            return reference.document(scheduleId).set(data = schedule).let {
+                return@let scheduleId
             }
         }
 
@@ -158,6 +153,15 @@ interface CustomScheduleRemoteDataSource {
             return classPojoFlow.map { classPojo ->
                 classPojo?.mapToDetails(userDataRoot, scheduleId)
             }
+        }
+
+        override suspend fun deleteScheduleById(scheduleId: UID, targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES).document(scheduleId)
+
+            return reference.delete()
         }
 
         private suspend fun ClassPojo.mapToDetails(userDataRoot: DocumentReference, scheduleId: UID): ClassDetailsPojo {

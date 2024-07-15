@@ -165,8 +165,12 @@ fun LocalDateTime.setHoursAndMinutes(hour: Int, minute: Int): LocalDateTime {
     )
 }
 
-fun epochTimeDuration(start: Instant, end: Instant): Long {
+fun epochDateTimeDuration(start: Instant, end: Instant): Long {
     return end.toEpochMilliseconds() - start.toEpochMilliseconds()
+}
+
+fun epochTimeDuration(start: Instant, end: Instant): Long {
+    return end.dateTime().time.epochTimeDuration() - start.dateTime().time.epochTimeDuration()
 }
 
 fun LocalDateTime.dayEpochDuration(): Long {
@@ -178,15 +182,19 @@ fun LocalTime.epochTimeDuration(): Long {
 }
 
 fun Instant.isNotZeroDifference(end: Instant): Boolean {
-    return epochTimeDuration(this, end) > 0L
+    return epochDateTimeDuration(this, end) > 0L
+}
+
+fun epochDateTimeDuration(timeRange: TimeRange): Long {
+    return epochDateTimeDuration(timeRange.from, timeRange.to)
 }
 
 fun epochTimeDuration(timeRange: TimeRange): Long {
-    return timeRange.to.toEpochMilliseconds() - timeRange.from.toEpochMilliseconds()
+    return epochTimeDuration(timeRange.from, timeRange.to)
 }
 
-fun durationOrZero(start: Instant?, end: Instant?) = if (start != null && end != null) {
-    epochTimeDuration(start, end)
+fun dateTimeDurationOrZero(start: Instant?, end: Instant?) = if (start != null && end != null) {
+    epochDateTimeDuration(start, end)
 } else {
     Date.EMPTY_DURATION
 }

@@ -52,7 +52,7 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 @Composable
 fun DialogButtons(
     modifier: Modifier = Modifier,
-    confirmEnabled: Boolean = true,
+    enabledConfirm: Boolean = true,
     confirmTitle: String = StudyAssistantRes.strings.selectConfirmTitle,
     onCancelClick: () -> Unit,
     onConfirmClick: () -> Unit,
@@ -70,12 +70,12 @@ fun DialogButtons(
             )
         }
         TextButton(
-            enabled = confirmEnabled,
+            enabled = enabledConfirm,
             onClick = onConfirmClick
         ) {
             Text(
                 text = confirmTitle,
-                color = when (confirmEnabled) {
+                color = when (enabledConfirm) {
                     true -> MaterialTheme.colorScheme.primary
                     false -> MaterialTheme.colorScheme.onSurfaceVariant
                 },

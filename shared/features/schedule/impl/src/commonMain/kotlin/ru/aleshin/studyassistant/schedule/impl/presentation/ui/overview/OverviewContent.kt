@@ -77,7 +77,6 @@ internal fun OverviewContent(
                         contentPadding = PaddingValues(horizontal = 12.dp),
                     ) {
                         items(schedule.classes) { classModel ->
-                            Modifier.fillMaxWidth()
                             DetailsClassViewItem(
                                 modifier = Modifier.animateItemPlacement(),
                                 onClick = { onShowClassInfo(classModel) },

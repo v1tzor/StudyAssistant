@@ -38,6 +38,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeR
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun OverviewTopBar(
     modifier: Modifier = Modifier,
+    enabledEdit: Boolean,
     onEditClick: () -> Unit,
     onDetailsClick: () -> Unit,
     onCurrentDay: () -> Unit,
@@ -53,6 +54,7 @@ internal fun OverviewTopBar(
         navigationIcon = {
             Row {
                 TopAppBarButton(
+                    enabled = enabledEdit,
                     imagePainter = painterResource(ScheduleThemeRes.icons.editList),
                     imageDescription = null,
                     onButtonClick = onEditClick,

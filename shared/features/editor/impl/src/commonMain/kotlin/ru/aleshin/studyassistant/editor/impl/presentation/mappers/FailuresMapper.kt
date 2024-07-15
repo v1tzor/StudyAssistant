@@ -23,5 +23,6 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.tokens.EditorStr
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal fun EditorFailures.mapToMessage(strings: EditorStrings) = when (this) {
+    is EditorFailures.ShiftTimeError -> strings.shiftTimeError
     is EditorFailures.OtherError -> strings.otherErrorMessage
 }

@@ -113,4 +113,14 @@ class CustomScheduleRepositoryImpl(
             localDataSource.fetchClassById(uid, scheduleId).map { classEntity -> classEntity?.mapToDomain() }
         }
     }
+
+    override suspend fun deleteScheduleById(scheduleId: UID, targetUser: UID) {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        if (isSubscriber) {
+            remoteDataSource.deleteScheduleById(scheduleId, targetUser)
+        } else {
+            localDataSource.deleteScheduleById(scheduleId)
+        }
+    }
 }

@@ -140,7 +140,7 @@ internal class DetailsScreenModel(
             }
             is DetailsEvent.NavigateToEditor -> with(state()) {
                 val week = weekSchedule?.numberOfWeek ?: NumberOfRepeatWeek.ONE
-                val screen = screenProvider.provideEditorScreen(EditorScreen.Schedule(week))
+                val screen = screenProvider.provideEditorScreen(EditorScreen.WeekSchedule(week))
                 sendEffect(DetailsEffect.NavigateToGlobal(screen))
             }
         }

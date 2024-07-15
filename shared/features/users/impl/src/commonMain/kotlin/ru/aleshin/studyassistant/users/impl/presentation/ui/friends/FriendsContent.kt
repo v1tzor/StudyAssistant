@@ -62,7 +62,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.extensions.durationOrZero
+import ru.aleshin.studyassistant.core.common.extensions.dateTimeDurationOrZero
 import ru.aleshin.studyassistant.core.common.extensions.limitSize
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder.FRIENDS
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder.OVERVIEW_FRIEND_REQUESTS
@@ -161,7 +161,7 @@ private fun FriendsRequestsSection(
                                     Text(text = UsersThemeRes.strings.receivedFriendRequestLabel)
                                 },
                                 trailingIcon = {
-                                    val duration = durationOrZero(currentTime, user.second)
+                                    val duration = dateTimeDurationOrZero(currentTime, user.second)
                                     Text(text = duration.toMinutesOrHoursTitle())
                                 },
                                 actions = {

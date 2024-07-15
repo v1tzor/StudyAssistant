@@ -18,15 +18,15 @@ package ru.aleshin.studyassistant.editor.impl.domain.common
 
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
+import ru.aleshin.studyassistant.editor.impl.domain.entities.ShiftTimeError
 
 /**
  * @author Stanislav Aleshin on 27.05.2024
  */
 internal interface EditorErrorHandler : ErrorHandler<EditorFailures> {
-
     class Base : EditorErrorHandler {
-
         override fun handle(throwable: Throwable) = when (throwable) {
+            is ShiftTimeError -> EditorFailures.ShiftTimeError
             else -> EditorFailures.OtherError(throwable)
         }
     }

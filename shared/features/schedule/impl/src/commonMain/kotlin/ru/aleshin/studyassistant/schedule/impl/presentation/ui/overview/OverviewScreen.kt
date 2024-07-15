@@ -91,7 +91,8 @@ internal data class OverviewScreen(val firstDay: Millis?) : Screen {
             topBar = {
                 Column {
                     OverviewTopBar(
-                        onEditClick = {},
+                        enabledEdit = state.selectedDate != null,
+                        onEditClick = { dispatchEvent(OverviewEvent.NavigateToDailyScheduleEditor) },
                         onCurrentDay = { dispatchEvent(OverviewEvent.SelectedCurrentDay) },
                         onDetailsClick = { dispatchEvent(OverviewEvent.NavigateToDetails) },
                     )

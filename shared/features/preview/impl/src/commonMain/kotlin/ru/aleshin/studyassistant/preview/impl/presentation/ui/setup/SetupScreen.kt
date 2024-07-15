@@ -70,7 +70,7 @@ internal data class SetupScreen(private val createdUser: UID) : Screen {
                         onSaveProfile = { dispatchEvent(SetupEvent.SaveProfileInfo) },
                         onSaveOrganization = { dispatchEvent(SetupEvent.SaveOrganizationInfo) },
                         onSaveCalendar = { dispatchEvent(SetupEvent.SaveCalendarInfo) },
-                        onFillOutSchedule = { dispatchEvent(SetupEvent.NavigateToScheduleEditor) },
+                        onFillOutSchedule = { dispatchEvent(SetupEvent.NavigateToWeekScheduleEditor) },
                         onStartUsing = { dispatchEvent(SetupEvent.NavigateToSchedule) },
                     )
                 }

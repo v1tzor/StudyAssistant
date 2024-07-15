@@ -23,32 +23,36 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.impl.navigation.EditorFeatureStarterImpl
 import ru.aleshin.studyassistant.editor.impl.navigation.EditorScreenProvider
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEditorEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEditorScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEditorStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEditorWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEditorWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEditorWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.screenmodel.DailyScheduleEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.screenmodel.DailyScheduleScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.screenmodel.DailyScheduleStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.screenmodel.DailyScheduleWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkWorkProcessor
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationEditorEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationEditorScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationEditorStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationEditorWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.ScheduleEditorWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectEditorEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectEditorScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectEditorStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectEditorWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.WeekScheduleEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.WeekScheduleScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.WeekScheduleStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.WeekScheduleWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -60,33 +64,38 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<EditorFeatureStarter> { EditorFeatureStarterImpl(instance(), instance(), instance()) }
     bindProvider<EditorScreenProvider> { EditorScreenProvider.Base() }
 
-    bindProvider<ScheduleEditorStateCommunicator> { ScheduleEditorStateCommunicator.Base() }
-    bindProvider<ScheduleEditorEffectCommunicator> { ScheduleEditorEffectCommunicator.Base() }
-    bindProvider<ScheduleEditorWorkProcessor> { ScheduleEditorWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<ScheduleEditorScreenModel> { ScheduleEditorScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<WeekScheduleStateCommunicator> { WeekScheduleStateCommunicator.Base() }
+    bindProvider<WeekScheduleEffectCommunicator> { WeekScheduleEffectCommunicator.Base() }
+    bindProvider<WeekScheduleWorkProcessor> { WeekScheduleWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<WeekScheduleScreenModel> { WeekScheduleScreenModel(instance(), instance(), instance(), instance(), instance()) }
 
-    bindProvider<ClassEditorStateCommunicator> { ClassEditorStateCommunicator.Base() }
-    bindProvider<ClassEditorEffectCommunicator> { ClassEditorEffectCommunicator.Base() }
-    bindProvider<ClassEditorWorkProcessor> { ClassEditorWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<ClassEditorScreenModel> { ClassEditorScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<DailyScheduleStateCommunicator> { DailyScheduleStateCommunicator.Base() }
+    bindProvider<DailyScheduleEffectCommunicator> { DailyScheduleEffectCommunicator.Base() }
+    bindProvider<DailyScheduleWorkProcessor> { DailyScheduleWorkProcessor.Base(instance(), instance(), instance(), instance()) }
+    bindProvider<DailyScheduleScreenModel> { DailyScheduleScreenModel(instance(), instance(), instance(), instance(), instance()) }
 
-    bindProvider<SubjectEditorStateCommunicator> { SubjectEditorStateCommunicator.Base() }
-    bindProvider<SubjectEditorEffectCommunicator> { SubjectEditorEffectCommunicator.Base() }
-    bindProvider<SubjectEditorWorkProcessor> { SubjectEditorWorkProcessor.Base(instance(), instance(), instance()) }
-    bindProvider<SubjectEditorScreenModel> { SubjectEditorScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<ClassStateCommunicator> { ClassStateCommunicator.Base() }
+    bindProvider<ClassEffectCommunicator> { ClassEffectCommunicator.Base() }
+    bindProvider<ClassWorkProcessor> { ClassWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<ClassScreenModel> { ClassScreenModel(instance(), instance(), instance(), instance(), instance()) }
 
-    bindProvider<EmployeeEditorStateCommunicator> { EmployeeEditorStateCommunicator.Base() }
-    bindProvider<EmployeeEditorEffectCommunicator> { EmployeeEditorEffectCommunicator.Base() }
-    bindProvider<EmployeeEditorWorkProcessor> { EmployeeEditorWorkProcessor.Base(instance(), instance()) }
-    bindProvider<EmployeeEditorScreenModel> { EmployeeEditorScreenModel(instance(), instance(), instance(), instance()) }
+    bindProvider<SubjectStateCommunicator> { SubjectStateCommunicator.Base() }
+    bindProvider<SubjectEffectCommunicator> { SubjectEffectCommunicator.Base() }
+    bindProvider<SubjectWorkProcessor> { SubjectWorkProcessor.Base(instance(), instance(), instance()) }
+    bindProvider<SubjectScreenModel> { SubjectScreenModel(instance(), instance(), instance(), instance(), instance()) }
 
-    bindProvider<HomeworkEditorStateCommunicator> { HomeworkEditorStateCommunicator.Base() }
-    bindProvider<HomeworkEditorEffectCommunicator> { HomeworkEditorEffectCommunicator.Base() }
-    bindProvider<HomeworkEditorWorkProcessor> { HomeworkEditorWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<HomeworkEditorScreenModel> { HomeworkEditorScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<EmployeeStateCommunicator> { EmployeeStateCommunicator.Base() }
+    bindProvider<EmployeeEffectCommunicator> { EmployeeEffectCommunicator.Base() }
+    bindProvider<EmployeeWorkProcessor> { EmployeeWorkProcessor.Base(instance(), instance()) }
+    bindProvider<EmployeeScreenModel> { EmployeeScreenModel(instance(), instance(), instance(), instance()) }
 
-    bindProvider<OrganizationEditorStateCommunicator> { OrganizationEditorStateCommunicator.Base() }
-    bindProvider<OrganizationEditorEffectCommunicator> { OrganizationEditorEffectCommunicator.Base() }
-    bindProvider<OrganizationEditorWorkProcessor> { OrganizationEditorWorkProcessor.Base(instance()) }
-    bindProvider<OrganizationEditorScreenModel> { OrganizationEditorScreenModel(instance(), instance(), instance(), instance()) }
+    bindProvider<HomeworkStateCommunicator> { HomeworkStateCommunicator.Base() }
+    bindProvider<HomeworkEffectCommunicator> { HomeworkEffectCommunicator.Base() }
+    bindProvider<HomeworkWorkProcessor> { HomeworkWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<HomeworkScreenModel> { HomeworkScreenModel(instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<OrganizationStateCommunicator> { OrganizationStateCommunicator.Base() }
+    bindProvider<OrganizationEffectCommunicator> { OrganizationEffectCommunicator.Base() }
+    bindProvider<OrganizationWorkProcessor> { OrganizationWorkProcessor.Base(instance()) }
+    bindProvider<OrganizationScreenModel> { OrganizationScreenModel(instance(), instance(), instance(), instance()) }
 }

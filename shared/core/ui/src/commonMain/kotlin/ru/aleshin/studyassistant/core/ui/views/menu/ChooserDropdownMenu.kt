@@ -57,9 +57,11 @@ fun <T> ChooserDropdownMenu(
             DropdownMenuItem(
                 text = { text(item) },
                 enabled = enabledItem(item),
-                leadingIcon = if (leadingIcon != null) { {
-                    leadingIcon(item)
-                } } else {
+                leadingIcon = if (leadingIcon != null) {
+                    {
+                        leadingIcon(item)
+                    }
+                } else {
                     null
                 },
                 onClick = { onChoose(item) }

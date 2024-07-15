@@ -32,4 +32,5 @@ interface CustomScheduleRepository {
     suspend fun fetchScheduleByDate(date: Instant, targetUser: UID): Flow<CustomSchedule?>
     suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<CustomSchedule>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<Class?>
+    suspend fun deleteScheduleById(scheduleId: UID, targetUser: UID)
 }

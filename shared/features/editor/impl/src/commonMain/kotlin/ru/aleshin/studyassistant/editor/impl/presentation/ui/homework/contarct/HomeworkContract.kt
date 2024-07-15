@@ -39,7 +39,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.EditHomew
  */
 @Immutable
 @Parcelize
-internal data class HomeworkEditorViewState(
+internal data class HomeworkViewState(
     val isLoading: Boolean = true,
     val isClassesLoading: Boolean = true,
     val editableHomework: EditHomeworkUi? = null,
@@ -49,40 +49,40 @@ internal data class HomeworkEditorViewState(
     val classesForLinking: ClassesForLinkedUi = emptyMap(),
 ) : BaseViewState
 
-internal sealed class HomeworkEditorEvent : BaseEvent {
+internal sealed class HomeworkEvent : BaseEvent {
     data class Init(
         val homeworkId: UID?,
         val date: Long?,
         val subjectId: UID?,
         val organizationId: UID?,
-    ) : HomeworkEditorEvent()
+    ) : HomeworkEvent()
 
-    data class UpdateOrganization(val organization: OrganizationShortUi?) : HomeworkEditorEvent()
-    data class UpdateSubject(val subject: SubjectUi?) : HomeworkEditorEvent()
-    data class UpdateDate(val date: Instant?) : HomeworkEditorEvent()
-    data class UpdateLinkedClass(val classId: UID?, val date: Instant?) : HomeworkEditorEvent()
-    data class UpdateTask(val theory: String, val practice: String, val presentations: String) : HomeworkEditorEvent()
-    data class UpdateTestTopic(val isTest: Boolean, val topic: String) : HomeworkEditorEvent()
-    data class UpdatePriority(val priority: TaskPriority) : HomeworkEditorEvent()
-    data object DeleteHomework : HomeworkEditorEvent()
-    data object SaveHomework : HomeworkEditorEvent()
-    data class NavigateToOrganizationEditor(val organizationId: UID?) : HomeworkEditorEvent()
-    data class NavigateToSubjectEditor(val subjectId: UID?) : HomeworkEditorEvent()
-    data object NavigateToBack : HomeworkEditorEvent()
+    data class UpdateOrganization(val organization: OrganizationShortUi?) : HomeworkEvent()
+    data class UpdateSubject(val subject: SubjectUi?) : HomeworkEvent()
+    data class UpdateDate(val date: Instant?) : HomeworkEvent()
+    data class UpdateLinkedClass(val classId: UID?, val date: Instant?) : HomeworkEvent()
+    data class UpdateTask(val theory: String, val practice: String, val presentations: String) : HomeworkEvent()
+    data class UpdateTestTopic(val isTest: Boolean, val topic: String) : HomeworkEvent()
+    data class UpdatePriority(val priority: TaskPriority) : HomeworkEvent()
+    data object DeleteHomework : HomeworkEvent()
+    data object SaveHomework : HomeworkEvent()
+    data class NavigateToOrganizationEditor(val organizationId: UID?) : HomeworkEvent()
+    data class NavigateToSubjectEditor(val subjectId: UID?) : HomeworkEvent()
+    data object NavigateToBack : HomeworkEvent()
 }
 
-internal sealed class HomeworkEditorEffect : BaseUiEffect {
-    data class ShowError(val failures: EditorFailures) : HomeworkEditorEffect()
-    data class NavigateToLocal(val pushScreen: Screen) : HomeworkEditorEffect()
-    data object NavigateToBack : HomeworkEditorEffect()
+internal sealed class HomeworkEffect : BaseUiEffect {
+    data class ShowError(val failures: EditorFailures) : HomeworkEffect()
+    data class NavigateToLocal(val pushScreen: Screen) : HomeworkEffect()
+    data object NavigateToBack : HomeworkEffect()
 }
 
-internal sealed class HomeworkEditorAction : BaseAction {
-    data class SetupEditModel(val editModel: EditHomeworkUi) : HomeworkEditorAction()
-    class UpdateEditModel(val editModel: EditHomeworkUi?) : HomeworkEditorAction()
-    data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : HomeworkEditorAction()
-    data class UpdateSubjects(val subjects: List<SubjectUi>) : HomeworkEditorAction()
-    data class UpdateClassesForLinked(val classes: ClassesForLinkedUi) : HomeworkEditorAction()
-    data class UpdateLoading(val isLoading: Boolean) : HomeworkEditorAction()
-    data class UpdateClassesLoading(val isLoading: Boolean) : HomeworkEditorAction()
+internal sealed class HomeworkAction : BaseAction {
+    data class SetupEditModel(val editModel: EditHomeworkUi) : HomeworkAction()
+    class UpdateEditModel(val editModel: EditHomeworkUi?) : HomeworkAction()
+    data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : HomeworkAction()
+    data class UpdateSubjects(val subjects: List<SubjectUi>) : HomeworkAction()
+    data class UpdateClassesForLinked(val classes: ClassesForLinkedUi) : HomeworkAction()
+    data class UpdateLoading(val isLoading: Boolean) : HomeworkAction()
+    data class UpdateClassesLoading(val isLoading: Boolean) : HomeworkAction()
 }

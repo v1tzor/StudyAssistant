@@ -52,7 +52,7 @@ internal sealed class SetupEvent : BaseEvent {
     data object SaveProfileInfo : SetupEvent()
     data object SaveOrganizationInfo : SetupEvent()
     data object SaveCalendarInfo : SetupEvent()
-    data object NavigateToScheduleEditor : SetupEvent()
+    data object NavigateToWeekScheduleEditor : SetupEvent()
     data object NavigateToSchedule : SetupEvent()
 }
 

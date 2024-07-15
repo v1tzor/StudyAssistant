@@ -16,16 +16,17 @@
 
 package ru.aleshin.studyassistant.editor.impl.navigation
 
-import ru.aleshin.studyassistant.core.common.architecture.screen.EmptyScreen
 import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.ClassEditorScreen
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.EmployeeEditorScreen
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.HomeworkEditorScreen
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.OrganizationEditorScreen
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.ProfileEditorScreen
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.ScheduleEditorScreen
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.SubjectEditorScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.ClassScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.DailyScheduleScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.EmployeeScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.HomeworkScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.OrganizationScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.ProfileScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.WeekScheduleScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.SubjectScreen
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.TodoScreen
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -35,36 +36,40 @@ internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen> {
     class Base : EditorScreenProvider {
 
         override fun provideFeatureScreen(screen: EditorScreen) = when (screen) {
-            is EditorScreen.Schedule -> ScheduleEditorScreen(
+            is EditorScreen.WeekSchedule -> WeekScheduleScreen(
                 week = screen.week,
             )
-            is EditorScreen.CustomSchedule -> EmptyScreen
-            is EditorScreen.Class -> ClassEditorScreen(
+            is EditorScreen.DailySchedule -> DailyScheduleScreen(
+                date = screen.date,
+                baseScheduleId = screen.baseScheduleId,
+                customScheduleId = screen.customScheduleId,
+            )
+            is EditorScreen.Class -> ClassScreen(
                 classId = screen.classId,
                 scheduleId = screen.scheduleId,
                 organizationId = screen.organizationId,
                 customSchedule = screen.isCustomSchedule,
                 weekDay = screen.weekDay,
             )
-            is EditorScreen.Subject -> SubjectEditorScreen(
+            is EditorScreen.Subject -> SubjectScreen(
                 subjectId = screen.subjectId,
                 organizationId = screen.organizationId,
             )
-            is EditorScreen.Employee -> EmployeeEditorScreen(
+            is EditorScreen.Employee -> EmployeeScreen(
                 employeeId = screen.employeeId,
                 organizationId = screen.organizationId,
             )
-            is EditorScreen.Homework -> HomeworkEditorScreen(
+            is EditorScreen.Homework -> HomeworkScreen(
                 homeworkId = screen.homeworkId,
                 date = screen.date,
                 subjectId = screen.subjectId,
                 organizationId = screen.organizationId,
             )
-            is EditorScreen.Organization -> OrganizationEditorScreen(
+            is EditorScreen.Organization -> OrganizationScreen(
                 organizationId = screen.organizationId,
             )
-            is EditorScreen.Profile -> ProfileEditorScreen()
-            is EditorScreen.Todo -> EmptyScreen
+            is EditorScreen.Profile -> ProfileScreen()
+            is EditorScreen.Todo -> TodoScreen()
         }
     }
 }

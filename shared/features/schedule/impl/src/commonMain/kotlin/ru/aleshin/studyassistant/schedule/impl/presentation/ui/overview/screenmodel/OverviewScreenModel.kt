@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
 import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
 import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleScreenProvider
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewAction
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewDeps
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewEffect
@@ -115,6 +116,18 @@ internal class OverviewScreenModel(
                     date = date.startThisDay().toEpochMilliseconds(),
                     subjectId = classModel.subject?.uid,
                     organizationId = classModel.organization.uid,
+                )
+                val screen = screenProvider.provideEditorScreen(featureScreen)
+                sendEffect(OverviewEffect.NavigateToGlobal(screen))
+            }
+            is OverviewEvent.NavigateToDailyScheduleEditor -> with(state()) {
+                val selectedDate = checkNotNull(selectedDate)
+                val baseSchedule = if (schedule != null && schedule is ScheduleDetailsUi.Base) schedule else null
+                val customSchedule = if (schedule != null && schedule is ScheduleDetailsUi.Custom) schedule else null
+                val featureScreen = EditorScreen.DailySchedule(
+                    date = selectedDate.startThisDay().toEpochMilliseconds(),
+                    baseScheduleId = baseSchedule?.data?.uid,
+                    customScheduleId = customSchedule?.data?.uid,
                 )
                 val screen = screenProvider.provideEditorScreen(featureScreen)
                 sendEffect(OverviewEffect.NavigateToGlobal(screen))

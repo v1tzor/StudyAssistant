@@ -51,6 +51,7 @@ interface CustomScheduleLocalDataSource {
     suspend fun fetchScheduleByDate(date: Instant): Flow<CustomScheduleDetailsEntity?>
     suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant): Flow<List<CustomScheduleDetailsEntity>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<ClassDetailsEntity?>
+    suspend fun deleteScheduleById(scheduleId: UID)
 
     class Base(
         private val scheduleQueries: CustomScheduleQueries,
@@ -118,6 +119,10 @@ interface CustomScheduleLocalDataSource {
                 val foundClass = classes?.find { it.uid == uid }
                 return@map foundClass?.mapToDetails(scheduleId)
             }
+        }
+
+        override suspend fun deleteScheduleById(scheduleId: UID) {
+            scheduleQueries.deleteScheduleById(scheduleId)
         }
 
         private suspend fun ClassEntity.mapToDetails(scheduleId: UID): ClassDetailsEntity {

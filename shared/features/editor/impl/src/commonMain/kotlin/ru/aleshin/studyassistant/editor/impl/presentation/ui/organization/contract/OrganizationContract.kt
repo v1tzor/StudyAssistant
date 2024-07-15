@@ -33,32 +33,32 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactIn
  */
 @Immutable
 @Parcelize
-internal data class OrganizationEditorViewState(
+internal data class OrganizationViewState(
     val isLoading: Boolean = true,
     val editableOrganization: EditOrganizationUi? = null,
 ) : BaseViewState
 
-internal sealed class OrganizationEditorEvent : BaseEvent {
-    data class Init(val organizationId: UID?) : OrganizationEditorEvent()
-    data class UpdateAvatar(val avatarUrl: String?) : OrganizationEditorEvent()
-    data class UpdateType(val organizationType: OrganizationType?) : OrganizationEditorEvent()
-    data class UpdateName(val shortName: String?, val fullName: String?) : OrganizationEditorEvent()
-    data class UpdateEmails(val emails: List<ContactInfoUi>) : OrganizationEditorEvent()
-    data class UpdatePhones(val phones: List<ContactInfoUi>) : OrganizationEditorEvent()
-    data class UpdateWebs(val webs: List<ContactInfoUi>) : OrganizationEditorEvent()
-    data class UpdateStatus(val isMain: Boolean) : OrganizationEditorEvent()
-    data class UpdateLocations(val locations: List<ContactInfoUi>) : OrganizationEditorEvent()
-    data object SaveOrganization : OrganizationEditorEvent()
-    data object NavigateToBack : OrganizationEditorEvent()
+internal sealed class OrganizationEvent : BaseEvent {
+    data class Init(val organizationId: UID?) : OrganizationEvent()
+    data class UpdateAvatar(val avatarUrl: String?) : OrganizationEvent()
+    data class UpdateType(val organizationType: OrganizationType?) : OrganizationEvent()
+    data class UpdateName(val shortName: String?, val fullName: String?) : OrganizationEvent()
+    data class UpdateEmails(val emails: List<ContactInfoUi>) : OrganizationEvent()
+    data class UpdatePhones(val phones: List<ContactInfoUi>) : OrganizationEvent()
+    data class UpdateWebs(val webs: List<ContactInfoUi>) : OrganizationEvent()
+    data class UpdateStatus(val isMain: Boolean) : OrganizationEvent()
+    data class UpdateLocations(val locations: List<ContactInfoUi>) : OrganizationEvent()
+    data object SaveOrganization : OrganizationEvent()
+    data object NavigateToBack : OrganizationEvent()
 }
 
-internal sealed class OrganizationEditorEffect : BaseUiEffect {
-    data class ShowError(val failures: EditorFailures) : OrganizationEditorEffect()
-    data object NavigateToBack : OrganizationEditorEffect()
+internal sealed class OrganizationEffect : BaseUiEffect {
+    data class ShowError(val failures: EditorFailures) : OrganizationEffect()
+    data object NavigateToBack : OrganizationEffect()
 }
 
-internal sealed class OrganizationEditorAction : BaseAction {
-    data class SetupEditModel(val editModel: EditOrganizationUi) : OrganizationEditorAction()
-    data class UpdateEditModel(val editModel: EditOrganizationUi?) : OrganizationEditorAction()
-    data class UpdateLoading(val isLoading: Boolean) : OrganizationEditorAction()
+internal sealed class OrganizationAction : BaseAction {
+    data class SetupEditModel(val editModel: EditOrganizationUi) : OrganizationAction()
+    data class UpdateEditModel(val editModel: EditOrganizationUi?) : OrganizationAction()
+    data class UpdateLoading(val isLoading: Boolean) : OrganizationAction()
 }
