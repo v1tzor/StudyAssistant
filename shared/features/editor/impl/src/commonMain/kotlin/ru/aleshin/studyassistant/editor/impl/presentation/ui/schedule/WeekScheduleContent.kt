@@ -75,7 +75,7 @@ internal fun WeekScheduleContent(
                     state = listState,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    items(DayOfWeek.entries.toTypedArray()) { dayOfWeek ->
+                    items(DayOfWeek.entries.toTypedArray(), key = { it.name }) { dayOfWeek ->
                         val dayOfWeekSchedule = weekSchedule?.weekDaySchedules?.get(dayOfWeek)
                         ScheduleView(
                             dayOfWeek = dayOfWeek,

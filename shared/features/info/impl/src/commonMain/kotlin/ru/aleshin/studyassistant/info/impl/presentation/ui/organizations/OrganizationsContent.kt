@@ -21,7 +21,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -35,11 +34,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -256,7 +258,6 @@ private fun OrganizationsContactSection(
 @Composable
 private fun OrganizationsEmployeesSection(
     modifier: Modifier = Modifier,
-    gridState: LazyGridState = rememberLazyGridState(),
     isLoading: Boolean,
     organizationData: OrganizationUi?,
     onShowAllEmployee: () -> Unit,
@@ -267,7 +268,10 @@ private fun OrganizationsEmployeesSection(
         modifier = modifier.padding(horizontal = 16.dp),
     ) { loading ->
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     modifier = Modifier.weight(1f),
                     text = InfoThemeRes.strings.employeesSectionTitle,
@@ -290,7 +294,8 @@ private fun OrganizationsEmployeesSection(
                 }
             }
             if (!loading) {
-                if (organizationData != null) {
+                if (organizationData != null && organizationData.employee.size > 2) {
+                    val gridState: LazyGridState = rememberLazyGridState()
                     LazyHorizontalGrid(
                         rows = GridCells.Fixed(2),
                         modifier = Modifier.fillMaxWidth().height(188.dp),
@@ -299,17 +304,37 @@ private fun OrganizationsEmployeesSection(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         flingBehavior = rememberSnapFlingBehavior(SnapLayoutInfoProvider(gridState)),
                     ) {
-                        items(organizationData.employee) { employee ->
-                            val activeSubjects = organizationData.subjects.filter {
-                                it.teacher?.uid == employee.uid
-                            }
+                        items(organizationData.employee, key = { it.uid }) { employee ->
                             ShortEmployeeView(
                                 onClick = { onShowEmployeeProfile(employee.uid) },
                                 avatar = employee.avatar,
                                 post = employee.post,
                                 firstName = employee.firstName,
                                 secondName = employee.patronymic ?: employee.secondName,
-                                subjects = activeSubjects,
+                                subjects = organizationData.subjects.filter {
+                                    it.teacher?.uid == employee.uid
+                                },
+                            )
+                        }
+                    }
+                } else if (organizationData != null) {
+                    val listState = rememberLazyListState()
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth().height(88.dp),
+                        state = listState,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        flingBehavior = rememberSnapFlingBehavior(listState),
+                    ) {
+                        items(organizationData.employee, key = { it.uid }) { employee ->
+                            ShortEmployeeView(
+                                onClick = { onShowEmployeeProfile(employee.uid) },
+                                avatar = employee.avatar,
+                                post = employee.post,
+                                firstName = employee.firstName,
+                                secondName = employee.patronymic ?: employee.secondName,
+                                subjects = organizationData.subjects.filter {
+                                    it.teacher?.uid == employee.uid
+                                },
                             )
                         }
                     }
@@ -320,7 +345,6 @@ private fun OrganizationsEmployeesSection(
                 LazyHorizontalGrid(
                     rows = GridCells.Fixed(2),
                     modifier = Modifier.fillMaxWidth().height(188.dp),
-                    state = gridState,
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
@@ -338,10 +362,8 @@ private fun OrganizationsEmployeesSection(
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun OrganizationsSubjectsSection(
     modifier: Modifier = Modifier,
-    gridState: LazyGridState = rememberLazyGridState(),
     isLoading: Boolean,
     organizationData: OrganizationUi?,
     onShowAllSubjects: () -> Unit,
@@ -352,7 +374,10 @@ private fun OrganizationsSubjectsSection(
         modifier = modifier.padding(horizontal = 16.dp),
     ) { loading ->
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     modifier = Modifier.weight(1f),
                     text = InfoThemeRes.strings.subjectsSectionTitle,
@@ -375,7 +400,8 @@ private fun OrganizationsSubjectsSection(
                 }
             }
             if (!loading) {
-                if (organizationData != null) {
+                if (organizationData != null && organizationData.subjects.size > 2) {
+                    val gridState = rememberLazyGridState()
                     LazyHorizontalGrid(
                         rows = GridCells.Fixed(2),
                         modifier = Modifier.fillMaxWidth().height(196.dp),
@@ -384,7 +410,26 @@ private fun OrganizationsSubjectsSection(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         flingBehavior = rememberSnapFlingBehavior(SnapLayoutInfoProvider(gridState)),
                     ) {
-                        items(organizationData.subjects) { subject ->
+                        items(organizationData.subjects, key = { it.uid }) { subject ->
+                            ShortSubjectView(
+                                onClick = { onShowSubjectEditor(subject.uid) },
+                                eventType = subject.eventType,
+                                office = subject.office,
+                                color = Color(subject.color),
+                                name = subject.name,
+                                teacher = subject.teacher,
+                            )
+                        }
+                    }
+                } else if (organizationData != null) {
+                    val listState = rememberLazyListState()
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth().height(92.dp),
+                        state = listState,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        flingBehavior = rememberSnapFlingBehavior(listState),
+                    ) {
+                        items(organizationData.subjects, key = { it.uid }) { subject ->
                             ShortSubjectView(
                                 onClick = { onShowSubjectEditor(subject.uid) },
                                 eventType = subject.eventType,
@@ -402,7 +447,6 @@ private fun OrganizationsSubjectsSection(
                 LazyHorizontalGrid(
                     rows = GridCells.Fixed(2),
                     modifier = Modifier.fillMaxWidth().height(196.dp),
-                    state = gridState,
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {

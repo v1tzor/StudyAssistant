@@ -35,11 +35,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.EmployeeAvatarView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.EmployeeSubjectView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.NoneEmployeeSubjectView
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 17.06.2024.
@@ -100,7 +100,7 @@ internal fun ShortEmployeeView(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (subjects.isNotEmpty()) {
-                        items(subjects) { subject ->
+                        items(subjects, key = { it.uid }) { subject ->
                             EmployeeSubjectView(
                                 color = Color(subject.color),
                                 text = subject.name,

@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,15 +28,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
@@ -62,11 +60,9 @@ internal fun CommonScheduleView(
     isCurrentDay: Boolean,
     activeClass: ActiveClassUi?,
     classes: List<ClassDetailsUi>,
-    userScrollEnabled: Boolean = false,
     onOpenSchedule: () -> Unit,
     onClassClick: (ClassDetailsUi) -> Unit,
 ) {
-    val scrollState = rememberScrollState()
     val coreStrings = StudyAssistantRes.strings
     val dateFormat = LocalDate.Format {
         dayOfMonth()
@@ -83,11 +79,9 @@ internal fun CommonScheduleView(
                 onClick = onOpenSchedule,
                 dayOfWeek = date.dayOfWeek.mapToSting(coreStrings),
                 date = date.format(dateFormat),
-                isHighlighted = isCurrentDay,
+                isCurrentDay = isCurrentDay,
             )
             CommonScheduleViewContent(
-                modifier = if (userScrollEnabled) Modifier.weight(1f) else Modifier.wrapContentSize(),
-                scrollState = if (userScrollEnabled) scrollState else null,
                 activeClass = activeClass,
                 classes = classes,
                 onClassClick = onClassClick,
@@ -102,13 +96,13 @@ internal fun CommonScheduleViewPlaceholder(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
+        shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Column {
             PlaceholderBox(
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.large,
+                shape = MaterialTheme.shapes.medium,
                 color = MaterialTheme.colorScheme.surfaceContainer,
             )
             Column(
@@ -148,24 +142,25 @@ private fun CommonScheduleViewHeader(
     enabled: Boolean = true,
     dayOfWeek: String,
     date: String,
-    isHighlighted: Boolean,
+    isCurrentDay: Boolean,
 ) {
     Surface(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         enabled = enabled,
         shape = MaterialTheme.shapes.medium,
-        color = if (isHighlighted) {
-            MaterialTheme.colorScheme.primaryContainer
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        border = if (isCurrentDay) {
+            BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceContainerHigh)
         } else {
-            MaterialTheme.colorScheme.surfaceContainer
+            null
         },
     ) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)) {
             Text(
                 text = dayOfWeek,
-                color = if (isHighlighted) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
+                color = if (isCurrentDay) {
+                    MaterialTheme.colorScheme.primary
                 } else {
                     MaterialTheme.colorScheme.onSurface
                 },
@@ -187,17 +182,11 @@ private fun CommonScheduleViewHeader(
 @Composable
 private fun CommonScheduleViewContent(
     modifier: Modifier = Modifier,
-    scrollState: ScrollState?,
     activeClass: ActiveClassUi?,
     classes: List<ClassDetailsUi>,
     onClassClick: (ClassDetailsUi) -> Unit,
 ) {
-    Column(
-        modifier = modifier.padding(start = 6.dp, end = 6.dp, top = 8.dp, bottom = 12.dp).then(
-            if (scrollState != null) Modifier.verticalScroll(scrollState) else Modifier
-        ),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
+    Column(modifier = modifier.padding(start = 2.dp, end = 2.dp, top = 4.dp, bottom = 8.dp)) {
         if (classes.isEmpty()) {
             EmptyClassesView()
         } else {
@@ -238,9 +227,10 @@ private fun EmptyClassesView(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth().height(32.dp),
+        modifier = modifier.fillMaxWidth().height(42.dp).padding(horizontal = 4.dp),
         shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        color = Color.Transparent,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(

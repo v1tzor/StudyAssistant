@@ -328,33 +328,31 @@ private fun FriendsViewItem(
         Column(modifier = Modifier.weight(1f)) {
             friends.forEach { friend ->
                 var isExpandedFriendMenu by remember { mutableStateOf(false) }
-                Row {
-                    UserView(
-                        onClick = { onOpenUserProfile(friend.uid) },
-                        name = friend.username,
-                        avatar = friend.avatar,
-                        supportText = { Text(text = friend.email) },
-                        trailingIcon = {
-                            FriendDropdownMenu(
-                                isExpand = isExpandedFriendMenu,
-                                onDismiss = { isExpandedFriendMenu = false },
-                                onDeleteFromFriend = {
-                                    onDeleteFriend(friend.uid)
-                                    isExpandedFriendMenu = false
-                                },
+                UserView(
+                    onClick = { onOpenUserProfile(friend.uid) },
+                    name = friend.username,
+                    avatar = friend.avatar,
+                    supportText = { Text(text = friend.email) },
+                    trailingIcon = {
+                        FriendDropdownMenu(
+                            isExpand = isExpandedFriendMenu,
+                            onDismiss = { isExpandedFriendMenu = false },
+                            onDeleteFromFriend = {
+                                onDeleteFriend(friend.uid)
+                                isExpandedFriendMenu = false
+                            },
+                        )
+                        IconButton(
+                            modifier = Modifier.size(32.dp),
+                            onClick = { isExpandedFriendMenu = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = null
                             )
-                            IconButton(
-                                modifier = Modifier.size(32.dp),
-                                onClick = { isExpandedFriendMenu = true }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.MoreVert,
-                                    contentDescription = null
-                                )
-                            }
-                        },
-                    )
-                }
+                        }
+                    },
+                )
             }
         }
     }

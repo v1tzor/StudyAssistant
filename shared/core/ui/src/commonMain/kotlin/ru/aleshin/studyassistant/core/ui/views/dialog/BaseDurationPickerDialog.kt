@@ -111,7 +111,7 @@ fun DurationPickerDialog(
                         contentPadding = PaddingValues(horizontal = 24.dp),
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        items(StandardDuration.entries.toTypedArray()) {
+                        items(StandardDuration.entries.toTypedArray(), key = { it.name }) {
                             AssistChip(
                                 onClick = {
                                     hour = it.hour

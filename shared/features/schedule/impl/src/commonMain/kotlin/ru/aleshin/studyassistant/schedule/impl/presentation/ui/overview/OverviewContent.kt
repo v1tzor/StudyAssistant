@@ -62,57 +62,60 @@ internal fun OverviewContent(
     modifier: Modifier = Modifier,
     onShowClassInfo: (ClassDetailsUi) -> Unit,
 ) = with(state) {
-    Column(modifier = modifier.padding(top = 12.dp)) {
-        Crossfade(
-            modifier = Modifier.weight(1f),
-            targetState = isScheduleLoading,
-            animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-        ) { loading ->
-            if (!loading && schedule != null) {
-                if (schedule.classes.isNotEmpty()) {
-                    val classListState = rememberLazyListState()
-                    LazyColumn(
-                        state = classListState,
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp),
-                    ) {
-                        items(schedule.classes) { classModel ->
-                            DetailsClassViewItem(
-                                modifier = Modifier.animateItemPlacement(),
-                                onClick = { onShowClassInfo(classModel) },
-                                isActive = activeClass?.uid == classModel.uid,
-                                progress = activeClass?.progress?.takeIf { activeClass.isStarted } ?: -1f,
-                                timeRange = classModel.timeRange,
-                                subject = classModel.subject,
-                                office = classModel.office,
-                                organization = classModel.organization,
-                                teacher = classModel.teacher,
-                                location = classModel.location,
-                                headerBadge = {
-                                    if (classModel.homework != null) {
-                                        DetailsClassHomeworkBadge(
-                                            homeworkStatus = classModel.homework.status,
-                                        )
-                                    }
-                                    if (classModel.homework?.test != null) {
-                                        DetailsClassTestBadge()
-                                    }
-                                }
-                            )
-                        }
-                        item { Spacer(modifier = Modifier.height(60.dp)) }
-                    }
-                } else {
-                    EmptyClassesView(modifier = Modifier.weight(1f))
-                }
-            } else {
+    Crossfade(
+        modifier = modifier.fillMaxSize().padding(top = 12.dp),
+        targetState = isScheduleLoading,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = Spring.DefaultDisplacementThreshold,
+        ),
+    ) { loading ->
+        if (!loading && schedule != null) {
+            if (schedule.classes.isNotEmpty()) {
+                val classListState = rememberLazyListState()
                 LazyColumn(
+                    state = classListState,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp),
                 ) {
-                    items(OVERVIEW_ITEMS) {
-                        DetailsClassViewPlaceholder()
+                    items(schedule.classes, key = { it.uid }) { classModel ->
+                        DetailsClassViewItem(
+                            modifier = Modifier.animateItemPlacement(),
+                            onClick = { onShowClassInfo(classModel) },
+                            isActive = activeClass?.uid == classModel.uid,
+                            progress = activeClass?.progress?.takeIf { activeClass.isStarted }
+                                ?: -1f,
+                            timeRange = classModel.timeRange,
+                            subject = classModel.subject,
+                            office = classModel.office,
+                            organization = classModel.organization,
+                            teacher = classModel.teacher,
+                            location = classModel.location,
+                            headerBadge = {
+                                if (classModel.homework != null) {
+                                    DetailsClassHomeworkBadge(
+                                        homeworkStatus = classModel.homework.status,
+                                    )
+                                }
+                                if (classModel.homework?.test != null) {
+                                    DetailsClassTestBadge()
+                                }
+                            }
+                        )
                     }
+                    item { Spacer(modifier = Modifier.height(60.dp)) }
+                }
+            } else {
+                EmptyClassesView(modifier = Modifier.fillMaxSize())
+            }
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp),
+            ) {
+                items(OVERVIEW_ITEMS) {
+                    DetailsClassViewPlaceholder()
                 }
             }
         }

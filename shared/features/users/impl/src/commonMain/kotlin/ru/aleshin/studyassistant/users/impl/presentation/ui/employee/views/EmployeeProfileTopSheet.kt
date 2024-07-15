@@ -22,6 +22,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -164,6 +166,7 @@ private fun EmployeeTopSheetFooterPlaceholder(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun EmployeeTopSheetHeader(
     modifier: Modifier = Modifier,
@@ -184,19 +187,40 @@ private fun EmployeeTopSheetHeader(
             imageUrl = avatar,
         )
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = buildString {
-                    append(firstName)
-                    if (patronymic != null) append(" ", patronymic)
-                    if (secondName != null) append(" ", secondName)
-                },
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
-                overflow = TextOverflow.Ellipsis,
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
                 maxLines = 2,
-                style = MaterialTheme.typography.titleLarge,
-            )
+            ) {
+                Text(
+                    text = firstName,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                if (patronymic != null) {
+                    Text(
+                        text = patronymic,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                }
+                if (secondName != null) {
+                    Text(
+                        text = secondName,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                }
+            }
             if (email != null) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),

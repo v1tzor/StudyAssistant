@@ -56,7 +56,7 @@ internal fun CalendarPageInfo(
         modifier = modifier.padding(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(NumberOfRepeatWeek.entries) { week ->
+        items(NumberOfRepeatWeek.entries, key = { it.name }) { week ->
             NumberOfWeekView(
                 modifier = Modifier.animateItemPlacement(),
                 selected = week == calendarSettings.numberOfWeek,

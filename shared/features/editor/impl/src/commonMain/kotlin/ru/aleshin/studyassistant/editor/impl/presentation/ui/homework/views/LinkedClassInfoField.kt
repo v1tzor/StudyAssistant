@@ -199,7 +199,7 @@ private fun LinkClassView(
                                 selected = linkedClass == null,
                             )
                         }
-                        items(classes) { dateClassModel ->
+                        items(classes, key = { it.first.toString() + it.second.uid }) { dateClassModel ->
                             LinkClassItem(
                                 onClick = { onSelectedClass(dateClassModel.second, dateClassModel.first) },
                                 selected = linkedClass == dateClassModel.second.uid &&

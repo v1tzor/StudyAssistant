@@ -94,7 +94,7 @@ internal fun ColorInfoField(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     userScrollEnabled = !isLoading,
                 ) {
-                    items(CustomColors.entries) { customColor ->
+                    items(CustomColors.entries, key = { it.name }) { customColor ->
                         val darkColor = Color(customColor.dark)
                         val lightColor = Color(customColor.light)
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

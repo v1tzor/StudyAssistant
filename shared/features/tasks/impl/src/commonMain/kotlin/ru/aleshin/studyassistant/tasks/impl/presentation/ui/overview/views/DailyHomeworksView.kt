@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -81,7 +80,6 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
  * @author Stanislav Aleshin on 29.06.2024.
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 internal fun DailyHomeworksView(
     modifier: Modifier = Modifier,
     date: Instant,
