@@ -17,13 +17,14 @@
 package ru.aleshin.studyassistant.core.remote.models.users
 
 import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
 @Serializable
 data class SocialNetworkPojo(
-    val name: String,
-    val icon: String,
-    val url: String,
+    val type: String = SocialNetworkType.OTHER.name,
+    val otherType: String? = null,
+    val data: String = "",
 )

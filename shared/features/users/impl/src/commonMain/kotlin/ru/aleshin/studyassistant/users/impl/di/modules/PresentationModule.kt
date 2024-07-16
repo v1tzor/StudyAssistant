@@ -38,6 +38,10 @@ import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.screenmodel
 import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.screenmodel.RequestsScreenModel
 import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.screenmodel.RequestsStateCommunicator
 import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.screenmodel.RequestsWorkProcessor
+import ru.aleshin.studyassistant.users.impl.presentation.ui.user.screenmodel.UserProfileEffectCommunicator
+import ru.aleshin.studyassistant.users.impl.presentation.ui.user.screenmodel.UserProfileScreenModel
+import ru.aleshin.studyassistant.users.impl.presentation.ui.user.screenmodel.UserProfileStateCommunicator
+import ru.aleshin.studyassistant.users.impl.presentation.ui.user.screenmodel.UserProfileWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -53,6 +57,11 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<EmployeeProfileEffectCommunicator> { EmployeeProfileEffectCommunicator.Base() }
     bindProvider<EmployeeProfileWorkProcessor> { EmployeeProfileWorkProcessor.Base(instance()) }
     bindProvider<EmployeeProfileScreenModel> { EmployeeProfileScreenModel(instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<UserProfileStateCommunicator> { UserProfileStateCommunicator.Base() }
+    bindProvider<UserProfileEffectCommunicator> { UserProfileEffectCommunicator.Base() }
+    bindProvider<UserProfileWorkProcessor> { UserProfileWorkProcessor.Base(instance(), instance()) }
+    bindProvider<UserProfileScreenModel> { UserProfileScreenModel(instance(), instance(), instance(), instance()) }
 
     bindProvider<FriendsStateCommunicator> { FriendsStateCommunicator.Base() }
     bindProvider<FriendsEffectCommunicator> { FriendsEffectCommunicator.Base() }

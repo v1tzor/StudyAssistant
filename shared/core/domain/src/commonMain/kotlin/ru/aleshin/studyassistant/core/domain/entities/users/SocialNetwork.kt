@@ -20,7 +20,7 @@ package ru.aleshin.studyassistant.core.domain.entities.users
  * @author Stanislav Aleshin on 20.04.2024.
  */
 data class SocialNetwork(
-    val name: String,
-    val icon: String,
-    val url: String,
+    val type: SocialNetworkType,
+    val otherType: String?,
+    val data: String,
 )

@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.preview.impl.presentation.models.users
+package ru.aleshin.studyassistant.users.impl.presentation.ui.user.screenmodel
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.StateCommunicator
+import ru.aleshin.studyassistant.users.impl.presentation.ui.user.contract.UserProfileViewState
 
 /**
- * @author Stanislav Aleshin on 20.04.2024.
+ * @author Stanislav Aleshin on 15.07.2024.
  */
-@Parcelize
-internal data class SocialNetworkUi(
-    val type: SocialNetworkType,
-    val otherType: String?,
-    val data: String,
-) : Parcelable
+internal interface UserProfileStateCommunicator : StateCommunicator<UserProfileViewState> {
+    class Base : UserProfileStateCommunicator, StateCommunicator.Abstract<UserProfileViewState>(
+        defaultState = UserProfileViewState()
+    )
+}

@@ -20,6 +20,7 @@ import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetwork
+import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 import ru.aleshin.studyassistant.core.remote.models.users.SocialNetworkPojo
 
@@ -59,13 +60,13 @@ fun AppUserPojo.mapToDomain() = AppUser(
 )
 
 fun SocialNetwork.mapToRemote() = SocialNetworkPojo(
-    name = name,
-    icon = icon,
-    url = url
+    type = type.name,
+    otherType = otherType,
+    data = data,
 )
 
 fun SocialNetworkPojo.mapToDomain() = SocialNetwork(
-    name = name,
-    icon = icon,
-    url = url
+    type = SocialNetworkType.valueOf(type),
+    otherType = otherType,
+    data = data,
 )

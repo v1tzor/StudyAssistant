@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects
-
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+package ru.aleshin.studyassistant.core.domain.entities.users
 
 /**
- * @author Stanislav Aleshin on 20.04.2024.
+ * @author Stanislav Aleshin on 16.07.2024.
  */
-@Parcelize
-internal data class SocialNetworkUi(
-    val name: String,
-    val icon: String,
-    val url: String,
-) : Parcelable
+enum class SocialNetworkType {
+    TELEGRAM, FACEBOOK, X, INSTAGRAM, TIKTOK, YOUTUBE, DISCORD, WHATSAPP, VK, OTHER
+}

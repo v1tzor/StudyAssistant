@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.preview.impl.presentation.models.users
-
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
+package ru.aleshin.studyassistant.core.domain.entities.users
 
 /**
- * @author Stanislav Aleshin on 20.04.2024.
+ * @author Stanislav Aleshin on 16.07.2024.
  */
-@Parcelize
-internal data class SocialNetworkUi(
-    val type: SocialNetworkType,
-    val otherType: String?,
-    val data: String,
-) : Parcelable
+enum class UserFriendStatus {
+    NOT_FRIENDS, REQUEST_SENT, IN_FRIENDS
+}

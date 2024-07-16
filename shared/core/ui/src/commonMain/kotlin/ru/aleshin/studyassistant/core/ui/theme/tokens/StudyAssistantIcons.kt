@@ -47,6 +47,7 @@ import studyassistant.shared.core.ui.generated.resources.ic_profile
 import studyassistant.shared.core.ui.generated.resources.ic_profile_outline
 import studyassistant.shared.core.ui.generated.resources.ic_select_date
 import studyassistant.shared.core.ui.generated.resources.ic_seminar
+import studyassistant.shared.core.ui.generated.resources.ic_soc_network
 import studyassistant.shared.core.ui.generated.resources.ic_sorted_type
 import studyassistant.shared.core.ui.generated.resources.ic_study
 import studyassistant.shared.core.ui.generated.resources.ic_study_assistant
@@ -58,6 +59,15 @@ import studyassistant.shared.core.ui.generated.resources.ic_university
 import studyassistant.shared.core.ui.generated.resources.ic_upload_circular
 import studyassistant.shared.core.ui.generated.resources.ic_web
 import studyassistant.shared.core.ui.generated.resources.ic_webinar
+import studyassistant.shared.core.ui.generated.resources.logo_discord
+import studyassistant.shared.core.ui.generated.resources.logo_facebook
+import studyassistant.shared.core.ui.generated.resources.logo_instagram
+import studyassistant.shared.core.ui.generated.resources.logo_telegram
+import studyassistant.shared.core.ui.generated.resources.logo_tiktok
+import studyassistant.shared.core.ui.generated.resources.logo_vk
+import studyassistant.shared.core.ui.generated.resources.logo_whatsapp
+import studyassistant.shared.core.ui.generated.resources.logo_x
+import studyassistant.shared.core.ui.generated.resources.logo_youtube
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
@@ -107,6 +117,16 @@ data class StudyAssistantIcons(
     val calendarToday: DrawableResource,
     val priorityHigh: DrawableResource,
     val organizationType: DrawableResource,
+    val telegramSocialNetwork: DrawableResource,
+    val XSocialNetwork: DrawableResource,
+    val instagramSocialNetwork: DrawableResource,
+    val tikTokSocialNetwork: DrawableResource,
+    val facebookSocialNetwork: DrawableResource,
+    val youtubeSocialNetwork: DrawableResource,
+    val whatsAppSocialNetwork: DrawableResource,
+    val discordSocialNetwork: DrawableResource,
+    val vkSocialNetwork: DrawableResource,
+    val otherSocialNetwork: DrawableResource,
 ) {
     companion object {
         val BASE = StudyAssistantIcons(
@@ -153,7 +173,17 @@ data class StudyAssistantIcons(
             presentationTasks = Res.drawable.ic_presentation,
             calendarToday = Res.drawable.ic_calendar_today,
             priorityHigh = Res.drawable.ic_priority_high,
-            organizationType = Res.drawable.ic_organization_type
+            organizationType = Res.drawable.ic_organization_type,
+            telegramSocialNetwork = Res.drawable.logo_telegram,
+            facebookSocialNetwork = Res.drawable.logo_facebook,
+            XSocialNetwork = Res.drawable.logo_x,
+            instagramSocialNetwork = Res.drawable.logo_instagram,
+            tikTokSocialNetwork = Res.drawable.logo_tiktok,
+            youtubeSocialNetwork = Res.drawable.logo_youtube,
+            vkSocialNetwork = Res.drawable.logo_vk,
+            discordSocialNetwork = Res.drawable.logo_discord,
+            whatsAppSocialNetwork = Res.drawable.logo_whatsapp,
+            otherSocialNetwork = Res.drawable.ic_soc_network,
         )
     }
 }

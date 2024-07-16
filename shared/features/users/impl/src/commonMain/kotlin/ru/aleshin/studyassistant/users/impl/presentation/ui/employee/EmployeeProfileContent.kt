@@ -239,7 +239,7 @@ private fun EmployeeProfileContactInfoSection(
                         EmployeeContactInfoNoneView()
                     }
                 } else {
-                    repeat(Placeholder.EMPLOYEE_CONTACT_INFO) {
+                    repeat(Placeholder.USER_CONTACT_INFO) {
                         EmployeeContactInfoViewPlaceholder()
                     }
                 }

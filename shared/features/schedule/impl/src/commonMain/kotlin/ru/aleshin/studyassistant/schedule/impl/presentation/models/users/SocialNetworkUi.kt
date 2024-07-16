@@ -18,13 +18,14 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.models.users
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
 @Parcelize
 internal data class SocialNetworkUi(
-    val name: String,
-    val icon: String,
-    val url: String,
+    val type: SocialNetworkType,
+    val otherType: String?,
+    val data: String,
 ) : Parcelable

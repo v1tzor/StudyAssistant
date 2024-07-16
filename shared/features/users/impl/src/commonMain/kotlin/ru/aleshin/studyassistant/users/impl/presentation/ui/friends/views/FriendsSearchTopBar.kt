@@ -237,7 +237,7 @@ private fun FriendsSearchTopBarContent(
                                     onClick = { onCancelSendFriendRequest(user.uid) },
                                 ) {
                                     Text(
-                                        text = UsersThemeRes.strings.cancelFriendRequestTitle,
+                                        text = UsersThemeRes.strings.cancelSendFriendRequestTitle,
                                         style = MaterialTheme.typography.labelMedium,
                                     )
                                 }

@@ -135,6 +135,16 @@ data class StudyAssistantStrings(
     val russianLanguageTitle: String,
     val lightThemeTitle: String,
     val darkThemeTitle: String,
+    val telegramSocialNetwork: String,
+    val XSocialNetwork: String,
+    val instagramSocialNetwork: String,
+    val tikTokSocialNetwork: String,
+    val facebookSocialNetwork: String,
+    val youtubeSocialNetwork: String,
+    val whatsAppSocialNetwork: String,
+    val discordSocialNetwork: String,
+    val vkSocialNetwork: String,
+    val otherTitle: String,
 )
 
 internal val russianFamelString = StudyAssistantStrings(
@@ -250,6 +260,16 @@ internal val russianFamelString = StudyAssistantStrings(
     russianLanguageTitle = "Русский",
     lightThemeTitle = "Светлая",
     darkThemeTitle = "Тёмная",
+    telegramSocialNetwork = "Telegram",
+    facebookSocialNetwork = "Facebook",
+    XSocialNetwork = "X",
+    instagramSocialNetwork = "Instagram",
+    tikTokSocialNetwork = "TikTok",
+    youtubeSocialNetwork = "YouTube",
+    vkSocialNetwork = "VK",
+    discordSocialNetwork = "Discord",
+    whatsAppSocialNetwork = "Whatsapp",
+    otherTitle = "Другое",
 )
 
 internal val englishFamelString = StudyAssistantStrings(
@@ -365,6 +385,16 @@ internal val englishFamelString = StudyAssistantStrings(
     russianLanguageTitle = "Русский",
     lightThemeTitle = "Light",
     darkThemeTitle = "Dark",
+    telegramSocialNetwork = "Telegram",
+    facebookSocialNetwork = "Facebook",
+    XSocialNetwork = "X",
+    instagramSocialNetwork = "Instagram",
+    tikTokSocialNetwork = "TikTok",
+    youtubeSocialNetwork = "YouTube",
+    vkSocialNetwork = "VK",
+    discordSocialNetwork = "Discord",
+    whatsAppSocialNetwork = "Whatsapp",
+    otherTitle = "Other",
 )
 
 fun StudyAssistantStrings.monthNames() = MonthNames(

@@ -16,12 +16,17 @@
 
 package ru.aleshin.studyassistant.users.impl.domain.interactors
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
+import ru.aleshin.studyassistant.core.domain.entities.users.UserFriendStatus
+import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.users.impl.domain.common.UsersEitherWrapper
 import ru.aleshin.studyassistant.users.impl.domain.entities.UsersFailures
@@ -31,6 +36,8 @@ import ru.aleshin.studyassistant.users.impl.domain.entities.UsersFailures
  */
 internal interface UsersInteractor {
 
+    suspend fun fetchUserById(userId: UID): FlowDomainResult<UsersFailures, AppUser>
+    suspend fun fetchUserFriendStatus(userId: UID): FlowDomainResult<UsersFailures, UserFriendStatus>
     suspend fun fetchAllFriends(): FlowDomainResult<UsersFailures, List<AppUser>>
     suspend fun findUsersByCode(code: String): FlowDomainResult<UsersFailures, List<AppUser>>
     suspend fun addUserToFriends(userId: UID): UnitDomainResult<UsersFailures>
@@ -38,11 +45,37 @@ internal interface UsersInteractor {
 
     class Base(
         private val usersRepository: UsersRepository,
+        private val requestsRepository: FriendRequestsRepository,
         private val eitherWrapper: UsersEitherWrapper,
     ) : UsersInteractor {
 
         private val currentUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid
+
+        override suspend fun fetchUserById(userId: UID) = eitherWrapper.wrapFlow {
+            usersRepository.fetchAppUserById(userId).map { user -> checkNotNull(user) }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        override suspend fun fetchUserFriendStatus(userId: UID) = eitherWrapper.wrapFlow {
+            val currentUserInfo = usersRepository.fetchAppUserById(currentUser)
+            val userFriendRequests = requestsRepository.fetchShortRequestsByUser(userId)
+
+            currentUserInfo.flatMapLatest { userInfo ->
+                userFriendRequests.map { friendRequests ->
+                    val isFriend = userInfo?.friends?.contains(userId) ?: false
+                    val isSendRequest = friendRequests.send.containsKey(userId)
+
+                    return@map if (isFriend) {
+                        UserFriendStatus.IN_FRIENDS
+                    } else if (isSendRequest) {
+                        UserFriendStatus.REQUEST_SENT
+                    } else {
+                        UserFriendStatus.NOT_FRIENDS
+                    }
+                }
+            }
+        }
 
         override suspend fun fetchAllFriends() = eitherWrapper.wrapFlow {
             usersRepository.fetchAppUserFriends(currentUser)

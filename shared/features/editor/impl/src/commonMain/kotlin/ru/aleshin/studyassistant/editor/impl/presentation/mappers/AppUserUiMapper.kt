@@ -55,14 +55,15 @@ internal fun AppUserUi.mapToDomain() = AppUser(
     subscribePeriod = subscribePeriod,
     socialNetworks = socialNetworks.map { it.mapToDomain() },
 )
+
 internal fun SocialNetwork.mapToUi() = SocialNetworkUi(
-    name = name,
-    icon = icon,
-    url = url,
+    type = type,
+    otherType = otherType,
+    data = data,
 )
 
 internal fun SocialNetworkUi.mapToDomain() = SocialNetwork(
-    name = name,
-    icon = icon,
-    url = url,
+    type = type,
+    otherType = otherType,
+    data = data,
 )

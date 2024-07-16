@@ -262,7 +262,7 @@ internal fun RequestsSentTab(
                                     onClick = { onCancelSendFriendRequest(user.first.uid) },
                                 ) {
                                     Text(
-                                        text = UsersThemeRes.strings.cancelFriendRequestTitle,
+                                        text = UsersThemeRes.strings.cancelSendFriendRequestTitle,
                                         style = MaterialTheme.typography.labelMedium,
                                     )
                                 }

@@ -323,7 +323,7 @@ private fun EmployeeTopSheetFooter(
             )
         }
         if (workTimeStart != null || workTimeEnd != null) {
-            item { VerticalDivider(modifier = Modifier.height(68.dp)) }
+            item { VerticalDivider(modifier = Modifier.height(56.dp)) }
             item {
                 EmployeeInfoView(
                     icon = Icons.Outlined.WorkOutline,
@@ -342,7 +342,7 @@ private fun EmployeeTopSheetFooter(
             }
         }
         if (birthday != null) {
-            item { VerticalDivider(modifier = Modifier.height(68.dp)) }
+            item { VerticalDivider(modifier = Modifier.height(56.dp)) }
             item {
                 EmployeeInfoView(
                     icon = Icons.Outlined.Cake,
