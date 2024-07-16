@@ -16,10 +16,14 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel
 
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.Instant
@@ -30,9 +34,8 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkC
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.common.extensions.shiftMinutes
-import ru.aleshin.studyassistant.core.common.functional.Constants.Delay.UPDATE_ACTIVE_CLASS
+import ru.aleshin.studyassistant.core.common.functional.Constants.Delay
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
-import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.AnalysisInteractor
@@ -65,16 +68,25 @@ internal interface OverviewWorkProcessor :
             is OverviewWorkCommand.UpdateIsHomeworkDone -> updateIsHomeworkDoneWork(command.homework, command.isDone)
         }
 
-        private fun loadScheduleWork(date: Instant) = flow {
-            scheduleInteractor.fetchDetailsScheduleByDate(date).collectAndHandle(
-                onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
-                onRightAction = { scheduleDetails ->
-                    val currentTime = dateManager.fetchCurrentInstant()
-                    val schedule = scheduleDetails.mapToUi(currentTime)
-                    emit(ActionResult(OverviewAction.UpdateSchedule(schedule)))
-                    emitAll(cycleUpdateActiveClass(schedule, date))
-                }
-            )
+        private fun loadScheduleWork(date: Instant) = channelFlow {
+            var cycleUpdateJob: Job? = null
+            scheduleInteractor.fetchDetailsScheduleByDate(date).collect { scheduleEither ->
+                cycleUpdateJob?.cancelAndJoin()
+                scheduleEither.handle(
+                    onLeftAction = { send(EffectResult(OverviewEffect.ShowError(it))) },
+                    onRightAction = { scheduleDetails ->
+                        val currentTime = dateManager.fetchCurrentInstant()
+                        val schedule = scheduleDetails.mapToUi(currentTime)
+
+                        send(ActionResult(OverviewAction.UpdateSchedule(schedule)))
+
+                        cycleUpdateJob = cycleUpdateActiveClass(schedule, date)
+                            .onEach { send(it) }
+                            .launchIn(this)
+                            .apply { start() }
+                    },
+                )
+            }
         }.onStart {
             emit(ActionResult(OverviewAction.UpdateScheduleLoading(true)))
         }
@@ -104,13 +116,16 @@ internal interface OverviewWorkProcessor :
         }
 
         private fun cycleUpdateActiveClass(schedule: ScheduleDetailsUi, classesDate: Instant) = flow {
+            val scheduleClasses = schedule.mapToValue(
+                onBaseSchedule = { it?.classes },
+                onCustomSchedule = { it?.classes }
+            )
             while (currentCoroutineContext().isActive) {
+                delay(Delay.UPDATE_ACTIVE_CLASS)
+
                 var activeClassData: ActiveClassUi? = null
                 val currentInstant = dateManager.fetchCurrentInstant()
-                val scheduleClasses = schedule.mapToValue(
-                    onBaseSchedule = { it?.classes },
-                    onCustomSchedule = { it?.classes }
-                )
+
                 if (classesDate.equalsDay(currentInstant) && scheduleClasses != null) {
                     val activeClass = scheduleClasses.find { classModel ->
                         val endInstant = classesDate.setHoursAndMinutes(classModel.timeRange.to)
@@ -142,7 +157,6 @@ internal interface OverviewWorkProcessor :
                     }
                 }
                 emit(ActionResult(OverviewAction.UpdateActiveClass(activeClassData)))
-                delay(UPDATE_ACTIVE_CLASS)
             }
         }
     }

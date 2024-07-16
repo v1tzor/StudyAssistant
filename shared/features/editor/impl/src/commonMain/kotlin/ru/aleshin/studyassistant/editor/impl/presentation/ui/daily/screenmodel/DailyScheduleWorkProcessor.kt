@@ -66,38 +66,31 @@ internal interface DailyScheduleWorkProcessor :
                 baseScheduleId = command.baseScheduleId,
                 customScheduleId = command.customScheduleId,
             )
-
             is DailyScheduleWorkCommand.LoadCalendarSettings -> loadCalendarSettings()
             is DailyScheduleWorkCommand.CreateCustomSchedule -> createCustomScheduleWork(
                 date = command.date,
                 baseSchedule = command.baseSchedule,
             )
-
             is DailyScheduleWorkCommand.DeleteCustomSchedule -> deleteCustomScheduleWork(
                 customScheduleId = command.customScheduleId,
             )
-
             is DailyScheduleWorkCommand.DeleteClass -> deleteClassWork(
                 targetId = command.targetId,
                 schedule = command.schedule,
             )
-
             is DailyScheduleWorkCommand.SwapClasses -> swapClassesWork(
                 from = command.from,
                 to = command.to,
                 schedule = command.schedule,
             )
-
             is DailyScheduleWorkCommand.UpdateStartOfDay -> updateStartOfDayWork(
                 time = command.time,
                 schedule = command.schedule,
             )
-
             is DailyScheduleWorkCommand.UpdateClassesDuration -> updateClassesDurationWork(
                 durations = command.durations,
                 schedule = command.schedule,
             )
-
             is DailyScheduleWorkCommand.UpdateBreaksDuration -> updateBreaksDurationWork(
                 durations = command.durations,
                 schedule = command.schedule,

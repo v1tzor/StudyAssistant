@@ -17,10 +17,14 @@
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.Instant
@@ -31,6 +35,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkC
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
 import ru.aleshin.studyassistant.core.common.extensions.endOfWeek
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
+import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.common.extensions.shiftWeek
 import ru.aleshin.studyassistant.core.common.extensions.startOfWeek
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
@@ -75,31 +80,46 @@ internal interface OverviewWorkProcessor :
             is OverviewWorkCommand.UpdateTodo -> updateTodoWork(command.todo)
         }
 
-        private fun loadHomeworksWork(currentDate: Instant) = flow<OverviewWorkResult> {
+        private fun loadHomeworksWork(currentDate: Instant) = channelFlow<OverviewWorkResult> {
+            var cycleUpdateJob: Job? = null
             val targetTimeRange = TimeRange(
                 from = currentDate.startOfWeek().shiftWeek(-1),
                 to = currentDate.endOfWeek().shiftWeek(+1),
             )
-            homeworksInteractor.fetchHomeworksByTimeRange(targetTimeRange).collectAndHandle(
-                onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
-                onRightAction = { homeworkList ->
-                    val homeworks = homeworkList.map {
-                        val status = HomeworkStatus.calculate(it.isDone, it.completeDate, it.deadline, currentDate)
-                        return@map it.mapToUi(status)
-                    }
-                    val groupedHomeworks = homeworks.groupBy { homework ->
-                        homework.deadline.startThisDay()
-                    }
-                    val homeworksMap = buildMap {
-                        targetTimeRange.periodDates().forEach { date ->
-                            put(date, groupedHomeworks[date] ?: emptyList<HomeworkDetailsUi>())
+            homeworksInteractor.fetchHomeworksByTimeRange(targetTimeRange).collect { homeworksEither ->
+                cycleUpdateJob?.cancelAndJoin()
+                homeworksEither.handle(
+                    onLeftAction = { send(EffectResult(OverviewEffect.ShowError(it))) },
+                    onRightAction = { homeworkList ->
+                        val homeworks = homeworkList.map { homework ->
+                            val currentTime = dateManager.fetchCurrentInstant()
+                            val status = HomeworkStatus.calculate(
+                                isDone = homework.isDone,
+                                completeDate = homework.completeDate,
+                                deadline = homework.deadline,
+                                currentTime = currentDate.setHoursAndMinutes(currentTime),
+                            )
+                            return@map homework.mapToUi(status)
                         }
-                    }
-                    val homeworksScope = calculateHomeworkScope(homeworksMap)
-                    emit(ActionResult(OverviewAction.UpdateHomeworks(homeworksMap, homeworksScope)))
-                    emitAll(cycleUpdateHomeworkStatus(homeworksMap))
-                },
-            )
+                        val groupedHomeworks = homeworks.groupBy { homework ->
+                            homework.deadline.startThisDay()
+                        }
+                        val homeworksMap = buildMap {
+                            targetTimeRange.periodDates().forEach { date ->
+                                put(date, groupedHomeworks[date] ?: emptyList<HomeworkDetailsUi>())
+                            }
+                        }
+                        val homeworksScope = calculateHomeworkScope(homeworksMap)
+
+                        send(ActionResult(OverviewAction.UpdateHomeworks(homeworksMap, homeworksScope)))
+
+                        cycleUpdateJob = cycleUpdateHomeworkStatus(homeworksMap)
+                            .onEach { send(it) }
+                            .launchIn(this)
+                            .apply { start() }
+                    },
+                )
+            }
         }.onStart {
             emit(ActionResult(OverviewAction.UpdateHomeworksLoading(true)))
         }
@@ -122,22 +142,31 @@ internal interface OverviewWorkProcessor :
             emit(ActionResult(OverviewAction.UpdateErrorsLoading(true)))
         }
 
-        private fun loadTodosWork(currentDate: Instant) = flow<OverviewWorkResult> {
+        private fun loadTodosWork(currentDate: Instant) = channelFlow<OverviewWorkResult> {
+            var cycleUpdateJob: Job? = null
             val targetTimeRange = TimeRange(
                 from = currentDate.startOfWeek().shiftWeek(-1),
                 to = currentDate.endOfWeek().shiftWeek(+1),
             )
-            todoInteractor.fetchTodosByTimeRange(targetTimeRange).collectAndHandle(
-                onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
-                onRightAction = { todoList ->
-                    val todos = todoList.map {
-                        val status = TodoStatus.calculate(it.isDone, it.deadline, currentDate)
-                        return@map it.mapToUi(status)
-                    }
-                    emit(ActionResult(OverviewAction.UpdateTodos(todos)))
-                    emitAll(cycleUpdateTodoStatus(todos))
-                },
-            )
+            todoInteractor.fetchTodosByTimeRange(targetTimeRange).collect { todoEither ->
+                cycleUpdateJob?.cancelAndJoin()
+                todoEither.handle(
+                    onLeftAction = { send(EffectResult(OverviewEffect.ShowError(it))) },
+                    onRightAction = { todoList ->
+                        val todos = todoList.map { todo ->
+                            val status = TodoStatus.calculate(todo.isDone, todo.deadline, currentDate)
+                            return@map todo.mapToUi(status)
+                        }
+
+                        send(ActionResult(OverviewAction.UpdateTodos(todos)))
+
+                        cycleUpdateJob = cycleUpdateTodoStatus(todos)
+                            .onEach { send(it) }
+                            .launchIn(this)
+                            .apply { start() }
+                    },
+                )
+            }
         }.onStart {
             emit(ActionResult(OverviewAction.UpdateTasksLoading(true)))
         }
@@ -163,42 +192,43 @@ internal interface OverviewWorkProcessor :
             )
         }
 
-        private fun cycleUpdateHomeworkStatus(homeworksMap: Map<Instant, List<HomeworkDetailsUi>>) = flow {
-            val updatedHomeworksMap = homeworksMap.toMutableMap()
-            while (currentCoroutineContext().isActive) {
-                delay(Delay.UPDATE_TASK_STATUS)
+        private fun cycleUpdateHomeworkStatus(homeworksMap: Map<Instant, List<HomeworkDetailsUi>>) =
+            flow {
+                val updatedHomeworksMap = homeworksMap.toMutableMap()
+                while (currentCoroutineContext().isActive) {
+                    delay(Delay.UPDATE_TASK_STATUS)
 
-                var isUpdated = false
-                val currentInstant = dateManager.fetchCurrentInstant()
-                val updatedHomeworks = updatedHomeworksMap.values.toList().extractAllItem()
+                    var isUpdated = false
+                    val currentInstant = dateManager.fetchCurrentInstant()
+                    val updatedHomeworks = updatedHomeworksMap.values.toList().extractAllItem()
 
-                updatedHomeworks.forEach { homework ->
-                    val status = homework.status
-                    if (status == HomeworkStatus.WAIT || status == HomeworkStatus.IN_FUTURE) {
-                        val newStatus = HomeworkStatus.calculate(
-                            isDone = homework.isDone,
-                            completeDate = homework.completeDate,
-                            deadline = homework.deadline,
-                            currentTime = currentInstant,
-                        )
-                        if (newStatus != status) {
-                            isUpdated = true
-                            val date = homework.deadline.startThisDay()
-                            val newHomework = homework.copy(status = newStatus)
-                            val newHomeworks = updatedHomeworksMap[date]!!.toMutableList().apply {
-                                remove(homework)
-                                add(newHomework)
+                    updatedHomeworks.forEach { homework ->
+                        val status = homework.status
+                        if (status == HomeworkStatus.WAIT || status == HomeworkStatus.IN_FUTURE) {
+                            val newStatus = HomeworkStatus.calculate(
+                                isDone = homework.isDone,
+                                completeDate = homework.completeDate,
+                                deadline = homework.deadline,
+                                currentTime = currentInstant,
+                            )
+                            if (newStatus != status) {
+                                isUpdated = true
+                                val date = homework.deadline.startThisDay()
+                                val newHomework = homework.copy(status = newStatus)
+                                val newHomeworks = updatedHomeworksMap[date]!!.toMutableList().apply {
+                                    remove(homework)
+                                    add(newHomework)
+                                }
+                                updatedHomeworksMap[date] = newHomeworks
                             }
-                            updatedHomeworksMap[date] = newHomeworks
                         }
                     }
-                }
-                if (isUpdated) {
-                    val homeworksScope = calculateHomeworkScope(updatedHomeworksMap)
-                    emit(ActionResult(OverviewAction.UpdateHomeworks(updatedHomeworksMap, homeworksScope)))
+                    if (isUpdated) {
+                        val homeworksScope = calculateHomeworkScope(updatedHomeworksMap)
+                        emit(ActionResult(OverviewAction.UpdateHomeworks(updatedHomeworksMap, homeworksScope)))
+                    }
                 }
             }
-        }
 
         private fun cycleUpdateTodoStatus(todos: List<TodoDetailsUi>) = flow {
             val updatedTodos = todos.toMutableList()

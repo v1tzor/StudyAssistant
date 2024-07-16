@@ -18,6 +18,9 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import kotlinx.datetime.DayOfWeek
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 
 /**
@@ -29,6 +32,12 @@ internal sealed class ScheduleDetailsUi : Parcelable {
     data class Base(val data: BaseScheduleDetailsUi?) : ScheduleDetailsUi()
 
     data class Custom(val data: CustomScheduleDetailsUi?) : ScheduleDetailsUi()
+
+    val uid: UID?
+        get() = mapToValue(onBaseSchedule = { it?.uid }, onCustomSchedule = { it?.uid })
+
+    val dayOfWeek: DayOfWeek?
+        get() = mapToValue(onBaseSchedule = { it?.dayOfWeek }, onCustomSchedule = { it?.date?.dateTime()?.dayOfWeek })
 
     val classes: List<ClassDetailsUi>
         get() = mapToValue(onBaseSchedule = { it?.classes }, onCustomSchedule = { it?.classes }) ?: emptyList()

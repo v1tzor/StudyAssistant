@@ -24,6 +24,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,9 +34,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.github.panpf.sketch.AsyncImage
+import com.github.panpf.sketch.rememberAsyncImageState
+import com.github.panpf.sketch.request.ComposableImageOptions
+import com.github.panpf.sketch.request.error
+import com.github.panpf.sketch.request.placeholder
+import ru.aleshin.studyassistant.core.common.functional.Constants
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.UserCodeView
@@ -94,7 +103,18 @@ internal fun AvatarView(
         contentColor = contentColor,
     ) {
         if (imageUrl != null) {
-            // TODO Get image from firebase storage
+            AsyncImage(
+                uri = imageUrl,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.full),
+                state = rememberAsyncImageState(
+                    options = ComposableImageOptions {
+                        crossfade(Constants.Animations.STANDARD_TWEEN)
+                        placeholder(MaterialTheme.colorScheme.secondaryContainer)
+                        error(StudyAssistantRes.icons.testsOutline)
+                    }
+                ),
+            )
         } else {
             Box(contentAlignment = Alignment.Center) {
                 Text(

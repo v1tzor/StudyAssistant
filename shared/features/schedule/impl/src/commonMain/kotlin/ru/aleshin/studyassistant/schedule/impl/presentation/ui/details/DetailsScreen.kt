@@ -39,11 +39,12 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.ClassBottomSheet
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
@@ -67,10 +68,12 @@ internal class DetailsScreen : Screen {
         val strings = ScheduleThemeRes.strings
         val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
+
         val di = localDI().direct
         val dateManager = remember { di.instance<DateManager>() }
         val classSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        var selectedSheetClass by remember { mutableStateOf<Pair<ClassDetailsUi, Instant>?>(null) }
+        var selectedSheetSchedule by remember { mutableStateOf<ScheduleDetailsUi?>(null) }
+        var selectedSheetClass by remember { mutableStateOf<Pair<UID, Instant>?>(null) }
         var showClassBottomSheet by remember { mutableStateOf(false) }
 
         Scaffold(
@@ -80,8 +83,9 @@ internal class DetailsScreen : Screen {
                     state = state,
                     modifier = Modifier.padding(paddingValues),
                     onOpenSchedule = { dispatchEvent(DetailsEvent.OpenOverviewSchedule(it)) },
-                    onShowClassInfo = { classModel, classDate ->
-                        selectedSheetClass = Pair(classModel, classDate)
+                    onShowClassInfo = { classModel, schedule, classDate ->
+                        selectedSheetClass = Pair(classModel.uid, classDate)
+                        selectedSheetSchedule = schedule
                         showClassBottomSheet = true
                     },
                 )
@@ -111,14 +115,16 @@ internal class DetailsScreen : Screen {
             },
         )
 
-        val sheetClass = selectedSheetClass
-        if (showClassBottomSheet && sheetClass != null) {
+        val sheetSchedule = state.weekSchedule?.weekDaySchedules?.get(selectedSheetSchedule?.dayOfWeek)
+        val sheetClass = sheetSchedule?.classes?.find { it.uid == selectedSheetClass?.first }
+        val sheetDate = selectedSheetClass?.second
+        if (showClassBottomSheet && sheetClass != null && sheetDate != null) {
             ClassBottomSheet(
                 sheetState = classSheetState,
                 currentTime = dateManager.fetchCurrentInstant(),
                 activeClass = state.activeClass,
-                classModel = sheetClass.first,
-                classDate = sheetClass.second,
+                classModel = sheetClass,
+                classDate = sheetDate,
                 onEditHomework = { dispatchEvent(DetailsEvent.EditHomeworkInEditor(it)) },
                 onAddHomework = { homework, date ->
                     dispatchEvent(DetailsEvent.AddHomeworkInEditor(homework, date))

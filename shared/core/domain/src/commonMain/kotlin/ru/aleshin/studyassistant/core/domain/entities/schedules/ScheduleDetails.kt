@@ -16,8 +16,12 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.schedules
 
+import ru.aleshin.studyassistant.core.domain.entities.classes.Class
+import ru.aleshin.studyassistant.core.domain.entities.classes.ClassDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseScheduleDetails
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.convertToDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomScheduleDetails
+import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.convertToDetails
 
 /**
  * @author Stanislav Aleshin on 08.06.2024.
@@ -25,4 +29,11 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSch
 sealed class ScheduleDetails {
     data class Base(val data: BaseScheduleDetails?) : ScheduleDetails()
     data class Custom(val data: CustomScheduleDetails?) : ScheduleDetails()
+}
+
+fun Schedule.convertToDetails(
+    classesMapper: (Class) -> ClassDetails,
+) = when (this) {
+    is Schedule.Base -> ScheduleDetails.Base(data?.convertToDetails(classesMapper))
+    is Schedule.Custom -> ScheduleDetails.Custom(data?.convertToDetails(classesMapper))
 }

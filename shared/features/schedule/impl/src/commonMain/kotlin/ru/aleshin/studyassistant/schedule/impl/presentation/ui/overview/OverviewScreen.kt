@@ -37,12 +37,12 @@ import org.kodein.di.compose.localDI
 import org.kodein.di.direct
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.ClassBottomSheet
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewDeps
@@ -73,7 +73,7 @@ internal data class OverviewScreen(val firstDay: Millis?) : Screen {
 
         val localDI = localDI().direct
         val dateManager = remember { localDI.instance<DateManager>() }
-        var selectedSheetClass by remember { mutableStateOf<ClassDetailsUi?>(null) }
+        var selectedSheetClass by remember { mutableStateOf<UID?>(null) }
         var showClassBottomSheet by remember { mutableStateOf(false) }
 
         Scaffold(
@@ -82,8 +82,8 @@ internal data class OverviewScreen(val firstDay: Millis?) : Screen {
                 OverviewContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
-                    onShowClassInfo = {
-                        selectedSheetClass = it
+                    onShowClassInfo = { classModel ->
+                        selectedSheetClass = classModel.uid
                         showClassBottomSheet = true
                     }
                 )
@@ -119,7 +119,7 @@ internal data class OverviewScreen(val firstDay: Millis?) : Screen {
             },
         )
 
-        val sheetClass = selectedSheetClass
+        val sheetClass = state.schedule?.classes?.find { it.uid == selectedSheetClass }
         if (showClassBottomSheet && sheetClass != null) {
             ClassBottomSheet(
                 sheetState = classSheetState,

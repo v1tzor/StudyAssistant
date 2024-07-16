@@ -69,7 +69,7 @@ internal fun ClassTimeRangeChooser(
         userScrollEnabled = enabled,
     ) {
         if (!freeClassTimeRanges.isNullOrEmpty()) {
-            items(freeClassTimeRanges.keys.toList(), key = { it.from }) { timeRange ->
+            items(freeClassTimeRanges.keys.toList(), key = { it.from.toString() }) { timeRange ->
                 ClassTimeRangeItem(
                     enabled = enabled,
                     selected = timeRange.timeEquals(currentTime),

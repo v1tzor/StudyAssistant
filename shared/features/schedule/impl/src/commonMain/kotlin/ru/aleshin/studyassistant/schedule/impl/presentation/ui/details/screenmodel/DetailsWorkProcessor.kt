@@ -16,24 +16,27 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel
 
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.isActive
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.extensions.dateTimeByWeek
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
-import ru.aleshin.studyassistant.core.common.functional.Constants.Delay.UPDATE_ACTIVE_CLASS
+import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
-import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.isActive
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.HomeworkInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleInteractor
@@ -62,16 +65,25 @@ internal interface DetailsWorkProcessor :
             is DetailsWorkCommand.UpdateIsHomeworkDone -> updateIsHomeworkDoneWork(command.homework, command.isDone)
         }
 
-        private fun loadWeekScheduleWork(week: TimeRange) = flow {
-            scheduleInteractor.fetchDetailsWeekSchedule(week).collectAndHandle(
-                onLeftAction = { emit(EffectResult(DetailsEffect.ShowError(it))) },
-                onRightAction = { weekScheduleDetails ->
-                    val currentTime = dateManager.fetchCurrentInstant()
-                    val weekSchedule = weekScheduleDetails.mapToUi(currentTime)
-                    emit(ActionResult(DetailsAction.UpdateWeekSchedule(weekSchedule)))
-                    emitAll(cycleUpdateActiveClass(weekSchedule))
-                }
-            )
+        private fun loadWeekScheduleWork(week: TimeRange) = channelFlow {
+            var cycleUpdateJob: Job? = null
+            scheduleInteractor.fetchDetailsWeekSchedule(week).collect { scheduleEither ->
+                cycleUpdateJob?.cancelAndJoin()
+                scheduleEither.handle(
+                    onLeftAction = { send(EffectResult(DetailsEffect.ShowError(it))) },
+                    onRightAction = { weekScheduleDetails ->
+                        val currentTime = dateManager.fetchCurrentInstant()
+                        val weekSchedule = weekScheduleDetails.mapToUi(currentTime)
+
+                        send(ActionResult(DetailsAction.UpdateWeekSchedule(weekSchedule)))
+
+                        cycleUpdateJob = cycleUpdateActiveClass(weekSchedule)
+                            .onEach { send(it) }
+                            .launchIn(this)
+                            .apply { start() }
+                    }
+                )
+            }
         }.onStart {
             emit(ActionResult(DetailsAction.UpdateLoading(true)))
         }
@@ -89,6 +101,8 @@ internal interface DetailsWorkProcessor :
 
         private fun cycleUpdateActiveClass(schedule: WeekScheduleDetailsUi) = flow {
             while (currentCoroutineContext().isActive) {
+                delay(Constants.Delay.UPDATE_ACTIVE_CLASS)
+
                 var activeClassData: ActiveClassUi? = null
                 val currentInstant = dateManager.fetchCurrentInstant()
                 val currentDateTime = currentInstant.toLocalDateTime(TimeZone.currentSystemDefault())
@@ -119,7 +133,6 @@ internal interface DetailsWorkProcessor :
                     }
                 }
                 emit(ActionResult(DetailsAction.UpdateActiveClass(activeClassData)))
-                delay(UPDATE_ACTIVE_CLASS)
             }
         }
     }

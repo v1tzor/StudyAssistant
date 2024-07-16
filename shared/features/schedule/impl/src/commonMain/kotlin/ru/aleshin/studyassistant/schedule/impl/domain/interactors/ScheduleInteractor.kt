@@ -16,9 +16,10 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.interactors
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
@@ -26,9 +27,11 @@ import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.classes.convertToDetails
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
 import ru.aleshin.studyassistant.core.domain.entities.schedules.ScheduleDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.WeekScheduleDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.convertToDetails
+import ru.aleshin.studyassistant.core.domain.entities.schedules.convertToDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.convertToDetails
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
@@ -58,86 +61,134 @@ internal interface ScheduleInteractor {
         private val targetUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid
 
+//        override suspend fun fetchDetailsWeekSchedule(week: TimeRange) = eitherWrapper.wrapFlow {
+//            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
+//            val numberOfWeek = week.from.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
+//
+//            val baseSchedules = baseScheduleRepository.fetchSchedulesByVersion(week, numberOfWeek, targetUser).first()
+//            val customSchedules = customScheduleRepository.fetchSchedulesByTimeRange(week, targetUser).first()
+//            val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(week, targetUser)
+//
+//            val weekDaySchedules = mutableMapOf<DayOfWeek, ScheduleDetails>()
+//
+//            homeworksFlow.map { homeworks ->
+//                customSchedules.forEach { customSchedule ->
+//                    val dayOfWeek = customSchedule.date.dateTime().dayOfWeek
+//                    val detailsSchedule = customSchedule.convertToDetails(
+//                        classesMapper = { classModel ->
+//                            classModel.convertToDetails(homeworks.find { it.classId == classModel.uid })
+//                        }
+//                    )
+//                    weekDaySchedules[dayOfWeek] = ScheduleDetails.Custom(
+//                        detailsSchedule.copy(
+//                            classes = detailsSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
+//                        )
+//                    )
+//                }
+//
+//                baseSchedules.forEach { baseSchedule ->
+//                    val dayOfWeek = baseSchedule.dayOfWeek
+//                    if (weekDaySchedules[dayOfWeek] == null) {
+//                        val detailsSchedule = baseSchedule.convertToDetails(
+//                            classesMapper = { classModel ->
+//                                classModel.convertToDetails(homeworks.find { it.classId == classModel.uid })
+//                            }
+//                        )
+//                        weekDaySchedules[dayOfWeek] = ScheduleDetails.Base(
+//                            detailsSchedule.copy(
+//                                classes = detailsSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
+//                            )
+//                        )
+//                    }
+//                }
+//
+//                WeekScheduleDetails(
+//                    from = week.from,
+//                    to = week.to,
+//                    numberOfWeek = numberOfWeek,
+//                    weekDaySchedules = weekDaySchedules,
+//                )
+//            }
+//        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchDetailsWeekSchedule(week: TimeRange) = eitherWrapper.wrapFlow {
             val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
             val numberOfWeek = week.from.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
 
-            val baseSchedules = baseScheduleRepository.fetchSchedulesByVersion(week, numberOfWeek, targetUser).first()
-            val customSchedules = customScheduleRepository.fetchSchedulesByTimeRange(week, targetUser).first()
+            val baseSchedulesFlow = baseScheduleRepository.fetchSchedulesByVersion(week, numberOfWeek, targetUser)
+            val customSchedulesFlow = customScheduleRepository.fetchSchedulesByTimeRange(week, targetUser)
+
             val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(week, targetUser)
 
-            val weekDaySchedules = mutableMapOf<DayOfWeek, ScheduleDetails>()
-
-            homeworksFlow.map { homeworks ->
-                customSchedules.forEach { customSchedule ->
-                    val dayOfWeek = customSchedule.date.dateTime().dayOfWeek
-                    val detailsSchedule = customSchedule.convertToDetails(
-                        classesMapper = { classModel ->
-                            classModel.convertToDetails(homeworks.find { it.classId == classModel.uid })
-                        }
-                    )
-                    weekDaySchedules[dayOfWeek] = ScheduleDetails.Custom(
-                        detailsSchedule.copy(
-                            classes = detailsSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
-                        )
-                    )
-                }
-
-                baseSchedules.forEach { baseSchedule ->
-                    val dayOfWeek = baseSchedule.dayOfWeek
-                    if (weekDaySchedules[dayOfWeek] == null) {
-                        val detailsSchedule = baseSchedule.convertToDetails(
-                            classesMapper = { classModel ->
-                                classModel.convertToDetails(homeworks.find { it.classId == classModel.uid })
+            baseSchedulesFlow.flatMapLatest { baseSchedules ->
+                customSchedulesFlow.flatMapLatest { customSchedules ->
+                    homeworksFlow.map { homeworks ->
+                        val weekDaySchedules = buildMap {
+                            customSchedules.forEach { customSchedule ->
+                                val scheduleWeekDay = customSchedule.date.dateTime().dayOfWeek
+                                val customDetailsSchedule = customSchedule.convertToDetails { classModel ->
+                                    classModel.convertToDetails(homeworks.find { it.classId == classModel.uid })
+                                }
+                                val sortedClasses = customDetailsSchedule.classes.sortedBy { classModel ->
+                                    classModel.timeRange.from.dateTime().time
+                                }
+                                val detailsSchedule = ScheduleDetails.Custom(customDetailsSchedule.copy(classes = sortedClasses))
+                                put(scheduleWeekDay, detailsSchedule)
                             }
-                        )
-                        weekDaySchedules[dayOfWeek] = ScheduleDetails.Base(
-                            detailsSchedule.copy(
-                                classes = detailsSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
-                            )
+                            baseSchedules.forEach { baseSchedule ->
+                                val dayOfWeek = baseSchedule.dayOfWeek
+                                if (get(dayOfWeek) == null) {
+                                    val baseDetailsSchedule = baseSchedule.convertToDetails { classModel ->
+                                        classModel.convertToDetails(homeworks.find { it.classId == classModel.uid })
+                                    }
+                                    val sortedClasses = baseDetailsSchedule.classes.sortedBy { classModel ->
+                                        classModel.timeRange.from.dateTime().time
+                                    }
+                                    val detailsSchedule = ScheduleDetails.Base(baseDetailsSchedule.copy(classes = sortedClasses))
+                                    put(dayOfWeek, detailsSchedule)
+                                }
+                            }
+                        }
+
+                        WeekScheduleDetails(
+                            from = week.from,
+                            to = week.to,
+                            numberOfWeek = numberOfWeek,
+                            weekDaySchedules = weekDaySchedules,
                         )
                     }
                 }
-
-                WeekScheduleDetails(
-                    from = week.from,
-                    to = week.to,
-                    numberOfWeek = numberOfWeek,
-                    weekDaySchedules = weekDaySchedules,
-                )
             }
         }
 
+        @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchDetailsScheduleByDate(date: Instant) = eitherWrapper.wrapFlow {
             val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
             val currentNumberOfWeek = date.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
 
-            val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek, targetUser).first()
-            val customSchedule = customScheduleRepository.fetchScheduleByDate(date, targetUser).first()
             val homeworksFlow = homeworksRepository.fetchHomeworksByDate(date, targetUser)
 
-            return@wrapFlow homeworksFlow.map { homeworks ->
-                if (customSchedule != null) {
-                    val detailsSchedule = customSchedule.convertToDetails(
+            val baseScheduleFlow = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek, targetUser)
+            val customScheduleFlow = customScheduleRepository.fetchScheduleByDate(date, targetUser)
+            val scheduleFlow = baseScheduleFlow.flatMapLatest { baseSchedule ->
+                customScheduleFlow.map { customSchedule ->
+                    if (customSchedule != null) {
+                        val sortedClasses = customSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
+                        Schedule.Custom(customSchedule.copy(classes = sortedClasses))
+                    } else {
+                        val sortedClasses = baseSchedule?.classes?.sortedBy { it.timeRange.from.dateTime().time }
+                        Schedule.Base(baseSchedule?.copy(classes = sortedClasses ?: emptyList()))
+                    }
+                }
+            }
+
+            return@wrapFlow scheduleFlow.flatMapLatest { schedule ->
+                homeworksFlow.map { homeworks ->
+                    schedule.convertToDetails(
                         classesMapper = { classModel ->
                             classModel.convertToDetails(homeworks.find { it.classId == classModel.uid })
                         }
-                    )
-                    ScheduleDetails.Custom(
-                        detailsSchedule.copy(
-                            classes = detailsSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
-                        )
-                    )
-                } else {
-                    val detailsSchedule = baseSchedule?.convertToDetails(
-                        classesMapper = { classModel ->
-                            classModel.convertToDetails(homeworks.find { it.classId == classModel.uid })
-                        }
-                    )
-                    ScheduleDetails.Base(
-                        detailsSchedule?.copy(
-                            classes = detailsSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
-                        )
                     )
                 }
             }

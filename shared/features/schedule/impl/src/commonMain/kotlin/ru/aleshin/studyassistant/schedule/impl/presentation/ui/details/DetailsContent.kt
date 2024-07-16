@@ -45,6 +45,7 @@ import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.WeekScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsViewState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.CommonScheduleView
@@ -58,7 +59,7 @@ internal fun DetailsContent(
     state: DetailsViewState,
     modifier: Modifier = Modifier,
     onOpenSchedule: (Instant) -> Unit,
-    onShowClassInfo: (ClassDetailsUi, Instant) -> Unit,
+    onShowClassInfo: (ClassDetailsUi, ScheduleDetailsUi, Instant) -> Unit,
 ) = with(state) {
     Crossfade(
         modifier = modifier,
@@ -94,7 +95,7 @@ private fun DetailsCommonSchedulesSection(
     weekSchedule: WeekScheduleDetailsUi?,
     activeClass: ActiveClassUi?,
     onOpenSchedule: (Instant) -> Unit,
-    onShowClassInfo: (ClassDetailsUi, Instant) -> Unit,
+    onShowClassInfo: (ClassDetailsUi, ScheduleDetailsUi, Instant) -> Unit,
 ) {
     Crossfade(
         modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
@@ -129,7 +130,9 @@ private fun DetailsCommonSchedulesSection(
                                 activeClass = activeClass,
                                 classes = classes ?: emptyList(),
                                 onOpenSchedule = { onOpenSchedule(scheduleDate) },
-                                onClassClick = { onShowClassInfo(it, scheduleDate) },
+                                onClassClick = {
+                                    if (schedule != null) onShowClassInfo(it, schedule, scheduleDate)
+                                },
                             )
                         }
                         Spacer(modifier = Modifier.height(60.dp))
@@ -159,7 +162,7 @@ private fun DetailsVerticalSchedulesSection(
     weekSchedule: WeekScheduleDetailsUi?,
     activeClass: ActiveClassUi?,
     onOpenSchedule: (Instant) -> Unit,
-    onShowClassInfo: (ClassDetailsUi, Instant) -> Unit,
+    onShowClassInfo: (ClassDetailsUi, ScheduleDetailsUi, Instant) -> Unit,
 ) {
     Crossfade(
         modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
@@ -190,7 +193,9 @@ private fun DetailsVerticalSchedulesSection(
                         activeClass = activeClass,
                         classes = classes ?: emptyList(),
                         onOpenSchedule = { onOpenSchedule(scheduleDate) },
-                        onClassClick = { onShowClassInfo(it, scheduleDate) },
+                        onClassClick = {
+                            if (schedule != null) onShowClassInfo(it, schedule, scheduleDate)
+                        },
                     )
                 }
             }

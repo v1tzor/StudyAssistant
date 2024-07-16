@@ -16,10 +16,14 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel
 
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.Instant
@@ -62,27 +66,41 @@ internal interface HomeworksWorkProcessor :
             is HomeworksWorkCommand.UpdateHomework -> updateHomeworkWork(command.homework)
         }
 
-        private fun loadHomeworksWork(timeRange: TimeRange) = flow<HomeworksWorkResult> {
-            val currentTime = dateManager.fetchCurrentInstant()
-            homeworksInteractor.fetchHomeworksByTimeRange(timeRange).collectAndHandle(
-                onLeftAction = { emit(EffectResult(HomeworksEffect.ShowError(it))) },
-                onRightAction = { homeworkList ->
-                    val homeworks = homeworkList.map {
-                        val status = HomeworkStatus.calculate(it.isDone, it.completeDate, it.deadline, currentTime)
-                        return@map it.mapToUi(status)
-                    }
-                    val groupedHomeworks = homeworks.groupBy { homework ->
-                        homework.deadline.startThisDay()
-                    }
-                    val homeworksMap = buildMap {
-                        timeRange.periodDates().forEach { date ->
-                            put(date, groupedHomeworks[date] ?: emptyList<HomeworkDetailsUi>())
+        private fun loadHomeworksWork(timeRange: TimeRange) = channelFlow<HomeworksWorkResult> {
+            var cycleUpdateJob: Job? = null
+            homeworksInteractor.fetchHomeworksByTimeRange(timeRange).collect { homeworkEither ->
+                cycleUpdateJob?.cancelAndJoin()
+                homeworkEither.handle(
+                    onLeftAction = { send(EffectResult(HomeworksEffect.ShowError(it))) },
+                    onRightAction = { homeworkList ->
+                        val homeworks = homeworkList.map { homework ->
+                            val currentTime = dateManager.fetchCurrentInstant()
+                            val status = HomeworkStatus.calculate(
+                                isDone = homework.isDone,
+                                completeDate = homework.completeDate,
+                                deadline = homework.deadline,
+                                currentTime = currentTime,
+                            )
+                            return@map homework.mapToUi(status)
                         }
-                    }
-                    emit(ActionResult(HomeworksAction.UpdateHomeworks(homeworksMap)))
-                    emitAll(cycleUpdateHomeworkStatus(homeworksMap))
-                },
-            )
+                        val groupedHomeworks = homeworks.groupBy { homework ->
+                            homework.deadline.startThisDay()
+                        }
+                        val homeworksMap = buildMap {
+                            timeRange.periodDates().forEach { date ->
+                                put(date, groupedHomeworks[date] ?: emptyList<HomeworkDetailsUi>())
+                            }
+                        }
+
+                        send(ActionResult(HomeworksAction.UpdateHomeworks(homeworksMap)))
+
+                        cycleUpdateJob = cycleUpdateHomeworkStatus(homeworksMap)
+                            .onEach { send(it) }
+                            .launchIn(this)
+                            .apply { start() }
+                    },
+                )
+            }
         }.onStart {
             emit(ActionResult(HomeworksAction.UpdateLoading(true)))
         }

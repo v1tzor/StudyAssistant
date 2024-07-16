@@ -23,6 +23,16 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSch
  * @author Stanislav Aleshin on 29.06.2024.
  */
 sealed class Schedule {
+
     data class Base(val data: BaseSchedule?) : Schedule()
+
     data class Custom(val data: CustomSchedule?) : Schedule()
+
+    inline fun <T> mapToValue(
+        onBaseSchedule: (BaseSchedule?) -> T,
+        onCustomSchedule: (CustomSchedule?) -> T,
+    ) = when (this) {
+        is Base -> onBaseSchedule(data)
+        is Custom -> onCustomSchedule(data)
+    }
 }

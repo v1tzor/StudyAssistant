@@ -55,7 +55,8 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.Cl
 /**
  * @author Stanislav Aleshin on 02.06.2024.
  */
-internal interface ClassWorkProcessor : FlowWorkProcessor<ClassWorkCommand, ClassAction, ClassEffect> {
+internal interface ClassWorkProcessor :
+    FlowWorkProcessor<ClassWorkCommand, ClassAction, ClassEffect> {
 
     class Base(
         private val baseScheduleInteractor: BaseScheduleInteractor,
@@ -112,12 +113,18 @@ internal interface ClassWorkProcessor : FlowWorkProcessor<ClassWorkCommand, Clas
             val schedule = if (scheduleId != null) {
                 if (isCustom) {
                     customScheduleInteractor.fetchScheduleById(scheduleId).firstHandleAndGet(
-                        onLeftAction = { emit(EffectResult(ClassEffect.ShowError(it))).let { null } },
+                        onLeftAction = {
+                            emit(EffectResult(ClassEffect.ShowError(it)))
+                            ScheduleUi.Custom(null)
+                        },
                         onRightAction = { schedule -> ScheduleUi.Custom(schedule?.mapToUi()) },
                     )
                 } else {
                     baseScheduleInteractor.fetchScheduleById(scheduleId).firstHandleAndGet(
-                        onLeftAction = { emit(EffectResult(ClassEffect.ShowError(it))).let { null } },
+                        onLeftAction = {
+                            emit(EffectResult(ClassEffect.ShowError(it)))
+                            ScheduleUi.Base(null)
+                        },
                         onRightAction = { schedule -> ScheduleUi.Base(schedule?.mapToUi()) },
                     )
                 }
@@ -131,7 +138,7 @@ internal interface ClassWorkProcessor : FlowWorkProcessor<ClassWorkCommand, Clas
                 )
             }
 
-            val scheduleClasses = schedule?.blockMapToValue(
+            val scheduleClasses = schedule.blockMapToValue(
                 onBaseSchedule = { baseSchedule -> baseSchedule?.classes },
                 onCustomSchedule = { customSchedule -> customSchedule?.classes },
             )
@@ -150,7 +157,7 @@ internal interface ClassWorkProcessor : FlowWorkProcessor<ClassWorkCommand, Clas
             )
             val action = ClassAction.SetupEditModel(
                 editModel = editModel,
-                schedule = checkNotNull(schedule),
+                schedule = schedule,
                 freeClassTimeRanges = freeTimeRanges,
                 weekDay = weekDay,
             )
@@ -259,6 +266,7 @@ internal interface ClassWorkProcessor : FlowWorkProcessor<ClassWorkCommand, Clas
                         onRightAction = { emit(EffectResult(ClassEffect.NavigateToBack)) },
                     )
                 }
+
                 is ScheduleUi.Custom -> if (classModel.uid.isEmpty()) {
                     customClassInteractor.addClassBySchedule(
                         classModel = classModel,
@@ -307,7 +315,10 @@ internal interface ClassWorkProcessor : FlowWorkProcessor<ClassWorkCommand, Clas
                     )
                     if (endClassTime.equalsDay(startRange)) {
                         val classTimeRange = TimeRange(startClassTime, endClassTime)
-                        val isOverlay = overlayManager.isOverlay(classTimeRange, existClasses ?: emptyList()).isOverlay
+                        val isOverlay = overlayManager.isOverlay(
+                            classTimeRange,
+                            existClasses ?: emptyList()
+                        ).isOverlay
                         put(classTimeRange, !isOverlay)
                     }
                 }

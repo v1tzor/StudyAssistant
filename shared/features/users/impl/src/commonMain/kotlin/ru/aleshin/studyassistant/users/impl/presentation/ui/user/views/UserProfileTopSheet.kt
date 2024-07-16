@@ -156,13 +156,13 @@ private fun UserProfileTopSheetHeaderPlaceholder(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 userScrollEnabled = false,
             ) {
-               items(USER_CONTACT_INFO) {
-                   PlaceholderBox(
-                       modifier = Modifier.size(100.dp, 68.dp),
-                       shape = MaterialTheme.shapes.small,
-                       color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                   )
-               }
+                items(USER_CONTACT_INFO) {
+                    PlaceholderBox(
+                        modifier = Modifier.size(100.dp, 68.dp),
+                        shape = MaterialTheme.shapes.small,
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    )
+                }
             }
         }
     }
@@ -266,7 +266,9 @@ private fun UserProfileTopSheetHeader(
                     }
                 }
                 if (birthday != null) {
-                    item { VerticalDivider(modifier = Modifier.height(56.dp)) }
+                    item {
+                        VerticalDivider(modifier = Modifier.height(56.dp))
+                    }
                     item {
                         UserInfoView(
                             icon = Icons.Outlined.Cake,
@@ -276,7 +278,9 @@ private fun UserProfileTopSheetHeader(
                     }
                 }
                 if (city != null) {
-                    item { VerticalDivider(modifier = Modifier.height(56.dp)) }
+                    item {
+                        VerticalDivider(modifier = Modifier.height(56.dp))
+                    }
                     item {
                         UserInfoView(
                             icon = Icons.Outlined.HomeWork,
