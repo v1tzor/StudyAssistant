@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.core.ui.views
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,10 +40,9 @@ import ru.aleshin.studyassistant.core.ui.theme.material.full
  * @author Stanislav Aleshin on 16.04.2024.
  */
 @Composable
-@ExperimentalFoundationApi
 fun CircularStepsRow(
     modifier: Modifier = Modifier,
-    countSteps: Int,
+    stepsCount: Int,
     currentStep: Int,
     rowState: LazyListState = rememberLazyListState(),
     horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(8.dp),
@@ -58,7 +56,7 @@ fun CircularStepsRow(
         horizontalArrangement = horizontalArrangement,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        items(countSteps) { index ->
+        items(stepsCount) { index ->
             CircularStepView(
                 modifier = Modifier,
                 active = index == currentStep,

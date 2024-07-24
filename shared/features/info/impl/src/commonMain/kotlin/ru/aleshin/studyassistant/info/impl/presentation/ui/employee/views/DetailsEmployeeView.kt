@@ -48,8 +48,8 @@ import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
+import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
 import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.info.impl.presentation.ui.common.EmployeeAvatarView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.EmployeeSubjectView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.NoneEmployeeSubjectView
 
@@ -156,10 +156,12 @@ private fun DetailsEmployeeView(
             modifier = Modifier.padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            EmployeeAvatarView(
+            AvatarView(
+                modifier = modifier.size(40.dp),
                 firstName = firstName,
                 secondName = secondName ?: patronymic,
                 imageUrl = avatar,
+                style = MaterialTheme.typography.titleMedium,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 DetailsEmployeeViewContent(

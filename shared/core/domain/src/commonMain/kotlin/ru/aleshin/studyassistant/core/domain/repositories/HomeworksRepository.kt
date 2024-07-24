@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
  */
 interface HomeworksRepository {
     suspend fun addOrUpdateHomework(homework: Homework, targetUser: UID): UID
+    suspend fun addHomeworksGroup(homeworks: List<Homework>, targetUser: UID)
     suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<Homework?>
     suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>>
     suspend fun fetchOverdueHomeworks(currentDate: Instant, targetUser: UID): Flow<List<Homework>>

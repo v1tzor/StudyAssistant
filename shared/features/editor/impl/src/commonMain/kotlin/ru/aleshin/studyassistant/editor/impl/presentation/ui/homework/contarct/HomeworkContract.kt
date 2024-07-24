@@ -29,7 +29,7 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
-import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassesForLinkedUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassesForLinkedMapUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.EditHomeworkUi
@@ -46,7 +46,7 @@ internal data class HomeworkViewState(
     val organizations: List<OrganizationShortUi> = emptyList(),
     val subjects: List<SubjectUi> = emptyList(),
     @TypeParceler<Instant, InstantParceler>
-    val classesForLinking: ClassesForLinkedUi = emptyMap(),
+    val classesForLinking: ClassesForLinkedMapUi = emptyMap(),
 ) : BaseViewState
 
 internal sealed class HomeworkEvent : BaseEvent {
@@ -82,7 +82,7 @@ internal sealed class HomeworkAction : BaseAction {
     class UpdateEditModel(val editModel: EditHomeworkUi?) : HomeworkAction()
     data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : HomeworkAction()
     data class UpdateSubjects(val subjects: List<SubjectUi>) : HomeworkAction()
-    data class UpdateClassesForLinked(val classes: ClassesForLinkedUi) : HomeworkAction()
+    data class UpdateClassesForLinked(val classes: ClassesForLinkedMapUi) : HomeworkAction()
     data class UpdateLoading(val isLoading: Boolean) : HomeworkAction()
     data class UpdateClassesLoading(val isLoading: Boolean) : HomeworkAction()
 }

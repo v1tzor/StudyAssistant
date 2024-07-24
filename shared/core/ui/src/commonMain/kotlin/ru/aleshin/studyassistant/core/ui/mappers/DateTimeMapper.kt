@@ -18,49 +18,52 @@ package ru.aleshin.studyassistant.core.ui.mappers
 import androidx.compose.runtime.Composable
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DateTimeFormat
-import kotlinx.datetime.format.char
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.toMinutesAndHoursSuffixString
 import ru.aleshin.studyassistant.core.common.extensions.toMinutesOrHoursSuffixString
+import ru.aleshin.studyassistant.core.common.extensions.toString
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.timeFormat
+import kotlin.time.Duration
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
  */
 @Composable
-fun Long.toMinutesOrHoursTitle(): String {
-    val minutesSymbols = StudyAssistantRes.strings.minutesSuffix
-    val hoursSymbols = StudyAssistantRes.strings.hoursSuffix
+fun Duration.toLanguageString(): String {
+    val daySuffix = StudyAssistantRes.strings.daySuffix
+    val minuteSuffix = StudyAssistantRes.strings.minuteSuffix
+    val hourSuffix = StudyAssistantRes.strings.hourSuffix
 
-    return this.toMinutesOrHoursSuffixString(minutesSymbols, hoursSymbols)
+    return this.toString(daySuffix, minuteSuffix, hourSuffix)
+}
+
+@Composable
+fun Long.toMinutesOrHoursTitle(): String {
+    val minuteSuffix = StudyAssistantRes.strings.minuteSuffix
+    val hoursSuffix = StudyAssistantRes.strings.hourSuffix
+
+    return this.toMinutesOrHoursSuffixString(minuteSuffix, hoursSuffix)
 }
 
 @Composable
 fun Long.toMinutesAndHoursTitle(): String {
-    val minutesSymbols = StudyAssistantRes.strings.minutesSuffix
-    val hoursSymbols = StudyAssistantRes.strings.hoursSuffix
+    val minuteSuffix = StudyAssistantRes.strings.minuteSuffix
+    val hoursSuffix = StudyAssistantRes.strings.hourSuffix
 
-    return this.toMinutesAndHoursSuffixString(minutesSymbols, hoursSymbols)
+    return this.toMinutesAndHoursSuffixString(minuteSuffix, hoursSuffix)
 }
 
 @Composable
 fun TimeRange.format(
-    fromDateTimeFormat: DateTimeFormat<DateTimeComponents> = DateTimeComponents.Format {
-        hour()
-        char(':')
-        minute()
-    },
-    joinSymbol: String = " - ",
-    toDateTimeFormat: DateTimeFormat<DateTimeComponents> = DateTimeComponents.Format {
-        hour()
-        char(':')
-        minute()
-    },
+    fromDateTimeFormat: DateTimeFormat<DateTimeComponents> = DateTimeComponents.Formats.timeFormat(),
+    joinChars: String = " - ",
+    toDateTimeFormat: DateTimeFormat<DateTimeComponents> = DateTimeComponents.Formats.timeFormat(),
 ): String {
     return buildString {
         append(from.formatByTimeZone(fromDateTimeFormat))
-        append(joinSymbol)
+        append(joinChars)
         append(to.formatByTimeZone(toDateTimeFormat))
     }
 }

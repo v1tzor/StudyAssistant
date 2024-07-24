@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.core.data.repositories.GeneralSettingsRepositor
 import ru.aleshin.studyassistant.core.data.repositories.HomeworksRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ManageUserRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.OrganizationsRepositoryImpl
+import ru.aleshin.studyassistant.core.data.repositories.ShareHomeworksRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.SubjectsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.TodoRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.UsersRepositoryImpl
@@ -52,6 +53,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsReposit
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -62,6 +64,7 @@ import ru.aleshin.studyassistant.core.remote.datasources.requests.FriendRequests
 import ru.aleshin.studyassistant.core.remote.datasources.schedules.BaseScheduleRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.schedules.CustomScheduleRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.settings.CalendarSettingsRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.share.ShareHomeworksRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.subjects.SubjectsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.HomeworksRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.TodoRemoteDataSource
@@ -80,6 +83,9 @@ val coreDataModule = DI.Module("CoreData") {
 
     bindSingleton<FriendRequestsRemoteDataSource> { FriendRequestsRemoteDataSource.Base(instance()) }
     bindSingleton<FriendRequestsRepository> { FriendRequestsRepositoryImpl(instance()) }
+
+    bindSingleton<ShareHomeworksRemoteDataSource> { ShareHomeworksRemoteDataSource.Base(instance()) }
+    bindSingleton<ShareHomeworksRepository> { ShareHomeworksRepositoryImpl(instance()) }
 
     bindSingleton<GeneralSettingsLocalDataSource> {
         GeneralSettingsLocalDataSource.Base(instance(), instance())

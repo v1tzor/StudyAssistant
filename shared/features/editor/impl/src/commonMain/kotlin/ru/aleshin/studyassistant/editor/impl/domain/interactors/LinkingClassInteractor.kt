@@ -26,13 +26,12 @@ import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
+import ru.aleshin.studyassistant.core.domain.entities.classes.ClassesForLinkedMap
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
-import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
-import ru.aleshin.studyassistant.editor.impl.domain.entities.ClassesForLinked
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 
 /**
@@ -43,13 +42,11 @@ internal interface LinkingClassInteractor {
     suspend fun fetchFreeClassesForHomework(
         subject: UID,
         date: Instant,
-        currentHomework: UID?,
-    ): FlowDomainResult<EditorFailures, ClassesForLinked>
+    ): FlowDomainResult<EditorFailures, ClassesForLinkedMap>
 
     class Base(
         private val baseScheduleRepository: BaseScheduleRepository,
         private val customScheduleRepository: CustomScheduleRepository,
-        private val homeworksRepository: HomeworksRepository,
         private val calendarRepository: CalendarSettingsRepository,
         private val usersRepository: UsersRepository,
         private val eitherWrapper: EditorEitherWrapper,
@@ -62,7 +59,6 @@ internal interface LinkingClassInteractor {
         override suspend fun fetchFreeClassesForHomework(
             subject: UID,
             date: Instant,
-            currentHomework: UID?,
         ) = eitherWrapper.wrapFlow {
             val maxNumberOfWeek = calendarRepository.fetchSettings(targetUser).first().numberOfWeek
 
@@ -71,7 +67,6 @@ internal interface LinkingClassInteractor {
                 to = date.shiftDay(14),
             )
 
-            val homeworks = homeworksRepository.fetchHomeworksByTimeRange(searchedTimeRange, targetUser).first()
             val customSchedulesFlow = customScheduleRepository.fetchSchedulesByTimeRange(
                 timeRange = searchedTimeRange,
                 targetUser = targetUser,
@@ -90,16 +85,16 @@ internal interface LinkingClassInteractor {
                                 val groupedClasses = customSchedule.classes.groupBy { it.organization.uid }.mapValues {
                                     it.value.sortedBy { classModel -> classModel.timeRange.from }
                                 }
-                                val subjectClasses = customSchedule.classes.filter { classModel ->
+                                val classesWithTargetSubject = customSchedule.classes.filter { classModel ->
                                     val subjectFilter = classModel.subject?.uid == subject
                                     return@filter subjectFilter
                                 }
-                                val subjectNumberedClasses = subjectClasses.map { classModel ->
+                                val numberedClassesWithTargetSubject = classesWithTargetSubject.map { classModel ->
                                     val organizationClasses = groupedClasses[classModel.organization.uid]
                                     val number = organizationClasses?.indexOf(classModel)?.inc() ?: 0
                                     Pair(number, classModel)
                                 }
-                                put(customSchedule.date, subjectNumberedClasses)
+                                put(customSchedule.date, numberedClassesWithTargetSubject)
                             }
                         }
 
@@ -111,16 +106,16 @@ internal interface LinkingClassInteractor {
                                 val groupedClasses = baseSchedule.classes.groupBy { it.organization.uid }.mapValues {
                                     it.value.sortedBy { classModel -> classModel.timeRange.from }
                                 }
-                                val subjectClasses = baseSchedule.classes.filter { classModel ->
+                                val classesWithTargetSubject = baseSchedule.classes.filter { classModel ->
                                     val subjectFilter = classModel.subject?.uid == subject
                                     return@filter subjectFilter
                                 }
-                                val subjectNumberedClasses = subjectClasses.map { classModel ->
+                                val numberedClassesWithTargetSubject = classesWithTargetSubject.map { classModel ->
                                     val organizationClasses = groupedClasses[classModel.organization.uid]
                                     val number = organizationClasses?.indexOf(classModel)?.inc() ?: 0
                                     Pair(number, classModel)
                                 }
-                                put(baseScheduleEntry.first, subjectNumberedClasses)
+                                put(baseScheduleEntry.first, numberedClassesWithTargetSubject)
                             }
                         }
                     }

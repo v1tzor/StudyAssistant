@@ -80,7 +80,7 @@ internal class HomeworkScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_CLASSES) {
-                    val command = HomeworkWorkCommand.LoadClassesForLinked(subjectId, date, homeworkId)
+                    val command = HomeworkWorkCommand.LoadClassesForLinked(subjectId, date)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -96,8 +96,7 @@ internal class HomeworkScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_CLASSES) {
-                    val currentHomework = editableHomework?.uid?.ifEmpty { null }
-                    val command = HomeworkWorkCommand.LoadClassesForLinked(null, null, currentHomework)
+                    val command = HomeworkWorkCommand.LoadClassesForLinked(null, null)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -110,8 +109,7 @@ internal class HomeworkScreenModel(
                 launchBackgroundWork(BackgroundKey.LOAD_CLASSES) {
                     val subjectId = event.subject?.uid
                     val instant = editableHomework?.deadline
-                    val currentHomework = editableHomework?.uid?.ifEmpty { null }
-                    val command = HomeworkWorkCommand.LoadClassesForLinked(subjectId, instant, currentHomework)
+                    val command = HomeworkWorkCommand.LoadClassesForLinked(subjectId, instant)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -124,8 +122,7 @@ internal class HomeworkScreenModel(
                 launchBackgroundWork(BackgroundKey.LOAD_CLASSES) {
                     val subjectId = editableHomework?.subject?.uid
                     val instant = event.date
-                    val currentHomework = editableHomework?.uid?.ifEmpty { null }
-                    val command = HomeworkWorkCommand.LoadClassesForLinked(subjectId, instant, currentHomework)
+                    val command = HomeworkWorkCommand.LoadClassesForLinked(subjectId, instant)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }

@@ -23,7 +23,10 @@ import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.HomeworksScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.OverviewScreen
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.ShareScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.TodosScreen
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
+import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -32,18 +35,26 @@ internal interface TasksScreenProvider : FeatureScreenProvider<TasksScreen> {
 
     fun provideEditorScreen(screen: EditorScreen): Screen
 
+    fun provideUsersScreen(screen: UsersScreen): Screen
+
     class Base(
         private val editorFeatureStarter: () -> EditorFeatureStarter,
+        private val usersFeatureStarter: () -> UsersFeatureStarter,
     ) : TasksScreenProvider {
 
         override fun provideFeatureScreen(screen: TasksScreen) = when (screen) {
             is TasksScreen.Overview -> OverviewScreen()
             is TasksScreen.Homeworks -> HomeworksScreen(screen.targetDate)
             is TasksScreen.Todos -> TodosScreen()
+            is TasksScreen.Share -> ShareScreen()
         }
 
         override fun provideEditorScreen(screen: EditorScreen): Screen {
             return editorFeatureStarter().fetchRootScreenAndNavigate(screen)
+        }
+
+        override fun provideUsersScreen(screen: UsersScreen): Screen {
+            return usersFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }

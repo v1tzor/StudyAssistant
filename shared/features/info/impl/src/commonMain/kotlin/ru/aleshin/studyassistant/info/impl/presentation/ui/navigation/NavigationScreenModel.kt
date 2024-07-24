@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.info.impl.presentation.ui.navigation
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.info.impl.di.holder.InfoFeatureDIHolder
 
 /**
@@ -27,7 +26,6 @@ internal class NavigationScreenModel : ScreenModel {
 
     override fun onDispose() {
         super.onDispose()
-        Logger.i("test") { "onDispose -> info" }
         InfoFeatureDIHolder.clear()
     }
 }

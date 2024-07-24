@@ -46,15 +46,14 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.endOfWeek
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.tokens.dayOfWeekShortNames
-import ru.aleshin.studyassistant.core.ui.theme.tokens.monthNames
+import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
+import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksViewState
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.HomeworksDetailsViewItem
@@ -175,18 +174,8 @@ private fun HomeworkDateHeader(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         val coreStrings = StudyAssistantRes.strings
-        val shortDateFormat = DateTimeComponents.Format {
-            dayOfMonth()
-            char(' ')
-            monthName(coreStrings.monthNames())
-        }
-        val detailsDateFormat = DateTimeComponents.Format {
-            dayOfWeek(coreStrings.dayOfWeekShortNames())
-            chars(", ")
-            dayOfMonth()
-            char(' ')
-            monthName(coreStrings.monthNames())
-        }
+        val shortDateFormat = DateTimeComponents.Formats.dayMonthFormat(coreStrings)
+        val detailsDateFormat = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(coreStrings)
         val daysDifference = currentDate.daysUntil(date, TimeZone.currentSystemDefault()).days.inWholeDays
         Text(
             text = when (daysDifference) {

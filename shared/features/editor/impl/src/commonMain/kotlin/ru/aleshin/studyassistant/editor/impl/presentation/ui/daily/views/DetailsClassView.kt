@@ -50,7 +50,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
@@ -61,6 +60,7 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.endSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
+import ru.aleshin.studyassistant.core.ui.views.timeFormat
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
@@ -196,18 +196,13 @@ private fun DetailsClassTime(
     number: Int,
     timeRange: TimeRange,
 ) {
-    val timeFormat = DateTimeComponents.Format {
-        hour()
-        char(':')
-        minute()
-    }
     Column(
         modifier = modifier.defaultMinSize(minWidth = 36.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = timeRange.from.formatByTimeZone(timeFormat),
+            text = timeRange.from.formatByTimeZone(DateTimeComponents.Formats.timeFormat()),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             style = MaterialTheme.typography.bodyMedium,
@@ -222,7 +217,7 @@ private fun DetailsClassTime(
             )
         }
         Text(
-            text = timeRange.to.formatByTimeZone(timeFormat),
+            text = timeRange.to.formatByTimeZone(DateTimeComponents.Formats.timeFormat()),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             style = MaterialTheme.typography.bodyMedium,

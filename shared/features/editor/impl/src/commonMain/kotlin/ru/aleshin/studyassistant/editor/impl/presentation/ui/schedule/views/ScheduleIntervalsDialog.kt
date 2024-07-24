@@ -47,7 +47,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
@@ -56,6 +55,7 @@ import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
 import ru.aleshin.studyassistant.core.ui.views.DialogHeader
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseTimePickerDialog
+import ru.aleshin.studyassistant.core.ui.views.timeFormat
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
@@ -142,17 +142,11 @@ internal fun StartOfClassesField(
     onChangeTime: (Instant?) -> Unit,
 ) {
     var isOpenTimePickerDialog by remember { mutableStateOf(false) }
-    val timeFormat = DateTimeComponents.Format {
-        hour()
-        char(':')
-        minute()
-    }
-    val formatStartTime = startOfClassTime?.formatByTimeZone(timeFormat)
 
     Box(modifier = modifier) {
         ClickableTextField(
             onClick = { isOpenTimePickerDialog = true },
-            value = formatStartTime,
+            value = startOfClassTime?.formatByTimeZone(DateTimeComponents.Formats.timeFormat()),
             label = EditorThemeRes.strings.startOfClassesTitle,
             placeholder = EditorThemeRes.strings.startOfClassesPlaceholder,
             leadingIcon = {

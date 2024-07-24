@@ -36,7 +36,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationClassesInfoUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
@@ -70,9 +70,15 @@ internal fun OrganizationView(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                OrganizationAvatarView(
-                    username = organizationData.shortName,
+                AvatarView(
+                    modifier = modifier.size(100.dp),
+                    firstName = organizationData.shortName.split(' ').getOrElse(0) { "-" },
+                    secondName = organizationData.shortName.split(' ').getOrNull(1),
                     imageUrl = organizationData.avatar,
+                    shape = MaterialTheme.shapes.extraLarge,
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.SemiBold,
+                    ),
                 )
                 Column {
                     Text(
@@ -148,34 +154,6 @@ internal fun NoneOrganizationView(
                     text = InfoThemeRes.strings.noneOrganizationTitle,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.titleMedium,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun OrganizationAvatarView(
-    modifier: Modifier = Modifier,
-    username: String,
-    imageUrl: String?,
-    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    contentColor: Color = MaterialTheme.colorScheme.primary,
-) {
-    Surface(
-        modifier = modifier.size(100.dp),
-        shape = MaterialTheme.shapes.extraLarge,
-        color = containerColor,
-        contentColor = contentColor,
-    ) {
-        if (imageUrl != null) {
-            // TODO Get image from firebase storage
-        } else {
-            Box(contentAlignment = Alignment.Center) {
-                Text(
-                    text = username.substring(0, 2).uppercase(),
-                    fontWeight = FontWeight.SemiBold,
-                    style = MaterialTheme.typography.headlineLarge,
                 )
             }
         }

@@ -21,6 +21,11 @@ SELECT *
 FROM subjectEntity
 WHERE teacher_id = ?;
 
+fetchSubjectsByNames:
+SELECT *
+FROM subjectEntity
+WHERE name IN ?;
+
 fetchSubjectById:
 SELECT *
 FROM subjectEntity

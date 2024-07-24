@@ -82,6 +82,10 @@ internal class OverviewScreenModel(
                     val command = OverviewWorkCommand.LoadActiveSchedule(currentDate)
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_SHARE) {
+                    val command = OverviewWorkCommand.LoadSharedHomeworks
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is OverviewEvent.DoHomework -> with(event) {
                 val currentTime = dateManager.fetchCurrentInstant()
@@ -114,6 +118,12 @@ internal class OverviewScreenModel(
                 )
                 launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
                     val command = OverviewWorkCommand.UpdateTodo(updatedTodo)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.ShareHomeworks -> with(event) {
+                launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
+                    val command = OverviewWorkCommand.ShareHomeworks(sentMediatedHomeworks)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -153,6 +163,11 @@ internal class OverviewScreenModel(
                 val screen = screenProvider.provideFeatureScreen(featureScreen)
                 sendEffect(OverviewEffect.NavigateToLocal(screen))
             }
+            is OverviewEvent.NavigateToShare -> {
+                val featureScreen = TasksScreen.Share
+                val screen = screenProvider.provideFeatureScreen(featureScreen)
+                sendEffect(OverviewEffect.NavigateToLocal(screen))
+            }
             is OverviewEvent.NavigateToTodos -> {
                 val screen = screenProvider.provideFeatureScreen(TasksScreen.Todos)
                 sendEffect(OverviewEffect.NavigateToLocal(screen))
@@ -169,14 +184,19 @@ internal class OverviewScreenModel(
             homeworksScope = action.homeworkScope,
             isLoadingHomeworks = false,
         )
+        is OverviewAction.UpdateTodos -> currentState.copy(
+            todos = action.todos,
+            isLoadingTasks = false,
+        )
         is OverviewAction.UpdateTaskErrors -> currentState.copy(
             homeworkErrors = action.homeworkErrors,
             todoErrors = action.todoErrors,
             isLoadingErrors = false,
         )
-        is OverviewAction.UpdateTodos -> currentState.copy(
-            todos = action.todos,
-            isLoadingTasks = false,
+        is OverviewAction.UpdateSharedHomeworks -> currentState.copy(
+            sharedHomeworks = action.homeworks,
+            friends = action.friends,
+            isLoadingShare = false,
         )
         is OverviewAction.UpdateActiveSchedule -> currentState.copy(
             activeSchedule = action.activeSchedule,
@@ -193,10 +213,13 @@ internal class OverviewScreenModel(
         is OverviewAction.UpdateTasksLoading -> currentState.copy(
             isLoadingTasks = action.isLoading,
         )
+        is OverviewAction.UpdateShareLoading -> currentState.copy(
+            isLoadingShare = action.isLoading,
+        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_HOMEWORKS, LOAD_ACTIVE_SCHEDULE, LOAD_ERRORS, LOAD_TASKS, HOMEWORK_ACTION,
+        LOAD_HOMEWORKS, LOAD_ACTIVE_SCHEDULE, LOAD_ERRORS, LOAD_TASKS, LOAD_SHARE, HOMEWORK_ACTION,
     }
 }
 

@@ -21,4 +21,4 @@ import kotlinx.datetime.Instant
 /**
  * @author Stanislav Aleshin on 23.06.2024.
  */
-internal typealias ClassesForLinkedUi = Map<Instant, List<ClassUi>>
+internal typealias ClassesForLinkedMapUi = Map<Instant, List<ClassUi>>

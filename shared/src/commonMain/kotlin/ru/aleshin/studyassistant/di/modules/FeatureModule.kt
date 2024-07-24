@@ -37,6 +37,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsReposit
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -147,12 +148,15 @@ val featureModule = DI.Module("Feature") {
     bindEagerSingleton<TasksFeatureDependencies> {
         object : TasksFeatureDependencies {
             override val editorFeatureStarter = provider<EditorFeatureStarter>()
+            override val usersFeatureStarter = provider<UsersFeatureStarter>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val homeworkRepository = instance<HomeworksRepository>()
+            override val shareHomeworksRepository = instance<ShareHomeworksRepository>()
             override val todoRepository = instance<TodoRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val subjectsRepository = instance<SubjectsRepository>()
             override val usersRepository = instance<UsersRepository>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()

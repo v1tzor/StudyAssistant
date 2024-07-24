@@ -36,6 +36,7 @@ import kotlinx.datetime.until
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date.DAYS_IN_WEEK
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import kotlin.time.Duration
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -231,6 +232,36 @@ fun Int.minutesToMillis(): Long {
 
 fun Int.hoursToMillis(): Long {
     return this * Date.MILLIS_IN_HOUR
+}
+
+fun Duration.toString(
+    daySuffix: String,
+    minuteSuffix: String,
+    hourSuffix: String,
+) = buildString {
+    val isNegative = isNegative()
+    if (isNegative) append('-')
+    absoluteValue.toComponents { days, hours, minutes, _, _ ->
+        val hasDays = days != 0L
+        val hasHours = hours != 0
+        val hasMinutes = minutes != 0
+        var components = 0
+        if (hasDays) {
+            append(days).append(daySuffix)
+            components++
+        }
+        if (hasHours) {
+            if (components++ > 0) append(' ')
+            append(hours).append(hourSuffix)
+        }
+        if (!hasHours && hasMinutes) {
+            if (components++ > 0) append(' ')
+            append(minutes).append(minuteSuffix)
+        } else {
+            append(0).append(minutes)
+        }
+        if (isNegative && components > 1) insert(1, '(').append(')')
+    }
 }
 
 fun Long.toMinutesOrHoursSuffixString(minutesSuffix: String, hoursSuffix: String): String {

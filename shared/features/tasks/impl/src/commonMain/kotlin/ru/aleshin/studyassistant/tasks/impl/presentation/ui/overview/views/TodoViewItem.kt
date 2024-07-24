@@ -44,7 +44,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
@@ -54,9 +53,9 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.STANDAR
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.tokens.monthNames
 import ru.aleshin.studyassistant.core.ui.views.InfoBadge
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
+import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 
 /**
@@ -174,13 +173,8 @@ private fun TodoViewFooter(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val strings = StudyAssistantRes.strings
         if (deadline != null) {
-            val deadlineDateFormat = DateTimeComponents.Format {
-                dayOfMonth()
-                char(' ')
-                monthName(strings.monthNames())
-            }
+            val deadlineDateFormat = DateTimeComponents.Formats.dayMonthFormat(StudyAssistantRes.strings)
             when (status) {
                 TodoStatus.COMPLETE -> InfoBadge(
                     modifier = modifier,

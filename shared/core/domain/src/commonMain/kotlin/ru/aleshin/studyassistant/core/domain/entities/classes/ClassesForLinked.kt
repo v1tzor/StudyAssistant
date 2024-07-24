@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.impl.domain.entities
+package ru.aleshin.studyassistant.core.domain.entities.classes
 
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 
 /**
  * @author Stanislav Aleshin on 23.06.2024.
  */
-internal typealias ClassesForLinked = Map<Instant, List<Pair<Int, Class>>>
+typealias ClassesForLinked = List<Pair<Int, Class>>
+
+typealias ClassesForLinkedMap = Map<Instant, ClassesForLinked>

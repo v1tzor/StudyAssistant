@@ -71,7 +71,6 @@ internal interface HomeworkWorkProcessor :
             is HomeworkWorkCommand.LoadClassesForLinked -> loadClassesForLinkedWork(
                 subjectId = command.subjectId,
                 date = command.date,
-                currentHomework = command.currentHomework,
             )
             is HomeworkWorkCommand.DeleteHomework -> deleteHomeworkWork(
                 editModel = command.editModel,
@@ -143,13 +142,12 @@ internal interface HomeworkWorkProcessor :
         private fun loadClassesForLinkedWork(
             subjectId: UID?,
             date: Instant?,
-            currentHomework: UID?,
         ) = flow<HomeworkWorkResult> {
             if (subjectId == null) {
                 return@flow emit(ActionResult(HomeworkAction.UpdateClassesForLinked(emptyMap())))
             }
             val targetDate = date ?: dateManager.fetchBeginningCurrentInstant()
-            linkingClassInteractor.fetchFreeClassesForHomework(subjectId, targetDate, currentHomework).collectAndHandle(
+            linkingClassInteractor.fetchFreeClassesForHomework(subjectId, targetDate).collectAndHandle(
                 onLeftAction = { emit(EffectResult(HomeworkEffect.NavigateToBack)) },
                 onRightAction = { classes ->
                     val classesForLinked = classes.mapValues { entry ->
@@ -194,7 +192,6 @@ internal sealed class HomeworkWorkCommand : WorkCommand {
     data class LoadClassesForLinked(
         val subjectId: UID?,
         val date: Instant?,
-        val currentHomework: UID?,
     ) : HomeworkWorkCommand()
 
     data class DeleteHomework(val editModel: EditHomeworkUi) : HomeworkWorkCommand()

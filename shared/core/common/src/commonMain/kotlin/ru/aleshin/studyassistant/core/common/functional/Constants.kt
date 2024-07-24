@@ -96,6 +96,7 @@ object Constants {
         const val FULL_FRIEND_REQUESTS = 10
         const val FRIENDS = 10
         const val SOCIAL_NETWORKS = 4
+        const val SHARED_HOMEWORK_SUBJECTS = 4
     }
 
     object Delay {
@@ -138,12 +139,6 @@ object Constants {
         const val OVERVIEW_FIRST_ITEM = 14
         const val OVERVIEW_NEXT_DAYS = 15
         const val OVERVIEW_PREVIOUS_DAYS = 14
-
-        const val MINUTES_FORMAT = "%s%s"
-        const val HOURS_FORMAT = "%s%s"
-        const val HOURS_AND_MINUTES_FORMAT = "%s%s %s%s"
-
-        const val SHIFT_MINUTE_VALUE = 5
     }
 
     object Window {

@@ -14,40 +14,66 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.info.impl.presentation.ui.common
+package ru.aleshin.studyassistant.core.ui.views.menu
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.github.panpf.sketch.AsyncImage
+import com.github.panpf.sketch.AsyncImageState
+import com.github.panpf.sketch.rememberAsyncImageState
+import com.github.panpf.sketch.request.ComposableImageOptions
+import com.github.panpf.sketch.request.placeholder
+import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 
 /**
- * @author Stanislav Aleshin on 17.06.2024.
+ * @author Stanislav Aleshin on 20.07.2024.
  */
 @Composable
-internal fun EmployeeAvatarView(
+fun AvatarView(
     modifier: Modifier = Modifier,
+    state: AsyncImageState = rememberAsyncImageState(
+        options = ComposableImageOptions {
+            crossfade(Constants.Animations.STANDARD_TWEEN)
+            placeholder(MaterialTheme.colorScheme.secondaryContainer)
+        }
+    ),
     firstName: String,
     secondName: String?,
     imageUrl: String?,
+    shape: Shape = MaterialTheme.shapes.full,
+    contentScale: ContentScale = ContentScale.Fit,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.primary,
+    style: TextStyle = MaterialTheme.typography.bodyLarge,
 ) {
     Surface(
-        modifier = modifier.size(40.dp),
-        shape = MaterialTheme.shapes.full,
+        modifier = modifier.defaultMinSize(48.dp, 48.dp),
+        shape = shape,
         color = containerColor,
         contentColor = contentColor,
     ) {
         if (imageUrl != null) {
-            // TODO Get image from firebase storage
+            AsyncImage(
+                uri = imageUrl,
+                contentDescription = firstName,
+                modifier = Modifier.fillMaxSize().clip(shape),
+                state = state,
+                contentScale = contentScale,
+            )
         } else {
             Box(contentAlignment = Alignment.Center) {
                 Text(
@@ -55,7 +81,7 @@ internal fun EmployeeAvatarView(
                         append(firstName.first().uppercase())
                         if (!secondName.isNullOrBlank()) append(secondName.first().uppercase())
                     },
-                    style = MaterialTheme.typography.titleMedium,
+                    style = style,
                 )
             }
         }

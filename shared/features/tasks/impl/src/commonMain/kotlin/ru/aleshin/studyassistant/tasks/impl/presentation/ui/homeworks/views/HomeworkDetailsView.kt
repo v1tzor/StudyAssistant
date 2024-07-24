@@ -20,8 +20,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,12 +30,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -58,7 +54,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
@@ -79,6 +74,8 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.Subject
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTaskComponentUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.fetchAllTasks
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.HomeworkTaskTestView
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.HomeworkTaskView
 
 /**
  * @author Stanislav Aleshin on 03.07.2024.
@@ -468,115 +465,5 @@ private fun HomeworkTaskCountView(
             maxLines = 1,
             style = MaterialTheme.typography.labelLarge,
         )
-    }
-}
-
-@Composable
-private fun HomeworkTaskTestView(
-    modifier: Modifier = Modifier,
-    topic: String,
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.errorContainer,
-    ) {
-        Row(
-            modifier = Modifier.padding(6.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                modifier = modifier.size(18.dp),
-                imageVector = Icons.Default.Error,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.error,
-            )
-            Text(
-                text = TasksThemeRes.strings.homeworkTestLabel,
-                color = MaterialTheme.colorScheme.error,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-                style = MaterialTheme.typography.labelLarge,
-            )
-            Text(
-                modifier = Modifier.weight(1f),
-                text = topic,
-                color = MaterialTheme.colorScheme.error,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.End,
-                maxLines = 3,
-                style = MaterialTheme.typography.labelMedium,
-            )
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalLayoutApi::class)
-private fun HomeworkTaskView(
-    modifier: Modifier = Modifier,
-    icon: Painter,
-    title: String,
-    tasks: List<HomeworkTaskComponentUi>,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            modifier = Modifier.fillMaxHeight(),
-            contentAlignment = Alignment.TopStart,
-        ) {
-            Row(
-                modifier = Modifier.padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    painter = icon,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = title,
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-        }
-        FlowRow(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            tasks.forEach { homeworkTask ->
-                when (homeworkTask) {
-                    is HomeworkTaskComponentUi.Label -> {
-                        Text(
-                            modifier = Modifier.padding(vertical = 2.dp),
-                            text = buildString { append(homeworkTask.text, ": ") },
-                            color = MaterialTheme.colorScheme.onSurface,
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                    }
-                    is HomeworkTaskComponentUi.Tasks -> homeworkTask.taskList.forEach { taskText ->
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                        ) {
-                            Box(modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)) {
-                                Text(
-                                    text = taskText,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    style = MaterialTheme.typography.labelLarge,
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }

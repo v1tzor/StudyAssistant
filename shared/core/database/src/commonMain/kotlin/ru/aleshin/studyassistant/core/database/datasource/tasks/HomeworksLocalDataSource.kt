@@ -44,6 +44,7 @@ import kotlin.coroutines.CoroutineContext
 interface HomeworksLocalDataSource {
 
     suspend fun addOrUpdateHomework(homework: HomeworkEntity): UID
+    suspend fun addHomeworksGroup(homeworks: List<HomeworkEntity>)
     suspend fun fetchHomeworkById(uid: UID): Flow<HomeworkDetailsEntity?>
     suspend fun fetchHomeworksByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsEntity>>
     suspend fun fetchOverdueHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
@@ -63,9 +64,13 @@ interface HomeworksLocalDataSource {
 
         override suspend fun addOrUpdateHomework(homework: HomeworkEntity): UID {
             val uid = homework.uid.ifEmpty { randomUUID() }
-            homeworkQueries.addOrUpdateHomeworks(homework.copy(uid = uid))
+            homeworkQueries.addOrUpdateHomework(homework.copy(uid = uid))
 
             return uid
+        }
+
+        override suspend fun addHomeworksGroup(homeworks: List<HomeworkEntity>) {
+            homeworks.forEach { addOrUpdateHomework(it) }
         }
 
         override suspend fun fetchHomeworkById(uid: UID): Flow<HomeworkDetailsEntity?> {

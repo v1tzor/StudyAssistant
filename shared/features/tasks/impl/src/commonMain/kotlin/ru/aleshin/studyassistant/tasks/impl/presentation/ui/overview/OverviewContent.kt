@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -62,22 +63,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.limitSize
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewViewState
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.DailyHomeworksView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.DailyHomeworksViewPlaceholder
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.HomeworkErrorsView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.HomeworkTasksChart
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.ShareHomeworksBottomSheet
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.SharedHomeworksStatusView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TaskErrorsBottomSheet
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TasksProgressView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TodoViewItem
@@ -97,10 +104,11 @@ internal fun OverviewContent(
     onRefresh: () -> Unit,
     onShowAllHomeworkTasks: () -> Unit,
     onOpenHomeworkTasks: (HomeworkDetailsUi) -> Unit,
+    onOpenSharedHomeworks: () -> Unit,
     onDoHomework: (HomeworkDetailsUi) -> Unit,
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
     onRepeatHomework: (HomeworkDetailsUi) -> Unit,
-    onShareHomeworks: (List<HomeworkDetailsUi>) -> Unit,
+    onShareHomeworks: (SentMediatedHomeworksUi) -> Unit,
     onShowAllTodoTasks: () -> Unit,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
@@ -118,11 +126,14 @@ internal fun OverviewContent(
             TasksProgressControlSection(
                 isLoadingHomeworks = isLoadingHomeworks,
                 isLoadingErrors = isLoadingErrors,
+                isLoadingShare = isLoadingShare,
                 currentDate = currentDate,
                 homeworks = homeworks,
+                sharedHomeworks = sharedHomeworks,
                 todos = todos,
                 homeworkErrors = homeworkErrors,
                 todoErrors = todoErrors,
+                onOpenSharedHomeworks = onOpenSharedHomeworks,
                 onEditHomework = onOpenHomeworkTasks,
                 onDoHomework = onDoHomework,
                 onSkipHomework = onSkipHomework,
@@ -136,6 +147,7 @@ internal fun OverviewContent(
                 isLoading = isLoadingHomeworks,
                 currentDate = currentDate,
                 homeworks = homeworks,
+                allFriends = friends,
                 onOpenHomeworkTasks = onOpenHomeworkTasks,
                 onShowAllHomeworkTasks = onShowAllHomeworkTasks,
                 onDoHomework = onDoHomework,
@@ -160,11 +172,14 @@ private fun TasksProgressControlSection(
     modifier: Modifier = Modifier,
     isLoadingHomeworks: Boolean,
     isLoadingErrors: Boolean,
+    isLoadingShare: Boolean,
     currentDate: Instant,
     homeworks: Map<Instant, List<HomeworkDetailsUi>>,
+    sharedHomeworks: SharedHomeworksUi?,
     todos: List<TodoDetailsUi>,
     homeworkErrors: HomeworkErrorsUi?,
     todoErrors: TodoErrorsUi?,
+    onOpenSharedHomeworks: () -> Unit,
     onEditHomework: (HomeworkDetailsUi) -> Unit,
     onDoHomework: (HomeworkDetailsUi) -> Unit,
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
@@ -187,7 +202,7 @@ private fun TasksProgressControlSection(
             todos = todos,
         )
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxHeight().weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             HomeworkErrorsView(
@@ -196,6 +211,12 @@ private fun TasksProgressControlSection(
                 homeworkErrors = homeworkErrors,
                 todoErrors = todoErrors,
                 onShowErrors = { taskErrorsSheetState = true },
+            )
+            SharedHomeworksStatusView(
+                modifier = Modifier.fillMaxWidth(),
+                isLoading = isLoadingShare,
+                sharedHomeworks = sharedHomeworks,
+                onOpenSharedHomeworks = onOpenSharedHomeworks,
             )
         }
     }
@@ -250,17 +271,19 @@ private fun HomeworkAnalyticsSection(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 private fun HomeworksSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     currentDate: Instant,
     homeworks: Map<Instant, List<HomeworkDetailsUi>>,
+    allFriends: List<AppUserUi>,
     onShowAllHomeworkTasks: () -> Unit,
     onOpenHomeworkTasks: (HomeworkDetailsUi) -> Unit,
     onDoHomework: (HomeworkDetailsUi) -> Unit,
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
     onRepeatHomework: (HomeworkDetailsUi) -> Unit,
-    onShareHomeworks: (List<HomeworkDetailsUi>) -> Unit,
+    onShareHomeworks: (SentMediatedHomeworksUi) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -305,7 +328,9 @@ private fun HomeworksSection(
                 ) {
                     items(homeworksMapList, key = { it.first.toString() }) { homeworksEntry ->
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            var isShowSharedHomeworksSheet by remember { mutableStateOf(false) }
                             val isCurrent = currentDate.equalsDay(homeworksEntry.first)
+
                             if (isCurrent) {
                                 VerticalDivider(
                                     modifier = Modifier.padding(vertical = 16.dp),
@@ -321,12 +346,26 @@ private fun HomeworksSection(
                                 onOpenHomeworkTask = onOpenHomeworkTasks,
                                 onSkipHomework = onSkipHomework,
                                 onRepeatHomework = onRepeatHomework,
-                                onShareHomeworks = onShareHomeworks,
+                                onShareHomeworks = { isShowSharedHomeworksSheet = true },
                             )
                             if (isCurrent) {
                                 VerticalDivider(
                                     modifier = Modifier.padding(vertical = 16.dp),
                                     color = MaterialTheme.colorScheme.secondaryContainer,
+                                )
+                            }
+
+                            if (isShowSharedHomeworksSheet) {
+                                ShareHomeworksBottomSheet(
+                                    currentTime = Clock.System.now(),
+                                    targetDate = homeworksEntry.first,
+                                    homeworks = homeworksEntry.second,
+                                    allFriends = allFriends,
+                                    onDismissRequest = { isShowSharedHomeworksSheet = false },
+                                    onConfirm = {
+                                        onShareHomeworks(it)
+                                        isShowSharedHomeworksSheet = false
+                                    },
                                 )
                             }
                         }

@@ -30,11 +30,14 @@ import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.ScheduleUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 
 /**
  * @author Stanislav Aleshin on 27.06.2024
@@ -45,15 +48,18 @@ internal data class OverviewViewState(
     val isLoadingHomeworks: Boolean = true,
     val isLoadingErrors: Boolean = true,
     val isLoadingTasks: Boolean = true,
+    val isLoadingShare: Boolean = true,
     @TypeParceler<Instant, InstantParceler>
     val currentDate: Instant = Clock.System.now().startThisDay(),
     val activeSchedule: ScheduleUi? = null,
     @TypeParceler<Instant, InstantParceler>
     val homeworks: Map<Instant, List<HomeworkDetailsUi>> = mapOf(),
+    val friends: List<AppUserUi> = emptyList(),
+    val sharedHomeworks: SharedHomeworksUi? = null,
+    val todos: List<TodoDetailsUi> = emptyList(),
     val homeworksScope: HomeworkScopeUi? = null,
     val homeworkErrors: HomeworkErrorsUi? = null,
     val todoErrors: TodoErrorsUi? = null,
-    val todos: List<TodoDetailsUi> = emptyList(),
 ) : BaseViewState
 
 internal sealed class OverviewEvent : BaseEvent {
@@ -63,10 +69,12 @@ internal sealed class OverviewEvent : BaseEvent {
     data class RepeatHomework(val homework: HomeworkDetailsUi) : OverviewEvent()
     data class SkipHomework(val homework: HomeworkDetailsUi) : OverviewEvent()
     data class UpdateTodoDone(val todo: TodoDetailsUi, val isDone: Boolean) : OverviewEvent()
+    data class ShareHomeworks(val sentMediatedHomeworks: SentMediatedHomeworksUi) : OverviewEvent()
     data class NavigateToHomeworkEditor(val homework: HomeworkDetailsUi) : OverviewEvent()
     data class NavigateToTodoEditor(val todo: TodoDetailsUi?) : OverviewEvent()
     data object AddHomeworkInEditor : OverviewEvent()
     data class NavigateToHomeworks(val homework: HomeworkDetailsUi?) : OverviewEvent()
+    data object NavigateToShare : OverviewEvent()
     data object NavigateToTodos : OverviewEvent()
 }
 
@@ -81,14 +89,19 @@ internal sealed class OverviewAction : BaseAction {
         val homeworks: Map<Instant, List<HomeworkDetailsUi>>,
         val homeworkScope: HomeworkScopeUi,
     ) : OverviewAction()
-    data class UpdateActiveSchedule(val activeSchedule: ScheduleUi?) : OverviewAction()
+    data class UpdateTodos(val todos: List<TodoDetailsUi>) : OverviewAction()
     data class UpdateTaskErrors(
         val homeworkErrors: HomeworkErrorsUi?,
         val todoErrors: TodoErrorsUi?,
     ) : OverviewAction()
-    data class UpdateTodos(val todos: List<TodoDetailsUi>) : OverviewAction()
+    data class UpdateSharedHomeworks(
+        val homeworks: SharedHomeworksUi,
+        val friends: List<AppUserUi>,
+    ) : OverviewAction()
+    data class UpdateActiveSchedule(val activeSchedule: ScheduleUi?) : OverviewAction()
     data class UpdateCurrentDate(val date: Instant) : OverviewAction()
     data class UpdateHomeworksLoading(val isLoading: Boolean) : OverviewAction()
     data class UpdateErrorsLoading(val isLoading: Boolean) : OverviewAction()
     data class UpdateTasksLoading(val isLoading: Boolean) : OverviewAction()
+    data class UpdateShareLoading(val isLoading: Boolean) : OverviewAction()
 }

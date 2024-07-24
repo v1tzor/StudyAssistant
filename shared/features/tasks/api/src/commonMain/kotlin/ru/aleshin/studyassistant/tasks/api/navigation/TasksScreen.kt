@@ -25,4 +25,5 @@ sealed class TasksScreen : FeatureScreen {
     data object Overview : TasksScreen()
     data class Homeworks(val targetDate: Long? = null) : TasksScreen()
     data object Todos : TasksScreen()
+    data object Share : TasksScreen()
 }

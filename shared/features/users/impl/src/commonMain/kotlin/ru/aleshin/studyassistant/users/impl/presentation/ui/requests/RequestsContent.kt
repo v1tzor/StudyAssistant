@@ -46,6 +46,7 @@ import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTimeDurationOrZero
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.ui.mappers.toLanguageString
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
 import ru.aleshin.studyassistant.users.impl.presentation.models.AppUserUi
 import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
@@ -131,8 +132,7 @@ internal fun RequestsReceivedTab(
                                 Text(text = UsersThemeRes.strings.receivedFriendRequestLabel)
                             },
                             trailingIcon = {
-                                val duration = dateTimeDurationOrZero(currentTime, user.second)
-                                Text(text = duration.toMinutesOrHoursTitle())
+                                Text(text = (currentTime - user.second).toLanguageString())
                             },
                             actions = {
                                 Button(

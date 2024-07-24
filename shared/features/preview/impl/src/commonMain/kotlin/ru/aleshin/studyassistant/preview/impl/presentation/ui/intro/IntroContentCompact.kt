@@ -73,7 +73,7 @@ internal fun IntroContentCompact(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CircularStepsRow(
-                countSteps = IntroPage.entries.size,
+                stepsCount = IntroPage.entries.size,
                 currentStep = pagerState.currentPage,
             )
             AnimatedContent(

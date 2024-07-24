@@ -21,7 +21,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -77,6 +79,7 @@ fun <T> BaseSelectorDialog(
     itemView: @Composable LazyItemScope.(T) -> Unit,
     notSelectedItem: @Composable (LazyItemScope.() -> Unit)? = null,
     addItemView: @Composable (LazyItemScope.() -> Unit)? = null,
+    filters: @Composable (RowScope.() -> Unit)? = null,
     properties: DialogProperties = DialogProperties(),
     sizes: SelectorDialogSizes = SelectorDialogSizes(),
     shadowElevation: Dp = 4.dp,
@@ -99,6 +102,14 @@ fun <T> BaseSelectorDialog(
                     header = header,
                     title = title,
                 )
+                if (filters != null) {
+                    Row(
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = filters,
+                    )
+                }
                 HorizontalDivider()
                 LazyColumn(
                     modifier = Modifier.height(sizes.contentHeight).padding(
@@ -140,7 +151,11 @@ fun LazyItemScope.SelectorDialogItemView(
     Surface(
         onClick = { if (!selected) onClick() },
         enabled = enabled,
-        modifier = modifier.alphaByEnabled(enabled).fillMaxWidth().animateItemPlacement(),
+        modifier = modifier
+            .alphaByEnabled(enabled)
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .animateItemPlacement(),
         shape = MaterialTheme.shapes.large,
         color = when (selected) {
             true -> MaterialTheme.colorScheme.primaryContainer

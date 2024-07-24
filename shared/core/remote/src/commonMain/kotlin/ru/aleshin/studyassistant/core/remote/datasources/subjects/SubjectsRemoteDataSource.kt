@@ -39,6 +39,7 @@ interface SubjectsRemoteDataSource {
     suspend fun addOrUpdateSubject(subject: SubjectPojo, targetUser: UID): UID
     suspend fun fetchSubjectById(uid: UID, targetUser: UID): Flow<SubjectDetailsPojo?>
     suspend fun fetchAllSubjectsByOrganization(organizationId: UID, targetUser: UID): Flow<List<SubjectDetailsPojo>>
+    suspend fun fetchAllSubjectsByNames(names: List<String>, targetUser: UID): List<SubjectDetailsPojo>
     suspend fun fetchSubjectsByEmployee(employeeId: UID, targetUser: UID): Flow<List<SubjectDetailsPojo>>
     suspend fun deleteSubject(targetId: UID, targetUser: UID)
 
@@ -110,6 +111,31 @@ interface SubjectsRemoteDataSource {
 
                     subjectPojo.mapToDetails(employee = employee)
                 }
+            }
+        }
+
+        override suspend fun fetchAllSubjectsByNames(
+            names: List<String>,
+            targetUser: UID
+        ): List<SubjectDetailsPojo> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).where {
+                UserData.SUBJECT_NAME inArray names
+            }
+
+            val subjectPojoList = subjectsReference.snapshotGet().map { snapshot ->
+                snapshot.data(serializer<SubjectPojo>())
+            }
+
+            return subjectPojoList.map { subjectPojo ->
+                val employeeReferenceRoot = userDataRoot.collection(UserData.EMPLOYEE)
+
+                val employeeReference = subjectPojo.teacherId?.let { employeeReferenceRoot.document(it) }
+                val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeePojo?>())
+
+                subjectPojo.mapToDetails(employee = employee)
             }
         }
 

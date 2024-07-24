@@ -70,6 +70,23 @@ class SubjectsRepositoryImpl(
         }
     }
 
+    override suspend fun fetchAllSubjectsByNames(
+        names: List<UID>,
+        targetUser: UID
+    ): List<Subject> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.fetchAllSubjectsByNames(names, targetUser).map { subjectPojo ->
+                subjectPojo.mapToDomain()
+            }
+        } else {
+            localDataSource.fetchAllSubjectsByNames(names).map { subjectEntity ->
+                subjectEntity.mapToDomain()
+            }
+        }
+    }
+
     override suspend fun fetchSubjectsByEmployee(employeeId: UID, targetUser: UID): Flow<List<Subject>> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 

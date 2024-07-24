@@ -33,16 +33,17 @@ internal data class TasksIcons(
     val tomorrowTime: DrawableResource,
     val weekTime: DrawableResource,
     val homeworkError: DrawableResource,
-    val exchangeHomeworks: DrawableResource,
+    val sharedHomeworks: DrawableResource,
     val viewAllTasks: DrawableResource,
     val viewShortTasks: DrawableResource,
 ) {
+
     companion object {
         val LIGHT = TasksIcons(
             tomorrowTime = Res.drawable.ic_timeline_in_progress,
             weekTime = Res.drawable.ic_calendar_clock_outline,
             homeworkError = Res.drawable.ic_alert_triangular,
-            exchangeHomeworks = Res.drawable.ic_account_file_outline,
+            sharedHomeworks = Res.drawable.ic_account_file_outline,
             viewAllTasks = Res.drawable.ic_view_day_outline,
             viewShortTasks = Res.drawable.ic_view_array_outline,
         )
@@ -50,7 +51,7 @@ internal data class TasksIcons(
             tomorrowTime = Res.drawable.ic_timeline_in_progress,
             weekTime = Res.drawable.ic_calendar_clock_outline,
             homeworkError = Res.drawable.ic_alert_triangular,
-            exchangeHomeworks = Res.drawable.ic_account_file_outline,
+            sharedHomeworks = Res.drawable.ic_account_file_outline,
             viewAllTasks = Res.drawable.ic_view_day_outline,
             viewShortTasks = Res.drawable.ic_view_array_outline,
         )

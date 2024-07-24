@@ -41,7 +41,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.ui.mappers.format
@@ -49,6 +48,7 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
+import ru.aleshin.studyassistant.core.ui.views.shortDayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 
 /**
@@ -105,11 +105,6 @@ internal fun HomeworksTimeRangeSelector(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val dateFormat = DateTimeComponents.Format {
-                dayOfMonth()
-                char('.')
-                monthNumber()
-            }
             IconButton(
                 onClick = onPrevious,
                 modifier = Modifier.size(36.dp),
@@ -123,8 +118,8 @@ internal fun HomeworksTimeRangeSelector(
             Text(
                 modifier = Modifier.alphaByEnabled(enabled).animateContentSize(),
                 text = selectedTimeRange?.format(
-                    fromDateTimeFormat = dateFormat,
-                    toDateTimeFormat = dateFormat
+                    fromDateTimeFormat = DateTimeComponents.Formats.shortDayMonthFormat(),
+                    toDateTimeFormat = DateTimeComponents.Formats.shortDayMonthFormat(),
                 ) ?: StudyAssistantRes.strings.notSelectedTitle,
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis,

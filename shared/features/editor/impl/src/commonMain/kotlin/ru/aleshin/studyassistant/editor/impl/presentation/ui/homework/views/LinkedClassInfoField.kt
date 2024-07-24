@@ -59,19 +59,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.Padding
-import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.tokens.dayOfWeekShortNames
-import ru.aleshin.studyassistant.core.ui.theme.tokens.monthNames
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
+import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassesForLinkedUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassesForLinkedMapUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 
 /**
@@ -83,7 +80,7 @@ internal fun LinkedClassInfoField(
     isLoading: Boolean,
     selectedDate: Instant?,
     linkedClass: UID?,
-    classesForLinked: ClassesForLinkedUi,
+    classesForLinked: ClassesForLinkedMapUi,
     onSelectedDate: (Instant?) -> Unit,
     onSelectedClass: (ClassUi?, Instant?) -> Unit,
 ) {
@@ -101,18 +98,12 @@ internal fun LinkedClassInfoField(
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            val strings = StudyAssistantRes.strings
-            val dateFormat = DateTimeComponents.Format {
-                dayOfWeek(strings.dayOfWeekShortNames())
-                chars(", ")
-                dayOfMonth(Padding.NONE)
-                char(' ')
-                monthName(strings.monthNames())
-            }
             ClickableTextField(
                 onClick = { datePickerState = true },
                 enabled = !isLoading,
-                value = selectedDate?.formatByTimeZone(dateFormat),
+                value = selectedDate?.formatByTimeZone(
+                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings)
+                ),
                 label = EditorThemeRes.strings.homeworkDateFieldLabel,
                 placeholder = EditorThemeRes.strings.homeworkDateFieldPlaceholder,
                 trailingIcon = {
@@ -135,8 +126,8 @@ internal fun LinkedClassInfoField(
     if (datePickerState) {
         HomeworkDatePicker(
             onDismiss = { datePickerState = false },
-            onSelectedDate = { selectedDate ->
-                onSelectedDate(selectedDate)
+            onSelectedDate = { date ->
+                onSelectedDate(date)
                 datePickerState = false
             }
         )
@@ -150,7 +141,7 @@ private fun LinkClassView(
     isLoading: Boolean,
     selectedDate: Instant?,
     linkedClass: UID?,
-    classesForLinked: ClassesForLinkedUi,
+    classesForLinked: ClassesForLinkedMapUi,
     onSelectedClass: (ClassUi?, Instant?) -> Unit,
 ) {
     Surface(
@@ -243,16 +234,10 @@ private fun LinkClassItem(
         },
     ) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-            val strings = StudyAssistantRes.strings
-            val dateFormat = DateTimeComponents.Format {
-                dayOfWeek(strings.dayOfWeekShortNames())
-                chars(", ")
-                monthName(strings.monthNames())
-                char(' ')
-                dayOfMonth(Padding.NONE)
-            }
             Text(
-                text = date.formatByTimeZone(dateFormat),
+                text = date.formatByTimeZone(
+                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings)
+                ),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 overflow = TextOverflow.Ellipsis,

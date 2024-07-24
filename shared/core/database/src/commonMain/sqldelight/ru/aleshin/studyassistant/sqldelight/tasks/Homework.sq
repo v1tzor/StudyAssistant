@@ -13,6 +13,10 @@ CREATE TABLE homeworkEntity (
     complete_date INTEGER
 );
 
+addOrUpdateHomework:
+INSERT OR REPLACE INTO homeworkEntity (uid, class_id, deadline, subject_id, organization_id, theoretical_tasks, practical_tasks, presentations, test, priority, is_done, complete_date)
+VALUES ?;
+
 fetchHomeworksByTimeRange:
 SELECT *
 FROM homeworkEntity
@@ -36,9 +40,6 @@ SELECT *
 FROM homeworkEntity
 WHERE uid = ?;
 
-addOrUpdateHomeworks:
-INSERT OR REPLACE INTO homeworkEntity (uid, class_id, deadline, subject_id, organization_id, theoretical_tasks, practical_tasks, presentations, test, priority, is_done, complete_date)
-VALUES ?;
 
 deleteHomework:
 DELETE FROM homeworkEntity

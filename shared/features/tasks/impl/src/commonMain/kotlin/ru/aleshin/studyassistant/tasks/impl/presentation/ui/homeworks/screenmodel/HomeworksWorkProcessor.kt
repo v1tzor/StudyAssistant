@@ -45,6 +45,8 @@ import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ScheduleInteracto
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToBase
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToDetails
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksAction
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksEffect
 
@@ -81,7 +83,7 @@ internal interface HomeworksWorkProcessor :
                                 deadline = homework.deadline,
                                 currentTime = currentTime,
                             )
-                            return@map homework.mapToUi(status)
+                            return@map homework.mapToUi().convertToDetails(status)
                         }
                         val groupedHomeworks = homeworks.groupBy { homework ->
                             homework.deadline.startThisDay()
@@ -115,7 +117,7 @@ internal interface HomeworksWorkProcessor :
         }
 
         private fun updateHomeworkWork(homework: HomeworkDetailsUi) = flow {
-            homeworksInteractor.updateHomework(homework.mapToDomain()).handle(
+            homeworksInteractor.updateHomework(homework.convertToBase().mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(HomeworksEffect.ShowError(it))) },
             )
         }

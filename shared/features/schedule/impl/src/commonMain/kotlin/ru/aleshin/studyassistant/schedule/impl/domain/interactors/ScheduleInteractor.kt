@@ -61,56 +61,6 @@ internal interface ScheduleInteractor {
         private val targetUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid
 
-//        override suspend fun fetchDetailsWeekSchedule(week: TimeRange) = eitherWrapper.wrapFlow {
-//            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
-//            val numberOfWeek = week.from.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
-//
-//            val baseSchedules = baseScheduleRepository.fetchSchedulesByVersion(week, numberOfWeek, targetUser).first()
-//            val customSchedules = customScheduleRepository.fetchSchedulesByTimeRange(week, targetUser).first()
-//            val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(week, targetUser)
-//
-//            val weekDaySchedules = mutableMapOf<DayOfWeek, ScheduleDetails>()
-//
-//            homeworksFlow.map { homeworks ->
-//                customSchedules.forEach { customSchedule ->
-//                    val dayOfWeek = customSchedule.date.dateTime().dayOfWeek
-//                    val detailsSchedule = customSchedule.convertToDetails(
-//                        classesMapper = { classModel ->
-//                            classModel.convertToDetails(homeworks.find { it.classId == classModel.uid })
-//                        }
-//                    )
-//                    weekDaySchedules[dayOfWeek] = ScheduleDetails.Custom(
-//                        detailsSchedule.copy(
-//                            classes = detailsSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
-//                        )
-//                    )
-//                }
-//
-//                baseSchedules.forEach { baseSchedule ->
-//                    val dayOfWeek = baseSchedule.dayOfWeek
-//                    if (weekDaySchedules[dayOfWeek] == null) {
-//                        val detailsSchedule = baseSchedule.convertToDetails(
-//                            classesMapper = { classModel ->
-//                                classModel.convertToDetails(homeworks.find { it.classId == classModel.uid })
-//                            }
-//                        )
-//                        weekDaySchedules[dayOfWeek] = ScheduleDetails.Base(
-//                            detailsSchedule.copy(
-//                                classes = detailsSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
-//                            )
-//                        )
-//                    }
-//                }
-//
-//                WeekScheduleDetails(
-//                    from = week.from,
-//                    to = week.to,
-//                    numberOfWeek = numberOfWeek,
-//                    weekDaySchedules = weekDaySchedules,
-//                )
-//            }
-//        }
-
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchDetailsWeekSchedule(week: TimeRange) = eitherWrapper.wrapFlow {
             val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek

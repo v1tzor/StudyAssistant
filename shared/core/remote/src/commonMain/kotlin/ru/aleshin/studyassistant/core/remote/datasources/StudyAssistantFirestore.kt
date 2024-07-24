@@ -49,6 +49,7 @@ object StudyAssistantFirestore {
         const val HOMEWORK_DONE = "done"
         const val HOMEWORK_COMPLETE_DATE = "completeDate"
         const val SUBJECT_TEACHER_ID = "teacherId"
+        const val SUBJECT_NAME = "name"
         const val TODO_DEADLINE = "deadline"
         const val TODO_DONE = "done"
         const val TODO_COMPLETE_DATE = "completeDate"
@@ -63,6 +64,10 @@ object StudyAssistantFirestore {
 
     object Requests {
         const val ROOT = "requests"
+    }
+
+    object SharedHomeworks {
+        const val ROOT = "sharedHomeworks"
     }
 
     object LIMITS {

@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
 
 /**
@@ -27,7 +26,6 @@ internal class NavigationScreenModel : ScreenModel {
 
     override fun onDispose() {
         super.onDispose()
-        Logger.i("test") { "onDispose schedule" }
         ScheduleFeatureDIHolder.clear()
     }
 }

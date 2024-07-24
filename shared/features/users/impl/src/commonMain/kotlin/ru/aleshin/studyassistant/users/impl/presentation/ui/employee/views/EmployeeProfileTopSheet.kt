@@ -20,7 +20,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -46,15 +45,12 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.Padding
-import kotlinx.datetime.format.char
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
@@ -62,6 +58,8 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
+import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
+import ru.aleshin.studyassistant.core.ui.views.shortTimeFormat
 import ru.aleshin.studyassistant.users.impl.presentation.models.ContactInfoUi
 import ru.aleshin.studyassistant.users.impl.presentation.models.EmployeeDetailsUi
 import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
@@ -181,10 +179,12 @@ private fun EmployeeTopSheetHeader(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        EmployeeAvatarView(
+        AvatarView(
+            modifier = modifier.size(120.dp),
             firstName = firstName,
             secondName = secondName,
             imageUrl = avatar,
+            style = MaterialTheme.typography.headlineLarge,
         )
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             FlowRow(
@@ -265,37 +265,6 @@ private fun EmployeeTopSheetHeader(
 }
 
 @Composable
-private fun EmployeeAvatarView(
-    modifier: Modifier = Modifier,
-    firstName: String,
-    secondName: String?,
-    imageUrl: String?,
-    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    contentColor: Color = MaterialTheme.colorScheme.primary,
-) {
-    Surface(
-        modifier = modifier.size(120.dp),
-        shape = MaterialTheme.shapes.full,
-        color = containerColor,
-        contentColor = contentColor,
-    ) {
-        if (imageUrl != null) {
-            // TODO Get image from firebase storage
-        } else {
-            Box(contentAlignment = Alignment.Center) {
-                Text(
-                    text = buildString {
-                        append(firstName.first().uppercase())
-                        if (!secondName.isNullOrBlank()) append(secondName.first().uppercase())
-                    },
-                    style = MaterialTheme.typography.headlineLarge,
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun EmployeeTopSheetFooter(
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
@@ -304,11 +273,6 @@ private fun EmployeeTopSheetFooter(
     workTimeStart: Instant?,
     workTimeEnd: Instant?,
 ) {
-    val timeFormat = DateTimeComponents.Format {
-        hour(Padding.NONE)
-        char(':')
-        minute()
-    }
     LazyRow(
         modifier = modifier,
         state = listState,
@@ -330,12 +294,13 @@ private fun EmployeeTopSheetFooter(
                     label = UsersThemeRes.strings.employeeWorkTimeLabel,
                     title = buildString {
                         if (workTimeStart != null) {
-                            append(workTimeStart.formatByTimeZone(timeFormat))
+                            append(workTimeStart.formatByTimeZone(DateTimeComponents.Formats.shortTimeFormat()))
                         } else {
                             append("*")
                         }
                         if (workTimeEnd != null) {
-                            append(" ", "-", " ", workTimeEnd.formatByTimeZone(timeFormat))
+                            append(" ", "-", " ")
+                            append(workTimeEnd.formatByTimeZone(DateTimeComponents.Formats.shortTimeFormat()))
                         }
                     },
                 )

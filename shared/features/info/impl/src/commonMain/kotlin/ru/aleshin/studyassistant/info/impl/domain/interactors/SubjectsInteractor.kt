@@ -31,6 +31,7 @@ import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
 internal interface SubjectsInteractor {
 
     suspend fun fetchSubjectsByOrganization(organizationId: UID): FlowDomainResult<InfoFailures, List<Subject>>
+
     suspend fun deleteSubjectById(targetId: UID): UnitDomainResult<InfoFailures>
 
     class Base(

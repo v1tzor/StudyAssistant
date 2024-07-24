@@ -24,6 +24,6 @@ interface SubscriptionChecker {
     fun checkSubscriptionActivity(): Boolean
 
     object FreeApp : SubscriptionChecker {
-        override fun checkSubscriptionActivity() = true
+        override fun checkSubscriptionActivity() = true // true while develop
     }
 }

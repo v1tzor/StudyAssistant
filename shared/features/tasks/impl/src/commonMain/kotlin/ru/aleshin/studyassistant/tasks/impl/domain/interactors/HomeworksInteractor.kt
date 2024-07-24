@@ -43,6 +43,7 @@ import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
  */
 internal interface HomeworksInteractor {
 
+    suspend fun addHomeworksGroup(homeworks: List<Homework>): UnitDomainResult<TasksFailures>
     suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange): FlowDomainResult<TasksFailures, List<Homework>>
     suspend fun fetchHomeworkErrors(targetDate: Instant): FlowDomainResult<TasksFailures, HomeworkErrors>
     suspend fun updateHomework(homework: Homework): UnitDomainResult<TasksFailures>
@@ -58,6 +59,10 @@ internal interface HomeworksInteractor {
 
         private val targetUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid
+
+        override suspend fun addHomeworksGroup(homeworks: List<Homework>) = eitherWrapper.wrapUnit {
+            homeworksRepository.addHomeworksGroup(homeworks, targetUser)
+        }
 
         override suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange) = eitherWrapper.wrapFlow {
             homeworksRepository.fetchHomeworksByTimeRange(timeRange, targetUser).map { homeworkList ->

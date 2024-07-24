@@ -30,10 +30,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
 
 /**
  * @author Stanislav Aleshin on 27.04.2024
@@ -57,13 +57,7 @@ fun BirthdayDatePicker(
                 enabled = confirmEnabled,
                 onClick = {
                     val selectedDate = datePickerState.selectedDateMillis ?: return@TextButton
-                    val dateFormat = DateTimeComponents.Format {
-                        dayOfMonth()
-                        char('.')
-                        monthNumber()
-                        char('.')
-                        year()
-                    }
+                    val dateFormat = DateTimeComponents.Formats.dayMonthYearFormat()
                     val birthday = selectedDate.mapEpochTimeToInstant().formatByTimeZone(dateFormat)
                     onSelectedDate.invoke(birthday)
                 },

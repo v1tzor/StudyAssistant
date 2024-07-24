@@ -30,6 +30,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":shared:features:tasks:api"))
             implementation(project(":shared:features:editor:api"))
+            implementation(project(":shared:features:users:api"))
 
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:data"))

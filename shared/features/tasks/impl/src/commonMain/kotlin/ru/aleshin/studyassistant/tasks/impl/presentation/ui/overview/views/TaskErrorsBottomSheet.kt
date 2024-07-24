@@ -55,13 +55,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.tokens.dayOfWeekShortNames
-import ru.aleshin.studyassistant.core.ui.theme.tokens.monthNames
 import ru.aleshin.studyassistant.core.ui.views.MediumDragHandle
+import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
@@ -386,16 +384,10 @@ private fun ErrorHomeworkViewContent(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Column {
-            val coreStrings = StudyAssistantRes.strings
-            val dateFormat = DateTimeComponents.Format {
-                dayOfWeek(coreStrings.dayOfWeekShortNames())
-                chars(", ")
-                dayOfMonth()
-                char(' ')
-                monthName(coreStrings.monthNames())
-            }
             Text(
-                text = deadline.formatByTimeZone(dateFormat),
+                text = deadline.formatByTimeZone(
+                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings),
+                ),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 overflow = TextOverflow.Ellipsis,
@@ -477,16 +469,10 @@ private fun ErrorTodoView(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 if (deadline != null) {
-                    val coreStrings = StudyAssistantRes.strings
-                    val dateFormat = DateTimeComponents.Format {
-                        dayOfWeek(coreStrings.dayOfWeekShortNames())
-                        chars(", ")
-                        dayOfMonth()
-                        char(' ')
-                        monthName(coreStrings.monthNames())
-                    }
                     Text(
-                        text = deadline.formatByTimeZone(dateFormat),
+                        text = deadline.formatByTimeZone(
+                            format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings),
+                        ),
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
                         overflow = TextOverflow.Ellipsis,

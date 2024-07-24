@@ -51,6 +51,16 @@ class HomeworksRepositoryImpl(
         }
     }
 
+    override suspend fun addHomeworksGroup(homeworks: List<Homework>, targetUser: UID) {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.addHomeworksGroup(homeworks.map { it.mapToRemoteData() }, targetUser)
+        } else {
+            localDataSource.addHomeworksGroup(homeworks.map { it.mapToLocalData() })
+        }
+    }
+
     override suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<Homework?> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 

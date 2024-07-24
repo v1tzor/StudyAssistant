@@ -21,11 +21,9 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -49,18 +47,10 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.github.panpf.sketch.AsyncImage
-import com.github.panpf.sketch.rememberAsyncImageState
-import com.github.panpf.sketch.request.ComposableImageOptions
-import com.github.panpf.sketch.request.error
-import com.github.panpf.sketch.request.placeholder
-import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder.USER_CONTACT_INFO
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.core.domain.entities.users.UserFriendStatus
@@ -70,6 +60,7 @@ import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.UserCodeView
+import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
 import ru.aleshin.studyassistant.users.impl.presentation.models.AppUserUi
 import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
 
@@ -231,10 +222,12 @@ private fun UserProfileTopSheetHeader(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        UserProfileAvatarView(
+        AvatarView(
+            modifier = Modifier.size(120.dp),
             firstName = username.split(' ').getOrElse(0) { "-" },
             secondName = username.split(' ').getOrNull(1),
             imageUrl = avatar,
+            style = MaterialTheme.typography.headlineLarge,
         )
         Column(
             modifier = Modifier.weight(1f),
@@ -325,48 +318,6 @@ private fun UserInfoView(
                 maxLines = 1,
                 style = MaterialTheme.typography.labelLarge,
             )
-        }
-    }
-}
-
-@Composable
-private fun UserProfileAvatarView(
-    modifier: Modifier = Modifier,
-    firstName: String,
-    secondName: String?,
-    imageUrl: String?,
-    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    contentColor: Color = MaterialTheme.colorScheme.primary,
-) {
-    Surface(
-        modifier = modifier.size(120.dp),
-        shape = MaterialTheme.shapes.full,
-        color = containerColor,
-        contentColor = contentColor,
-    ) {
-        if (imageUrl != null) {
-            AsyncImage(
-                uri = imageUrl,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.full),
-                state = rememberAsyncImageState(
-                    options = ComposableImageOptions {
-                        crossfade(Constants.Animations.STANDARD_TWEEN)
-                        placeholder(MaterialTheme.colorScheme.secondaryContainer)
-                        error(StudyAssistantRes.icons.testsOutline)
-                    }
-                ),
-            )
-        } else {
-            Box(contentAlignment = Alignment.Center) {
-                Text(
-                    text = buildString {
-                        append(firstName.first().uppercase())
-                        if (!secondName.isNullOrBlank()) append(secondName.first().uppercase())
-                    },
-                    style = MaterialTheme.typography.headlineLarge,
-                )
-            }
         }
     }
 }

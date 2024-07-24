@@ -34,6 +34,11 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewScreenModel
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewStateCommunicator
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewWorkProcessor
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareEffectCommunicator
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareScreenModel
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareStateCommunicator
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareWorkProcessor
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -43,15 +48,20 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<NavigationScreen> { NavigationScreen() }
 
     bindProvider<TasksFeatureStarter> { TasksFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<TasksScreenProvider> { TasksScreenProvider.Base(instance<() -> EditorFeatureStarter>()) }
+    bindProvider<TasksScreenProvider> { TasksScreenProvider.Base(instance<() -> EditorFeatureStarter>(), instance<() -> UsersFeatureStarter>()) }
 
     bindProvider<OverviewStateCommunicator> { OverviewStateCommunicator.Base() }
     bindProvider<OverviewEffectCommunicator> { OverviewEffectCommunicator.Base() }
-    bindProvider<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance(), instance(), instance()) }
+    bindProvider<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindProvider<OverviewScreenModel> { OverviewScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<HomeworksStateCommunicator> { HomeworksStateCommunicator.Base() }
     bindProvider<HomeworksEffectCommunicator> { HomeworksEffectCommunicator.Base() }
     bindProvider<HomeworksWorkProcessor> { HomeworksWorkProcessor.Base(instance(), instance(), instance()) }
     bindProvider<HomeworksScreenModel> { HomeworksScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<ShareStateCommunicator> { ShareStateCommunicator.Base() }
+    bindProvider<ShareEffectCommunicator> { ShareEffectCommunicator.Base() }
+    bindProvider<ShareWorkProcessor> { ShareWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<ShareScreenModel> { ShareScreenModel(instance(), instance(), instance(), instance(), instance()) }
 }

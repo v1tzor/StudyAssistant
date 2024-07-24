@@ -35,13 +35,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseTimePickerDialog
+import ru.aleshin.studyassistant.core.ui.views.timeFormat
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 
 /**
@@ -73,16 +73,11 @@ internal fun WorkTimeInfoField(
         }
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                val timeFormat = DateTimeComponents.Format {
-                    hour()
-                    char(':')
-                    minute()
-                }
                 ClickableTextField(
                     onClick = { isOpenStartTimePicker = true },
                     enabled = !isLoading,
                     modifier = Modifier.weight(1f),
-                    value = startTime?.formatByTimeZone(timeFormat),
+                    value = startTime?.formatByTimeZone(DateTimeComponents.Formats.timeFormat()),
                     label = EditorThemeRes.strings.startTimeFieldLabel,
                     placeholder = EditorThemeRes.strings.startTimeFieldPlaceholder,
                     trailingIcon = {
@@ -95,7 +90,7 @@ internal fun WorkTimeInfoField(
                 ClickableTextField(
                     modifier = Modifier.weight(1f),
                     enabled = !isLoading,
-                    value = endTime?.formatByTimeZone(timeFormat),
+                    value = endTime?.formatByTimeZone(DateTimeComponents.Formats.timeFormat()),
                     label = EditorThemeRes.strings.endTimeFieldLabel,
                     placeholder = EditorThemeRes.strings.endTimeFieldPlaceholder,
                     trailingIcon = {

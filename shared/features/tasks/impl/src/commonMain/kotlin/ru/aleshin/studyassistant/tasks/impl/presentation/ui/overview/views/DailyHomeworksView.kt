@@ -60,16 +60,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.tokens.monthNames
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
+import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTaskComponentUi
@@ -90,7 +89,7 @@ internal fun DailyHomeworksView(
     onOpenHomeworkTask: (HomeworkDetailsUi) -> Unit,
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
     onRepeatHomework: (HomeworkDetailsUi) -> Unit,
-    onShareHomeworks: (List<HomeworkDetailsUi>) -> Unit,
+    onShareHomeworks: () -> Unit,
 ) {
     Surface(
         modifier = modifier.size(170.dp, 350.dp),
@@ -101,7 +100,7 @@ internal fun DailyHomeworksView(
             DailyHomeworksViewHeader(
                 date = date,
                 isHighlighted = isCurrent,
-                onShare = { onShareHomeworks(homeworks) },
+                onShare = onShareHomeworks,
             )
             LazyColumn(
                 modifier = Modifier.padding(4.dp).weight(1f),
@@ -110,16 +109,27 @@ internal fun DailyHomeworksView(
                 if (homeworks.isNotEmpty()) {
                     items(homeworks, key = { it.uid }) { homework ->
                         ShortHomeworkViewItem(
+                            onStartToEndSwipe = {
+                                if (homework.status == HomeworkStatus.SKIPPED) {
+                                    onRepeatHomework(homework)
+                                } else {
+                                    onSkipHomework(homework)
+                                }
+                            },
+                            onEndToStartSwipe = {
+                                if (homework.status == HomeworkStatus.COMPLETE) {
+                                    onRepeatHomework(homework)
+                                } else {
+                                    onDoHomework(homework)
+                                }
+                            },
                             status = homework.status,
                             subject = homework.subject,
                             theoreticalTasks = homework.theoreticalTasks.components,
                             practicalTasks = homework.practicalTasks.components,
                             presentationTasks = homework.presentationTasks.components,
                             isPassed = isPassed,
-                            onDone = { onDoHomework(homework) },
                             onOpenTask = { onOpenHomeworkTask(homework) },
-                            onSkip = { onSkipHomework(homework) },
-                            onRepeat = { onRepeatHomework(homework) },
                         )
                     }
                 } else {
@@ -178,14 +188,8 @@ private fun DailyHomeworksViewHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                val strings = StudyAssistantRes.strings
-                val dateFormat = DateTimeComponents.Format {
-                    dayOfMonth()
-                    char(' ')
-                    monthName(strings.monthNames())
-                }
                 Text(
-                    text = date.dateTime().dayOfWeek.mapToSting(strings),
+                    text = date.dateTime().dayOfWeek.mapToSting(StudyAssistantRes.strings),
                     color = if (isHighlighted) {
                         MaterialTheme.colorScheme.onSecondaryContainer
                     } else {
@@ -194,7 +198,9 @@ private fun DailyHomeworksViewHeader(
                     style = MaterialTheme.typography.labelLarge,
                 )
                 Text(
-                    text = date.formatByTimeZone(dateFormat),
+                    text = date.formatByTimeZone(
+                        format = DateTimeComponents.Formats.dayMonthFormat(StudyAssistantRes.strings),
+                    ),
                     color = if (isHighlighted) {
                         MaterialTheme.colorScheme.secondary
                     } else {
@@ -224,6 +230,8 @@ private fun DailyHomeworksViewHeader(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun ShortHomeworkViewItem(
+    onStartToEndSwipe: () -> Unit,
+    onEndToStartSwipe: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     status: HomeworkStatus,
@@ -232,24 +240,13 @@ private fun ShortHomeworkViewItem(
     practicalTasks: List<HomeworkTaskComponentUi>,
     presentationTasks: List<HomeworkTaskComponentUi>,
     isPassed: Boolean,
-    onDone: () -> Unit,
     onOpenTask: () -> Unit,
-    onSkip: () -> Unit,
-    onRepeat: () -> Unit,
 ) {
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissBoxValue ->
             when (dismissBoxValue) {
-                SwipeToDismissBoxValue.EndToStart -> if (status == HomeworkStatus.COMPLETE) {
-                    onRepeat()
-                } else {
-                    onDone()
-                }
-                SwipeToDismissBoxValue.StartToEnd -> if (status == HomeworkStatus.SKIPPED) {
-                    onRepeat()
-                } else {
-                    onSkip()
-                }
+                SwipeToDismissBoxValue.EndToStart -> onEndToStartSwipe()
+                SwipeToDismissBoxValue.StartToEnd -> onStartToEndSwipe()
                 SwipeToDismissBoxValue.Settled -> {}
             }
             return@rememberSwipeToDismissBoxState false
@@ -337,7 +334,7 @@ private fun ShortHomeworkView(
             color = subject?.color?.let { Color(it) } ?: MaterialTheme.colorScheme.outline,
             content = { Box(modifier = Modifier.fillMaxHeight()) }
         )
-        ErrorHomeworkViewContent(
+        ShortHomeworkViewContent(
             modifier = Modifier.weight(1f),
             subject = subject?.name,
             theoreticalTasks = theoreticalTasks,
@@ -388,7 +385,7 @@ private fun ShortHomeworkView(
 }
 
 @Composable
-private fun ErrorHomeworkViewContent(
+private fun ShortHomeworkViewContent(
     modifier: Modifier = Modifier,
     subject: String?,
     theoreticalTasks: List<HomeworkTaskComponentUi>,
@@ -407,15 +404,15 @@ private fun ErrorHomeworkViewContent(
             style = MaterialTheme.typography.titleSmall,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            ErrorHomeworkTaskCountView(
+            ShortHomeworkTaskCountView(
                 painter = painterResource(StudyAssistantRes.icons.theoreticalTasks),
                 count = theoreticalTasks.fetchAllTasks().size,
             )
-            ErrorHomeworkTaskCountView(
+            ShortHomeworkTaskCountView(
                 painter = painterResource(StudyAssistantRes.icons.practicalTasks),
                 count = practicalTasks.fetchAllTasks().size,
             )
-            ErrorHomeworkTaskCountView(
+            ShortHomeworkTaskCountView(
                 painter = painterResource(StudyAssistantRes.icons.presentationTasks),
                 count = presentationTasks.fetchAllTasks().size,
             )
@@ -424,7 +421,7 @@ private fun ErrorHomeworkViewContent(
 }
 
 @Composable
-private fun ErrorHomeworkTaskCountView(
+private fun ShortHomeworkTaskCountView(
     modifier: Modifier = Modifier,
     painter: Painter,
     count: Int,

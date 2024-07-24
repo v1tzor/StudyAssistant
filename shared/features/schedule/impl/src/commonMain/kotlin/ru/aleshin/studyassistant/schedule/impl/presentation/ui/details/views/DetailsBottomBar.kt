@@ -38,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
@@ -48,6 +47,7 @@ import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.theme.material.topSide
+import ru.aleshin.studyassistant.core.ui.views.shortDayMonthFormat
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 
 /**
@@ -99,11 +99,7 @@ internal fun WeekPickerView(
 ) {
     val currentWeekNumber = currentWeek?.from?.dateTime()?.date?.isoWeekNumber() ?: Int.MIN_VALUE
     val selectedWeekNumber = selectedWeek?.from?.dateTime()?.date?.isoWeekNumber() ?: Int.MAX_VALUE
-    val dateFormat = DateTimeComponents.Format {
-        dayOfMonth()
-        char('.')
-        monthNumber()
-    }
+    val shortDateFormat = DateTimeComponents.Formats.shortDayMonthFormat()
     Surface(
         modifier = modifier.animateContentSize().height(36.dp),
         shape = MaterialTheme.shapes.full,
@@ -131,9 +127,9 @@ internal fun WeekPickerView(
                     currentWeekNumber.inc() == selectedWeekNumber -> ScheduleThemeRes.strings.nextWeekTitle
                     currentWeekNumber.dec() == selectedWeekNumber -> ScheduleThemeRes.strings.previousWeekTitle
                     else -> buildString {
-                        append(selectedWeek.from.formatByTimeZone(dateFormat))
+                        append(selectedWeek.from.formatByTimeZone(shortDateFormat))
                         append(" - ")
-                        append(selectedWeek.to.formatByTimeZone(dateFormat))
+                        append(selectedWeek.to.formatByTimeZone(shortDateFormat))
                     }
                 },
                 color = MaterialTheme.colorScheme.onSurface,

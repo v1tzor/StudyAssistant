@@ -33,7 +33,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -41,18 +40,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.github.panpf.sketch.AsyncImage
-import com.github.panpf.sketch.rememberAsyncImageState
-import com.github.panpf.sketch.request.ComposableImageOptions
-import com.github.panpf.sketch.request.error
-import com.github.panpf.sketch.request.placeholder
-import ru.aleshin.studyassistant.core.common.functional.Constants.Animations.STANDARD_TWEEN
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
+import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
 
 /**
  * @author Stanislav Aleshin on 12.07.2024.
@@ -83,7 +75,8 @@ internal fun UserView(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = if (actions != null) Alignment.Top else Alignment.CenterVertically,
     ) {
-        UserAvatarView(
+        AvatarView(
+            modifier = Modifier.size(48.dp),
             firstName = name.split(' ').getOrElse(0) { "-" },
             secondName = name.split(' ').getOrNull(1),
             imageUrl = avatar,
@@ -129,48 +122,6 @@ internal fun UserView(
                         trailingIcon?.invoke(this)
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-internal fun UserAvatarView(
-    modifier: Modifier = Modifier,
-    firstName: String,
-    secondName: String?,
-    imageUrl: String?,
-    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    contentColor: Color = MaterialTheme.colorScheme.primary,
-) {
-    Surface(
-        modifier = modifier.size(48.dp),
-        shape = MaterialTheme.shapes.full,
-        color = containerColor,
-        contentColor = contentColor,
-    ) {
-        if (imageUrl != null) {
-            AsyncImage(
-                uri = imageUrl,
-                contentDescription = null,
-                modifier = Modifier.size(48.dp).clip(MaterialTheme.shapes.full),
-                state = rememberAsyncImageState(
-                    options = ComposableImageOptions {
-                        crossfade(STANDARD_TWEEN)
-                        placeholder(MaterialTheme.colorScheme.secondaryContainer)
-                        error(StudyAssistantRes.icons.testsOutline)
-                    }
-                ),
-            )
-        } else {
-            Box(contentAlignment = Alignment.Center) {
-                Text(
-                    text = buildString {
-                        append(firstName.first().uppercase())
-                        if (!secondName.isNullOrBlank()) append(secondName.first().uppercase())
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                )
             }
         }
     }

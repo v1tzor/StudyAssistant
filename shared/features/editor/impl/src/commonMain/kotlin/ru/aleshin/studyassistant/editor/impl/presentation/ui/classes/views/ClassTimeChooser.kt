@@ -41,10 +41,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.Padding
-import kotlinx.datetime.format.char
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.ui.views.shortTimeFormat
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 
 /**
@@ -123,11 +122,6 @@ private fun ClassTimeRangeItem(
     endTime: Instant,
     isFree: Boolean,
 ) {
-    val timeFormat = DateTimeComponents.Format {
-        hour(Padding.NONE)
-        char(':')
-        minute()
-    }
     Box(
         modifier = modifier
             .fillMaxHeight()
@@ -146,9 +140,9 @@ private fun ClassTimeRangeItem(
         Text(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
             text = buildString {
-                append(startTime.formatByTimeZone(timeFormat))
+                append(startTime.formatByTimeZone(DateTimeComponents.Formats.shortTimeFormat()))
                 append("-")
-                append(endTime.formatByTimeZone(timeFormat))
+                append(endTime.formatByTimeZone(DateTimeComponents.Formats.shortTimeFormat()))
             },
             color = when {
                 selected && isFree -> MaterialTheme.colorScheme.onPrimary

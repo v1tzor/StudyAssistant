@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Surface
@@ -61,7 +62,7 @@ internal fun HomeworkErrorsView(
     ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
                 text = TasksThemeRes.strings.homeworkErrorsViewHeader,
@@ -123,7 +124,7 @@ internal fun HomeworkErrorsView(
                 }
                 Button(
                     onClick = onShowErrors,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().height(32.dp),
                     enabled = !isLoading,
                     contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -131,7 +132,10 @@ internal fun HomeworkErrorsView(
                         contentColor = MaterialTheme.colorScheme.onError,
                     ),
                 ) {
-                    Text(text = TasksThemeRes.strings.showHomeworkErrorsTitle)
+                    Text(
+                        text = TasksThemeRes.strings.showHomeworkErrorsTitle,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
                 }
             }
         }

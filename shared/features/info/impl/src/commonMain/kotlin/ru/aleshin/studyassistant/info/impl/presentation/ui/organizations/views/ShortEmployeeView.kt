@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -36,8 +37,8 @@ import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
 import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.info.impl.presentation.ui.common.EmployeeAvatarView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.EmployeeSubjectView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.NoneEmployeeSubjectView
 
@@ -67,10 +68,12 @@ internal fun ShortEmployeeView(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            EmployeeAvatarView(
+            AvatarView(
+                modifier = modifier.size(40.dp),
                 firstName = firstName,
                 secondName = secondName,
                 imageUrl = avatar,
+                style = MaterialTheme.typography.titleMedium,
             )
             Column(
                 modifier = Modifier.fillMaxWidth(),

@@ -106,7 +106,7 @@ fun TimeChooserDropdownItem(
                         onChangeTime(newTime)
                     }
                 },
-                suffix = { Text(text = StudyAssistantRes.strings.hoursSuffix) },
+                suffix = { Text(text = StudyAssistantRes.strings.hourSuffix) },
             )
             MenuTextField(
                 enabled = enabled,
@@ -132,7 +132,7 @@ fun TimeChooserDropdownItem(
                         onChangeTime(newTime)
                     }
                 },
-                suffix = { Text(text = StudyAssistantRes.strings.minutesSuffix) },
+                suffix = { Text(text = StudyAssistantRes.strings.minuteSuffix) },
             )
             IconButton(
                 enabled = enabled,
@@ -208,7 +208,7 @@ fun DurationChooserDropdownItem(
                         onChangeTime(hourMillis + minuteMillis)
                     }
                 },
-                suffix = { Text(text = StudyAssistantRes.strings.hoursSuffix) },
+                suffix = { Text(text = StudyAssistantRes.strings.hourSuffix) },
             )
             MenuTextField(
                 enabled = enabled,
@@ -232,7 +232,7 @@ fun DurationChooserDropdownItem(
                         onChangeTime(hourMillis + minuteMillis)
                     }
                 },
-                suffix = { Text(text = StudyAssistantRes.strings.minutesSuffix) },
+                suffix = { Text(text = StudyAssistantRes.strings.minuteSuffix) },
             )
             IconButton(
                 enabled = enabled,

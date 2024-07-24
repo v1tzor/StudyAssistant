@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.exists
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirestore.UserData
@@ -42,6 +43,7 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 interface HomeworksRemoteDataSource {
 
     suspend fun addOrUpdateHomework(homework: HomeworkPojo, targetUser: UID): UID
+    suspend fun addHomeworksGroup(homeworks: List<HomeworkPojo>, targetUser: UID)
     suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<HomeworkDetailsPojo?>
     suspend fun fetchHomeworksByTimeRange(from: Long, to: Long, targetUser: UID): Flow<List<HomeworkDetailsPojo>>
     suspend fun fetchOverdueHomeworks(currentDate: Long, targetUser: UID): Flow<List<HomeworkDetailsPojo>>
@@ -68,6 +70,21 @@ interface HomeworksRemoteDataSource {
                     reference.document(uid).update(UserData.UID to uid)
                     return@runTransaction uid
                 }
+            }
+        }
+
+        override suspend fun addHomeworksGroup(homeworks: List<HomeworkPojo>, targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.HOMEWORKS)
+
+            database.batch().apply {
+                homeworks.forEach { homework ->
+                    val uid = homework.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+                    set(reference.document(uid), homework)
+                }
+                return@apply commit()
             }
         }
 

@@ -24,21 +24,27 @@ import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsReposi
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.
  */
 interface TasksFeatureDependencies : BaseFeatureDependencies {
     val editorFeatureStarter: () -> EditorFeatureStarter
+    val usersFeatureStarter: () -> UsersFeatureStarter
     val baseScheduleRepository: BaseScheduleRepository
     val customScheduleRepository: CustomScheduleRepository
     val organizationsRepository: OrganizationsRepository
     val calendarSettingsRepository: CalendarSettingsRepository
     val homeworkRepository: HomeworksRepository
+    val shareHomeworksRepository: ShareHomeworksRepository
     val todoRepository: TodoRepository
+    val subjectsRepository: SubjectsRepository
     val usersRepository: UsersRepository
     val dateManager: DateManager
     val coroutineManager: CoroutineManager

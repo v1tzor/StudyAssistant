@@ -48,12 +48,17 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.HomeworksInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ScheduleInteractor
+import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ShareHomeworksInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.TodoInteractor
+import ru.aleshin.studyassistant.tasks.impl.domain.interactors.UsersInteractor
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToBase
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToDetails
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.fetchAllTasks
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewAction
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEffect
@@ -68,6 +73,8 @@ internal interface OverviewWorkProcessor :
         private val homeworksInteractor: HomeworksInteractor,
         private val todoInteractor: TodoInteractor,
         private val scheduleInteractor: ScheduleInteractor,
+        private val shareInteractor: ShareHomeworksInteractor,
+        private val usersInteractor: UsersInteractor,
         private val dateManager: DateManager,
     ) : OverviewWorkProcessor {
 
@@ -75,9 +82,11 @@ internal interface OverviewWorkProcessor :
             is OverviewWorkCommand.LoadHomeworks -> loadHomeworksWork(command.currentDate)
             is OverviewWorkCommand.LoadHomeworkErrors -> loadTaskErrorsWork(command.currentDate)
             is OverviewWorkCommand.LoadTodos -> loadTodosWork(command.currentDate)
+            is OverviewWorkCommand.LoadSharedHomeworks -> loadSharedHomeworksWork()
             is OverviewWorkCommand.LoadActiveSchedule -> loadActiveScheduleWork(command.currentDate)
             is OverviewWorkCommand.UpdateHomework -> updateHomeworkWork(command.homework)
             is OverviewWorkCommand.UpdateTodo -> updateTodoWork(command.todo)
+            is OverviewWorkCommand.ShareHomeworks -> shareHomeworksWork(command.sentMediatedHomeworks)
         }
 
         private fun loadHomeworksWork(currentDate: Instant) = channelFlow<OverviewWorkResult> {
@@ -99,7 +108,7 @@ internal interface OverviewWorkProcessor :
                                 deadline = homework.deadline,
                                 currentTime = currentDate.setHoursAndMinutes(currentTime),
                             )
-                            return@map homework.mapToUi(status)
+                            return@map homework.mapToUi().convertToDetails(status)
                         }
                         val groupedHomeworks = homeworks.groupBy { homework ->
                             homework.deadline.startThisDay()
@@ -171,6 +180,25 @@ internal interface OverviewWorkProcessor :
             emit(ActionResult(OverviewAction.UpdateTasksLoading(true)))
         }
 
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private fun loadSharedHomeworksWork() = flow {
+            val sharedHomeworksFlow = shareInteractor.fetchSharedHomeworks()
+            val friendsFlow = usersInteractor.fetchAllFriends()
+
+            sharedHomeworksFlow.flatMapLatestWithResult(
+                secondFlow = friendsFlow,
+                onError = { OverviewEffect.ShowError(it) },
+                onData = { homeworks, friends ->
+                    val allFriends = friends.map { it.mapToUi() }
+                    OverviewAction.UpdateSharedHomeworks(homeworks.mapToUi(), allFriends)
+                },
+            ).collect { workResult ->
+                emit(workResult)
+            }
+        }.onStart {
+            emit(ActionResult(OverviewAction.UpdateShareLoading(true)))
+        }
+
         private fun loadActiveScheduleWork(currentDate: Instant) = flow<OverviewWorkResult> {
             scheduleInteractor.fetchScheduleByDate(currentDate).collectAndHandle(
                 onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
@@ -181,7 +209,7 @@ internal interface OverviewWorkProcessor :
         }
 
         private fun updateHomeworkWork(homework: HomeworkDetailsUi) = flow {
-            homeworksInteractor.updateHomework(homework.mapToDomain()).handle(
+            homeworksInteractor.updateHomework(homework.convertToBase().mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
             )
         }
@@ -275,6 +303,12 @@ internal interface OverviewWorkProcessor :
                 },
             )
         }
+
+        private fun shareHomeworksWork(sentMediatedHomeworks: SentMediatedHomeworksUi) = flow {
+            shareInteractor.shareHomeworks(sentMediatedHomeworks.mapToDomain()).handle(
+                onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) }
+            )
+        }
     }
 }
 
@@ -282,9 +316,11 @@ internal sealed class OverviewWorkCommand : WorkCommand {
     data class LoadHomeworks(val currentDate: Instant) : OverviewWorkCommand()
     data class LoadHomeworkErrors(val currentDate: Instant) : OverviewWorkCommand()
     data class LoadTodos(val currentDate: Instant) : OverviewWorkCommand()
+    data object LoadSharedHomeworks : OverviewWorkCommand()
     data class LoadActiveSchedule(val currentDate: Instant) : OverviewWorkCommand()
     data class UpdateHomework(val homework: HomeworkDetailsUi) : OverviewWorkCommand()
     data class UpdateTodo(val todo: TodoDetailsUi) : OverviewWorkCommand()
+    data class ShareHomeworks(val sentMediatedHomeworks: SentMediatedHomeworksUi) : OverviewWorkCommand()
 }
 
 internal typealias OverviewWorkResult = WorkResult<OverviewAction, OverviewEffect>
