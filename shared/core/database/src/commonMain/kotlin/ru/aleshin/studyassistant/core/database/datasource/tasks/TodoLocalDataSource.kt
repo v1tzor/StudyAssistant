@@ -35,6 +35,7 @@ interface TodoLocalDataSource {
     suspend fun addOrUpdateTodo(todo: TodoEntity): UID
     suspend fun fetchTodoById(uid: UID): Flow<TodoEntity?>
     suspend fun fetchTodosByTimeRange(from: Long, to: Long): Flow<List<TodoEntity>>
+    suspend fun fetchActiveTodos(): Flow<List<TodoEntity>>
     suspend fun fetchOverdueTodos(currentDate: Long): Flow<List<TodoEntity>>
     suspend fun deleteTodo(uid: UID)
 
@@ -60,6 +61,11 @@ interface TodoLocalDataSource {
 
         override suspend fun fetchTodosByTimeRange(from: Long, to: Long): Flow<List<TodoEntity>> {
             val query = todoQueries.fetchTodosByTimeRange(from, to)
+            return query.asFlow().mapToList(coroutineContext)
+        }
+
+        override suspend fun fetchActiveTodos(): Flow<List<TodoEntity>> {
+            val query = todoQueries.fetchActiveTodos()
             return query.asFlow().mapToList(coroutineContext)
         }
 

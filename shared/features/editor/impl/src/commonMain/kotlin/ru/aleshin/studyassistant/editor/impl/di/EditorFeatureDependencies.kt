@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
@@ -39,6 +40,7 @@ interface EditorFeatureDependencies : BaseFeatureDependencies {
     val subjectsRepository: SubjectsRepository
     val organizationsRepository: OrganizationsRepository
     val homeworksRepository: HomeworksRepository
+    val todoRepository: TodoRepository
     val calendarSettingsRepository: CalendarSettingsRepository
     val usersRepository: UsersRepository
     val dateManager: DateManager

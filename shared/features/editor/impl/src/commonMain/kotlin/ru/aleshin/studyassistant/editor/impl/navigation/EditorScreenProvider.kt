@@ -69,7 +69,9 @@ internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen> {
                 organizationId = screen.organizationId,
             )
             is EditorScreen.Profile -> ProfileScreen()
-            is EditorScreen.Todo -> TodoScreen()
+            is EditorScreen.Todo -> TodoScreen(
+                todoId = screen.todoId,
+            )
         }
     }
 }

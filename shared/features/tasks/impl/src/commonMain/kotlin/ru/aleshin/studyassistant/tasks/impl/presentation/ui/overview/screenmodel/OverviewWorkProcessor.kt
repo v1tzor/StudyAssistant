@@ -153,11 +153,7 @@ internal interface OverviewWorkProcessor :
 
         private fun loadTodosWork(currentDate: Instant) = channelFlow<OverviewWorkResult> {
             var cycleUpdateJob: Job? = null
-            val targetTimeRange = TimeRange(
-                from = currentDate.startOfWeek().shiftWeek(-1),
-                to = currentDate.endOfWeek().shiftWeek(+1),
-            )
-            todoInteractor.fetchTodosByTimeRange(targetTimeRange).collect { todoEither ->
+            todoInteractor.fetchActiveTodos().collect { todoEither ->
                 cycleUpdateJob?.cancelAndJoin()
                 todoEither.handle(
                     onLeftAction = { send(EffectResult(OverviewEffect.ShowError(it))) },

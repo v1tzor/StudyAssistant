@@ -36,6 +36,7 @@ interface TodoRemoteDataSource {
     suspend fun addOrUpdateTodo(todo: TodoPojo, targetUser: UID): UID
     suspend fun fetchTodoById(uid: UID, targetUser: UID): Flow<TodoPojo?>
     suspend fun fetchTodosByTimeRange(from: Long, to: Long, targetUser: UID): Flow<List<TodoPojo>>
+    suspend fun fetchActiveTodos(targetUser: UID): Flow<List<TodoPojo>>
     suspend fun fetchOverdueTodos(currentDate: Long, targetUser: UID): Flow<List<TodoPojo>>
     suspend fun deleteTodo(uid: UID, targetUser: UID)
 
@@ -86,6 +87,21 @@ interface TodoRemoteDataSource {
                 val fromDeadlineFilter = UserData.TODO_DEADLINE greaterThanOrEqualTo from
                 val toDeadlineFilter = UserData.TODO_DEADLINE lessThanOrEqualTo to
                 return@where fromDeadlineFilter and toDeadlineFilter
+            }.orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)
+
+            return reference.snapshots.map { snapshot ->
+                snapshot.documents.map { it.data(serializer<TodoPojo>()) }
+            }
+        }
+
+        override suspend fun fetchActiveTodos(targetUser: UID): Flow<List<TodoPojo>> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.TODOS).where {
+                val doneFilter = UserData.TODO_DONE equalTo false
+                val completeDateFilter = UserData.TODO_COMPLETE_DATE equalTo null
+                return@where doneFilter and completeDateFilter
             }.orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)
 
             return reference.snapshots.map { snapshot ->

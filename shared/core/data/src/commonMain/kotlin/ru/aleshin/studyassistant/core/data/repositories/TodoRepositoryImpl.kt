@@ -96,6 +96,20 @@ class TodoRepositoryImpl(
         }
     }
 
+    override suspend fun fetchActiveTodos(targetUser: UID): Flow<List<Todo>> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.fetchActiveTodos(targetUser).map { todos ->
+                todos.map { todoPojo -> todoPojo.mapToDomain() }
+            }
+        } else {
+            localDataSource.fetchActiveTodos().map { todos ->
+                todos.map { todoEntity -> todoEntity.mapToDomain() }
+            }
+        }
+    }
+
     override suspend fun fetchOverdueTodos(
         currentDate: Instant,
         targetUser: UID

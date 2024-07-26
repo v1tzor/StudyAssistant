@@ -14,6 +14,12 @@ FROM todoEntity
 WHERE deadline BETWEEN ? AND ?
 ORDER BY deadline DESC;
 
+fetchActiveTodos:
+SELECT *
+FROM todoEntity
+WHERE is_done = 0 AND complete_date IS NULL
+ORDER BY deadline DESC;
+
 fetchOverdueTodos:
 SELECT *
 FROM todoEntity

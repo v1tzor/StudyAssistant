@@ -53,6 +53,10 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmode
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectStateCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.screenmodel.TodoEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.screenmodel.TodoScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.screenmodel.TodoStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.screenmodel.TodoWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -93,6 +97,11 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<HomeworkEffectCommunicator> { HomeworkEffectCommunicator.Base() }
     bindProvider<HomeworkWorkProcessor> { HomeworkWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindProvider<HomeworkScreenModel> { HomeworkScreenModel(instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<TodoStateCommunicator> { TodoStateCommunicator.Base() }
+    bindProvider<TodoEffectCommunicator> { TodoEffectCommunicator.Base() }
+    bindProvider<TodoWorkProcessor> { TodoWorkProcessor.Base(instance()) }
+    bindProvider<TodoScreenModel> { TodoScreenModel(instance(), instance(), instance(), instance()) }
 
     bindProvider<OrganizationStateCommunicator> { OrganizationStateCommunicator.Base() }
     bindProvider<OrganizationEffectCommunicator> { OrganizationEffectCommunicator.Base() }

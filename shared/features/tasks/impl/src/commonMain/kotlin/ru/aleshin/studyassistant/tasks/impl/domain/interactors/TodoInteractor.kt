@@ -35,6 +35,7 @@ import ru.aleshin.studyassistant.tasks.impl.domain.entities.TodoErrors
 internal interface TodoInteractor {
 
     suspend fun fetchTodosByTimeRange(timeRange: TimeRange): FlowDomainResult<TasksFailures, List<Todo>>
+    suspend fun fetchActiveTodos(): FlowDomainResult<TasksFailures, List<Todo>>
     suspend fun fetchTodoErrors(targetDate: Instant): FlowDomainResult<TasksFailures, TodoErrors>
     suspend fun updateTodo(todo: Todo): UnitDomainResult<TasksFailures>
 
@@ -49,6 +50,12 @@ internal interface TodoInteractor {
 
         override suspend fun fetchTodosByTimeRange(timeRange: TimeRange) = eitherWrapper.wrapFlow {
             todoRepository.fetchTodosByTimeRange(timeRange, targetUser).map { todoList ->
+                todoList.sortedBy { it.deadline }
+            }
+        }
+
+        override suspend fun fetchActiveTodos() = eitherWrapper.wrapFlow {
+            todoRepository.fetchActiveTodos(targetUser).map { todoList ->
                 todoList.sortedBy { it.deadline }
             }
         }

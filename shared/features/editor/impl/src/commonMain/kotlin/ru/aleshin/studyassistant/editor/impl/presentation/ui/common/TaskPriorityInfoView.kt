@@ -66,7 +66,7 @@ internal fun TaskPriorityInfoView(
 }
 
 @Composable
-private fun TaskPriorityView(
+internal fun TaskPriorityView(
     modifier: Modifier = Modifier,
     enabled: Boolean,
     selected: TaskPriority?,
@@ -105,7 +105,7 @@ internal enum class TaskPrioritySegmentedItem : SegmentedButtonItem {
     },
     HIGH {
         override val title: String @Composable get() = EditorThemeRes.strings.highPriorityItemTitle
-    };
+    }
 }
 
 internal fun TaskPrioritySegmentedItem.toModel() = when (this) {

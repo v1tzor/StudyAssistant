@@ -31,6 +31,7 @@ import ru.aleshin.studyassistant.editor.impl.domain.interactors.HomeworkInteract
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.LinkingClassInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.SubjectInteractor
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.TodoInteractor
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -47,6 +48,7 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<SubjectInteractor> { SubjectInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<HomeworkInteractor> { HomeworkInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<TodoInteractor> { TodoInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<LinkingClassInteractor> { LinkingClassInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance(), instance()) }
 }
