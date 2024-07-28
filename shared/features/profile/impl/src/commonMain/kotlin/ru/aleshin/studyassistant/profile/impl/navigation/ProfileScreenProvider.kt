@@ -21,6 +21,8 @@ import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.core.common.inject.MainScreen
 import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.ProfileScreen
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsScreen
@@ -37,11 +39,13 @@ internal interface ProfileScreenProvider : FeatureScreenProvider<MainScreen> {
     fun provideUsersScreen(screen: UsersScreen): Screen
 
     fun provideSettingsScreen(screen: SettingsScreen): Screen
+    fun provideEditorScreen(screen: EditorScreen): Screen
 
     class Base(
         private val authFeatureStarter: () -> AuthFeatureStarter,
         private val usersFeatureStarter: () -> UsersFeatureStarter,
         private val settingsFeatureStarter: () -> SettingsFeatureStarter,
+        private val editorFeatureStarter: () -> EditorFeatureStarter,
     ) : ProfileScreenProvider {
 
         override fun provideFeatureScreen(screen: MainScreen): Screen {
@@ -58,6 +62,10 @@ internal interface ProfileScreenProvider : FeatureScreenProvider<MainScreen> {
 
         override fun provideSettingsScreen(screen: SettingsScreen): Screen {
             return settingsFeatureStarter().fetchRootScreenAndNavigate(screen)
+        }
+
+        override fun provideEditorScreen(screen: EditorScreen): Screen {
+            return editorFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }

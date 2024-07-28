@@ -51,7 +51,7 @@ fun GenderDropdownMenu(
         Gender.entries.forEach { gender ->
             val isSelected = gender == selected
             DropdownMenuItem(
-                modifier = modifier.alpha(if (!isSelected) 1f else 0.6f),
+                modifier = Modifier.alpha(if (!isSelected) 1f else 0.6f),
                 onClick = { onSelect(gender) },
                 enabled = !isSelected,
                 text = {

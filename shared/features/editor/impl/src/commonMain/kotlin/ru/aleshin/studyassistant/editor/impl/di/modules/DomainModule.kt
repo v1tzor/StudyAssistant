@@ -21,6 +21,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorErrorHandler
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseClassInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseScheduleInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.CalendarSettingsInteractor
@@ -49,6 +50,7 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<HomeworkInteractor> { HomeworkInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<TodoInteractor> { TodoInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<LinkingClassInteractor> { LinkingClassInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance(), instance()) }
 }

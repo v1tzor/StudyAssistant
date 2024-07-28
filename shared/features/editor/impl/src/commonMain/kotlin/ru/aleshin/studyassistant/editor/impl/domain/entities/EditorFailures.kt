@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.common.functional.DomainFailures
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal sealed class EditorFailures : DomainFailures {
+    data object CredentialsError : EditorFailures()
     data object ShiftTimeError : EditorFailures()
     data class OtherError(val throwable: Throwable) : EditorFailures()
 }

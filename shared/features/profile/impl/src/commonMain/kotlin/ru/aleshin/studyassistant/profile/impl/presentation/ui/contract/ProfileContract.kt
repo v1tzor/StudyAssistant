@@ -45,7 +45,7 @@ internal sealed class ProfileEvent : BaseEvent {
     data object NavigateToNotifySettings : ProfileEvent()
     data object NavigateToCalendarSettings : ProfileEvent()
     data object NavigateToPaymentsSettings : ProfileEvent()
-    data object EditProfile : ProfileEvent()
+    data object NavigateToProfileEditor : ProfileEvent()
     data object SignOut : ProfileEvent()
 }
 

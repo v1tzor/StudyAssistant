@@ -59,6 +59,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -75,6 +76,7 @@ import ru.aleshin.studyassistant.core.common.functional.Constants
 fun InfoTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    readOnly: Boolean = false,
     value: String?,
     maxLength: Int = Constants.Text.DEFAULT_MAX_TEXT_LENGTH,
     onValueChange: (String) -> Unit,
@@ -93,7 +95,7 @@ fun InfoTextField(
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource?? = remember { MutableInteractionSource() },
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         disabledLabelColor = MaterialTheme.colorScheme.onSurface,
         disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -116,6 +118,7 @@ fun InfoTextField(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 65.dp).animateContentSize(),
             enabled = enabled,
+            readOnly = readOnly,
             value = value ?: "",
             onValueChange = { text ->
                 if (text.length <= maxLength) {
@@ -152,6 +155,86 @@ fun InfoTextField(
 fun InfoTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    readOnly: Boolean = false,
+    value: String?,
+    maxLength: Int = Constants.Text.DEFAULT_MAX_TEXT_LENGTH,
+    onValueChange: (String) -> Unit,
+    label: String,
+    leadingInfoIcon: ImageVector,
+    placeholder: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
+    supportingText: @Composable (() -> Unit)? = null,
+    isError: Boolean = false,
+    textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    singleLine: Boolean = true,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1,
+    interactionSource: MutableInteractionSource?? = remember { MutableInteractionSource() },
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
+        disabledLabelColor = MaterialTheme.colorScheme.onSurface,
+        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
+        focusedBorderColor = MaterialTheme.colorScheme.outline,
+        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+    )
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            modifier = Modifier.size(24.dp),
+            imageVector = leadingInfoIcon,
+            contentDescription = label,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 65.dp).animateContentSize(),
+            enabled = enabled,
+            readOnly = readOnly,
+            value = value ?: "",
+            onValueChange = { text ->
+                if (text.length <= maxLength) {
+                    onValueChange(text)
+                }
+            },
+            label = {
+                Text(
+                    text = label,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            placeholder = placeholder,
+            textStyle = textStyle,
+            trailingIcon = trailingIcon,
+            prefix = prefix,
+            suffix = suffix,
+            supportingText = supportingText,
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            isError = isError,
+            singleLine = singleLine,
+            maxLines = maxLines,
+            minLines = minLines,
+            interactionSource = interactionSource,
+            colors = colors,
+            shape = MaterialTheme.shapes.large,
+        )
+    }
+}
+
+@Composable
+fun InfoTextField(
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
     value: TextFieldValue,
     maxLength: Int = Constants.Text.DEFAULT_MAX_TEXT_LENGTH,
     onValueChange: (TextFieldValue) -> Unit,
@@ -170,7 +253,7 @@ fun InfoTextField(
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource? = remember { MutableInteractionSource() },
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         disabledLabelColor = MaterialTheme.colorScheme.onSurface,
         disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -193,6 +276,7 @@ fun InfoTextField(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 65.dp).animateContentSize(),
             enabled = enabled,
+            readOnly = readOnly,
             value = value,
             onValueChange = { value1 ->
                 if (value1.text.length <= maxLength) {
@@ -229,6 +313,7 @@ fun InfoTextField(
 fun VerticalInfoTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    readOnly: Boolean = false,
     value: String?,
     maxLength: Int = Constants.Text.DEFAULT_MAX_TEXT_LENGTH,
     onValueChange: (String) -> Unit,
@@ -248,7 +333,7 @@ fun VerticalInfoTextField(
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource? = remember { MutableInteractionSource() },
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         disabledLabelColor = MaterialTheme.colorScheme.onSurface,
         disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -269,6 +354,7 @@ fun VerticalInfoTextField(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 56.dp).animateContentSize(),
             enabled = enabled,
+            readOnly = readOnly,
             value = value ?: "",
             onValueChange = { text ->
                 if (text.length <= maxLength) {
@@ -312,6 +398,7 @@ fun VerticalInfoTextField(
 fun VerticalInfoTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    readOnly: Boolean = false,
     value: TextFieldValue,
     maxLength: Int = Constants.Text.DEFAULT_MAX_TEXT_LENGTH,
     onValueChange: (TextFieldValue) -> Unit,
@@ -331,7 +418,7 @@ fun VerticalInfoTextField(
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource? = remember { MutableInteractionSource() },
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         disabledLabelColor = MaterialTheme.colorScheme.onSurface,
         disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -352,6 +439,7 @@ fun VerticalInfoTextField(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth().sizeIn(minHeight = 56.dp).animateContentSize(),
             enabled = enabled,
+            readOnly = readOnly,
             value = value,
             onValueChange = { fieldValue ->
                 if (fieldValue.text.length <= maxLength) {
@@ -410,7 +498,7 @@ fun ClickableInfoTextField(
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource? = remember { MutableInteractionSource() },
 ) {
     Row(
         modifier = modifier,
@@ -532,7 +620,7 @@ fun ClickableTextField(
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource? = remember { MutableInteractionSource() },
 ) {
     Box(modifier = modifier.padding(top = if (label != null) 5.dp else 0.dp)) {
         Surface(

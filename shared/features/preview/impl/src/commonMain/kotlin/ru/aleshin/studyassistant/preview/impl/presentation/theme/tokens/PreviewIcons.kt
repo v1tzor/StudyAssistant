@@ -18,10 +18,7 @@ package ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.features.preview.impl.generated.resources.Res
-import studyassistant.shared.features.preview.impl.generated.resources.ic_description
-import studyassistant.shared.features.preview.impl.generated.resources.ic_gender
 import studyassistant.shared.features.preview.impl.generated.resources.ic_textbox
 import studyassistant.shared.features.preview.impl.generated.resources.il_analytics
 import studyassistant.shared.features.preview.impl.generated.resources.il_analytics_dark
@@ -37,7 +34,6 @@ import studyassistant.shared.features.preview.impl.generated.resources.il_study_
 /**
  * @author Stanislav Aleshin on 14.06.2023.
  */
-@OptIn(ExperimentalResourceApi::class)
 internal data class PreviewIcons(
     val studyIllustration: DrawableResource,
     val organizationIllustration: DrawableResource,
@@ -45,8 +41,6 @@ internal data class PreviewIcons(
     val friendsIllustration: DrawableResource,
     val scheduleIllustration: DrawableResource,
     val name: DrawableResource,
-    val description: DrawableResource,
-    val gender: DrawableResource,
 ) {
     companion object {
         val LIGHT = PreviewIcons(
@@ -56,8 +50,6 @@ internal data class PreviewIcons(
             friendsIllustration = Res.drawable.il_friends,
             scheduleIllustration = Res.drawable.il_schedule,
             name = Res.drawable.ic_textbox,
-            description = Res.drawable.ic_description,
-            gender = Res.drawable.ic_gender,
         )
         val DARK = PreviewIcons(
             studyIllustration = Res.drawable.il_study_dark,
@@ -66,8 +58,6 @@ internal data class PreviewIcons(
             friendsIllustration = Res.drawable.il_friends_dark,
             scheduleIllustration = Res.drawable.il_schedule_dark,
             name = Res.drawable.ic_textbox,
-            description = Res.drawable.ic_description,
-            gender = Res.drawable.ic_gender,
         )
     }
 }

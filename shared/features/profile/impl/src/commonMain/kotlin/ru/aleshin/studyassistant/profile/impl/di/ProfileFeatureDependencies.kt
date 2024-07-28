@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
 import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
@@ -32,6 +33,7 @@ interface ProfileFeatureDependencies : BaseFeatureDependencies {
     val authFeatureStarter: () -> AuthFeatureStarter
     val usersFeatureStarter: () -> UsersFeatureStarter
     val settingsFeatureStarter: () -> SettingsFeatureStarter
+    val editorFeatureStarter: () -> EditorFeatureStarter
     val authRepository: AuthRepository
     val usersRepository: UsersRepository
     val friendRequestsRepository: FriendRequestsRepository

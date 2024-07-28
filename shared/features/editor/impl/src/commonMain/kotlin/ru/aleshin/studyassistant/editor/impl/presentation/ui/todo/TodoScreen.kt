@@ -70,7 +70,7 @@ internal data class TodoScreen(private val todoId: UID?) : Screen {
             },
             topBar = {
                 TodoTopBar(
-                    onBackPressed = { dispatchEvent(TodoEvent.NavigateToBack) },
+                    onBackClick = { dispatchEvent(TodoEvent.NavigateToBack) },
                 )
             },
             bottomBar = {

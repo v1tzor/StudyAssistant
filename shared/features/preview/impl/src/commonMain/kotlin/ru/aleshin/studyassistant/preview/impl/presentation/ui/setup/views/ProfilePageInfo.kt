@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -51,6 +52,7 @@ import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.GenderDropdownMenu
 import ru.aleshin.studyassistant.core.ui.views.InfoTextField
 import ru.aleshin.studyassistant.core.ui.views.dialog.BirthdayDatePicker
+import ru.aleshin.studyassistant.core.ui.views.menu.SelectableAvatarView
 import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 
@@ -72,8 +74,11 @@ internal fun ProfilePageInfo(
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             SelectableAvatarView(
                 onClick = onSetAvatar,
-                username = profile.username,
+                modifier = Modifier.size(90.dp),
+                firstName = profile.username.split(' ').getOrNull(0) ?: "-",
+                secondName = profile.username.split(' ').getOrNull(1),
                 imageUrl = profile.avatar,
+                style = MaterialTheme.typography.displaySmall,
             )
         }
         Column(
@@ -117,7 +122,7 @@ internal fun ProfilePageInfo(
                 },
                 maxLength = Constants.Text.MAX_PROFILE_DESC_LENGTH,
                 label = PreviewThemeRes.strings.profileDescriptionLabel,
-                leadingInfoIcon = painterResource(PreviewThemeRes.icons.description),
+                leadingInfoIcon = painterResource(StudyAssistantRes.icons.userDescription),
                 trailingIcon = {
                     if (descriptionInteraction.collectIsFocusedAsState().value) {
                         IconButton(onClick = { focusManager.clearFocus() }) {
@@ -174,7 +179,7 @@ internal fun ProfilePageInfo(
                 onClick = { isExpandedGenderMenu = true },
                 label = PreviewThemeRes.strings.genderLabel,
                 placeholder = PreviewThemeRes.strings.genderPlaceholder,
-                infoIcon = painterResource(PreviewThemeRes.icons.gender),
+                infoIcon = painterResource(StudyAssistantRes.icons.gender),
                 trailingIcon = {
                     ExpandedIcon(
                         isExpanded = isExpandedGenderMenu,

@@ -37,13 +37,13 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 @Composable
 internal fun HomeworkTopBar(
     modifier: Modifier = Modifier,
-    onBackPressed: () -> Unit,
+    onBackClick: () -> Unit,
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = { Text(text = EditorThemeRes.strings.homeworkEditorHeader) },
         navigationIcon = {
-            IconButton(onClick = onBackPressed) {
+            IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = StudyAssistantRes.strings.backIconDesc,

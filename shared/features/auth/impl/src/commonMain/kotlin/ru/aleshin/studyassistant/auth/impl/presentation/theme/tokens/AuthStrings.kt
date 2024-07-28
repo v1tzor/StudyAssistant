@@ -91,7 +91,7 @@ internal data class AuthStrings(
             showPasswordDesc = "Показать пароль",
             authErrorMessage = "Неправильный логин или пароль!",
             userNotFoundErrorMessage = "Данные пользователя не найдены!",
-            credentialsErrorMessage = "Данные пользователя, по-видимому, неверны или неполны!",
+            credentialsErrorMessage = "Данные пользователя, неверны или неполны!",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = AuthStrings(

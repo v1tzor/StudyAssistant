@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.auth
 
+import dev.gitlive.firebase.auth.EmailAuthProvider
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseUser
 import dev.gitlive.firebase.auth.GoogleAuthProvider
@@ -39,7 +40,7 @@ interface AuthRemoteDataSource {
 
     suspend fun sendVerifyEmail(email: String)
 
-    suspend fun updatePasswordOrEmail(email: String? = null, password: String? = null)
+    suspend fun updatePassword(oldPassword: String, newPassword: String)
 
     suspend fun signOut()
 
@@ -77,10 +78,12 @@ interface AuthRemoteDataSource {
             currentUser.sendEmailVerification()
         }
 
-        override suspend fun updatePasswordOrEmail(email: String?, password: String?) {
+        override suspend fun updatePassword(oldPassword: String, newPassword: String) {
             val currentUser = firebaseAuth.currentUser ?: throw FirebaseUserException()
-            if (email != null) currentUser.updateEmail(email)
-            if (password != null) currentUser.updatePassword(password)
+            val userEmail = checkNotNull(currentUser.email)
+            val authCredential = EmailAuthProvider.credential(userEmail, oldPassword)
+            currentUser.reauthenticate(authCredential)
+            currentUser.updatePassword(newPassword)
         }
 
         override suspend fun signOut() {

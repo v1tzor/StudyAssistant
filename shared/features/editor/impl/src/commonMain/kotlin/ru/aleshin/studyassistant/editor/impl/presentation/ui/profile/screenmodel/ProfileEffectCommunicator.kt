@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.impl.presentation.mappers
+package ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.screenmodel
 
-import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.tokens.EditorStrings
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.EffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEffect
 
 /**
- * @author Stanislav Aleshin on 27.05.2024.
+ * @author Stanislav Aleshin on 28.07.2024.
  */
-internal fun EditorFailures.mapToMessage(strings: EditorStrings) = when (this) {
-    is EditorFailures.CredentialsError -> strings.credentialsErrorMessage
-    is EditorFailures.ShiftTimeError -> strings.shiftTimeError
-    is EditorFailures.OtherError -> strings.otherErrorMessage
+internal interface ProfileEffectCommunicator : EffectCommunicator<ProfileEffect> {
+    class Base : ProfileEffectCommunicator, EffectCommunicator.Abstract<ProfileEffect>()
 }

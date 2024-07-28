@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.editor.impl.presentation.theme.tokens
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.features.editor.impl.generated.resources.Res
 import studyassistant.shared.features.editor.impl.generated.resources.ic_break
 import studyassistant.shared.features.editor.impl.generated.resources.ic_circle_edit_outline
@@ -35,7 +34,6 @@ import studyassistant.shared.features.editor.impl.generated.resources.ic_worktim
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-@OptIn(ExperimentalResourceApi::class)
 internal data class EditorIcons(
     val breaks: DrawableResource,
     val number: DrawableResource,

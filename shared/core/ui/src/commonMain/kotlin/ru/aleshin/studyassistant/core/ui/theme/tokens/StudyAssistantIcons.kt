@@ -28,9 +28,11 @@ import studyassistant.shared.core.ui.generated.resources.ic_church
 import studyassistant.shared.core.ui.generated.resources.ic_class
 import studyassistant.shared.core.ui.generated.resources.ic_classes_column
 import studyassistant.shared.core.ui.generated.resources.ic_clock_outline
+import studyassistant.shared.core.ui.generated.resources.ic_description
 import studyassistant.shared.core.ui.generated.resources.ic_duration
 import studyassistant.shared.core.ui.generated.resources.ic_email
 import studyassistant.shared.core.ui.generated.resources.ic_employee
+import studyassistant.shared.core.ui.generated.resources.ic_gender
 import studyassistant.shared.core.ui.generated.resources.ic_lecture
 import studyassistant.shared.core.ui.generated.resources.ic_map_marker
 import studyassistant.shared.core.ui.generated.resources.ic_movements
@@ -127,6 +129,8 @@ data class StudyAssistantIcons(
     val discordSocialNetwork: DrawableResource,
     val vkSocialNetwork: DrawableResource,
     val otherSocialNetwork: DrawableResource,
+    val userDescription: DrawableResource,
+    val gender: DrawableResource,
 ) {
     companion object {
         val BASE = StudyAssistantIcons(
@@ -184,6 +188,8 @@ data class StudyAssistantIcons(
             discordSocialNetwork = Res.drawable.logo_discord,
             whatsAppSocialNetwork = Res.drawable.logo_whatsapp,
             otherSocialNetwork = Res.drawable.ic_soc_network,
+            userDescription = Res.drawable.ic_description,
+            gender = Res.drawable.ic_gender,
         )
     }
 }

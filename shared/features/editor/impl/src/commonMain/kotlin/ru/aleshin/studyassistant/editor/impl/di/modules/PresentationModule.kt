@@ -45,6 +45,10 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationStateCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.screenmodel.ProfileEffectCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.screenmodel.ProfileScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.screenmodel.ProfileStateCommunicator
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.screenmodel.ProfileWorkProcessor
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.WeekScheduleEffectCommunicator
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.WeekScheduleScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.WeekScheduleStateCommunicator
@@ -107,4 +111,9 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<OrganizationEffectCommunicator> { OrganizationEffectCommunicator.Base() }
     bindProvider<OrganizationWorkProcessor> { OrganizationWorkProcessor.Base(instance()) }
     bindProvider<OrganizationScreenModel> { OrganizationScreenModel(instance(), instance(), instance(), instance()) }
+
+    bindProvider<ProfileStateCommunicator> { ProfileStateCommunicator.Base() }
+    bindProvider<ProfileEffectCommunicator> { ProfileEffectCommunicator.Base() }
+    bindProvider<ProfileWorkProcessor> { ProfileWorkProcessor.Base(instance()) }
+    bindProvider<ProfileScreenModel> { ProfileScreenModel(instance(), instance(), instance(), instance()) }
 }

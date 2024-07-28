@@ -28,9 +28,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,6 +81,8 @@ internal fun SetupContent(
             onUpdateCalendarSettings = onUpdateCalendarSettings,
         )
         SetupPageNavigationSection(
+            enabledSaveProfile = profile?.username?.isNotBlank() == true,
+            enabledSaveOrganization = organization?.shortName?.isNotBlank() == true,
             currentPage = currentPage,
             isFillOutSchedule = isFillOutSchedule,
             onSaveProfile = onSaveProfile,
@@ -190,6 +192,8 @@ private fun SetupStepHeader(
 @Composable
 private fun SetupPageNavigationSection(
     modifier: Modifier = Modifier,
+    enabledSaveProfile: Boolean,
+    enabledSaveOrganization: Boolean,
     currentPage: SetupPage,
     isFillOutSchedule: Boolean,
     onSaveProfile: () -> Unit,
@@ -204,20 +208,19 @@ private fun SetupPageNavigationSection(
     ) {
         when (currentPage) {
             SetupPage.PROFILE -> NavigationPageButton(
+                enabled = enabledSaveProfile,
                 onClick = onSaveProfile,
                 navigationLabel = currentPage.buttonLabel,
             )
-
             SetupPage.ORGANIZATION -> NavigationPageButton(
+                enabled = enabledSaveOrganization,
                 onClick = onSaveOrganization,
                 navigationLabel = currentPage.buttonLabel,
             )
-
             SetupPage.CALENDAR -> NavigationPageButton(
                 onClick = onSaveCalendar,
                 navigationLabel = currentPage.buttonLabel,
             )
-
             SetupPage.SCHEDULE -> {
                 NavigationPageButton(
                     onClick = onFillOutSchedule,

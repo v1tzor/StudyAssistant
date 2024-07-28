@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsReposi
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
@@ -43,6 +44,7 @@ interface EditorFeatureDependencies : BaseFeatureDependencies {
     val todoRepository: TodoRepository
     val calendarSettingsRepository: CalendarSettingsRepository
     val usersRepository: UsersRepository
+    val manageUserRepository: ManageUserRepository
     val dateManager: DateManager
     val overlayManager: TimeOverlayManager
     val coroutineManager: CoroutineManager

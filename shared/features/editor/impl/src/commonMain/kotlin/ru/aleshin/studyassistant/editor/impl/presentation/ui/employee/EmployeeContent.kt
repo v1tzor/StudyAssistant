@@ -39,12 +39,12 @@ import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.AvatarSection
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.BirthdayInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EmailInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationsInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.PhoneInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.WebInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract.EmployeeViewState
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.BirthdayInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeeNameInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeePostInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.WorkTimeInfoField

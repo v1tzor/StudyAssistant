@@ -91,7 +91,7 @@ internal data class HomeworkScreen(
             },
             topBar = {
                 HomeworkTopBar(
-                    onBackPressed = { dispatchEvent(HomeworkEvent.NavigateToBack) },
+                    onBackClick = { dispatchEvent(HomeworkEvent.NavigateToBack) },
                 )
             },
             bottomBar = {

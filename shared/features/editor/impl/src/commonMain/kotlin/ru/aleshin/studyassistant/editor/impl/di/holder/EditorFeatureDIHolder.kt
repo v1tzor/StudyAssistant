@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsReposi
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
@@ -61,6 +62,7 @@ object EditorFeatureDIHolder : BaseFeatureDIHolder<EditorFeatureApi, EditorFeatu
                 bindSingleton<TodoRepository> { dependencies.todoRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
+                bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
                 bindSingleton<TimeOverlayManager> { dependencies.overlayManager }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }

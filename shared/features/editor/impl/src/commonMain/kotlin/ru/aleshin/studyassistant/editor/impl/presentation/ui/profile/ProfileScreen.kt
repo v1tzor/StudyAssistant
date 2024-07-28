@@ -16,16 +16,89 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.profile
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.navigation.nestedPop
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEffect
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEvent
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileViewState
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.screenmodel.rememberProfileScreenModel
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.ProfileTopBar
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.ProfileTopSheet
 
 /**
- * @author Stanislav Aleshin on 16.06.2024.
+ * @author Stanislav Aleshin on 28.07.2024
  */
 internal class ProfileScreen : Screen {
 
     @Composable
-    override fun Content() {
-        // TODO Not yet implemented
+    override fun Content() = ScreenContent(
+        screenModel = rememberProfileScreenModel(),
+        initialState = ProfileViewState(),
+    ) { state ->
+        val strings = EditorThemeRes.strings
+        val navigator = LocalNavigator.currentOrThrow
+        val snackbarState = remember { SnackbarHostState() }
+
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            content = { paddingValues ->
+                ProfileContent(
+                    state = state,
+                    modifier = Modifier.padding(paddingValues),
+                    onUpdateName = { dispatchEvent(ProfileEvent.UpdateUsername(it)) },
+                    onUpdateDescription = { dispatchEvent(ProfileEvent.UpdateDescription(it)) },
+                    onUpdateBirthday = { dispatchEvent(ProfileEvent.UpdateBirthday(it)) },
+                    onUpdateGender = { dispatchEvent(ProfileEvent.UpdateGender(it)) },
+                    onUpdateCity = { dispatchEvent(ProfileEvent.UpdateCity(it)) },
+                    onUpdateSocialNetworks = { dispatchEvent(ProfileEvent.UpdateSocialNetworks(it)) },
+                )
+            },
+            topBar = {
+                Column {
+                    ProfileTopBar(
+                        onBackClick = { dispatchEvent(ProfileEvent.NavigateToBack) },
+                        onChangePassword = { old, new -> dispatchEvent(ProfileEvent.UpdatePassword(old, new)) },
+                    )
+                    ProfileTopSheet(
+                        isLoading = state.isLoading,
+                        appUser = state.appUser,
+                        onUpdateAvatar = { dispatchEvent(ProfileEvent.UpdateAvatar(it)) }
+                    )
+                }
+            },
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarState,
+                    snackbar = { ErrorSnackbar(it) },
+                )
+            },
+        )
+
+        handleEffect { effect ->
+            when (effect) {
+                is ProfileEffect.NavigateToBack -> navigator.nestedPop()
+                is ProfileEffect.ShowError -> {
+                    snackbarState.showSnackbar(
+                        message = effect.failures.mapToMessage(strings),
+                        withDismissAction = true,
+                    )
+                }
+            }
+        }
     }
 }

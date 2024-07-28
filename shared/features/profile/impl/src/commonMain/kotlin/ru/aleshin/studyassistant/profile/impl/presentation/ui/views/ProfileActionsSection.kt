@@ -16,11 +16,9 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.ui.views
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -81,13 +79,12 @@ internal fun ProfileActionsSection(
                 icon = painterResource(ProfileThemeRes.icons.friends),
                 title = ProfileThemeRes.strings.friendsTitle,
                 value = {
-                    AnimatedContent(
+                    Crossfade(
                         targetState = profile == null,
-                        transitionSpec = {
-                            fadeIn(animationSpec = tween(500, delayMillis = 180)).togetherWith(
-                                fadeOut(animationSpec = tween(500))
-                            )
-                        },
+                        animationSpec = spring(
+                            stiffness = Spring.StiffnessMediumLow,
+                            visibilityThreshold = Spring.DefaultDisplacementThreshold,
+                        )
                     ) { loading ->
                         if (loading) {
                             PlaceholderBox(

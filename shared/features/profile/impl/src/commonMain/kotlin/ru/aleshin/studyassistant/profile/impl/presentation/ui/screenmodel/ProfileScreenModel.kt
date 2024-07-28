@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.profile.impl.di.holder.ProfileFeatureDIHolder
 import ru.aleshin.studyassistant.profile.impl.navigation.ProfileScreenProvider
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileAction
@@ -89,7 +90,10 @@ internal class ProfileScreenModel(
                 val screen = screenProvider.provideSettingsScreen(SettingsScreen.Subscription)
                 sendEffect(ProfileEffect.PushGlobalScreen(screen))
             }
-            is ProfileEvent.EditProfile -> {}
+            is ProfileEvent.NavigateToProfileEditor -> {
+                val screen = screenProvider.provideEditorScreen(EditorScreen.Profile)
+                sendEffect(ProfileEffect.PushGlobalScreen(screen))
+            }
         }
     }
 

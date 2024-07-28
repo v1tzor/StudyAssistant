@@ -71,7 +71,7 @@ internal class ProfileScreen : Screen {
                 topBar = {
                     ProfileTopBar(
                         onSignOutClick = { dispatchEvent(ProfileEvent.SignOut) },
-                        onEditClick = { dispatchEvent(ProfileEvent.EditProfile) },
+                        onEditClick = { dispatchEvent(ProfileEvent.NavigateToProfileEditor) },
                     )
                 },
                 snackbarHost = {

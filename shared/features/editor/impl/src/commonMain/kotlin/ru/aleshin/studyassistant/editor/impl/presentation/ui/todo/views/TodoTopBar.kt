@@ -36,13 +36,13 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun TodoTopBar(
     modifier: Modifier = Modifier,
-    onBackPressed: () -> Unit,
+    onBackClick: () -> Unit,
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = { Text(text = EditorThemeRes.strings.todoEditorHeader) },
         navigationIcon = {
-            IconButton(onClick = onBackPressed) {
+            IconButton(onClick = onBackClick) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
             }
         },

@@ -22,6 +22,5 @@ package ru.aleshin.studyassistant.core.domain.repositories
 interface ManageUserRepository {
     suspend fun sendPasswordResetEmail(email: String)
     suspend fun sendVerifyEmail(email: String)
-    suspend fun updatePassword(password: String)
-    suspend fun updateEmail(email: String)
+    suspend fun updatePassword(oldPassword: String, newPassword: String)
 }

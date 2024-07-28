@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -50,6 +51,7 @@ import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.VerticalInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.dialog.ContactInfoEditorDialog
 import ru.aleshin.studyassistant.core.ui.views.menu.OrganizationTypeDropdownMenu
+import ru.aleshin.studyassistant.core.ui.views.menu.SelectableAvatarView
 import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
 import ru.aleshin.studyassistant.preview.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
@@ -81,9 +83,12 @@ internal fun OrganizationPageInfo(
 
             SelectableAvatarView(
                 onClick = onSetAvatar,
-                username = type.mapToSting(StudyAssistantRes.strings),
+                modifier = Modifier.size(90.dp),
+                firstName = type.mapToSting(StudyAssistantRes.strings),
+                secondName = null,
                 imageUrl = avatar,
                 shape = RoundedCornerShape(32.dp),
+                style = MaterialTheme.typography.displaySmall,
             )
             VerticalInfoTextField(
                 value = editableShortName,

@@ -21,6 +21,7 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
 import ru.aleshin.studyassistant.profile.impl.navigation.ProfileFeatureStarterImpl
 import ru.aleshin.studyassistant.profile.impl.navigation.ProfileScreenProvider
@@ -39,7 +40,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<ProfileScreen> { ProfileScreen() }
 
     bindProvider<ProfileFeatureStarter> { ProfileFeatureStarterImpl(instance()) }
-    bindProvider<ProfileScreenProvider> { ProfileScreenProvider.Base(instance<() -> AuthFeatureStarter>(), instance<() -> UsersFeatureStarter>(), instance<() -> SettingsFeatureStarter>()) }
+    bindProvider<ProfileScreenProvider> { ProfileScreenProvider.Base(instance<() -> AuthFeatureStarter>(), instance<() -> UsersFeatureStarter>(), instance<() -> SettingsFeatureStarter>(), instance<() -> EditorFeatureStarter>()) }
 
     bindSingleton<ProfileStateCommunicator> { ProfileStateCommunicator.Base() }
     bindSingleton<ProfileEffectCommunicator> { ProfileEffectCommunicator.Base() }

@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
+import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.profile.api.di.ProfileFeatureApi
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
 import ru.aleshin.studyassistant.profile.impl.di.ProfileFeatureDependencies
@@ -49,6 +50,7 @@ object ProfileFeatureDIHolder : BaseFeatureDIHolder<ProfileFeatureApi, ProfileFe
                 bindSingleton<() -> AuthFeatureStarter> { dependencies.authFeatureStarter }
                 bindSingleton<() -> UsersFeatureStarter> { dependencies.usersFeatureStarter }
                 bindSingleton<() -> SettingsFeatureStarter> { dependencies.settingsFeatureStarter }
+                bindSingleton<() -> EditorFeatureStarter> { dependencies.editorFeatureStarter }
                 bindSingleton<AuthRepository> { dependencies.authRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<FriendRequestsRepository> { dependencies.friendRequestsRepository }

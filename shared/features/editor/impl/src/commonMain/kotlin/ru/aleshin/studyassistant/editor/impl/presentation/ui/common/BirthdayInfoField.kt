@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views
+package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
