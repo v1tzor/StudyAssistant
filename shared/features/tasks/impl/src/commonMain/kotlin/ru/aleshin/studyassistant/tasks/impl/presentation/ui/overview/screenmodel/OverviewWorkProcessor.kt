@@ -153,14 +153,24 @@ internal interface OverviewWorkProcessor :
 
         private fun loadTodosWork(currentDate: Instant) = channelFlow<OverviewWorkResult> {
             var cycleUpdateJob: Job? = null
-            todoInteractor.fetchActiveTodos().collect { todoEither ->
+            val targetTimeRange = TimeRange(
+                from = currentDate.startOfWeek(),
+                to = currentDate.endOfWeek(),
+            )
+            todoInteractor.fetchActiveAndTimeRangeTodos(targetTimeRange).collect { todoEither ->
                 cycleUpdateJob?.cancelAndJoin()
                 todoEither.handle(
                     onLeftAction = { send(EffectResult(OverviewEffect.ShowError(it))) },
                     onRightAction = { todoList ->
                         val todos = todoList.map { todo ->
-                            val status = TodoStatus.calculate(todo.isDone, todo.deadline, currentDate)
-                            return@map todo.mapToUi(status)
+                            val currentTime = dateManager.fetchCurrentInstant()
+                            val duration = todo.deadline?.let { it - currentTime }
+                            val status = TodoStatus.calculate(
+                                isDone = todo.isDone,
+                                deadline = todo.deadline,
+                                currentTime = currentTime,
+                            )
+                            return@map todo.mapToUi(status, duration)
                         }
 
                         send(ActionResult(OverviewAction.UpdateTodos(todos)))
@@ -255,26 +265,21 @@ internal interface OverviewWorkProcessor :
             }
 
         private fun cycleUpdateTodoStatus(todos: List<TodoDetailsUi>) = flow {
-            val updatedTodos = todos.toMutableList()
             while (currentCoroutineContext().isActive) {
                 delay(Delay.UPDATE_TASK_STATUS)
 
-                var isUpdated = false
                 val currentInstant = dateManager.fetchCurrentInstant()
 
-                updatedTodos.forEachIndexed { todoIndex, todo ->
-                    if (todo.status == TodoStatus.IN_PROGRESS) {
-                        val newStatus = TodoStatus.calculate(todo.isDone, todo.deadline, currentInstant)
-                        if (newStatus != todo.status) {
-                            isUpdated = true
-                            val newTodo = todo.copy(status = newStatus)
-                            updatedTodos[todoIndex] = newTodo
-                        }
+                val updatedTodos = todos.map { todo ->
+                    val newStatus = TodoStatus.calculate(todo.isDone, todo.deadline, currentInstant)
+                    val duration = if (todo.status != TodoStatus.COMPLETE) {
+                        todo.deadline?.let { it - currentInstant }
+                    } else {
+                        null
                     }
+                    return@map todo.copy(status = newStatus, toDeadlineDuration = duration)
                 }
-                if (isUpdated) {
-                    emit(ActionResult(OverviewAction.UpdateTodos(updatedTodos)))
-                }
+                emit(ActionResult(OverviewAction.UpdateTodos(updatedTodos)))
             }
         }
 

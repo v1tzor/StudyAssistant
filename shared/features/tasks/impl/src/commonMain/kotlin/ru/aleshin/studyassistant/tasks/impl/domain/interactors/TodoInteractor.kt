@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.tasks.impl.domain.interactors
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
@@ -35,7 +37,7 @@ import ru.aleshin.studyassistant.tasks.impl.domain.entities.TodoErrors
 internal interface TodoInteractor {
 
     suspend fun fetchTodosByTimeRange(timeRange: TimeRange): FlowDomainResult<TasksFailures, List<Todo>>
-    suspend fun fetchActiveTodos(): FlowDomainResult<TasksFailures, List<Todo>>
+    suspend fun fetchActiveAndTimeRangeTodos(timeRange: TimeRange): FlowDomainResult<TasksFailures, List<Todo>>
     suspend fun fetchTodoErrors(targetDate: Instant): FlowDomainResult<TasksFailures, TodoErrors>
     suspend fun updateTodo(todo: Todo): UnitDomainResult<TasksFailures>
 
@@ -54,9 +56,15 @@ internal interface TodoInteractor {
             }
         }
 
-        override suspend fun fetchActiveTodos() = eitherWrapper.wrapFlow {
-            todoRepository.fetchActiveTodos(targetUser).map { todoList ->
-                todoList.sortedBy { it.deadline }
+        @OptIn(ExperimentalCoroutinesApi::class)
+        override suspend fun fetchActiveAndTimeRangeTodos(timeRange: TimeRange) = eitherWrapper.wrapFlow {
+            todoRepository.fetchTodosByTimeRange(timeRange, targetUser).flatMapLatest { timeRangeTodos ->
+                todoRepository.fetchActiveTodos(targetUser).map { activeTodos ->
+                    val filteredTimeRangeTodos = timeRangeTodos.filter { todo ->
+                        activeTodos.find { it.uid == todo.uid } == null
+                    }
+                    return@map (activeTodos + filteredTimeRangeTodos).sortedBy { it.deadline }
+                }
             }
         }
 

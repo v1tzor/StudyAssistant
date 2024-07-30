@@ -90,7 +90,7 @@ internal class OverviewScreenModel(
             is OverviewEvent.DoHomework -> with(event) {
                 val currentTime = dateManager.fetchCurrentInstant()
                 val updatedHomework = homework.copy(isDone = true, completeDate = currentTime)
-                launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
+                launchBackgroundWork(BackgroundKey.TASK_ACTION) {
                     val command = OverviewWorkCommand.UpdateHomework(updatedHomework)
                     workProcessor.work(command).collectAndHandleWork()
                 }
@@ -98,14 +98,14 @@ internal class OverviewScreenModel(
             is OverviewEvent.SkipHomework -> with(event) {
                 val currentTime = dateManager.fetchCurrentInstant()
                 val updatedHomework = homework.copy(isDone = false, completeDate = currentTime)
-                launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
+                launchBackgroundWork(BackgroundKey.TASK_ACTION) {
                     val command = OverviewWorkCommand.UpdateHomework(updatedHomework)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
             is OverviewEvent.RepeatHomework -> with(event) {
                 val updatedHomework = homework.copy(isDone = false, completeDate = null)
-                launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
+                launchBackgroundWork(BackgroundKey.TASK_ACTION) {
                     val command = OverviewWorkCommand.UpdateHomework(updatedHomework)
                     workProcessor.work(command).collectAndHandleWork()
                 }
@@ -116,13 +116,13 @@ internal class OverviewScreenModel(
                     isDone = isDone,
                     completeDate = if (isDone) currentTime else null,
                 )
-                launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
+                launchBackgroundWork(BackgroundKey.TASK_ACTION) {
                     val command = OverviewWorkCommand.UpdateTodo(updatedTodo)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
             is OverviewEvent.ShareHomeworks -> with(event) {
-                launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
+                launchBackgroundWork(BackgroundKey.TASK_ACTION) {
                     val command = OverviewWorkCommand.ShareHomeworks(sentMediatedHomeworks)
                     workProcessor.work(command).collectAndHandleWork()
                 }
@@ -219,7 +219,7 @@ internal class OverviewScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_HOMEWORKS, LOAD_ACTIVE_SCHEDULE, LOAD_ERRORS, LOAD_TASKS, LOAD_SHARE, HOMEWORK_ACTION,
+        LOAD_HOMEWORKS, LOAD_ACTIVE_SCHEDULE, LOAD_ERRORS, LOAD_TASKS, LOAD_SHARE, TASK_ACTION,
     }
 }
 

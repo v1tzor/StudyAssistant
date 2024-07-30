@@ -24,7 +24,7 @@ import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.HomeworksScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.OverviewScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.ShareScreen
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.TodosScreen
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.TodoScreen
 import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 
@@ -45,7 +45,7 @@ internal interface TasksScreenProvider : FeatureScreenProvider<TasksScreen> {
         override fun provideFeatureScreen(screen: TasksScreen) = when (screen) {
             is TasksScreen.Overview -> OverviewScreen()
             is TasksScreen.Homeworks -> HomeworksScreen(screen.targetDate)
-            is TasksScreen.Todos -> TodosScreen()
+            is TasksScreen.Todos -> TodoScreen()
             is TasksScreen.Share -> ShareScreen()
         }
 

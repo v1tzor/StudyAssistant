@@ -67,7 +67,7 @@ internal class HomeworksScreenModel(
         event: HomeworksEvent,
     ) {
         when (event) {
-            is HomeworksEvent.Init, HomeworksEvent.Refresh -> {
+            is HomeworksEvent.Init -> {
                 val currentDate = dateManager.fetchBeginningCurrentInstant()
                 val targetTimeRange = TimeRange(
                     from = currentDate.startOfWeek().shiftWeek(-1),
@@ -96,7 +96,7 @@ internal class HomeworksScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is HomeworksEvent.PreviousTimeRange -> with(state()){
+            is HomeworksEvent.PreviousTimeRange -> with(state()) {
                 val currentDate = dateManager.fetchBeginningCurrentInstant()
                 val currentTimeRange = checkNotNull(selectedTimeRange)
                 val targetTimeRange = TimeRange(

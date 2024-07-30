@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract
 
-import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
@@ -42,7 +41,6 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 /**
  * @author Stanislav Aleshin on 27.06.2024
  */
-@Immutable
 @Parcelize
 internal data class OverviewViewState(
     val isLoadingHomeworks: Boolean = true,

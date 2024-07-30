@@ -251,16 +251,14 @@ fun Duration.toString(
             components++
         }
         if (hasHours) {
-            if (components++ > 0) append(' ')
+            if (components > 0) append(' ')
             append(hours).append(hourSuffix)
         }
-        if (!hasHours && hasMinutes) {
-            if (components++ > 0) append(' ')
+        if (!hasDays && !hasHours && hasMinutes) {
             append(minutes).append(minuteSuffix)
-        } else {
-            append(0).append(minutes)
+        } else if (!hasDays && !hasHours && !hasMinutes) {
+            append(0).append(minuteSuffix)
         }
-        if (isNegative && components > 1) insert(1, '(').append(')')
     }
 }
 

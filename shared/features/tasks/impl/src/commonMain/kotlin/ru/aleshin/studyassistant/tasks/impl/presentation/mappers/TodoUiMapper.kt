@@ -21,13 +21,18 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TodoErrors
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
+import kotlin.time.Duration
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.
  */
-internal fun Todo.mapToUi(status: TodoStatus) = TodoDetailsUi(
+internal fun Todo.mapToUi(
+    status: TodoStatus,
+    toDeadlineDuration: Duration?,
+) = TodoDetailsUi(
     uid = uid,
     deadline = deadline,
+    toDeadlineDuration = toDeadlineDuration,
     name = name,
     status = status,
     priority = priority,
@@ -47,5 +52,5 @@ internal fun TodoDetailsUi.mapToDomain() = Todo(
 )
 
 internal fun TodoErrors.mapToUi() = TodoErrorsUi(
-    overdueTodos = overdueTodos.map { it.mapToUi(TodoStatus.NOT_COMPLETE) },
+    overdueTodos = overdueTodos.map { it.mapToUi(TodoStatus.NOT_COMPLETE, null) },
 )

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views
+package ru.aleshin.studyassistant.tasks.impl.presentation.ui.common
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -52,11 +52,13 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.MEDIUM
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.STANDARD
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
+import ru.aleshin.studyassistant.core.ui.mappers.toLanguageString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.InfoBadge
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import kotlin.time.Duration
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.
@@ -70,6 +72,7 @@ internal fun TodoViewItem(
     todoText: String,
     status: TodoStatus,
     deadline: Instant?,
+    toDeadlineDuration: Duration?,
     priority: TaskPriority,
     onChangeDone: (Boolean) -> Unit,
 ) {
@@ -91,6 +94,7 @@ internal fun TodoViewItem(
             HorizontalDivider()
             TodoViewFooter(
                 deadline = deadline,
+                toDeadlineDuration = toDeadlineDuration,
                 status = status,
             )
         }
@@ -166,6 +170,7 @@ private fun TodoViewHeader(
 private fun TodoViewFooter(
     modifier: Modifier = Modifier,
     deadline: Instant?,
+    toDeadlineDuration: Duration?,
     status: TodoStatus,
 ) {
     Row(
@@ -176,69 +181,93 @@ private fun TodoViewFooter(
         if (deadline != null) {
             val deadlineDateFormat = DateTimeComponents.Formats.dayMonthFormat(StudyAssistantRes.strings)
             when (status) {
-                TodoStatus.COMPLETE -> InfoBadge(
-                    modifier = modifier,
-                    leadingIcon = {
-                        Icon(
-                            modifier = Modifier.size(18.dp),
-                            painter = painterResource(StudyAssistantRes.icons.tasksOutline),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface,
-                        )
-                    },
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    content = {
-                        Text(
-                            text = buildString {
-                                append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
-                                append(deadline.formatByTimeZone(deadlineDateFormat))
-                            },
-                            maxLines = 1,
-                        )
-                    }
-                )
-                TodoStatus.IN_PROGRESS -> InfoBadge(
-                    modifier = modifier,
-                    leadingIcon = {
-                        Icon(
-                            modifier = Modifier.size(18.dp),
-                            painter = painterResource(StudyAssistantRes.icons.tasksOutline),
-                            contentDescription = null,
-                            tint = StudyAssistantRes.colors.accents.yellow,
-                        )
-                    },
-                    containerColor = StudyAssistantRes.colors.accents.yellowContainer,
-                    content = {
-                        Text(
-                            text = buildString {
-                                append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
-                                append(deadline.formatByTimeZone(deadlineDateFormat))
-                            },
-                            maxLines = 1,
-                        )
-                    }
-                )
-                TodoStatus.NOT_COMPLETE -> InfoBadge(
-                    modifier = modifier,
-                    leadingIcon = {
-                        Icon(
-                            modifier = Modifier.size(18.dp),
-                            imageVector = Icons.Default.ErrorOutline,
-                            contentDescription = null,
-                            tint = StudyAssistantRes.colors.accents.red,
-                        )
-                    },
-                    containerColor = StudyAssistantRes.colors.accents.redContainer,
-                    content = {
-                        Text(
-                            text = buildString {
-                                append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
-                                append(deadline.formatByTimeZone(deadlineDateFormat))
-                            },
-                            maxLines = 1,
+                TodoStatus.COMPLETE -> {
+                    InfoBadge(
+                        modifier = modifier,
+                        leadingIcon = {
+                            Icon(
+                                modifier = Modifier.size(18.dp),
+                                painter = painterResource(StudyAssistantRes.icons.tasksOutline),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface,
+                            )
+                        },
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        content = {
+                            Text(
+                                text = buildString {
+                                    append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
+                                    append(deadline.formatByTimeZone(deadlineDateFormat))
+                                },
+                                maxLines = 1,
+                            )
+                        }
+                    )
+                }
+                TodoStatus.IN_PROGRESS -> {
+                    InfoBadge(
+                        modifier = modifier,
+                        leadingIcon = {
+                            Icon(
+                                modifier = Modifier.size(18.dp),
+                                painter = painterResource(StudyAssistantRes.icons.tasksOutline),
+                                contentDescription = null,
+                                tint = StudyAssistantRes.colors.accents.yellow,
+                            )
+                        },
+                        containerColor = StudyAssistantRes.colors.accents.yellowContainer,
+                        content = {
+                            Text(
+                                text = buildString {
+                                    append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
+                                    append(deadline.formatByTimeZone(deadlineDateFormat))
+                                },
+                                maxLines = 1,
+                            )
+                        }
+                    )
+                    if (toDeadlineDuration != null) {
+                        InfoBadge(
+                            modifier = modifier,
+                            containerColor = StudyAssistantRes.colors.accents.yellowContainer,
+                            content = {
+                                Text(text = toDeadlineDuration.toLanguageString(), maxLines = 1)
+                            }
                         )
                     }
-                )
+                }
+                TodoStatus.NOT_COMPLETE -> {
+                    InfoBadge(
+                        modifier = modifier,
+                        leadingIcon = {
+                            Icon(
+                                modifier = Modifier.size(18.dp),
+                                imageVector = Icons.Default.ErrorOutline,
+                                contentDescription = null,
+                                tint = StudyAssistantRes.colors.accents.red,
+                            )
+                        },
+                        containerColor = StudyAssistantRes.colors.accents.redContainer,
+                        content = {
+                            Text(
+                                text = buildString {
+                                    append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
+                                    append(deadline.formatByTimeZone(deadlineDateFormat))
+                                },
+                                maxLines = 1,
+                            )
+                        }
+                    )
+                    if (toDeadlineDuration != null) {
+                        InfoBadge(
+                            modifier = modifier,
+                            containerColor = StudyAssistantRes.colors.accents.redContainer,
+                            content = {
+                                Text(text = toDeadlineDuration.toLanguageString(), maxLines = 1)
+                            }
+                        )
+                    }
+                }
             }
         }
     }

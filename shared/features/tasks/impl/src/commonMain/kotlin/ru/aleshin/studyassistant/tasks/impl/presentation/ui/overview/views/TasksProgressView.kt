@@ -58,7 +58,6 @@ import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
-import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
@@ -108,13 +107,6 @@ internal fun TasksProgressView(
                         return@filter timeRange.containsDate(it.key)
                     }
                 }
-                val weekTodos by derivedStateOf {
-                    todos.filter {
-                        val timeRange = currentDate.dateTime().weekTimeRange()
-                        val homeworkDate = it.deadline?.startThisDay()
-                        return@filter if (homeworkDate != null) timeRange.containsDate(homeworkDate) else true
-                    }
-                }
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
@@ -158,7 +150,7 @@ internal fun TasksProgressView(
                 }
                 InfoProgressView(
                     isLoading = isLoading,
-                    items = weekTodos.map { it.completeDate != null },
+                    items = todos.map { it.completeDate != null },
                     progressIcon = painterResource(StudyAssistantRes.icons.tasksOutline),
                     infoLabel = {
                         Text(

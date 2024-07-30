@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.common.platform
 import dev.icerock.moko.parcelize.Parcel
 import dev.icerock.moko.parcelize.Parceler
 import kotlinx.datetime.Instant
+import kotlin.time.Duration
 
 /**
  * @author Stanislav Aleshin on 03.06.2024.
@@ -42,5 +43,27 @@ object NullInstantParceler : Parceler<Instant?> {
 
     override fun Instant?.write(parcel: Parcel, flags: Int) {
         if (this != null) parcel.writeString(this.toString())
+    }
+}
+
+object DurationParceler : Parceler<Duration> {
+
+    override fun create(parcel: Parcel): Duration {
+        return Duration.parseIsoString(checkNotNull(parcel.readString()))
+    }
+
+    override fun Duration.write(parcel: Parcel, flags: Int) {
+        parcel.writeString(this.toIsoString())
+    }
+}
+
+object NullDurationParceler : Parceler<Duration?> {
+
+    override fun create(parcel: Parcel): Duration? {
+        return parcel.readString()?.let { Duration.parseIsoString(it) }
+    }
+
+    override fun Duration?.write(parcel: Parcel, flags: Int) {
+        if (this != null) parcel.writeString(this.toIsoString())
     }
 }

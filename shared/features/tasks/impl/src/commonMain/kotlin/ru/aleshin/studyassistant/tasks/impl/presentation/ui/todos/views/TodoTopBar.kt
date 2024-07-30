@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.views
+package ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.views
 
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -30,17 +30,17 @@ import androidx.compose.ui.Modifier
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 
 /**
- * @author Stanislav Aleshin on 18.07.2024.
+ * @author Stanislav Aleshin on 28.07.2024.
  */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun ShareTopBar(
+internal fun TodoTopBar(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
-        title = { Text(text = TasksThemeRes.strings.shareHomeworksHeader) },
+        title = { Text(text = TasksThemeRes.strings.todosHeader) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
@@ -51,7 +51,7 @@ internal fun ShareTopBar(
             }
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         ),
     )
 }

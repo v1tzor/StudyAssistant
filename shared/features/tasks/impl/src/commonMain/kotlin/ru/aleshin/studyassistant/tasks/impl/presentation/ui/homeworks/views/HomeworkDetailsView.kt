@@ -41,9 +41,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
@@ -200,25 +201,30 @@ private fun HomeworksDetailsViewHeader(
     onSkip: () -> Unit,
     onRepeat: () -> Unit,
 ) {
-    val dismissHeaderState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { dismissBoxValue ->
-            when (dismissBoxValue) {
-                SwipeToDismissBoxValue.EndToStart -> if (status == HomeworkStatus.COMPLETE) {
-                    onRepeat()
-                } else {
-                    onDone()
+    val density = LocalDensity.current
+    val dismissHeaderState = remember(status) {
+        SwipeToDismissBoxState(
+            initialValue = SwipeToDismissBoxValue.Settled,
+            density = density,
+            confirmValueChange = { dismissBoxValue ->
+                when (dismissBoxValue) {
+                    SwipeToDismissBoxValue.EndToStart -> if (status == HomeworkStatus.COMPLETE) {
+                        onRepeat()
+                    } else {
+                        onDone()
+                    }
+                    SwipeToDismissBoxValue.StartToEnd -> if (status == HomeworkStatus.SKIPPED) {
+                        onRepeat()
+                    } else {
+                        onSkip()
+                    }
+                    SwipeToDismissBoxValue.Settled -> {}
                 }
-                SwipeToDismissBoxValue.StartToEnd -> if (status == HomeworkStatus.SKIPPED) {
-                    onRepeat()
-                } else {
-                    onSkip()
-                }
-                SwipeToDismissBoxValue.Settled -> {}
-            }
-            return@rememberSwipeToDismissBoxState false
-        },
-        positionalThreshold = { it * .5f },
-    )
+                false
+            },
+            positionalThreshold = { it * .5f }
+        )
+    }
     SwipeToDismissBox(
         state = dismissHeaderState,
         modifier = modifier.fillMaxWidth().clipToBounds(),

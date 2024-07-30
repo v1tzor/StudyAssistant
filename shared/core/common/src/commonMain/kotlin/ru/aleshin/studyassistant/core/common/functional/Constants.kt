@@ -92,7 +92,8 @@ object Constants {
         const val EMPLOYEES_OR_SUBJECTS = 12
         const val HOMEWORKS = 7
         const val USER_CONTACT_INFO = 4
-        const val TODOS = 6
+        const val OVERVIEW_TODOS = 6
+        const val TODOS = 15
         const val OVERVIEW_FRIEND_REQUESTS = 3
         const val FULL_FRIEND_REQUESTS = 10
         const val FRIENDS = 10

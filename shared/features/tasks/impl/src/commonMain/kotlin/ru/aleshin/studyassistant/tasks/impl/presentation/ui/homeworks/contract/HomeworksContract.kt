@@ -50,7 +50,6 @@ internal data class HomeworksViewState(
 
 internal sealed class HomeworksEvent : BaseEvent {
     data object Init : HomeworksEvent()
-    data object Refresh : HomeworksEvent()
     data object NextTimeRange : HomeworksEvent()
     data object PreviousTimeRange : HomeworksEvent()
     data class DoHomework(val homework: HomeworkDetailsUi) : HomeworksEvent()

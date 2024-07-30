@@ -67,7 +67,6 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
-import ru.aleshin.studyassistant.core.common.extensions.limitSize
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksUi
@@ -78,6 +77,9 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetail
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewItem
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewItemPlaceholder
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewNoneItem
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewViewState
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.DailyHomeworksView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.DailyHomeworksViewPlaceholder
@@ -87,9 +89,6 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.Share
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.SharedHomeworksStatusView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TaskErrorsBottomSheet
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TasksProgressView
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TodoViewItem
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TodoViewItemPlaceholder
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TodoViewNoneItem
 
 /**
  * @author Stanislav Aleshin on 29.06.2024
@@ -434,13 +433,14 @@ private fun TodosSection(
             animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         ) { loading ->
             if (!loading) {
-                val limitedTodos = todos.limitSize(12)
+                val activeTodos = todos.filter { it.completeDate == null }
                 FlowRow(
+                    modifier = Modifier.animateContentSize(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    if (limitedTodos.isNotEmpty()) {
-                        limitedTodos.forEach { todo ->
+                    if (activeTodos.isNotEmpty()) {
+                        activeTodos.forEach { todo ->
                             TodoViewItem(
                                 modifier = Modifier.wrapContentSize(),
                                 onClick = { onOpenTodoTask(todo) },
@@ -448,6 +448,7 @@ private fun TodosSection(
                                 todoText = todo.name,
                                 status = todo.status,
                                 deadline = todo.deadline,
+                                toDeadlineDuration = todo.toDeadlineDuration,
                                 priority = todo.priority,
                                 onChangeDone = { onChangeTodoDone(todo, it) }
                             )
@@ -461,7 +462,7 @@ private fun TodosSection(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    repeat(Placeholder.TODOS) {
+                    repeat(Placeholder.OVERVIEW_TODOS) {
                         TodoViewItemPlaceholder()
                     }
                 }

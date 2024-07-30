@@ -38,6 +38,10 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.Sh
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareScreenModel
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareStateCommunicator
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareWorkProcessor
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoEffectCommunicator
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoScreenModel
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoStateCommunicator
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoWorkProcessor
 import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
@@ -64,4 +68,9 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<ShareEffectCommunicator> { ShareEffectCommunicator.Base() }
     bindProvider<ShareWorkProcessor> { ShareWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindProvider<ShareScreenModel> { ShareScreenModel(instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<TodoStateCommunicator> { TodoStateCommunicator.Base() }
+    bindProvider<TodoEffectCommunicator> { TodoEffectCommunicator.Base() }
+    bindProvider<TodoWorkProcessor> { TodoWorkProcessor.Base(instance(), instance()) }
+    bindProvider<TodoScreenModel> { TodoScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
 }

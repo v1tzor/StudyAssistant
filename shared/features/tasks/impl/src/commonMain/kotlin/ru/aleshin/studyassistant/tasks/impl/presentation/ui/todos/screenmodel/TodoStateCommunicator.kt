@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos
+package ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel
 
-import androidx.compose.runtime.Composable
-import cafe.adriel.voyager.core.screen.Screen
+import ru.aleshin.studyassistant.core.common.architecture.communications.state.StateCommunicator
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract.TodoViewState
 
 /**
- * @author Stanislav Aleshin on 19.06.2024.
+ * @author Stanislav Aleshin on 28.07.2024.
  */
-internal class TodosScreen : Screen {
-
-    @Composable
-    override fun Content() {
-        // TODO Not yet implemented
-    }
+internal interface TodoStateCommunicator : StateCommunicator<TodoViewState> {
+    class Base : TodoStateCommunicator, StateCommunicator.Abstract<TodoViewState>(
+        defaultState = TodoViewState()
+    )
 }
