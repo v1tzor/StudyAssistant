@@ -78,6 +78,7 @@ internal fun DetailsClassViewItem(
     progress: Progress,
     timeRange: TimeRange,
     subject: SubjectUi?,
+    eventType: EventType,
     office: String,
     organization: OrganizationShortUi?,
     teacher: EmployeeUi?,
@@ -100,6 +101,7 @@ internal fun DetailsClassViewItem(
             onClick = onClick,
             enabled = enabled,
             subject = subject,
+            eventType = eventType,
             office = office,
             organization = organization,
             teacher = teacher,
@@ -222,6 +224,7 @@ private fun DetailsClassView(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     subject: SubjectUi?,
+    eventType: EventType,
     office: String,
     teacher: EmployeeUi?,
     organization: OrganizationShortUi?,
@@ -247,8 +250,8 @@ private fun DetailsClassView(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    DetailsClassViewHeader(subject = subject, headerBadge = headerBadge)
-                    DetailsClassViewContent(subject = subject)
+                    DetailsClassViewHeader(eventType = eventType, headerBadge = headerBadge)
+                    DetailsClassViewContent(subject = subject, eventType = eventType)
                 }
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     DetailsClassViewFooter(
@@ -266,7 +269,7 @@ private fun DetailsClassView(
 @Composable
 private fun DetailsClassViewHeader(
     modifier: Modifier = Modifier,
-    subject: SubjectUi?,
+    eventType: EventType,
     headerBadge: @Composable (RowScope.() -> Unit)?,
 ) {
     Row(
@@ -274,10 +277,8 @@ private fun DetailsClassViewHeader(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Icon(
-            painter = painterResource(
-                resource = (subject?.eventType ?: EventType.CLASS).mapToIcon(StudyAssistantRes.icons),
-            ),
-            contentDescription = subject?.eventType?.mapToString(StudyAssistantRes.strings),
+            painter = painterResource(eventType.mapToIcon(StudyAssistantRes.icons)),
+            contentDescription = eventType.mapToString(StudyAssistantRes.strings),
             tint = MaterialTheme.colorScheme.primary,
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -289,10 +290,11 @@ private fun DetailsClassViewHeader(
 private fun DetailsClassViewContent(
     modifier: Modifier = Modifier,
     subject: SubjectUi?,
+    eventType: EventType,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = (subject?.eventType ?: EventType.CLASS).mapToString(StudyAssistantRes.strings),
+            text = eventType.mapToString(StudyAssistantRes.strings),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             style = MaterialTheme.typography.labelSmall,

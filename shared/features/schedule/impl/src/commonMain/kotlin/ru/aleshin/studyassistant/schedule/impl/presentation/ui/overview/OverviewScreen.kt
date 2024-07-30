@@ -143,7 +143,7 @@ internal data class OverviewScreen(val firstDay: Millis?) : Screen {
         handleEffect { effect ->
             when (effect) {
                 is OverviewEffect.NavigateToLocal -> navigator.push(effect.pushScreen)
-                is OverviewEffect.NavigateToGlobal -> navigator.root()?.push(effect.pushScreen)
+                is OverviewEffect.NavigateToGlobal -> navigator.root().push(effect.pushScreen)
                 is OverviewEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

@@ -63,7 +63,7 @@ internal class OverviewScreenModel(
         event: OverviewEvent,
     ) {
         when (event) {
-            is OverviewEvent.Init, OverviewEvent.Refresh -> {
+            is OverviewEvent.Init -> {
                 val currentDate = dateManager.fetchBeginningCurrentInstant()
                 sendAction(OverviewAction.UpdateCurrentDate(currentDate))
                 launchBackgroundWork(BackgroundKey.LOAD_HOMEWORKS) {

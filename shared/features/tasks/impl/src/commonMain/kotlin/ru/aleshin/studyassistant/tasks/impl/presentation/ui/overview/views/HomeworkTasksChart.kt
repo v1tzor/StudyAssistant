@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ import io.github.koalaplot.core.util.ExperimentalKoalaPlotApi
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
 import io.github.koalaplot.core.xygraph.XYGraph
 import io.github.koalaplot.core.xygraph.rememberFloatLinearAxisModel
+import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
@@ -60,14 +62,36 @@ internal fun HomeworkTasksChart(
         StudyAssistantRes.colors.accents.orange,
         StudyAssistantRes.colors.accents.red,
     )
-    val dateList = homeworkScope?.theoreticalTasks?.map { it.key.dateTime().dayOfMonth.toString() } ?: listOf("")
+    val dateList = remember(homeworkScope) {
+        homeworkScope?.theoreticalTasks?.map { it.key.dateTime().dayOfMonth.toString() } ?: listOf("")
+    }
+    val dailyTasks = mutableMapOf<Instant, Float>()
+    val numberOfTheoryTasks = remember(homeworkScope) {
+        homeworkScope?.theoreticalTasks?.map {
+            dailyTasks[it.key] = (dailyTasks[it.key] ?: 0f) + it.value
+            return@map it.value.toFloat()
+        }
+    }
+    val numberOfPracticeTasks = remember(homeworkScope) {
+        homeworkScope?.practicalTasks?.map {
+            dailyTasks[it.key] = (dailyTasks[it.key] ?: 0f) + it.value
+            return@map it.value.toFloat()
+        }
+    }
+    val numberOfPresentationTasks = remember(homeworkScope) {
+        homeworkScope?.presentationTasks?.map {
+            dailyTasks[it.key] = (dailyTasks[it.key] ?: 0f) + it.value
+            return@map it.value.toFloat()
+        }
+    }
 
-    val numberOfTheoryTasks = homeworkScope?.theoreticalTasks?.map { it.value.toFloat() } ?: listOf(0f)
-    val numberOfPracticeTasks = homeworkScope?.practicalTasks?.map { it.value.toFloat() } ?: listOf(0f)
-    val numberOfPresentationTasks = homeworkScope?.presentationTasks?.map { it.value.toFloat() } ?: listOf(0f)
-    val numberOfTasks = listOf(numberOfTheoryTasks, numberOfPracticeTasks, numberOfPresentationTasks)
+    val numberOfTasks = listOf(
+        numberOfTheoryTasks ?: emptyList(),
+        numberOfPracticeTasks ?: emptyList(),
+        numberOfPresentationTasks ?: emptyList(),
+    )
 
-    val maxValue = numberOfTasks.maxOfOrNull { it.maxOrNull() ?: 0f }
+    val maxValue = dailyTasks.maxOfOrNull { it.value }
 
     Column(
         modifier = modifier.fillMaxWidth().height(180.dp),

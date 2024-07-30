@@ -74,7 +74,6 @@ internal class OrganizationsScreenModel(
                 }
             }
             is OrganizationsEvent.ChangeOrganization -> {
-                sendAction(OrganizationsAction.UpdateSelectedOrganization(event.organizationId))
                 launchBackgroundWork(BackgroundKey.LOAD_ORGANIZATION_DATA) {
                     val command = OrganizationsWorkCommand.LoadOrganizationData(event.organizationId)
                     workProcessor.work(command).collectAndHandleWork()
@@ -119,9 +118,6 @@ internal class OrganizationsScreenModel(
             organizationData = action.data,
             classesInfo = action.classesInfo,
             isLoading = false,
-        )
-        is OrganizationsAction.UpdateSelectedOrganization -> currentState.copy(
-            selectedOrganization = action.organizationId,
         )
         is OrganizationsAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,

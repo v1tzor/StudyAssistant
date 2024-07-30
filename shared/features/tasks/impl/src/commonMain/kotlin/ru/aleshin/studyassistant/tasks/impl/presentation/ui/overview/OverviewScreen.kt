@@ -66,7 +66,6 @@ internal class OverviewScreen : Screen {
                 OverviewContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
-                    onRefresh = { dispatchEvent(OverviewEvent.Refresh) },
                     onOpenHomeworkTasks = { dispatchEvent(OverviewEvent.NavigateToHomeworks(it)) },
                     onOpenSharedHomeworks = { dispatchEvent(OverviewEvent.NavigateToShare) },
                     onShowAllHomeworkTasks = { dispatchEvent(OverviewEvent.NavigateToHomeworks(null)) },

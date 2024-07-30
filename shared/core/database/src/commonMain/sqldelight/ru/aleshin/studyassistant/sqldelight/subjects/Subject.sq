@@ -6,9 +6,7 @@ CREATE TABLE subjectEntity (
     teacher_id TEXT,
     office TEXT NOT NULL,
     color INTEGER NOT NULL,
-    location TEXT,
-    FOREIGN KEY (organization_id) REFERENCES organizationEntity (uid) ON DELETE RESTRICT,
-    FOREIGN KEY (teacher_id) REFERENCES employeeEntity (uid) ON DELETE SET NULL
+    location TEXT
 );
 
 fetchSubjectsByOrganization:

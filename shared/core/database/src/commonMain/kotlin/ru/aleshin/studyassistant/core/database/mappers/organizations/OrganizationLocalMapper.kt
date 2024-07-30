@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.database.mappers.organizations
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationDetailsEntity
+import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationShortEntity
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationEntity
@@ -61,4 +62,15 @@ fun OrganizationEntity.mapToDetails(
     webs = webs.map { Json.decodeFromString(it) },
     offices = offices,
     isHide = is_hide == 1L,
+)
+
+fun OrganizationEntity.mapToShort() = OrganizationShortEntity(
+    uid = uid,
+    main = is_main == 1L,
+    shortName = short_name,
+    type = type,
+    avatar = avatar,
+    locations = locations.map { Json.decodeFromString(it) },
+    offices = offices,
+    scheduleTimeIntervals = Json.decodeFromString(schedule_time_intervals),
 )

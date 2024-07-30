@@ -64,7 +64,7 @@ fun BaseSchedule.mapToLocalData() = BaseScheduleEntity(
     uid = uid,
     date_version_from = dateVersion.from.toEpochMilliseconds(),
     date_version_to = dateVersion.to.toEpochMilliseconds(),
-    week_day_of_week = week.name,
+    week_day_of_week = dayOfWeek.name,
     week = week.name,
-    classes = classes.map { Json.encodeToString(it.mapToRemoteData()) },
+    classes = classes.map { Json.encodeToString(it.mapToLocalData()) },
 )

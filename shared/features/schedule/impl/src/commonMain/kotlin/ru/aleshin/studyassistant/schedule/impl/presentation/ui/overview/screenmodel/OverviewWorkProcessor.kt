@@ -36,6 +36,7 @@ import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.common.extensions.shiftMinutes
 import ru.aleshin.studyassistant.core.common.functional.Constants.Delay
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.AnalysisInteractor
@@ -64,7 +65,7 @@ internal interface OverviewWorkProcessor :
 
         override suspend fun work(command: OverviewWorkCommand) = when (command) {
             is OverviewWorkCommand.LoadSchedule -> loadScheduleWork(command.date)
-            is OverviewWorkCommand.LoadAnalysis -> loadAnalysisWork()
+            is OverviewWorkCommand.LoadAnalysis -> loadAnalysisWork(command.week)
             is OverviewWorkCommand.UpdateIsHomeworkDone -> updateIsHomeworkDoneWork(command.homework, command.isDone)
         }
 
@@ -91,8 +92,7 @@ internal interface OverviewWorkProcessor :
             emit(ActionResult(OverviewAction.UpdateScheduleLoading(true)))
         }
 
-        private fun loadAnalysisWork() = flow<DomainResult<OverviewAction, OverviewEffect>> {
-            val week = dateManager.fetchCurrentWeek()
+        private fun loadAnalysisWork(week: TimeRange) = flow<DomainResult<OverviewAction, OverviewEffect>> {
             analysisInteractor.fetchWeekAnalysis(week).handle(
                 onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
                 onRightAction = { weekAnalysis ->
@@ -164,6 +164,6 @@ internal interface OverviewWorkProcessor :
 
 internal sealed class OverviewWorkCommand : WorkCommand {
     data class LoadSchedule(val date: Instant) : OverviewWorkCommand()
-    data object LoadAnalysis : OverviewWorkCommand()
+    data class LoadAnalysis(val week: TimeRange) : OverviewWorkCommand()
     data class UpdateIsHomeworkDone(val homework: HomeworkDetailsUi, val isDone: Boolean) : OverviewWorkCommand()
 }

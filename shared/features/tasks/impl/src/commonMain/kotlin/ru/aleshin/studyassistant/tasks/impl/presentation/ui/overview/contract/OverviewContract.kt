@@ -62,7 +62,6 @@ internal data class OverviewViewState(
 
 internal sealed class OverviewEvent : BaseEvent {
     data object Init : OverviewEvent()
-    data object Refresh : OverviewEvent()
     data class DoHomework(val homework: HomeworkDetailsUi) : OverviewEvent()
     data class RepeatHomework(val homework: HomeworkDetailsUi) : OverviewEvent()
     data class SkipHomework(val homework: HomeworkDetailsUi) : OverviewEvent()

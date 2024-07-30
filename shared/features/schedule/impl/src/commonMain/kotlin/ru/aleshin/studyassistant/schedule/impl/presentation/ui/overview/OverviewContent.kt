@@ -87,6 +87,7 @@ internal fun OverviewContent(
                             progress = activeClass?.progress?.takeIf { activeClass.isStarted } ?: -1f,
                             timeRange = classModel.timeRange,
                             subject = classModel.subject,
+                            eventType = classModel.eventType,
                             office = classModel.office,
                             organization = classModel.organization,
                             teacher = classModel.teacher,

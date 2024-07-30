@@ -37,14 +37,13 @@ import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.Orga
 internal data class OrganizationsViewState(
     val isLoading: Boolean = true,
     val shortOrganizations: List<OrganizationShortUi>? = null,
-    val selectedOrganization: UID? = null,
     val organizationData: OrganizationUi? = null,
     val classesInfo: OrganizationClassesInfoUi? = null,
 ) : BaseViewState
 
 internal sealed class OrganizationsEvent : BaseEvent {
     data object Init : OrganizationsEvent()
-    data class Refresh(val organizationId: UID) : OrganizationsEvent()
+    data class Refresh(val organizationId: UID?) : OrganizationsEvent()
     data class ChangeOrganization(val organizationId: UID?) : OrganizationsEvent()
     data class OpenEmployeeProfile(val employeeId: UID) : OrganizationsEvent()
     data class NavigateToEmployees(val organizationId: UID) : OrganizationsEvent()
@@ -65,6 +64,5 @@ internal sealed class OrganizationsAction : BaseAction {
         val data: OrganizationUi?,
         val classesInfo: OrganizationClassesInfoUi?,
     ) : OrganizationsAction()
-    data class UpdateSelectedOrganization(val organizationId: UID?) : OrganizationsAction()
     data class UpdateLoading(val isLoading: Boolean) : OrganizationsAction()
 }

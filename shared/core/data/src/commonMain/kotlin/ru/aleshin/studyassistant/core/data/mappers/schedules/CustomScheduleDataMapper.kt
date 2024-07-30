@@ -53,5 +53,5 @@ fun CustomSchedule.mapToRemoteData() = CustomSchedulePojo(
 fun CustomSchedule.mapToLocalData() = CustomScheduleEntity(
     uid = uid,
     date = date.toEpochMilliseconds(),
-    classes = classes.map { Json.encodeToString(it.mapToRemoteData()) },
+    classes = classes.map { Json.encodeToString(it.mapToLocalData()) },
 )

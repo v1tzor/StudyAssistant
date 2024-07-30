@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.remote.models.users.ContactInfoPojo
 import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 
@@ -68,10 +69,10 @@ fun EmployeeEntity.mapToDomain() = Employee(
     } else {
         null
     },
-    emails = emails.map { Json.decodeFromString(it) },
-    phones = phones.map { Json.decodeFromString(it) },
-    locations = locations.map { Json.decodeFromString(it) },
-    webs = webs.map { Json.decodeFromString(it) },
+    emails = emails.map { Json.decodeFromString<ContactInfoPojo>(it).mapToDomain() },
+    phones = phones.map { Json.decodeFromString<ContactInfoPojo>(it).mapToDomain() },
+    locations = locations.map { Json.decodeFromString<ContactInfoPojo>(it).mapToDomain() },
+    webs = webs.map { Json.decodeFromString<ContactInfoPojo>(it).mapToDomain() },
 )
 
 fun Employee.mapToRemoteData() = EmployeePojo(
@@ -102,8 +103,8 @@ fun Employee.mapToLocalData() = EmployeeEntity(
     birthday = birthday,
     workTimeStart = workTime?.from?.toEpochMilliseconds(),
     workTimeEnd = workTime?.to?.toEpochMilliseconds(),
-    emails = emails.map { Json.encodeToString(it) },
-    phones = phones.map { Json.encodeToString(it) },
-    locations = locations.map { Json.encodeToString(it) },
-    webs = webs.map { Json.encodeToString(it) },
+    emails = emails.map { Json.encodeToString(it.mapToLocalData()) },
+    phones = phones.map { Json.encodeToString(it.mapToLocalData()) },
+    locations = locations.map { Json.encodeToString(it.mapToLocalData()) },
+    webs = webs.map { Json.encodeToString(it.mapToLocalData()) },
 )

@@ -160,6 +160,7 @@ private fun ClassBottomSheetHeader(
         ) {
             SheetClassView(
                 subject = classModel.subject,
+                eventType = classModel.eventType,
                 office = classModel.office,
                 organization = classModel.organization,
                 teacher = classModel.teacher,

@@ -36,14 +36,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
@@ -51,6 +48,7 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.theme.material.topSide
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
+import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
 
 /**
@@ -61,7 +59,7 @@ internal fun OrganizationsBottomBar(
     modifier: Modifier = Modifier,
     allOrganizations: List<OrganizationShortUi>?,
     pagerState: PagerState,
-    selectedOrganization: UID?,
+    organizationData: OrganizationUi?,
     onChangeOrganization: (OrganizationShortUi?) -> Unit,
 ) {
     Surface(
@@ -88,11 +86,10 @@ internal fun OrganizationsBottomBar(
             }
         }
         if (allOrganizations != null) {
-            val currentPage by derivedStateOf { pagerState.currentPage }
-            LaunchedEffect(currentPage) {
-                val visibleOrganization = allOrganizations.getOrNull(currentPage)
-                if (selectedOrganization != visibleOrganization?.uid) {
-                    onChangeOrganization(visibleOrganization)
+            val currentOrganization = allOrganizations.getOrNull(pagerState.currentPage)
+            LaunchedEffect(currentOrganization) {
+                if (organizationData == null || organizationData.uid != currentOrganization?.uid) {
+                    onChangeOrganization(currentOrganization)
                 }
             }
         }

@@ -220,12 +220,13 @@ private fun OrganizationsContactSection(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 if (!loading) {
-                    if (organizationData != null) {
-                        organizationData.groupedContactInfo().forEach { contactEntry ->
+                    val groupedContactInfo = organizationData?.groupedContactInfo()
+                    if (!groupedContactInfo.isNullOrEmpty()) {
+                        groupedContactInfo.forEach { contactEntry ->
                             OrganizationContactInfoItem(
-                                onClick = { onCopyContactInfo(contactEntry.value) },
-                                icon = painterResource(contactEntry.key.mapToIcon(StudyAssistantRes.icons)),
-                                contactInfo = contactEntry.value
+                                onClick = { onCopyContactInfo(contactEntry.key) },
+                                icon = painterResource(contactEntry.value.mapToIcon(StudyAssistantRes.icons)),
+                                contactInfo = contactEntry.key
                             )
                         }
                     } else {
@@ -317,7 +318,7 @@ private fun OrganizationsEmployeesSection(
                             )
                         }
                     }
-                } else if (organizationData != null) {
+                } else if (organizationData != null && organizationData.employee.isNotEmpty()) {
                     val listState = rememberLazyListState()
                     LazyRow(
                         modifier = Modifier.fillMaxWidth().height(88.dp),
@@ -421,7 +422,7 @@ private fun OrganizationsSubjectsSection(
                             )
                         }
                     }
-                } else if (organizationData != null) {
+                } else if (organizationData != null && organizationData.subjects.isNotEmpty()) {
                     val listState = rememberLazyListState()
                     LazyRow(
                         modifier = Modifier.fillMaxWidth().height(92.dp),

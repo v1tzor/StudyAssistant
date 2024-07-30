@@ -117,7 +117,7 @@ internal interface CustomScheduleInteractor {
             baseDuration: Millis,
             specificDurations: List<NumberedDuration>
         ) = eitherWrapper.wrapUnit {
-            val updatedClasses = buildList {
+            val updatedClasses = buildList<Class> {
                 schedule.classes.forEachIndexed { index, classModel ->
                     val targetClass = lastOrNull() ?: classModel
                     val targetDuration = specificDurations.find { it.number == index.inc() }?.duration ?: baseDuration
@@ -129,7 +129,7 @@ internal interface CustomScheduleInteractor {
                             to = targetClass.timeRange.from.shiftMillis(targetDuration),
                         )
                     )
-                    add(updatedTargetClass)
+                    if (getOrNull(index) == null) add(updatedTargetClass) else set(index, updatedTargetClass)
 
                     if (index != schedule.classes.lastIndex) {
                         val nextClass = schedule.classes[index + 1]

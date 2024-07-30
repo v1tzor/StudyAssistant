@@ -24,7 +24,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -65,7 +64,6 @@ internal class OrganizationsScreen : Screen {
         val snackbarState = remember { SnackbarHostState() }
         val coroutineScope = rememberCoroutineScope()
         val pagerState = rememberPagerState { (state.shortOrganizations?.size ?: 0) + 1 }
-        val refreshState = rememberPullToRefreshState()
         val organizationId by derivedStateOf { state.shortOrganizations?.getOrNull(pagerState.currentPage)?.uid }
 
         Scaffold(
@@ -74,9 +72,8 @@ internal class OrganizationsScreen : Screen {
                 OrganizationsContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
-                    refreshState = refreshState,
                     onRefresh = {
-                        dispatchEvent(OrganizationsEvent.Refresh(organizationId!!))
+                        dispatchEvent(OrganizationsEvent.Refresh(organizationId))
                     },
                     onAddOrganization = {
                         dispatchEvent(OrganizationsEvent.NavigateToOrganizationEditor(null))
@@ -109,7 +106,7 @@ internal class OrganizationsScreen : Screen {
                 OrganizationsBottomBar(
                     pagerState = pagerState,
                     allOrganizations = state.shortOrganizations,
-                    selectedOrganization = state.selectedOrganization,
+                    organizationData = state.organizationData,
                     onChangeOrganization = {
                         dispatchEvent(OrganizationsEvent.ChangeOrganization(it?.uid))
                     }

@@ -31,15 +31,25 @@ internal data class OrganizationClassesInfoUi(
     val classesDurationInWeek: Map<NumberOfRepeatWeek, Millis>,
 ) : Parcelable {
 
-    fun classesDurationString(): String {
-        val sortedDurations = classesDurationInWeek.toList().sortedBy { it.first.isoRepeatWeekNumber }
-        val hours = sortedDurations.map { it.second.toHorses() }
-        return hours.joinToString(separator = " | ")
+    fun numberOfClassesString(): String {
+        val classesList = numberOfClassesInWeek.toList()
+        val sortedClasses = if (classesList.isNotEmpty()) {
+            classesList.sortedBy { it.first.isoRepeatWeekNumber }
+        } else {
+            listOf(Pair(NumberOfRepeatWeek.ONE, 0))
+        }
+        val numbers = sortedClasses.map { it.second }
+        return numbers.joinToString(separator = " | ")
     }
 
-    fun numberOfClassesString(): String {
-        val sortedClasses = numberOfClassesInWeek.toList().sortedBy { it.first.isoRepeatWeekNumber }
-        val numbers = sortedClasses .map { it.second }
-        return numbers.joinToString(separator = " | ")
+    fun classesDurationString(): String {
+        val classesDurationsList = classesDurationInWeek.toList()
+        val sortedDurations = if (classesDurationsList.isNotEmpty()) {
+            classesDurationsList.sortedBy { it.first.isoRepeatWeekNumber }
+        } else {
+            listOf(Pair(NumberOfRepeatWeek.ONE, 0L))
+        }
+        val hours = sortedDurations.map { it.second.toHorses() }
+        return hours.joinToString(separator = " | ")
     }
 }

@@ -23,8 +23,11 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.isCurrentWeek
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
@@ -64,29 +67,42 @@ internal class OverviewScreenModel(
     ) {
         when (event) {
             is OverviewEvent.Init -> with(state()) {
-                sendAction(OverviewAction.UpdateSelectedDate(event.firstDay ?: currentDate))
+                val targetDate = event.firstDay ?: currentDate
+                sendAction(OverviewAction.UpdateSelectedDate(targetDate))
                 launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
-                    val command = OverviewWorkCommand.LoadSchedule(event.firstDay ?: currentDate)
+                    val command = OverviewWorkCommand.LoadSchedule(targetDate)
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_ANALYSIS) {
-                    val command = OverviewWorkCommand.LoadAnalysis
+                    val command = OverviewWorkCommand.LoadAnalysis(targetDate.dateTime().weekTimeRange())
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is OverviewEvent.SelectedDate -> {
-                sendAction(OverviewAction.UpdateSelectedDate(event.date))
+            is OverviewEvent.SelectedDate -> with(state()) {
+                if (selectedDate?.isCurrentWeek(event.date) != true) {
+                    launchBackgroundWork(BackgroundKey.LOAD_ANALYSIS) {
+                        val command = OverviewWorkCommand.LoadAnalysis(event.date.dateTime().weekTimeRange())
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
+                }
                 launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
                     val command = OverviewWorkCommand.LoadSchedule(event.date)
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                sendAction(OverviewAction.UpdateSelectedDate(event.date))
             }
             is OverviewEvent.SelectedCurrentDay -> with(state()) {
-                sendAction(OverviewAction.UpdateSelectedDate(currentDate))
+                if (selectedDate?.isCurrentWeek(currentDate) != true) {
+                    launchBackgroundWork(BackgroundKey.LOAD_ANALYSIS) {
+                        val command = OverviewWorkCommand.LoadAnalysis(currentDate.dateTime().weekTimeRange())
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
+                }
                 launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
                     val command = OverviewWorkCommand.LoadSchedule(currentDate)
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                sendAction(OverviewAction.UpdateSelectedDate(currentDate))
             }
             is OverviewEvent.CompleteHomework -> {
                 launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {

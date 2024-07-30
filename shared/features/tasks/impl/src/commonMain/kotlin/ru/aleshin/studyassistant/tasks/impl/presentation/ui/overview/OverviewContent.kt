@@ -48,9 +48,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshState
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -94,13 +91,10 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.Tasks
  * @author Stanislav Aleshin on 29.06.2024
  */
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 internal fun OverviewContent(
     state: OverviewViewState,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
-    refreshState: PullToRefreshState = rememberPullToRefreshState(),
-    onRefresh: () -> Unit,
     onShowAllHomeworkTasks: () -> Unit,
     onOpenHomeworkTasks: (HomeworkDetailsUi) -> Unit,
     onOpenSharedHomeworks: () -> Unit,
@@ -112,56 +106,49 @@ internal fun OverviewContent(
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
 ) = with(state) {
-    PullToRefreshBox(
-        modifier = modifier,
-        isRefreshing = isLoadingHomeworks || isLoadingErrors || isLoadingTasks,
-        onRefresh = onRefresh,
-        state = refreshState,
+    Column(
+        modifier = modifier.fillMaxSize().padding(top = 8.dp).verticalScroll(scrollState),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(top = 8.dp).verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            TasksProgressControlSection(
-                isLoadingHomeworks = isLoadingHomeworks,
-                isLoadingErrors = isLoadingErrors,
-                isLoadingShare = isLoadingShare,
-                currentDate = currentDate,
-                homeworks = homeworks,
-                sharedHomeworks = sharedHomeworks,
-                todos = todos,
-                homeworkErrors = homeworkErrors,
-                todoErrors = todoErrors,
-                onOpenSharedHomeworks = onOpenSharedHomeworks,
-                onEditHomework = onOpenHomeworkTasks,
-                onDoHomework = onDoHomework,
-                onSkipHomework = onSkipHomework,
-                onChangeTodoDone = { todo, done -> onChangeTodoDone(todo, done) },
-            )
-            HomeworkAnalyticsSection(
-                isLoading = isLoadingHomeworks,
-                homeworksScope = homeworksScope,
-            )
-            HomeworksSection(
-                isLoading = isLoadingHomeworks,
-                currentDate = currentDate,
-                homeworks = homeworks,
-                allFriends = friends,
-                onOpenHomeworkTasks = onOpenHomeworkTasks,
-                onShowAllHomeworkTasks = onShowAllHomeworkTasks,
-                onDoHomework = onDoHomework,
-                onSkipHomework = onSkipHomework,
-                onRepeatHomework = onRepeatHomework,
-                onShareHomeworks = onShareHomeworks,
-            )
-            TodosSection(
-                isLoading = isLoadingTasks,
-                todos = todos,
-                onShowAllTodoTasks = onShowAllTodoTasks,
-                onOpenTodoTask = onOpenTodoTask,
-                onChangeTodoDone = onChangeTodoDone,
-            )
-        }
+        TasksProgressControlSection(
+            isLoadingHomeworks = isLoadingHomeworks,
+            isLoadingErrors = isLoadingErrors,
+            isLoadingShare = isLoadingShare,
+            currentDate = currentDate,
+            homeworks = homeworks,
+            sharedHomeworks = sharedHomeworks,
+            todos = todos,
+            homeworkErrors = homeworkErrors,
+            todoErrors = todoErrors,
+            onOpenSharedHomeworks = onOpenSharedHomeworks,
+            onEditHomework = onOpenHomeworkTasks,
+            onDoHomework = onDoHomework,
+            onSkipHomework = onSkipHomework,
+            onChangeTodoDone = { todo, done -> onChangeTodoDone(todo, done) },
+        )
+        HomeworkAnalyticsSection(
+            isLoading = isLoadingHomeworks,
+            homeworksScope = homeworksScope,
+        )
+        HomeworksSection(
+            isLoading = isLoadingHomeworks,
+            currentDate = currentDate,
+            homeworks = homeworks,
+            allFriends = friends,
+            onOpenHomeworkTasks = onOpenHomeworkTasks,
+            onShowAllHomeworkTasks = onShowAllHomeworkTasks,
+            onDoHomework = onDoHomework,
+            onSkipHomework = onSkipHomework,
+            onRepeatHomework = onRepeatHomework,
+            onShareHomeworks = onShareHomeworks,
+        )
+        TodosSection(
+            isLoading = isLoadingTasks,
+            todos = todos,
+            onShowAllTodoTasks = onShowAllTodoTasks,
+            onOpenTodoTask = onOpenTodoTask,
+            onChangeTodoDone = onChangeTodoDone,
+        )
     }
 }
 

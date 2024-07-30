@@ -47,10 +47,10 @@ internal data class OrganizationUi(
     val isHide: Boolean = false,
 ) : Parcelable {
 
-    fun groupedContactInfo(): Map<ContactInfoType, ContactInfoUi> = buildMap {
-        putAll(emails.sortedBy { it.label }.map { Pair(ContactInfoType.EMAIL, it) })
-        putAll(phones.sortedBy { it.label }.map { Pair(ContactInfoType.PHONE, it) })
-        putAll(locations.sortedBy { it.label }.map { Pair(ContactInfoType.LOCATION, it) })
-        putAll(webs.sortedBy { it.label }.map { Pair(ContactInfoType.WEBSITE, it) })
+    fun groupedContactInfo(): Map<ContactInfoUi, ContactInfoType> = buildMap {
+        putAll(emails.sortedBy { it.label }.map { Pair(it, ContactInfoType.EMAIL) })
+        putAll(phones.sortedBy { it.label }.map { Pair(it, ContactInfoType.PHONE) })
+        putAll(locations.sortedBy { it.label }.map { Pair(it, ContactInfoType.LOCATION) })
+        putAll(webs.sortedBy { it.label }.map { Pair(it, ContactInfoType.WEBSITE) })
     }
 }

@@ -15,8 +15,7 @@ CREATE TABLE employeeEntity (
   emails TEXT AS List<String> NOT NULL,
   phones TEXT AS List<String> NOT NULL,
   locations TEXT AS List<String> NOT NULL,
-  webs TEXT AS List<String> NOT NULL,
-  FOREIGN KEY (organization_id) REFERENCES organizationEntity (uid) ON DELETE RESTRICT
+  webs TEXT AS List<String> NOT NULL
 );
 
 fetchEmployeesByOrganization:

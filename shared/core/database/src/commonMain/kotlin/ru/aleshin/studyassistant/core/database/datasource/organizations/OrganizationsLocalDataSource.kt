@@ -22,16 +22,14 @@ import app.cash.sqldelight.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.json.Json
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.database.mappers.organizations.mapToDetails
+import ru.aleshin.studyassistant.core.database.mappers.organizations.mapToShort
 import ru.aleshin.studyassistant.core.database.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationShortEntity
-import ru.aleshin.studyassistant.core.database.models.organizations.ScheduleTimeIntervalsEntity
-import ru.aleshin.studyassistant.core.database.models.users.ContactInfoEntity
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationEntity
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
@@ -90,15 +88,8 @@ interface OrganizationsLocalDataSource {
         }
 
         override suspend fun fetchShortOrganizationById(uid: UID): Flow<OrganizationShortEntity?> {
-            val query = organizationQueries.fetchOrganizationById(
-                uid = uid,
-                mapper = { id, isMain, name, _, type, avatar, timeIntervalsModel, _, _, locationList, _, offices, _ ->
-                    val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsEntity>(timeIntervalsModel)
-                    val locations = locationList.map { Json.decodeFromString<ContactInfoEntity>(it) }
-                    OrganizationShortEntity(id, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
-                },
-            )
-            val organization = query.asFlow().mapToOneOrNull(coroutineContext)
+            val query = organizationQueries.fetchOrganizationById(uid)
+            val organization = query.asFlow().mapToOneOrNull(coroutineContext).map { it?.mapToShort() }
 
             return organization
         }
@@ -127,14 +118,10 @@ interface OrganizationsLocalDataSource {
         }
 
         override suspend fun fetchAllShortOrganization(): Flow<List<OrganizationShortEntity>> {
-            val query = organizationQueries.fetchAllOrganizations(
-                mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel, _, _, locationList, _, offices, _ ->
-                    val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsEntity>(timeIntervalsModel)
-                    val locations = locationList.map { Json.decodeFromString<ContactInfoEntity>(it) }
-                    OrganizationShortEntity(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
-                },
-            )
-            val organizations = query.asFlow().mapToList(coroutineContext)
+            val query = organizationQueries.fetchAllOrganizations()
+            val organizations = query.asFlow().mapToList(coroutineContext).map { entities ->
+                entities.map { it.mapToShort() }
+            }
 
             return organizations
         }

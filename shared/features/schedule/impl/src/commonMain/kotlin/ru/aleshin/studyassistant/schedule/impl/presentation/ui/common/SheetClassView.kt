@@ -38,14 +38,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 21.06.2024.
@@ -54,6 +54,7 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 internal fun SheetClassView(
     modifier: Modifier = Modifier,
     subject: SubjectUi?,
+    eventType: EventType,
     office: String,
     organization: OrganizationShortUi?,
     teacher: EmployeeUi?,
@@ -70,6 +71,7 @@ internal fun SheetClassView(
         ) {
             SheetClassViewHeader(
                 subject = subject,
+                eventType = eventType,
                 office = office,
             )
             SheetClassViewFooter(
@@ -85,6 +87,7 @@ internal fun SheetClassView(
 private fun SheetClassViewHeader(
     modifier: Modifier = Modifier,
     subject: SubjectUi?,
+    eventType: EventType,
     office: String,
 ) {
     Row(
@@ -93,7 +96,7 @@ private fun SheetClassViewHeader(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = (subject?.eventType ?: EventType.CLASS).mapToString(StudyAssistantRes.strings),
+                text = eventType.mapToString(StudyAssistantRes.strings),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 style = MaterialTheme.typography.labelSmall,
