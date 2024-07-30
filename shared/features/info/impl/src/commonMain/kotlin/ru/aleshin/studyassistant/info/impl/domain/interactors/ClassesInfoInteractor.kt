@@ -49,7 +49,10 @@ internal interface ClassesInfoInteractor {
             val currentWeek = dateManager.fetchCurrentWeek()
             val schedules = scheduleRepository.fetchSchedulesByVersion(currentWeek, null, targetUser)
             val classes = schedules.first().groupBy { it.week }.mapValues { entry ->
-                entry.value.map { schedule -> schedule.classes }.extractAllItem()
+                val allClasses = entry.value.map { schedule -> schedule.classes }.extractAllItem()
+                return@mapValues allClasses.filter { classModel ->
+                    classModel.organization.uid == organizationId
+                }
             }
 
             val numberOfClassesInWeek = classes.mapValues { entry ->

@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.preview.impl.domain.interactors
 
+import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -44,7 +45,9 @@ internal interface OrganizationsInteractor {
             get() = usersRepository.fetchCurrentUserOrError().uid
 
         override suspend fun fetchAllOrganization() = eitherWrapper.wrapFlow {
-            organizationsRepository.fetchAllOrganization(targetUser)
+            organizationsRepository.fetchAllOrganization(targetUser).map { organizations ->
+                organizations.sortedByDescending { it.isMain }
+            }
         }
 
         override suspend fun createOrUpdateOrganization(organization: Organization) = eitherWrapper.wrap {

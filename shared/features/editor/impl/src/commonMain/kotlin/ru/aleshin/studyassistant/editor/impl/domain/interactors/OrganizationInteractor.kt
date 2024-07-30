@@ -67,7 +67,9 @@ internal interface OrganizationInteractor {
         }
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {
-            organizationsRepository.fetchAllShortOrganization(targetUser)
+            organizationsRepository.fetchAllShortOrganization(targetUser).map { organizations ->
+                organizations.sortedByDescending { it.isMain }
+            }
         }
 
         override suspend fun updateShortOrganization(organization: OrganizationShort) = eitherWrapper.wrapUnit {
