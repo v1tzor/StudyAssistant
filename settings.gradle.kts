@@ -12,6 +12,8 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://developer.huawei.com/repo/")
+        maven("https://artifactory-external.vkpartner.ru/artifactory/maven")
     }
 }
 

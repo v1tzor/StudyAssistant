@@ -23,6 +23,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
@@ -54,6 +55,7 @@ object PreviewFeatureDIHolder : BaseFeatureDIHolder<PreviewFeatureApi, PreviewFe
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
+                bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<PreviewFeatureApi> {
                     object : PreviewFeatureApi {

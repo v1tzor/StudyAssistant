@@ -19,14 +19,15 @@ package ru.aleshin.studyassistant
 import com.mmk.kmpauth.google.GoogleAuthCredentials
 import com.mmk.kmpauth.google.GoogleAuthProvider
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.firestore.LocalCacheSettings
 import dev.gitlive.firebase.firestore.firestore
+import dev.gitlive.firebase.firestore.firestoreSettings
+import dev.gitlive.firebase.firestore.persistentCacheSettings
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
-import ru.aleshin.studyassistant.core.common.di.coreModule
-import ru.aleshin.studyassistant.core.common.functional.Constants.App.WEB_CLIENT_ID
+import ru.aleshin.studyassistant.core.common.di.coreCommonModule
 import ru.aleshin.studyassistant.core.data.di.coreDataModule
-import ru.aleshin.studyassistant.core.data.di.coreDatabaseModule
 import ru.aleshin.studyassistant.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.aleshin.studyassistant.di.modules.domainModule
@@ -44,16 +45,19 @@ object PlatformSDK {
             bindSingleton<PlatformConfiguration> { configuration }
             importAll(
                 platformModule,
-                coreModule,
-                coreDatabaseModule,
+                coreCommonModule,
                 coreDataModule,
                 featureModule,
                 presentationModule,
                 domainModule,
             )
         }
-        Firebase.firestore.setSettings(persistenceEnabled = true)
-        GoogleAuthProvider.create(credentials = GoogleAuthCredentials(serverId = WEB_CLIENT_ID))
+        Firebase.firestore.settings = firestoreSettings {
+            persistentCacheSettings {
+                cacheSettings = LocalCacheSettings.Persistent.newBuilder().build()
+            }
+        }
+        GoogleAuthProvider.create(GoogleAuthCredentials(serverId = BuildKonfig.WEB_CLIENT_ID))
         MainDependenciesGraph.initialize(graph.direct)
     }
 }

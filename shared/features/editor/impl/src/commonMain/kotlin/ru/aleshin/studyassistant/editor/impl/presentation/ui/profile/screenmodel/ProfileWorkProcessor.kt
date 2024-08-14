@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.screenmodel
 
+import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
@@ -29,6 +30,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEffect
+import toStorageFile
 
 /**
  * @author Stanislav Aleshin on 28.07.2024.
@@ -44,6 +46,8 @@ internal interface ProfileWorkProcessor :
             is ProfileWorkCommand.LoadAppUser -> loadAppUserWork()
             is ProfileWorkCommand.UpdateAppUser -> updateAppUserWork(command.user)
             is ProfileWorkCommand.UpdatePassword -> updatePasswordWork(command.oldPassword, command.newPassword)
+            is ProfileWorkCommand.UpdateAvatar -> updateAvatarWork(command.user, command.file)
+            is ProfileWorkCommand.DeleteAvatar -> deleteAvatarWork(command.user)
         }
 
         private fun loadAppUserWork() = flow {
@@ -66,11 +70,37 @@ internal interface ProfileWorkProcessor :
                 onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
             )
         }
+
+        private fun updateAvatarWork(user: AppUserUi, file: PlatformFile) = flow {
+            appUserInteractor.uploadAvatar(user.uid, file.toStorageFile()).handle(
+                onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
+                onRightAction = { imageUrl ->
+                    val updatedUser = user.copy(avatar = imageUrl)
+                    appUserInteractor.updateUser(updatedUser.mapToDomain()).handle(
+                        onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
+                    )
+                }
+            )
+        }
+
+        private fun deleteAvatarWork(user: AppUserUi) = flow {
+            appUserInteractor.deleteAvatar(user.uid).handle(
+                onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
+                onRightAction = {
+                    val updatedUser = user.copy(avatar = null)
+                    appUserInteractor.updateUser(updatedUser.mapToDomain()).handle(
+                        onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
+                    )
+                }
+            )
+        }
     }
 }
 
 internal sealed class ProfileWorkCommand : WorkCommand {
     data object LoadAppUser : ProfileWorkCommand()
     data class UpdateAppUser(val user: AppUserUi) : ProfileWorkCommand()
+    data class UpdateAvatar(val user: AppUserUi, val file: PlatformFile) : ProfileWorkCommand()
+    data class DeleteAvatar(val user: AppUserUi) : ProfileWorkCommand()
     data class UpdatePassword(val oldPassword: String, val newPassword: String) : ProfileWorkCommand()
 }

@@ -23,13 +23,18 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.uriString
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
@@ -39,6 +44,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contra
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contract.OrganizationViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.rememberOrganizationScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.views.OrganizationTopBar
+import toStorageFile
 
 /**
  * @author Stanislav Aleshin on 08.07.2024
@@ -52,6 +58,8 @@ internal data class OrganizationScreen(val organizationId: UID?) : Screen {
         dependencies = OrganizationDeps(organizationId = organizationId),
     ) { state ->
         val strings = EditorThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
+        val coroutineScope = rememberCoroutineScope()
         val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
 
@@ -61,7 +69,10 @@ internal data class OrganizationScreen(val organizationId: UID?) : Screen {
                 OrganizationContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
-                    onUpdateAvatar = { dispatchEvent(OrganizationEvent.UpdateAvatar(it)) },
+                    onUpdateAvatar = {
+                        dispatchEvent(OrganizationEvent.UpdateAvatar(it.toStorageFile().uriString()))
+                    },
+                    onDeleteAvatar = { dispatchEvent(OrganizationEvent.DeleteAvatar) },
                     onSelectedType = { dispatchEvent(OrganizationEvent.UpdateType(it)) },
                     onUpdateName = { short, full ->
                         dispatchEvent(OrganizationEvent.UpdateName(short, full))
@@ -71,6 +82,14 @@ internal data class OrganizationScreen(val organizationId: UID?) : Screen {
                     onUpdateWebs = { dispatchEvent(OrganizationEvent.UpdateWebs(it)) },
                     onUpdateLocations = { dispatchEvent(OrganizationEvent.UpdateLocations(it)) },
                     onStatusChange = { dispatchEvent(OrganizationEvent.UpdateStatus(it)) },
+                    onExceedingAvatarSizeLimit = {
+                        coroutineScope.launch {
+                            snackbarState.showSnackbar(
+                                message = coreStrings.exceedingLimitImageSizeMessage,
+                                withDismissAction = true,
+                            )
+                        }
+                    }
                 )
             },
             topBar = {
@@ -93,7 +112,9 @@ internal data class OrganizationScreen(val organizationId: UID?) : Screen {
                 is OrganizationEffect.NavigateToBack -> navigator.nestedPop()
                 is OrganizationEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.apply {
+                            Logger.i("test") { this.toString() }
+                        }.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

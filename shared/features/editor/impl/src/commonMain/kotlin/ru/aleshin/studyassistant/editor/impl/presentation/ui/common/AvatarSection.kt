@@ -19,24 +19,18 @@ package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import io.github.vinceglb.filekit.core.PlatformFile
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
+import ru.aleshin.studyassistant.core.ui.views.menu.SelectableAvatarView
 
 /**
  * @author Stanislav Aleshin on 06.06.2024
@@ -45,10 +39,11 @@ import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 internal fun AvatarSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    firstName: String?,
-    secondName: String?,
+    shortName: String?,
     avatar: String?,
-    onUpdate: (String?) -> Unit
+    onUpdateAvatar: (PlatformFile) -> Unit,
+    onDeleteAvatar: () -> Unit,
+    onExceedingLimit: (Int) -> Unit,
 ) {
     Box(
         modifier = modifier.fillMaxWidth(),
@@ -62,61 +57,17 @@ internal fun AvatarSection(
                 AvatarViewPlaceholder()
             } else {
                 SelectableAvatarView(
-                    firstName = firstName,
-                    secondName = secondName,
+                    modifier = Modifier.size(90.dp),
+                    onSelect = onUpdateAvatar,
+                    onDelete = onDeleteAvatar,
+                    onExceedingLimit = onExceedingLimit,
+                    firstName = shortName?.split(' ')?.getOrNull(0) ?: "*",
+                    secondName = shortName?.split(' ')?.getOrNull(1),
                     imageUrl = avatar,
-                    onClick = {},
+                    style = MaterialTheme.typography.displaySmall,
                 )
             }
         }
-    }
-}
-
-@Composable
-internal fun SelectableAvatarView(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    firstName: String?,
-    secondName: String?,
-    imageUrl: String?,
-    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    contentColor: Color = MaterialTheme.colorScheme.primary,
-) {
-    Box {
-        Surface(
-            onClick = onClick,
-            modifier = modifier.size(90.dp, 90.dp),
-            enabled = enabled,
-            shape = MaterialTheme.shapes.full,
-            color = containerColor,
-            contentColor = contentColor,
-        ) {
-            if (imageUrl != null) {
-                // TODO Get image with glide
-            } else {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = buildString {
-                            append(firstName?.firstOrNull()?.uppercase() ?: "")
-                            append(secondName?.firstOrNull()?.uppercase() ?: "")
-                            if (firstName == null && secondName == null) append('-')
-                        },
-                        style = MaterialTheme.typography.displaySmall,
-                    )
-                }
-            }
-        }
-        Icon(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .size(24.dp)
-                .clip(MaterialTheme.shapes.full)
-                .border(2.dp, MaterialTheme.colorScheme.surfaceContainerLow),
-            painter = painterResource(StudyAssistantRes.icons.upload),
-            contentDescription = StudyAssistantRes.strings.avatarDesc,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 

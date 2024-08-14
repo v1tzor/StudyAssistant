@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name="ru.aleshin.studyassistant.application.StudyAssistantApp"
         android:allowBackup="true"
@@ -15,7 +18,7 @@
         tools:targetApi="34">
 
         <activity
-            android:name="ru.aleshin.studyassistant.ui.MainActivity"
+            android:name="ru.aleshin.studyassistant.presentation.ui.MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize"
             android:launchMode="singleTop">

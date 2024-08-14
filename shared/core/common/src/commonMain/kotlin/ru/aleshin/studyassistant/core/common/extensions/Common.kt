@@ -27,8 +27,8 @@ inline fun <T> List<List<T>>.extractAllItem() = buildList {
     this@extractAllItem.forEach { addAll(it) }
 }
 
-fun generateSevenDigitCode(): String {
-    return abs(Random(Clock.System.now().toEpochMilliseconds()).nextInt()).toString().substring(IntRange(0, 6))
+fun generateDigitCode(numbers: Int = 7): String {
+    return abs(Random(Clock.System.now().toEpochMilliseconds()).nextInt()).toString().substring(IntRange(0, numbers - 1))
 }
 
 inline fun <T> Iterable<T>.forEachWith(action: T.() -> Unit) {

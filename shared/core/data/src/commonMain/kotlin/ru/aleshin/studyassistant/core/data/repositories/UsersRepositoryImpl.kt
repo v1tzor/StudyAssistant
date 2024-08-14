@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.data.repositories
 
 import dev.gitlive.firebase.auth.FirebaseUser
+import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -33,31 +34,43 @@ class UsersRepositoryImpl(
     private val remoteDataSource: UsersRemoteDataSource,
 ) : UsersRepository {
 
-    override fun fetchCurrentUser(): FirebaseUser? {
-        return remoteDataSource.fetchCurrentFirebaseUser()
-    }
-
     override suspend fun addOrUpdateAppUser(user: AppUser): Boolean {
         return remoteDataSource.addOrUpdateUser(user.mapToRemote())
     }
 
-    override suspend fun fetchAppUserById(uid: UID): Flow<AppUser?> {
+    override fun fetchCurrentAppUser(): FirebaseUser? {
+        return remoteDataSource.fetchCurrentAppUser()
+    }
+
+    override suspend fun fetchAuthStateChanged(): Flow<FirebaseUser?> {
+        return remoteDataSource.fetchAuthStateChanged()
+    }
+
+    override suspend fun fetchUserById(uid: UID): Flow<AppUser?> {
         return remoteDataSource.fetchUserById(uid).map { userPojo -> userPojo?.mapToDomain() }
     }
 
-    override suspend fun fetchRealtimeAppUserById(uid: UID): AppUser? {
-        return remoteDataSource.fetchRealtimeAppUserById(uid)?.mapToDomain()
+    override suspend fun fetchRealtimeUserById(uid: UID): AppUser? {
+        return remoteDataSource.fetchRealtimeUserById(uid)?.mapToDomain()
     }
 
-    override suspend fun fetchAppUserFriends(uid: UID): Flow<List<AppUser>> {
-        return remoteDataSource.fetchAppUserFriends(uid).map { users ->
+    override suspend fun fetchUserFriends(uid: UID): Flow<List<AppUser>> {
+        return remoteDataSource.fetchUserFriends(uid).map { users ->
             users.map { userPojo -> userPojo.mapToDomain() }
         }
     }
 
-    override suspend fun findAppUsersByCode(code: String): Flow<List<AppUser>> {
+    override suspend fun findUsersByCode(code: String): Flow<List<AppUser>> {
         return remoteDataSource.findUsersByCode(code).map { users ->
             users.map { userPojo -> userPojo.mapToDomain() }
         }
+    }
+
+    override suspend fun uploadUserAvatar(uid: UID, avatar: File): String {
+        return remoteDataSource.uploadAvatar(uid, avatar)
+    }
+
+    override suspend fun deleteUserAvatar(uid: UID) {
+        return remoteDataSource.deleteAvatar(uid)
     }
 }

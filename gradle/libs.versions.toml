@@ -7,24 +7,27 @@ jvmTarget = "17"
 version-name = "0.0.1-alpha"
 version-code = "1"
 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-agp = "8.3.2"
+agp = "8.5.2"
 kotlin = "2.0.20-Beta2"
-kotlin-coroutines = "1.8.0"
+kotlin-coroutines = "1.9.0-RC"
 kotlin-datetime = "0.6.0"
-kotlin-serialization = "1.6.2"
+kotlin-serialization = "1.7.0"
 mokoParcelize = "0.9.0"
 compose = "1.6.8"
 compose-compiler = "1.5.11"
 compose-material3 = "1.2.1"
 compose-material = "1.12.0"
 compose-plugin = "1.7.0-alpha02"
-androidx-activityCompose = "1.9.0"
+androidx-activityCompose = "1.9.1"
 gms = "4.4.2"
+oauth = "1.22.0"
 firebase-bom = "33.1.1"
+rustore-bom = "6.0.0"
 firebase-gitlive = "1.13.0"
 ksp = "2.0.0-1.0.22"
 voyager = "1.1.0-beta02"
-kodein = "7.21.2"
+kodein = "7.22.0"
+ktor = "2.3.12"
 accompanist = "0.34.0"
 coreKtx = "1.13.1"
 bignum = "0.3.9"
@@ -35,9 +38,11 @@ placeholder = "1.0.7"
 gms-auth = "21.2.0"
 networkchecker = "1.2.0"
 kmpauth-google = "1.3.0"
-koalaplot-charts = "0.6.1"
+koalaplot-charts = "0.6.3"
 sketch = "4.0.0-alpha03"
 drag-and-drop = "0.2.0"
+filekit = "0.7.0"
+konfig = "0.15.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -55,19 +60,32 @@ compose-foundation = { module = "androidx.compose.foundation:foundation", versio
 compose-material = { group = "com.google.android.material", name = "material", version.ref = "compose-material" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
 google-accompanist = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
-google-auth-android = { module = "com.google.android.gms:play-services-auth", version.ref = "gms-auth" }
+google-gsm-services = { module = "com.google.android.gms:play-services-auth", version.ref = "gms-auth" }
+google-oauth-bom-android = { module = "com.google.auth:google-auth-library-bom", version.ref = "oauth" }
+google-oauth-android = { module = "com.google.auth:google-auth-library-oauth2-http" }
+google-oauth-credentials-android = { module = "com.google.auth:google-auth-library-credentials" }
 google-auth = { module = "io.github.mirzemehdi:kmpauth-google", version.ref = "kmpauth-google" }
 placeholder = { group = "com.eygraber", name = "compose-placeholder-material3", version.ref = "placeholder" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebase-gitlive" }
 firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebase-gitlive" }
+firebase-storage = { module = "dev.gitlive:firebase-storage", version.ref = "firebase-gitlive" }
+firebase-messaging = { module = "dev.gitlive:firebase-messaging", version.ref = "firebase-gitlive" }
+firebase-bom-android = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
+firebase-auth-android = { module = "com.google.firebase:firebase-auth-ktx" }
+firebase-messaging-android = { module = "com.google.firebase:firebase-messaging" }
+firebase-messaging-directboot-android = { module = "com.google.firebase:firebase-messaging-directboot" }
+rustore-bom = { module = "ru.rustore.sdk:bom", version.ref = "rustore-bom" }
+rustore-universalpush-core = { module = "ru.rustore.sdk:universalpush" }
+rustore-universalpush-rustore = { module = "ru.rustore.sdk:universalrustore" }
+rustore-universalpush-fcm = { module = "ru.rustore.sdk:universalfcm" }
+rustore-universalpush-hms = { module = "ru.rustore.sdk:universalhms" }
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-screenModel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 voyager-kodein = { module = "cafe.adriel.voyager:voyager-kodein", version.ref = "voyager" }
 kodein-core = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
 kodein-compose = { module = "org.kodein.di:kodein-di-framework-compose", version.ref = "kodein" }
-kodein-android = { module = "org.kodein.di:kodein-di-framework-compose", version.ref = "kodein" }
+kodein-android = { module = "org.kodein.di:kodein-di-framework-android-core", version.ref = "kodein" }
 bignumn = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 sqldelight-core = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
@@ -85,12 +103,21 @@ sketch-compose = { module = "io.github.panpf.sketch4:sketch-compose", version.re
 sketch-compose-resources = { module = "io.github.panpf.sketch4:sketch-compose-resources", version.ref = "sketch" }
 sketch-compose-extnsions-resources = { module = "io.github.panpf.sketch4:sketch-extensions-compose-resources", version.ref = "sketch" }
 dragAndDrop = { module = "com.mohamedrejeb.dnd:compose-dnd", version.ref = "drag-and-drop" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-content-negotation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
+filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekit" }
 
 [bundles]
 mokoResources = ["mokoResources-core", "mokoResources-compose"]
-firebase = ["firebase-auth", "firebase-firestore"]
+firebase = ["firebase-auth", "firebase-firestore", "firebase-storage", "firebase-messaging"]
 voyager = ["voyager-navigator", "voyager-screenModel", "voyager-transitions", "voyager-kodein"]
 sketch = ["sketch-compose", "sketch-compose-resources", "sketch-compose-extnsions-resources"]
+filekit = ["filekit-core", "filekit-compose"]
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -106,3 +133,4 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 sqlitedelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 gms = { id = "com.google.gms.google-services", version.ref = "gms" }
+konfig = { id = "com.codingfeline.buildkonfig", version.ref = "konfig" }

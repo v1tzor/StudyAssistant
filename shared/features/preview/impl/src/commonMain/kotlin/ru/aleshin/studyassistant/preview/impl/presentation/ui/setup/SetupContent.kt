@@ -38,6 +38,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import io.github.vinceglb.filekit.core.PlatformFile
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
 import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
 import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
@@ -61,8 +63,13 @@ internal fun SetupContent(
     onUpdateOrganization: (OrganizationUi) -> Unit,
     onUpdateCalendarSettings: (CalendarSettingsUi) -> Unit,
     onSaveProfile: () -> Unit,
+    onUpdateProfileAvatar: (PlatformFile) -> Unit,
+    onDeleteProfileAvatar: () -> Unit,
     onSaveOrganization: () -> Unit,
+    onUpdateOrganizationAvatar: (PlatformFile) -> Unit,
+    onDeleteOrganizationAvatar: () -> Unit,
     onSaveCalendar: () -> Unit,
+    onExceedingAvatarSizeLimit: (Int) -> Unit,
     onFillOutSchedule: () -> Unit,
     onStartUsing: () -> Unit,
 ) = with(state) {
@@ -74,11 +81,18 @@ internal fun SetupContent(
             modifier = Modifier.weight(1f),
             currentPage = currentPage,
             profile = profile,
+            actionWithProfileAvatar = actionWithProfileAvatar,
             organization = organization,
+            actionWithOrganizationAvatar = actionWithOrganizationAvatar,
             calendarSettings = calendarSettings,
             onUpdateProfile = onUpdateProfile,
+            onUpdateProfileAvatar = onUpdateProfileAvatar,
+            onDeleteProfileAvatar = onDeleteProfileAvatar,
             onUpdateOrganization = onUpdateOrganization,
+            onUpdateOrganizationAvatar = onUpdateOrganizationAvatar,
+            onDeleteOrganizationAvatar = onDeleteOrganizationAvatar,
             onUpdateCalendarSettings = onUpdateCalendarSettings,
+            onExceedingAvatarSizeLimit = onExceedingAvatarSizeLimit,
         )
         SetupPageNavigationSection(
             enabledSaveProfile = profile?.username?.isNotBlank() == true,
@@ -99,11 +113,18 @@ private fun SetupPageInfoSection(
     modifier: Modifier = Modifier,
     currentPage: SetupPage,
     profile: AppUserUi?,
+    actionWithProfileAvatar: ActionWithAvatar,
     organization: OrganizationUi?,
+    actionWithOrganizationAvatar: ActionWithAvatar,
     calendarSettings: CalendarSettingsUi?,
     onUpdateProfile: (AppUserUi) -> Unit,
+    onUpdateProfileAvatar: (PlatformFile) -> Unit,
+    onDeleteProfileAvatar: () -> Unit,
     onUpdateOrganization: (OrganizationUi) -> Unit,
+    onUpdateOrganizationAvatar: (PlatformFile) -> Unit,
+    onDeleteOrganizationAvatar: () -> Unit,
     onUpdateCalendarSettings: (CalendarSettingsUi) -> Unit,
+    onExceedingAvatarSizeLimit: (Int) -> Unit
 ) {
     AnimatedContent(
         targetState = if (profile != null) currentPage else null,
@@ -129,15 +150,29 @@ private fun SetupPageInfoSection(
                         SetupPage.PROFILE -> if (profile != null) {
                             ProfilePageInfo(
                                 profile = profile,
+                                avatar = when (actionWithProfileAvatar) {
+                                    is ActionWithAvatar.None -> actionWithProfileAvatar.uri
+                                    is ActionWithAvatar.Set -> actionWithProfileAvatar.uri
+                                    is ActionWithAvatar.Delete -> null
+                                },
                                 onUpdateProfile = onUpdateProfile,
-                                onSetAvatar = {},
+                                onUpdateAvatar = onUpdateProfileAvatar,
+                                onDeleteAvatar = onDeleteProfileAvatar,
+                                onExceedingLimit = onExceedingAvatarSizeLimit,
                             )
                         }
                         SetupPage.ORGANIZATION -> if (organization != null) {
                             OrganizationPageInfo(
                                 organization = organization,
+                                avatar = when (actionWithOrganizationAvatar) {
+                                    is ActionWithAvatar.None -> actionWithOrganizationAvatar.uri
+                                    is ActionWithAvatar.Set -> actionWithOrganizationAvatar.uri
+                                    is ActionWithAvatar.Delete -> null
+                                },
                                 onUpdateOrganization = onUpdateOrganization,
-                                onSetAvatar = {},
+                                onUpdateAvatar = onUpdateOrganizationAvatar,
+                                onDeleteAvatar = onDeleteOrganizationAvatar,
+                                onExceedingLimit = onExceedingAvatarSizeLimit,
                             )
                         }
                         SetupPage.CALENDAR -> if (calendarSettings != null) {

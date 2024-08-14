@@ -27,8 +27,8 @@ import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirestore.SharedHomeworks
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirestore.Users
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.SharedHomeworks
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Users
 import ru.aleshin.studyassistant.core.remote.mappers.share.convertToDetails
 import ru.aleshin.studyassistant.core.remote.models.shared.SharedHomeworksDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.shared.SharedHomeworksPojo

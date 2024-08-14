@@ -22,10 +22,12 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.profile.api.di.ProfileFeatureApi
@@ -54,7 +56,9 @@ object ProfileFeatureDIHolder : BaseFeatureDIHolder<ProfileFeatureApi, ProfileFe
                 bindSingleton<AuthRepository> { dependencies.authRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<FriendRequestsRepository> { dependencies.friendRequestsRepository }
+                bindSingleton<MessageRepository> { dependencies.messageRepository }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
+                bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<ProfileFeatureApi> {
                     object : ProfileFeatureApi {
                         override fun fetchStarter() = instance<ProfileFeatureStarter>()

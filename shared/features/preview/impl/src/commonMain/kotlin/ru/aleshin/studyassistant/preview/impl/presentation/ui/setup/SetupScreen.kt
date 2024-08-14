@@ -23,13 +23,17 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.uriString
 import ru.aleshin.studyassistant.core.common.navigation.root
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
@@ -40,6 +44,7 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.Set
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupViewState
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.rememberSetupScreenModel
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupTopBar
+import toStorageFile
 
 /**
  * @author Stanislav Aleshin on 17.04.2024
@@ -53,8 +58,10 @@ internal data class SetupScreen(private val createdUser: UID) : Screen {
         initialState = SetupViewState(),
     ) { state ->
         val strings = PreviewThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
         val windowSize = LocalWindowSize.current
         val rootNavigator = LocalNavigator.currentOrThrow.root()
+        val coroutineScope = rememberCoroutineScope()
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -68,10 +75,26 @@ internal data class SetupScreen(private val createdUser: UID) : Screen {
                         onUpdateOrganization = { dispatchEvent(SetupEvent.UpdateOrganization(it)) },
                         onUpdateCalendarSettings = { dispatchEvent(SetupEvent.UpdateCalendarSettings(it)) },
                         onSaveProfile = { dispatchEvent(SetupEvent.SaveProfileInfo) },
+                        onUpdateProfileAvatar = {
+                            dispatchEvent(SetupEvent.UpdateProfileAvatar(it.toStorageFile().uriString()))
+                        },
+                        onDeleteProfileAvatar = { dispatchEvent(SetupEvent.DeleteProfileAvatar) },
                         onSaveOrganization = { dispatchEvent(SetupEvent.SaveOrganizationInfo) },
+                        onUpdateOrganizationAvatar = {
+                            dispatchEvent(SetupEvent.UpdateOrganizationAvatar(it.toStorageFile().uriString()))
+                        },
+                        onDeleteOrganizationAvatar = { dispatchEvent(SetupEvent.DeleteOrganizationAvatar) },
                         onSaveCalendar = { dispatchEvent(SetupEvent.SaveCalendarInfo) },
                         onFillOutSchedule = { dispatchEvent(SetupEvent.NavigateToWeekScheduleEditor) },
                         onStartUsing = { dispatchEvent(SetupEvent.NavigateToSchedule) },
+                        onExceedingAvatarSizeLimit = {
+                            coroutineScope.launch {
+                                snackbarState.showSnackbar(
+                                    message = coreStrings.exceedingLimitImageSizeMessage,
+                                    withDismissAction = true,
+                                )
+                            }
+                        }
                     )
                 }
             },

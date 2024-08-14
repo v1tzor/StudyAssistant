@@ -17,8 +17,14 @@
 package ru.aleshin.studyassistant.di
 
 import android.content.Context
+import ru.aleshin.studyassistant.core.common.platform.Platform
+import ru.aleshin.studyassistant.presentation.services.RemoteMessageHandler
 
-actual data class PlatformConfiguration constructor(val applicationContext: Context){
+actual data class PlatformConfiguration constructor(
+    actual val serviceTokenProvider: PlatformGoogleAuthTokenProvider,
+    val remoteMessageHandler: RemoteMessageHandler,
+    val applicationContext: Context,
+) {
     actual val platform: Platform
         get() = Platform.Android
 }

@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
@@ -88,7 +89,9 @@ internal class ProfileScreen : Screen {
                     is ProfileEffect.ReplaceGlobalScreen -> rootNavigator.replaceAll(effect.screen)
                     is ProfileEffect.ShowError -> {
                         snackbarState.showSnackbar(
-                            message = effect.failures.mapToMessage(strings),
+                            message = effect.failures.apply { 
+                                Logger.e("test") { "error -> $this" }
+                            }.mapToMessage(strings),
                             withDismissAction = true,
                         )
                     }

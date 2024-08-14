@@ -16,7 +16,9 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
+import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
@@ -33,7 +35,9 @@ internal interface AppUserInteractor {
 
     suspend fun fetchAppUser(): FlowDomainResult<EditorFailures, AppUser>
     suspend fun updateUser(user: AppUser): UnitDomainResult<EditorFailures>
+    suspend fun uploadAvatar(uid: UID, file: File): DomainResult<EditorFailures, String>
     suspend fun updatePassword(oldPassword: String, newPassword: String): UnitDomainResult<EditorFailures>
+    suspend fun deleteAvatar(uid: UID): UnitDomainResult<EditorFailures>
 
     class Base(
         private val usersRepository: UsersRepository,
@@ -45,7 +49,7 @@ internal interface AppUserInteractor {
             get() = usersRepository.fetchCurrentUserOrError().uid
 
         override suspend fun fetchAppUser() = eitherWrapper.wrapFlow {
-            usersRepository.fetchAppUserById(currentUser).map { appUser ->
+            usersRepository.fetchUserById(currentUser).map { appUser ->
                 checkNotNull(appUser)
             }
         }
@@ -54,8 +58,16 @@ internal interface AppUserInteractor {
             usersRepository.addOrUpdateAppUser(user)
         }
 
+        override suspend fun uploadAvatar(uid: UID, file: File) = eitherWrapper.wrap {
+            usersRepository.uploadUserAvatar(uid, file)
+        }
+
         override suspend fun updatePassword(oldPassword: String, newPassword: String) = eitherWrapper.wrap {
             manageUserRepository.updatePassword(oldPassword, newPassword)
+        }
+
+        override suspend fun deleteAvatar(uid: UID) = eitherWrapper.wrap {
+            usersRepository.deleteUserAvatar(uid)
         }
     }
 }

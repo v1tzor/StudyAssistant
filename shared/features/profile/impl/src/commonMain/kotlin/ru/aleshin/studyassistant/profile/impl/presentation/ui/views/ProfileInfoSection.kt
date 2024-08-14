@@ -20,32 +20,21 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.panpf.sketch.AsyncImage
-import com.github.panpf.sketch.rememberAsyncImageState
-import com.github.panpf.sketch.request.ComposableImageOptions
-import com.github.panpf.sketch.request.error
-import com.github.panpf.sketch.request.placeholder
-import ru.aleshin.studyassistant.core.common.functional.Constants
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.UserCodeView
+import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
 import ru.aleshin.studyassistant.profile.impl.presentation.models.AppUserUi
 
 /**
@@ -73,51 +62,17 @@ internal fun ProfileInfoSection(
                 ContactInfoViewPlaceholder()
             } else if (profile != null) {
                 AvatarView(
-                    username = profile.username,
-                    imageUrl = profile.avatar
+                    modifier = Modifier.size(120.dp),
+                    firstName = profile.username.split(' ').getOrNull(0) ?: "*",
+                    secondName = profile.username.split(' ').getOrNull(1),
+                    imageUrl = profile.avatar,
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight.Medium,
+                    ),
                 )
                 ContactInfoView(
                     username = profile.username,
                     code = profile.code,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-internal fun AvatarView(
-    modifier: Modifier = Modifier,
-    username: String?,
-    imageUrl: String?,
-    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    contentColor: Color = MaterialTheme.colorScheme.primary,
-) {
-    Surface(
-        modifier = modifier.size(120.dp),
-        shape = MaterialTheme.shapes.full,
-        color = containerColor,
-        contentColor = contentColor,
-    ) {
-        if (imageUrl != null) {
-            AsyncImage(
-                uri = imageUrl,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.full),
-                state = rememberAsyncImageState(
-                    options = ComposableImageOptions {
-                        crossfade(Constants.Animations.STANDARD_TWEEN)
-                        placeholder(MaterialTheme.colorScheme.secondaryContainer)
-                        error(StudyAssistantRes.icons.testsOutline)
-                    }
-                ),
-            )
-        } else {
-            Box(contentAlignment = Alignment.Center) {
-                Text(
-                    text = username?.substring(0, 2)?.uppercase() ?: "-",
-                    fontWeight = FontWeight.Medium,
-                    style = MaterialTheme.typography.displaySmall,
                 )
             }
         }

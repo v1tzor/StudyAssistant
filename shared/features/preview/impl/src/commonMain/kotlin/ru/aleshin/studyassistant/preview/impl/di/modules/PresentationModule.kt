@@ -52,6 +52,6 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<SetupStateCommunicator> { SetupStateCommunicator.Base() }
     bindProvider<SetupEffectCommunicator> { SetupEffectCommunicator.Base() }
-    bindProvider<SetupWorkProcessor> { SetupWorkProcessor.Base(instance(), instance(), instance()) }
+    bindProvider<SetupWorkProcessor> { SetupWorkProcessor.Base(instance(), instance(), instance(), instance()) }
     bindProvider<SetupScreenModel> { SetupScreenModel(instance(), instance(), instance(), instance(), instance()) }
 }

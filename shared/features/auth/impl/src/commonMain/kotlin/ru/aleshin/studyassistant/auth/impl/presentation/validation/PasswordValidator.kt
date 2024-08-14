@@ -19,8 +19,8 @@ package ru.aleshin.studyassistant.auth.impl.presentation.validation
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.PasswordValidError
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.functional.Constants.Text.MIN_PASSWORD_LENGTH
-import validation.ValidateResult
-import validation.Validator
+import ru.aleshin.studyassistant.core.common.validation.ValidateResult
+import ru.aleshin.studyassistant.core.common.validation.Validator
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.

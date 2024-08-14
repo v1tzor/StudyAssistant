@@ -49,13 +49,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import models.StandardDuration
 import ru.aleshin.studyassistant.core.common.extensions.hoursToMillis
 import ru.aleshin.studyassistant.core.common.extensions.minutesToMillis
 import ru.aleshin.studyassistant.core.common.extensions.toHorses
 import ru.aleshin.studyassistant.core.common.extensions.toMinutesInHours
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
+import ru.aleshin.studyassistant.core.ui.models.StandardDuration
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**

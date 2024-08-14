@@ -27,7 +27,7 @@ import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirestore.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
 import ru.aleshin.studyassistant.core.remote.mappers.schedules.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.models.classes.ClassDetailsPojo
@@ -63,10 +63,10 @@ interface CustomScheduleRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES)
 
-            val scheduleId = schedule.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+            val uid = schedule.uid.takeIf { it.isNotBlank() } ?: randomUUID()
 
-            return reference.document(scheduleId).set(data = schedule).let {
-                return@let scheduleId
+            return reference.document(uid).set(data = schedule.copy(uid = uid)).let {
+                return@let uid
             }
         }
 

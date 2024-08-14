@@ -24,11 +24,11 @@ import ru.aleshin.studyassistant.core.common.functional.UID
  */
 @Serializable
 data class AppUserPojo(
-    val uid: UID,
-    val messageId: UID,
-    val username: String,
-    val email: String,
-    val code: String,
+    val uid: UID = "",
+    val devices: List<UserDevicePojo> = emptyList(),
+    val username: String = "",
+    val email: String = "",
+    val code: String = "",
     val avatar: String? = null,
     val description: String? = null,
     val city: String? = null,

@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kapt)
-    alias(libs.plugins.gms)
     alias(libs.plugins.compose.compiler)
+    // alias(libs.plugins.gms)
 }
 
 android {
@@ -53,13 +53,40 @@ android {
             isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles("proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    flavorDimensions += "production"
+    productFlavors {
+        create("google") {
+            // FCM
+            dimension = "production"
+        }
+        create("github") {
+            // FCM
+            dimension = "production"
+        }
+        create("fdroid") {
+            // None
+            dimension = "production"
+            applicationIdSuffix = ".fdroid"
+        }
+        create("rustore") {
+            // FCM, RuStore
+            dimension = "production"
+
+            val projectId = localProperties.getProperty("rustoreProjectId")
+            val serviceAuthToken = localProperties.getProperty("rustoreServiceAuthToken")
+
+            buildConfigField("String", "PROJECT_ID", projectId)
+            buildConfigField("String", "SERVICE_AUTH_TOKEN", serviceAuthToken)
         }
     }
 
@@ -79,10 +106,24 @@ android {
 
     packaging {
         resources {
+            resources.pickFirsts.add("META-INF/INDEX.LIST")
+            resources.merges.add("META-INF/DEPENDENCIES")
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
 }
+
+androidComponents {
+    beforeVariants { variant ->
+        if (!variant.productFlavors.joinToString().contains("fdroid")) {
+            apply(plugin = libs.plugins.gms.get().pluginId)
+        }
+    }
+}
+
+val rustoreImplementation = "rustoreImplementation"
+val googleImplementation = "googleImplementation"
+val githubImplementation = "githubImplementation"
 
 dependencies {
     implementation(project(":shared"))
@@ -90,6 +131,27 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.compose.material)
 
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.google.auth.android)
+    implementation(libs.sqldelight.core)
+    implementation(libs.sqldelight.android)
+
+    implementation(libs.kodein.android)
+
+    googleImplementation(libs.google.gsm.services)
+    rustoreImplementation(libs.google.gsm.services)
+    githubImplementation(libs.google.gsm.services)
+    implementation(platform(libs.google.oauth.bom.android))
+    implementation(libs.google.oauth.android)
+    implementation(libs.google.oauth.credentials.android)
+
+    implementation(platform(libs.firebase.bom.android))
+    implementation(libs.firebase.auth.android)
+    implementation(libs.firebase.messaging.android)
+    implementation(libs.firebase.messaging.directboot.android)
+
+    implementation(platform(libs.rustore.bom))
+    implementation(libs.rustore.universalpush.core)
+    googleImplementation(libs.rustore.universalpush.fcm)
+    rustoreImplementation(libs.rustore.universalpush.fcm)
+    githubImplementation(libs.rustore.universalpush.fcm)
+    rustoreImplementation(libs.rustore.universalpush.rustore)
 }

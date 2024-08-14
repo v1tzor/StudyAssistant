@@ -244,7 +244,7 @@ val seed = Color(0xFF6366F1)
 // Splash
 
 val onSplash = Color(0xFFEEEEEE)
-val splash = Color(0xFF2F2EBE)
+val splash = Color(0xFF5B1FBD)
 
 // Accents
 

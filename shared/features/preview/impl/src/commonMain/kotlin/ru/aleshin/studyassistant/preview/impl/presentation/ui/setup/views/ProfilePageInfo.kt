@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import io.github.vinceglb.filekit.core.PlatformFile
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
@@ -63,9 +64,12 @@ import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 internal fun ProfilePageInfo(
     modifier: Modifier = Modifier,
     profile: AppUserUi,
+    avatar: String?,
     scrollState: ScrollState = rememberScrollState(),
     onUpdateProfile: (AppUserUi) -> Unit,
-    onSetAvatar: () -> Unit,
+    onUpdateAvatar: (PlatformFile) -> Unit,
+    onDeleteAvatar: () -> Unit,
+    onExceedingLimit: (Int) -> Unit,
 ) = with(profile) {
     Column(
         modifier = modifier,
@@ -73,11 +77,13 @@ internal fun ProfilePageInfo(
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             SelectableAvatarView(
-                onClick = onSetAvatar,
+                onSelect = onUpdateAvatar,
+                onDelete = onDeleteAvatar,
+                onExceedingLimit = onExceedingLimit,
                 modifier = Modifier.size(90.dp),
                 firstName = profile.username.split(' ').getOrNull(0) ?: "-",
                 secondName = profile.username.split(' ').getOrNull(1),
-                imageUrl = profile.avatar,
+                imageUrl = avatar,
                 style = MaterialTheme.typography.displaySmall,
             )
         }

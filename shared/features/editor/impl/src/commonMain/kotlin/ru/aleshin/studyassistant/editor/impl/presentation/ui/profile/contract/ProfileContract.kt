@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract
 
 import androidx.compose.runtime.Immutable
 import dev.icerock.moko.parcelize.Parcelize
+import io.github.vinceglb.filekit.core.PlatformFile
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
@@ -39,7 +40,8 @@ internal data class ProfileViewState(
 
 internal sealed class ProfileEvent : BaseEvent {
     data object Init : ProfileEvent()
-    data class UpdateAvatar(val url: String?) : ProfileEvent()
+    data class UpdateAvatar(val file: PlatformFile) : ProfileEvent()
+    data object DeleteAvatar : ProfileEvent()
     data class UpdateUsername(val name: String) : ProfileEvent()
     data class UpdateDescription(val text: String?) : ProfileEvent()
     data class UpdateBirthday(val text: String?) : ProfileEvent()

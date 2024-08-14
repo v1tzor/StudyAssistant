@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.core.ui.mappers
 
-import models.ThemeUiType
 import ru.aleshin.studyassistant.core.domain.entities.settings.ThemeType
+import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 
 /**

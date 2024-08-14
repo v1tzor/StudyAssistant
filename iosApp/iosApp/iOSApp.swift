@@ -4,6 +4,7 @@ import FirebaseCore
 import FirebaseAuth
 import GoogleSignIn
 import shared
+import OAuth2
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
@@ -26,13 +27,19 @@ struct iOSApp: App {
     
     init() {
         FirebaseConfiguration.shared.setLoggerLevel(.min)
-        FirebaseApp.configure()
-        PlatformSDK().doInit(configuration: PlatformConfiguration())
+        let filePath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist")
+        guard let fileopts = FirebaseOptions(contentsOfFile: filePath!) else { assert(false, "Couldn't load config file") }
+        FirebaseApp.configure(options: fileopts)
+
+        let tokenProvider = GoogleAuthTokenProvider()
+        let uuidProvider = UUIDProvider()
+        let configuration = PlatformConfiguration(serviceTokenProvider: tokenProvider, uuidProvider: uuidProvider)
+        
+        PlatformSDK().doInit(configuration: configuration)
     }
     
     var body: some Scene {
         WindowGroup {
-            let _ = print("Scene")
             ContentView().onOpenURL(perform: { url in
                             print("onOpenURI")
                             GIDSignIn.sharedInstance.handle(url)

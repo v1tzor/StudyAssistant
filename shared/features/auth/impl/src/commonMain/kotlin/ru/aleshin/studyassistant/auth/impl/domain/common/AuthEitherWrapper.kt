@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.auth.impl.domain.common
 
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
-import wrappers.EitherWrapper
+import ru.aleshin.studyassistant.core.common.wrappers.EitherWrapper
 
 /**
  * @author Stanislav Aleshin on 16.04.2024

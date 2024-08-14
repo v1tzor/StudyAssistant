@@ -21,10 +21,14 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.Actio
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.functional.File
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.firstHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.firstOrNullHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.common.functional.handleAndGet
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.EmployeeInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
@@ -49,7 +53,7 @@ internal interface EmployeeWorkProcessor :
         override suspend fun work(command: EmployeeWorkCommand) = when (command) {
             is EmployeeWorkCommand.LoadEditModel -> loadEditModelWork(command.employeeId, command.organizationId)
             is EmployeeWorkCommand.LoadOrganization -> loadOrganizationWork(command.organizationId)
-            is EmployeeWorkCommand.SaveEditModel -> saveEditModelWork(command.editableEmployee)
+            is EmployeeWorkCommand.SaveEditModel -> saveEditModelWork(command.editModel, command.actionWithAvatar)
         }
 
         private fun loadEditModelWork(employeeId: UID?, organizationId: UID) = flow {
@@ -73,8 +77,31 @@ internal interface EmployeeWorkProcessor :
             )
         }
 
-        private fun saveEditModelWork(editableEmployee: EditEmployeeUi) = flow {
-            val employee = editableEmployee.convertToBase().mapToDomain()
+        private fun saveEditModelWork(
+            editModel: EditEmployeeUi,
+            actionWithAvatar: ActionWithAvatar,
+        ) = flow {
+            val uid = editModel.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+
+            val avatar = when (actionWithAvatar) {
+                is ActionWithAvatar.Set -> {
+                    employeeInteractor.uploadAvatar(uid, File(actionWithAvatar.uri)).handleAndGet(
+                        onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))).let { null } },
+                        onRightAction = { it },
+                    )
+                }
+                is ActionWithAvatar.Delete -> {
+                    employeeInteractor.deleteAvatar(uid).handleAndGet(
+                        onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))).let { null } },
+                        onRightAction = { null },
+                    )
+                }
+                is ActionWithAvatar.None -> actionWithAvatar.uri
+            }
+
+            val updatedEditModel = editModel.copy(uid = uid, avatar = avatar)
+            val employee = updatedEditModel.convertToBase().mapToDomain()
+
             employeeInteractor.addOrUpdateEmployee(employee).handle(
                 onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))) },
                 onRightAction = { emit(EffectResult(EmployeeEffect.NavigateToBack)) },
@@ -86,5 +113,8 @@ internal interface EmployeeWorkProcessor :
 internal sealed class EmployeeWorkCommand : WorkCommand {
     data class LoadEditModel(val employeeId: UID?, val organizationId: UID) : EmployeeWorkCommand()
     data class LoadOrganization(val organizationId: UID) : EmployeeWorkCommand()
-    data class SaveEditModel(val editableEmployee: EditEmployeeUi) : EmployeeWorkCommand()
+    data class SaveEditModel(
+        val editModel: EditEmployeeUi,
+        val actionWithAvatar: ActionWithAvatar,
+    ) : EmployeeWorkCommand()
 }

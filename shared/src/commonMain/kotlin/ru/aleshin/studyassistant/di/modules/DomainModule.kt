@@ -21,8 +21,8 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.domain.common.MainEitherWrapper
 import ru.aleshin.studyassistant.domain.common.MainErrorHandler
+import ru.aleshin.studyassistant.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.domain.interactors.GeneralSettingsInteractor
-import ru.aleshin.studyassistant.domain.interactors.UserCheckerInteractor
 
 /**
  * @author Stanislav Aleshin on 25.04.2024.
@@ -32,5 +32,5 @@ val domainModule = DI.Module("DomainModule") {
     bindSingleton<MainEitherWrapper> { MainEitherWrapper.Base(instance()) }
 
     bindSingleton<GeneralSettingsInteractor> { GeneralSettingsInteractor.Base(instance(), instance()) }
-    bindSingleton<UserCheckerInteractor> { UserCheckerInteractor.Base(instance(), instance()) }
+    bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance(), instance()) }
 }

@@ -25,7 +25,7 @@ import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.exists
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirestore.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectPojo

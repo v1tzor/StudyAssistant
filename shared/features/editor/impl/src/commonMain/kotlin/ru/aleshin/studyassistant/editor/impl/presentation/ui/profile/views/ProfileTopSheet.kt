@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import io.github.vinceglb.filekit.core.PlatformFile
 import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
@@ -53,7 +54,9 @@ internal fun ProfileTopSheet(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     appUser: AppUserUi?,
-    onUpdateAvatar: (String?) -> Unit,
+    onUpdateAvatar: (PlatformFile) -> Unit,
+    onDeleteAvatar: () -> Unit,
+    onExceedingLimit: (Int) -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -74,7 +77,9 @@ internal fun ProfileTopSheet(
             ) {
                 if (!loading && appUser != null) {
                     SelectableAvatarView(
-                        onClick = {},
+                        onSelect = onUpdateAvatar,
+                        onDelete = onDeleteAvatar,
+                        onExceedingLimit = onExceedingLimit,
                         modifier = Modifier.size(120.dp),
                         imageUrl = appUser.avatar,
                         firstName = appUser.username.split(' ').getOrNull(0) ?: "-",

@@ -34,17 +34,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.AvatarSection
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.BirthdayInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EmailInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationsInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.PhoneInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.WebInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract.EmployeeViewState
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeeAvatarSection
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeeNameInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeePostInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.WorkTimeInfoField
@@ -57,7 +59,9 @@ internal fun EmployeeContent(
     state: EmployeeViewState,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
-    onUpdateAvatar: (String?) -> Unit,
+    onUpdateAvatar: (PlatformFile) -> Unit,
+    onDeleteAvatar: () -> Unit,
+    onExceedingAvatarSizeLimit: (Int) -> Unit,
     onUpdateName: (first: String?, second: String?, patronymic: String?) -> Unit,
     onEmployeePostSelected: (EmployeePost?) -> Unit,
     omWorkTimeSelected: (Instant?, Instant?) -> Unit,
@@ -71,12 +75,18 @@ internal fun EmployeeContent(
         modifier = modifier.fillMaxSize().padding(top = 24.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        AvatarSection(
+        EmployeeAvatarSection(
             isLoading = isLoading,
             firstName = editableEmployee?.firstName,
-            secondName = editableEmployee?.patronymic ?: editableEmployee?.secondName,
-            avatar = editableEmployee?.avatar,
-            onUpdate = onUpdateAvatar,
+            lastName = editableEmployee?.patronymic ?: editableEmployee?.secondName,
+            avatar = when (actionWithAvatar) {
+                is ActionWithAvatar.None -> actionWithAvatar.uri
+                is ActionWithAvatar.Set -> actionWithAvatar.uri
+                is ActionWithAvatar.Delete -> null
+            },
+            onUpdateAvatar = onUpdateAvatar,
+            onDeleteAvatar = onDeleteAvatar,
+            onExceedingAvatarSizeLimit = onExceedingAvatarSizeLimit,
         )
         EmployeeNameInfoField(
             isLoading = isLoading,

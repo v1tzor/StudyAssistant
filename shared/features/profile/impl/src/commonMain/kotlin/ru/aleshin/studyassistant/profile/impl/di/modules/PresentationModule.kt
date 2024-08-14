@@ -44,6 +44,6 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindSingleton<ProfileStateCommunicator> { ProfileStateCommunicator.Base() }
     bindSingleton<ProfileEffectCommunicator> { ProfileEffectCommunicator.Base() }
-    bindSingleton<ProfileWorkProcessor> { ProfileWorkProcessor.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<ProfileWorkProcessor> { ProfileWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<ProfileScreenModel> { ProfileScreenModel(instance(), instance(), instance(), instance(), instance()) }
 }

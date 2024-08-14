@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
+import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
@@ -40,6 +41,8 @@ internal interface OrganizationInteractor {
     suspend fun fetchShortOrganizationById(uid: UID): FlowDomainResult<EditorFailures, OrganizationShort>
     suspend fun fetchAllShortOrganizations(): FlowDomainResult<EditorFailures, List<OrganizationShort>>
     suspend fun updateShortOrganization(organization: OrganizationShort): UnitDomainResult<EditorFailures>
+    suspend fun uploadAvatar(uid: UID, file: File): DomainResult<EditorFailures, String>
+    suspend fun deleteAvatar(uid: UID): UnitDomainResult<EditorFailures>
 
     class Base(
         private val organizationsRepository: OrganizationsRepository,
@@ -78,6 +81,13 @@ internal interface OrganizationInteractor {
             val updatedModel = organization.convertToBase(checkNotNull(baseModel))
 
             organizationsRepository.addOrUpdateOrganization(updatedModel, targetUser)
+        }
+
+        override suspend fun uploadAvatar(uid: UID, file: File) = eitherWrapper.wrap {
+            organizationsRepository.uploadAvatar(uid, file, targetUser)
+        }
+        override suspend fun deleteAvatar(uid: UID) = eitherWrapper.wrap {
+            organizationsRepository.deleteAvatar(uid, targetUser)
         }
     }
 }

@@ -64,8 +64,15 @@ internal class ProfileScreenModel(
             }
             is ProfileEvent.UpdateAvatar -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
-                    val updatedUser = checkNotNull(appUser).copy(avatar = event.url)
-                    val command = ProfileWorkCommand.UpdateAppUser(updatedUser)
+                    val user = checkNotNull(appUser)
+                    val command = ProfileWorkCommand.UpdateAvatar(user, event.file)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is ProfileEvent.DeleteAvatar -> with(state()) {
+                launchBackgroundWork(BackgroundKey.USER_ACTION) {
+                    val user = checkNotNull(appUser)
+                    val command = ProfileWorkCommand.DeleteAvatar(user)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }

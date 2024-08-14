@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.presentation.models
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import models.ThemeUiType
+import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 
 /**

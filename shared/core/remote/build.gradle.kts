@@ -25,10 +25,26 @@ kotlin {
     }
 
     sourceSets {
+        androidMain.dependencies {
+            implementation(libs.ktor.client.okhttp)
+
+            implementation(project.dependencies.platform(libs.rustore.bom))
+            implementation(libs.rustore.universalpush.core)
+        }
         commonMain.dependencies {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:domain"))
+
             api(libs.bundles.firebase)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.client.content.negotation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.kotlin.serialization)
+            implementation(libs.kotlin.serialization.json)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
     }
 

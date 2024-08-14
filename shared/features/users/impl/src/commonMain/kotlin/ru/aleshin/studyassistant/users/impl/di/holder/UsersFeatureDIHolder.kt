@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
@@ -53,6 +54,7 @@ object UsersFeatureDIHolder : BaseFeatureDIHolder<UsersFeatureApi, UsersFeatureD
                 bindSingleton<SubjectsRepository> { dependencies.subjectsRepository }
                 bindSingleton<FriendRequestsRepository> { dependencies.friendRequestsRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
+                bindSingleton<MessageRepository> { dependencies.messageRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<UsersFeatureApi> {

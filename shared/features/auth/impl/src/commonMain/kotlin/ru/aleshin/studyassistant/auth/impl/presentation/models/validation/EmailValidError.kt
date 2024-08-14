@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.models.validation
 
 import dev.icerock.moko.parcelize.Parcelize
-import validation.ValidateError
+import ru.aleshin.studyassistant.core.common.validation.ValidateError
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.

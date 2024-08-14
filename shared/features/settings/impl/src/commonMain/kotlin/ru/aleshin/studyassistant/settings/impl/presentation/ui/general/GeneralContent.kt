@@ -25,9 +25,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import models.ThemeUiType
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
+import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes

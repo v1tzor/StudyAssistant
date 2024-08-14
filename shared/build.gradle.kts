@@ -1,9 +1,13 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.parcelize)
+    alias(libs.plugins.konfig)
 }
 
 kotlin {
@@ -28,6 +32,10 @@ kotlin {
     }
 
     sourceSets {
+        androidMain.dependencies {
+            implementation(project.dependencies.platform(libs.rustore.bom))
+            implementation(libs.rustore.universalpush.core)
+        }
         commonMain.dependencies {
             implementation(project(":shared:features:navigation:api"))
             implementation(project(":shared:features:navigation:impl"))
@@ -50,12 +58,12 @@ kotlin {
             implementation(project(":shared:features:editor:api"))
             implementation(project(":shared:features:editor:impl"))
 
-            implementation(project(":shared:core:domain"))
+            api(project(":shared:core:common"))
+            api(project(":shared:core:ui"))
+            api(project(":shared:core:domain"))
             implementation(project(":shared:core:database"))
             implementation(project(":shared:core:remote"))
             implementation(project(":shared:core:data"))
-            api(project(":shared:core:common"))
-            api(project(":shared:core:ui"))
 
             implementation(compose.components.resources)
             implementation(libs.firebase.firestore)
@@ -83,5 +91,19 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+buildkonfig {
+    packageName = "ru.aleshin.studyassistant"
+
+    val webClientId: String = gradleLocalProperties(rootDir, providers).getProperty("web_client_id")
+
+    require(webClientId.isNotEmpty()) {
+        "Enter your Google server's client ID (not your Android client ID) in local.properties"
+    }
+
+    defaultConfigs {
+        buildConfigField(STRING, "WEB_CLIENT_ID", webClientId)
     }
 }

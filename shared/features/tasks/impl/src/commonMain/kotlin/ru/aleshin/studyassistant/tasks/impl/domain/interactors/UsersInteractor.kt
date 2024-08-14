@@ -39,7 +39,7 @@ internal interface UsersInteractor {
             get() = usersRepository.fetchCurrentUserOrError().uid
 
         override suspend fun fetchAllFriends() = eitherWrapper.wrapFlow {
-            usersRepository.fetchAppUserFriends(currentUser)
+            usersRepository.fetchUserFriends(currentUser)
         }
     }
 }

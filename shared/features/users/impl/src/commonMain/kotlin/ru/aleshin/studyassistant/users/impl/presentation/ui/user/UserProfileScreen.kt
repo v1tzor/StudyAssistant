@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
@@ -93,7 +94,9 @@ internal class UserProfileScreen(val userId: UID) : Screen {
                 is UserProfileEffect.NavigateToBack -> navigator.nestedPop()
                 is UserProfileEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.apply {
+                            Logger.i("test") { "error -> $this" }
+                        }.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

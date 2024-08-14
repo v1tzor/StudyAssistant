@@ -16,12 +16,14 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
+import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeeDetails
 import ru.aleshin.studyassistant.core.domain.entities.employee.convertToDetails
@@ -37,8 +39,10 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 internal interface EmployeeInteractor {
 
     suspend fun addOrUpdateEmployee(employee: Employee): DomainResult<EditorFailures, UID>
+    suspend fun uploadAvatar(uid: UID, file: File): DomainResult<EditorFailures, String>
     suspend fun fetchAllDetailsEmployee(organizationId: UID): FlowDomainResult<EditorFailures, List<EmployeeDetails>>
     suspend fun fetchEmployeeById(uid: UID): FlowDomainResult<EditorFailures, Employee?>
+    suspend fun deleteAvatar(uid: UID): UnitDomainResult<EditorFailures>
 
     class Base(
         private val employeeRepository: EmployeeRepository,
@@ -52,6 +56,10 @@ internal interface EmployeeInteractor {
 
         override suspend fun addOrUpdateEmployee(employee: Employee) = eitherWrapper.wrap {
             employeeRepository.addOrUpdateEmployee(employee, targetUser)
+        }
+
+        override suspend fun uploadAvatar(uid: UID, file: File) = eitherWrapper.wrap {
+            employeeRepository.uploadAvatar(uid, file, targetUser)
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -72,6 +80,10 @@ internal interface EmployeeInteractor {
 
         override suspend fun fetchEmployeeById(uid: UID) = eitherWrapper.wrapFlow {
             employeeRepository.fetchEmployeeById(uid, targetUser)
+        }
+
+        override suspend fun deleteAvatar(uid: UID) = eitherWrapper.wrap {
+            employeeRepository.deleteAvatar(uid, targetUser)
         }
     }
 }

@@ -16,8 +16,13 @@
 
 package ru.aleshin.studyassistant.profile.impl.domain.interactors
 
+import kotlinx.coroutines.flow.first
+import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
+import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.profile.impl.domain.common.ProfileEitherWrapper
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 
@@ -26,15 +31,31 @@ import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
  */
 internal interface AuthInteractor {
 
-    suspend fun signOut(): UnitDomainResult<ProfileFailures>
+    suspend fun signOut(deviceId: UID): UnitDomainResult<ProfileFailures>
 
     class Base(
         private val authRepository: AuthRepository,
+        private val messageRepository: MessageRepository,
+        private val usersRepository: UsersRepository,
         private val eitherWrapper: ProfileEitherWrapper,
     ) : AuthInteractor {
 
-        override suspend fun signOut() = eitherWrapper.wrap {
+        private val targetUser: UID
+            get() = usersRepository.fetchCurrentUserOrError().uid
+
+        override suspend fun signOut(deviceId: UID) = eitherWrapper.wrap {
+            val userInfo = usersRepository.fetchUserById(targetUser).first() ?: throw FirebaseUserException()
+            val deviceInfo = userInfo.devices.find { it.deviceId == deviceId }
+            if (deviceInfo != null) {
+                val updatedDevices = buildList {
+                    addAll(userInfo.devices)
+                    remove(deviceInfo)
+                }
+                val updatedUserInfo = userInfo.copy(devices = updatedDevices)
+                usersRepository.addOrUpdateAppUser(updatedUserInfo)
+            }
             authRepository.signOut()
+            messageRepository.deleteToken()
         }
     }
 }

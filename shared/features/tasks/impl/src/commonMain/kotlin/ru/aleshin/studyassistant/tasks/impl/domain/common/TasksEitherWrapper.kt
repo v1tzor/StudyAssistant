@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.tasks.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
-import wrappers.FlowEitherWrapper
 
 /**
  * @author Stanislav Aleshin on 21.04.2024

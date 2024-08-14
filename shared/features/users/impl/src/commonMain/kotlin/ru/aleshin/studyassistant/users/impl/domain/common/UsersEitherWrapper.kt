@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.users.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
 import ru.aleshin.studyassistant.users.impl.domain.entities.UsersFailures
-import wrappers.FlowEitherWrapper
 
 /**
  * @author Stanislav Aleshin on 10.07.2024

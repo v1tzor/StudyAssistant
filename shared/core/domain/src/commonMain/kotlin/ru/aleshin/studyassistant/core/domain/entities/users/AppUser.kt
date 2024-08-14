@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.core.domain.entities.users
 
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.extensions.generateSevenDigitCode
+import ru.aleshin.studyassistant.core.common.extensions.generateDigitCode
 import ru.aleshin.studyassistant.core.common.functional.UID
 
 /**
@@ -25,7 +25,7 @@ import ru.aleshin.studyassistant.core.common.functional.UID
  */
 data class AppUser(
     val uid: UID,
-    val messageId: UID = "",
+    val devices: List<UserDevice>,
     val username: String,
     val email: String,
     val code: String,
@@ -39,11 +39,17 @@ data class AppUser(
     val socialNetworks: List<SocialNetwork> = emptyList(),
 ) {
     companion object {
-        fun createNewUser(uid: UID, username: String, email: String) = AppUser(
+        fun createNewUser(
+            uid: UID,
+            device: UserDevice,
+            username: String,
+            email: String
+        ) = AppUser(
             uid = uid,
+            devices = listOf(device),
             username = username,
             email = email,
-            code = generateSevenDigitCode(),
+            code = generateDigitCode(),
         )
     }
 }

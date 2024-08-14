@@ -26,8 +26,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirestore.Requests
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirestore.Users
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Requests
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Users
 import ru.aleshin.studyassistant.core.remote.models.requests.FriendRequestsDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.requests.FriendRequestsPojo
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo

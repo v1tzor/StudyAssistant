@@ -22,10 +22,11 @@ import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.profile.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.FriendRequestsInteractor
-import ru.aleshin.studyassistant.profile.impl.domain.interactors.UserInteractor
 import ru.aleshin.studyassistant.profile.impl.navigation.ProfileScreenProvider
 import ru.aleshin.studyassistant.profile.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileAction
@@ -38,10 +39,11 @@ internal interface ProfileWorkProcessor :
     FlowWorkProcessor<ProfileWorkCommand, ProfileAction, ProfileEffect> {
 
     class Base(
-        private val userInteractor: UserInteractor,
-        private val friendRequestsInteractor: FriendRequestsInteractor,
         private val authInteractor: AuthInteractor,
+        private val userInteractor: AppUserInteractor,
+        private val friendRequestsInteractor: FriendRequestsInteractor,
         private val screenProvider: ProfileScreenProvider,
+        private val deviceInfoProvider: DeviceInfoProvider,
     ) : ProfileWorkProcessor {
 
         override suspend fun work(command: ProfileWorkCommand) = when (command) {
@@ -51,7 +53,7 @@ internal interface ProfileWorkProcessor :
 
         @OptIn(ExperimentalCoroutinesApi::class)
         private fun loadProfileInfoWork() = flow {
-            val userInfoFlow = userInteractor.fetchCurrentAppUser()
+            val userInfoFlow = userInteractor.fetchAppUser()
             val friendsRequestsFlow = friendRequestsInteractor.fetchAllFriendRequests()
 
             userInfoFlow.flatMapLatestWithResult(
@@ -68,7 +70,8 @@ internal interface ProfileWorkProcessor :
         }
 
         private fun signOutWork() = flow {
-            authInteractor.signOut().handle(
+            val deviceId = deviceInfoProvider.fetchDeviceId()
+            authInteractor.signOut(deviceId).handle(
                 onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
                 onRightAction = {
                     val authScreen = screenProvider.provideAuthScreen(AuthScreen.Login)

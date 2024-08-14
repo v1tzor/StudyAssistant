@@ -29,7 +29,7 @@ import io.github.koalaplot.core.style.KoalaPlotTheme
 import io.github.koalaplot.core.style.LineStyle
 import io.github.koalaplot.core.style.Sizes
 import io.github.koalaplot.core.xygraph.TickPosition
-import models.ThemeUiType
+import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
 import ru.aleshin.studyassistant.core.ui.theme.material.baseShapes
 import ru.aleshin.studyassistant.core.ui.theme.material.baseTypography
 import ru.aleshin.studyassistant.core.ui.theme.material.isDarkTheme

@@ -38,10 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ru.aleshin.studyassistant.core.common.functional.Constants
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.onSplash
 import ru.aleshin.studyassistant.core.ui.theme.material.splash
@@ -50,7 +49,6 @@ import ru.aleshin.studyassistant.core.ui.theme.material.splash
  * @author Stanislav Aleshin on 09.02.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 fun SplashContent(
     modifier: Modifier = Modifier,
 ) {

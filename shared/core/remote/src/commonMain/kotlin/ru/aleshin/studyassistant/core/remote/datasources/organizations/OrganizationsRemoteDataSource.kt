@@ -17,15 +17,18 @@
 package ru.aleshin.studyassistant.core.remote.datasources.organizations
 
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.storage.File
+import dev.gitlive.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
-import ru.aleshin.studyassistant.core.common.extensions.exists
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirestore.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Storage
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
 import ru.aleshin.studyassistant.core.remote.mappers.organizations.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationDetailsPojo
@@ -40,13 +43,16 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 interface OrganizationsRemoteDataSource {
 
     suspend fun addOrUpdateOrganization(organization: OrganizationPojo, targetUser: UID): UID
+    suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String
     suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsPojo?>
     suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShortPojo?>
     suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationDetailsPojo>>
     suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShortPojo>>
+    suspend fun deleteAvatar(uid: UID, targetUser: UID)
 
     class Base(
         private val database: FirebaseFirestore,
+        private val storage: FirebaseStorage
     ) : OrganizationsRemoteDataSource {
 
         override suspend fun addOrUpdateOrganization(organization: OrganizationPojo, targetUser: UID): UID {
@@ -55,17 +61,21 @@ interface OrganizationsRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
 
-            return database.runTransaction {
-                val isExist = organization.uid.isNotEmpty() && reference.document(organization.uid).exists()
-                if (isExist) {
-                    reference.document(organization.uid).set(organization)
-                    return@runTransaction organization.uid
-                } else {
-                    val uid = reference.add(organization).id
-                    reference.document(uid).update(UserData.UID to uid)
-                    return@runTransaction uid
-                }
+            val uid = organization.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+
+            return reference.document(uid).set(organization.copy(uid = uid)).let {
+                return@let uid
             }
+        }
+
+        override suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val storageRoot = storage.reference.child(targetUser).child(Storage.ORGANIZATIONS).child(uid)
+
+            val avatarReference = storageRoot.child(Storage.ORGANIZATION_AVATAR).child(Storage.ORGANIZATION_AVATAR_FILE)
+            avatarReference.putFile(file)
+
+            return avatarReference.getDownloadUrl()
         }
 
         override suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsPojo?> {
@@ -159,6 +169,14 @@ interface OrganizationsRemoteDataSource {
             return reference.snapshots.map { snapshot ->
                 snapshot.documents.map { it.data(serializer<OrganizationShortPojo>()) }
             }
+        }
+
+        override suspend fun deleteAvatar(uid: UID, targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val storageRoot = storage.reference.child(targetUser).child(Storage.ORGANIZATIONS).child(uid)
+
+            val avatarReference = storageRoot.child(Storage.ORGANIZATION_AVATAR).child(Storage.ORGANIZATION_AVATAR_FILE)
+            avatarReference.delete()
         }
     }
 }

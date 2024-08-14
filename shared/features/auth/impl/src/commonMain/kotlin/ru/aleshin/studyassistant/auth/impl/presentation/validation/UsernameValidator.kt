@@ -19,8 +19,8 @@ package ru.aleshin.studyassistant.auth.impl.presentation.validation
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.UsernameValidError
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.functional.Constants.Text.USERNAME_LENGTH
-import validation.ValidateResult
-import validation.Validator
+import ru.aleshin.studyassistant.core.common.validation.ValidateResult
+import ru.aleshin.studyassistant.core.common.validation.Validator
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.

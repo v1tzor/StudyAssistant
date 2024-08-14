@@ -42,7 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
+import io.github.vinceglb.filekit.core.PlatformFile
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
@@ -60,13 +60,15 @@ import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
  * @author Stanislav Aleshin on 27.04.2024
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun OrganizationPageInfo(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     organization: OrganizationUi,
+    avatar: String?,
     onUpdateOrganization: (OrganizationUi) -> Unit,
-    onSetAvatar: () -> Unit,
+    onUpdateAvatar: (PlatformFile) -> Unit,
+    onDeleteAvatar: () -> Unit,
+    onExceedingLimit: (Int) -> Unit,
 ) = with(organization) {
     Column(
         modifier = modifier,
@@ -82,10 +84,12 @@ internal fun OrganizationPageInfo(
             val shortNameInteraction = remember { MutableInteractionSource() }
 
             SelectableAvatarView(
-                onClick = onSetAvatar,
+                onSelect = onUpdateAvatar,
+                onDelete = onDeleteAvatar,
+                onExceedingLimit = onExceedingLimit,
                 modifier = Modifier.size(90.dp),
-                firstName = type.mapToSting(StudyAssistantRes.strings),
-                secondName = null,
+                firstName = organization.shortName.split(' ').getOrNull(0) ?: "*",
+                secondName = organization.shortName.split(' ').getOrNull(1),
                 imageUrl = avatar,
                 shape = RoundedCornerShape(32.dp),
                 style = MaterialTheme.typography.displaySmall,

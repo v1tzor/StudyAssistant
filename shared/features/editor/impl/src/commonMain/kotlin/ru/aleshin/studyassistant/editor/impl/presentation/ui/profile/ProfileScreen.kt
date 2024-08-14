@@ -24,12 +24,16 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
@@ -51,7 +55,9 @@ internal class ProfileScreen : Screen {
         initialState = ProfileViewState(),
     ) { state ->
         val strings = EditorThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
         val navigator = LocalNavigator.currentOrThrow
+        val coroutineScope = rememberCoroutineScope()
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -77,7 +83,16 @@ internal class ProfileScreen : Screen {
                     ProfileTopSheet(
                         isLoading = state.isLoading,
                         appUser = state.appUser,
-                        onUpdateAvatar = { dispatchEvent(ProfileEvent.UpdateAvatar(it)) }
+                        onUpdateAvatar = { file -> dispatchEvent(ProfileEvent.UpdateAvatar(file)) },
+                        onDeleteAvatar = { dispatchEvent(ProfileEvent.DeleteAvatar) },
+                        onExceedingLimit = {
+                            coroutineScope.launch {
+                                snackbarState.showSnackbar(
+                                    message = coreStrings.exceedingLimitImageSizeMessage,
+                                    withDismissAction = true,
+                                )
+                            }
+                        }
                     )
                 }
             },
@@ -94,7 +109,9 @@ internal class ProfileScreen : Screen {
                 is ProfileEffect.NavigateToBack -> navigator.nestedPop()
                 is ProfileEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.apply {
+                            Logger.e("test") { "error -> $this" }
+                        }.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

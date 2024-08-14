@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.domain.repositories
 
 import dev.gitlive.firebase.auth.FirebaseUser
+import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -26,11 +27,14 @@ import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
  * @author Stanislav Aleshin on 29.04.2024.
  */
 interface UsersRepository {
-    fun fetchCurrentUser(): FirebaseUser?
-    fun fetchCurrentUserOrError() = fetchCurrentUser() ?: throw FirebaseUserException()
     suspend fun addOrUpdateAppUser(user: AppUser): Boolean
-    suspend fun fetchAppUserById(uid: UID): Flow<AppUser?>
-    suspend fun fetchRealtimeAppUserById(uid: UID): AppUser?
-    suspend fun fetchAppUserFriends(uid: UID): Flow<List<AppUser>>
-    suspend fun findAppUsersByCode(code: String): Flow<List<AppUser>>
+    fun fetchCurrentAppUser(): FirebaseUser?
+    fun fetchCurrentUserOrError() = fetchCurrentAppUser() ?: throw FirebaseUserException()
+    suspend fun fetchAuthStateChanged(): Flow<FirebaseUser?>
+    suspend fun fetchUserById(uid: UID): Flow<AppUser?>
+    suspend fun fetchRealtimeUserById(uid: UID): AppUser?
+    suspend fun fetchUserFriends(uid: UID): Flow<List<AppUser>>
+    suspend fun findUsersByCode(code: String): Flow<List<AppUser>>
+    suspend fun uploadUserAvatar(uid: UID, avatar: File): String
+    suspend fun deleteUserAvatar(uid: UID)
 }

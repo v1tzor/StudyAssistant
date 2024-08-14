@@ -28,7 +28,7 @@ import ru.aleshin.studyassistant.core.common.extensions.exists
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirestore.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.tasks.mapToDetails
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationShortPojo

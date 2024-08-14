@@ -18,11 +18,11 @@ package ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract
 
 import androidx.compose.runtime.Immutable
 import dev.icerock.moko.parcelize.Parcelize
-import models.ThemeUiType
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
 import ru.aleshin.studyassistant.settings.impl.presentation.models.GeneralSettingsUi

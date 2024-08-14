@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract.EmployeeAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract.EmployeeDeps
@@ -66,9 +67,16 @@ internal class EmployeeScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is EmployeeEvent.UpdateAvatar -> with(state()) {
-                val updatedEmployee = editableEmployee?.copy(avatar = event.avatarUrl)
-                sendAction(EmployeeAction.UpdateEditModel(updatedEmployee))
+            is EmployeeEvent.UpdateAvatar -> with(event) {
+                sendAction(EmployeeAction.UpdateActionWithAvatar(ActionWithAvatar.Set(imageUrl)))
+            }
+            is EmployeeEvent.DeleteAvatar -> with(state()) {
+                val action = if (editableEmployee?.avatar != null) {
+                    ActionWithAvatar.Delete
+                } else {
+                    ActionWithAvatar.None(null)
+                }
+                sendAction(EmployeeAction.UpdateActionWithAvatar(action))
             }
             is EmployeeEvent.UpdateName -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(
@@ -112,7 +120,7 @@ internal class EmployeeScreenModel(
             is EmployeeEvent.SaveEmployee -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SAVE_EMPLOYEE) {
                     val employee = checkNotNull(editableEmployee)
-                    val command = EmployeeWorkCommand.SaveEditModel(employee)
+                    val command = EmployeeWorkCommand.SaveEditModel(employee, actionWithAvatar)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -128,6 +136,7 @@ internal class EmployeeScreenModel(
     ) = when (action) {
         is EmployeeAction.SetupEditModel -> currentState.copy(
             editableEmployee = action.editModel,
+            actionWithAvatar = ActionWithAvatar.None(action.editModel.avatar),
             isLoading = false,
         )
         is EmployeeAction.UpdateEditModel -> currentState.copy(
@@ -135,6 +144,9 @@ internal class EmployeeScreenModel(
         )
         is EmployeeAction.UpdateOrganization -> currentState.copy(
             organization = action.organization,
+        )
+        is EmployeeAction.UpdateActionWithAvatar -> currentState.copy(
+            actionWithAvatar = action.actionWithAvatar,
         )
         is EmployeeAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,

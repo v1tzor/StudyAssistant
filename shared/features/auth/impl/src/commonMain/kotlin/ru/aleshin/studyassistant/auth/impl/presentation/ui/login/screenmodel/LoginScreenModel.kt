@@ -17,13 +17,8 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel
 
 import androidx.compose.runtime.Composable
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
@@ -34,7 +29,12 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginE
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginViewState
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.PasswordValidator
-import validation.operateValidate
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.validation.operateValidate
 
 /**
  * @author Stanislav Aleshin on 16.04.2024

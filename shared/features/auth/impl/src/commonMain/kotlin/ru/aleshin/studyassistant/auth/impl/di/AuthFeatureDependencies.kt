@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.auth.impl.di
 
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
@@ -33,5 +34,6 @@ interface AuthFeatureDependencies : BaseFeatureDependencies {
     val authRepository: AuthRepository
     val usersRepository: UsersRepository
     val manageUserRepository: ManageUserRepository
+    val deviceInfoProvider: DeviceInfoProvider
     val coroutineManager: CoroutineManager
 }

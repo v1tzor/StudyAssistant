@@ -16,10 +16,12 @@
 
 package ru.aleshin.studyassistant.preview.impl.domain.interactors
 
+import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -31,9 +33,10 @@ import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
  */
 internal interface OrganizationsInteractor {
 
+    suspend fun addOrUpdateOrganization(organization: Organization): DomainResult<PreviewFailures, UID>
     suspend fun fetchAllOrganization(): FlowDomainResult<PreviewFailures, List<Organization>>
-
-    suspend fun createOrUpdateOrganization(organization: Organization): DomainResult<PreviewFailures, UID>
+    suspend fun uploadAvatar(uid: UID, file: File): DomainResult<PreviewFailures, String>
+    suspend fun deleteAvatar(uid: UID): UnitDomainResult<PreviewFailures>
 
     class Base(
         private val organizationsRepository: OrganizationsRepository,
@@ -44,14 +47,22 @@ internal interface OrganizationsInteractor {
         private val targetUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid
 
+        override suspend fun addOrUpdateOrganization(organization: Organization) = eitherWrapper.wrap {
+            organizationsRepository.addOrUpdateOrganization(organization, targetUser)
+        }
+
         override suspend fun fetchAllOrganization() = eitherWrapper.wrapFlow {
             organizationsRepository.fetchAllOrganization(targetUser).map { organizations ->
                 organizations.sortedByDescending { it.isMain }
             }
         }
 
-        override suspend fun createOrUpdateOrganization(organization: Organization) = eitherWrapper.wrap {
-            organizationsRepository.addOrUpdateOrganization(organization, targetUser)
+        override suspend fun uploadAvatar(uid: UID, file: File) = eitherWrapper.wrap {
+            organizationsRepository.uploadAvatar(uid, file, targetUser)
+        }
+
+        override suspend fun deleteAvatar(uid: UID) = eitherWrapper.wrap {
+            organizationsRepository.deleteAvatar(uid, targetUser)
         }
     }
 }

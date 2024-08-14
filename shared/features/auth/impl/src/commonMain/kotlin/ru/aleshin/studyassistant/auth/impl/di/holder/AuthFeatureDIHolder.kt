@@ -28,6 +28,7 @@ import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
 import ru.aleshin.studyassistant.auth.impl.di.modules.domainModule
 import ru.aleshin.studyassistant.auth.impl.di.modules.navigationModule
 import ru.aleshin.studyassistant.auth.impl.di.modules.presentationModule
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
@@ -52,6 +53,7 @@ object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeatureDepe
                 bindSingleton<AuthRepository> { dependencies.authRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
+                bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<AuthFeatureApi> {
                     object : AuthFeatureApi {

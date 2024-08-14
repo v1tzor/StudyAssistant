@@ -35,7 +35,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import validation.operateValidate
+import ru.aleshin.studyassistant.core.common.validation.operateValidate
 
 /**
  * @author Stanislav Aleshin on 17.04.2024

@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.preview.impl.domain.interactors
 
+import dev.gitlive.firebase.storage.File
+import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
@@ -29,9 +31,10 @@ import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
  */
 internal interface UsersInteractor {
 
-    suspend fun fetchUserById(uid: UID): FlowDomainResult<PreviewFailures, AppUser?>
-
     suspend fun updateUser(user: AppUser): UnitDomainResult<PreviewFailures>
+    suspend fun uploadAvatar(uid: UID, file: File): DomainResult<PreviewFailures, String>
+    suspend fun fetchUserById(uid: UID): FlowDomainResult<PreviewFailures, AppUser?>
+    suspend fun deleteAvatar(uid: UID): UnitDomainResult<PreviewFailures>
 
     class Base(
         private val usersRepository: UsersRepository,
@@ -39,11 +42,18 @@ internal interface UsersInteractor {
     ) : UsersInteractor {
 
         override suspend fun fetchUserById(uid: UID) = eitherWrapper.wrapFlow {
-            usersRepository.fetchAppUserById(uid)
+            usersRepository.fetchUserById(uid)
         }
 
         override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {
             usersRepository.addOrUpdateAppUser(user)
+        }
+
+        override suspend fun uploadAvatar(uid: UID, file: File) = eitherWrapper.wrap {
+            usersRepository.uploadUserAvatar(uid, file)
+        }
+        override suspend fun deleteAvatar(uid: UID) = eitherWrapper.wrap {
+            usersRepository.deleteUserAvatar(uid)
         }
     }
 }

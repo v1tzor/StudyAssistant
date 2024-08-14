@@ -21,9 +21,13 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.Actio
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.functional.File
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.firstOrNullHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.common.functional.handleAndGet
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
@@ -45,7 +49,7 @@ internal interface OrganizationWorkProcessor :
 
         override suspend fun work(command: OrganizationWorkCommand) = when (command) {
             is OrganizationWorkCommand.LoadEditModel -> loadEditModelWork(command.organizationId)
-            is OrganizationWorkCommand.SaveEditModel -> saveEditModelWork(command.editModel)
+            is OrganizationWorkCommand.SaveEditModel -> saveEditModelWork(command.editModel, command.actionWithAvatar)
         }
 
         private fun loadEditModelWork(organizationId: UID?) = flow {
@@ -57,14 +61,35 @@ internal interface OrganizationWorkProcessor :
             } else {
                 null
             }
-            val editModel = organization?.convertToEdit() ?: EditOrganizationUi.createEditModel(
-                uid = organizationId,
-            )
+            val editModel = organization?.convertToEdit() ?: EditOrganizationUi.createEditModel(organizationId)
             emit(ActionResult(OrganizationAction.SetupEditModel(editModel)))
         }
 
-        private fun saveEditModelWork(editModel: EditOrganizationUi) = flow {
-            val organization = editModel.convertToBase().mapToDomain()
+        private fun saveEditModelWork(
+            editModel: EditOrganizationUi,
+            actionWithAvatar: ActionWithAvatar
+        ) = flow {
+            val uid = editModel.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+
+            val avatar = when (actionWithAvatar) {
+                is ActionWithAvatar.Set -> {
+                    organizationInteractor.uploadAvatar(uid, File(actionWithAvatar.uri)).handleAndGet(
+                        onLeftAction = { emit(EffectResult(OrganizationEffect.ShowError(it))).let { null } },
+                        onRightAction = { it },
+                    )
+                }
+                is ActionWithAvatar.Delete -> {
+                    organizationInteractor.deleteAvatar(uid).handleAndGet(
+                        onLeftAction = { emit(EffectResult(OrganizationEffect.ShowError(it))).let { null } },
+                        onRightAction = { null },
+                    )
+                }
+                is ActionWithAvatar.None -> actionWithAvatar.uri
+            }
+
+            val updatedEditModel = editModel.copy(uid = uid, avatar = avatar)
+            val organization = updatedEditModel.convertToBase().mapToDomain()
+
             organizationInteractor.addOrUpdateOrganization(organization).handle(
                 onLeftAction = { emit(EffectResult(OrganizationEffect.ShowError(it))) },
                 onRightAction = { emit(EffectResult(OrganizationEffect.NavigateToBack)) }
@@ -75,5 +100,8 @@ internal interface OrganizationWorkProcessor :
 
 internal sealed class OrganizationWorkCommand : WorkCommand {
     data class LoadEditModel(val organizationId: UID?) : OrganizationWorkCommand()
-    data class SaveEditModel(val editModel: EditOrganizationUi) : OrganizationWorkCommand()
+    data class SaveEditModel(
+        val editModel: EditOrganizationUi,
+        val actionWithAvatar: ActionWithAvatar,
+    ) : OrganizationWorkCommand()
 }

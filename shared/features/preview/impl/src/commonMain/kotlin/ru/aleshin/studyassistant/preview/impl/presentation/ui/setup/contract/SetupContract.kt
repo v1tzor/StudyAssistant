@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
 import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
@@ -38,7 +39,9 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupP
 internal data class SetupViewState(
     val currentPage: SetupPage = SetupPage.PROFILE,
     val profile: AppUserUi? = null,
+    val actionWithProfileAvatar: ActionWithAvatar = ActionWithAvatar.None(null),
     val organization: OrganizationUi? = null,
+    val actionWithOrganizationAvatar: ActionWithAvatar = ActionWithAvatar.None(null),
     val calendarSettings: CalendarSettingsUi? = null,
     val isFillOutSchedule: Boolean = false,
 ) : BaseViewState
@@ -47,7 +50,11 @@ internal sealed class SetupEvent : BaseEvent {
     data class Init(val createdUserId: UID) : SetupEvent()
     data object NavigateToBackPage : SetupEvent()
     data class UpdateProfile(val userProfile: AppUserUi) : SetupEvent()
+    data class UpdateProfileAvatar(val imageUri: String) : SetupEvent()
+    data object DeleteProfileAvatar : SetupEvent()
     data class UpdateOrganization(val organization: OrganizationUi) : SetupEvent()
+    data class UpdateOrganizationAvatar(val imageUri: String) : SetupEvent()
+    data object DeleteOrganizationAvatar : SetupEvent()
     data class UpdateCalendarSettings(val calendarSettings: CalendarSettingsUi) : SetupEvent()
     data object SaveProfileInfo : SetupEvent()
     data object SaveOrganizationInfo : SetupEvent()
@@ -69,8 +76,10 @@ internal sealed class SetupAction : BaseAction {
         val organization: OrganizationUi,
         val calendarSettings: CalendarSettingsUi
     ) : SetupAction()
-    data class UpdateProfileInfo(val profile: AppUserUi) : SetupAction()
-    data class UpdateOrganizationInfo(val organization: OrganizationUi) : SetupAction()
+    data class UpdateUserProfile(val profile: AppUserUi) : SetupAction()
+    data class UpdateActionWithProfileAvatar(val action: ActionWithAvatar) : SetupAction()
+    data class UpdateOrganization(val organization: OrganizationUi) : SetupAction()
+    data class UpdateActionWithOrganizationAvatar(val action: ActionWithAvatar) : SetupAction()
     data class UpdateCalendarSettings(val calendarSettings: CalendarSettingsUi) : SetupAction()
     data class UpdateFillOutSchedule(val isFillOut: Boolean) : SetupAction()
 }

@@ -24,14 +24,12 @@ object Constants {
     object App {
         const val SPLASH_NAME = "STUDY\nASSISTANT"
         const val NAME = "Study Assistant"
-        const val LOG = "study_assistant"
+        const val LOGGER_TAG = "study_assistant"
         const val DEVELOPER = "Stanislav Aleshin"
         const val LICENCE = "Apache Licence v2.0"
         const val GITHUB_URI = "https://github.com/v1tzor/StudyAssistant"
         const val ISSUES_URI = "https://github.com/v1tzor/StudyAssistant/issues"
         const val PERMISSION_TAG = "Notificatio_Permission"
-        const val WEB_CLIENT_ID =
-            "190379302885-gnrh3tua2lftfs7ke2uhnfj1vinbc8vm.apps.googleusercontent.com"
     }
 
     object Database {
@@ -63,24 +61,18 @@ object Constants {
         const val USER_CODE_LENGTH = 7
     }
 
+    object Image {
+        const val BYTE_TO_MB = 1024 * 1024
+        const val AVATAR_MAX_SIZE_IN_BYTES = 1024 * 1024 * 2
+    }
+
     object Notification {
-        const val CHANNEL_ID = "studyAlarmChannel"
+        const val CHANNEL_ID = "studyAssistantAlarmChannel"
+        const val CHANNEL_NAME = "Common"
     }
 
     object Alarm {
         const val ALARM_NOTIFICATION_ACTION = "ru.aleshin.ALARM_NOTIFICATION_ACTION"
-        const val NOTIFICATION_TIME_TYPE = "ALARM_DATA_TIME_TYPE"
-        const val NOTIFICATION_CATEGORY = "ALARM_DATA_CATEGORY"
-        const val NOTIFICATION_SUBCATEGORY = "ALARM_DATA_SUBCATEGORY"
-        const val NOTIFICATION_ICON = "ALARM_DATA_ICON"
-        const val APP_ICON = "ALARM_DATA_APP_ICON"
-        const val REPEAT_TIME = "REPEAT_TIME"
-        const val REPEAT_TYPE = "REPEAT_TYPE"
-        const val TEMPLATE_ID = "REPEAT_TEMPLATE_ID"
-        const val DAY_OF_MONTH = "REPEAT_DAY_OF_MONTH"
-        const val WEEK_DAY = "REPEAT_WEEK_DAY"
-        const val WEEK_NUMBER = "REPEAT_WEEK_NUMBER"
-        const val MONTH = "REPEAT_MONTH"
     }
 
     object Placeholder {

@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
@@ -34,6 +35,7 @@ interface UsersFeatureDependencies : BaseFeatureDependencies {
     val employeeRepository: EmployeeRepository
     val friendRequestsRepository: FriendRequestsRepository
     val usersRepository: UsersRepository
+    val messageRepository: MessageRepository
     val dateManager: DateManager
     val coroutineManager: CoroutineManager
 }

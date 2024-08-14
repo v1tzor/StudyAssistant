@@ -22,11 +22,23 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +53,10 @@ import com.github.panpf.sketch.AsyncImageState
 import com.github.panpf.sketch.rememberAsyncImageState
 import com.github.panpf.sketch.request.ComposableImageOptions
 import com.github.panpf.sketch.request.placeholder
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerType
+import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
@@ -62,7 +78,7 @@ fun AvatarView(
     secondName: String?,
     imageUrl: String?,
     shape: Shape = MaterialTheme.shapes.full,
-    contentScale: ContentScale = ContentScale.Fit,
+    contentScale: ContentScale = ContentScale.Crop,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.primary,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
@@ -85,7 +101,7 @@ fun AvatarView(
             Box(contentAlignment = Alignment.Center) {
                 Text(
                     text = buildString {
-                        append(firstName.first().uppercase())
+                        append(firstName.firstOrNull()?.uppercase() ?: "")
                         if (!secondName.isNullOrBlank()) append(secondName.first().uppercase())
                     },
                     style = style,
@@ -97,7 +113,10 @@ fun AvatarView(
 
 @Composable
 fun SelectableAvatarView(
-    onClick: () -> Unit,
+    onSelect: (PlatformFile) -> Unit,
+    onDelete: () -> Unit,
+    onExceedingLimit: (currentSize: Int) -> Unit = {},
+    imageByteLimit: Int? = Constants.Image.AVATAR_MAX_SIZE_IN_BYTES,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     state: AsyncImageState = rememberAsyncImageState(
@@ -110,17 +129,31 @@ fun SelectableAvatarView(
     secondName: String?,
     imageUrl: String?,
     shape: Shape = MaterialTheme.shapes.full,
-    contentScale: ContentScale = ContentScale.Fit,
+    contentScale: ContentScale = ContentScale.Crop,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.primary,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
     iconOffset: DpOffset = DpOffset(0.dp, 0.dp),
 ) {
     Box {
+        var isExpandAvatarMenu by remember { mutableStateOf(false) }
+        val coroutineScope = rememberCoroutineScope()
+        val imagePickerLauncher = rememberFilePickerLauncher(PickerType.Image) { file ->
+            coroutineScope.launch {
+                if (file != null) {
+                    val size = file.readBytes().size
+                    if (imageByteLimit != null && size > imageByteLimit) {
+                        return@launch onExceedingLimit(size)
+                    }
+                    onSelect(file)
+                }
+            }
+        }
+
         Surface(
-            onClick = onClick,
+            onClick = { isExpandAvatarMenu = true },
             modifier = modifier.defaultMinSize(90.dp, 90.dp),
-            enabled = enabled,
+            enabled = enabled || imageUrl != null,
             shape = shape,
             color = containerColor,
             contentColor = contentColor,
@@ -137,7 +170,7 @@ fun SelectableAvatarView(
                 Box(contentAlignment = Alignment.Center) {
                     Text(
                         text = buildString {
-                            append(firstName.first().uppercase())
+                            append(firstName.firstOrNull()?.uppercase() ?: "")
                             if (!secondName.isNullOrBlank()) append(secondName.first().uppercase())
                         },
                         style = style,
@@ -145,16 +178,90 @@ fun SelectableAvatarView(
                 }
             }
         }
-        Icon(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .offset(iconOffset.x, iconOffset.y)
-                .size(24.dp)
-                .clip(MaterialTheme.shapes.full)
-                .border(2.dp, MaterialTheme.colorScheme.surfaceContainerLow),
-            painter = painterResource(StudyAssistantRes.icons.upload),
-            contentDescription = StudyAssistantRes.strings.avatarDesc,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        Box(modifier = Modifier.align(Alignment.BottomEnd).offset(iconOffset.x, iconOffset.y)) {
+            Icon(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(MaterialTheme.shapes.full)
+                    .border(2.dp, MaterialTheme.colorScheme.surfaceContainerLow),
+                painter = painterResource(StudyAssistantRes.icons.upload),
+                contentDescription = StudyAssistantRes.strings.avatarDesc,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            AvatarDropdownMenu(
+                isExpanded = isExpandAvatarMenu,
+                enabledAdd = enabled,
+                alreadyHaveAvatar = imageUrl != null,
+                onDelete = {
+                    onDelete()
+                    isExpandAvatarMenu = false
+                },
+                onDismiss = {
+                    isExpandAvatarMenu = false
+                },
+                onAddOrUpdate = {
+                    imagePickerLauncher.launch()
+                    isExpandAvatarMenu = false
+                },
+            )
+        }
+    }
+}
+
+@Composable
+internal fun AvatarDropdownMenu(
+    modifier: Modifier = Modifier,
+    isExpanded: Boolean,
+    enabledAdd: Boolean,
+    alreadyHaveAvatar: Boolean,
+    onDismiss: () -> Unit,
+    onAddOrUpdate: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    DropdownMenu(
+        expanded = isExpanded,
+        onDismissRequest = onDismiss,
+        modifier = modifier.sizeIn(minWidth = 180.dp),
+        shape = MaterialTheme.shapes.large,
+        offset = DpOffset(0.dp, 6.dp),
+    ) {
+        if (alreadyHaveAvatar && enabledAdd) {
+            DropdownMenuItem(
+                onClick = onAddOrUpdate,
+                text = { Text(text = StudyAssistantRes.strings.changeConfirmTitle) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                },
+            )
+        } else if (enabledAdd) {
+            DropdownMenuItem(
+                onClick = onAddOrUpdate,
+                text = { Text(text = StudyAssistantRes.strings.addTitle) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                },
+            )
+        }
+        if (alreadyHaveAvatar) {
+            DropdownMenuItem(
+                onClick = onDelete,
+                text = { Text(text = StudyAssistantRes.strings.deleteConfirmTitle) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                },
+            )
+        }
     }
 }

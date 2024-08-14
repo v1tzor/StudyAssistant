@@ -62,7 +62,7 @@ internal class UserProfileScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is UserProfileEvent.SendFriendRequest ->  with(state()) {
+            is UserProfileEvent.SendFriendRequest -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
                     val userId = checkNotNull(user?.uid)
                     val command = UserProfileWorkCommand.SendFriendRequest(userId)

@@ -20,13 +20,16 @@ import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseUser
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.Source
+import dev.gitlive.firebase.storage.File
+import dev.gitlive.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.exists
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirestore.Users
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Storage
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Users
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 
 /**
@@ -38,15 +41,19 @@ interface UsersRemoteDataSource {
      * @return [Boolean] if the user is created for the first time, it returns true
      */
     suspend fun addOrUpdateUser(user: AppUserPojo): Boolean
-    fun fetchCurrentFirebaseUser(): FirebaseUser?
+    suspend fun uploadAvatar(uid: UID, avatar: File): String
+    fun fetchCurrentAppUser(): FirebaseUser?
+    suspend fun fetchAuthStateChanged(): Flow<FirebaseUser?>
     suspend fun fetchUserById(uid: UID): Flow<AppUserPojo?>
-    suspend fun fetchRealtimeAppUserById(uid: UID): AppUserPojo?
-    suspend fun fetchAppUserFriends(uid: UID): Flow<List<AppUserPojo>>
+    suspend fun fetchRealtimeUserById(uid: UID): AppUserPojo?
+    suspend fun fetchUserFriends(uid: UID): Flow<List<AppUserPojo>>
     suspend fun findUsersByCode(code: String): Flow<List<AppUserPojo>>
+    suspend fun deleteAvatar(uid: UID)
 
     class Base(
         private val auth: FirebaseAuth,
         private val database: FirebaseFirestore,
+        private val storage: FirebaseStorage,
     ) : UsersRemoteDataSource {
 
         override suspend fun addOrUpdateUser(user: AppUserPojo): Boolean {
@@ -61,8 +68,22 @@ interface UsersRemoteDataSource {
             }
         }
 
-        override fun fetchCurrentFirebaseUser(): FirebaseUser? {
+        override suspend fun uploadAvatar(uid: UID, avatar: File): String {
+            if (uid.isEmpty()) throw FirebaseUserException()
+            val storageRoot = storage.reference.child(uid)
+
+            val avatarReference = storageRoot.child(Storage.USER_AVATAR).child(Storage.USER_AVATAR_FILE)
+            avatarReference.putFile(avatar)
+
+            return avatarReference.getDownloadUrl()
+        }
+
+        override fun fetchCurrentAppUser(): FirebaseUser? {
             return auth.currentUser
+        }
+
+        override suspend fun fetchAuthStateChanged(): Flow<FirebaseUser?> {
+            return auth.authStateChanged
         }
 
         override suspend fun fetchUserById(uid: UID): Flow<AppUserPojo?> {
@@ -75,7 +96,7 @@ interface UsersRemoteDataSource {
             }
         }
 
-        override suspend fun fetchRealtimeAppUserById(uid: UID): AppUserPojo? {
+        override suspend fun fetchRealtimeUserById(uid: UID): AppUserPojo? {
             if (uid.isEmpty()) throw FirebaseUserException()
 
             val reference = database.collection(Users.ROOT).document(uid)
@@ -83,7 +104,7 @@ interface UsersRemoteDataSource {
             return reference.get(Source.SERVER).data(serializer<AppUserPojo?>())
         }
 
-        override suspend fun fetchAppUserFriends(uid: UID): Flow<List<AppUserPojo>> {
+        override suspend fun fetchUserFriends(uid: UID): Flow<List<AppUserPojo>> {
             require(uid.isNotEmpty())
 
             val queryReference = database.collection(Users.ROOT).where {
@@ -103,6 +124,14 @@ interface UsersRemoteDataSource {
             return queryReference.snapshots.map { snapshot ->
                 snapshot.documents.map { it.data<AppUserPojo>() }
             }
+        }
+
+        override suspend fun deleteAvatar(uid: UID) {
+            if (uid.isEmpty()) throw FirebaseUserException()
+            val storageRoot = storage.reference.child(uid)
+
+            val avatarReference = storageRoot.child(Storage.USER_AVATAR).child(Storage.USER_AVATAR_FILE)
+            avatarReference.delete()
         }
     }
 }

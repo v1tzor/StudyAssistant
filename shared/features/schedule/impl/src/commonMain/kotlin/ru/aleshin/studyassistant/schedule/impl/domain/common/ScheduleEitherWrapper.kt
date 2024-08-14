@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
-import wrappers.FlowEitherWrapper
 
 /**
  * @author Stanislav Aleshin on 21.04.2024

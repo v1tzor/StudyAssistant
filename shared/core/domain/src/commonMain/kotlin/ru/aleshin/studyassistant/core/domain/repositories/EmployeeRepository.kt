@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.domain.repositories
 
+import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
@@ -25,7 +26,9 @@ import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
  */
 interface EmployeeRepository {
     suspend fun addOrUpdateEmployee(employee: Employee, targetUser: UID): UID
+    suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String
     suspend fun fetchAllEmployeeByOrganization(organizationId: UID, targetUser: UID): Flow<List<Employee>>
     suspend fun fetchEmployeeById(uid: UID, targetUser: UID): Flow<Employee?>
     suspend fun deleteEmployee(targetId: UID, targetUser: UID)
+    suspend fun deleteAvatar(uid: UID, targetUser: UID)
 }

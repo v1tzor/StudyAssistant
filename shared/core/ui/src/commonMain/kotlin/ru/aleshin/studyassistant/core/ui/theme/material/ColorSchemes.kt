@@ -19,7 +19,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import models.ThemeUiType
+import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.darkColorAccents
 import ru.aleshin.studyassistant.core.ui.theme.tokens.lightColorAccents
 

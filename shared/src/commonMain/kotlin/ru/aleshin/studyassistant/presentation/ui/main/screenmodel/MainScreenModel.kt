@@ -62,6 +62,10 @@ class MainScreenModel(
                     val command = MainWorkCommand.InitialNavigation
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(MainWorkCommand.UpdatePushToken) {
+                    val command = MainWorkCommand.UpdatePushToken
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
         }
     }

@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.EditOrganizationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
@@ -36,11 +37,13 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactIn
 internal data class OrganizationViewState(
     val isLoading: Boolean = true,
     val editableOrganization: EditOrganizationUi? = null,
+    val actionWithAvatar: ActionWithAvatar = ActionWithAvatar.None(null),
 ) : BaseViewState
 
 internal sealed class OrganizationEvent : BaseEvent {
     data class Init(val organizationId: UID?) : OrganizationEvent()
-    data class UpdateAvatar(val avatarUrl: String?) : OrganizationEvent()
+    data class UpdateAvatar(val imageUri: String) : OrganizationEvent()
+    data object DeleteAvatar : OrganizationEvent()
     data class UpdateType(val organizationType: OrganizationType?) : OrganizationEvent()
     data class UpdateName(val shortName: String?, val fullName: String?) : OrganizationEvent()
     data class UpdateEmails(val emails: List<ContactInfoUi>) : OrganizationEvent()
@@ -60,5 +63,6 @@ internal sealed class OrganizationEffect : BaseUiEffect {
 internal sealed class OrganizationAction : BaseAction {
     data class SetupEditModel(val editModel: EditOrganizationUi) : OrganizationAction()
     data class UpdateEditModel(val editModel: EditOrganizationUi?) : OrganizationAction()
+    data class UpdateActionWithAvatar(val action: ActionWithAvatar) : OrganizationAction()
     data class UpdateLoading(val isLoading: Boolean) : OrganizationAction()
 }

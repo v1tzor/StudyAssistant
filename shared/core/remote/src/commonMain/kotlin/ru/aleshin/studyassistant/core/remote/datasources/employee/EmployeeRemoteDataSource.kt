@@ -17,6 +17,8 @@
 package ru.aleshin.studyassistant.core.remote.datasources.employee
 
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.storage.File
+import dev.gitlive.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -24,7 +26,8 @@ import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.exists
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirestore.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Storage
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
 import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 
 /**
@@ -33,12 +36,15 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 interface EmployeeRemoteDataSource {
 
     suspend fun addOrUpdateEmployee(employee: EmployeePojo, targetUser: UID): UID
+    suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String
     suspend fun fetchEmployeeById(uid: UID, targetUser: UID): Flow<EmployeePojo?>
     suspend fun fetchAllEmployeeByOrganization(organizationId: UID, targetUser: UID): Flow<List<EmployeePojo>>
     suspend fun deleteEmployee(targetId: UID, targetUser: UID)
+    suspend fun deleteAvatar(uid: UID, targetUser: UID)
 
     class Base(
         private val database: FirebaseFirestore,
+        private val storage: FirebaseStorage,
     ) : EmployeeRemoteDataSource {
 
         override suspend fun addOrUpdateEmployee(employee: EmployeePojo, targetUser: UID): UID {
@@ -58,6 +64,16 @@ interface EmployeeRemoteDataSource {
                     return@runTransaction uid
                 }
             }
+        }
+
+        override suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val storageRoot = storage.reference.child(targetUser).child(Storage.EMPLOYEE).child(uid)
+
+            val avatarReference = storageRoot.child(Storage.EMPLOYEE_AVATAR).child(Storage.EMPLOYEE_AVATAR_FILE)
+            avatarReference.putFile(file)
+
+            return avatarReference.getDownloadUrl()
         }
 
         override suspend fun fetchEmployeeById(uid: UID, targetUser: UID): Flow<EmployeePojo?> {
@@ -99,6 +115,15 @@ interface EmployeeRemoteDataSource {
             val reference = userDataRoot.collection(UserData.EMPLOYEE).document(targetId)
 
             return reference.delete()
+        }
+
+        override suspend fun deleteAvatar(uid: UID, targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val storageRoot = storage.reference.child(targetUser).child(Storage.EMPLOYEE).child(uid)
+
+            val avatarReference = storageRoot.child(Storage.EMPLOYEE_AVATAR).child(Storage.EMPLOYEE_AVATAR_FILE)
+
+            return avatarReference.delete()
         }
     }
 }

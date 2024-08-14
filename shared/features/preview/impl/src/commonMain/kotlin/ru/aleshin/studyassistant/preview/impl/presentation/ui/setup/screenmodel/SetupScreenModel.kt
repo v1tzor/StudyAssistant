@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
 import ru.aleshin.studyassistant.preview.impl.navigation.PreviewScreenProvider
@@ -60,39 +61,63 @@ internal class SetupScreenModel(
         event: SetupEvent,
     ) {
         when (event) {
-            is SetupEvent.Init -> launchBackgroundWork(BackgroundKey.FETCH_ALL_DATA) {
-                val command = SetupWorkCommand.FetchAllData(event.createdUserId)
-                workProcessor.work(command).collectAndHandleWork()
+            is SetupEvent.Init -> {
+                launchBackgroundWork(BackgroundKey.LOAD_ALL_DATA) {
+                    val command = SetupWorkCommand.LoadAllData(event.createdUserId)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is SetupEvent.UpdateProfile -> {
-                sendAction(SetupAction.UpdateProfileInfo(event.userProfile))
+                sendAction(SetupAction.UpdateUserProfile(event.userProfile))
             }
             is SetupEvent.UpdateOrganization -> {
-                sendAction(SetupAction.UpdateOrganizationInfo(event.organization))
+                sendAction(SetupAction.UpdateOrganization(event.organization))
             }
             is SetupEvent.UpdateCalendarSettings -> {
                 sendAction(SetupAction.UpdateCalendarSettings(event.calendarSettings))
             }
-            is SetupEvent.SaveProfileInfo -> {
+            is SetupEvent.SaveProfileInfo -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SAVE_PROFILE) {
-                    val profile = state().profile ?: return@launchBackgroundWork
-                    val command = SetupWorkCommand.SaveProfileInfo(profile)
+                    val profile = checkNotNull(profile)
+                    val command = SetupWorkCommand.UpdateUserProfile(profile, actionWithProfileAvatar)
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 sendAction(SetupAction.UpdatePage(SetupPage.ORGANIZATION))
             }
-            is SetupEvent.SaveOrganizationInfo -> {
+            is SetupEvent.UpdateProfileAvatar -> with(event) {
+                sendAction(SetupAction.UpdateActionWithProfileAvatar(ActionWithAvatar.Set(imageUri)))
+            }
+            is SetupEvent.DeleteProfileAvatar -> with(state()) {
+                val action = if (profile?.avatar != null) {
+                    ActionWithAvatar.Delete
+                } else {
+                    ActionWithAvatar.None(null)
+                }
+                sendAction(SetupAction.UpdateActionWithProfileAvatar(action))
+            }
+            is SetupEvent.SaveOrganizationInfo -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SAVE_ORGANIZATION) {
-                    val organization = state().organization ?: return@launchBackgroundWork
-                    val command = SetupWorkCommand.SaveOrganizationInfo(organization)
+                    val organization = checkNotNull(organization)
+                    val command = SetupWorkCommand.UpdateOrganization(organization, actionWithOrganizationAvatar)
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 sendAction(SetupAction.UpdatePage(SetupPage.CALENDAR))
             }
-            is SetupEvent.SaveCalendarInfo -> {
+            is SetupEvent.UpdateOrganizationAvatar -> with(event) {
+                sendAction(SetupAction.UpdateActionWithOrganizationAvatar(ActionWithAvatar.Set(imageUri)))
+            }
+            is SetupEvent.DeleteOrganizationAvatar -> with(state()) {
+                val action = if (organization?.avatar != null) {
+                    ActionWithAvatar.Delete
+                } else {
+                    ActionWithAvatar.None(null)
+                }
+                sendAction(SetupAction.UpdateActionWithOrganizationAvatar(action))
+            }
+            is SetupEvent.SaveCalendarInfo -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SAVE_SETTINGS) {
-                    val calendarSettings = state().calendarSettings ?: return@launchBackgroundWork
-                    val command = SetupWorkCommand.SaveCalendarSettings(calendarSettings)
+                    val calendarSettings = checkNotNull(calendarSettings)
+                    val command = SetupWorkCommand.UpdateCalendarSettings(calendarSettings)
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 sendAction(SetupAction.UpdatePage(SetupPage.SCHEDULE))
@@ -121,14 +146,22 @@ internal class SetupScreenModel(
         )
         is SetupAction.UpdateAll -> currentState.copy(
             profile = action.profile,
+            actionWithProfileAvatar = ActionWithAvatar.None(action.profile.avatar),
             organization = action.organization,
+            actionWithOrganizationAvatar = ActionWithAvatar.None(action.organization.avatar),
             calendarSettings = action.calendarSettings,
         )
-        is SetupAction.UpdateProfileInfo -> currentState.copy(
+        is SetupAction.UpdateUserProfile -> currentState.copy(
             profile = action.profile,
         )
-        is SetupAction.UpdateOrganizationInfo -> currentState.copy(
+        is SetupAction.UpdateActionWithProfileAvatar -> currentState.copy(
+            actionWithProfileAvatar = action.action,
+        )
+        is SetupAction.UpdateOrganization -> currentState.copy(
             organization = action.organization,
+        )
+        is SetupAction.UpdateActionWithOrganizationAvatar -> currentState.copy(
+            actionWithOrganizationAvatar = action.action,
         )
         is SetupAction.UpdateCalendarSettings -> currentState.copy(
             calendarSettings = action.calendarSettings,
@@ -139,7 +172,7 @@ internal class SetupScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        FETCH_ALL_DATA, SAVE_PROFILE, SAVE_ORGANIZATION, SAVE_SETTINGS,
+        LOAD_ALL_DATA, SAVE_PROFILE, SAVE_ORGANIZATION, SAVE_SETTINGS, UPDATE_AVATAR
     }
 }
 

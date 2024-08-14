@@ -16,13 +16,13 @@
 
 package ru.aleshin.studyassistant.navigation.impl.di.holder
 
-import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
-import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.navigation.api.di.NavigationFeatureApi
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter

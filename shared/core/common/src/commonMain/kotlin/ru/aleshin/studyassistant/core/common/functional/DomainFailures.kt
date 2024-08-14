@@ -16,13 +16,13 @@
 package ru.aleshin.studyassistant.core.common.functional
 
 import co.touchlab.kermit.Logger
-import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOG
+import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
 interface DomainFailures
 
-inline fun <reified T : DomainFailures> T.log(tag: String = LOG) = this.apply {
+inline fun <reified T : DomainFailures> T.log(tag: String = LOGGER_TAG) = this.apply {
     Logger.e(tag) { "Fail with business logic: $this" }
 }

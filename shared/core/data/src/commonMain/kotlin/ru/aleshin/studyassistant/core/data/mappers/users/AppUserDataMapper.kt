@@ -17,19 +17,22 @@
 package ru.aleshin.studyassistant.core.data.mappers.users
 
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.messages.PushServiceType
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetwork
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
+import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 import ru.aleshin.studyassistant.core.remote.models.users.SocialNetworkPojo
+import ru.aleshin.studyassistant.core.remote.models.users.UserDevicePojo
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
 fun AppUser.mapToRemote() = AppUserPojo(
     uid = uid,
-    messageId = messageId,
+    devices = devices.map { it.mapToData() },
     username = username,
     email = email,
     code = code,
@@ -44,8 +47,8 @@ fun AppUser.mapToRemote() = AppUserPojo(
 )
 
 fun AppUserPojo.mapToDomain() = AppUser(
-    messageId = messageId,
     uid = uid,
+    devices = devices.map { it.mapToDomain() },
     username = username,
     email = email,
     code = code,
@@ -57,6 +60,22 @@ fun AppUserPojo.mapToDomain() = AppUser(
     friends = friends,
     subscribePeriod = subscribePeriod?.mapEpochTimeToInstant(),
     socialNetworks = socialNetworks.map { it.mapToDomain() },
+)
+
+internal fun UserDevice.mapToData() = UserDevicePojo(
+    platform = platform,
+    deviceId = deviceId,
+    deviceName = deviceName,
+    pushToken = pushToken,
+    pushServiceType = pushServiceType.toString(),
+)
+
+internal fun UserDevicePojo.mapToDomain() = UserDevice(
+    platform = platform,
+    deviceId = deviceId,
+    deviceName = deviceName,
+    pushToken = pushToken,
+    pushServiceType = PushServiceType.valueOf(pushServiceType),
 )
 
 fun SocialNetwork.mapToRemote() = SocialNetworkPojo(

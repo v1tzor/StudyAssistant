@@ -29,20 +29,13 @@ import ru.aleshin.studyassistant.core.data.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.data.repositories.GeneralSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.HomeworksRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ManageUserRepositoryImpl
+import ru.aleshin.studyassistant.core.data.repositories.MessageRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.OrganizationsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ShareHomeworksRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.SubjectsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.TodoRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.UsersRepositoryImpl
-import ru.aleshin.studyassistant.core.database.datasource.employee.EmployeeLocalDataSource
-import ru.aleshin.studyassistant.core.database.datasource.organizations.OrganizationsLocalDataSource
-import ru.aleshin.studyassistant.core.database.datasource.schedules.BaseScheduleLocalDataSource
-import ru.aleshin.studyassistant.core.database.datasource.schedules.CustomScheduleLocalDataSource
-import ru.aleshin.studyassistant.core.database.datasource.settings.CalendarSettingsLocalDataSource
-import ru.aleshin.studyassistant.core.database.datasource.settings.GeneralSettingsLocalDataSource
-import ru.aleshin.studyassistant.core.database.datasource.subjects.SubjectsLocalDataSource
-import ru.aleshin.studyassistant.core.database.datasource.tasks.HomeworksLocalDataSource
-import ru.aleshin.studyassistant.core.database.datasource.tasks.TodoLocalDataSource
+import ru.aleshin.studyassistant.core.database.di.coreDatabaseModule
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
@@ -52,125 +45,36 @@ import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsReposito
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
+import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.organizations.OrganizationsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.requests.FriendRequestsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.schedules.BaseScheduleRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.schedules.CustomScheduleRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.settings.CalendarSettingsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.share.ShareHomeworksRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.subjects.SubjectsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.tasks.HomeworksRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.tasks.TodoRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.di.coreRemoteModule
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
  */
 val coreDataModule = DI.Module("CoreData") {
-    bindSingleton<AuthRemoteDataSource> { AuthRemoteDataSource.Base(instance(), instance()) }
+    importAll(coreDatabaseModule, coreRemoteModule)
+
     bindSingleton<AuthRepository> { AuthRepositoryImpl(instance()) }
     bindSingleton<ManageUserRepository> { ManageUserRepositoryImpl(instance()) }
 
-    bindSingleton<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance()) }
     bindSingleton<UsersRepository> { UsersRepositoryImpl(instance()) }
 
-    bindSingleton<FriendRequestsRemoteDataSource> { FriendRequestsRemoteDataSource.Base(instance()) }
     bindSingleton<FriendRequestsRepository> { FriendRequestsRepositoryImpl(instance()) }
 
-    bindSingleton<ShareHomeworksRemoteDataSource> { ShareHomeworksRemoteDataSource.Base(instance()) }
     bindSingleton<ShareHomeworksRepository> { ShareHomeworksRepositoryImpl(instance()) }
-
-    bindSingleton<GeneralSettingsLocalDataSource> {
-        GeneralSettingsLocalDataSource.Base(instance(), instance())
-    }
-    bindProvider<GeneralSettingsRepository> {
-        GeneralSettingsRepositoryImpl(instance())
-    }
-
-    bindSingleton<CalendarSettingsRemoteDataSource> {
-        CalendarSettingsRemoteDataSource.Base(instance())
-    }
-    bindSingleton<CalendarSettingsLocalDataSource> {
-        CalendarSettingsLocalDataSource.Base(instance(), instance())
-    }
-    bindProvider<CalendarSettingsRepository> {
-        CalendarSettingsRepositoryImpl(instance(), instance(), instance())
-    }
-
-    bindSingleton<BaseScheduleLocalDataSource> {
-        BaseScheduleLocalDataSource.Base(instance(), instance(), instance(), instance(), instance())
-    }
-    bindSingleton<BaseScheduleRemoteDataSource> {
-        BaseScheduleRemoteDataSource.Base(instance())
-    }
-    bindProvider<BaseScheduleRepository> {
-        BaseScheduleRepositoryImpl(instance(), instance(), instance())
-    }
-
-    bindSingleton<CustomScheduleLocalDataSource> {
-        CustomScheduleLocalDataSource.Base(instance(), instance(), instance(), instance(), instance())
-    }
-    bindSingleton<CustomScheduleRemoteDataSource> {
-        CustomScheduleRemoteDataSource.Base(instance())
-    }
-    bindProvider<CustomScheduleRepository> {
-        CustomScheduleRepositoryImpl(instance(), instance(), instance())
-    }
-
-    bindSingleton<SubjectsLocalDataSource> {
-        SubjectsLocalDataSource.Base(instance(), instance(), instance())
-    }
-    bindSingleton<SubjectsRemoteDataSource> {
-        SubjectsRemoteDataSource.Base(instance())
-    }
-    bindProvider<SubjectsRepository> {
-        SubjectsRepositoryImpl(instance(), instance(), instance())
-    }
-
-    bindSingleton<EmployeeLocalDataSource> {
-        EmployeeLocalDataSource.Base(instance(), instance())
-    }
-    bindSingleton<EmployeeRemoteDataSource> {
-        EmployeeRemoteDataSource.Base(instance())
-    }
-    bindProvider<EmployeeRepository> {
-        EmployeeRepositoryImpl(instance(), instance(), instance())
-    }
-
-    bindSingleton<HomeworksLocalDataSource> {
-        HomeworksLocalDataSource.Base(instance(), instance(), instance(), instance(), instance())
-    }
-    bindSingleton<HomeworksRemoteDataSource> {
-        HomeworksRemoteDataSource.Base(instance())
-    }
-    bindProvider<HomeworksRepository> {
-        HomeworksRepositoryImpl(instance(), instance(), instance())
-    }
-
-    bindSingleton<TodoLocalDataSource> {
-        TodoLocalDataSource.Base(instance(), instance())
-    }
-    bindSingleton<TodoRemoteDataSource> {
-        TodoRemoteDataSource.Base(instance())
-    }
-    bindProvider<TodoRepository> {
-        TodoRepositoryImpl(instance(), instance(), instance())
-    }
-
-    bindSingleton<OrganizationsLocalDataSource> {
-        OrganizationsLocalDataSource.Base(instance(), instance(), instance(), instance())
-    }
-    bindSingleton<OrganizationsRemoteDataSource> {
-        OrganizationsRemoteDataSource.Base(instance())
-    }
-    bindProvider<OrganizationsRepository> {
-        OrganizationsRepositoryImpl(instance(), instance(), instance())
-    }
+    bindProvider<GeneralSettingsRepository> { GeneralSettingsRepositoryImpl(instance()) }
+    bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance(), instance()) }
+    bindProvider<BaseScheduleRepository> { BaseScheduleRepositoryImpl(instance(), instance(), instance()) }
+    bindProvider<CustomScheduleRepository> { CustomScheduleRepositoryImpl(instance(), instance(), instance()) }
+    bindProvider<SubjectsRepository> { SubjectsRepositoryImpl(instance(), instance(), instance()) }
+    bindProvider<EmployeeRepository> { EmployeeRepositoryImpl(instance(), instance(), instance()) }
+    bindProvider<HomeworksRepository> { HomeworksRepositoryImpl(instance(), instance(), instance()) }
+    bindProvider<TodoRepository> { TodoRepositoryImpl(instance(), instance(), instance()) }
+    bindProvider<OrganizationsRepository> { OrganizationsRepositoryImpl(instance(), instance(), instance()) }
+    bindProvider<MessageRepository> { MessageRepositoryImpl(instance()) }
 }

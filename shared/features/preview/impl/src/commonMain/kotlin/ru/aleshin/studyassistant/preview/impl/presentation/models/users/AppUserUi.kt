@@ -30,7 +30,7 @@ import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 @Parcelize
 internal data class AppUserUi(
     val uid: UID,
-    val messageId: UID,
+    val devices: List<UserDeviceUi>,
     val username: String,
     val email: String,
     val code: String,
@@ -45,9 +45,12 @@ internal data class AppUserUi(
     val friends: List<UID> = emptyList(),
 ) : Parcelable {
     companion object {
-        fun createEmpty(uid: UID) = AppUserUi(
+        fun createEmpty(
+            uid: UID,
+            device: UserDeviceUi,
+        ) = AppUserUi(
             uid = uid,
-            messageId = "",
+            devices = listOf(device),
             username = "",
             email = "",
             code = "",

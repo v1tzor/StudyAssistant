@@ -17,6 +17,8 @@
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel
 
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToDomain
@@ -27,7 +29,10 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.Actio
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 
 /**
@@ -39,21 +44,29 @@ internal interface RegisterWorkProcessor :
     class Base(
         private val authInteractor: AuthInteractor,
         private val screenProvider: AuthScreenProvider,
+        private val deviceInfoProvider: DeviceInfoProvider,
     ) : RegisterWorkProcessor {
 
         override suspend fun work(command: RegisterWorkCommand) = when (command) {
             is RegisterWorkCommand.RegisterNewAccount -> registerNewAccountWork(command.credentials)
         }
 
-        private fun registerNewAccountWork(credentials: RegisterCredentialsUi) = flow {
-            emit(ActionResult(RegisterAction.UpdateLoading(true)))
-            authInteractor.registerNewAccount(credentials.mapToDomain()).handle(
+        private fun registerNewAccountWork(credentials: RegisterCredentialsUi) = flow<RegisterWorkResult> {
+            val device = UserDevice.specifyDevice(
+                platform = deviceInfoProvider.fetchDevicePlatform(),
+                deviceId = deviceInfoProvider.fetchDeviceId(),
+                deviceName = deviceInfoProvider.fetchDeviceName(),
+            )
+            authInteractor.registerNewAccount(credentials.mapToDomain(), device).handle(
                 onLeftAction = { emit(EffectResult(RegisterEffect.ShowError(it))) },
                 onRightAction = { user ->
                     val targetScreen = screenProvider.providePreviewScreen(PreviewScreen.Setup(user.uid))
                     emit(EffectResult(RegisterEffect.ReplaceGlobalScreen(targetScreen)))
                 },
             )
+        }.onStart {
+            emit(ActionResult(RegisterAction.UpdateLoading(true)))
+        }.onCompletion {
             emit(ActionResult(RegisterAction.UpdateLoading(false)))
         }
     }
@@ -62,3 +75,5 @@ internal interface RegisterWorkProcessor :
 internal sealed class RegisterWorkCommand : WorkCommand {
     data class RegisterNewAccount(val credentials: RegisterCredentialsUi) : RegisterWorkCommand()
 }
+
+internal typealias RegisterWorkResult = WorkResult<RegisterAction, RegisterEffect>

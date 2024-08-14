@@ -46,8 +46,8 @@ internal data class OrganizationUi(
     val isHide: Boolean = false,
 ) : Parcelable {
     companion object {
-        fun createMainOrganization() = OrganizationUi(
-            uid = "",
+        fun createMainOrganization(uid: String = "") = OrganizationUi(
+            uid = uid,
             isMain = true,
             shortName = "",
         )

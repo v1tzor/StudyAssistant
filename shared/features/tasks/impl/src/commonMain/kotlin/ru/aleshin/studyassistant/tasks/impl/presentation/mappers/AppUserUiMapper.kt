@@ -18,15 +18,17 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.mappers
 
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetwork
+import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.SocialNetworkUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.UserDeviceUi
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
 internal fun AppUser.mapToUi() = AppUserUi(
     uid = uid,
-    messageId = messageId,
+    devices = devices.map { it.mapToUi() },
     username = username,
     email = email,
     code = code,
@@ -42,7 +44,7 @@ internal fun AppUser.mapToUi() = AppUserUi(
 
 internal fun AppUserUi.mapToDomain() = AppUser(
     uid = uid,
-    messageId = messageId,
+    devices = devices.map { it.mapToDomain() },
     username = username,
     email = email,
     code = code,
@@ -54,6 +56,22 @@ internal fun AppUserUi.mapToDomain() = AppUser(
     friends = friends,
     subscribePeriod = subscribePeriod,
     socialNetworks = socialNetworks.map { it.mapToDomain() },
+)
+
+internal fun UserDevice.mapToUi() = UserDeviceUi(
+    platform = platform,
+    deviceId = deviceId,
+    deviceName = deviceName,
+    pushToken = pushToken,
+    pushServiceType = pushServiceType,
+)
+
+internal fun UserDeviceUi.mapToDomain() = UserDevice(
+    platform = platform,
+    deviceId = deviceId,
+    deviceName = deviceName,
+    pushToken = pushToken,
+    pushServiceType = pushServiceType,
 )
 
 internal fun SocialNetwork.mapToUi() = SocialNetworkUi(

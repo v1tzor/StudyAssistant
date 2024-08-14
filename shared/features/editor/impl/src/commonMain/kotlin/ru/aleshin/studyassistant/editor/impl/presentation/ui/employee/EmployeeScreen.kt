@@ -23,13 +23,17 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.uriString
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
@@ -39,6 +43,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract.E
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract.EmployeeViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.rememberEmployeeScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeeTopBar
+import toStorageFile
 
 /**
  * @author Stanislav Aleshin on 06.06.2024
@@ -58,6 +63,8 @@ internal data class EmployeeScreen(
         ),
     ) { state ->
         val strings = EditorThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
+        val coroutineScope = rememberCoroutineScope()
         val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
 
@@ -67,7 +74,10 @@ internal data class EmployeeScreen(
                 EmployeeContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
-                    onUpdateAvatar = { dispatchEvent(EmployeeEvent.UpdateAvatar(it)) },
+                    onUpdateAvatar = {
+                        dispatchEvent(EmployeeEvent.UpdateAvatar(it.toStorageFile().uriString()))
+                    },
+                    onDeleteAvatar = { dispatchEvent(EmployeeEvent.DeleteAvatar) },
                     onEmployeePostSelected = { dispatchEvent(EmployeeEvent.UpdatePost(it)) },
                     omBirthdaySelected = { dispatchEvent(EmployeeEvent.UpdateBirthday(it)) },
                     onUpdateEmails = { dispatchEvent(EmployeeEvent.UpdateEmails(it)) },
@@ -79,6 +89,14 @@ internal data class EmployeeScreen(
                     },
                     onUpdateName = { first, second, patronymic ->
                         dispatchEvent(EmployeeEvent.UpdateName(first, second, patronymic))
+                    },
+                    onExceedingAvatarSizeLimit = {
+                        coroutineScope.launch {
+                            snackbarState.showSnackbar(
+                                message = coreStrings.exceedingLimitImageSizeMessage,
+                                withDismissAction = true,
+                            )
+                        }
                     },
                 )
             },

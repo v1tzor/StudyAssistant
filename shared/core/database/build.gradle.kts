@@ -36,6 +36,7 @@ kotlin {
             implementation(libs.sqldelight.core)
             implementation(libs.sqldelight.prmimitiveAdapters)
             implementation(libs.sqldelight.coroutines)
+            implementation(libs.firebase.storage)
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
             implementation(libs.logger)

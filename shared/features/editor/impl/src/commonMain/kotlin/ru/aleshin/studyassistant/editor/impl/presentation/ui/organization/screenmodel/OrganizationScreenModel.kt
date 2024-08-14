@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contract.OrganizationAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contract.OrganizationDeps
@@ -62,9 +63,16 @@ internal class OrganizationScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is OrganizationEvent.UpdateAvatar -> with(state()) {
-                val updatedOrganization = editableOrganization?.copy(avatar = event.avatarUrl)
-                sendAction(OrganizationAction.UpdateEditModel(updatedOrganization))
+            is OrganizationEvent.UpdateAvatar -> with(event) {
+                sendAction(OrganizationAction.UpdateActionWithAvatar(ActionWithAvatar.Set(imageUri)))
+            }
+            is OrganizationEvent.DeleteAvatar -> with(state()) {
+                val action = if (editableOrganization?.avatar != null) {
+                    ActionWithAvatar.Delete
+                } else {
+                    ActionWithAvatar.None(null)
+                }
+                sendAction(OrganizationAction.UpdateActionWithAvatar(action))
             }
             is OrganizationEvent.UpdateType -> with(state()) {
                 val updatedOrganization = editableOrganization?.copy(type = event.organizationType)
@@ -100,7 +108,7 @@ internal class OrganizationScreenModel(
             is OrganizationEvent.SaveOrganization -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SAVE_ORGANIZATION) {
                     val editModel = checkNotNull(editableOrganization)
-                    val command = OrganizationWorkCommand.SaveEditModel(editModel)
+                    val command = OrganizationWorkCommand.SaveEditModel(editModel, actionWithAvatar)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -116,10 +124,14 @@ internal class OrganizationScreenModel(
     ) = when (action) {
         is OrganizationAction.SetupEditModel -> currentState.copy(
             editableOrganization = action.editModel,
+            actionWithAvatar = ActionWithAvatar.None(action.editModel.avatar),
             isLoading = false,
         )
         is OrganizationAction.UpdateEditModel -> currentState.copy(
             editableOrganization = action.editModel,
+        )
+        is OrganizationAction.UpdateActionWithAvatar -> currentState.copy(
+            actionWithAvatar = action.action,
         )
         is OrganizationAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
@@ -127,7 +139,7 @@ internal class OrganizationScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_ORGANIZATION, SAVE_ORGANIZATION
+        LOAD_ORGANIZATION, SAVE_ORGANIZATION, UPDATE_AVATAR
     }
 }
 

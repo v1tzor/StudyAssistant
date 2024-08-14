@@ -16,19 +16,23 @@
 
 package ru.aleshin.studyassistant.presentation.ui.main.screenmodel
 
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.extensions.delayedAction
 import ru.aleshin.studyassistant.core.common.functional.Constants.Delay.SPLASH_NAV
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.Either
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
+import ru.aleshin.studyassistant.core.common.functional.firstRightOrNull
+import ru.aleshin.studyassistant.core.common.messages.PushServiceType
+import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
+import ru.aleshin.studyassistant.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.domain.interactors.GeneralSettingsInteractor
-import ru.aleshin.studyassistant.domain.interactors.UserCheckerInteractor
 import ru.aleshin.studyassistant.navigation.GlobalScreenProvider
 import ru.aleshin.studyassistant.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
@@ -42,14 +46,16 @@ import kotlin.time.ExperimentalTime
 interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, MainEffect> {
 
     class Base(
-        private val userCheckerInteractor: UserCheckerInteractor,
+        private val userInteractor: AppUserInteractor,
         private val settingsInteractor: GeneralSettingsInteractor,
+        private val deviceInfoProvider: DeviceInfoProvider,
         private val screenProvider: GlobalScreenProvider,
     ) : MainWorkProcessor {
 
         override suspend fun work(command: MainWorkCommand) = when (command) {
-            MainWorkCommand.LoadThemeSettings -> loadThemeWork()
-            MainWorkCommand.InitialNavigation -> initialNavigationWork()
+            is MainWorkCommand.LoadThemeSettings -> loadThemeWork()
+            is MainWorkCommand.InitialNavigation -> initialNavigationWork()
+            is MainWorkCommand.UpdatePushToken -> updatePushTokenWork()
         }
 
         private fun loadThemeWork() = flow {
@@ -70,7 +76,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                         is Either.Right -> settingsEither.data
                     }
                 }
-                val isAuthorized = userCheckerInteractor.checkIsAuthorized().let { checkEither ->
+                val isAuthorized = userInteractor.checkIsAuthorized().let { checkEither ->
                     when (checkEither) {
                         is Either.Left -> return@delayedAction EffectResult(MainEffect.ShowError(checkEither.data))
                         is Either.Right -> checkEither.data
@@ -90,10 +96,41 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
             }
             emit(result)
         }
+
+        private fun updatePushTokenWork() = flow {
+            userInteractor.fetchAppUser().collectAndHandle(
+                onLeftAction = { emit(EffectResult(MainEffect.ShowError(it))) },
+                onRightAction = { appUser ->
+                    val token = userInteractor.fetchAppToken().firstRightOrNull {
+                        emit(EffectResult(MainEffect.ShowError(it)))
+                    }
+                    val deviceId = deviceInfoProvider.fetchDeviceId()
+                    val currentDeviceInfo = appUser?.devices?.find { it.deviceId == deviceId }
+                    val actualDeviceInfo = UserDevice(
+                        platform = deviceInfoProvider.fetchDevicePlatform(),
+                        deviceId = deviceId,
+                        deviceName = deviceInfoProvider.fetchDeviceName(),
+                        pushToken = token?.token,
+                        pushServiceType = token?.service ?: PushServiceType.NONE,
+                    )
+                    if (appUser != null && currentDeviceInfo != null && actualDeviceInfo != currentDeviceInfo) {
+                        val updatedUser = appUser.copy(
+                            devices = buildList {
+                                addAll(appUser.devices)
+                                remove(currentDeviceInfo)
+                                add(actualDeviceInfo)
+                            }
+                        )
+                        userInteractor.updateUser(updatedUser)
+                    }
+                },
+            )
+        }
     }
 }
 
 sealed class MainWorkCommand : WorkCommand {
     data object LoadThemeSettings : MainWorkCommand()
     data object InitialNavigation : MainWorkCommand()
+    data object UpdatePushToken : MainWorkCommand()
 }

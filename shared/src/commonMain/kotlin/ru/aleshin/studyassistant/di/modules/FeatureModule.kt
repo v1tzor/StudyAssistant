@@ -24,6 +24,7 @@ import org.kodein.di.provider
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
@@ -36,6 +37,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsReposito
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
+import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
@@ -97,6 +99,7 @@ val featureModule = DI.Module("Feature") {
             override val usersRepository = instance<UsersRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }
@@ -114,6 +117,7 @@ val featureModule = DI.Module("Feature") {
             override val authRepository = instance<AuthRepository>()
             override val usersRepository = instance<UsersRepository>()
             override val manageUserRepository = instance<ManageUserRepository>()
+            override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }
@@ -198,7 +202,9 @@ val featureModule = DI.Module("Feature") {
             override val editorFeatureStarter = provider<EditorFeatureStarter>()
             override val authRepository = instance<AuthRepository>()
             override val usersRepository = instance<UsersRepository>()
+            override val messageRepository = instance<MessageRepository>()
             override val friendRequestsRepository = instance<FriendRequestsRepository>()
+            override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
         }
     }
@@ -216,6 +222,7 @@ val featureModule = DI.Module("Feature") {
             override val subjectsRepository = instance<SubjectsRepository>()
             override val friendRequestsRepository = instance<FriendRequestsRepository>()
             override val usersRepository = instance<UsersRepository>()
+            override val messageRepository = instance<MessageRepository>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
         }

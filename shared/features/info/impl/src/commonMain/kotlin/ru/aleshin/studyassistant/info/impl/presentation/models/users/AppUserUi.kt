@@ -30,7 +30,7 @@ import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 @Parcelize
 internal data class AppUserUi(
     val uid: UID,
-    val messageId: UID,
+    val devices: List<UserDeviceUi>,
     val username: String,
     val email: String,
     val code: String,

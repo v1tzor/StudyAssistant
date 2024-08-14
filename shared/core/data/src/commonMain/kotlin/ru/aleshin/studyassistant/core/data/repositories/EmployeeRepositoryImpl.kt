@@ -16,9 +16,11 @@
 
 package ru.aleshin.studyassistant.core.data.repositories
 
+import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.uriString
 import ru.aleshin.studyassistant.core.common.payments.SubscriptionChecker
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
@@ -44,6 +46,16 @@ class EmployeeRepositoryImpl(
             remoteDataSource.addOrUpdateEmployee(employee.mapToRemoteData(), targetUser)
         } else {
             localDataSource.addOrUpdateEmployee(employee.mapToLocalData())
+        }
+    }
+
+    override suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.uploadAvatar(uid, file, targetUser)
+        } else {
+            file.uriString()
         }
     }
 
@@ -77,6 +89,14 @@ class EmployeeRepositoryImpl(
             remoteDataSource.deleteEmployee(targetId, targetUser)
         } else {
             localDataSource.deleteEmployee(targetId)
+        }
+    }
+
+    override suspend fun deleteAvatar(uid: UID, targetUser: UID) {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        if (isSubscriber) {
+            remoteDataSource.deleteAvatar(uid, targetUser)
         }
     }
 }

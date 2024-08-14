@@ -16,9 +16,15 @@
 
 package ru.aleshin.studyassistant.di
 
+import ru.aleshin.studyassistant.core.common.platform.IosUUIDProvider
+import ru.aleshin.studyassistant.core.common.platform.Platform
+
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
-actual class PlatformConfiguration {
+actual data class PlatformConfiguration(
+    actual val serviceTokenProvider: PlatformGoogleAuthTokenProvider,
+    val uuidProvider: IosUUIDProvider,
+) {
     actual val platform = Platform.IOS
 }

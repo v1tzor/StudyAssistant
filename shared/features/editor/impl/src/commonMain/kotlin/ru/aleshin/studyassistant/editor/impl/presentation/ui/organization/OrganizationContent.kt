@@ -34,7 +34,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.vinceglb.filekit.core.PlatformFile
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.AvatarSection
@@ -55,7 +57,9 @@ internal fun OrganizationContent(
     state: OrganizationViewState,
     modifier: Modifier,
     scrollState: ScrollState = rememberScrollState(),
-    onUpdateAvatar: (String?) -> Unit,
+    onUpdateAvatar: (PlatformFile) -> Unit,
+    onDeleteAvatar: () -> Unit,
+    onExceedingAvatarSizeLimit: (Int) -> Unit,
     onSelectedType: (OrganizationType?) -> Unit,
     onUpdateName: (short: String?, full: String?) -> Unit,
     onUpdateEmails: (List<ContactInfoUi>) -> Unit,
@@ -70,10 +74,15 @@ internal fun OrganizationContent(
     ) {
         AvatarSection(
             isLoading = isLoading,
-            firstName = editableOrganization?.shortName?.split(' ')?.getOrNull(0),
-            secondName = editableOrganization?.shortName?.split(' ')?.getOrNull(1),
-            avatar = editableOrganization?.avatar,
-            onUpdate = onUpdateAvatar,
+            shortName = editableOrganization?.shortName,
+            avatar = when (actionWithAvatar) {
+                is ActionWithAvatar.None -> actionWithAvatar.uri
+                is ActionWithAvatar.Set -> actionWithAvatar.uri
+                is ActionWithAvatar.Delete -> null
+            },
+            onUpdateAvatar = onUpdateAvatar,
+            onDeleteAvatar = onDeleteAvatar,
+            onExceedingLimit = onExceedingAvatarSizeLimit,
         )
         OrganizationTypeInfoField(
             isLoading = isLoading,

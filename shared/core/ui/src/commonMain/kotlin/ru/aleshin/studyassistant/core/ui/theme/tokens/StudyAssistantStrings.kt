@@ -145,7 +145,19 @@ data class StudyAssistantStrings(
     val whatsAppSocialNetwork: String,
     val discordSocialNetwork: String,
     val vkSocialNetwork: String,
+    val exceedingLimitImageSizeMessage: String,
     val otherTitle: String,
+    val addToFriendsMessageTitle: String,
+    val addToFriendsMessageBodySuffix: String,
+    val acceptFriendRequestMessageTitleSuffix: String,
+    val acceptFriendRequestMessageBody: String,
+    val rejectFriendRequestMessageTitleSuffix: String,
+    val rejectFriendRequestMessageBody: String,
+    val shareHomeworkMessageTitleSuffix: String,
+    val shareHomeworkMessageBody: String,
+    val shareScheduleMessageTitleSuffix: String,
+    val shareScheduleMessageBody: String,
+    val emptyMessageUser: String,
 )
 
 internal val russianFamelString = StudyAssistantStrings(
@@ -272,6 +284,18 @@ internal val russianFamelString = StudyAssistantStrings(
     discordSocialNetwork = "Discord",
     whatsAppSocialNetwork = "Whatsapp",
     otherTitle = "Другое",
+    exceedingLimitImageSizeMessage = "Изображение должно быть <2 MB",
+    addToFriendsMessageTitle = "У вас новый запрос в друзья!",
+    addToFriendsMessageBodySuffix = "хочет добавить вас в друзья.",
+    acceptFriendRequestMessageTitleSuffix = "добавил/а вас в друзья",
+    acceptFriendRequestMessageBody = "Теперь вы можете обмениваться информацией!",
+    rejectFriendRequestMessageTitleSuffix = "отклонил/а заявку в друзья",
+    rejectFriendRequestMessageBody = "Свяжитесь с пользователем лично.",
+    shareHomeworkMessageTitleSuffix = "поделился/лась с вами заданиями!",
+    shareHomeworkMessageBody = "Предметы: ",
+    shareScheduleMessageTitleSuffix = "поделился/лась с вами расписанием!",
+    shareScheduleMessageBody = "Добавьте его прямо сейчас!",
+    emptyMessageUser = "Пользователь",
 )
 
 internal val englishFamelString = StudyAssistantStrings(
@@ -398,6 +422,18 @@ internal val englishFamelString = StudyAssistantStrings(
     discordSocialNetwork = "Discord",
     whatsAppSocialNetwork = "Whatsapp",
     otherTitle = "Other",
+    exceedingLimitImageSizeMessage = "The image must be <2 MB",
+    addToFriendsMessageTitle = "You have a new friend request!",
+    addToFriendsMessageBodySuffix = "wants to add you as friends.",
+    acceptFriendRequestMessageTitleSuffix = "added you as a friend",
+    acceptFriendRequestMessageBody = "Now you can share information!",
+    rejectFriendRequestMessageTitleSuffix = "rejected the friend request",
+    rejectFriendRequestMessageBody = "Contact the user personally.",
+    shareHomeworkMessageTitleSuffix = "shared the tasks with you!",
+    shareHomeworkMessageBody = "Subjects: ",
+    shareScheduleMessageTitleSuffix = "shared the schedule with you!",
+    shareScheduleMessageBody = "Add it right now!",
+    emptyMessageUser = "User",
 )
 
 fun StudyAssistantStrings.monthNames() = MonthNames(

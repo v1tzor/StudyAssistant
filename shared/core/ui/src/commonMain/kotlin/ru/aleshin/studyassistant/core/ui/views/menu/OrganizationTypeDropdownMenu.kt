@@ -24,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
@@ -45,7 +44,7 @@ fun OrganizationTypeDropdownMenu(
     DropdownMenu(
         expanded = isExpanded,
         onDismissRequest = onDismiss,
-        modifier = modifier.sizeIn(maxHeight = 200.dp).clip(MaterialTheme.shapes.large),
+        modifier = modifier.sizeIn(maxHeight = 200.dp),
         shape = MaterialTheme.shapes.large,
         offset = DpOffset(0.dp, 6.dp),
     ) {

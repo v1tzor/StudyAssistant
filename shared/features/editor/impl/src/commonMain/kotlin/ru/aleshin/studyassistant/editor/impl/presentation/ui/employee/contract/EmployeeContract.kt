@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
@@ -39,11 +40,13 @@ internal data class EmployeeViewState(
     val isLoading: Boolean = true,
     val editableEmployee: EditEmployeeUi? = null,
     val organization: OrganizationShortUi? = null,
+    val actionWithAvatar: ActionWithAvatar = ActionWithAvatar.None(null),
 ) : BaseViewState
 
 internal sealed class EmployeeEvent : BaseEvent {
     data class Init(val employeeId: UID?, val organizationId: UID) : EmployeeEvent()
-    data class UpdateAvatar(val avatarUrl: String?) : EmployeeEvent()
+    data class UpdateAvatar(val imageUrl: String) : EmployeeEvent()
+    data object DeleteAvatar : EmployeeEvent()
     data class UpdateName(val first: String?, val second: String?, val patronymic: String?) : EmployeeEvent()
     data class UpdatePost(val post: EmployeePost?) : EmployeeEvent()
     data class UpdateWorkTime(val start: Instant?, val end: Instant?) : EmployeeEvent()
@@ -65,5 +68,6 @@ internal sealed class EmployeeAction : BaseAction {
     data class SetupEditModel(val editModel: EditEmployeeUi) : EmployeeAction()
     data class UpdateEditModel(val editModel: EditEmployeeUi?) : EmployeeAction()
     data class UpdateOrganization(val organization: OrganizationShortUi) : EmployeeAction()
+    data class UpdateActionWithAvatar(val actionWithAvatar: ActionWithAvatar) : EmployeeAction()
     data class UpdateLoading(val isLoading: Boolean) : EmployeeAction()
 }
