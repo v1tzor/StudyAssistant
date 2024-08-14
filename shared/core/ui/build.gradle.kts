@@ -47,8 +47,11 @@ kotlin {
             api(libs.placeholder)
 
             api(libs.koalaplot.charts)
+            api(libs.bundles.filekit)
 
             api(libs.bundles.sketch)
+
+            implementation(libs.firebase.storage)
         }
     }
 

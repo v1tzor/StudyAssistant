@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "Appicon.png",
+      "filename" : "ic_launcher_ios.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

@@ -9,3 +9,9 @@ captures
 .cxx
 local.properties
 xcuserdata
+androidApp/src/main/assets/service-account-file.json
+iosApp/iosApp/service-account-file.json
+iosApp/service-account-file.json
+iosApp/GoogleService-Info.plist
+iosApp/iosApp/GoogleService-Info.plist
+androidApp/google-services.json
