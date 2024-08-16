@@ -16,14 +16,33 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
+import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.classes.ClassDetails
+import ru.aleshin.studyassistant.core.domain.entities.classes.MediatedClass
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.MediatedClassUi
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
  */
+internal fun Class.mapToUi(number: Int) = ClassUi(
+    uid = uid,
+    scheduleId = scheduleId,
+    organization = organization.mapToUi(),
+    eventType = eventType,
+    subject = subject?.mapToUi(),
+    customData = customData,
+    teacher = teacher?.mapToUi(),
+    office = office,
+    location = location?.mapToUi(),
+    timeRange = timeRange,
+    number = number,
+    notification = notification,
+)
+
 internal inline fun ClassDetails.mapToUi(
     number: Int,
     homeworkStatus: (Homework) -> HomeworkStatus,
@@ -41,4 +60,46 @@ internal inline fun ClassDetails.mapToUi(
     notification = notification,
     number = number,
     homework = homework?.let { it.mapToUi(status = homeworkStatus(it)) },
+)
+
+internal fun MediatedClass.mapToUi() = MediatedClassUi(
+    uid = uid,
+    scheduleId = scheduleId,
+    organizationId = organizationId,
+    eventType = eventType,
+    subjectId = subjectId,
+    customData = customData,
+    teacherId = teacherId,
+    office = office,
+    location = location?.mapToUi(),
+    timeRange = timeRange,
+    notification = notification,
+)
+
+internal fun ClassUi.mapToDomain() = Class(
+    uid = uid,
+    scheduleId = scheduleId,
+    organization = organization.mapToDomain(),
+    eventType = eventType,
+    subject = subject?.mapToDomain(),
+    customData = customData,
+    teacher = teacher?.mapToDomain(),
+    office = office,
+    location = location?.mapToDomain(),
+    timeRange = timeRange,
+    notification = notification,
+)
+
+internal fun MediatedClassUi.mapToDomain() = MediatedClass(
+    uid = uid,
+    scheduleId = scheduleId,
+    organizationId = organizationId,
+    eventType = eventType,
+    subjectId = subjectId,
+    customData = customData,
+    teacherId = teacherId,
+    office = office,
+    location = location?.mapToDomain(),
+    timeRange = timeRange,
+    notification = notification,
 )

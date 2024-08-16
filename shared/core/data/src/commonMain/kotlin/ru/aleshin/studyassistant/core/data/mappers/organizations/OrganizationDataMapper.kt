@@ -19,12 +19,15 @@ package ru.aleshin.studyassistant.core.data.mappers.organizations
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToDomain
+import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToRemoteData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToRemoteData
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationDetailsEntity
+import ru.aleshin.studyassistant.core.domain.entities.organizations.MediatedOrganization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
+import ru.aleshin.studyassistant.core.remote.models.organizations.MediatedOrganizationPojo
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationPojo
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationEntity
@@ -48,6 +51,22 @@ fun OrganizationDetailsPojo.mapToDomain() = Organization(
     webs = webs.map { it.mapToDomain() },
     offices = offices,
     isHide = isHide,
+)
+
+fun MediatedOrganizationPojo.mapToDomain() = MediatedOrganization(
+    uid = uid,
+    isMain = main,
+    shortName = shortName,
+    fullName = fullName,
+    type = OrganizationType.valueOf(type),
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
+    subjects = subjects.map { it.mapToDomain() },
+    employee = employee.map { it.mapToDomain() },
+    emails = emails.map { it.mapToDomain() },
+    phones = phones.map { it.mapToDomain() },
+    locations = locations.map { it.mapToDomain() },
+    webs = webs.map { it.mapToDomain() },
+    offices = offices,
 )
 
 fun OrganizationDetailsEntity.mapToDomain() = Organization(
@@ -82,6 +101,22 @@ fun Organization.mapToRemoteData() = OrganizationPojo(
     webs = webs.map { it.mapToRemoteData() },
     offices = offices,
     hide = isHide,
+)
+
+fun MediatedOrganization.mapToRemoteData() = MediatedOrganizationPojo(
+    uid = uid,
+    main = isMain,
+    shortName = shortName,
+    fullName = fullName,
+    type = type.name,
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToRemoteDate(),
+    subjects = subjects.map { it.mapToRemoteData() },
+    employee = employee.map { it.mapToRemoteData() },
+    emails = emails.map { it.mapToRemoteData() },
+    phones = phones.map { it.mapToRemoteData() },
+    locations = locations.map { it.mapToRemoteData() },
+    webs = webs.map { it.mapToRemoteData() },
+    offices = offices,
 )
 
 fun Organization.mapToLocalData() = OrganizationEntity(

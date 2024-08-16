@@ -18,8 +18,8 @@ package ru.aleshin.studyassistant.core.domain.repositories
 
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.entities.share.SharedHomeworks
-import ru.aleshin.studyassistant.core.domain.entities.share.SharedHomeworksDetails
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SharedHomeworks
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SharedHomeworksDetails
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.

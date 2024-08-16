@@ -23,6 +23,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
@@ -43,6 +44,7 @@ interface TasksFeatureDependencies : BaseFeatureDependencies {
     val calendarSettingsRepository: CalendarSettingsRepository
     val homeworkRepository: HomeworksRepository
     val shareHomeworksRepository: ShareHomeworksRepository
+    val messageRepository: MessageRepository
     val todoRepository: TodoRepository
     val subjectsRepository: SubjectsRepository
     val usersRepository: UsersRepository

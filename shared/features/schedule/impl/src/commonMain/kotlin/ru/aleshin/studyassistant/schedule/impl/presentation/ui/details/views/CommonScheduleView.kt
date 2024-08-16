@@ -49,6 +49,7 @@ import ru.aleshin.studyassistant.core.ui.views.SmallInfoBadge
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.CommonClassView
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.

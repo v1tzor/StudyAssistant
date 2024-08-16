@@ -26,6 +26,11 @@ SELECT *
 FROM organizationEntity
 WHERE uid = ?;
 
+fetchOrganizationsById:
+SELECT *
+FROM organizationEntity
+WHERE uid IN ?;
+
 addOrUpdateOrganization:
 INSERT OR REPLACE INTO organizationEntity (uid, is_main, short_name, full_name, type, avatar, schedule_time_intervals, emails, phones, locations, webs, offices, is_hide)
 VALUES ?;

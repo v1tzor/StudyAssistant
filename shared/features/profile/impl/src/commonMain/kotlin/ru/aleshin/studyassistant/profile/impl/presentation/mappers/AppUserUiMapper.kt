@@ -19,9 +19,9 @@ package ru.aleshin.studyassistant.profile.impl.presentation.mappers
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetwork
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
-import ru.aleshin.studyassistant.profile.impl.presentation.models.AppUserUi
-import ru.aleshin.studyassistant.profile.impl.presentation.models.SocialNetworkUi
-import ru.aleshin.studyassistant.profile.impl.presentation.models.UserDeviceUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.users.AppUserUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.users.SocialNetworkUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.users.UserDeviceUi
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.

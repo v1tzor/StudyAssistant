@@ -33,6 +33,7 @@ import kotlin.coroutines.CoroutineContext
 interface EmployeeLocalDataSource {
 
     suspend fun addOrUpdateEmployee(employee: EmployeeEntity): UID
+    suspend fun addOrUpdateEmployeeGroup(employees: List<EmployeeEntity>)
     suspend fun fetchEmployeeById(uid: UID): Flow<EmployeeEntity?>
     suspend fun fetchAllEmployeeByOrganization(organizationId: UID): Flow<List<EmployeeEntity>>
     suspend fun deleteEmployee(targetId: UID)
@@ -50,6 +51,10 @@ interface EmployeeLocalDataSource {
             employeeQueries.addOrUpdateEmployee(employee.copy(uid = uid))
 
             return uid
+        }
+
+        override suspend fun addOrUpdateEmployeeGroup(employees: List<EmployeeEntity>) {
+            employees.forEach { employee -> addOrUpdateEmployee(employee) }
         }
 
         override suspend fun fetchEmployeeById(uid: UID): Flow<EmployeeEntity?> {

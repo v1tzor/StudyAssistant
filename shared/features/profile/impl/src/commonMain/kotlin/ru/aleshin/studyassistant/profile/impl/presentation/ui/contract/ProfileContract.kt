@@ -16,30 +16,48 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.ui.contract
 
-import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
+import dev.icerock.moko.parcelize.TypeParceler
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
-import ru.aleshin.studyassistant.profile.impl.presentation.models.AppUserUi
-import ru.aleshin.studyassistant.profile.impl.presentation.models.FriendRequestsUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.organization.OrganizationShortUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.SentMediatedSchedulesUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.ShareSchedulesSendDataUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.SharedSchedulesShortUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.users.AppUserUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.users.FriendRequestsUi
 
 /**
  * @author Stanislav Aleshin on 21.04.2024
  */
-@Immutable
 @Parcelize
 internal data class ProfileViewState(
-    val myProfile: AppUserUi? = null,
-    val myFriendRequest: FriendRequestsUi? = null,
+    val isLoading: Boolean = true,
+    val isLoadingShare: Boolean = true,
+    val isLoadingSend: Boolean = false,
+    @TypeParceler<Instant, InstantParceler>
+    val currentTime: Instant = Clock.System.now(),
+    val appUserProfile: AppUserUi? = null,
+    val friendRequest: FriendRequestsUi? = null,
+    val sharedSchedules: SharedSchedulesShortUi? = null,
+    val allOrganizations: List<OrganizationShortUi> = emptyList(),
+    val allFriends: List<AppUserUi> = emptyList(),
 ) : BaseViewState
 
 internal sealed class ProfileEvent : BaseEvent {
     data object Init : ProfileEvent()
     data object NavigateToFriends : ProfileEvent()
+    data class SendSharedSchedule(val sendData: ShareSchedulesSendDataUi) : ProfileEvent()
+    data class CancelSentSchedule(val schedule: SentMediatedSchedulesUi) : ProfileEvent()
+    data class NavigateToShareScheduleViewer(val shareId: UID) : ProfileEvent()
     data object NavigateToPrivacySettings : ProfileEvent()
     data object NavigateToGeneralSettings : ProfileEvent()
     data object NavigateToNotifySettings : ProfileEvent()
@@ -56,5 +74,20 @@ internal sealed class ProfileEffect : BaseUiEffect {
 }
 
 internal sealed class ProfileAction : BaseAction {
-    data class UpdateProfileInfo(val profile: AppUserUi?, val requests: FriendRequestsUi?) : ProfileAction()
+
+    data class UpdateProfileInfo(
+        val profile: AppUserUi?,
+        val requests: FriendRequestsUi?,
+    ) : ProfileAction()
+
+    data class UpdateSharedSchedules(
+        val schedules: SharedSchedulesShortUi?,
+        val organizations: List<OrganizationShortUi>
+    ) : ProfileAction()
+
+    data class UpdateFriends(val friends: List<AppUserUi>) : ProfileAction()
+    data class UpdateCurrentTime(val time: Instant) : ProfileAction()
+    data class UpdateLoading(val isLoading: Boolean) : ProfileAction()
+    data class UpdateLoadingShared(val isLoading: Boolean) : ProfileAction()
+    data class UpdateLoadingSend(val isLoading: Boolean) : ProfileAction()
 }

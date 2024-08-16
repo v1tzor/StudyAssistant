@@ -50,6 +50,16 @@ class OrganizationsRepositoryImpl(
         }
     }
 
+    override suspend fun addOrUpdateOrganizationsGroup(organizations: List<Organization>, targetUser: UID) {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.addOrUpdateOrganizationsGroup(organizations.map { it.mapToRemoteData() }, targetUser)
+        } else {
+            localDataSource.addOrUpdateOrganizationsGroup(organizations.map { it.mapToLocalData() })
+        }
+    }
+
     override suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
@@ -70,6 +80,20 @@ class OrganizationsRepositoryImpl(
         } else {
             localDataSource.fetchOrganizationById(uid).map { organizationEntity ->
                 organizationEntity?.mapToDomain()
+            }
+        }
+    }
+
+    override suspend fun fetchOrganizationsById(uid: List<UID>, targetUser: UID): Flow<List<Organization>> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.fetchOrganizationsById(uid, targetUser).map { organizations ->
+                organizations.map { organizationPojo -> organizationPojo.mapToDomain() }
+            }
+        } else {
+            localDataSource.fetchOrganizationsById(uid).map { organizations ->
+                organizations.map { organizationEntity -> organizationEntity.mapToDomain() }
             }
         }
     }

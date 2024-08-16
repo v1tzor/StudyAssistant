@@ -16,7 +16,9 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
+import ru.aleshin.studyassistant.core.domain.entities.subject.MediatedSubject
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.MediatedSubjectUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
 
 /**
@@ -33,12 +35,34 @@ internal fun Subject.mapToUi() = SubjectUi(
     location = location?.mapToUi(),
 )
 
+internal fun MediatedSubject.mapToUi() = MediatedSubjectUi(
+    uid = uid,
+    organizationId = organizationId,
+    eventType = eventType,
+    name = name,
+    teacherId = teacherId,
+    office = office,
+    color = color,
+    location = location?.mapToUi(),
+)
+
 internal fun SubjectUi.mapToDomain() = Subject(
     uid = uid,
     organizationId = organizationId,
     eventType = eventType,
     name = name,
     teacher = teacher?.mapToDomain(),
+    office = office,
+    color = color,
+    location = location?.mapToDomain(),
+)
+
+internal fun MediatedSubjectUi.mapToDomain() = MediatedSubject(
+    uid = uid,
+    organizationId = organizationId,
+    eventType = eventType,
+    name = name,
+    teacherId = teacherId,
     office = office,
     color = color,
     location = location?.mapToDomain(),

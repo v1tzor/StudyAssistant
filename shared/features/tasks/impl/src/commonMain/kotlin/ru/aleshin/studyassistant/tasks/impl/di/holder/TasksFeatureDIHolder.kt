@@ -29,6 +29,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
@@ -63,6 +64,7 @@ object TasksFeatureDIHolder : BaseFeatureDIHolder<TasksFeatureApi, TasksFeatureD
                 bindSingleton<HomeworksRepository> { dependencies.homeworkRepository }
                 bindSingleton<ShareHomeworksRepository> { dependencies.shareHomeworksRepository }
                 bindSingleton<SubjectsRepository> { dependencies.subjectsRepository }
+                bindSingleton<MessageRepository> { dependencies.messageRepository }
                 bindSingleton<TodoRepository> { dependencies.todoRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }

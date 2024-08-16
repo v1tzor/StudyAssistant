@@ -72,6 +72,10 @@ object StudyAssistantFirebase {
         const val ROOT = "sharedHomeworks"
     }
 
+    object SharedSchedules {
+        const val ROOT = "sharedSchedules"
+    }
+
     object Storage {
         const val USER_AVATAR = "avatar"
         const val ORGANIZATIONS = "organizations"

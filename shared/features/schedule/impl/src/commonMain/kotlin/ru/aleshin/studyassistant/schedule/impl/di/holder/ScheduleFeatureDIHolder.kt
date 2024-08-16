@@ -28,8 +28,11 @@ import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
@@ -39,6 +42,7 @@ import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
 import ru.aleshin.studyassistant.schedule.impl.di.modules.domainModule
 import ru.aleshin.studyassistant.schedule.impl.di.modules.navigationModule
 import ru.aleshin.studyassistant.schedule.impl.di.modules.presentationModule
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -53,11 +57,15 @@ object ScheduleFeatureDIHolder :
             val di = DI {
                 importAll(navigationModule, presentationModule, domainModule)
                 bindInstance<() -> EditorFeatureStarter> { dependencies.editorFeatureStarter }
+                bindInstance<() -> UsersFeatureStarter> { dependencies.usersFeatureStarter }
                 bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
+                bindSingleton<ShareSchedulesRepository> { dependencies.shareSchedulesRepository }
                 bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<HomeworksRepository> { dependencies.homeworkRepository }
+                bindSingleton<SubjectsRepository> { dependencies.subjectsRepository }
+                bindSingleton<EmployeeRepository> { dependencies.employeeRepository }
                 bindSingleton<TodoRepository> { dependencies.todoRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }

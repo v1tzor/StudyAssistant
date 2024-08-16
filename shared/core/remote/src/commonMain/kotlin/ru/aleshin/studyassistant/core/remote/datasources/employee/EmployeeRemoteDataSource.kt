@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.exists
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Storage
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
@@ -36,6 +37,7 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 interface EmployeeRemoteDataSource {
 
     suspend fun addOrUpdateEmployee(employee: EmployeePojo, targetUser: UID): UID
+    suspend fun addOrUpdateEmployeeGroup(employees: List<EmployeePojo>, targetUser: UID)
     suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String
     suspend fun fetchEmployeeById(uid: UID, targetUser: UID): Flow<EmployeePojo?>
     suspend fun fetchAllEmployeeByOrganization(organizationId: UID, targetUser: UID): Flow<List<EmployeePojo>>
@@ -63,6 +65,21 @@ interface EmployeeRemoteDataSource {
                     reference.document(uid).update(UserData.UID to uid)
                     return@runTransaction uid
                 }
+            }
+        }
+
+        override suspend fun addOrUpdateEmployeeGroup(employees: List<EmployeePojo>, targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.EMPLOYEE)
+
+            database.batch().apply {
+                employees.forEach { employee ->
+                    val uid = employee.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+                    set(reference.document(uid), employee.copy(uid = uid))
+                }
+                return@apply commit()
             }
         }
 

@@ -20,11 +20,16 @@ import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
 import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
@@ -36,10 +41,15 @@ interface ProfileFeatureDependencies : BaseFeatureDependencies {
     val usersFeatureStarter: () -> UsersFeatureStarter
     val settingsFeatureStarter: () -> SettingsFeatureStarter
     val editorFeatureStarter: () -> EditorFeatureStarter
+    val scheduleFeatureStarter: () -> ScheduleFeatureStarter
     val authRepository: AuthRepository
     val usersRepository: UsersRepository
     val friendRequestsRepository: FriendRequestsRepository
+    val baseSchedulesRepository: BaseScheduleRepository
+    val shareSchedulesRepository: ShareSchedulesRepository
+    val organizationsRepository: OrganizationsRepository
     val messageRepository: MessageRepository
     val deviceInfoProvider: DeviceInfoProvider
     val coroutineManager: CoroutineManager
+    val dateManager: DateManager
 }

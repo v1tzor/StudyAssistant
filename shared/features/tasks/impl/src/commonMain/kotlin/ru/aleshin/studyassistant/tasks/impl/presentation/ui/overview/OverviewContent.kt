@@ -65,7 +65,7 @@ import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
@@ -101,7 +101,7 @@ internal fun OverviewContent(
     onDoHomework: (HomeworkDetailsUi) -> Unit,
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
     onRepeatHomework: (HomeworkDetailsUi) -> Unit,
-    onShareHomeworks: (SentMediatedHomeworksUi) -> Unit,
+    onShareHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
     onShowAllTodoTasks: () -> Unit,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
@@ -269,7 +269,7 @@ private fun HomeworksSection(
     onDoHomework: (HomeworkDetailsUi) -> Unit,
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
     onRepeatHomework: (HomeworkDetailsUi) -> Unit,
-    onShareHomeworks: (SentMediatedHomeworksUi) -> Unit,
+    onShareHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),

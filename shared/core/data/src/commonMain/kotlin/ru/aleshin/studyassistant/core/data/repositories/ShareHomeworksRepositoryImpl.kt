@@ -21,8 +21,8 @@ import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.share.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.share.mapToRemoteData
-import ru.aleshin.studyassistant.core.domain.entities.share.SharedHomeworks
-import ru.aleshin.studyassistant.core.domain.entities.share.SharedHomeworksDetails
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SharedHomeworks
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SharedHomeworksDetails
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.remote.datasources.share.ShareHomeworksRemoteDataSource
 

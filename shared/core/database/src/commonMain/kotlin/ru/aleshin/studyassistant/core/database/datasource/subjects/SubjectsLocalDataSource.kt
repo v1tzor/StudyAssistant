@@ -37,6 +37,7 @@ import kotlin.coroutines.CoroutineContext
 interface SubjectsLocalDataSource {
 
     suspend fun addOrUpdateSubject(subject: SubjectEntity): UID
+    suspend fun addOrUpdateSubjectsGroup(subjects: List<SubjectEntity>)
     suspend fun fetchSubjectById(uid: UID): Flow<SubjectDetailsEntity?>
     suspend fun fetchAllSubjectsByOrganization(organizationId: UID): Flow<List<SubjectDetailsEntity>>
     suspend fun fetchAllSubjectsByNames(names: List<String>): List<SubjectDetailsEntity>
@@ -57,6 +58,10 @@ interface SubjectsLocalDataSource {
             subjectQueries.addOrUpdateSubject(subject.copy(uid = uid))
 
             return uid
+        }
+
+        override suspend fun addOrUpdateSubjectsGroup(subjects: List<SubjectEntity>) {
+            subjects.forEach { subject -> addOrUpdateSubject(subject) }
         }
 
         override suspend fun fetchSubjectById(uid: UID): Flow<SubjectDetailsEntity?> {

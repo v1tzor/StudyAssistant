@@ -40,6 +40,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -131,8 +132,12 @@ val featureModule = DI.Module("Feature") {
     bindEagerSingleton<ScheduleFeatureDependencies> {
         object : ScheduleFeatureDependencies {
             override val editorFeatureStarter = provider<EditorFeatureStarter>()
+            override val usersFeatureStarter = provider<UsersFeatureStarter>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
+            override val shareSchedulesRepository = instance<ShareSchedulesRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
+            override val subjectsRepository = instance<SubjectsRepository>()
+            override val employeeRepository = instance<EmployeeRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val homeworkRepository = instance<HomeworksRepository>()
             override val todoRepository = instance<TodoRepository>()
@@ -158,6 +163,7 @@ val featureModule = DI.Module("Feature") {
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val homeworkRepository = instance<HomeworksRepository>()
             override val shareHomeworksRepository = instance<ShareHomeworksRepository>()
+            override val messageRepository = instance<MessageRepository>()
             override val todoRepository = instance<TodoRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
@@ -200,12 +206,17 @@ val featureModule = DI.Module("Feature") {
             override val usersFeatureStarter = provider<UsersFeatureStarter>()
             override val settingsFeatureStarter = provider<SettingsFeatureStarter>()
             override val editorFeatureStarter = provider<EditorFeatureStarter>()
+            override val scheduleFeatureStarter = provider<ScheduleFeatureStarter>()
             override val authRepository = instance<AuthRepository>()
+            override val shareSchedulesRepository = instance<ShareSchedulesRepository>()
             override val usersRepository = instance<UsersRepository>()
             override val messageRepository = instance<MessageRepository>()
+            override val organizationsRepository = instance<OrganizationsRepository>()
+            override val baseSchedulesRepository = instance<BaseScheduleRepository>()
             override val friendRequestsRepository = instance<FriendRequestsRepository>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val dateManager = instance<DateManager>()
         }
     }
     bindProvider<ProfileFeatureStarter> {

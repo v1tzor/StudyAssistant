@@ -30,9 +30,9 @@ import ru.aleshin.studyassistant.core.remote.models.users.UserDevicePojo
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
-fun AppUser.mapToRemote() = AppUserPojo(
+fun AppUser.mapToRemoteData() = AppUserPojo(
     uid = uid,
-    devices = devices.map { it.mapToData() },
+    devices = devices.map { it.mapToRemoteData() },
     username = username,
     email = email,
     code = code,
@@ -43,7 +43,7 @@ fun AppUser.mapToRemote() = AppUserPojo(
     gender = gender?.name,
     friends = friends,
     subscribePeriod = subscribePeriod?.toEpochMilliseconds(),
-    socialNetworks = socialNetworks.map { it.mapToRemote() },
+    socialNetworks = socialNetworks.map { it.mapToRemoteData() },
 )
 
 fun AppUserPojo.mapToDomain() = AppUser(
@@ -62,7 +62,7 @@ fun AppUserPojo.mapToDomain() = AppUser(
     socialNetworks = socialNetworks.map { it.mapToDomain() },
 )
 
-internal fun UserDevice.mapToData() = UserDevicePojo(
+internal fun UserDevice.mapToRemoteData() = UserDevicePojo(
     platform = platform,
     deviceId = deviceId,
     deviceName = deviceName,
@@ -78,7 +78,7 @@ internal fun UserDevicePojo.mapToDomain() = UserDevice(
     pushServiceType = PushServiceType.valueOf(pushServiceType),
 )
 
-fun SocialNetwork.mapToRemote() = SocialNetworkPojo(
+fun SocialNetwork.mapToRemoteData() = SocialNetworkPojo(
     type = type.name,
     otherType = otherType,
     data = data,

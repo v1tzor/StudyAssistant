@@ -17,12 +17,13 @@
 package ru.aleshin.studyassistant.info.impl.presentation.ui.employee
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -54,7 +55,6 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
 internal data class EmployeeScreen(val organizationId: UID) : Screen {
 
     @Composable
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun Content() = ScreenContent(
         screenModel = rememberEmployeeScreenModel(),
         initialState = EmployeeViewState(),
@@ -109,6 +109,7 @@ internal data class EmployeeScreen(val organizationId: UID) : Screen {
                     snackbar = { ErrorSnackbar(it) },
                 )
             },
+            contentWindowInsets = WindowInsets.statusBars,
         )
 
         handleEffect { effect ->

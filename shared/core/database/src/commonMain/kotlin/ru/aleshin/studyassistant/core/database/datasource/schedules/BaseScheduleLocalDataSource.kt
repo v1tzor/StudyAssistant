@@ -49,6 +49,7 @@ import kotlin.coroutines.CoroutineContext
 interface BaseScheduleLocalDataSource {
 
     suspend fun addOrUpdateSchedule(schedule: BaseScheduleEntity): UID
+    suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseScheduleEntity>)
     suspend fun fetchScheduleById(uid: UID): Flow<BaseScheduleDetailsEntity?>
     suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek): Flow<BaseScheduleDetailsEntity?>
     suspend fun fetchSchedulesByVersion(from: Instant, to: Instant, numberOfWeek: NumberOfRepeatWeek?): Flow<List<BaseScheduleDetailsEntity>>
@@ -70,6 +71,10 @@ interface BaseScheduleLocalDataSource {
             scheduleQueries.addOrUpdateSchedule(schedule.copy(uid = uid))
 
             return uid
+        }
+
+        override suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseScheduleEntity>) {
+            schedules.forEach { schedule -> addOrUpdateSchedule(schedule) }
         }
 
         override suspend fun fetchScheduleById(uid: UID): Flow<BaseScheduleDetailsEntity?> {

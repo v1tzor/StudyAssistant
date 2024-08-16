@@ -35,7 +35,7 @@ import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.UserCodeView
 import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
-import ru.aleshin.studyassistant.profile.impl.presentation.models.AppUserUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.users.AppUserUi
 
 /**
  * @author Stanislav Aleshin on 21.04.2024
@@ -43,10 +43,11 @@ import ru.aleshin.studyassistant.profile.impl.presentation.models.AppUserUi
 @Composable
 internal fun ProfileInfoSection(
     modifier: Modifier = Modifier,
+    isLoading: Boolean,
     profile: AppUserUi?,
 ) {
     Crossfade(
-        targetState = profile == null,
+        targetState = isLoading,
         animationSpec = spring(
             stiffness = Spring.StiffnessMediumLow,
             visibilityThreshold = Spring.DefaultDisplacementThreshold,

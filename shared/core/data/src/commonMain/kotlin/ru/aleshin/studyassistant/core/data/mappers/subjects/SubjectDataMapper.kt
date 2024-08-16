@@ -24,7 +24,9 @@ import ru.aleshin.studyassistant.core.data.mappers.users.mapToRemoteData
 import ru.aleshin.studyassistant.core.database.mappers.employee.mapToLocal
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import ru.aleshin.studyassistant.core.domain.entities.subject.MediatedSubject
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
+import ru.aleshin.studyassistant.core.remote.models.subjects.MediatedSubjectPojo
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectPojo
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectEntity
@@ -38,6 +40,17 @@ fun SubjectDetailsPojo.mapToDomain() = Subject(
     eventType = EventType.valueOf(eventType),
     name = name,
     teacher = teacher?.mapToDomain(),
+    office = office,
+    color = color,
+    location = location?.mapToDomain(),
+)
+
+fun MediatedSubjectPojo.mapToDomain() = MediatedSubject(
+    uid = uid,
+    organizationId = organizationId,
+    eventType = EventType.valueOf(eventType),
+    name = name,
+    teacherId = teacherId,
     office = office,
     color = color,
     location = location?.mapToDomain(),
@@ -60,6 +73,17 @@ fun Subject.mapToRemoteData() = SubjectPojo(
     eventType = eventType.name,
     name = name,
     teacherId = teacher?.uid,
+    office = office,
+    color = color,
+    location = location?.mapToRemoteData(),
+)
+
+fun MediatedSubject.mapToRemoteData() = MediatedSubjectPojo(
+    uid = uid,
+    organizationId = organizationId,
+    eventType = eventType.name,
+    name = name,
+    teacherId = teacherId,
     office = office,
     color = color,
     location = location?.mapToRemoteData(),

@@ -50,6 +50,7 @@ import ru.aleshin.studyassistant.core.remote.datasources.schedules.BaseScheduleR
 import ru.aleshin.studyassistant.core.remote.datasources.schedules.CustomScheduleRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.settings.CalendarSettingsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.share.ShareHomeworksRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.share.ShareSchedulesRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.subjects.SubjectsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.HomeworksRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.TodoRemoteDataSource
@@ -102,6 +103,7 @@ val coreRemoteModule = DI.Module("CoreRemote") {
     bindSingleton<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance()) }
     bindSingleton<FriendRequestsRemoteDataSource> { FriendRequestsRemoteDataSource.Base(instance()) }
     bindSingleton<ShareHomeworksRemoteDataSource> { ShareHomeworksRemoteDataSource.Base(instance()) }
+    bindSingleton<ShareSchedulesRemoteDataSource> { ShareSchedulesRemoteDataSource.Base(instance()) }
     bindSingleton<BaseScheduleRemoteDataSource> { BaseScheduleRemoteDataSource.Base(instance()) }
     bindSingleton<CustomScheduleRemoteDataSource> { CustomScheduleRemoteDataSource.Base(instance()) }
     bindSingleton<SubjectsRemoteDataSource> { SubjectsRemoteDataSource.Base(instance()) }

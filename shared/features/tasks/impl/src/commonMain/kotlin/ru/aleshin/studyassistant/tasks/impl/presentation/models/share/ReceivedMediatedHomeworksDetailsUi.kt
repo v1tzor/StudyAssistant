@@ -20,6 +20,7 @@ import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.MediatedHomeworkUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
@@ -29,6 +30,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
  */
 @Parcelize
 internal data class ReceivedMediatedHomeworksDetailsUi(
+    val uid: UID,
     @TypeParceler<Instant, InstantParceler>
     val date: Instant,
     @TypeParceler<Instant, InstantParceler>

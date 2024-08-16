@@ -47,6 +47,16 @@ class SubjectsRepositoryImpl(
         }
     }
 
+    override suspend fun addOrUpdateSubjectsGroup(subjects: List<Subject>, targetUser: UID) {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.addOrUpdateSubjectsGroup(subjects.map { it.mapToRemoteData() }, targetUser)
+        } else {
+            localDataSource.addOrUpdateSubjectsGroup(subjects.map { it.mapToLocalData() })
+        }
+    }
+
     override suspend fun fetchSubjectById(uid: UID, targetUser: UID): Flow<Subject?> {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 

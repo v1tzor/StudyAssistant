@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
  */
 interface SubjectsRepository {
     suspend fun addOrUpdateSubject(subject: Subject, targetUser: UID): UID
+    suspend fun addOrUpdateSubjectsGroup(subjects: List<Subject>, targetUser: UID)
     suspend fun fetchAllSubjectsByOrganization(organizationId: UID, targetUser: UID): Flow<List<Subject>>
     suspend fun fetchAllSubjectsByNames(names: List<UID>, targetUser: UID): List<Subject>
     suspend fun fetchSubjectsByEmployee(employeeId: UID, targetUser: UID): Flow<List<Subject>>

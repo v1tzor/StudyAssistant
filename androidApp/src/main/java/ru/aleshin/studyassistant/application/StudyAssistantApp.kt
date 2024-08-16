@@ -8,7 +8,6 @@ import android.net.TrafficStats
 import android.os.Build
 import android.os.StrictMode
 import androidx.annotation.RequiresApi
-import co.touchlab.kermit.Logger
 import com.google.firebase.FirebaseApp
 import ru.aleshin.studyassistant.PlatformSDK
 import ru.aleshin.studyassistant.core.common.functional.Constants
@@ -52,7 +51,6 @@ class StudyAssistantApp : Application() {
     }
 
     private fun initPlatformSDK() {
-        Logger.d("test") { "DO INIT" }
         // val options = FirebaseOptions.Builder().build() TODO: Set FirebaseOptions
         FirebaseApp.initializeApp(this)
 

@@ -21,9 +21,11 @@ import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToDomain
 import ru.aleshin.studyassistant.core.database.models.tasks.HomeworkDetailsEntity
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
+import ru.aleshin.studyassistant.core.domain.entities.tasks.MediatedHomework
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.remote.models.tasks.HomeworkDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.tasks.HomeworkPojo
+import ru.aleshin.studyassistant.core.remote.models.tasks.MediatedHomeworkPojo
 import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkEntity
 
 /**
@@ -42,6 +44,16 @@ fun HomeworkDetailsPojo.mapToDomain() = Homework(
     priority = TaskPriority.valueOf(priority),
     isDone = isDone,
     completeDate = completeDate?.mapEpochTimeToInstant(),
+)
+
+fun MediatedHomeworkPojo.mapToDomain() = MediatedHomework(
+    uid = uid,
+    subjectName = subjectName,
+    theoreticalTasks = theoreticalTasks,
+    practicalTasks = practicalTasks,
+    presentationTasks = presentationTasks,
+    test = test,
+    priority = TaskPriority.valueOf(priority),
 )
 
 fun HomeworkDetailsEntity.mapToDomain() = Homework(
@@ -72,6 +84,16 @@ fun Homework.mapToRemoteData() = HomeworkPojo(
     priority = priority.name,
     done = isDone,
     completeDate = completeDate?.toEpochMilliseconds(),
+)
+
+fun MediatedHomework.mapToRemoteData() = MediatedHomeworkPojo(
+    uid = uid,
+    subjectName = subjectName,
+    theoreticalTasks = theoreticalTasks,
+    practicalTasks = practicalTasks,
+    presentationTasks = presentationTasks,
+    test = test,
+    priority = priority.name,
 )
 
 fun Homework.mapToLocalData() = HomeworkEntity(

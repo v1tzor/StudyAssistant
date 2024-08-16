@@ -16,12 +16,13 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -33,7 +34,6 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
@@ -51,7 +51,6 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.Overv
 internal class OverviewScreen : Screen {
 
     @Composable
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun Content() = ScreenContent(
         screenModel = rememberOverviewScreenModel(),
         initialState = OverviewViewState(),
@@ -100,6 +99,7 @@ internal class OverviewScreen : Screen {
                     snackbar = { ErrorSnackbar(it) },
                 )
             },
+            contentWindowInsets = WindowInsets.statusBars,
         )
 
         handleEffect { effect ->
@@ -108,9 +108,7 @@ internal class OverviewScreen : Screen {
                 is OverviewEffect.NavigateToGlobal -> navigator.root().push(effect.pushScreen)
                 is OverviewEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.apply {
-                            Logger.e { "${effect.failures}" }
-                        }.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

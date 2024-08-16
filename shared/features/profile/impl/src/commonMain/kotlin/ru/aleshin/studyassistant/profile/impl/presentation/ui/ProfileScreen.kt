@@ -16,8 +16,10 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.ui
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -27,7 +29,6 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
@@ -67,6 +68,9 @@ internal class ProfileScreen : Screen {
                         onNotifySettingsClick = { dispatchEvent(ProfileEvent.NavigateToNotifySettings) },
                         onCalendarSettingsClick = { dispatchEvent(ProfileEvent.NavigateToCalendarSettings) },
                         onPaymentsSettingsClick = { dispatchEvent(ProfileEvent.NavigateToPaymentsSettings) },
+                        onShowSchedule = { dispatchEvent(ProfileEvent.NavigateToShareScheduleViewer(it.uid)) },
+                        onCancelSentSchedule = { dispatchEvent(ProfileEvent.CancelSentSchedule(it)) },
+                        onShareSchedule = { dispatchEvent(ProfileEvent.SendSharedSchedule(it)) }
                     )
                 },
                 topBar = {
@@ -81,6 +85,7 @@ internal class ProfileScreen : Screen {
                         snackbar = { ErrorSnackbar(it) },
                     )
                 },
+                contentWindowInsets = WindowInsets.statusBars
             )
 
             handleEffect { effect ->
@@ -89,9 +94,7 @@ internal class ProfileScreen : Screen {
                     is ProfileEffect.ReplaceGlobalScreen -> rootNavigator.replaceAll(effect.screen)
                     is ProfileEffect.ShowError -> {
                         snackbarState.showSnackbar(
-                            message = effect.failures.apply { 
-                                Logger.e("test") { "error -> $this" }
-                            }.mapToMessage(strings),
+                            message = effect.failures.mapToMessage(strings),
                             withDismissAction = true,
                         )
                     }

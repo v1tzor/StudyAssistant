@@ -18,17 +18,27 @@ package ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
+import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
-import ru.aleshin.studyassistant.profile.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.FriendRequestsInteractor
+import ru.aleshin.studyassistant.profile.impl.domain.interactors.OrganizationsInteractor
+import ru.aleshin.studyassistant.profile.impl.domain.interactors.ShareSchedulesInteractor
+import ru.aleshin.studyassistant.profile.impl.domain.interactors.UserInteractor
 import ru.aleshin.studyassistant.profile.impl.navigation.ProfileScreenProvider
+import ru.aleshin.studyassistant.profile.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.profile.impl.presentation.mappers.mapToUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.SentMediatedSchedulesUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.ShareSchedulesSendDataUi
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileAction
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileEffect
 
@@ -40,14 +50,20 @@ internal interface ProfileWorkProcessor :
 
     class Base(
         private val authInteractor: AuthInteractor,
-        private val userInteractor: AppUserInteractor,
+        private val userInteractor: UserInteractor,
         private val friendRequestsInteractor: FriendRequestsInteractor,
+        private val shareSchedulesInteractor: ShareSchedulesInteractor,
+        private val organizationsInteractor: OrganizationsInteractor,
         private val screenProvider: ProfileScreenProvider,
         private val deviceInfoProvider: DeviceInfoProvider,
     ) : ProfileWorkProcessor {
 
         override suspend fun work(command: ProfileWorkCommand) = when (command) {
             is ProfileWorkCommand.LoadProfileInfo -> loadProfileInfoWork()
+            is ProfileWorkCommand.LoadSharedSchedules -> loadSharedSchedulesWork()
+            is ProfileWorkCommand.LoadFriends -> loadFriendsWork()
+            is ProfileWorkCommand.SendSharedSchedule -> sendSharedScheduleWork(command.sendData)
+            is ProfileWorkCommand.CancelSentSharedSchedule -> cancelSentSharedScheduleWork(command.schedule)
             is ProfileWorkCommand.SignOut -> signOutWork()
         }
 
@@ -67,6 +83,53 @@ internal interface ProfileWorkProcessor :
             ).collect { workResult ->
                 emit(workResult)
             }
+        }.onStart {
+            emit(ActionResult(ProfileAction.UpdateLoading(true)))
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private fun loadSharedSchedulesWork() = flow {
+            val sharedSchedulesFlow = shareSchedulesInteractor.fetchShortSharedSchedules()
+            val organizationsFlow = organizationsInteractor.fetchAllShortOrganizations()
+
+            sharedSchedulesFlow.flatMapLatestWithResult(
+                secondFlow = organizationsFlow,
+                onError = { ProfileEffect.ShowError(it) },
+                onData = { schedules, shortOrganizations ->
+                    val sharedSchedules = schedules.mapToUi()
+                    val organizations = shortOrganizations.map { it.mapToUi() }
+                    ProfileAction.UpdateSharedSchedules(sharedSchedules, organizations)
+                },
+            ).collect { workResult ->
+                emit(workResult)
+            }
+        }.onStart {
+            emit(ActionResult(ProfileAction.UpdateLoadingShared(true)))
+        }
+
+        private fun loadFriendsWork() = flow {
+            userInteractor.fetchAllFriends().collectAndHandle(
+                onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
+                onRightAction = { friends ->
+                    emit(ActionResult(ProfileAction.UpdateFriends(friends.map { it.mapToUi() })))
+                },
+            )
+        }
+
+        private fun sendSharedScheduleWork(sendData: ShareSchedulesSendDataUi) = flow<ProfileWorkResult> {
+            shareSchedulesInteractor.shareSchedules(sendData.mapToDomain()).handle(
+                onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
+            )
+        }.onStart {
+            emit(ActionResult(ProfileAction.UpdateLoadingSend(true)))
+        }.onCompletion {
+            emit(ActionResult(ProfileAction.UpdateLoadingSend(false)))
+        }
+
+        private fun cancelSentSharedScheduleWork(schedule: SentMediatedSchedulesUi) = flow {
+            shareSchedulesInteractor.cancelSendSchedules(schedule.mapToDomain()).handle(
+                onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
+            )
         }
 
         private fun signOutWork() = flow {
@@ -84,5 +147,11 @@ internal interface ProfileWorkProcessor :
 
 internal sealed class ProfileWorkCommand : WorkCommand {
     data object LoadProfileInfo : ProfileWorkCommand()
+    data object LoadSharedSchedules : ProfileWorkCommand()
+    data object LoadFriends : ProfileWorkCommand()
+    data class SendSharedSchedule(val sendData: ShareSchedulesSendDataUi) : ProfileWorkCommand()
+    data class CancelSentSharedSchedule(val schedule: SentMediatedSchedulesUi) : ProfileWorkCommand()
     data object SignOut : ProfileWorkCommand()
 }
+
+internal typealias ProfileWorkResult = WorkResult<ProfileAction, ProfileEffect>

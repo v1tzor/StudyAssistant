@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.core.common.messages
 
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.callbackFlow
@@ -48,7 +47,6 @@ actual class PushServiceTokenManager(
                     fcmToken != null -> UniversalPushToken.FCM(fcmToken)
                     else -> UniversalPushToken.None
                 }
-                Logger.i("test") { "token -> $universalPushToken" }
                 continuation.resume(universalPushToken)
             }.addOnFailureListener { error ->
                 continuation.resumeWithException(error)
@@ -56,7 +54,6 @@ actual class PushServiceTokenManager(
         }
         val newTokenListener = OnNewTokenListener { providerType, token ->
             if (token.isNotBlank()) {
-                Logger.i("test") { "new token -> $token" }
                 val universalPushToken = when (providerType) {
                     UNIVERSAL_RUSTORE_PROVIDER -> UniversalPushToken.RuStore(token)
                     UNIVERSAL_HMS_PROVIDER -> UniversalPushToken.HMS(token)

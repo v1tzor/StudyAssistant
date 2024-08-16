@@ -27,6 +27,7 @@ import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.exists
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
@@ -47,6 +48,7 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 interface BaseScheduleRemoteDataSource {
 
     suspend fun addOrUpdateSchedule(schedule: BaseSchedulePojo, targetUser: UID): UID
+    suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseSchedulePojo>, targetUser: UID)
     suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<BaseScheduleDetailsPojo?>
     suspend fun fetchScheduleByDate(
         date: Instant,
@@ -84,6 +86,21 @@ interface BaseScheduleRemoteDataSource {
                     reference.document(uid).update(UserData.UID to uid)
                     return@runTransaction uid
                 }
+            }
+        }
+
+        override suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseSchedulePojo>, targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.BASE_SCHEDULES)
+
+            database.batch().apply {
+                schedules.forEach { schedule ->
+                    val uid = schedule.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+                    set(reference.document(uid), schedule.copy(uid = uid))
+                }
+                return@apply commit()
             }
         }
 

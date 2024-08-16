@@ -30,8 +30,8 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.SharedHomeworks
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Users
 import ru.aleshin.studyassistant.core.remote.mappers.share.convertToDetails
-import ru.aleshin.studyassistant.core.remote.models.shared.SharedHomeworksDetailsPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.SharedHomeworksPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomeworksDetailsPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomeworksPojo
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 
 /**
@@ -70,8 +70,8 @@ interface ShareHomeworksRemoteDataSource {
 
             return sharedHomeworksPojoFlow.flatMapLatest { sharedHomeworks ->
                 val users = buildList {
-                    addAll(sharedHomeworks.sent.map { it.recipients }.extractAllItem())
-                    addAll(sharedHomeworks.received.map { it.sender })
+                    addAll(sharedHomeworks.sent.map { it.value.recipients }.extractAllItem())
+                    addAll(sharedHomeworks.received.map { it.value.sender })
                 }
                 val senderAndRecipientsUsersReference = users.let {
                     if (users.isEmpty()) return@let null

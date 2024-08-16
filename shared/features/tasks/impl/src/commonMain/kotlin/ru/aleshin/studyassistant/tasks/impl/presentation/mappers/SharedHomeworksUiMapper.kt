@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.mappers
 
-import ru.aleshin.studyassistant.core.domain.entities.share.ReceivedMediatedHomeworks
-import ru.aleshin.studyassistant.core.domain.entities.share.ReceivedMediatedHomeworksDetails
-import ru.aleshin.studyassistant.core.domain.entities.share.SentMediatedHomeworks
-import ru.aleshin.studyassistant.core.domain.entities.share.SentMediatedHomeworksDetails
-import ru.aleshin.studyassistant.core.domain.entities.share.SharedHomeworks
-import ru.aleshin.studyassistant.core.domain.entities.share.SharedHomeworksDetails
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.ReceivedMediatedHomeworks
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.ReceivedMediatedHomeworksDetails
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SentMediatedHomeworks
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SentMediatedHomeworksDetails
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SharedHomeworks
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SharedHomeworksDetails
 import ru.aleshin.studyassistant.core.domain.entities.tasks.MediatedHomework
 import ru.aleshin.studyassistant.core.domain.entities.tasks.toHomeworkComponents
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.ReceivedMediatedHomeworksDetailsUi
@@ -37,16 +37,17 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.MediatedHo
  * @author Stanislav Aleshin on 18.07.2024.
  */
 internal fun SharedHomeworksDetails.mapToUi() = SharedHomeworksDetailsUi(
-    received = received.map { it.mapToUi() },
-    sent = sent.map { it.mapToUi() }
+    received = received.mapValues { it.value.mapToUi() },
+    sent = sent.mapValues { it.value.mapToUi() }
 )
 
 internal fun SharedHomeworks.mapToUi() = SharedHomeworksUi(
-    received = received.map { it.mapToUi() },
-    sent = sent.map { it.mapToUi() }
+    received = received.mapValues { it.value.mapToUi() },
+    sent = sent.mapValues { it.value.mapToUi() }
 )
 
 internal fun ReceivedMediatedHomeworksDetails.mapToUi() = ReceivedMediatedHomeworksDetailsUi(
+    uid = uid,
     date = date,
     sendDate = sendDate,
     sender = sender.mapToUi(),
@@ -54,6 +55,7 @@ internal fun ReceivedMediatedHomeworksDetails.mapToUi() = ReceivedMediatedHomewo
 )
 
 internal fun ReceivedMediatedHomeworks.mapToUi() = ReceivedMediatedHomeworksUi(
+    uid = uid,
     date = date,
     sendDate = sendDate,
     sender = sender,
@@ -61,6 +63,7 @@ internal fun ReceivedMediatedHomeworks.mapToUi() = ReceivedMediatedHomeworksUi(
 )
 
 internal fun SentMediatedHomeworksDetails.mapToUi() = SentMediatedHomeworksDetailsUi(
+    uid = uid,
     date = date,
     sendDate = sendDate,
     recipients = recipients.map { it.mapToUi() },
@@ -68,6 +71,7 @@ internal fun SentMediatedHomeworksDetails.mapToUi() = SentMediatedHomeworksDetai
 )
 
 internal fun SentMediatedHomeworks.mapToUi() = SentMediatedHomeworksUi(
+    uid = uid,
     date = date,
     sendDate = sendDate,
     recipients = recipients,
@@ -94,16 +98,17 @@ internal fun MediatedHomework.mapToUi() = MediatedHomeworkUi(
 )
 
 internal fun SharedHomeworksDetailsUi.mapToDomain() = SharedHomeworksDetails(
-    received = received.map { it.mapToDomain() },
-    sent = sent.map { it.mapToDomain() }
+    received = received.mapValues { it.value.mapToDomain() },
+    sent = sent.mapValues { it.value.mapToDomain() }
 )
 
 internal fun SharedHomeworksUi.mapToDomain() = SharedHomeworks(
-    received = received.map { it.mapToDomain() },
-    sent = sent.map { it.mapToDomain() }
+    received = received.mapValues { it.value.mapToDomain() },
+    sent = sent.mapValues { it.value.mapToDomain() }
 )
 
 internal fun ReceivedMediatedHomeworksDetailsUi.mapToDomain() = ReceivedMediatedHomeworksDetails(
+    uid = uid,
     date = date,
     sendDate = sendDate,
     sender = sender.mapToDomain(),
@@ -111,6 +116,7 @@ internal fun ReceivedMediatedHomeworksDetailsUi.mapToDomain() = ReceivedMediated
 )
 
 internal fun ReceivedMediatedHomeworksUi.mapToDomain() = ReceivedMediatedHomeworks(
+    uid = uid,
     date = date,
     sendDate = sendDate,
     sender = sender,
@@ -118,6 +124,7 @@ internal fun ReceivedMediatedHomeworksUi.mapToDomain() = ReceivedMediatedHomewor
 )
 
 internal fun SentMediatedHomeworksDetailsUi.mapToDomain() = SentMediatedHomeworksDetails(
+    uid = uid,
     date = date,
     sendDate = sendDate,
     recipients = recipients.map { it.mapToDomain() },
@@ -125,6 +132,7 @@ internal fun SentMediatedHomeworksDetailsUi.mapToDomain() = SentMediatedHomework
 )
 
 internal fun SentMediatedHomeworksUi.mapToDomain() = SentMediatedHomeworks(
+    uid = uid,
     date = date,
     sendDate = sendDate,
     recipients = recipients,

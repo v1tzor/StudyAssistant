@@ -20,12 +20,16 @@ import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
 import ru.aleshin.studyassistant.core.domain.entities.schedules.ScheduleDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.WeekScheduleDetails
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseScheduleDetails
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.MediatedBaseSchedule
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomScheduleDetails
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.BaseScheduleDetailsUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.BaseScheduleUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.CustomScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.DateVersionUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.MediatedBaseScheduleUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.WeekScheduleDetailsUi
 
@@ -47,6 +51,14 @@ internal fun BaseScheduleDetails.mapToUi(currentTime: Instant): BaseScheduleDeta
         },
     )
 }
+
+internal fun MediatedBaseSchedule.mapToUi() = MediatedBaseScheduleUi(
+    uid = uid,
+    dateVersion = dateVersion,
+    dayOfWeek = dayOfWeek,
+    week = week,
+    classes = classes.map { it.mapToUi() },
+)
 
 internal fun CustomScheduleDetails.mapToUi(currentTime: Instant): CustomScheduleDetailsUi {
     val groupedClasses = classes.groupBy { it.organization.uid }
@@ -75,6 +87,27 @@ internal fun WeekScheduleDetails.mapToUi(currentTime: Instant) = WeekScheduleDet
 )
 
 internal fun DateVersion.mapToUi() = DateVersionUi(
+    from = from,
+    to = to,
+)
+
+internal fun BaseScheduleUi.mapToDomain() = BaseSchedule(
+    uid = uid,
+    dateVersion = dateVersion.mapToDomain(),
+    dayOfWeek = dayOfWeek,
+    week = week,
+    classes = classes.map { it.mapToDomain() }
+)
+
+internal fun MediatedBaseScheduleUi.mapToDomain() = MediatedBaseSchedule(
+    uid = uid,
+    dateVersion = dateVersion,
+    dayOfWeek = dayOfWeek,
+    week = week,
+    classes = classes.map { it.mapToDomain() },
+)
+
+internal fun DateVersionUi.mapToDomain() = DateVersion(
     from = from,
     to = to,
 )

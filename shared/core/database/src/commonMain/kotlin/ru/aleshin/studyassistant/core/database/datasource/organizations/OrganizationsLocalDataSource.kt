@@ -42,7 +42,9 @@ import kotlin.coroutines.CoroutineContext
 interface OrganizationsLocalDataSource {
 
     suspend fun addOrUpdateOrganization(organization: OrganizationEntity): UID
+    suspend fun addOrUpdateOrganizationsGroup(organizations: List<OrganizationEntity>)
     suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationDetailsEntity?>
+    suspend fun fetchOrganizationsById(uid: List<UID>): Flow<List<OrganizationDetailsEntity>>
     suspend fun fetchShortOrganizationById(uid: UID): Flow<OrganizationShortEntity?>
     suspend fun fetchAllOrganization(): Flow<List<OrganizationDetailsEntity>>
     suspend fun fetchAllShortOrganization(): Flow<List<OrganizationShortEntity>>
@@ -62,6 +64,10 @@ interface OrganizationsLocalDataSource {
             organizationQueries.addOrUpdateOrganization(organization.copy(uid = uid))
 
             return uid
+        }
+
+        override suspend fun addOrUpdateOrganizationsGroup(organizations: List<OrganizationEntity>) {
+            organizations.forEach { organization -> addOrUpdateOrganization(organization) }
         }
 
         override suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationDetailsEntity?> {
@@ -84,6 +90,29 @@ interface OrganizationsLocalDataSource {
                     employee = employeeList,
                     subjects = subjectList,
                 )
+            }
+        }
+
+        override suspend fun fetchOrganizationsById(uid: List<UID>): Flow<List<OrganizationDetailsEntity>> {
+            val query = organizationQueries.fetchOrganizationsById(uid)
+            val organizationEntityListFlow = query.asFlow().mapToList(coroutineContext)
+
+            return organizationEntityListFlow.map { organizations ->
+                organizations.map { organizationEntity ->
+                    val organizationId = organizationEntity.uid
+                    val employeeQuery = employeeQueries.fetchEmployeesByOrganization(organizationId)
+                    val subjectQuery = subjectQueries.fetchSubjectsByOrganization(organizationId)
+
+                    val employeeList = employeeQuery.executeAsList()
+                    val subjectList = subjectQuery.executeAsList().map { entity ->
+                        entity.mapToDetails(employeeList.find { it.uid == entity.teacher_id })
+                    }
+
+                    organizationEntity.mapToDetails(
+                        employee = employeeList,
+                        subjects = subjectList,
+                    )
+                }
             }
         }
 

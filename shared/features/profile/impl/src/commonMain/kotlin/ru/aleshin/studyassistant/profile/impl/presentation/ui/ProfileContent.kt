@@ -19,6 +19,9 @@ package ru.aleshin.studyassistant.profile.impl.presentation.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.ReceivedMediatedSchedulesShortUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.SentMediatedSchedulesUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.ShareSchedulesSendDataUi
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileViewState
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.views.ProfileActionsSection
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.views.ProfileInfoSection
@@ -36,21 +39,35 @@ internal fun ProfileContent(
     onNotifySettingsClick: () -> Unit,
     onCalendarSettingsClick: () -> Unit,
     onPaymentsSettingsClick: () -> Unit,
-) {
+    onShowSchedule: (ReceivedMediatedSchedulesShortUi) -> Unit,
+    onCancelSentSchedule: (SentMediatedSchedulesUi) -> Unit,
+    onShareSchedule: (ShareSchedulesSendDataUi) -> Unit,
+) = with(state) {
     Column(modifier = modifier) {
         ProfileInfoSection(
-            profile = state.myProfile,
+            isLoading = isLoading,
+            profile = appUserProfile,
         )
         ProfileActionsSection(
             modifier = Modifier.weight(1f),
-            profile = state.myProfile,
-            requests = state.myFriendRequest,
+            isLoading = isLoading,
+            isLoadingShare = isLoadingShare,
+            isLoadingSend = isLoadingSend,
+            currentTime = currentTime,
+            profile = appUserProfile,
+            requests = friendRequest,
+            allOrganizations = allOrganizations,
+            allFriends = allFriends,
+            sharedSchedules = sharedSchedules,
             onFriendsClick = onFriendsClick,
             onPrivacySettingsClick = onPrivacySettingsClick,
             onGeneralSettingsClick = onGeneralSettingsClick,
             onNotifySettingsClick = onNotifySettingsClick,
             onCalendarSettingsClick = onCalendarSettingsClick,
             onPaymentsSettingsClick = onPaymentsSettingsClick,
+            onShowSchedule = onShowSchedule,
+            onCancelSentSchedule = onCancelSentSchedule,
+            onShareSchedule = onShareSchedule,
         )
     }
 }

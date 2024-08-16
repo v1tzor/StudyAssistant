@@ -22,8 +22,10 @@ import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.domain.entities.employee.MediatedEmployee
 import ru.aleshin.studyassistant.core.remote.models.users.ContactInfoPojo
 import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
+import ru.aleshin.studyassistant.core.remote.models.users.MediatedEmployeePojo
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 
 /**
@@ -37,6 +39,28 @@ fun EmployeePojo.mapToDomain() = Employee(
     patronymic = patronymic,
     post = EmployeePost.valueOf(post),
     avatar = avatar,
+    birthday = birthday,
+    workTime = if (workTimeStart != null && workTimeEnd != null) {
+        TimeRange(
+            from = workTimeStart!!.mapEpochTimeToInstant(),
+            to = workTimeEnd!!.mapEpochTimeToInstant(),
+        )
+    } else {
+        null
+    },
+    emails = emails.map { it.mapToDomain() },
+    phones = phones.map { it.mapToDomain() },
+    locations = locations.map { it.mapToDomain() },
+    webs = webs.map { it.mapToDomain() },
+)
+
+fun MediatedEmployeePojo.mapToDomain() = MediatedEmployee(
+    uid = uid,
+    organizationId = organizationId,
+    firstName = firstName,
+    secondName = secondName,
+    patronymic = patronymic,
+    post = EmployeePost.valueOf(post),
     birthday = birthday,
     workTime = if (workTimeStart != null && workTimeEnd != null) {
         TimeRange(
@@ -83,6 +107,22 @@ fun Employee.mapToRemoteData() = EmployeePojo(
     patronymic = patronymic,
     post = post.name,
     avatar = avatar,
+    birthday = birthday,
+    workTimeStart = workTime?.from?.toEpochMilliseconds(),
+    workTimeEnd = workTime?.to?.toEpochMilliseconds(),
+    emails = emails.map { it.mapToRemoteData() },
+    phones = phones.map { it.mapToRemoteData() },
+    locations = locations.map { it.mapToRemoteData() },
+    webs = webs.map { it.mapToRemoteData() },
+)
+
+fun MediatedEmployee.mapToRemoteData() = MediatedEmployeePojo(
+    uid = uid,
+    organizationId = organizationId,
+    firstName = firstName,
+    secondName = secondName,
+    patronymic = patronymic,
+    post = post.name,
     birthday = birthday,
     workTimeStart = workTime?.from?.toEpochMilliseconds(),
     workTimeEnd = workTime?.to?.toEpochMilliseconds(),

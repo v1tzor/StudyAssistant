@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.exists
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
@@ -37,6 +38,7 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 interface SubjectsRemoteDataSource {
 
     suspend fun addOrUpdateSubject(subject: SubjectPojo, targetUser: UID): UID
+    suspend fun addOrUpdateSubjectsGroup(subjects: List<SubjectPojo>, targetUser: UID)
     suspend fun fetchSubjectById(uid: UID, targetUser: UID): Flow<SubjectDetailsPojo?>
     suspend fun fetchAllSubjectsByOrganization(organizationId: UID, targetUser: UID): Flow<List<SubjectDetailsPojo>>
     suspend fun fetchAllSubjectsByNames(names: List<String>, targetUser: UID): List<SubjectDetailsPojo>
@@ -63,6 +65,21 @@ interface SubjectsRemoteDataSource {
                     reference.document(uid).update(UserData.UID to uid)
                     return@runTransaction uid
                 }
+            }
+        }
+
+        override suspend fun addOrUpdateSubjectsGroup(subjects: List<SubjectPojo>, targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.SUBJECTS)
+
+            database.batch().apply {
+                subjects.forEach { subject ->
+                    val uid = subject.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+                    set(reference.document(uid), subject.copy(uid = uid))
+                }
+                return@apply commit()
             }
         }
 

@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.core.common.messages
 
-import co.touchlab.kermit.Logger
 import dev.gitlive.firebase.FirebaseApp
 import ru.aleshin.studyassistant.core.common.BuildKonfig
 
@@ -46,7 +45,6 @@ interface PushServiceAuthTokenProvider {
         }
 
         override suspend fun fetchProjectId(): String {
-            Logger.i("test") { "options -> ${firebaseApp.options}" }
             return checkNotNull(firebaseApp.options.projectId) {
                 "Firebase app is not contains project id"
             }

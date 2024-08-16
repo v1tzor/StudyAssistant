@@ -27,8 +27,10 @@ import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
  */
 interface OrganizationsRepository {
     suspend fun addOrUpdateOrganization(organization: Organization, targetUser: UID): UID
+    suspend fun addOrUpdateOrganizationsGroup(organizations: List<Organization>, targetUser: UID)
     suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String
     suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<Organization?>
+    suspend fun fetchOrganizationsById(uid: List<UID>, targetUser: UID): Flow<List<Organization>>
     suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShort?>
     suspend fun fetchAllOrganization(targetUser: UID): Flow<List<Organization>>
     suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShort>>

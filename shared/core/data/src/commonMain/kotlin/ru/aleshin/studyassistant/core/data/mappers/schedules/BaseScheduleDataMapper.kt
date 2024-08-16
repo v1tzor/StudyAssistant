@@ -25,15 +25,25 @@ import ru.aleshin.studyassistant.core.database.models.schedule.BaseScheduleDetai
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.MediatedBaseSchedule
 import ru.aleshin.studyassistant.core.remote.models.classes.ClassPojo
 import ru.aleshin.studyassistant.core.remote.models.schedule.BaseScheduleDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.schedule.BaseSchedulePojo
+import ru.aleshin.studyassistant.core.remote.models.schedule.MediatedBaseSchedulePojo
 import ru.aleshin.studyassistant.sqldelight.schedules.BaseScheduleEntity
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
 fun BaseScheduleDetailsPojo.mapToDomain() = BaseSchedule(
+    uid = uid,
+    dateVersion = DateVersion(dateVersionFrom.mapEpochTimeToInstant(), dateVersionTo.mapEpochTimeToInstant()),
+    dayOfWeek = DayOfWeek.valueOf(weekDayOfWeek),
+    week = NumberOfRepeatWeek.valueOf(week),
+    classes = classes.map { it.mapToDomain() },
+)
+
+fun MediatedBaseSchedulePojo.mapToDomain() = MediatedBaseSchedule(
     uid = uid,
     dateVersion = DateVersion(dateVersionFrom.mapEpochTimeToInstant(), dateVersionTo.mapEpochTimeToInstant()),
     dayOfWeek = DayOfWeek.valueOf(weekDayOfWeek),
@@ -58,6 +68,15 @@ fun BaseSchedule.mapToRemoteData() = BaseSchedulePojo(
     classes = mutableMapOf<UID, ClassPojo>().apply {
         classes.forEach { put(it.uid, it.mapToRemoteData()) }
     },
+)
+
+fun MediatedBaseSchedule.mapToRemoteData() = MediatedBaseSchedulePojo(
+    uid = uid,
+    dateVersionFrom = dateVersion.from.toEpochMilliseconds(),
+    dateVersionTo = dateVersion.to.toEpochMilliseconds(),
+    weekDayOfWeek = dayOfWeek.name,
+    week = week.name,
+    classes = classes.map { it.mapToRemoteData() },
 )
 
 fun BaseSchedule.mapToLocalData() = BaseScheduleEntity(

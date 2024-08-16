@@ -34,6 +34,11 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmo
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewScreenModel
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewStateCommunicator
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewWorkProcessor
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.screenmodel.ShareEffectCommunicator
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.screenmodel.ShareScreenModel
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.screenmodel.ShareStateCommunicator
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.screenmodel.ShareWorkProcessor
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -43,7 +48,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<NavigationScreen> { NavigationScreen() }
 
     bindProvider<ScheduleFeatureStarter> { ScheduleFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<ScheduleScreenProvider> { ScheduleScreenProvider.Base(instance<() -> EditorFeatureStarter>()) }
+    bindProvider<ScheduleScreenProvider> { ScheduleScreenProvider.Base(instance<() -> EditorFeatureStarter>(), instance<() -> UsersFeatureStarter>()) }
 
     bindProvider<OverviewStateCommunicator> { OverviewStateCommunicator.Base() }
     bindProvider<OverviewEffectCommunicator> { OverviewEffectCommunicator.Base() }
@@ -54,4 +59,9 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<DetailsEffectCommunicator> { DetailsEffectCommunicator.Base() }
     bindProvider<DetailsWorkProcessor> { DetailsWorkProcessor.Base(instance(), instance(), instance()) }
     bindProvider<DetailsScreenModel> { DetailsScreenModel(instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<ShareStateCommunicator> { ShareStateCommunicator.Base() }
+    bindProvider<ShareEffectCommunicator> { ShareEffectCommunicator.Base() }
+    bindProvider<ShareWorkProcessor> { ShareWorkProcessor.Base(instance(), instance(), instance()) }
+    bindProvider<ShareScreenModel> { ShareScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
 }

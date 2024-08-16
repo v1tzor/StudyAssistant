@@ -43,16 +43,23 @@ class BaseScheduleRepositoryImpl(
     private val subscriptionChecker: SubscriptionChecker,
 ) : BaseScheduleRepository {
 
-    override suspend fun addOrUpdateSchedule(
-        schedule: BaseSchedule,
-        targetUser: UID
-    ): UID {
+    override suspend fun addOrUpdateSchedule(schedule: BaseSchedule, targetUser: UID): UID {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
             remoteDataSource.addOrUpdateSchedule(schedule.mapToRemoteData(), targetUser)
         } else {
             localDataSource.addOrUpdateSchedule(schedule.mapToLocalData())
+        }
+    }
+
+    override suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseSchedule>, targetUser: UID) {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.addOrUpdateSchedulesGroup(schedules.map { it.mapToRemoteData() }, targetUser)
+        } else {
+            localDataSource.addOrUpdateSchedulesGroup(schedules.map { it.mapToLocalData() })
         }
     }
 

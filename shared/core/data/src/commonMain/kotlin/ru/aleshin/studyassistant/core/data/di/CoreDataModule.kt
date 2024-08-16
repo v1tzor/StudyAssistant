@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.core.data.repositories.ManageUserRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.MessageRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.OrganizationsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ShareHomeworksRepositoryImpl
+import ru.aleshin.studyassistant.core.data.repositories.ShareSchedulesRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.SubjectsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.TodoRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.UsersRepositoryImpl
@@ -48,6 +49,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -67,6 +69,7 @@ val coreDataModule = DI.Module("CoreData") {
     bindSingleton<FriendRequestsRepository> { FriendRequestsRepositoryImpl(instance()) }
 
     bindSingleton<ShareHomeworksRepository> { ShareHomeworksRepositoryImpl(instance()) }
+    bindSingleton<ShareSchedulesRepository> { ShareSchedulesRepositoryImpl(instance()) }
     bindProvider<GeneralSettingsRepository> { GeneralSettingsRepositoryImpl(instance()) }
     bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<BaseScheduleRepository> { BaseScheduleRepositoryImpl(instance(), instance(), instance()) }

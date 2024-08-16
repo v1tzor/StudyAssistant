@@ -25,9 +25,13 @@ import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.profile.api.di.ProfileFeatureApi
@@ -35,6 +39,7 @@ import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
 import ru.aleshin.studyassistant.profile.impl.di.ProfileFeatureDependencies
 import ru.aleshin.studyassistant.profile.impl.di.modules.domainModule
 import ru.aleshin.studyassistant.profile.impl.di.modules.presentationModule
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
 import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
@@ -53,12 +58,17 @@ object ProfileFeatureDIHolder : BaseFeatureDIHolder<ProfileFeatureApi, ProfileFe
                 bindSingleton<() -> UsersFeatureStarter> { dependencies.usersFeatureStarter }
                 bindSingleton<() -> SettingsFeatureStarter> { dependencies.settingsFeatureStarter }
                 bindSingleton<() -> EditorFeatureStarter> { dependencies.editorFeatureStarter }
+                bindSingleton<() -> ScheduleFeatureStarter> { dependencies.scheduleFeatureStarter }
                 bindSingleton<AuthRepository> { dependencies.authRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<FriendRequestsRepository> { dependencies.friendRequestsRepository }
+                bindSingleton<ShareSchedulesRepository> { dependencies.shareSchedulesRepository }
+                bindSingleton<BaseScheduleRepository> { dependencies.baseSchedulesRepository }
+                bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
                 bindSingleton<MessageRepository> { dependencies.messageRepository }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
+                bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<ProfileFeatureApi> {
                     object : ProfileFeatureApi {
                         override fun fetchStarter() = instance<ProfileFeatureStarter>()

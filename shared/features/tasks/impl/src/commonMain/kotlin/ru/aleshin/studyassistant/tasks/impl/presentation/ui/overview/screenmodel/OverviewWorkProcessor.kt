@@ -53,7 +53,7 @@ import ru.aleshin.studyassistant.tasks.impl.domain.interactors.TodoInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.UsersInteractor
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
@@ -305,7 +305,7 @@ internal interface OverviewWorkProcessor :
             )
         }
 
-        private fun shareHomeworksWork(sentMediatedHomeworks: SentMediatedHomeworksUi) = flow {
+        private fun shareHomeworksWork(sentMediatedHomeworks: SentMediatedHomeworksDetailsUi) = flow {
             shareInteractor.shareHomeworks(sentMediatedHomeworks.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) }
             )
@@ -321,7 +321,7 @@ internal sealed class OverviewWorkCommand : WorkCommand {
     data class LoadActiveSchedule(val currentDate: Instant) : OverviewWorkCommand()
     data class UpdateHomework(val homework: HomeworkDetailsUi) : OverviewWorkCommand()
     data class UpdateTodo(val todo: TodoDetailsUi) : OverviewWorkCommand()
-    data class ShareHomeworks(val sentMediatedHomeworks: SentMediatedHomeworksUi) : OverviewWorkCommand()
+    data class ShareHomeworks(val sentMediatedHomeworks: SentMediatedHomeworksDetailsUi) : OverviewWorkCommand()
 }
 
 internal typealias OverviewWorkResult = WorkResult<OverviewAction, OverviewEffect>

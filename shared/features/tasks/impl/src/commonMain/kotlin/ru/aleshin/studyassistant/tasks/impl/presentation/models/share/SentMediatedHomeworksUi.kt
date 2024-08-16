@@ -29,6 +29,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.MediatedHo
  */
 @Parcelize
 internal data class SentMediatedHomeworksUi(
+    val uid: UID,
     @TypeParceler<Instant, InstantParceler>
     val date: Instant,
     @TypeParceler<Instant, InstantParceler>

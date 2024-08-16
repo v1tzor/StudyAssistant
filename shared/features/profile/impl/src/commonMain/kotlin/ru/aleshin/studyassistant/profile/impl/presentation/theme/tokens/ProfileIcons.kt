@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.profile.impl.presentation.theme.tokens
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.features.profile.impl.generated.resources.Res
 import studyassistant.shared.features.profile.impl.generated.resources.ic_calendar
 import studyassistant.shared.features.profile.impl.generated.resources.ic_edit
@@ -30,11 +29,11 @@ import studyassistant.shared.features.profile.impl.generated.resources.ic_send_c
 import studyassistant.shared.features.profile.impl.generated.resources.ic_settings_common
 import studyassistant.shared.features.profile.impl.generated.resources.ic_settings_privacy
 import studyassistant.shared.features.profile.impl.generated.resources.ic_sign_out
+import studyassistant.shared.features.profile.impl.generated.resources.ic_table
 
 /**
  * @author Stanislav Aleshin on 21.06.2023.
  */
-@OptIn(ExperimentalResourceApi::class)
 internal data class ProfileIcons(
     val edit: DrawableResource,
     val signOut: DrawableResource,
@@ -46,6 +45,7 @@ internal data class ProfileIcons(
     val notifySettings: DrawableResource,
     val calendarSettings: DrawableResource,
     val paymentsSettings: DrawableResource,
+    val shareSchedule: DrawableResource,
 ) {
     companion object {
         val LIGHT = ProfileIcons(
@@ -59,6 +59,7 @@ internal data class ProfileIcons(
             notifySettings = Res.drawable.ic_notifications,
             calendarSettings = Res.drawable.ic_calendar,
             paymentsSettings = Res.drawable.ic_payment,
+            shareSchedule = Res.drawable.ic_table,
         )
         val DARK = ProfileIcons(
             edit = Res.drawable.ic_edit,
@@ -71,6 +72,7 @@ internal data class ProfileIcons(
             notifySettings = Res.drawable.ic_notifications,
             calendarSettings = Res.drawable.ic_calendar,
             paymentsSettings = Res.drawable.ic_payment,
+            shareSchedule = Res.drawable.ic_table,
         )
     }
 }

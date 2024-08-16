@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract
 
-import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
@@ -40,7 +39,6 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.MediatedHo
 /**
  * @author Stanislav Aleshin on 18.07.2024
  */
-@Immutable
 @Parcelize
 internal data class ShareViewState(
     val isLoading: Boolean = true,

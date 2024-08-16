@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -112,9 +111,7 @@ internal data class OrganizationScreen(val organizationId: UID?) : Screen {
                 is OrganizationEffect.NavigateToBack -> navigator.nestedPop()
                 is OrganizationEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.apply {
-                            Logger.i("test") { this.toString() }
-                        }.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

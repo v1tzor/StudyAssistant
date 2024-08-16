@@ -43,8 +43,10 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 interface OrganizationsRemoteDataSource {
 
     suspend fun addOrUpdateOrganization(organization: OrganizationPojo, targetUser: UID): UID
+    suspend fun addOrUpdateOrganizationsGroup(organizations: List<OrganizationPojo>, targetUser: UID)
     suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String
     suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsPojo?>
+    suspend fun fetchOrganizationsById(uid: List<UID>, targetUser: UID): Flow<List<OrganizationDetailsPojo>>
     suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShortPojo?>
     suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationDetailsPojo>>
     suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShortPojo>>
@@ -65,6 +67,24 @@ interface OrganizationsRemoteDataSource {
 
             return reference.document(uid).set(organization.copy(uid = uid)).let {
                 return@let uid
+            }
+        }
+
+        override suspend fun addOrUpdateOrganizationsGroup(
+            organizations: List<OrganizationPojo>,
+            targetUser: UID
+        ) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
+
+            database.batch().apply {
+                organizations.forEach { organization ->
+                    val uid = organization.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+                    set(reference.document(uid), organization.copy(uid = uid))
+                }
+                return@apply commit()
             }
         }
 
@@ -110,6 +130,47 @@ interface OrganizationsRemoteDataSource {
                     subjects = subjectList.filterNotNull(),
                     employee = employeeList.filterNotNull(),
                 )
+            }
+        }
+
+        override suspend fun fetchOrganizationsById(
+            uid: List<UID>,
+            targetUser: UID,
+        ): Flow<List<OrganizationDetailsPojo>> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.ORGANIZATIONS).where {
+                UserData.UID inArray uid
+            }
+
+            val organizationPojoListFlow = reference.snapshots.map { snapshot ->
+                snapshot.documents.map { it.data(serializer<OrganizationPojo>()) }
+            }
+
+            return organizationPojoListFlow.map { organizations ->
+                organizations.map { organizationPojo ->
+                    val employeeReference = userDataRoot.collection(UserData.EMPLOYEE).where {
+                        UserData.ORGANIZATION_ID equalTo organizationPojo.uid
+                    }
+                    val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).where {
+                        UserData.ORGANIZATION_ID equalTo organizationPojo.uid
+                    }
+
+                    val employeeList = employeeReference.snapshotGet().map { snapshot ->
+                        snapshot.data(serializer<EmployeePojo?>())
+                    }
+                    val subjectList = subjectsReference.snapshotGet().map { snapshot ->
+                        snapshot.data(serializer<SubjectPojo?>())
+                    }.map { subjectPojo ->
+                        subjectPojo?.mapToDetails(employeeList.find { it?.uid == subjectPojo.teacherId })
+                    }
+
+                    organizationPojo.mapToDetails(
+                        employee = employeeList.filterNotNull(),
+                        subjects = subjectList.filterNotNull(),
+                    )
+                }
             }
         }
 

@@ -27,9 +27,11 @@ import ru.aleshin.studyassistant.core.database.mappers.employee.mapToLocal
 import ru.aleshin.studyassistant.core.database.models.classes.ClassDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.classes.ClassEntity
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
+import ru.aleshin.studyassistant.core.domain.entities.classes.MediatedClass
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.remote.models.classes.ClassDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.classes.ClassPojo
+import ru.aleshin.studyassistant.core.remote.models.classes.MediatedClassPojo
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
@@ -62,6 +64,20 @@ fun ClassDetailsPojo.mapToDomain() = Class(
     notification = notification,
 )
 
+fun MediatedClassPojo.mapToDomain() = MediatedClass(
+    uid = uid,
+    scheduleId = scheduleId,
+    organizationId = organizationId,
+    eventType = EventType.valueOf(eventType),
+    subjectId = subjectId,
+    customData = customData,
+    teacherId = teacherId,
+    office = office,
+    location = location?.mapToDomain(),
+    timeRange = TimeRange(startTime.mapEpochTimeToInstant(), endTime.mapEpochTimeToInstant()),
+    notification = notification,
+)
+
 fun Class.mapToRemoteData() = ClassPojo(
     uid = uid,
     organizationId = organization.uid,
@@ -69,6 +85,21 @@ fun Class.mapToRemoteData() = ClassPojo(
     subjectId = subject?.uid,
     customData = customData,
     teacherId = teacher?.uid,
+    office = office,
+    location = location?.mapToRemoteData(),
+    startTime = timeRange.from.toEpochMilliseconds(),
+    endTime = timeRange.to.toEpochMilliseconds(),
+    notification = notification,
+)
+
+fun MediatedClass.mapToRemoteData() = MediatedClassPojo(
+    uid = uid,
+    scheduleId = scheduleId,
+    organizationId = organizationId,
+    eventType = eventType.toString(),
+    subjectId = subjectId,
+    customData = customData,
+    teacherId = teacherId,
     office = office,
     location = location?.mapToRemoteData(),
     startTime = timeRange.from.toEpochMilliseconds(),

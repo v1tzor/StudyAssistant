@@ -18,12 +18,13 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.models.share
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import ru.aleshin.studyassistant.core.common.functional.UID
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
 @Parcelize
 internal data class SharedHomeworksDetailsUi(
-    val received: List<ReceivedMediatedHomeworksDetailsUi> = emptyList(),
-    val sent: List<SentMediatedHomeworksDetailsUi> = emptyList(),
+    val received: Map<UID, ReceivedMediatedHomeworksDetailsUi> = emptyMap(),
+    val sent: Map<UID, SentMediatedHomeworksDetailsUi> = emptyMap(),
 ) : Parcelable

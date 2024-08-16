@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.profile.impl.presentation.mappers
 
 import ru.aleshin.studyassistant.core.domain.entities.requests.FriendRequests
-import ru.aleshin.studyassistant.profile.impl.presentation.models.FriendRequestsUi
+import ru.aleshin.studyassistant.profile.impl.presentation.models.users.FriendRequestsUi
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.

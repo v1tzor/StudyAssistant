@@ -29,6 +29,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":shared:features:schedule:api"))
+            implementation(project(":shared:features:users:api"))
             implementation(project(":shared:features:editor:api"))
 
             implementation(project(":shared:core:common"))

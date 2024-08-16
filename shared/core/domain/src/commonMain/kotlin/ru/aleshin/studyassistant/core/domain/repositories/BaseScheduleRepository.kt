@@ -29,6 +29,7 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedul
  */
 interface BaseScheduleRepository {
     suspend fun addOrUpdateSchedule(schedule: BaseSchedule, targetUser: UID): UID
+    suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseSchedule>, targetUser: UID)
     suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<BaseSchedule?>
     suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek, targetUser: UID): Flow<BaseSchedule?>
     suspend fun fetchSchedulesByVersion(version: TimeRange, numberOfWeek: NumberOfRepeatWeek?, targetUser: UID): Flow<List<BaseSchedule>>

@@ -31,12 +31,12 @@ import kotlin.time.Duration
  * @author Stanislav Aleshin on 13.04.2024.
  */
 @Composable
-fun Duration.toLanguageString(): String {
+fun Duration.toLanguageString(showAbsoluteValue: Boolean = true): String {
     val daySuffix = StudyAssistantRes.strings.daySuffix
     val minuteSuffix = StudyAssistantRes.strings.minuteSuffix
     val hourSuffix = StudyAssistantRes.strings.hourSuffix
 
-    return this.toString(daySuffix, minuteSuffix, hourSuffix)
+    return this.toString(daySuffix, minuteSuffix, hourSuffix, showAbsoluteValue)
 }
 
 @Composable

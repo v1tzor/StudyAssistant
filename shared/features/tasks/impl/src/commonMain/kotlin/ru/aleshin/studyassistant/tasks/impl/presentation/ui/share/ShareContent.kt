@@ -94,7 +94,7 @@ internal fun ShareContent(
             isLoadingLink = isLoadingLink,
             currentTime = currentTime,
             organizations = organizations,
-            receivedMediatedHomeworks = sharedHomeworks?.received ?: emptyList(),
+            receivedMediatedHomeworks = sharedHomeworks?.received?.values?.toList() ?: emptyList(),
             linkDataList = linkDataList,
             linkSchedule = linkSchedule,
             linkSubjects = linkSubjects,
@@ -110,7 +110,7 @@ internal fun ShareContent(
         SentTasksSection(
             isLoading = isLoading,
             currentTime = currentTime,
-            sentMediatedHomeworks = sharedHomeworks?.sent ?: emptyList(),
+            sentMediatedHomeworks = sharedHomeworks?.sent?.values?.toList() ?: emptyList(),
             onCancelSend = onCancelSend,
         )
     }

@@ -17,12 +17,12 @@
 package ru.aleshin.studyassistant.core.remote.mappers.share
 
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.models.shared.ReceivedMediatedHomeworksDetailsPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.ReceivedMediatedHomeworksPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.SentMediatedHomeworksDetailsPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.SentMediatedHomeworksPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.SharedHomeworksDetailsPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.SharedHomeworksPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.ReceivedMediatedHomeworksDetailsPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.ReceivedMediatedHomeworksPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SentMediatedHomeworksDetailsPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SentMediatedHomeworksPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomeworksDetailsPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomeworksPojo
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 
 /**
@@ -32,13 +32,14 @@ fun SharedHomeworksPojo.convertToDetails(
     recipientsMapper: (List<UID>) -> List<AppUserPojo>,
     sendersMapper: (UID) -> AppUserPojo,
 ) = SharedHomeworksDetailsPojo(
-    received = received.map { it.convertToDetails(sendersMapper) },
-    sent = sent.map { it.convertToDetails(recipientsMapper) }
+    received = received.mapValues { it.value.convertToDetails(sendersMapper) },
+    sent = sent.mapValues { it.value.convertToDetails(recipientsMapper) },
 )
 
 fun SentMediatedHomeworksPojo.convertToDetails(
     recipientsMapper: (List<UID>) -> List<AppUserPojo>,
 ) = SentMediatedHomeworksDetailsPojo(
+    uid = uid,
     date = date,
     sendDate = sendDate,
     recipients = recipientsMapper(recipients),
@@ -48,6 +49,7 @@ fun SentMediatedHomeworksPojo.convertToDetails(
 fun ReceivedMediatedHomeworksPojo.convertToDetails(
     senderMapper: (UID) -> AppUserPojo,
 ) = ReceivedMediatedHomeworksDetailsPojo(
+    uid = uid,
     date = date,
     sendDate = sendDate,
     sender = senderMapper(sender),

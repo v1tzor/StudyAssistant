@@ -17,37 +17,37 @@
 package ru.aleshin.studyassistant.core.data.mappers.share
 
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToDomain
+import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToRemoteData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
-import ru.aleshin.studyassistant.core.domain.entities.share.ReceivedMediatedHomeworks
-import ru.aleshin.studyassistant.core.domain.entities.share.ReceivedMediatedHomeworksDetails
-import ru.aleshin.studyassistant.core.domain.entities.share.SentMediatedHomeworks
-import ru.aleshin.studyassistant.core.domain.entities.share.SentMediatedHomeworksDetails
-import ru.aleshin.studyassistant.core.domain.entities.share.SharedHomeworks
-import ru.aleshin.studyassistant.core.domain.entities.share.SharedHomeworksDetails
-import ru.aleshin.studyassistant.core.domain.entities.tasks.MediatedHomework
-import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
-import ru.aleshin.studyassistant.core.remote.models.shared.ReceivedMediatedHomeworksDetailsPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.ReceivedMediatedHomeworksPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.SentMediatedHomeworksDetailsPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.SentMediatedHomeworksPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.SharedHomeworksDetailsPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.SharedHomeworksPojo
-import ru.aleshin.studyassistant.core.remote.models.tasks.MediatedHomeworkPojo
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.ReceivedMediatedHomeworks
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.ReceivedMediatedHomeworksDetails
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SentMediatedHomeworks
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SentMediatedHomeworksDetails
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SharedHomeworks
+import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SharedHomeworksDetails
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.ReceivedMediatedHomeworksDetailsPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.ReceivedMediatedHomeworksPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SentMediatedHomeworksDetailsPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SentMediatedHomeworksPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomeworksDetailsPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomeworksPojo
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
 fun SharedHomeworksPojo.mapToDomain() = SharedHomeworks(
-    received = received.map { it.mapToDomain() },
-    sent = sent.map { it.mapToDomain() },
+    received = received.mapValues { it.value.mapToDomain() },
+    sent = sent.mapValues { it.value.mapToDomain() },
 )
 
 fun SharedHomeworksDetailsPojo.mapToDomain() = SharedHomeworksDetails(
-    received = received.map { it.mapToDomain() },
-    sent = sent.map { it.mapToDomain() },
+    received = received.mapValues { it.value.mapToDomain() },
+    sent = sent.mapValues { it.value.mapToDomain() },
 )
 
 fun ReceivedMediatedHomeworksPojo.mapToDomain() = ReceivedMediatedHomeworks(
+    uid = uid,
     date = date.mapEpochTimeToInstant(),
     sendDate = sendDate.mapEpochTimeToInstant(),
     sender = sender,
@@ -55,6 +55,7 @@ fun ReceivedMediatedHomeworksPojo.mapToDomain() = ReceivedMediatedHomeworks(
 )
 
 fun ReceivedMediatedHomeworksDetailsPojo.mapToDomain() = ReceivedMediatedHomeworksDetails(
+    uid = uid,
     date = date.mapEpochTimeToInstant(),
     sendDate = sendDate.mapEpochTimeToInstant(),
     sender = sender.mapToDomain(),
@@ -62,6 +63,7 @@ fun ReceivedMediatedHomeworksDetailsPojo.mapToDomain() = ReceivedMediatedHomewor
 )
 
 fun SentMediatedHomeworksPojo.mapToDomain() = SentMediatedHomeworks(
+    uid = uid,
     date = date.mapEpochTimeToInstant(),
     sendDate = sendDate.mapEpochTimeToInstant(),
     recipients = recipients,
@@ -69,28 +71,20 @@ fun SentMediatedHomeworksPojo.mapToDomain() = SentMediatedHomeworks(
 )
 
 fun SentMediatedHomeworksDetailsPojo.mapToDomain() = SentMediatedHomeworksDetails(
+    uid = uid,
     date = date.mapEpochTimeToInstant(),
     sendDate = sendDate.mapEpochTimeToInstant(),
     recipients = recipients.map { it.mapToDomain() },
     homeworks = homeworks.map { it.mapToDomain() }
 )
 
-fun MediatedHomeworkPojo.mapToDomain() = MediatedHomework(
-    uid = uid,
-    subjectName = subjectName,
-    theoreticalTasks = theoreticalTasks,
-    practicalTasks = practicalTasks,
-    presentationTasks = presentationTasks,
-    test = test,
-    priority = TaskPriority.valueOf(priority),
-)
-
 fun SharedHomeworks.mapToRemoteData() = SharedHomeworksPojo(
-    received = received.map { it.mapToRemoteData() },
-    sent = sent.map { it.mapToRemoteData() },
+    received = received.mapValues { it.value.mapToRemoteData() },
+    sent = sent.mapValues { it.value.mapToRemoteData() },
 )
 
 fun ReceivedMediatedHomeworks.mapToRemoteData() = ReceivedMediatedHomeworksPojo(
+    uid = uid,
     date = date.toEpochMilliseconds(),
     sendDate = sendDate.toEpochMilliseconds(),
     sender = sender,
@@ -98,18 +92,9 @@ fun ReceivedMediatedHomeworks.mapToRemoteData() = ReceivedMediatedHomeworksPojo(
 )
 
 fun SentMediatedHomeworks.mapToRemoteData() = SentMediatedHomeworksPojo(
+    uid = uid,
     date = date.toEpochMilliseconds(),
     sendDate = sendDate.toEpochMilliseconds(),
     recipients = recipients,
     homeworks = homeworks.map { it.mapToRemoteData() }
-)
-
-fun MediatedHomework.mapToRemoteData() = MediatedHomeworkPojo(
-    uid = uid,
-    subjectName = subjectName,
-    theoreticalTasks = theoreticalTasks,
-    practicalTasks = practicalTasks,
-    presentationTasks = presentationTasks,
-    test = test,
-    priority = priority.name,
 )

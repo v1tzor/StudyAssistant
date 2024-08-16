@@ -23,6 +23,9 @@ import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.DetailsScreen
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.OverviewScreen
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.ShareScreen
+import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
+import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -30,18 +33,25 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.Overview
 internal interface ScheduleScreenProvider : FeatureScreenProvider<ScheduleScreen> {
 
     fun provideEditorScreen(screen: EditorScreen): Screen
+    fun provideUsersScreen(screen: UsersScreen): Screen
 
     class Base(
         private val editorFeatureStarter: () -> EditorFeatureStarter,
+        private val usersFeatureStarter: () -> UsersFeatureStarter,
     ) : ScheduleScreenProvider {
 
         override fun provideFeatureScreen(screen: ScheduleScreen) = when (screen) {
             is ScheduleScreen.Overview -> OverviewScreen(screen.firstDay)
             is ScheduleScreen.Details -> DetailsScreen()
+            is ScheduleScreen.Share -> ShareScreen(screen.receivedShareId)
         }
 
         override fun provideEditorScreen(screen: EditorScreen): Screen {
             return editorFeatureStarter().fetchRootScreenAndNavigate(screen)
+        }
+
+        override fun provideUsersScreen(screen: UsersScreen): Screen {
+            return usersFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }

@@ -29,7 +29,7 @@ import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.ScheduleUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
@@ -66,7 +66,7 @@ internal sealed class OverviewEvent : BaseEvent {
     data class RepeatHomework(val homework: HomeworkDetailsUi) : OverviewEvent()
     data class SkipHomework(val homework: HomeworkDetailsUi) : OverviewEvent()
     data class UpdateTodoDone(val todo: TodoDetailsUi, val isDone: Boolean) : OverviewEvent()
-    data class ShareHomeworks(val sentMediatedHomeworks: SentMediatedHomeworksUi) : OverviewEvent()
+    data class ShareHomeworks(val sentMediatedHomeworks: SentMediatedHomeworksDetailsUi) : OverviewEvent()
     data class NavigateToHomeworkEditor(val homework: HomeworkDetailsUi) : OverviewEvent()
     data class NavigateToTodoEditor(val todo: TodoDetailsUi?) : OverviewEvent()
     data object AddHomeworkInEditor : OverviewEvent()

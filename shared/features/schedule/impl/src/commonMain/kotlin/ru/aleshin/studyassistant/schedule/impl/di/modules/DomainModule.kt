@@ -23,7 +23,9 @@ import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapp
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleErrorHandler
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.AnalysisInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.HomeworkInteractor
+import ru.aleshin.studyassistant.schedule.impl.domain.interactors.OrganizationsInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleInteractor
+import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ShareSchedulesInteractor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -32,7 +34,9 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<ScheduleErrorHandler> { ScheduleErrorHandler.Base() }
     bindSingleton<ScheduleEitherWrapper> { ScheduleEitherWrapper.Base(instance()) }
 
-    bindSingleton<ScheduleInteractor> { ScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ScheduleInteractor> { ScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<HomeworkInteractor> { HomeworkInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<ShareSchedulesInteractor> { ShareSchedulesInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<AnalysisInteractor> { AnalysisInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 }

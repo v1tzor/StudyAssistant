@@ -24,6 +24,8 @@ import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.ProfileScreen
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsScreen
 import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
@@ -35,17 +37,17 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 internal interface ProfileScreenProvider : FeatureScreenProvider<MainScreen> {
 
     fun provideAuthScreen(screen: AuthScreen): Screen
-
     fun provideUsersScreen(screen: UsersScreen): Screen
-
     fun provideSettingsScreen(screen: SettingsScreen): Screen
     fun provideEditorScreen(screen: EditorScreen): Screen
+    fun provideScheduleScreen(screen: ScheduleScreen): Screen
 
     class Base(
         private val authFeatureStarter: () -> AuthFeatureStarter,
         private val usersFeatureStarter: () -> UsersFeatureStarter,
         private val settingsFeatureStarter: () -> SettingsFeatureStarter,
         private val editorFeatureStarter: () -> EditorFeatureStarter,
+        private val scheduleFeatureStarter: () -> ScheduleFeatureStarter,
     ) : ProfileScreenProvider {
 
         override fun provideFeatureScreen(screen: MainScreen): Screen {
@@ -66,6 +68,10 @@ internal interface ProfileScreenProvider : FeatureScreenProvider<MainScreen> {
 
         override fun provideEditorScreen(screen: EditorScreen): Screen {
             return editorFeatureStarter().fetchRootScreenAndNavigate(screen)
+        }
+
+        override fun provideScheduleScreen(screen: ScheduleScreen): Screen {
+            return scheduleFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }

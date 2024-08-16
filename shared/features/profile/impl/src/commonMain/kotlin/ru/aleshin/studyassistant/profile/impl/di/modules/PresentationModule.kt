@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel.Profil
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel.ProfileScreenModel
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel.ProfileStateCommunicator
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel.ProfileWorkProcessor
+import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
 import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
@@ -40,10 +41,18 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<ProfileScreen> { ProfileScreen() }
 
     bindProvider<ProfileFeatureStarter> { ProfileFeatureStarterImpl(instance()) }
-    bindProvider<ProfileScreenProvider> { ProfileScreenProvider.Base(instance<() -> AuthFeatureStarter>(), instance<() -> UsersFeatureStarter>(), instance<() -> SettingsFeatureStarter>(), instance<() -> EditorFeatureStarter>()) }
+    bindProvider<ProfileScreenProvider> {
+        ProfileScreenProvider.Base(
+            instance<() -> AuthFeatureStarter>(),
+            instance<() -> UsersFeatureStarter>(),
+            instance<() -> SettingsFeatureStarter>(),
+            instance<() -> EditorFeatureStarter>(),
+            instance<() -> ScheduleFeatureStarter>()
+        )
+    }
 
     bindSingleton<ProfileStateCommunicator> { ProfileStateCommunicator.Base() }
     bindSingleton<ProfileEffectCommunicator> { ProfileEffectCommunicator.Base() }
-    bindSingleton<ProfileWorkProcessor> { ProfileWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<ProfileScreenModel> { ProfileScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ProfileWorkProcessor> { ProfileWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ProfileScreenModel> { ProfileScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
 }

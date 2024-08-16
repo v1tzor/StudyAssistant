@@ -22,9 +22,11 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.profile.impl.domain.common.ProfileEitherWrapper
 import ru.aleshin.studyassistant.profile.impl.domain.common.ProfileErrorHandler
-import ru.aleshin.studyassistant.profile.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.FriendRequestsInteractor
+import ru.aleshin.studyassistant.profile.impl.domain.interactors.OrganizationsInteractor
+import ru.aleshin.studyassistant.profile.impl.domain.interactors.ShareSchedulesInteractor
+import ru.aleshin.studyassistant.profile.impl.domain.interactors.UserInteractor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -34,6 +36,8 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<ProfileEitherWrapper> { ProfileEitherWrapper.Base(instance()) }
 
     bindProvider<AuthInteractor> { AuthInteractor.Base(instance(), instance(), instance(), instance()) }
-    bindProvider<AppUserInteractor> { AppUserInteractor.Base(instance(), instance()) }
+    bindProvider<UserInteractor> { UserInteractor.Base(instance(), instance()) }
     bindProvider<FriendRequestsInteractor> { FriendRequestsInteractor.Base(instance(), instance(), instance()) }
+    bindProvider<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance()) }
+    bindProvider<ShareSchedulesInteractor> { ShareSchedulesInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 }

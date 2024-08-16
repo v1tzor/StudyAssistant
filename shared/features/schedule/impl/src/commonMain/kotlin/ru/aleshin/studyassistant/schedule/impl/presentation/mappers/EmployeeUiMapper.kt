@@ -18,7 +18,9 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
+import ru.aleshin.studyassistant.core.domain.entities.employee.MediatedEmployee
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.MediatedEmployeeUi
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
@@ -40,6 +42,21 @@ internal fun Employee.mapToUi() = EmployeeUi(
     webs = webs.map { it.mapToUi() },
 )
 
+internal fun MediatedEmployee.mapToUi() = MediatedEmployeeUi(
+    uid = uid,
+    organizationId = organizationId,
+    firstName = firstName,
+    secondName = secondName,
+    patronymic = patronymic,
+    post = post,
+    birthday = birthday,
+    workTime = workTime,
+    emails = emails.map { it.mapToUi() },
+    phones = phones.map { it.mapToUi() },
+    locations = locations.map { it.mapToUi() },
+    webs = webs.map { it.mapToUi() },
+)
+
 internal fun EmployeeUi.mapToDomain() = Employee(
     uid = uid,
     organizationId = organizationId,
@@ -50,6 +67,21 @@ internal fun EmployeeUi.mapToDomain() = Employee(
     avatar = avatar,
     birthday = birthday,
     workTime = if (workTimeStart != null && workTimeEnd != null) TimeRange(workTimeStart, workTimeEnd) else null,
+    emails = emails.map { it.mapToDomain() },
+    phones = phones.map { it.mapToDomain() },
+    locations = locations.map { it.mapToDomain() },
+    webs = webs.map { it.mapToDomain() },
+)
+
+internal fun MediatedEmployeeUi.mapToDomain() = MediatedEmployee(
+    uid = uid,
+    organizationId = organizationId,
+    firstName = firstName,
+    secondName = secondName,
+    patronymic = patronymic,
+    post = post,
+    birthday = birthday,
+    workTime = workTime,
     emails = emails.map { it.mapToDomain() },
     phones = phones.map { it.mapToDomain() },
     locations = locations.map { it.mapToDomain() },

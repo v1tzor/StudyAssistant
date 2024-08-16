@@ -22,14 +22,19 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.classes.convertToDetails
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
 import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
 import ru.aleshin.studyassistant.core.domain.entities.schedules.ScheduleDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.WeekScheduleDetails
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.convertToDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.convertToDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.convertToDetails
@@ -46,6 +51,7 @@ import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
  */
 internal interface ScheduleInteractor {
 
+    suspend fun addBaseSchedules(schedules: List<BaseSchedule>): UnitDomainResult<ScheduleFailures>
     suspend fun fetchDetailsWeekSchedule(week: TimeRange): FlowDomainResult<ScheduleFailures, WeekScheduleDetails>
     suspend fun fetchDetailsScheduleByDate(date: Instant): FlowDomainResult<ScheduleFailures, ScheduleDetails>
 
@@ -55,11 +61,31 @@ internal interface ScheduleInteractor {
         private val customScheduleRepository: CustomScheduleRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
         private val usersRepository: UsersRepository,
+        private val dateManager: DateManager,
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : ScheduleInteractor {
 
         private val targetUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid
+
+        override suspend fun addBaseSchedules(schedules: List<BaseSchedule>) = eitherWrapper.wrapUnit {
+            val currentWeek = dateManager.fetchCurrentWeek()
+            val currentInstant = dateManager.fetchCurrentInstant()
+
+            val currentSchedules = baseScheduleRepository.fetchSchedulesByVersion(currentWeek, null, targetUser).first()
+            val deprecatedSchedules = currentSchedules.map { schedule ->
+                val deprecatedVersion = schedule.dateVersion.makeDeprecated(currentInstant)
+                val updatedClasses = schedule.classes.map { it.copy(uid = randomUUID()) }
+                return@map schedule.copy(dateVersion = deprecatedVersion, classes = updatedClasses)
+            }
+            baseScheduleRepository.addOrUpdateSchedulesGroup(deprecatedSchedules, targetUser)
+
+            val newActualSchedules = schedules.map { schedules ->
+                val actualVersion = DateVersion.createNewVersion(currentInstant)
+                return@map schedules.copy(dateVersion = actualVersion)
+            }
+            baseScheduleRepository.addOrUpdateSchedulesGroup(newActualSchedules, targetUser)
+        }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchDetailsWeekSchedule(week: TimeRange) = eitherWrapper.wrapFlow {
@@ -83,7 +109,9 @@ internal interface ScheduleInteractor {
                                 val sortedClasses = customDetailsSchedule.classes.sortedBy { classModel ->
                                     classModel.timeRange.from.dateTime().time
                                 }
-                                val detailsSchedule = ScheduleDetails.Custom(customDetailsSchedule.copy(classes = sortedClasses))
+                                val detailsSchedule = ScheduleDetails.Custom(
+                                    customDetailsSchedule.copy(classes = sortedClasses)
+                                )
                                 put(scheduleWeekDay, detailsSchedule)
                             }
                             baseSchedules.forEach { baseSchedule ->
@@ -95,7 +123,9 @@ internal interface ScheduleInteractor {
                                     val sortedClasses = baseDetailsSchedule.classes.sortedBy { classModel ->
                                         classModel.timeRange.from.dateTime().time
                                     }
-                                    val detailsSchedule = ScheduleDetails.Base(baseDetailsSchedule.copy(classes = sortedClasses))
+                                    val detailsSchedule = ScheduleDetails.Base(
+                                        baseDetailsSchedule.copy(classes = sortedClasses)
+                                    )
                                     put(dayOfWeek, detailsSchedule)
                                 }
                             }

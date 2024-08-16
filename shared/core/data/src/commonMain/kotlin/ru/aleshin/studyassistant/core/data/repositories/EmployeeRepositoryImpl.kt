@@ -49,6 +49,16 @@ class EmployeeRepositoryImpl(
         }
     }
 
+    override suspend fun addOrUpdateEmployeeGroup(employees: List<Employee>, targetUser: UID) {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.addOrUpdateEmployeeGroup(employees.map { it.mapToRemoteData() }, targetUser)
+        } else {
+            localDataSource.addOrUpdateEmployeeGroup(employees.map { it.mapToLocalData() })
+        }
+    }
+
     override suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
