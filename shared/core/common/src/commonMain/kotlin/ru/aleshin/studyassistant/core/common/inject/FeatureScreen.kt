@@ -16,9 +16,11 @@
 
 package ru.aleshin.studyassistant.core.common.inject
 
+import cafe.adriel.voyager.core.screen.Screen
+
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface FeatureScreen
+interface FeatureScreen<R : RootScreen>
 
-object MainScreen : FeatureScreen
+interface RootScreen : Screen

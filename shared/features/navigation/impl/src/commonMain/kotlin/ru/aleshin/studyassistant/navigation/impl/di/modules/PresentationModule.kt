@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.navigation.impl.di.modules
 
-import cafe.adriel.voyager.core.screen.Screen
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
@@ -36,7 +35,7 @@ import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
  * @author Stanislav Aleshin on 14.04.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<Screen> { TabsScreen() }
+    bindSingleton<TabsScreen> { TabsScreen() }
 
     bindSingleton<NavigationFeatureStarter> { NavigationFeatureStarterImpl(instance()) }
     bindSingleton<TabScreenProvider> { TabScreenProvider.Base(instance<() -> ScheduleFeatureStarter>(), instance<() -> TasksFeatureStarter>(), instance<() -> InfoFeatureStarter>(), instance<() -> ProfileFeatureStarter>()) }

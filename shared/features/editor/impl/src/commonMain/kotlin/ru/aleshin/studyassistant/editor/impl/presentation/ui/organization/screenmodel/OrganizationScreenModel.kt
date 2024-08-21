@@ -112,6 +112,13 @@ internal class OrganizationScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+            is OrganizationEvent.HideOrganization -> with(state()) {
+                launchBackgroundWork(BackgroundKey.HIDE_ORGANIZATION) {
+                    val editModel = checkNotNull(editableOrganization)
+                    val command = OrganizationWorkCommand.HideOrganization(editModel)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
             is OrganizationEvent.NavigateToBack -> {
                 sendEffect(OrganizationEffect.NavigateToBack)
             }
@@ -139,7 +146,7 @@ internal class OrganizationScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_ORGANIZATION, SAVE_ORGANIZATION, UPDATE_AVATAR
+        LOAD_ORGANIZATION, SAVE_ORGANIZATION, HIDE_ORGANIZATION
     }
 }
 

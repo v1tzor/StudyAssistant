@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
+import ru.aleshin.studyassistant.info.api.presentation.InfoRootScreen
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.EmployeeScreen
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.OrganizationsScreen
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.SubjectsScreen
@@ -30,7 +31,7 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-internal interface InfoScreenProvider : FeatureScreenProvider<InfoScreen> {
+internal interface InfoScreenProvider : FeatureScreenProvider<InfoScreen, InfoRootScreen> {
 
     fun provideEditorScreen(screen: EditorScreen): Screen
 

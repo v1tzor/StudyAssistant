@@ -18,13 +18,13 @@ package ru.aleshin.studyassistant.info.impl.presentation.ui.navigation
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
 import ru.aleshin.studyassistant.core.common.di.withDirectDI
 import ru.aleshin.studyassistant.core.common.navigation.NestedFeatureNavigator
 import ru.aleshin.studyassistant.core.common.navigation.rememberNavigatorManager
 import ru.aleshin.studyassistant.core.common.navigation.rememberScreenProvider
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
+import ru.aleshin.studyassistant.info.api.presentation.InfoRootScreen
 import ru.aleshin.studyassistant.info.impl.di.holder.InfoFeatureDIHolder
 import ru.aleshin.studyassistant.info.impl.navigation.InfoNavigatorManager
 import ru.aleshin.studyassistant.info.impl.navigation.InfoScreenProvider
@@ -33,13 +33,13 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoTheme
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-internal class NavigationScreen : Screen {
+internal class NavigationScreen : InfoRootScreen() {
 
     @Composable
     override fun Content() = withDirectDI(directDI = { InfoFeatureDIHolder.fetchDI() }) {
         val screenModel = rememberScreenModel { NavigationScreenModel() }
-        val screenProvider = rememberScreenProvider<InfoScreenProvider, InfoScreen>()
-        val navigatorManager = rememberNavigatorManager<InfoNavigatorManager, InfoScreen>()
+        val screenProvider = rememberScreenProvider<InfoScreenProvider, InfoScreen, InfoRootScreen>()
+        val navigatorManager = rememberNavigatorManager<InfoNavigatorManager, InfoScreen, InfoRootScreen>()
 
         NestedFeatureNavigator(
             screenProvider = screenProvider,

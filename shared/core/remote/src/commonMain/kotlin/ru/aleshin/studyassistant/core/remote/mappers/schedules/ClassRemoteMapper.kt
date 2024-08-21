@@ -37,7 +37,6 @@ fun ClassDetailsPojo.mapToBase() = ClassPojo(
     location = location,
     startTime = startTime,
     endTime = endTime,
-    notification = notification,
 )
 
 fun ClassPojo.mapToDetails(
@@ -57,5 +56,4 @@ fun ClassPojo.mapToDetails(
     location = location,
     startTime = startTime,
     endTime = endTime,
-    notification = notification,
 )

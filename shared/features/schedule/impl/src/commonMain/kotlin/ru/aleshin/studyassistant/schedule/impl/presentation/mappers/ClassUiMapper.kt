@@ -40,7 +40,6 @@ internal fun Class.mapToUi(number: Int) = ClassUi(
     location = location?.mapToUi(),
     timeRange = timeRange,
     number = number,
-    notification = notification,
 )
 
 internal inline fun ClassDetails.mapToUi(
@@ -57,7 +56,6 @@ internal inline fun ClassDetails.mapToUi(
     office = office,
     location = location?.mapToUi(),
     timeRange = timeRange,
-    notification = notification,
     number = number,
     homework = homework?.let { it.mapToUi(status = homeworkStatus(it)) },
 )
@@ -73,7 +71,6 @@ internal fun MediatedClass.mapToUi() = MediatedClassUi(
     office = office,
     location = location?.mapToUi(),
     timeRange = timeRange,
-    notification = notification,
 )
 
 internal fun ClassUi.mapToDomain() = Class(
@@ -87,7 +84,6 @@ internal fun ClassUi.mapToDomain() = Class(
     office = office,
     location = location?.mapToDomain(),
     timeRange = timeRange,
-    notification = notification,
 )
 
 internal fun MediatedClassUi.mapToDomain() = MediatedClass(
@@ -101,5 +97,4 @@ internal fun MediatedClassUi.mapToDomain() = MediatedClass(
     office = office,
     location = location?.mapToDomain(),
     timeRange = timeRange,
-    notification = notification,
 )

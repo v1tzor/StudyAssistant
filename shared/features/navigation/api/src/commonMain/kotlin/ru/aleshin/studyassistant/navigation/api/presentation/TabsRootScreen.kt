@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.api.ui
+package ru.aleshin.studyassistant.navigation.api.presentation
 
-import ru.aleshin.studyassistant.core.domain.entities.common.DayOfNumberedWeek
+import ru.aleshin.studyassistant.core.common.inject.RootScreen
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 
 /**
- * @author Stanislav Aleshin on 31.05.2024.
+ * @author Stanislav Aleshin on 20.08.2024.
  */
-fun DayOfNumberedWeek.mapToUi() = DayOfNumberedWeekUi(
-    dayOfWeek = dayOfWeek,
-    week = week,
-)
-
-fun DayOfNumberedWeekUi.mapToDomain() = DayOfNumberedWeek(
-    dayOfWeek = dayOfWeek,
-    week = week,
-)
+@HiddenFromObjC
+@OptIn(ExperimentalObjCRefinement::class)
+abstract class TabsRootScreen : RootScreen

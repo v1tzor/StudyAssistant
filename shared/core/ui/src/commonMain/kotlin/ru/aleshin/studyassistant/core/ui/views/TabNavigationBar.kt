@@ -48,7 +48,7 @@ interface BottomBarItem {
 @Composable
 fun <Item : BottomBarItem> BottomNavigationBar(
     modifier: Modifier,
-    selectedItem: Item,
+    selectedItem: Item?,
     items: Array<Item>,
     onItemSelected: (Item) -> Unit,
     showLabel: Boolean,
@@ -59,7 +59,7 @@ fun <Item : BottomBarItem> BottomNavigationBar(
         modifier = modifier.height(
             height = (if (showLabel) 80.dp else 60.dp) + windowInsets.getBottom(density).pxToDp()
         ),
-        containerColor = selectedItem.containerColor,
+        containerColor = selectedItem?.containerColor ?: MaterialTheme.colorScheme.background,
         tonalElevation = StudyAssistantRes.elevations.levelZero,
         windowInsets = windowInsets,
     ) {

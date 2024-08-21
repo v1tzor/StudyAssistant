@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
+import ru.aleshin.studyassistant.tasks.api.presentation.TasksRootScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.HomeworksScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.OverviewScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.ShareScreen
@@ -31,7 +32,7 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-internal interface TasksScreenProvider : FeatureScreenProvider<TasksScreen> {
+internal interface TasksScreenProvider : FeatureScreenProvider<TasksScreen, TasksRootScreen> {
 
     fun provideEditorScreen(screen: EditorScreen): Screen
 

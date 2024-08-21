@@ -163,6 +163,7 @@ internal data class EditorStrings(
     val oldPasswordFieldLabel: String,
     val passwordFieldPlaceholder: String,
     val credentialsErrorMessage: String,
+    val hideOrganizationWarning: String,
     val otherErrorMessage: String,
 ) {
 
@@ -308,6 +309,7 @@ internal data class EditorStrings(
             passwordFieldPlaceholder = "Мин. 6 символов (a-Z)(0-9)",
             shiftTimeError = "Ошибка сдвига занятий! Нарушение временных рамок",
             credentialsErrorMessage = "Данные пользователя, неверны или неполны!",
+            hideOrganizationWarning = "Вы уверены что хотите скрыть организацию? После этого вы больше не сможете её использовать",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = EditorStrings(
@@ -451,6 +453,7 @@ internal data class EditorStrings(
             passwordFieldPlaceholder = "Min. 6 chars (a-Z)(0-9)",
             shiftTimeError = "Classes shift error! Violation of the time frame",
             credentialsErrorMessage = "The user's data seems to be incorrect or incomplete!",
+            hideOrganizationWarning = "Are you sure you want to hide the organization? After that, you won't be able to use it anymore",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

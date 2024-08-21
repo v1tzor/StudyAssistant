@@ -19,12 +19,12 @@ package ru.aleshin.studyassistant.info.impl.navigation
 import ru.aleshin.studyassistant.core.common.navigation.CommandBuffer
 import ru.aleshin.studyassistant.core.common.navigation.NavigatorManager
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
+import ru.aleshin.studyassistant.info.api.presentation.InfoRootScreen
 
 /**
  * @author Stanislav Aleshin on 25.05.2024.
  */
-internal interface InfoNavigatorManager : NavigatorManager<InfoScreen> {
-    class Base(commandBuffer: CommandBuffer) : InfoNavigatorManager, NavigatorManager.Abstract<InfoScreen>(
-        commandBuffer = commandBuffer
-    )
+internal interface InfoNavigatorManager : NavigatorManager<InfoScreen, InfoRootScreen> {
+    class Base(commandBuffer: CommandBuffer) : InfoNavigatorManager,
+        NavigatorManager.Abstract<InfoScreen, InfoRootScreen>(commandBuffer = commandBuffer)
 }

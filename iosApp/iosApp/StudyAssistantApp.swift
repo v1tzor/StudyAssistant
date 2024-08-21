@@ -8,15 +8,28 @@ import OAuth2
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
+    func requestNotificationPermission() {
+        let center = UNUserNotificationCenter.current()
+        
+        center.requestAuthorization(options: [.alert, .sound]) { (granted, error) in
+            if let error = error {
+                print("Ошибка запроса разрешений: \(error.localizedDescription)")
+                return
+            }
+            
+            if granted {} else {}
+        }
+    }
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-           return true
-       }
+        requestNotificationPermission()
+        return true
+    }
     
     func application(_ app: UIApplication,
                      open url: URL,
                      options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-      print("Handle URI")
-      return GIDSignIn.sharedInstance.handle(url)
+        return GIDSignIn.sharedInstance.handle(url)
     }
 }
 
@@ -30,7 +43,7 @@ struct iOSApp: App {
         let filePath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist")
         guard let fileopts = FirebaseOptions(contentsOfFile: filePath!) else { assert(false, "Couldn't load config file") }
         FirebaseApp.configure(options: fileopts)
-
+        
         let tokenProvider = GoogleAuthTokenProvider()
         let uuidProvider = UUIDProvider()
         let configuration = PlatformConfiguration(serviceTokenProvider: tokenProvider, uuidProvider: uuidProvider)
@@ -40,10 +53,7 @@ struct iOSApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView().onOpenURL(perform: { url in
-                            print("onOpenURI")
-                            GIDSignIn.sharedInstance.handle(url)
-                        })
+            ContentView().onOpenURL(perform: { url in GIDSignIn.sharedInstance.handle(url)})
         }
     }
 }

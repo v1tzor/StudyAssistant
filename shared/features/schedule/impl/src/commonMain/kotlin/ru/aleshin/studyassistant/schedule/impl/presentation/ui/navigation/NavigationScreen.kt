@@ -18,13 +18,13 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
 import ru.aleshin.studyassistant.core.common.di.withDirectDI
 import ru.aleshin.studyassistant.core.common.navigation.NestedFeatureNavigator
 import ru.aleshin.studyassistant.core.common.navigation.rememberNavigatorManager
 import ru.aleshin.studyassistant.core.common.navigation.rememberScreenProvider
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
+import ru.aleshin.studyassistant.schedule.api.presentation.ScheduleRootScreen
 import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
 import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleNavigatorManager
 import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleScreenProvider
@@ -33,13 +33,13 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleTheme
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-internal class NavigationScreen : Screen {
+internal class NavigationScreen : ScheduleRootScreen() {
 
     @Composable
     override fun Content() = withDirectDI(directDI = { ScheduleFeatureDIHolder.fetchDI() }) {
         val screenModel = rememberScreenModel { NavigationScreenModel() }
-        val screenProvider = rememberScreenProvider<ScheduleScreenProvider, ScheduleScreen>()
-        val navigatorManager = rememberNavigatorManager<ScheduleNavigatorManager, ScheduleScreen>()
+        val screenProvider = rememberScreenProvider<ScheduleScreenProvider, ScheduleScreen, ScheduleRootScreen>()
+        val navigatorManager = rememberNavigatorManager<ScheduleNavigatorManager, ScheduleScreen, ScheduleRootScreen>()
 
         NestedFeatureNavigator(
             screenProvider = screenProvider,

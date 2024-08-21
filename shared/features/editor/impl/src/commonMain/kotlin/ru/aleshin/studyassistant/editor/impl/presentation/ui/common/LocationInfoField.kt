@@ -21,9 +21,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -40,11 +44,12 @@ import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
 import ru.aleshin.studyassistant.core.ui.views.dialog.ContactInfoEditorDialog
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogAddItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogSwipeItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogTextField
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
@@ -163,11 +168,37 @@ internal fun LocationSelectorDialog(
         header = EditorThemeRes.strings.locationSelectorHeader,
         title = EditorThemeRes.strings.locationSelectorTitle,
         itemView = { location ->
-            SelectorDialogItemView(
+            val dismissState = rememberSwipeToDismissBoxState(
+                confirmValueChange = { dismissBoxValue ->
+                    if (dismissBoxValue == SwipeToDismissBoxValue.StartToEnd) {
+                        val updatedLocations = locations.toMutableList().apply { remove(location) }
+                        onUpdateLocations(updatedLocations)
+                        true
+                    } else {
+                        false
+                    }
+                },
+                positionalThreshold = { it * .60f },
+            )
+            SelectorDialogSwipeItemView(
                 onClick = { selectedLocation = location },
+                state = dismissState,
                 selected = location == selectedLocation,
                 title = location.value,
                 label = location.label,
+                enableDismissFromEndToStart = false,
+                backgroundContent = {
+                    SwipeToDismissBackground(
+                        dismissState = dismissState,
+                        startToEndContent = {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = null,
+                            )
+                        },
+                        startToEndColor = MaterialTheme.colorScheme.errorContainer,
+                    )
+                },
             )
         },
         addItemView = {
@@ -248,11 +279,37 @@ internal fun OfficeSelectorDialog(
         header = EditorThemeRes.strings.officeSelectorHeader,
         title = EditorThemeRes.strings.officeSelectorTitle,
         itemView = { office ->
-            SelectorDialogItemView(
+            val dismissState = rememberSwipeToDismissBoxState(
+                confirmValueChange = { dismissBoxValue ->
+                    if (dismissBoxValue == SwipeToDismissBoxValue.StartToEnd) {
+                        val updatedOffices = offices.toMutableList().apply { remove(office) }
+                        onUpdateOffices(updatedOffices)
+                        true
+                    } else {
+                        false
+                    }
+                },
+                positionalThreshold = { it * .60f },
+            )
+            SelectorDialogSwipeItemView(
                 onClick = { selectedOffice = office },
+                state = dismissState,
                 selected = office == selectedOffice,
                 title = office,
                 label = null,
+                enableDismissFromEndToStart = false,
+                backgroundContent = {
+                    SwipeToDismissBackground(
+                        dismissState = dismissState,
+                        startToEndContent = {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = null,
+                            )
+                        },
+                        startToEndColor = MaterialTheme.colorScheme.errorContainer,
+                    )
+                },
             )
         },
         addItemView = {
@@ -271,9 +328,7 @@ internal fun OfficeSelectorDialog(
                             isEdited = false
                         },
                         onConfirm = {
-                            val updatedOffices = offices.toMutableList().apply {
-                                add(editableOffice)
-                            }
+                            val updatedOffices = offices.toMutableList().apply { add(editableOffice) }
                             onUpdateOffices(updatedOffices)
                             editableOffice = ""
                             isEdited = false

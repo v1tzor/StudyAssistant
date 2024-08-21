@@ -36,5 +36,4 @@ data class ClassEntity(
     val location: ContactInfoEntity? = null,
     val startTime: Long = 0L,
     val endTime: Long = 0L,
-    val notification: Boolean = false,
 )

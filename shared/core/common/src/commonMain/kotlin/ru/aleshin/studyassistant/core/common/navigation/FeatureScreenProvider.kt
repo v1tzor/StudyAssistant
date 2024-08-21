@@ -23,16 +23,17 @@ import org.kodein.di.compose.localDI
 import org.kodein.di.direct
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
+import ru.aleshin.studyassistant.core.common.inject.RootScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface FeatureScreenProvider<S : FeatureScreen> {
+interface FeatureScreenProvider<S : FeatureScreen<R>, R : RootScreen> {
     fun provideFeatureScreen(screen: S): Screen
 }
 
 @Composable
-inline fun <reified T : FeatureScreenProvider<S>, S : FeatureScreen> Screen.rememberScreenProvider(): T {
+inline fun <reified T : FeatureScreenProvider<S, R>, S : FeatureScreen<R>, R : RootScreen> Screen.rememberScreenProvider(): T {
     val di = localDI().direct
     return remember { di.instance<T>() }
 }

@@ -19,7 +19,8 @@ package ru.aleshin.studyassistant.preview.impl.navigation
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.nav.NavigationScreen
+import ru.aleshin.studyassistant.preview.api.presentation.PreviewRootScreen
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.navigation.NavigationScreen
 
 /**
  * @author Stanislav Aleshin on 07.04.2024.
@@ -28,7 +29,7 @@ internal class PreviewFeatureStarterImpl(
     navScreen: NavigationScreen,
     navigatorManager: PreviewNavigatorManager,
     screenProvider: PreviewScreenProvider,
-) : PreviewFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<PreviewScreen>(
+) : PreviewFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<PreviewScreen, PreviewRootScreen>(
     featureNavScreen = navScreen,
     navigatorManager = navigatorManager,
     screenProvider = screenProvider,

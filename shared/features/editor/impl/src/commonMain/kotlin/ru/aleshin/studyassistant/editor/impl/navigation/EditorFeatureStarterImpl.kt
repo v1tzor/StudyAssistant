@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.editor.impl.navigation
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
+import ru.aleshin.studyassistant.editor.api.presentation.EditorRootScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreen
 
 /**
@@ -28,7 +29,7 @@ internal class EditorFeatureStarterImpl(
     navScreen: NavigationScreen,
     navigatorManager: EditorNavigatorManager,
     screenProvider: EditorScreenProvider,
-) : EditorFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<EditorScreen>(
+) : EditorFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<EditorScreen, EditorRootScreen>(
     featureNavScreen = navScreen,
     navigatorManager = navigatorManager,
     screenProvider = screenProvider,

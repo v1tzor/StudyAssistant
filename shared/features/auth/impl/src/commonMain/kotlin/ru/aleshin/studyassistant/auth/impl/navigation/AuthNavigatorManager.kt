@@ -17,14 +17,14 @@
 package ru.aleshin.studyassistant.auth.impl.navigation
 
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
+import ru.aleshin.studyassistant.auth.api.presentation.AuthRootScreen
 import ru.aleshin.studyassistant.core.common.navigation.CommandBuffer
 import ru.aleshin.studyassistant.core.common.navigation.NavigatorManager
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-internal interface AuthNavigatorManager : NavigatorManager<AuthScreen> {
-    class Base(commandBuffer: CommandBuffer) : AuthNavigatorManager, NavigatorManager.Abstract<AuthScreen>(
-        commandBuffer = commandBuffer
-    )
+internal interface AuthNavigatorManager : NavigatorManager<AuthScreen, AuthRootScreen> {
+    class Base(commandBuffer: CommandBuffer) : AuthNavigatorManager,
+        NavigatorManager.Abstract<AuthScreen, AuthRootScreen>(commandBuffer = commandBuffer)
 }

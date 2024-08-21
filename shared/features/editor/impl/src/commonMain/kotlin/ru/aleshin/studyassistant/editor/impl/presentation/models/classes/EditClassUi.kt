@@ -19,11 +19,11 @@ package ru.aleshin.studyassistant.editor.impl.presentation.models.classes
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
-import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
-import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
+import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
@@ -47,7 +47,6 @@ internal data class EditClassUi(
     val startTime: Instant? = null,
     @TypeParceler<Instant?, NullInstantParceler>
     val endTime: Instant? = null,
-    val notification: Boolean = false,
 ) : Parcelable {
 
     fun isValid() = organization != null && eventType != null && subject != null &&
@@ -81,7 +80,6 @@ internal fun ClassUi.convertToEditModel() = EditClassUi(
     location = location,
     startTime = timeRange.from,
     endTime = timeRange.to,
-    notification = notification,
 )
 
 internal fun EditClassUi.convertToBase(number: Int = 0) = ClassUi(
@@ -99,5 +97,4 @@ internal fun EditClassUi.convertToBase(number: Int = 0) = ClassUi(
         to = checkNotNull(endTime),
     ),
     number = number,
-    notification = notification,
 )

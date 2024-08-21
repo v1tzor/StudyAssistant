@@ -19,10 +19,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import cafe.adriel.voyager.core.screen.Screen
 import org.jetbrains.compose.resources.DrawableResource
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.BottomBarItem
 import ru.aleshin.studyassistant.core.ui.views.BottomNavigationBar
+import ru.aleshin.studyassistant.info.api.presentation.InfoRootScreen
+import ru.aleshin.studyassistant.profile.api.presentation.ProfileRootScreen
+import ru.aleshin.studyassistant.schedule.api.presentation.ScheduleRootScreen
+import ru.aleshin.studyassistant.tasks.api.presentation.TasksRootScreen
 
 /**
  * @author Stanislav Aleshin on 08.02.2024.
@@ -30,7 +35,7 @@ import ru.aleshin.studyassistant.core.ui.views.BottomNavigationBar
 @Composable
 internal fun TabsBottomNavigationBar(
     modifier: Modifier = Modifier,
-    selectedItem: TabsBottomBarItems,
+    selectedItem: TabsBottomBarItems?,
     onItemSelected: (TabsBottomBarItems) -> Unit,
 ) {
     BottomNavigationBar(
@@ -64,5 +69,13 @@ internal enum class TabsBottomBarItems : BottomBarItem {
         override val label: String @Composable get() = StudyAssistantRes.strings.profileBottomItem
         override val enabledIcon: DrawableResource @Composable get() = StudyAssistantRes.icons.profile
         override val disabledIcon: DrawableResource @Composable get() = StudyAssistantRes.icons.profileDisabled
-    },
+    };
+}
+
+internal fun Screen.mapToItem() = when (this) {
+    is ScheduleRootScreen -> TabsBottomBarItems.SCHEDULE
+    is TasksRootScreen -> TabsBottomBarItems.TASKS
+    is InfoRootScreen -> TabsBottomBarItems.INFO
+    is ProfileRootScreen -> TabsBottomBarItems.PROFILE
+    else -> null
 }

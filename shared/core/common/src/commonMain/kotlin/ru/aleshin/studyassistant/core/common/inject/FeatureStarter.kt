@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.core.common.inject
 
-import cafe.adriel.voyager.core.screen.Screen
 import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.core.common.navigation.NavigatorManager
 
@@ -25,17 +24,17 @@ import ru.aleshin.studyassistant.core.common.navigation.NavigatorManager
  */
 interface FeatureStarter {
 
-    interface WithNestedNavigation<S : FeatureScreen> {
+    interface WithNestedNavigation<S : FeatureScreen<R>, R : RootScreen> {
 
-        fun fetchRootScreenAndNavigate(screen: S, isNavigate: Boolean = true): Screen
+        fun fetchRootScreenAndNavigate(screen: S, isNavigate: Boolean = true): R
 
-        abstract class Abstract<S : FeatureScreen>(
-            private val featureNavScreen: Screen,
-            private val navigatorManager: NavigatorManager<S>,
-            private val screenProvider: FeatureScreenProvider<S>,
-        ) : WithNestedNavigation<S> {
+        abstract class Abstract<S : FeatureScreen<R>, R : RootScreen>(
+            private val featureNavScreen: R,
+            private val navigatorManager: NavigatorManager<S, R>,
+            private val screenProvider: FeatureScreenProvider<S, R>,
+        ) : WithNestedNavigation<S, R> {
 
-            override fun fetchRootScreenAndNavigate(screen: S, isNavigate: Boolean): Screen {
+            override fun fetchRootScreenAndNavigate(screen: S, isNavigate: Boolean): R {
                 val featureScreen = screenProvider.provideFeatureScreen(screen)
                 val isSetStartScreen = navigatorManager.setStartScreen(screen)
                 if (!isSetStartScreen && isNavigate) {
@@ -49,13 +48,13 @@ interface FeatureStarter {
         }
     }
 
-    interface WithSingleNavigation {
+    interface WithSingleNavigation<R : RootScreen> {
 
-        fun fetchFeatureScreen(): Screen
+        fun fetchFeatureScreen(): R
 
-        abstract class Abstract(private val mainScreen: Screen) : WithSingleNavigation {
+        abstract class Abstract<R : RootScreen>(private val mainScreen: R) : WithSingleNavigation<R> {
 
-            override fun fetchFeatureScreen(): Screen {
+            override fun fetchFeatureScreen(): R {
                 return mainScreen
             }
         }

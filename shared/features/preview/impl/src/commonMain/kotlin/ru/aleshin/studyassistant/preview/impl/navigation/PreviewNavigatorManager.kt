@@ -19,11 +19,12 @@ package ru.aleshin.studyassistant.preview.impl.navigation
 import ru.aleshin.studyassistant.core.common.navigation.CommandBuffer
 import ru.aleshin.studyassistant.core.common.navigation.NavigatorManager
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
+import ru.aleshin.studyassistant.preview.api.presentation.PreviewRootScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-internal interface PreviewNavigatorManager : NavigatorManager<PreviewScreen> {
+internal interface PreviewNavigatorManager : NavigatorManager<PreviewScreen, PreviewRootScreen> {
     class Base(commandBuffer: CommandBuffer) : PreviewNavigatorManager,
-        NavigatorManager.Abstract<PreviewScreen>(commandBuffer = commandBuffer)
+        NavigatorManager.Abstract<PreviewScreen, PreviewRootScreen>(commandBuffer = commandBuffer)
 }

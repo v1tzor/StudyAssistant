@@ -38,7 +38,6 @@ fun ClassDetailsEntity.mapToBase() = ClassEntity(
     location = location,
     startTime = startTime,
     endTime = endTime,
-    notification = notification,
 )
 
 fun ClassEntity.mapToDetails(
@@ -58,5 +57,4 @@ fun ClassEntity.mapToDetails(
     location = location,
     startTime = startTime,
     endTime = endTime,
-    notification = notification,
 )

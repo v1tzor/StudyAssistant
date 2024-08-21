@@ -41,7 +41,7 @@ fun Organization.convertToShort() = OrganizationShort(
     locations = locations,
     offices = offices,
     scheduleTimeIntervals = scheduleTimeIntervals,
-    avatar = avatar
+    avatar = avatar,
 )
 
 fun OrganizationShort.convertToBase(base: Organization) = base.copy(

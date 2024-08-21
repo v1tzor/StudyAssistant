@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
+import ru.aleshin.studyassistant.users.api.presentation.UsersRootScreen
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.EmployeeProfileScreen
 import ru.aleshin.studyassistant.users.impl.presentation.ui.friends.FriendsScreen
 import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.RequestsScreen
@@ -29,7 +30,7 @@ import ru.aleshin.studyassistant.users.impl.presentation.ui.user.UserProfileScre
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-internal interface UsersScreenProvider : FeatureScreenProvider<UsersScreen> {
+internal interface UsersScreenProvider : FeatureScreenProvider<UsersScreen, UsersRootScreen> {
 
     fun provideEditorScreen(screen: EditorScreen): Screen
 

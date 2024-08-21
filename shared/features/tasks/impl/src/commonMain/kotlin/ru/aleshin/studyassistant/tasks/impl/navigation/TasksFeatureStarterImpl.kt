@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.tasks.impl.navigation
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
+import ru.aleshin.studyassistant.tasks.api.presentation.TasksRootScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.navigation.NavigationScreen
 
 /**
@@ -28,7 +29,7 @@ internal class TasksFeatureStarterImpl(
     navScreen: NavigationScreen,
     navigatorManager: TasksNavigatorManager,
     screenProvider: TasksScreenProvider,
-) : TasksFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<TasksScreen>(
+) : TasksFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<TasksScreen, TasksRootScreen>(
     featureNavScreen = navScreen,
     navigatorManager = navigatorManager,
     screenProvider = screenProvider,

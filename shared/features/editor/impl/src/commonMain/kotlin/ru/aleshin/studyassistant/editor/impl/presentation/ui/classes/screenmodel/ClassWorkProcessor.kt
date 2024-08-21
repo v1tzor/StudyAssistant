@@ -31,8 +31,8 @@ import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.firstHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
-import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
-import ru.aleshin.studyassistant.editor.api.ui.mapToDomain
+import ru.aleshin.studyassistant.editor.api.presentation.DayOfNumberedWeekUi
+import ru.aleshin.studyassistant.editor.api.presentation.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseClassInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseScheduleInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.CustomClassInteractor

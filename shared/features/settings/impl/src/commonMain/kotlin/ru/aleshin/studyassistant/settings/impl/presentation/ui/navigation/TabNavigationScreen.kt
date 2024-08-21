@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.di.withDirectDI
@@ -33,6 +32,7 @@ import ru.aleshin.studyassistant.core.common.navigation.rememberNavigatorManager
 import ru.aleshin.studyassistant.core.common.navigation.rememberScreenProvider
 import ru.aleshin.studyassistant.core.ui.views.TabItem
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsScreen
+import ru.aleshin.studyassistant.settings.api.presentation.SettingsRootScreen
 import ru.aleshin.studyassistant.settings.impl.di.holder.SettingsFeatureDIHolder
 import ru.aleshin.studyassistant.settings.impl.navigation.SettingsNavigatorManager
 import ru.aleshin.studyassistant.settings.impl.navigation.SettingsScreenProvider
@@ -52,7 +52,7 @@ import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.Subs
 /**
  * @author Stanislav Aleshin on 08.07.2024.
  */
-internal class TabNavigationScreen : Screen {
+internal class TabNavigationScreen : SettingsRootScreen() {
 
     @Composable
     override fun Content() = withDirectDI(directDI = { SettingsFeatureDIHolder.fetchDI() }) {
@@ -61,8 +61,8 @@ internal class TabNavigationScreen : Screen {
             screenModel = rememberTabNavigationScreenModel(),
         ) {
             NestedFeatureNavigator(
-                screenProvider = rememberScreenProvider<SettingsScreenProvider, SettingsScreen>(),
-                navigatorManager = rememberNavigatorManager<SettingsNavigatorManager, SettingsScreen>(),
+                screenProvider = rememberScreenProvider<SettingsScreenProvider, SettingsScreen, SettingsRootScreen>(),
+                navigatorManager = rememberNavigatorManager<SettingsNavigatorManager, SettingsScreen, SettingsRootScreen>(),
             ) { navigator ->
                 SettingsTheme {
                     val selectedItem = when (navigator.lastItem) {

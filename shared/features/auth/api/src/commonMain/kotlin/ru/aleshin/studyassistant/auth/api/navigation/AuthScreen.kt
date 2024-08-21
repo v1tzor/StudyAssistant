@@ -16,12 +16,13 @@
 
 package ru.aleshin.studyassistant.auth.api.navigation
 
+import ru.aleshin.studyassistant.auth.api.presentation.AuthRootScreen
 import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-sealed class AuthScreen : FeatureScreen {
+sealed class AuthScreen : FeatureScreen<AuthRootScreen> {
     data object Login : AuthScreen()
     data object Register : AuthScreen()
     data object Forgot : AuthScreen()

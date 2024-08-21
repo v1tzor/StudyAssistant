@@ -50,6 +50,7 @@ internal interface OrganizationWorkProcessor :
         override suspend fun work(command: OrganizationWorkCommand) = when (command) {
             is OrganizationWorkCommand.LoadEditModel -> loadEditModelWork(command.organizationId)
             is OrganizationWorkCommand.SaveEditModel -> saveEditModelWork(command.editModel, command.actionWithAvatar)
+            is OrganizationWorkCommand.HideOrganization -> hideOrganizationWork(command.editModel)
         }
 
         private fun loadEditModelWork(organizationId: UID?) = flow {
@@ -92,7 +93,16 @@ internal interface OrganizationWorkProcessor :
 
             organizationInteractor.addOrUpdateOrganization(organization).handle(
                 onLeftAction = { emit(EffectResult(OrganizationEffect.ShowError(it))) },
-                onRightAction = { emit(EffectResult(OrganizationEffect.NavigateToBack)) }
+                onRightAction = { emit(EffectResult(OrganizationEffect.NavigateToBack)) },
+            )
+        }
+
+        private fun hideOrganizationWork(editModel: EditOrganizationUi) = flow {
+            val updatedEditModel = editModel.copy(isHide = true)
+            val organization = updatedEditModel.convertToBase().mapToDomain()
+            organizationInteractor.addOrUpdateOrganization(organization).handle(
+                onLeftAction = { emit(EffectResult(OrganizationEffect.ShowError(it))) },
+                onRightAction = { emit(EffectResult(OrganizationEffect.NavigateToBack)) },
             )
         }
     }
@@ -100,8 +110,11 @@ internal interface OrganizationWorkProcessor :
 
 internal sealed class OrganizationWorkCommand : WorkCommand {
     data class LoadEditModel(val organizationId: UID?) : OrganizationWorkCommand()
+
     data class SaveEditModel(
         val editModel: EditOrganizationUi,
         val actionWithAvatar: ActionWithAvatar,
     ) : OrganizationWorkCommand()
+
+    data class HideOrganization(val editModel: EditOrganizationUi) : OrganizationWorkCommand()
 }

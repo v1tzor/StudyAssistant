@@ -24,13 +24,14 @@ import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
+import ru.aleshin.studyassistant.preview.api.presentation.PreviewRootScreen
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.IntroScreen
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.SetupScreen
 
 /**
  * @author Stanislav Aleshin on 07.04.2024.
  */
-internal interface PreviewScreenProvider : FeatureScreenProvider<PreviewScreen> {
+internal interface PreviewScreenProvider : FeatureScreenProvider<PreviewScreen, PreviewRootScreen> {
 
     fun provideAuthScreen(screen: AuthScreen): Screen
 

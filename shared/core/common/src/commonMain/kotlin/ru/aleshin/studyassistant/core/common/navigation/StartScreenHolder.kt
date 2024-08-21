@@ -17,17 +17,18 @@
 package ru.aleshin.studyassistant.core.common.navigation
 
 import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
+import ru.aleshin.studyassistant.core.common.inject.RootScreen
 
 /**
  * @author Stanislav Aleshin on 08.07.2024.
  */
-interface StartScreenHolder<S : FeatureScreen> {
+interface StartScreenHolder<S : FeatureScreen<R>, R : RootScreen> {
 
     fun fetchStartScreen(): S
 
     fun setStartScreen(screen: S): Boolean
 
-    abstract class Abstract<S : FeatureScreen> : StartScreenHolder<S> {
+    abstract class Abstract<S : FeatureScreen<R>, R : RootScreen> : StartScreenHolder<S, R> {
 
         private var screen: S? = null
 

@@ -19,12 +19,12 @@ package ru.aleshin.studyassistant.tasks.impl.navigation
 import ru.aleshin.studyassistant.core.common.navigation.CommandBuffer
 import ru.aleshin.studyassistant.core.common.navigation.NavigatorManager
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
+import ru.aleshin.studyassistant.tasks.api.presentation.TasksRootScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-internal interface TasksNavigatorManager : NavigatorManager<TasksScreen> {
-    class Base(commandBuffer: CommandBuffer) : TasksNavigatorManager, NavigatorManager.Abstract<TasksScreen>(
-        commandBuffer = commandBuffer
-    )
+internal interface TasksNavigatorManager : NavigatorManager<TasksScreen, TasksRootScreen> {
+    class Base(commandBuffer: CommandBuffer) : TasksNavigatorManager,
+        NavigatorManager.Abstract<TasksScreen, TasksRootScreen>(commandBuffer = commandBuffer)
 }

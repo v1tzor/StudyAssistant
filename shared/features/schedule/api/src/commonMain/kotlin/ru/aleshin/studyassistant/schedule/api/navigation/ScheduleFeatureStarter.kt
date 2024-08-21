@@ -17,8 +17,9 @@
 package ru.aleshin.studyassistant.schedule.api.navigation
 
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
+import ru.aleshin.studyassistant.schedule.api.presentation.ScheduleRootScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface ScheduleFeatureStarter : FeatureStarter.WithNestedNavigation<ScheduleScreen>
+interface ScheduleFeatureStarter : FeatureStarter.WithNestedNavigation<ScheduleScreen, ScheduleRootScreen>

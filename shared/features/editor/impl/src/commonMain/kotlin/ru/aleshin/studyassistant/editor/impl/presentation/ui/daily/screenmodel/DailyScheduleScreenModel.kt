@@ -28,7 +28,7 @@ import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
-import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
+import ru.aleshin.studyassistant.editor.api.presentation.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
 import ru.aleshin.studyassistant.editor.impl.navigation.EditorScreenProvider
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleAction

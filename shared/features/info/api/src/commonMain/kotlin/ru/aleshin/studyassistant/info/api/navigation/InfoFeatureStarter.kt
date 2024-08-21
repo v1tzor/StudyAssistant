@@ -17,8 +17,9 @@
 package ru.aleshin.studyassistant.info.api.navigation
 
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
+import ru.aleshin.studyassistant.info.api.presentation.InfoRootScreen
 
 /**
  * @author Stanislav Aleshin on 16.06.2024.
  */
-interface InfoFeatureStarter : FeatureStarter.WithNestedNavigation<InfoScreen>
+interface InfoFeatureStarter : FeatureStarter.WithNestedNavigation<InfoScreen, InfoRootScreen>

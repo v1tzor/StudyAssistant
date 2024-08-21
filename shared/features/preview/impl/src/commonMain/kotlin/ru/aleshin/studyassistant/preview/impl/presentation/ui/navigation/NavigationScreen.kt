@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.preview.impl.presentation.ui.nav
+package ru.aleshin.studyassistant.preview.impl.presentation.ui.navigation
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
 import ru.aleshin.studyassistant.core.common.di.withDirectDI
 import ru.aleshin.studyassistant.core.common.navigation.NestedFeatureNavigator
 import ru.aleshin.studyassistant.core.common.navigation.rememberNavigatorManager
 import ru.aleshin.studyassistant.core.common.navigation.rememberScreenProvider
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
+import ru.aleshin.studyassistant.preview.api.presentation.PreviewRootScreen
 import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
 import ru.aleshin.studyassistant.preview.impl.navigation.PreviewNavigatorManager
 import ru.aleshin.studyassistant.preview.impl.navigation.PreviewScreenProvider
@@ -33,13 +33,13 @@ import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewTheme
 /**
  * @author Stanislav Aleshin on 07.04.2024.
  */
-internal class NavigationScreen : Screen {
+internal class NavigationScreen : PreviewRootScreen() {
 
     @Composable
     override fun Content() = withDirectDI(directDI = { PreviewFeatureDIHolder.fetchDI() }) {
         val screenModel = rememberScreenModel { NavScreenModel() }
-        val screenProvider = rememberScreenProvider<PreviewScreenProvider, PreviewScreen>()
-        val navigatorManager = rememberNavigatorManager<PreviewNavigatorManager, PreviewScreen>()
+        val screenProvider = rememberScreenProvider<PreviewScreenProvider, PreviewScreen, PreviewRootScreen>()
+        val navigatorManager = rememberNavigatorManager<PreviewNavigatorManager, PreviewScreen, PreviewRootScreen>()
 
         NestedFeatureNavigator(
             screenProvider = screenProvider,

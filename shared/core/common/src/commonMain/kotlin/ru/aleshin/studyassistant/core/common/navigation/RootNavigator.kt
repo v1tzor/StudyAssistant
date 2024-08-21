@@ -16,7 +16,10 @@
 
 package ru.aleshin.studyassistant.core.common.navigation
 
+import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.Navigator
 
 /**
@@ -33,5 +36,18 @@ tailrec fun Navigator.nestedPop() {
     } else {
         dispose(lastItem)
         parent?.nestedPop()
+    }
+}
+
+@OptIn(InternalVoyagerApi::class)
+fun Navigator.disposeByKeys(keys: Set<ScreenKey>) {
+    keys.forEach { targetKey ->
+        val mockScreen = object : Screen {
+            override val key: ScreenKey = targetKey
+
+            @Composable
+            override fun Content() = Unit
+        }
+        dispose(mockScreen)
     }
 }

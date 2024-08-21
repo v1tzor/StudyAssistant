@@ -17,8 +17,9 @@
 package ru.aleshin.studyassistant.users.api.navigation
 
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
+import ru.aleshin.studyassistant.users.api.presentation.UsersRootScreen
 
 /**
  * @author Stanislav Aleshin on 10.07.2024.
  */
-interface UsersFeatureStarter : FeatureStarter.WithNestedNavigation<UsersScreen>
+interface UsersFeatureStarter : FeatureStarter.WithNestedNavigation<UsersScreen, UsersRootScreen>

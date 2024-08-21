@@ -47,7 +47,6 @@ fun ClassDetailsEntity.mapToDomain() = Class(
     office = office,
     location = location?.mapToDomain(),
     timeRange = TimeRange(startTime.mapEpochTimeToInstant(), endTime.mapEpochTimeToInstant()),
-    notification = notification,
 )
 
 fun ClassDetailsPojo.mapToDomain() = Class(
@@ -61,7 +60,6 @@ fun ClassDetailsPojo.mapToDomain() = Class(
     office = office,
     location = location?.mapToDomain(),
     timeRange = TimeRange(startTime.mapEpochTimeToInstant(), endTime.mapEpochTimeToInstant()),
-    notification = notification,
 )
 
 fun MediatedClassPojo.mapToDomain() = MediatedClass(
@@ -75,7 +73,6 @@ fun MediatedClassPojo.mapToDomain() = MediatedClass(
     office = office,
     location = location?.mapToDomain(),
     timeRange = TimeRange(startTime.mapEpochTimeToInstant(), endTime.mapEpochTimeToInstant()),
-    notification = notification,
 )
 
 fun Class.mapToRemoteData() = ClassPojo(
@@ -89,7 +86,6 @@ fun Class.mapToRemoteData() = ClassPojo(
     location = location?.mapToRemoteData(),
     startTime = timeRange.from.toEpochMilliseconds(),
     endTime = timeRange.to.toEpochMilliseconds(),
-    notification = notification,
 )
 
 fun MediatedClass.mapToRemoteData() = MediatedClassPojo(
@@ -104,7 +100,6 @@ fun MediatedClass.mapToRemoteData() = MediatedClassPojo(
     location = location?.mapToRemoteData(),
     startTime = timeRange.from.toEpochMilliseconds(),
     endTime = timeRange.to.toEpochMilliseconds(),
-    notification = notification,
 )
 
 fun Class.mapToLocalData() = ClassEntity(
@@ -118,5 +113,4 @@ fun Class.mapToLocalData() = ClassEntity(
     location = location?.mapToLocalData(),
     startTime = timeRange.from.toEpochMilliseconds(),
     endTime = timeRange.to.toEpochMilliseconds(),
-    notification = notification,
 )

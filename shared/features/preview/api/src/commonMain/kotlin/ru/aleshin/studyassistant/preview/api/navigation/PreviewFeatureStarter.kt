@@ -17,8 +17,9 @@
 package ru.aleshin.studyassistant.preview.api.navigation
 
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
+import ru.aleshin.studyassistant.preview.api.presentation.PreviewRootScreen
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
-interface PreviewFeatureStarter : FeatureStarter.WithNestedNavigation<PreviewScreen>
+interface PreviewFeatureStarter : FeatureStarter.WithNestedNavigation<PreviewScreen, PreviewRootScreen>

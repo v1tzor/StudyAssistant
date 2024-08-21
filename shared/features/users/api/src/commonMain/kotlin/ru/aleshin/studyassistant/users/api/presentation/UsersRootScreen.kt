@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.auth.impl.presentation.ui.nav
+package ru.aleshin.studyassistant.users.api.presentation
 
-import cafe.adriel.voyager.core.model.ScreenModel
-import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
+import ru.aleshin.studyassistant.core.common.inject.RootScreen
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 
 /**
- * @author Stanislav Aleshin on 17.04.2024.
+ * @author Stanislav Aleshin on 20.08.2024.
  */
-internal class NavScreenModel : ScreenModel {
-
-    override fun onDispose() {
-        super.onDispose()
-        AuthFeatureDIHolder.clear()
-    }
-}
+@HiddenFromObjC
+@OptIn(ExperimentalObjCRefinement::class)
+abstract class UsersRootScreen : RootScreen

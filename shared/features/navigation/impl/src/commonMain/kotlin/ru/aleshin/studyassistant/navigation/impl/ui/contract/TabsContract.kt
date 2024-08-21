@@ -17,12 +17,12 @@ package ru.aleshin.studyassistant.navigation.impl.ui.contract
 
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
 import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
-import ru.aleshin.studyassistant.navigation.impl.ui.views.TabsBottomBarItems
 
 /**
  * @author Stanislav Aleshin on 18.02.2023.
@@ -30,7 +30,7 @@ import ru.aleshin.studyassistant.navigation.impl.ui.views.TabsBottomBarItems
 @Immutable
 @Parcelize
 internal data class TabsViewState(
-    val bottomBarItem: TabsBottomBarItems = TabsBottomBarItems.SCHEDULE,
+    val screenKeys: Set<ScreenKey> = emptySet(),
 ) : BaseViewState
 
 internal sealed class TabsEvent : BaseEvent {
@@ -46,5 +46,5 @@ internal sealed class TabsEffect : BaseUiEffect {
 }
 
 internal sealed class TabsAction : BaseAction {
-    data class ChangeNavItems(val item: TabsBottomBarItems) : TabsAction()
+    data class ChangeScreenKeys(val keys: Set<ScreenKey>) : TabsAction()
 }

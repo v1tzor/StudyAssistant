@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.auth.impl.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
+import ru.aleshin.studyassistant.auth.api.presentation.AuthRootScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.ForgotScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.LoginScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.RegisterScreen
@@ -29,7 +30,7 @@ import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-internal interface AuthScreenProvider : FeatureScreenProvider<AuthScreen> {
+internal interface AuthScreenProvider : FeatureScreenProvider<AuthScreen, AuthRootScreen> {
 
     fun providePreviewScreen(screen: PreviewScreen): Screen
 

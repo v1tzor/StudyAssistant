@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.profile.impl.presentation.ui.views
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
@@ -259,7 +260,7 @@ internal fun ShareScheduleView(
     var openSchedulesSenderSheet by remember { mutableStateOf(false) }
 
     Surface(
-        modifier = modifier,
+        modifier = modifier.animateContentSize(),
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {

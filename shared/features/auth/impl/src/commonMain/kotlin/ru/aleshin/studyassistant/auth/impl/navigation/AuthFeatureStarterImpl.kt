@@ -18,7 +18,8 @@ package ru.aleshin.studyassistant.auth.impl.navigation
 
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
-import ru.aleshin.studyassistant.auth.impl.presentation.ui.nav.NavigationScreen
+import ru.aleshin.studyassistant.auth.api.presentation.AuthRootScreen
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 
 /**
@@ -28,7 +29,7 @@ internal class AuthFeatureStarterImpl(
     navScreen: NavigationScreen,
     navigatorManager: AuthNavigatorManager,
     screenProvider: AuthScreenProvider,
-) : AuthFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<AuthScreen>(
+) : AuthFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<AuthScreen, AuthRootScreen>(
     featureNavScreen = navScreen,
     navigatorManager = navigatorManager,
     screenProvider = screenProvider,

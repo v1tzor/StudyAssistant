@@ -18,13 +18,13 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.ui.navigation
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
 import ru.aleshin.studyassistant.core.common.di.withDirectDI
 import ru.aleshin.studyassistant.core.common.navigation.NestedFeatureNavigator
 import ru.aleshin.studyassistant.core.common.navigation.rememberNavigatorManager
 import ru.aleshin.studyassistant.core.common.navigation.rememberScreenProvider
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
+import ru.aleshin.studyassistant.tasks.api.presentation.TasksRootScreen
 import ru.aleshin.studyassistant.tasks.impl.di.holder.TasksFeatureDIHolder
 import ru.aleshin.studyassistant.tasks.impl.navigation.TasksNavigatorManager
 import ru.aleshin.studyassistant.tasks.impl.navigation.TasksScreenProvider
@@ -33,13 +33,13 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksTheme
 /**
  * @author Stanislav Aleshin on 19.06.2024.
  */
-internal class NavigationScreen : Screen {
+internal class NavigationScreen : TasksRootScreen() {
 
     @Composable
     override fun Content() = withDirectDI(directDI = { TasksFeatureDIHolder.fetchDI() }) {
         val screenModel = rememberScreenModel { NavigationScreenModel() }
-        val screenProvider = rememberScreenProvider<TasksScreenProvider, TasksScreen>()
-        val navigatorManager = rememberNavigatorManager<TasksNavigatorManager, TasksScreen>()
+        val screenProvider = rememberScreenProvider<TasksScreenProvider, TasksScreen, TasksRootScreen>()
+        val navigatorManager = rememberNavigatorManager<TasksNavigatorManager, TasksScreen, TasksRootScreen>()
 
         NestedFeatureNavigator(
             screenProvider = screenProvider,

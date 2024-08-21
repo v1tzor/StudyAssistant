@@ -33,7 +33,6 @@ internal fun Class.mapToUi() = ClassUi(
     office = office,
     location = location?.mapToUi(),
     timeRange = timeRange,
-    notification = notification,
 )
 
 internal fun ClassUi.mapToDomain() = Class(
@@ -47,5 +46,4 @@ internal fun ClassUi.mapToDomain() = Class(
     office = office,
     location = location?.mapToDomain(),
     timeRange = timeRange,
-    notification = notification,
 )

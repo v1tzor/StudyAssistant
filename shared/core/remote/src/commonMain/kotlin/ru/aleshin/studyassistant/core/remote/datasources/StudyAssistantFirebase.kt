@@ -61,6 +61,7 @@ object StudyAssistantFirebase {
         const val DAY_OF_WEEK = "weekDayOfWeek"
         const val ORGANIZATION_ID = "organizationId"
         const val ORGANIZATION_AVATAR = "avatar"
+        const val ORGANIZATION_HIDE = "hide"
         const val USER_AVATAR = "avatar"
     }
 

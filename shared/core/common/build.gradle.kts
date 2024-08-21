@@ -35,6 +35,7 @@ kotlin {
         androidMain.dependencies {
             api(libs.androidx.core.ktx)
             api(libs.androidx.activity.compose)
+            api(libs.androidx.workmanager)
 
             implementation(project.dependencies.platform(libs.rustore.bom))
             implementation(libs.rustore.universalpush.core)

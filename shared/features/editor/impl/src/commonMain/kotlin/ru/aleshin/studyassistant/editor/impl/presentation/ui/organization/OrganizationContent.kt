@@ -41,6 +41,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactIn
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.AvatarSection
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EmailInfoFields
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.HideButton
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationsInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.PhoneInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.WebInfoFields
@@ -67,6 +68,7 @@ internal fun OrganizationContent(
     onUpdateWebs: (List<ContactInfoUi>) -> Unit,
     onUpdateLocations: (List<ContactInfoUi>) -> Unit,
     onStatusChange: (Boolean) -> Unit,
+    onHideOrganization: () -> Unit,
 ) = with(state) {
     Column(
         modifier = modifier.fillMaxSize().padding(top = 24.dp).verticalScroll(scrollState),
@@ -138,6 +140,13 @@ internal fun OrganizationContent(
             isMain = editableOrganization?.isMain ?: false,
             onStatusChange = onStatusChange,
         )
+        if (editableOrganization?.uid?.isNotBlank() == true) {
+            HideButton(
+                onHide = onHideOrganization,
+                modifier = Modifier.padding(start = 16.dp, end = 24.dp),
+                warningMessage = EditorThemeRes.strings.hideOrganizationWarning,
+            )
+        }
         Spacer(modifier = Modifier.height(56.dp))
     }
 }

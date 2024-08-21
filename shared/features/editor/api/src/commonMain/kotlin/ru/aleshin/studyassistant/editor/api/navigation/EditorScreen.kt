@@ -19,12 +19,13 @@ package ru.aleshin.studyassistant.editor.api.navigation
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
-import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
+import ru.aleshin.studyassistant.editor.api.presentation.DayOfNumberedWeekUi
+import ru.aleshin.studyassistant.editor.api.presentation.EditorRootScreen
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-sealed class EditorScreen : FeatureScreen {
+sealed class EditorScreen : FeatureScreen<EditorRootScreen> {
 
     data class WeekSchedule(val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE) : EditorScreen()
 

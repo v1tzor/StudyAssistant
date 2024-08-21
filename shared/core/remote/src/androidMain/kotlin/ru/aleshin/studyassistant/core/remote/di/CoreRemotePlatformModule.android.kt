@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.core.remote.di
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.messages.PushServiceTokenManager
+import ru.aleshin.studyassistant.core.common.messages.PushClientManager
 import ru.rustore.sdk.universalpush.RuStoreUniversalPushClient
 
 /**
@@ -27,5 +27,5 @@ import ru.rustore.sdk.universalpush.RuStoreUniversalPushClient
  */
 actual val coreRemotePlatformModule = DI.Module("CoreRemotePlatform") {
     bindSingleton<RuStoreUniversalPushClient> { RuStoreUniversalPushClient }
-    bindSingleton<PushServiceTokenManager> { PushServiceTokenManager(instance()) }
+    bindSingleton<PushClientManager> { PushClientManager(instance(), instance()) }
 }

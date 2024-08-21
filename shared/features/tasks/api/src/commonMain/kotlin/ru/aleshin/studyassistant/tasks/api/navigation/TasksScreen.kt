@@ -17,11 +17,12 @@
 package ru.aleshin.studyassistant.tasks.api.navigation
 
 import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
+import ru.aleshin.studyassistant.tasks.api.presentation.TasksRootScreen
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.
  */
-sealed class TasksScreen : FeatureScreen {
+sealed class TasksScreen : FeatureScreen<TasksRootScreen> {
     data object Overview : TasksScreen()
     data class Homeworks(val targetDate: Long? = null) : TasksScreen()
     data object Todos : TasksScreen()

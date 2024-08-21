@@ -26,12 +26,12 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.profile.api.presentation.ProfileRootScreen
 import ru.aleshin.studyassistant.profile.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.profile.impl.presentation.theme.ProfileTheme
 import ru.aleshin.studyassistant.profile.impl.presentation.theme.ProfileThemeRes
@@ -44,7 +44,7 @@ import ru.aleshin.studyassistant.profile.impl.presentation.ui.views.ProfileTopBa
 /**
  * @author Stanislav Aleshin on 21.04.2024
  */
-internal class ProfileScreen : Screen {
+internal class ProfileScreen : ProfileRootScreen() {
 
     @Composable
     override fun Content() = ScreenContent(

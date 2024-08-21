@@ -17,8 +17,9 @@
 package ru.aleshin.studyassistant.settings.api.navigation
 
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
+import ru.aleshin.studyassistant.settings.api.presentation.SettingsRootScreen
 
 /**
  * @author Stanislav Aleshin on 08.07.2024.
  */
-interface SettingsFeatureStarter : FeatureStarter.WithNestedNavigation<SettingsScreen>
+interface SettingsFeatureStarter : FeatureStarter.WithNestedNavigation<SettingsScreen, SettingsRootScreen>

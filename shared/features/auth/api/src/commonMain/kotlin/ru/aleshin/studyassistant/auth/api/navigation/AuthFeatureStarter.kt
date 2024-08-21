@@ -16,9 +16,10 @@
 
 package ru.aleshin.studyassistant.auth.api.navigation
 
+import ru.aleshin.studyassistant.auth.api.presentation.AuthRootScreen
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-interface AuthFeatureStarter : FeatureStarter.WithNestedNavigation<AuthScreen>
+interface AuthFeatureStarter : FeatureStarter.WithNestedNavigation<AuthScreen, AuthRootScreen>

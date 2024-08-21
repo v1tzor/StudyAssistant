@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.editor.impl.navigation
 
 import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
+import ru.aleshin.studyassistant.editor.api.presentation.EditorRootScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.ClassScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.DailyScheduleScreen
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.EmployeeScreen
@@ -31,7 +32,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.TodoScreen
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen> {
+internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen, EditorRootScreen> {
 
     class Base : EditorScreenProvider {
 

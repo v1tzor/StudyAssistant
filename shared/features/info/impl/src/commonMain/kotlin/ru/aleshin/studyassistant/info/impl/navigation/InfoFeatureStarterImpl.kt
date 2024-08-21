@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.info.impl.navigation
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
+import ru.aleshin.studyassistant.info.api.presentation.InfoRootScreen
 import ru.aleshin.studyassistant.info.impl.presentation.ui.navigation.NavigationScreen
 
 /**
@@ -28,7 +29,7 @@ internal class InfoFeatureStarterImpl(
     navScreen: NavigationScreen,
     navigatorManager: InfoNavigatorManager,
     screenProvider: InfoScreenProvider,
-) : InfoFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<InfoScreen>(
+) : InfoFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<InfoScreen, InfoRootScreen>(
     featureNavScreen = navScreen,
     navigatorManager = navigatorManager,
     screenProvider = screenProvider,

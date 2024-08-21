@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,13 +33,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.RadioButton
-import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
@@ -46,9 +46,14 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -82,6 +87,7 @@ fun <T> BaseSelectorDialog(
     filters: @Composable (RowScope.() -> Unit)? = null,
     properties: DialogProperties = DialogProperties(),
     sizes: SelectorDialogSizes = SelectorDialogSizes(),
+    itemsListState: LazyListState = rememberLazyListState(),
     shadowElevation: Dp = 4.dp,
     onDismiss: () -> Unit,
     onConfirm: (T?) -> Unit,
@@ -104,7 +110,7 @@ fun <T> BaseSelectorDialog(
                 )
                 if (filters != null) {
                     Row(
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+                        modifier = Modifier.padding(sizes.filtersPaddings),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         content = filters,
@@ -112,10 +118,8 @@ fun <T> BaseSelectorDialog(
                 }
                 HorizontalDivider()
                 LazyColumn(
-                    modifier = Modifier.height(sizes.contentHeight).padding(
-                        horizontal = 16.dp,
-                        vertical = 12.dp
-                    ),
+                    modifier = Modifier.height(sizes.contentHeight).padding(sizes.itemsListPaddings),
+                    state = itemsListState,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     if (notSelectedItem != null) {
@@ -203,6 +207,40 @@ fun LazyItemScope.SelectorDialogItemView(
                 )
             )
         }
+    }
+}
+
+@Composable
+fun LazyItemScope.SelectorDialogSwipeItemView(
+    onClick: () -> Unit,
+    state: SwipeToDismissBoxState,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    selected: Boolean,
+    title: String,
+    label: String?,
+    leadingIcon: (@Composable () -> Unit)? = null,
+    gesturesEnabled: Boolean = true,
+    enableDismissFromStartToEnd: Boolean = true,
+    enableDismissFromEndToStart: Boolean = true,
+    backgroundContent: @Composable RowScope.() -> Unit,
+) {
+    SwipeToDismissBox(
+        modifier = modifier.animateItem(),
+        state = state,
+        backgroundContent = backgroundContent,
+        enableDismissFromEndToStart = enableDismissFromEndToStart,
+        enableDismissFromStartToEnd = enableDismissFromStartToEnd,
+        gesturesEnabled = gesturesEnabled,
+    ) {
+        SelectorDialogItemView(
+            onClick = onClick,
+            enabled = enabled,
+            selected = selected,
+            title = title,
+            label = label,
+            leadingIcon = leadingIcon,
+        )
     }
 }
 
@@ -333,4 +371,6 @@ fun LazyItemScope.SelectorDialogNotSelectedItemView(
 data class SelectorDialogSizes(
     val dialogWidth: Dp = 350.dp,
     val contentHeight: Dp = 300.dp,
+    val filtersPaddings: PaddingValues = PaddingValues(start = 16.dp, end = 16.dp, bottom = 12.dp),
+    val itemsListPaddings: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
 )

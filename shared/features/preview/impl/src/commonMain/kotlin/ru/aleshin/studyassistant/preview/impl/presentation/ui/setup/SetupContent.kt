@@ -98,7 +98,6 @@ internal fun SetupContent(
             enabledSaveProfile = profile?.username?.isNotBlank() == true,
             enabledSaveOrganization = organization?.shortName?.isNotBlank() == true,
             currentPage = currentPage,
-            isFillOutSchedule = isFillOutSchedule,
             onSaveProfile = onSaveProfile,
             onSaveOrganization = onSaveOrganization,
             onSaveCalendar = onSaveCalendar,
@@ -230,7 +229,6 @@ private fun SetupPageNavigationSection(
     enabledSaveProfile: Boolean,
     enabledSaveOrganization: Boolean,
     currentPage: SetupPage,
-    isFillOutSchedule: Boolean,
     onSaveProfile: () -> Unit,
     onSaveOrganization: () -> Unit,
     onSaveCalendar: () -> Unit,
@@ -262,7 +260,6 @@ private fun SetupPageNavigationSection(
                     navigationLabel = currentPage.buttonLabel,
                 )
                 NavigationPageButton(
-                    enabled = isFillOutSchedule,
                     onClick = onStartUsing,
                     navigationLabel = PreviewThemeRes.strings.scheduleStartButtonLabel,
                     isTonal = true,

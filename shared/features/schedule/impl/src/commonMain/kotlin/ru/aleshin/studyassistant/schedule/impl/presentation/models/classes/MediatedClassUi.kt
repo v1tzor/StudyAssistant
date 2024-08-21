@@ -41,7 +41,6 @@ internal data class MediatedClassUi(
     val office: String,
     val location: ContactInfoUi?,
     val timeRange: TimeRange,
-    val notification: Boolean = false,
 ) : Parcelable
 
 internal fun MediatedClassUi.convertToBase(
@@ -67,6 +66,5 @@ internal fun MediatedClassUi.convertToBase(
         location = location,
         timeRange = timeRange,
         number = number,
-        notification = notification,
     )
 }

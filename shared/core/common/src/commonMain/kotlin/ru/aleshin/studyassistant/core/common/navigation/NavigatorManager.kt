@@ -23,17 +23,18 @@ import org.kodein.di.compose.localDI
 import org.kodein.di.direct
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
+import ru.aleshin.studyassistant.core.common.inject.RootScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-interface NavigatorManager<S : FeatureScreen> : NavigatorHolder, StartScreenHolder<S> {
+interface NavigatorManager<S : FeatureScreen<R>, R : RootScreen> : NavigatorHolder, StartScreenHolder<S, R> {
 
     fun executeNavigation(command: NavigationCommand)
 
-    abstract class Abstract<S : FeatureScreen>(
+    abstract class Abstract<S : FeatureScreen<R>, R : RootScreen>(
         private val commandBuffer: CommandBuffer
-    ) : NavigatorManager<S>, StartScreenHolder.Abstract<S>() {
+    ) : NavigatorManager<S, R>, StartScreenHolder.Abstract<S, R>() {
 
         private var navigator: Navigator? = null
 
@@ -62,7 +63,7 @@ interface NavigatorHolder {
 }
 
 @Composable
-inline fun <reified T : NavigatorManager<S>, S : FeatureScreen> Screen.rememberNavigatorManager(): T {
+inline fun <reified T : NavigatorManager<S, R>, S : FeatureScreen<R>, R : RootScreen> Screen.rememberNavigatorManager(): T {
     val di = localDI().direct
     return remember { di.instance<T>() }
 }

@@ -16,15 +16,16 @@
 
 package ru.aleshin.studyassistant.navigation.impl.navigation
 
-import cafe.adriel.voyager.core.screen.Screen
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
+import ru.aleshin.studyassistant.navigation.api.presentation.TabsRootScreen
+import ru.aleshin.studyassistant.navigation.impl.ui.TabsScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
 internal class NavigationFeatureStarterImpl(
-    tabsScreen: Screen,
-) : NavigationFeatureStarter, FeatureStarter.WithSingleNavigation.Abstract(
+    tabsScreen: TabsScreen,
+) : NavigationFeatureStarter, FeatureStarter.WithSingleNavigation.Abstract<TabsRootScreen>(
     mainScreen = tabsScreen,
 )

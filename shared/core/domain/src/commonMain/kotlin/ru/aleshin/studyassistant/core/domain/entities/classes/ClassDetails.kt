@@ -55,6 +55,5 @@ fun Class.convertToDetails(homework: Homework?) =
         office = office,
         location = location,
         timeRange = timeRange,
-        notification = notification,
         homework = homework,
     )

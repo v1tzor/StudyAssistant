@@ -35,7 +35,6 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.Subjec
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassViewState
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.NotifyParameter
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.TimeInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.OrganizationInfoField
@@ -60,7 +59,6 @@ internal fun ClassContent(
     onSelectTeacher: (EmployeeDetailsUi?) -> Unit,
     onSelectLocation: (ContactInfoUi?, String?) -> Unit,
     onSelectTime: (Instant?, Instant?) -> Unit,
-    onChangeNotifyParams: (Boolean) -> Unit,
 ) = with(state) {
     Column(
         modifier = modifier.fillMaxSize().padding(top = 20.dp).verticalScroll(scrollState),
@@ -112,11 +110,6 @@ internal fun ClassContent(
             endTime = editableClass?.endTime,
             freeClassTimeRanges = freeClassTimeRanges,
             onSelectedTime = onSelectTime,
-        )
-        NotifyParameter(
-            isLoading = isLoading,
-            notification = editableClass?.notification ?: false,
-            onChangeParams = onChangeNotifyParams,
         )
     }
 }

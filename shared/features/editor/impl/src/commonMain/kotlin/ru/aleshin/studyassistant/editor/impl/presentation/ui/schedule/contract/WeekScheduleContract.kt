@@ -25,7 +25,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
-import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
+import ru.aleshin.studyassistant.editor.api.presentation.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi

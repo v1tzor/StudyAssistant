@@ -18,11 +18,12 @@ package ru.aleshin.studyassistant.preview.api.navigation
 
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
+import ru.aleshin.studyassistant.preview.api.presentation.PreviewRootScreen
 
 /**
  * @author Stanislav Aleshin on 07.04.2024.
  */
-sealed class PreviewScreen : FeatureScreen {
+sealed class PreviewScreen : FeatureScreen<PreviewRootScreen> {
     data object Intro : PreviewScreen()
     data class Setup(val createdUser: UID) : PreviewScreen()
 }

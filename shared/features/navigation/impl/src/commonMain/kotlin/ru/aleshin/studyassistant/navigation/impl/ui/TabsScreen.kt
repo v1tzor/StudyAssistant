@@ -21,34 +21,47 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.lifecycle.DisposableEffectIgnoringConfiguration
+import cafe.adriel.voyager.core.stack.StackEvent
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import ru.aleshin.studyassistant.core.common.architecture.screen.EmptyScreen
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.navigation.disposeByKeys
+import ru.aleshin.studyassistant.info.api.presentation.InfoRootScreen
+import ru.aleshin.studyassistant.navigation.api.presentation.TabsRootScreen
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEffect
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEvent
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsViewState
 import ru.aleshin.studyassistant.navigation.impl.ui.screenmodel.rememberTabsScreenModel
 import ru.aleshin.studyassistant.navigation.impl.ui.views.TabsBottomBarItems
 import ru.aleshin.studyassistant.navigation.impl.ui.views.TabsBottomNavigationBar
+import ru.aleshin.studyassistant.profile.api.presentation.ProfileRootScreen
+import ru.aleshin.studyassistant.schedule.api.presentation.ScheduleRootScreen
+import ru.aleshin.studyassistant.tasks.api.presentation.TasksRootScreen
 
 /**
  * @author Stanislav Aleshin on 18.02.2023.
  */
-internal class TabsScreen : Screen {
+internal class TabsScreen : TabsRootScreen() {
 
     @Composable
     override fun Content() = ScreenContent(
         screenModel = rememberTabsScreenModel(),
         initialState = TabsViewState(),
     ) { state ->
+        val screenKeys by rememberUpdatedState(state.screenKeys)
         Navigator(
             screen = EmptyScreen,
-            disposeBehavior = NavigatorDisposeBehavior(false, false),
+            disposeBehavior = NavigatorDisposeBehavior(
+                disposeNestedNavigators = false,
+                disposeSteps = false
+            ),
         ) { navigator ->
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
@@ -59,7 +72,13 @@ internal class TabsScreen : Screen {
                 },
                 bottomBar = {
                     TabsBottomNavigationBar(
-                        selectedItem = state.bottomBarItem,
+                        selectedItem = when (navigator.lastItem) {
+                            is ScheduleRootScreen -> TabsBottomBarItems.SCHEDULE
+                            is TasksRootScreen -> TabsBottomBarItems.TASKS
+                            is InfoRootScreen -> TabsBottomBarItems.INFO
+                            is ProfileRootScreen -> TabsBottomBarItems.PROFILE
+                            else -> null
+                        },
                         onItemSelected = { tab ->
                             val event = when (tab) {
                                 TabsBottomBarItems.SCHEDULE -> TabsEvent.SelectedScheduleBottomItem
@@ -73,6 +92,13 @@ internal class TabsScreen : Screen {
                 },
                 contentWindowInsets = WindowInsets(0.dp),
             )
+            DisposableEffectIgnoringConfiguration {
+                onDispose {
+                    if (navigator.parent?.lastEvent != StackEvent.Push) {
+                        navigator.disposeByKeys(screenKeys)
+                    }
+                }
+            }
 
             handleEffect { effect ->
                 when (effect) {

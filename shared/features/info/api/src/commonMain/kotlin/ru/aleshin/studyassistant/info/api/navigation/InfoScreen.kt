@@ -18,11 +18,12 @@ package ru.aleshin.studyassistant.info.api.navigation
 
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
+import ru.aleshin.studyassistant.info.api.presentation.InfoRootScreen
 
 /**
  * @author Stanislav Aleshin on 16.06.2024.
  */
-sealed interface InfoScreen : FeatureScreen {
+sealed interface InfoScreen : FeatureScreen<InfoRootScreen> {
     data object Organizations : InfoScreen
     data class Employee(val organizationId: UID) : InfoScreen
     data class Subjects(val organizationId: UID) : InfoScreen

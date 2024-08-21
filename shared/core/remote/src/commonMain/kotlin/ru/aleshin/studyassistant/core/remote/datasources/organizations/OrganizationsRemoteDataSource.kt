@@ -106,10 +106,11 @@ interface OrganizationsRemoteDataSource {
             val reference = userDataRoot.collection(UserData.ORGANIZATIONS).document(uid)
 
             val organizationPojoFlow = reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<OrganizationPojo>())
+                snapshot.data(serializer<OrganizationPojo?>())
             }
 
             return organizationPojoFlow.map { organizationPojo ->
+                if (organizationPojo == null) return@map null
                 val employeeReference = userDataRoot.collection(UserData.EMPLOYEE).where {
                     UserData.ORGANIZATION_ID equalTo organizationPojo.uid
                 }
@@ -181,7 +182,7 @@ interface OrganizationsRemoteDataSource {
             val reference = userDataRoot.collection(UserData.ORGANIZATIONS).document(uid)
 
             return reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<OrganizationShortPojo>())
+                snapshot.data(serializer<OrganizationShortPojo?>())
             }
         }
 
@@ -189,7 +190,9 @@ interface OrganizationsRemoteDataSource {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
+            val reference = userDataRoot.collection(UserData.ORGANIZATIONS).where {
+                UserData.ORGANIZATION_HIDE equalTo false
+            }
 
             val organizationPojoListFlow = reference.snapshots.map { snapshot ->
                 snapshot.documents.map { it.data(serializer<OrganizationPojo>()) }
@@ -225,7 +228,9 @@ interface OrganizationsRemoteDataSource {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
+            val reference = userDataRoot.collection(UserData.ORGANIZATIONS).where {
+                UserData.ORGANIZATION_HIDE equalTo false
+            }
 
             return reference.snapshots.map { snapshot ->
                 snapshot.documents.map { it.data(serializer<OrganizationShortPojo>()) }

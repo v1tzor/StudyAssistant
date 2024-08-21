@@ -24,8 +24,8 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.exceptions.RemoteException
+import ru.aleshin.studyassistant.core.common.messages.PushClientManager
 import ru.aleshin.studyassistant.core.common.messages.PushServiceAuthTokenFactory
-import ru.aleshin.studyassistant.core.common.messages.PushServiceTokenManager
 import ru.aleshin.studyassistant.core.common.messages.UniversalPushToken
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.UniversalMessaging.HOST
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.UniversalMessaging.SEND_TOKENS
@@ -45,11 +45,11 @@ interface MessageRemoteDataSource {
     class Base(
         private val httpClient: HttpClient,
         private val tokenProviderFactory: PushServiceAuthTokenFactory,
-        private val tokenManager: PushServiceTokenManager,
+        private val clientManager: PushClientManager,
     ) : MessageRemoteDataSource {
 
         override suspend fun fetchToken(): Flow<UniversalPushToken> {
-            return tokenManager.fetchToken()
+            return clientManager.fetchToken()
         }
 
         override suspend fun sendMessage(message: UniversalMessageData) {
@@ -70,7 +70,7 @@ interface MessageRemoteDataSource {
         }
 
         override suspend fun deleteToken() {
-            tokenManager.deleteToken()
+            clientManager.deleteToken()
         }
     }
 }

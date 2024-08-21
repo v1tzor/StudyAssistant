@@ -31,8 +31,8 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel.Log
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel.LoginScreenModel
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel.LoginStateCommunicator
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel.LoginWorkProcessor
-import ru.aleshin.studyassistant.auth.impl.presentation.ui.nav.NavScreenModel
-import ru.aleshin.studyassistant.auth.impl.presentation.ui.nav.NavigationScreen
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.navigation.NavScreenModel
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterEffectCommunicator
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterScreenModel
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterStateCommunicator

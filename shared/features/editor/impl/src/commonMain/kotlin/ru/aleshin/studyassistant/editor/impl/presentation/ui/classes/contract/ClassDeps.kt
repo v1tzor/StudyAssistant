@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract
 import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.ScreenDependencies
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
+import ru.aleshin.studyassistant.editor.api.presentation.DayOfNumberedWeekUi
 
 /**
  * @author Stanislav Aleshin on 01.06.2024.

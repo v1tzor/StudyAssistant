@@ -17,8 +17,9 @@
 package ru.aleshin.studyassistant.profile.api.navigation
 
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
+import ru.aleshin.studyassistant.profile.api.presentation.ProfileRootScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface ProfileFeatureStarter : FeatureStarter.WithSingleNavigation
+interface ProfileFeatureStarter : FeatureStarter.WithSingleNavigation<ProfileRootScreen>

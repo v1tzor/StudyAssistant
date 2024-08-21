@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.schedule.impl.navigation
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
+import ru.aleshin.studyassistant.schedule.api.presentation.ScheduleRootScreen
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation.NavigationScreen
 
 /**
@@ -28,7 +29,7 @@ internal class ScheduleFeatureStarterImpl(
     navScreen: NavigationScreen,
     navigatorManager: ScheduleNavigatorManager,
     screenProvider: ScheduleScreenProvider,
-) : ScheduleFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<ScheduleScreen>(
+) : ScheduleFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<ScheduleScreen, ScheduleRootScreen>(
     featureNavScreen = navScreen,
     navigatorManager = navigatorManager,
     screenProvider = screenProvider,

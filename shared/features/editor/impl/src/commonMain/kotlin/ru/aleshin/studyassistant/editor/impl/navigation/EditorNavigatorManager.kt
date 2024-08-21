@@ -19,12 +19,12 @@ package ru.aleshin.studyassistant.editor.impl.navigation
 import ru.aleshin.studyassistant.core.common.navigation.CommandBuffer
 import ru.aleshin.studyassistant.core.common.navigation.NavigatorManager
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
+import ru.aleshin.studyassistant.editor.api.presentation.EditorRootScreen
 
 /**
  * @author Stanislav Aleshin on 25.05.2024.
  */
-internal interface EditorNavigatorManager : NavigatorManager<EditorScreen> {
-    class Base(commandBuffer: CommandBuffer) : EditorNavigatorManager, NavigatorManager.Abstract<EditorScreen>(
-        commandBuffer = commandBuffer
-    )
+internal interface EditorNavigatorManager : NavigatorManager<EditorScreen, EditorRootScreen> {
+    class Base(commandBuffer: CommandBuffer) : EditorNavigatorManager,
+        NavigatorManager.Abstract<EditorScreen, EditorRootScreen>(commandBuffer = commandBuffer)
 }

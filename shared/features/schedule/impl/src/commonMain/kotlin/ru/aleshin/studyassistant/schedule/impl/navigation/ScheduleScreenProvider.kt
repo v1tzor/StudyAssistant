@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
+import ru.aleshin.studyassistant.schedule.api.presentation.ScheduleRootScreen
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.DetailsScreen
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.OverviewScreen
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.ShareScreen
@@ -30,7 +31,7 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-internal interface ScheduleScreenProvider : FeatureScreenProvider<ScheduleScreen> {
+internal interface ScheduleScreenProvider : FeatureScreenProvider<ScheduleScreen, ScheduleRootScreen> {
 
     fun provideEditorScreen(screen: EditorScreen): Screen
     fun provideUsersScreen(screen: UsersScreen): Screen

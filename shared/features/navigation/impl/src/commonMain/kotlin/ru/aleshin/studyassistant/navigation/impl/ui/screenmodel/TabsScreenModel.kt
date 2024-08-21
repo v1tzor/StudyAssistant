@@ -30,7 +30,6 @@ import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsAction
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEffect
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEvent
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsViewState
-import ru.aleshin.studyassistant.navigation.impl.ui.views.TabsBottomBarItems
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
 
@@ -58,19 +57,19 @@ internal class TabsScreenModel(
     override suspend fun WorkScope<TabsViewState, TabsAction, TabsEffect>.handleEvent(
         event: TabsEvent,
     ) = when (event) {
-        TabsEvent.Init -> changeTabItem(TabsBottomBarItems.SCHEDULE) {
+        is TabsEvent.Init -> changeTabItem {
             provideScheduleScreen(ScheduleScreen.Overview(null))
         }
-        TabsEvent.SelectedScheduleBottomItem -> changeTabItem(TabsBottomBarItems.SCHEDULE) {
+        is TabsEvent.SelectedScheduleBottomItem -> changeTabItem {
             provideScheduleScreen(ScheduleScreen.Overview(null))
         }
-        TabsEvent.SelectedTasksBottomItem -> changeTabItem(TabsBottomBarItems.TASKS) {
+        is TabsEvent.SelectedTasksBottomItem -> changeTabItem {
             provideTasksScreen(TasksScreen.Overview)
         }
-        TabsEvent.SelectedInfoBottomItem -> changeTabItem(TabsBottomBarItems.INFO) {
+        is TabsEvent.SelectedInfoBottomItem -> changeTabItem {
             provideInfoScreen(InfoScreen.Organizations)
         }
-        TabsEvent.SelectedProfileBottomItem -> changeTabItem(TabsBottomBarItems.PROFILE) {
+        is TabsEvent.SelectedProfileBottomItem -> changeTabItem {
             provideProfileScreen()
         }
     }
@@ -79,8 +78,8 @@ internal class TabsScreenModel(
         action: TabsAction,
         currentState: TabsViewState,
     ) = when (action) {
-        is TabsAction.ChangeNavItems -> currentState.copy(
-            bottomBarItem = action.item,
+        is TabsAction.ChangeScreenKeys -> currentState.copy(
+            screenKeys = action.keys,
         )
     }
 
@@ -90,10 +89,12 @@ internal class TabsScreenModel(
     }
 
     private suspend fun WorkScope<TabsViewState, TabsAction, TabsEffect>.changeTabItem(
-        bottomItem: TabsBottomBarItems,
         onAction: TabScreenProvider.() -> Screen,
-    ) = sendAction(TabsAction.ChangeNavItems(item = bottomItem)).apply {
-        sendEffect(TabsEffect.ReplaceScreen(screen = tabScreenProvider.let(onAction)))
+    ) = with(state()) {
+        val screen = tabScreenProvider.let(onAction)
+        val updatedKeys = screenKeys.toMutableSet().apply { add(screen.key) }
+        sendAction(TabsAction.ChangeScreenKeys(keys = updatedKeys))
+        sendEffect(TabsEffect.ReplaceScreen(screen = screen))
     }
 }
 

@@ -38,5 +38,4 @@ data class Class(
     val office: String,
     val location: ContactInfo?,
     val timeRange: TimeRange,
-    val notification: Boolean = false,
 )

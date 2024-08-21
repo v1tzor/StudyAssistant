@@ -17,8 +17,9 @@
 package ru.aleshin.studyassistant.tasks.api.navigation
 
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
+import ru.aleshin.studyassistant.tasks.api.presentation.TasksRootScreen
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.
  */
-interface TasksFeatureStarter : FeatureStarter.WithNestedNavigation<TasksScreen>
+interface TasksFeatureStarter : FeatureStarter.WithNestedNavigation<TasksScreen, TasksRootScreen>

@@ -81,6 +81,7 @@ internal data class OrganizationScreen(val organizationId: UID?) : Screen {
                     onUpdateWebs = { dispatchEvent(OrganizationEvent.UpdateWebs(it)) },
                     onUpdateLocations = { dispatchEvent(OrganizationEvent.UpdateLocations(it)) },
                     onStatusChange = { dispatchEvent(OrganizationEvent.UpdateStatus(it)) },
+                    onHideOrganization = { dispatchEvent(OrganizationEvent.HideOrganization) },
                     onExceedingAvatarSizeLimit = {
                         coroutineScope.launch {
                             snackbarState.showSnackbar(

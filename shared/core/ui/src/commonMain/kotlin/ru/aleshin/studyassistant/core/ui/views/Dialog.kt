@@ -135,6 +135,42 @@ fun DialogButtons(
 }
 
 @Composable
+fun DialogAlertButtons(
+    modifier: Modifier = Modifier,
+    enabledConfirm: Boolean = true,
+    confirmTitle: String = StudyAssistantRes.strings.selectConfirmTitle,
+    onCancelClick: () -> Unit,
+    onConfirmClick: () -> Unit,
+) {
+    Row(
+        modifier = modifier.padding(top = 24.dp, bottom = 24.dp, end = 24.dp, start = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
+        TextButton(onClick = onCancelClick) {
+            Text(
+                text = StudyAssistantRes.strings.cancelTitle,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
+        TextButton(
+            enabled = enabledConfirm,
+            onClick = onConfirmClick
+        ) {
+            Text(
+                text = confirmTitle,
+                color = when (enabledConfirm) {
+                    true -> MaterialTheme.colorScheme.primary
+                    false -> MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
+    }
+}
+
+@Composable
 fun DialogHeader(
     modifier: Modifier = Modifier,
     header: String,

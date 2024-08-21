@@ -52,6 +52,7 @@ internal sealed class OrganizationEvent : BaseEvent {
     data class UpdateStatus(val isMain: Boolean) : OrganizationEvent()
     data class UpdateLocations(val locations: List<ContactInfoUi>) : OrganizationEvent()
     data object SaveOrganization : OrganizationEvent()
+    data object HideOrganization : OrganizationEvent()
     data object NavigateToBack : OrganizationEvent()
 }
 

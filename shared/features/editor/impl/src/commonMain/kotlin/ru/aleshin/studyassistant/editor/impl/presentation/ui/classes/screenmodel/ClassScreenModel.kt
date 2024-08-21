@@ -130,10 +130,6 @@ internal class ClassScreenModel(
                 val updatedClass = editableClass?.copy(startTime = event.startTime, endTime = event.endTime)
                 sendAction(ClassAction.UpdateEditModel(updatedClass))
             }
-            is ClassEvent.UpdateNotifyParams -> with(state()) {
-                val updateClass = editableClass?.copy(notification = event.notification)
-                sendAction(ClassAction.UpdateEditModel(updateClass))
-            }
             is ClassEvent.UpdateOrganizationOffices -> with(state()) {
                 launchBackgroundWork(BackgroundKey.UPDATE_LOCATIONS) {
                     val organization = editableClass?.organization

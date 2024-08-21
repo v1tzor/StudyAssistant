@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7555FF7A242A565900829871"
-               BuildableName = "iosApp.app"
-               BlueprintName = "iosApp"
-               ReferencedContainer = "container:iosApp.xcodeproj">
+               BuildableName = "StudyAssistant.app"
+               BlueprintName = "StudyAssistant"
+               ReferencedContainer = "container:StudyAssistant.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,18 +45,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7555FF7A242A565900829871"
-            BuildableName = "iosApp.app"
-            BlueprintName = "iosApp"
-            ReferencedContainer = "container:iosApp.xcodeproj">
+            BuildableName = "StudyAssistant.app"
+            BlueprintName = "StudyAssistant"
+            ReferencedContainer = "container:StudyAssistant.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "IDEPreferLogStreaming"
-            value = "YES"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -69,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7555FF7A242A565900829871"
-            BuildableName = "iosApp.app"
-            BlueprintName = "iosApp"
-            ReferencedContainer = "container:iosApp.xcodeproj">
+            BuildableName = "StudyAssistant.app"
+            BlueprintName = "StudyAssistant"
+            ReferencedContainer = "container:StudyAssistant.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

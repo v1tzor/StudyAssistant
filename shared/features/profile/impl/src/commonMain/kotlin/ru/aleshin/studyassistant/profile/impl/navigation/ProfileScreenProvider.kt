@@ -19,10 +19,10 @@ package ru.aleshin.studyassistant.profile.impl.navigation
 import cafe.adriel.voyager.core.screen.Screen
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
-import ru.aleshin.studyassistant.core.common.inject.MainScreen
 import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
+import ru.aleshin.studyassistant.profile.api.presentation.ProfileRootScreen
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.ProfileScreen
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
@@ -34,7 +34,7 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-internal interface ProfileScreenProvider : FeatureScreenProvider<MainScreen> {
+internal interface ProfileScreenProvider : FeatureScreenProvider<ProfileRootScreen, ProfileRootScreen> {
 
     fun provideAuthScreen(screen: AuthScreen): Screen
     fun provideUsersScreen(screen: UsersScreen): Screen
@@ -50,7 +50,7 @@ internal interface ProfileScreenProvider : FeatureScreenProvider<MainScreen> {
         private val scheduleFeatureStarter: () -> ScheduleFeatureStarter,
     ) : ProfileScreenProvider {
 
-        override fun provideFeatureScreen(screen: MainScreen): Screen {
+        override fun provideFeatureScreen(screen: ProfileRootScreen): Screen {
             return ProfileScreen()
         }
 

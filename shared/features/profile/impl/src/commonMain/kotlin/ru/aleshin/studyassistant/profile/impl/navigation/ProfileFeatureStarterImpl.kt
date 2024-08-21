@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.profile.impl.navigation
 
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
+import ru.aleshin.studyassistant.profile.api.presentation.ProfileRootScreen
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.ProfileScreen
 
 /**
@@ -25,6 +26,6 @@ import ru.aleshin.studyassistant.profile.impl.presentation.ui.ProfileScreen
  */
 internal class ProfileFeatureStarterImpl(
     profileScreen: ProfileScreen,
-) : ProfileFeatureStarter, FeatureStarter.WithSingleNavigation.Abstract(
+) : ProfileFeatureStarter, FeatureStarter.WithSingleNavigation.Abstract<ProfileRootScreen>(
     mainScreen = profileScreen,
 )

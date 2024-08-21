@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.settings.impl.navigation
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsScreen
+import ru.aleshin.studyassistant.settings.api.presentation.SettingsRootScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.TabNavigationScreen
 
 /**
@@ -28,7 +29,7 @@ internal class SettingsFeatureStarterImpl(
     navScreen: TabNavigationScreen,
     navigatorManager: SettingsNavigatorManager,
     screenProvider: SettingsScreenProvider,
-) : SettingsFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<SettingsScreen>(
+) : SettingsFeatureStarter, FeatureStarter.WithNestedNavigation.Abstract<SettingsScreen, SettingsRootScreen>(
     featureNavScreen = navScreen,
     navigatorManager = navigatorManager,
     screenProvider = screenProvider,

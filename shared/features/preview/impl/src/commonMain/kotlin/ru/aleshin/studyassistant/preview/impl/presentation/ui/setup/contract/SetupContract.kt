@@ -43,7 +43,6 @@ internal data class SetupViewState(
     val organization: OrganizationUi? = null,
     val actionWithOrganizationAvatar: ActionWithAvatar = ActionWithAvatar.None(null),
     val calendarSettings: CalendarSettingsUi? = null,
-    val isFillOutSchedule: Boolean = false,
 ) : BaseViewState
 
 internal sealed class SetupEvent : BaseEvent {
@@ -81,5 +80,4 @@ internal sealed class SetupAction : BaseAction {
     data class UpdateOrganization(val organization: OrganizationUi) : SetupAction()
     data class UpdateActionWithOrganizationAvatar(val action: ActionWithAvatar) : SetupAction()
     data class UpdateCalendarSettings(val calendarSettings: CalendarSettingsUi) : SetupAction()
-    data class UpdateFillOutSchedule(val isFillOut: Boolean) : SetupAction()
 }

@@ -16,27 +16,30 @@
 
 package ru.aleshin.studyassistant.navigation.impl.navigation
 
-import cafe.adriel.voyager.core.screen.Screen
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
+import ru.aleshin.studyassistant.info.api.presentation.InfoRootScreen
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
+import ru.aleshin.studyassistant.profile.api.presentation.ProfileRootScreen
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
+import ru.aleshin.studyassistant.schedule.api.presentation.ScheduleRootScreen
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
+import ru.aleshin.studyassistant.tasks.api.presentation.TasksRootScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
 internal interface TabScreenProvider {
 
-    fun provideScheduleScreen(screen: ScheduleScreen): Screen
+    fun provideScheduleScreen(screen: ScheduleScreen): ScheduleRootScreen
 
-    fun provideTasksScreen(screen: TasksScreen): Screen
+    fun provideTasksScreen(screen: TasksScreen): TasksRootScreen
 
-    fun provideInfoScreen(screen: InfoScreen): Screen
+    fun provideInfoScreen(screen: InfoScreen): InfoRootScreen
 
-    fun provideProfileScreen(): Screen
+    fun provideProfileScreen(): ProfileRootScreen
 
     class Base(
         private val scheduleFeatureStarter: () -> ScheduleFeatureStarter,
@@ -45,19 +48,19 @@ internal interface TabScreenProvider {
         private val profileFeatureStarter: () -> ProfileFeatureStarter,
     ) : TabScreenProvider {
 
-        override fun provideScheduleScreen(screen: ScheduleScreen): Screen {
+        override fun provideScheduleScreen(screen: ScheduleScreen): ScheduleRootScreen {
             return scheduleFeatureStarter().fetchRootScreenAndNavigate(screen, isNavigate = false)
         }
 
-        override fun provideTasksScreen(screen: TasksScreen): Screen {
+        override fun provideTasksScreen(screen: TasksScreen): TasksRootScreen {
             return tasksFeatureStarter().fetchRootScreenAndNavigate(screen, isNavigate = false)
         }
 
-        override fun provideInfoScreen(screen: InfoScreen): Screen {
+        override fun provideInfoScreen(screen: InfoScreen): InfoRootScreen {
             return infoFeatureStarter().fetchRootScreenAndNavigate(screen, isNavigate = false)
         }
 
-        override fun provideProfileScreen(): Screen {
+        override fun provideProfileScreen(): ProfileRootScreen {
             return profileFeatureStarter().fetchFeatureScreen()
         }
     }

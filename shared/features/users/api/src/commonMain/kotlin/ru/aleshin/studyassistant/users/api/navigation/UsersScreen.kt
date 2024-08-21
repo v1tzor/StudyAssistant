@@ -18,11 +18,12 @@ package ru.aleshin.studyassistant.users.api.navigation
 
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
+import ru.aleshin.studyassistant.users.api.presentation.UsersRootScreen
 
 /**
  * @author Stanislav Aleshin on 10.07.2024.
  */
-sealed class UsersScreen : FeatureScreen {
+sealed class UsersScreen : FeatureScreen<UsersRootScreen> {
     data object Friends : UsersScreen()
     data object Requests : UsersScreen()
     data class EmployeeProfile(val employeeId: UID) : UsersScreen()

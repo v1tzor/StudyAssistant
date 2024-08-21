@@ -29,8 +29,8 @@ import ru.aleshin.studyassistant.preview.impl.navigation.PreviewScreenProvider
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.screenmodel.IntroEffectCommunicator
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.screenmodel.IntroScreenModel
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.screenmodel.IntroStateCommunicator
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.nav.NavScreenModel
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.nav.NavigationScreen
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.navigation.NavScreenModel
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.SetupEffectCommunicator
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.SetupScreenModel
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.SetupStateCommunicator

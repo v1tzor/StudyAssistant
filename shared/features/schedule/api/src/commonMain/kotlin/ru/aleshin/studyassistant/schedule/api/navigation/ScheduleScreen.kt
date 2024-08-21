@@ -18,11 +18,12 @@ package ru.aleshin.studyassistant.schedule.api.navigation
 
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
+import ru.aleshin.studyassistant.schedule.api.presentation.ScheduleRootScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-sealed class ScheduleScreen : FeatureScreen {
+sealed class ScheduleScreen : FeatureScreen<ScheduleRootScreen> {
     data class Overview(val firstDay: Long?) : ScheduleScreen()
     data object Details : ScheduleScreen()
     data class Share(val receivedShareId: UID) : ScheduleScreen()

@@ -29,7 +29,7 @@ import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
-import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
+import ru.aleshin.studyassistant.editor.api.presentation.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.EditClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
@@ -68,7 +68,6 @@ internal sealed class ClassEvent : BaseEvent {
     data class UpdateTeacher(val teacher: EmployeeDetailsUi?) : ClassEvent()
     data class UpdateLocation(val location: ContactInfoUi?, val office: String?) : ClassEvent()
     data class UpdateTime(val startTime: Instant?, val endTime: Instant?) : ClassEvent()
-    data class UpdateNotifyParams(val notification: Boolean) : ClassEvent()
     data class UpdateOrganizationOffices(val offices: List<String>) : ClassEvent()
     data class UpdateOrganizationLocations(val locations: List<ContactInfoUi>) : ClassEvent()
     data object SaveClass : ClassEvent()

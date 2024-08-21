@@ -36,5 +36,4 @@ data class ClassPojo(
     val location: ContactInfoPojo? = null,
     val startTime: Long = 0L,
     val endTime: Long = 0L,
-    val notification: Boolean = false,
 )

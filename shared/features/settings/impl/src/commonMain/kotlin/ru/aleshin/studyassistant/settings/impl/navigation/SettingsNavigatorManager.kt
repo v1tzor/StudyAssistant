@@ -19,12 +19,13 @@ package ru.aleshin.studyassistant.settings.impl.navigation
 import ru.aleshin.studyassistant.core.common.navigation.CommandBuffer
 import ru.aleshin.studyassistant.core.common.navigation.NavigatorManager
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsScreen
+import ru.aleshin.studyassistant.settings.api.presentation.SettingsRootScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-internal interface SettingsNavigatorManager : NavigatorManager<SettingsScreen> {
+internal interface SettingsNavigatorManager : NavigatorManager<SettingsScreen, SettingsRootScreen> {
 
     class Base(commandBuffer: CommandBuffer) : SettingsNavigatorManager,
-        NavigatorManager.Abstract<SettingsScreen>(commandBuffer = commandBuffer)
+        NavigatorManager.Abstract<SettingsScreen, SettingsRootScreen>(commandBuffer = commandBuffer)
 }

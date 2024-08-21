@@ -35,7 +35,6 @@ data class MediatedClass(
     val office: String,
     val location: ContactInfo?,
     val timeRange: TimeRange,
-    val notification: Boolean = false,
 )
 
 fun Class.convertToMediate() = MediatedClass(
@@ -49,5 +48,4 @@ fun Class.convertToMediate() = MediatedClass(
     office = office,
     location = location,
     timeRange = timeRange,
-    notification = notification,
 )

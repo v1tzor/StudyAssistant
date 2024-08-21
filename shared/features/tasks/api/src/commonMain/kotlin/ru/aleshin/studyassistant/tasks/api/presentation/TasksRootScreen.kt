@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.api.ui
+package ru.aleshin.studyassistant.tasks.api.presentation
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import kotlinx.datetime.DayOfWeek
-import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.common.inject.RootScreen
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 
 /**
- * @author Stanislav Aleshin on 27.05.2024.
+ * @author Stanislav Aleshin on 20.08.2024.
  */
-@Parcelize
-data class DayOfNumberedWeekUi(
-    val dayOfWeek: DayOfWeek,
-    val week: NumberOfRepeatWeek,
-) : Parcelable
-
-// TODO: Not parcelize
+@HiddenFromObjC
+@OptIn(ExperimentalObjCRefinement::class)
+abstract class TasksRootScreen : RootScreen

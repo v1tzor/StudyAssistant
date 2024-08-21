@@ -22,12 +22,12 @@ import dev.gitlive.firebase.messaging.messaging
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.messages.PushServiceTokenManager
+import ru.aleshin.studyassistant.core.common.messages.PushClientManager
 
 /**
  * @author Stanislav Aleshin on 08.08.2024.
  */
 actual val coreRemotePlatformModule = DI.Module("CoreRemotePlatform") {
     bindSingleton<FirebaseMessaging> { Firebase.messaging }
-    bindSingleton<PushServiceTokenManager> { PushServiceTokenManager(instance()) }
+    bindSingleton<PushClientManager> { PushClientManager(instance()) }
 }

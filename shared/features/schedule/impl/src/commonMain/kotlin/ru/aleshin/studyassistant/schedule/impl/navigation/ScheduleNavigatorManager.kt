@@ -19,12 +19,12 @@ package ru.aleshin.studyassistant.schedule.impl.navigation
 import ru.aleshin.studyassistant.core.common.navigation.CommandBuffer
 import ru.aleshin.studyassistant.core.common.navigation.NavigatorManager
 import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleScreen
+import ru.aleshin.studyassistant.schedule.api.presentation.ScheduleRootScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-internal interface ScheduleNavigatorManager : NavigatorManager<ScheduleScreen> {
-    class Base(commandBuffer: CommandBuffer) : ScheduleNavigatorManager, NavigatorManager.Abstract<ScheduleScreen>(
-        commandBuffer = commandBuffer
-    )
+internal interface ScheduleNavigatorManager : NavigatorManager<ScheduleScreen, ScheduleRootScreen> {
+    class Base(commandBuffer: CommandBuffer) : ScheduleNavigatorManager,
+        NavigatorManager.Abstract<ScheduleScreen, ScheduleRootScreen>(commandBuffer = commandBuffer)
 }

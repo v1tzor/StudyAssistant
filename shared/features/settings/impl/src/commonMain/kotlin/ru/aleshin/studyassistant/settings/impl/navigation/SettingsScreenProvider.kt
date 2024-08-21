@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.settings.impl.navigation
 
 import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsScreen
+import ru.aleshin.studyassistant.settings.api.presentation.SettingsRootScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.CalendarScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.GeneralScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.NotificationScreen
@@ -26,7 +27,7 @@ import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.Subs
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-internal interface SettingsScreenProvider : FeatureScreenProvider<SettingsScreen> {
+internal interface SettingsScreenProvider : FeatureScreenProvider<SettingsScreen, SettingsRootScreen> {
 
     class Base : SettingsScreenProvider {
 

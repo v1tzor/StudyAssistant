@@ -21,7 +21,8 @@ import kotlinx.coroutines.flow.Flow
 /**
  * @author Stanislav Aleshin on 07.08.2024.
  */
-expect class PushServiceTokenManager {
+expect class PushClientManager {
+    fun fetchAvailabilityPushServices(): List<PushServiceType>
     suspend fun fetchToken(): Flow<UniversalPushToken>
     suspend fun deleteToken()
 }

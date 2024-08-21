@@ -31,7 +31,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
-import ru.aleshin.studyassistant.editor.api.ui.DayOfNumberedWeekUi
+import ru.aleshin.studyassistant.editor.api.presentation.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassDeps
@@ -81,7 +81,6 @@ internal class ClassScreen(
                     onUpdateOffices = { dispatchEvent(ClassEvent.UpdateOrganizationOffices(it)) },
                     onSelectOrganization = { dispatchEvent(ClassEvent.UpdateOrganization(it)) },
                     onSelectTeacher = { dispatchEvent(ClassEvent.UpdateTeacher(it)) },
-                    onChangeNotifyParams = { dispatchEvent(ClassEvent.UpdateNotifyParams(it)) },
                     onSelectSubject = { type, subject ->
                         dispatchEvent(ClassEvent.UpdateSubject(type, subject))
                     },

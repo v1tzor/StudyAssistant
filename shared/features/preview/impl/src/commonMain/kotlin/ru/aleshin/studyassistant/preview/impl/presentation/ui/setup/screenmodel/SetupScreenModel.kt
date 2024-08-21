@@ -125,7 +125,6 @@ internal class SetupScreenModel(
             is SetupEvent.NavigateToWeekScheduleEditor -> {
                 val screen = screenProvider.provideEditorScreen(EditorScreen.WeekSchedule())
                 sendEffect(SetupEffect.NavigateToGlobalScreen(screen))
-                sendAction(SetupAction.UpdateFillOutSchedule(isFillOut = true))
             }
             is SetupEvent.NavigateToSchedule -> {
                 val screen = screenProvider.provideTabNavigationScreen()
@@ -166,13 +165,10 @@ internal class SetupScreenModel(
         is SetupAction.UpdateCalendarSettings -> currentState.copy(
             calendarSettings = action.calendarSettings,
         )
-        is SetupAction.UpdateFillOutSchedule -> currentState.copy(
-            isFillOutSchedule = action.isFillOut,
-        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_ALL_DATA, SAVE_PROFILE, SAVE_ORGANIZATION, SAVE_SETTINGS, UPDATE_AVATAR
+        LOAD_ALL_DATA, SAVE_PROFILE, SAVE_ORGANIZATION, SAVE_SETTINGS
     }
 }
 

@@ -19,12 +19,12 @@ package ru.aleshin.studyassistant.users.impl.navigation
 import ru.aleshin.studyassistant.core.common.navigation.CommandBuffer
 import ru.aleshin.studyassistant.core.common.navigation.NavigatorManager
 import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
+import ru.aleshin.studyassistant.users.api.presentation.UsersRootScreen
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-internal interface UsersNavigatorManager : NavigatorManager<UsersScreen> {
-    class Base(commandBuffer: CommandBuffer) : UsersNavigatorManager, NavigatorManager.Abstract<UsersScreen>(
-        commandBuffer = commandBuffer
-    )
+internal interface UsersNavigatorManager : NavigatorManager<UsersScreen, UsersRootScreen> {
+    class Base(commandBuffer: CommandBuffer) : UsersNavigatorManager,
+        NavigatorManager.Abstract<UsersScreen, UsersRootScreen>(commandBuffer = commandBuffer)
 }

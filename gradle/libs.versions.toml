@@ -16,9 +16,11 @@ mokoParcelize = "0.9.0"
 compose = "1.6.8"
 compose-compiler = "1.5.11"
 compose-material3 = "1.2.1"
+compose-adaptive = "1.0.0-alpha01"
 compose-material = "1.12.0"
-compose-plugin = "1.7.0-alpha02"
+compose-plugin = "1.7.0-alpha03"
 androidx-activityCompose = "1.9.1"
+workmanager = "2.9.1"
 gms = "4.4.2"
 oauth = "1.22.0"
 firebase-bom = "33.1.1"
@@ -53,12 +55,15 @@ moko-parcelize = { module = "dev.icerock.moko:parcelize", version.ref = "mokoPar
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+androidx-workmanager = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-material = { group = "com.google.android.material", name = "material", version.ref = "compose-material" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
+compose-material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "compose-adaptive" }
+compose-material3-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "compose-adaptive" }
 google-accompanist = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
 google-gsm-services = { module = "com.google.android.gms:play-services-auth", version.ref = "gms-auth" }
 google-oauth-bom-android = { module = "com.google.auth:google-auth-library-bom", version.ref = "oauth" }

@@ -33,6 +33,12 @@ kotlin {
             implementation(project(":shared:features:tasks:api"))
             implementation(project(":shared:features:info:api"))
             implementation(project(":shared:features:profile:api"))
+//            // Implementation features impl module for get access to their DIHolder
+//            // This module is a shared submodule, so it is forbidden to refer to it from other modules except shared
+//            implementation(project(":shared:features:schedule:impl"))
+//            implementation(project(":shared:features:info:impl"))
+//            implementation(project(":shared:features:tasks:impl"))
+//            implementation(project(":shared:features:profile:impl"))
 
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:ui"))

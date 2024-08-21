@@ -42,5 +42,4 @@ internal data class ClassUi(
     val location: ContactInfoUi?,
     val timeRange: TimeRange,
     val number: Int,
-    val notification: Boolean = false,
 ) : Parcelable

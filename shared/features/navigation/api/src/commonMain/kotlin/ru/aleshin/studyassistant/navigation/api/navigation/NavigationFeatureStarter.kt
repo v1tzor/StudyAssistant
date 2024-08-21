@@ -17,8 +17,9 @@
 package ru.aleshin.studyassistant.navigation.api.navigation
 
 import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
+import ru.aleshin.studyassistant.navigation.api.presentation.TabsRootScreen
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-interface NavigationFeatureStarter : FeatureStarter.WithSingleNavigation
+interface NavigationFeatureStarter : FeatureStarter.WithSingleNavigation<TabsRootScreen>

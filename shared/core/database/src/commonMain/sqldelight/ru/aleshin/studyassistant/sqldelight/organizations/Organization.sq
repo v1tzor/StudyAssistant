@@ -19,7 +19,8 @@ CREATE TABLE organizationEntity (
 
 fetchAllOrganizations:
 SELECT *
-FROM organizationEntity;
+FROM organizationEntity
+WHERE is_hide = 0;
 
 fetchOrganizationById:
 SELECT *

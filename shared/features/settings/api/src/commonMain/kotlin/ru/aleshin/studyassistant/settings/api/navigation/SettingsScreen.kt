@@ -17,11 +17,12 @@
 package ru.aleshin.studyassistant.settings.api.navigation
 
 import ru.aleshin.studyassistant.core.common.inject.FeatureScreen
+import ru.aleshin.studyassistant.settings.api.presentation.SettingsRootScreen
 
 /**
  * @author Stanislav Aleshin on 08.07.2024.
  */
-sealed class SettingsScreen : FeatureScreen {
+sealed class SettingsScreen : FeatureScreen<SettingsRootScreen> {
     data object General : SettingsScreen()
     data object Notification : SettingsScreen()
     data object Calendar : SettingsScreen()
