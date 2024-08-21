@@ -80,7 +80,6 @@ internal fun ClassBottomSheet(
     sheetState: SheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
     ),
-    currentTime: Instant,
     activeClass: ActiveClassUi?,
     classModel: ClassDetailsUi,
     classDate: Instant,
@@ -121,7 +120,6 @@ internal fun ClassBottomSheet(
             }
             val coroutineScope = rememberCoroutineScope()
             ClassBottomSheetFooter(
-                currentTime = currentTime,
                 homework = classModel.homework,
                 onAddHomework = {
                     coroutineScope.launch { sheetState.hide() }
@@ -207,7 +205,6 @@ private fun ClassBottomSheetHeader(
 @Composable
 private fun ClassBottomSheetFooter(
     modifier: Modifier = Modifier,
-    currentTime: Instant,
     homework: HomeworkDetailsUi?,
     onAddHomework: () -> Unit,
     onEditHomework: (HomeworkDetailsUi) -> Unit,

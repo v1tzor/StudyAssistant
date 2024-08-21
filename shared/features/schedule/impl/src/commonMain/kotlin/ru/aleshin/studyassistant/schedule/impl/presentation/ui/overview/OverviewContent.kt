@@ -33,19 +33,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder.OVERVIEW_ITEMS
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.ClassBottomSheet
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewViewState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.DetailsClassHomeworkBadge
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.DetailsClassTestBadge
@@ -56,11 +65,14 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.De
  * @author Stanislav Aleshin on 09.06.2024
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 internal fun OverviewContent(
     state: OverviewViewState,
     modifier: Modifier = Modifier,
-    onShowClassInfo: (ClassDetailsUi) -> Unit,
+    onAddHomework: (ClassDetailsUi, Instant) -> Unit,
+    onEditHomework: (HomeworkDetailsUi) -> Unit,
+    onAgainHomework: (HomeworkDetailsUi) -> Unit,
+    onCompleteHomework: (HomeworkDetailsUi) -> Unit,
 ) = with(state) {
     Crossfade(
         modifier = modifier.fillMaxSize().padding(top = 12.dp),
@@ -80,9 +92,12 @@ internal fun OverviewContent(
                     contentPadding = PaddingValues(horizontal = 12.dp),
                 ) {
                     items(schedule.classes, key = { it.uid }) { classModel ->
+                        val classSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                        var openClassBottomSheet by remember { mutableStateOf(false) }
+
                         DetailsClassViewItem(
                             modifier = Modifier.animateItemPlacement(),
-                            onClick = { onShowClassInfo(classModel) },
+                            onClick = { openClassBottomSheet = true },
                             isActive = activeClass?.uid == classModel.uid,
                             progress = activeClass?.progress?.takeIf { activeClass.isStarted } ?: -1f,
                             timeRange = classModel.timeRange,
@@ -103,6 +118,20 @@ internal fun OverviewContent(
                                 }
                             }
                         )
+
+                        if (openClassBottomSheet && selectedDate != null) {
+                            ClassBottomSheet(
+                                sheetState = classSheetState,
+                                activeClass = activeClass,
+                                classModel = classModel,
+                                classDate = selectedDate,
+                                onEditHomework = onEditHomework,
+                                onAddHomework = onAddHomework,
+                                onAgainHomework = onAgainHomework,
+                                onCompleteHomework = onCompleteHomework,
+                                onDismissRequest = { openClassBottomSheet = false },
+                            )
+                        }
                     }
                     item { Spacer(modifier = Modifier.height(60.dp)) }
                 }
