@@ -58,10 +58,10 @@ internal class TabsScreenModel(
         event: TabsEvent,
     ) = when (event) {
         is TabsEvent.Init -> changeTabItem {
-            provideScheduleScreen(ScheduleScreen.Overview(null))
+            provideScheduleScreen(ScheduleScreen.Overview)
         }
         is TabsEvent.SelectedScheduleBottomItem -> changeTabItem {
-            provideScheduleScreen(ScheduleScreen.Overview(null))
+            provideScheduleScreen(ScheduleScreen.Overview)
         }
         is TabsEvent.SelectedTasksBottomItem -> changeTabItem {
             provideTasksScreen(TasksScreen.Overview)

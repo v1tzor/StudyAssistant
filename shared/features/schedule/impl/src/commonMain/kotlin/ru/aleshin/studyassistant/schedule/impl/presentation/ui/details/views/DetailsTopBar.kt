@@ -25,11 +25,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarButton
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarEmptyButton
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
+import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.

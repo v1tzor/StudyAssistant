@@ -42,7 +42,7 @@ internal interface ScheduleScreenProvider : FeatureScreenProvider<ScheduleScreen
     ) : ScheduleScreenProvider {
 
         override fun provideFeatureScreen(screen: ScheduleScreen) = when (screen) {
-            is ScheduleScreen.Overview -> OverviewScreen(screen.firstDay)
+            is ScheduleScreen.Overview -> OverviewScreen()
             is ScheduleScreen.Details -> DetailsScreen()
             is ScheduleScreen.Share -> ShareScreen(screen.receivedShareId)
         }

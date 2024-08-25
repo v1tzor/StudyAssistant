@@ -129,13 +129,8 @@ internal class DetailsScreenModel(
                 val screen = screenProvider.provideEditorScreen(featureScreen)
                 sendEffect(DetailsEffect.NavigateToGlobal(screen))
             }
-            is DetailsEvent.OpenOverviewSchedule -> {
-                val date = event.date.toEpochMilliseconds()
-                val screen = screenProvider.provideFeatureScreen(ScheduleScreen.Overview(date))
-                sendEffect(DetailsEffect.NavigateToLocal(screen))
-            }
             is DetailsEvent.NavigateToOverview -> {
-                val screen = screenProvider.provideFeatureScreen(ScheduleScreen.Overview(null))
+                val screen = screenProvider.provideFeatureScreen(ScheduleScreen.Overview)
                 sendEffect(DetailsEffect.NavigateToLocal(screen))
             }
             is DetailsEvent.NavigateToEditor -> with(state()) {

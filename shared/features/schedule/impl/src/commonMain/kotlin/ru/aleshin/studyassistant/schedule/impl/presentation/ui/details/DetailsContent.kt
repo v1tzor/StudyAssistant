@@ -66,7 +66,6 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.Com
 internal fun DetailsContent(
     state: DetailsViewState,
     modifier: Modifier = Modifier,
-    onOpenSchedule: (Instant) -> Unit,
     onAddHomework: (ClassDetailsUi, Instant) -> Unit,
     onEditHomework: (HomeworkDetailsUi) -> Unit,
     onAgainHomework: (HomeworkDetailsUi) -> Unit,
@@ -83,7 +82,6 @@ internal fun DetailsContent(
                 currentDate = currentDate,
                 weekSchedule = weekSchedule,
                 activeClass = activeClass,
-                onOpenSchedule = onOpenSchedule,
                 onAddHomework = onAddHomework,
                 onEditHomework = onEditHomework,
                 onAgainHomework = onAgainHomework,
@@ -94,7 +92,6 @@ internal fun DetailsContent(
                 currentDate = currentDate,
                 weekSchedule = weekSchedule,
                 activeClass = activeClass,
-                onOpenSchedule = onOpenSchedule,
                 onAddHomework = onAddHomework,
                 onEditHomework = onEditHomework,
                 onAgainHomework = onAgainHomework,
@@ -112,7 +109,6 @@ private fun DetailsCommonSchedulesSection(
     currentDate: Instant,
     weekSchedule: WeekScheduleDetailsUi?,
     activeClass: ActiveClassUi?,
-    onOpenSchedule: (Instant) -> Unit,
     onAddHomework: (ClassDetailsUi, Instant) -> Unit,
     onEditHomework: (HomeworkDetailsUi) -> Unit,
     onAgainHomework: (HomeworkDetailsUi) -> Unit,
@@ -154,7 +150,6 @@ private fun DetailsCommonSchedulesSection(
                                 isCurrentDay = currentDate.equalsDay(scheduleDate),
                                 activeClass = activeClass,
                                 classes = classes ?: emptyList(),
-                                onOpenSchedule = { onOpenSchedule(scheduleDate) },
                                 onClassClick = {
                                     selectedSheetClass = it.uid
                                     openClassBottomSheet = true
@@ -206,7 +201,6 @@ private fun DetailsVerticalSchedulesSection(
     currentDate: Instant,
     weekSchedule: WeekScheduleDetailsUi?,
     activeClass: ActiveClassUi?,
-    onOpenSchedule: (Instant) -> Unit,
     onAddHomework: (ClassDetailsUi, Instant) -> Unit,
     onEditHomework: (HomeworkDetailsUi) -> Unit,
     onAgainHomework: (HomeworkDetailsUi) -> Unit,
@@ -244,7 +238,6 @@ private fun DetailsVerticalSchedulesSection(
                         isCurrentDay = currentDate.equalsDay(scheduleDate),
                         activeClass = activeClass,
                         classes = classes ?: emptyList(),
-                        onOpenSchedule = { onOpenSchedule(scheduleDate) },
                         onClassClick = {
                             selectedSheetClass = it.uid
                             openClassBottomSheet = true

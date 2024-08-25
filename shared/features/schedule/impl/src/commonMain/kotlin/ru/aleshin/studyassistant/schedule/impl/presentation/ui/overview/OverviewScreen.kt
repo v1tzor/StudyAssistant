@@ -30,11 +30,9 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.root
-import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewDeps
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewEvent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewViewState
@@ -46,13 +44,12 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.Ov
 /**
  * @author Stanislav Aleshin on 09.06.2024
  */
-internal data class OverviewScreen(val firstDay: Millis?) : Screen {
+internal class OverviewScreen : Screen {
 
     @Composable
     override fun Content() = ScreenContent(
         screenModel = rememberOverviewScreenModel(),
         initialState = OverviewViewState(),
-        dependencies = OverviewDeps(firstDay = firstDay),
     ) { state ->
         val strings = ScheduleThemeRes.strings
         val navigator = LocalNavigator.currentOrThrow

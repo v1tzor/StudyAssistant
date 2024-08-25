@@ -54,7 +54,7 @@ internal data class OverviewViewState(
 ) : BaseViewState
 
 internal sealed class OverviewEvent : BaseEvent {
-    data class Init(val firstDay: Instant?) : OverviewEvent()
+    data object Init : OverviewEvent()
     data class SelectedDate(val date: Instant) : OverviewEvent()
     data object SelectedCurrentDay : OverviewEvent()
     data class CompleteHomework(val homework: HomeworkDetailsUi) : OverviewEvent()

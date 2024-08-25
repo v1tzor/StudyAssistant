@@ -61,7 +61,6 @@ internal class DetailsScreen : Screen {
                 DetailsContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
-                    onOpenSchedule = { dispatchEvent(DetailsEvent.OpenOverviewSchedule(it)) },
                     onEditHomework = { dispatchEvent(DetailsEvent.EditHomeworkInEditor(it)) },
                     onAddHomework = { homework, date ->
                         dispatchEvent(DetailsEvent.AddHomeworkInEditor(homework, date))

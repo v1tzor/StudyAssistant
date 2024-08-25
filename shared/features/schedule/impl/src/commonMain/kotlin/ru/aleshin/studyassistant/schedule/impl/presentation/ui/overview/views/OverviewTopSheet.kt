@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,11 +50,10 @@ import io.github.koalaplot.core.line.AreaBaseline
 import io.github.koalaplot.core.line.AreaPlot
 import io.github.koalaplot.core.style.AreaStyle
 import io.github.koalaplot.core.style.LineStyle
-import io.github.koalaplot.core.util.ExperimentalKoalaPlotApi
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
 import io.github.koalaplot.core.xygraph.DefaultPoint
+import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import io.github.koalaplot.core.xygraph.XYGraph
-import io.github.koalaplot.core.xygraph.rememberFloatLinearAxisModel
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
@@ -98,6 +98,7 @@ internal fun OverviewTopSheet(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OverviewTopSheetChart(
+                    selectedDate = selectedDate,
                     weekAnalysis = weekAnalysis
                 )
                 OverviewTopSheetClassTime(
@@ -117,29 +118,65 @@ internal fun OverviewTopSheet(
 }
 
 @Composable
-@OptIn(ExperimentalKoalaPlotApi::class)
 private fun OverviewTopSheetChart(
     modifier: Modifier = Modifier,
+    selectedDate: Instant?,
     weekAnalysis: List<DailyAnalysisUi>?,
 ) {
-    val xAxisDate = weekAnalysis?.map { it.date.dateTime().dayOfMonth.toString() } ?: listOf("")
-    val yAxisData = weekAnalysis?.map { it.generalAssessment } ?: listOf(0f)
-    val axisPoints = buildList {
-        for (i in 0..(weekAnalysis?.lastIndex ?: 0)) {
-            add(DefaultPoint(xAxisDate[i], yAxisData[i]))
+    val xAxisDate = remember(weekAnalysis) {
+        weekAnalysis?.map { it.date } ?: listOf(null)
+    }
+    val yAxisData = remember(weekAnalysis) {
+        weekAnalysis?.map { it.generalAssessment } ?: listOf(0f)
+    }
+    val axisPoints = remember(weekAnalysis) {
+        buildList {
+            for (i in 0..(weekAnalysis?.lastIndex ?: 0)) {
+                add(DefaultPoint(xAxisDate[i], yAxisData[i]))
+            }
         }
     }
     XYGraph(
-        xAxisModel = CategoryAxisModel(
-            categories = xAxisDate,
-            firstCategoryIsZero = true,
-        ),
-        yAxisModel = rememberFloatLinearAxisModel(
-            range = 0f..10f,
-            minorTickCount = 0,
-            minimumMajorTickSpacing = 16.dp,
-        ),
+        xAxisModel = remember(weekAnalysis) {
+            CategoryAxisModel(
+                categories = xAxisDate,
+                firstCategoryIsZero = true,
+            )
+        },
+        yAxisModel = remember(weekAnalysis) {
+            FloatLinearAxisModel(
+                range = 0f..10f,
+                minorTickCount = 1,
+                minimumMajorTickSpacing = 16.dp,
+            )
+        },
         modifier = modifier.fillMaxWidth().height(130.dp),
+        xAxisLabels = { date ->
+            Text(
+                text = date?.dateTime()?.dayOfMonth?.toString() ?: "",
+                color = if (date?.equalsDay(selectedDate) == true) {
+                    StudyAssistantRes.colors.accents.red
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Visible,
+                modifier = Modifier.padding(top = 2.dp)
+            )
+        },
+        yAxisLabels = {
+            Text(
+                text = it.toString(),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 1,
+                modifier = Modifier.padding(top = 2.dp)
+            )
+        },
+        xAxisTitle = {},
+        yAxisTitle = {},
     ) {
         AreaPlot(
             data = axisPoints,

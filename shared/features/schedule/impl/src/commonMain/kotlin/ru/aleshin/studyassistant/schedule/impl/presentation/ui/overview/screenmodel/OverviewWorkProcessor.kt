@@ -37,6 +37,7 @@ import ru.aleshin.studyassistant.core.common.extensions.shiftMinutes
 import ru.aleshin.studyassistant.core.common.functional.Constants.Delay
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.AnalysisInteractor
@@ -93,7 +94,7 @@ internal interface OverviewWorkProcessor :
         }
 
         private fun loadAnalysisWork(week: TimeRange) = flow<DomainResult<OverviewAction, OverviewEffect>> {
-            analysisInteractor.fetchWeekAnalysis(week).handle(
+            analysisInteractor.fetchWeekAnalysis(week).collectAndHandle(
                 onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
                 onRightAction = { weekAnalysis ->
                     val analysis = weekAnalysis.map { it.mapToUi() }

@@ -21,11 +21,11 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.isCurrentWeek
-import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
@@ -35,7 +35,6 @@ import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
 import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleScreenProvider
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewAction
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewDeps
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewEvent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewViewState
@@ -49,16 +48,16 @@ internal class OverviewScreenModel(
     stateCommunicator: OverviewStateCommunicator,
     effectCommunicator: OverviewEffectCommunicator,
     coroutineManager: CoroutineManager,
-) : BaseScreenModel<OverviewViewState, OverviewEvent, OverviewAction, OverviewEffect, OverviewDeps>(
+) : BaseScreenModel<OverviewViewState, OverviewEvent, OverviewAction, OverviewEffect, EmptyDeps>(
     stateCommunicator = stateCommunicator,
     effectCommunicator = effectCommunicator,
     coroutineManager = coroutineManager,
 ) {
 
-    override fun init(deps: OverviewDeps) {
+    override fun init(deps: EmptyDeps) {
         if (!isInitialize) {
             super.init(deps)
-            dispatchEvent(OverviewEvent.Init(deps.firstDay?.mapEpochTimeToInstant()))
+            dispatchEvent(OverviewEvent.Init)
         }
     }
 
@@ -67,21 +66,22 @@ internal class OverviewScreenModel(
     ) {
         when (event) {
             is OverviewEvent.Init -> with(state()) {
-                val targetDate = event.firstDay ?: currentDate
-                sendAction(OverviewAction.UpdateSelectedDate(targetDate))
+                sendAction(OverviewAction.UpdateSelectedDate(currentDate))
                 launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
-                    val command = OverviewWorkCommand.LoadSchedule(targetDate)
+                    val command = OverviewWorkCommand.LoadSchedule(currentDate)
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_ANALYSIS) {
-                    val command = OverviewWorkCommand.LoadAnalysis(targetDate.dateTime().weekTimeRange())
+                    val targetWeek = currentDate.dateTime().weekTimeRange()
+                    val command = OverviewWorkCommand.LoadAnalysis(targetWeek)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
             is OverviewEvent.SelectedDate -> with(state()) {
                 if (selectedDate?.isCurrentWeek(event.date) != true) {
                     launchBackgroundWork(BackgroundKey.LOAD_ANALYSIS) {
-                        val command = OverviewWorkCommand.LoadAnalysis(event.date.dateTime().weekTimeRange())
+                        val targetWeek = event.date.dateTime().weekTimeRange()
+                        val command = OverviewWorkCommand.LoadAnalysis(targetWeek)
                         workProcessor.work(command).collectAndHandleWork()
                     }
                 }
@@ -94,7 +94,8 @@ internal class OverviewScreenModel(
             is OverviewEvent.SelectedCurrentDay -> with(state()) {
                 if (selectedDate?.isCurrentWeek(currentDate) != true) {
                     launchBackgroundWork(BackgroundKey.LOAD_ANALYSIS) {
-                        val command = OverviewWorkCommand.LoadAnalysis(currentDate.dateTime().weekTimeRange())
+                        val targetWeek = currentDate.dateTime().weekTimeRange()
+                        val command = OverviewWorkCommand.LoadAnalysis(targetWeek)
                         workProcessor.work(command).collectAndHandleWork()
                     }
                 }

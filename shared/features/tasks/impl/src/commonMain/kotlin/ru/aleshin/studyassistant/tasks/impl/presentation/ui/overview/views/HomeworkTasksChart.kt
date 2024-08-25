@@ -136,7 +136,7 @@ internal fun HomeworkTasksChart(
                 Text(
                     text = date?.dateTime()?.dayOfMonth?.toString() ?: "",
                     color = if (date?.equalsDay(currentDate) == true) {
-                        MaterialTheme.colorScheme.primary
+                        StudyAssistantRes.colors.accents.red
                     } else {
                         MaterialTheme.colorScheme.onSurface
                     },

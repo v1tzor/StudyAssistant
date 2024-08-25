@@ -61,7 +61,6 @@ internal fun CommonScheduleView(
     isCurrentDay: Boolean,
     activeClass: ActiveClassUi?,
     classes: List<ClassDetailsUi>,
-    onOpenSchedule: () -> Unit,
     onClassClick: (ClassDetailsUi) -> Unit,
 ) {
     val coreStrings = StudyAssistantRes.strings
@@ -77,7 +76,6 @@ internal fun CommonScheduleView(
     ) {
         Column {
             CommonScheduleViewHeader(
-                onClick = onOpenSchedule,
                 dayOfWeek = date.dayOfWeek.mapToSting(coreStrings),
                 date = date.format(dateFormat),
                 isCurrentDay = isCurrentDay,
@@ -138,17 +136,13 @@ internal fun CommonScheduleViewPlaceholder(
 
 @Composable
 private fun CommonScheduleViewHeader(
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
     dayOfWeek: String,
     date: String,
     isCurrentDay: Boolean,
 ) {
     Surface(
-        onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        enabled = enabled,
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainer,
         border = if (isCurrentDay) {
