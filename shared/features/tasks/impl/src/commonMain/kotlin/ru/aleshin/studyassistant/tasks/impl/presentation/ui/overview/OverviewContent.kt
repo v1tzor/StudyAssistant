@@ -128,6 +128,7 @@ internal fun OverviewContent(
         )
         HomeworkAnalyticsSection(
             isLoading = isLoadingHomeworks,
+            currentDate = currentDate,
             homeworksScope = homeworksScope,
         )
         HomeworksSection(
@@ -225,6 +226,7 @@ private fun TasksProgressControlSection(
 private fun HomeworkAnalyticsSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    currentDate: Instant,
     homeworksScope: HomeworkScopeUi?,
 ) {
     Surface(
@@ -250,6 +252,7 @@ private fun HomeworkAnalyticsSection(
             }
             HomeworkTasksChart(
                 isLoading = isLoading,
+                currentDate = currentDate,
                 homeworkScope = homeworksScope,
             )
         }

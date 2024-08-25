@@ -44,12 +44,13 @@ import io.github.koalaplot.core.util.rotateVertically
 import io.github.koalaplot.core.xygraph.AxisModel
 import io.github.koalaplot.core.xygraph.AxisStyle
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
+import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import io.github.koalaplot.core.xygraph.XYGraph
 import io.github.koalaplot.core.xygraph.XYGraphScope
 import io.github.koalaplot.core.xygraph.rememberAxisStyle
-import io.github.koalaplot.core.xygraph.rememberFloatLinearAxisModel
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
@@ -63,6 +64,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 internal fun HomeworkTasksChart(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    currentDate: Instant,
     homeworkScope: HomeworkScopeUi?,
 ) {
     val taskTypes = listOf(
@@ -76,7 +78,7 @@ internal fun HomeworkTasksChart(
         StudyAssistantRes.colors.accents.red,
     )
     val dateList = remember(homeworkScope) {
-        homeworkScope?.theoreticalTasks?.map { it.key.dateTime().dayOfMonth.toString() } ?: listOf("")
+        homeworkScope?.theoreticalTasks?.map { it.key } ?: listOf(null)
     }
     val dailyTasks = mutableMapOf<Instant, Float>()
     val numberOfTheoryTasks = remember(homeworkScope) {
@@ -112,24 +114,32 @@ internal fun HomeworkTasksChart(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         XYGraph(
-            xAxisModel = CategoryAxisModel(
-                categories = dateList,
-                firstCategoryIsZero = true,
-                minimumMajorTickSpacing = 8.dp,
-            ),
-            yAxisModel = rememberFloatLinearAxisModel(
-                range = range,
-                minimumMajorTickIncrement = if (range.endInclusive - range.start > 2f) {
-                    2f
-                } else {
-                    (range.endInclusive - range.start) * 0.1f
-                },
-            ),
+            xAxisModel = remember(homeworkScope) {
+                CategoryAxisModel(
+                    categories = dateList,
+                    firstCategoryIsZero = true,
+                    minimumMajorTickSpacing = 8.dp,
+                )
+            },
+            yAxisModel = remember(homeworkScope) {
+                FloatLinearAxisModel(
+                    range = range,
+                    minimumMajorTickIncrement = if (range.endInclusive - range.start > 2f) {
+                        2f
+                    } else {
+                        (range.endInclusive - range.start) * 0.1f
+                    },
+                )
+            },
             modifier = Modifier.weight(1f),
-            xAxisLabels = {
+            xAxisLabels = { date ->
                 Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    text = date?.dateTime()?.dayOfMonth?.toString() ?: "",
+                    color = if (date?.equalsDay(currentDate) == true) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     softWrap = false,
