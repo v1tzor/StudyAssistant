@@ -114,32 +114,6 @@ internal interface AnalysisInteractor {
             }
         }
 
-//        override suspend fun fetchWeekAnalysis(weekTimeRange: TimeRange) = eitherWrapper.wrap {
-//            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
-//            val week = weekTimeRange.from.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
-//
-//            val baseSchedules = baseScheduleRepository.fetchSchedulesByVersion(weekTimeRange, week, targetUser).first()
-//            val customSchedules = customScheduleRepository.fetchSchedulesByTimeRange(weekTimeRange, targetUser).first()
-//            val todos = todoRepository.fetchTodosByTimeRange(weekTimeRange, targetUser).first()
-//            val homeworks = homeworksRepository.fetchHomeworksByTimeRange(weekTimeRange, targetUser).first()
-//            val groupedHomeworks = homeworks.groupBy { it.deadline.startThisDay() }
-//
-//            return@wrap buildList<DailyAnalysis> {
-//                weekTimeRange.periodDates().forEach { instant ->
-//                    val customSchedule = customSchedules.find { it.date.equalsDay(instant) }
-//                    val baseSchedule = baseSchedules.find { it.dayOfWeek == instant.dateTime().dayOfWeek }
-//                    val analysis = fetchDailyAnalysis(
-//                        date = instant,
-//                        baseSchedule = baseSchedule,
-//                        customSchedule = customSchedule,
-//                        groupedHomeworks = groupedHomeworks,
-//                        todos = todos,
-//                    )
-//                    add(analysis)
-//                }
-//            }
-//        }
-
         private fun fetchDailyAnalysis(
             date: Instant,
             baseSchedule: BaseSchedule?,
