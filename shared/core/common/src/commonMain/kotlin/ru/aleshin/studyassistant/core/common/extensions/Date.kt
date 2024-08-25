@@ -360,3 +360,8 @@ private fun firstWeekInYearStart(year: Int): LocalDate {
 }
 
 fun DateTimePeriod.millis() = minutes.minutesToMillis()
+
+fun LocalTime.untilInMillis(time: LocalTime): Long {
+    val value = time.toMillisecondOfDay() - this.toMillisecondOfDay()
+    return value.toLong()
+}

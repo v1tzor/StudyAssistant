@@ -42,16 +42,17 @@ fun <S : FeatureScreen<R>, R : RootScreen> R.NestedFeatureNavigator(
     screenProvider: FeatureScreenProvider<S, R>,
     navigatorManager: NavigatorManager<S, R>,
     onBackPressed: OnBackPressed = { true },
+    disposeBehavior: NavigatorDisposeBehavior = NavigatorDisposeBehavior(
+        disposeNestedNavigators = true,
+        disposeSteps = true,
+    ),
     content: NavigatorContent = { CurrentScreen() },
 ) {
     val startScreen = navigatorManager.fetchStartScreen()
     Navigator(
         screen = screenProvider.provideFeatureScreen(startScreen),
         onBackPressed = null,
-        disposeBehavior = NavigatorDisposeBehavior(
-            disposeNestedNavigators = true,
-            disposeSteps = true,
-        ),
+        disposeBehavior = disposeBehavior,
     ) { navigator ->
         NestedNavigatorBackHandler(navigator, onBackPressed)
 

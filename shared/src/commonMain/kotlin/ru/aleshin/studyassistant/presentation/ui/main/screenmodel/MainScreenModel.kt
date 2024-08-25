@@ -21,8 +21,8 @@ import androidx.compose.runtime.remember
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
+import ru.aleshin.studyassistant.core.common.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEvent
@@ -64,6 +64,10 @@ class MainScreenModel(
                 }
                 launchBackgroundWork(MainWorkCommand.UpdatePushToken) {
                     val command = MainWorkCommand.UpdatePushToken
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+                launchBackgroundWork(MainWorkCommand.UpdateReminderServices) {
+                    val command = MainWorkCommand.UpdateReminderServices
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }

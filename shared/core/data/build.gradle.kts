@@ -28,6 +28,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:domain"))
+            implementation(project(":shared:core:ui"))
             implementation(project(":shared:core:database"))
             implementation(project(":shared:core:remote"))
 

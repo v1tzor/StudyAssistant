@@ -129,6 +129,7 @@ dependencies {
     implementation(project(":shared"))
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.workmanager)
     implementation(libs.compose.material)
 
     implementation(libs.sqldelight.core)

@@ -27,7 +27,9 @@ import ru.aleshin.studyassistant.editor.api.presentation.EditorRootScreen
  */
 sealed class EditorScreen : FeatureScreen<EditorRootScreen> {
 
-    data class WeekSchedule(val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE) : EditorScreen()
+    data class WeekSchedule(
+        val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
+    ) : EditorScreen()
 
     data class DailySchedule(
         val date: Long,
@@ -43,9 +45,15 @@ sealed class EditorScreen : FeatureScreen<EditorRootScreen> {
         val weekDay: DayOfNumberedWeekUi,
     ) : EditorScreen()
 
-    data class Subject(val subjectId: UID?, val organizationId: UID) : EditorScreen()
+    data class Subject(
+        val subjectId: UID?,
+        val organizationId: UID,
+    ) : EditorScreen()
 
-    data class Employee(val employeeId: UID?, val organizationId: UID) : EditorScreen()
+    data class Employee(
+        val employeeId: UID?,
+        val organizationId: UID,
+    ) : EditorScreen()
 
     data class Homework(
         val homeworkId: UID?,
@@ -54,9 +62,13 @@ sealed class EditorScreen : FeatureScreen<EditorRootScreen> {
         val organizationId: UID?
     ) : EditorScreen()
 
-    data class Todo(val todoId: UID?) : EditorScreen()
+    data class Todo(
+        val todoId: UID?,
+    ) : EditorScreen()
 
-    data class Organization(val organizationId: UID?) : EditorScreen()
+    data class Organization(
+        val organizationId: UID?,
+    ) : EditorScreen()
 
     data object Profile : EditorScreen()
 }

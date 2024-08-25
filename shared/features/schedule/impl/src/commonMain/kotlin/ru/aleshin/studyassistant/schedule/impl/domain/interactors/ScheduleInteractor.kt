@@ -38,10 +38,13 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedul
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.convertToDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.convertToDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.convertToDetails
+import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
@@ -60,7 +63,10 @@ internal interface ScheduleInteractor {
         private val baseScheduleRepository: BaseScheduleRepository,
         private val customScheduleRepository: CustomScheduleRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
+        private val notificationSettingsRepository: NotificationSettingsRepository,
         private val usersRepository: UsersRepository,
+        private val startClassesReminderManager: StartClassesReminderManager,
+        private val endClassesReminderManager: EndClassesReminderManager,
         private val dateManager: DateManager,
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : ScheduleInteractor {
@@ -85,6 +91,14 @@ internal interface ScheduleInteractor {
                 return@map schedules.copy(dateVersion = actualVersion)
             }
             baseScheduleRepository.addOrUpdateSchedulesGroup(newActualSchedules, targetUser)
+
+            val notificationSettings = notificationSettingsRepository.fetchSettings(targetUser).first()
+            if (notificationSettings.beginningOfClasses != null) {
+                startClassesReminderManager.startOrRetryReminderService()
+            }
+            if (notificationSettings.endOfClasses) {
+                endClassesReminderManager.startOrRetryReminderService()
+            }
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)

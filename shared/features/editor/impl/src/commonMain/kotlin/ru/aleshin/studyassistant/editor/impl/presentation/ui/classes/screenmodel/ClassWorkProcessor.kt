@@ -252,7 +252,7 @@ internal interface ClassWorkProcessor :
                     baseClassInteractor.addClassBySchedule(
                         classModel = classModel,
                         schedule = schedule.data?.mapToDomain(),
-                        weekDay = weekDay.mapToDomain(),
+                        targetDay = weekDay.mapToDomain(),
                     ).handle(
                         onLeftAction = { emit(EffectResult(ClassEffect.ShowError(it))) },
                         onRightAction = { emit(EffectResult(ClassEffect.NavigateToBack)) },

@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.common.messages
 
+import android.content.Context
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.callbackFlow
@@ -31,9 +32,20 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * @author Stanislav Aleshin on 07.08.2024.
  */
-actual class PushServiceTokenManager(
+actual class PushClientManager(
+    private val context: Context,
     private val pushClient: RuStoreUniversalPushClient,
 ) {
+
+    actual fun fetchAvailabilityPushServices(): List<PushServiceType> {
+        return buildList {
+            val services = pushClient.checkAvailability(context).await()
+            if (services[UNIVERSAL_FCM_PROVIDER] == true) add(PushServiceType.FCM)
+            if (services[UNIVERSAL_RUSTORE_PROVIDER] == true) add(PushServiceType.RUSTORE)
+            if (services[UNIVERSAL_HMS_PROVIDER] == true) add(PushServiceType.HMS)
+            if (isEmpty()) add(PushServiceType.NONE)
+        }
+    }
 
     actual suspend fun fetchToken() = callbackFlow {
         val currentToken = suspendCoroutine { continuation ->

@@ -42,9 +42,9 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<EditorEitherWrapper> { EditorEitherWrapper.Base(instance()) }
 
     bindSingleton<BaseScheduleInteractor> { BaseScheduleInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<CustomScheduleInteractor> { CustomScheduleInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<BaseClassInteractor> { BaseClassInteractor.Base(instance(), instance(), instance(), instance()) }
-    bindSingleton<CustomClassInteractor> { CustomClassInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<CustomScheduleInteractor> { CustomScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<BaseClassInteractor> { BaseClassInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<CustomClassInteractor> { CustomClassInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<EmployeeInteractor> { EmployeeInteractor.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<SubjectInteractor> { SubjectInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance(), instance()) }

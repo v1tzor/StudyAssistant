@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
@@ -31,7 +32,10 @@ import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.domain.entities.organizations.NumberedDuration
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
+import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
@@ -65,7 +69,10 @@ internal interface CustomScheduleInteractor {
 
     class Base(
         private val scheduleRepository: CustomScheduleRepository,
+        private val notificationSettingsRepository: NotificationSettingsRepository,
         private val usersRepository: UsersRepository,
+        private val startClassesReminderManager: StartClassesReminderManager,
+        private val endClassesReminderManager: EndClassesReminderManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : CustomScheduleInteractor {
 
@@ -73,7 +80,9 @@ internal interface CustomScheduleInteractor {
             get() = usersRepository.fetchCurrentUserOrError().uid
 
         override suspend fun addOrUpdateSchedule(schedule: CustomSchedule) = eitherWrapper.wrap {
-            scheduleRepository.addOrUpdateSchedule(schedule, targetUser)
+            return@wrap scheduleRepository.addOrUpdateSchedule(schedule, targetUser).apply {
+                updateReminderServices()
+            }
         }
 
         override suspend fun fetchScheduleById(uid: UID) = eitherWrapper.wrapFlow {
@@ -83,7 +92,9 @@ internal interface CustomScheduleInteractor {
         }
 
         override suspend fun deleteScheduleById(uid: UID) = eitherWrapper.wrap {
-            scheduleRepository.deleteScheduleById(uid, targetUser)
+            scheduleRepository.deleteScheduleById(uid, targetUser).apply {
+                updateReminderServices()
+            }
         }
 
         override suspend fun updateStartOfDay(
@@ -109,7 +120,9 @@ internal interface CustomScheduleInteractor {
                     )
                 )
             }
-            scheduleRepository.addOrUpdateSchedule(schedule.copy(classes = updatedClasses), targetUser)
+            scheduleRepository.addOrUpdateSchedule(schedule.copy(classes = updatedClasses), targetUser).apply {
+                updateReminderServices()
+            }
         }
 
         override suspend fun updateClassesDuration(
@@ -155,7 +168,9 @@ internal interface CustomScheduleInteractor {
                 }
             }
 
-            scheduleRepository.addOrUpdateSchedule(schedule.copy(classes = updatedClasses), targetUser)
+            scheduleRepository.addOrUpdateSchedule(schedule.copy(classes = updatedClasses), targetUser).apply {
+                updateReminderServices()
+            }
         }
 
         override suspend fun updateBreaksDuration(
@@ -193,7 +208,19 @@ internal interface CustomScheduleInteractor {
                 }
             }
 
-            scheduleRepository.addOrUpdateSchedule(schedule.copy(classes = updatedClasses), targetUser)
+            scheduleRepository.addOrUpdateSchedule(schedule.copy(classes = updatedClasses), targetUser).apply {
+                updateReminderServices()
+            }
+        }
+
+        private suspend fun updateReminderServices() {
+            val notificationSettings = notificationSettingsRepository.fetchSettings(targetUser).first()
+            if (notificationSettings.beginningOfClasses != null) {
+                startClassesReminderManager.startOrRetryReminderService()
+            }
+            if (notificationSettings.endOfClasses) {
+                endClassesReminderManager.startOrRetryReminderService()
+            }
         }
     }
 }

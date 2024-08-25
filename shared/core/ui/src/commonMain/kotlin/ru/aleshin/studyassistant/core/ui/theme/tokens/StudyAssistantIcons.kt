@@ -40,6 +40,7 @@ import studyassistant.shared.core.ui.generated.resources.ic_online_lesson
 import studyassistant.shared.core.ui.generated.resources.ic_organization
 import studyassistant.shared.core.ui.generated.resources.ic_organization_geo
 import studyassistant.shared.core.ui.generated.resources.ic_organization_geo_outline
+import studyassistant.shared.core.ui.generated.resources.ic_organization_remove_outline
 import studyassistant.shared.core.ui.generated.resources.ic_organization_type
 import studyassistant.shared.core.ui.generated.resources.ic_phone
 import studyassistant.shared.core.ui.generated.resources.ic_practice
@@ -88,6 +89,7 @@ data class StudyAssistantIcons(
     val duration: DrawableResource,
     val organizationGeo: DrawableResource,
     val organization: DrawableResource,
+    val organizationRemove: DrawableResource,
     val upload: DrawableResource,
     val birthday: DrawableResource,
     val email: DrawableResource,
@@ -147,6 +149,7 @@ data class StudyAssistantIcons(
             duration = Res.drawable.ic_duration,
             organizationGeo = Res.drawable.ic_organization_geo,
             organization = Res.drawable.ic_organization,
+            organizationRemove = Res.drawable.ic_organization_remove_outline,
             upload = Res.drawable.ic_upload_circular,
             birthday = Res.drawable.ic_birthday,
             email = Res.drawable.ic_email,

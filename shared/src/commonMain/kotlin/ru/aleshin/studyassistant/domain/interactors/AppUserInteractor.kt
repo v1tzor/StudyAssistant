@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.domain.interactors
 
+import dev.gitlive.firebase.auth.FirebaseUser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -36,6 +37,7 @@ interface AppUserInteractor {
 
     suspend fun fetchAppUser(): FlowDomainResult<MainFailures, AppUser?>
     suspend fun fetchAppToken(): FlowDomainResult<MainFailures, UniversalPushToken>
+    suspend fun fetchAuthStateChanged(): FlowDomainResult<MainFailures, FirebaseUser?>
     suspend fun updateUser(user: AppUser): UnitDomainResult<MainFailures>
     suspend fun checkIsAuthorized(): DomainResult<MainFailures, Boolean>
 
@@ -47,6 +49,10 @@ interface AppUserInteractor {
 
         override suspend fun fetchAppToken() = eitherWrapper.wrapFlow {
             messagingRepository.fetchToken()
+        }
+
+        override suspend fun fetchAuthStateChanged() = eitherWrapper.wrapFlow {
+            usersRepository.fetchAuthStateChanged()
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)

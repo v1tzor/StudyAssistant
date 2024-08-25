@@ -35,6 +35,10 @@ import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.TabNav
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.screenmodel.TabNavigationEffectCommunicator
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.screenmodel.TabNavigationScreenModel
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.screenmodel.TabNavigationStateCommunicator
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.screenmodel.NotificationEffectCommunicator
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.screenmodel.NotificationScreenModel
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.screenmodel.NotificationStateCommunicator
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.screenmodel.NotificationWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -58,4 +62,9 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<CalendarEffectCommunicator> { CalendarEffectCommunicator.Base() }
     bindSingleton<CalendarWorkProcessor> { CalendarWorkProcessor.Base(instance()) }
     bindSingleton<CalendarScreenModel> { CalendarScreenModel(instance(), instance(), instance(), instance()) }
+
+    bindSingleton<NotificationStateCommunicator> { NotificationStateCommunicator.Base() }
+    bindSingleton<NotificationEffectCommunicator> { NotificationEffectCommunicator.Base() }
+    bindSingleton<NotificationWorkProcessor> { NotificationWorkProcessor.Base(instance(), instance()) }
+    bindSingleton<NotificationScreenModel> { NotificationScreenModel(instance(), instance(), instance(), instance()) }
 }

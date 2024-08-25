@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.di
 
 import ru.aleshin.studyassistant.core.common.platform.IosUUIDProvider
 import ru.aleshin.studyassistant.core.common.platform.Platform
+import ru.aleshin.studyassistant.core.data.managers.HomeworksReminderManagerImpl
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
@@ -27,4 +28,7 @@ actual data class PlatformConfiguration(
     val uuidProvider: IosUUIDProvider,
 ) {
     actual val platform = Platform.IOS
+
+    val homeworksReminderManager: HomeworksReminderManagerImpl
+        get() = HomeworksReminderManagerImpl()
 }

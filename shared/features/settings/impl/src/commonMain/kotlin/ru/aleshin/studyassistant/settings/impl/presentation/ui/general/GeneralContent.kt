@@ -46,7 +46,7 @@ internal fun GeneralContent(
     onSelectedTheme: (ThemeUiType) -> Unit,
 ) = with(state) {
     Column(
-        modifier = modifier.padding(top = 8.dp).verticalScroll(scrollState),
+        modifier = modifier.verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         SettingsSelectorView(

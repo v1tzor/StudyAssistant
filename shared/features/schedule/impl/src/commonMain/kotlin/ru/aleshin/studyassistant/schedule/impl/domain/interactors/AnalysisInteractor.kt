@@ -24,6 +24,15 @@ import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis
+import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.CLASS_MINUTE_DURATION_RATE
+import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.MAX_RATE
+import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.MOVEMENT_RATE
+import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.PRACTICE_RATE
+import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.PRESENTATION_RATE
+import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.TEST_RATE
+import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.THEORY_RATE
+import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.TODO_PRIORITY_RATE
+import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.TODO_RATE
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.common.ContactInfo
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
@@ -59,18 +68,6 @@ internal interface AnalysisInteractor {
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : AnalysisInteractor {
 
-        companion object {
-            const val MAX_RATE = 31f
-            const val CLASS_MINUTE_DURATION_RATE = 1f / 60f
-            const val TEST_RATE = 2f
-            const val MOVEMENT_RATE = 2f
-            const val THEORY_RATE = 0.2f
-            const val PRACTICE_RATE = 0.4f
-            const val PRESENTATION_RATE = 1.5f
-            const val TODO_RATE = 1
-            const val TODO_PRIORITY_RATE = 2
-        }
-
         private val targetUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid
 
@@ -96,7 +93,7 @@ internal interface AnalysisInteractor {
                     val dailyHomeworks = groupedHomeworks[instant]
                     val dailyTodos = todos.filter { it.deadline?.equalsDay(instant) == true }
 
-                    val homeworksNumberAndRate = fetchNumberAndRateOfTests(dailyHomeworks)
+                    val testsNumberAndRate = fetchNumberAndRateOfTests(dailyHomeworks)
                     val classesNumberAndRate = fetchNumberAndRateOfClasses(classes)
                     val movementsNumberAndRate = fetchNumberAndRateOfMovements(movementMap)
                     val homeworksProgressAndRate = fetchProgressAndRateOfHomeworks(dailyHomeworks)
@@ -104,22 +101,21 @@ internal interface AnalysisInteractor {
 
                     val rateList = listOf(
                         classesNumberAndRate.second,
-                        homeworksNumberAndRate.second,
+                        testsNumberAndRate.second,
                         movementsNumberAndRate.second,
                         homeworksProgressAndRate.second,
                         todosProgressAndRate.second,
                     )
 
-                    val analysis =
-                        DailyAnalysis(
-                            date = instant,
-                            generalAssessment = rateList.sum() / MAX_RATE,
-                            numberOfClasses = classesNumberAndRate.first,
-                            numberOfTests = homeworksNumberAndRate.first,
-                            numberOfMovements = movementsNumberAndRate.first,
-                            homeworksProgress = homeworksProgressAndRate.first,
-                            todosProgress = todosProgressAndRate.first,
-                        )
+                    val analysis = DailyAnalysis(
+                        date = instant,
+                        generalAssessment = rateList.sum() / MAX_RATE,
+                        numberOfClasses = classesNumberAndRate.first,
+                        numberOfTests = testsNumberAndRate.first,
+                        numberOfMovements = movementsNumberAndRate.first,
+                        homeworksProgress = homeworksProgressAndRate.first,
+                        todosProgress = todosProgressAndRate.first,
+                    )
                     add(analysis)
                 }
             }

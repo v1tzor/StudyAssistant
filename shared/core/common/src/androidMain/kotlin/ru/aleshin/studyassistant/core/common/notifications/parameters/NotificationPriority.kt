@@ -20,7 +20,7 @@ import androidx.core.app.NotificationCompat
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
-enum class NotificationPriority(val importance: Int) {
+enum class NotificationPriority(val priority: Int) {
     DEFAULT(NotificationCompat.PRIORITY_DEFAULT),
     MIN(NotificationCompat.PRIORITY_MIN),
     LOW(NotificationCompat.PRIORITY_LOW),

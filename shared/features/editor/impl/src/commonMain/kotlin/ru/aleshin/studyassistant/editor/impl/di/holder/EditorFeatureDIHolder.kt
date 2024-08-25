@@ -25,12 +25,15 @@ import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
+import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
@@ -61,6 +64,9 @@ object EditorFeatureDIHolder : BaseFeatureDIHolder<EditorFeatureApi, EditorFeatu
                 bindSingleton<HomeworksRepository> { dependencies.homeworksRepository }
                 bindSingleton<TodoRepository> { dependencies.todoRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
+                bindSingleton<NotificationSettingsRepository> { dependencies.notificationSettingsRepository }
+                bindSingleton<StartClassesReminderManager> { dependencies.startClassesReminderManager }
+                bindSingleton<EndClassesReminderManager> { dependencies.endClassesReminderManager }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
                 bindSingleton<TimeOverlayManager> { dependencies.overlayManager }

@@ -23,12 +23,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.messages.PushServiceType.FCM
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
-import ru.aleshin.studyassistant.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.presentation.services.RemoteMessageHandler
 import ru.rustore.sdk.universalpush.firebase.messaging.toUniversalRemoteMessage

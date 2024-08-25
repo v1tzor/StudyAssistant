@@ -23,6 +23,8 @@ import ru.aleshin.studyassistant.settings.impl.domain.common.SettingsEitherWrapp
 import ru.aleshin.studyassistant.settings.impl.domain.common.SettingsErrorHandler
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.CalendarSettingsInteractor
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.GeneralSettingsInteractor
+import ru.aleshin.studyassistant.settings.impl.domain.interactors.NotificationSettingsInteractor
+import ru.aleshin.studyassistant.settings.impl.domain.interactors.OrganizationInteractor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -33,4 +35,6 @@ internal val domainModule = DI.Module("Domain") {
 
     bindSingleton<GeneralSettingsInteractor> { GeneralSettingsInteractor.Base(instance(), instance()) }
     bindSingleton<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<NotificationSettingsInteractor> { NotificationSettingsInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance(), instance()) }
 }

@@ -23,15 +23,19 @@ import kotlinx.coroutines.flow.flowOf
 /**
  * @author Stanislav Aleshin on 07.08.2024.
  */
-actual class PushServiceTokenManager(
+actual class PushClientManager(
     private val firebaseMessaging: FirebaseMessaging,
 ) {
+
+    actual fun fetchAvailabilityPushServices(): List<PushServiceType> {
+        return listOf(PushServiceType.NONE)
+    }
 
     actual suspend fun fetchToken(): Flow<UniversalPushToken> {
         return flowOf(UniversalPushToken.None) // flowOf(UniversalPushToken.FCM(token = firebaseMessaging.getToken()))
     }
 
     actual suspend fun deleteToken() {
-        // TODO: In next version of firebase gitlive library
+        firebaseMessaging.deleteToken()
     }
 }

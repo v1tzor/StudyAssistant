@@ -16,8 +16,11 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateOfWeekDay
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
@@ -27,9 +30,14 @@ import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.common.DayOfNumberedWeek
+import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
+import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
@@ -42,7 +50,7 @@ internal interface BaseClassInteractor {
     suspend fun addClassBySchedule(
         classModel: Class,
         schedule: BaseSchedule?,
-        weekDay: DayOfNumberedWeek
+        targetDay: DayOfNumberedWeek
     ): DomainResult<EditorFailures, UID>
 
     suspend fun fetchClass(classId: UID, scheduleId: UID): FlowDomainResult<EditorFailures, Class?>
@@ -53,7 +61,11 @@ internal interface BaseClassInteractor {
 
     class Base(
         private val scheduleRepository: BaseScheduleRepository,
+        private val calendarSettingsRepository: CalendarSettingsRepository,
+        private val notificationSettingsRepository: NotificationSettingsRepository,
         private val usersRepository: UsersRepository,
+        private val startClassesReminderManager: StartClassesReminderManager,
+        private val endClassesReminderManager: EndClassesReminderManager,
         private val dateManager: DateManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : BaseClassInteractor {
@@ -64,13 +76,13 @@ internal interface BaseClassInteractor {
         override suspend fun addClassBySchedule(
             classModel: Class,
             schedule: BaseSchedule?,
-            weekDay: DayOfNumberedWeek
+            targetDay: DayOfNumberedWeek
         ) = eitherWrapper.wrap {
             val createClassModel = classModel.copy(uid = randomUUID())
             val currentDate = dateManager.fetchBeginningCurrentInstant()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
-            if (schedule != null) {
+            return@wrap if (schedule != null) {
                 val actualClasses = schedule.classes.toMutableList().apply {
                     add(createClassModel)
                 }
@@ -95,12 +107,14 @@ internal interface BaseClassInteractor {
             } else {
                 val createSchedule = BaseSchedule.createActual(
                     currentDate = currentDate,
-                    dayOfNumberedWeek = weekDay,
+                    dayOfNumberedWeek = targetDay,
                     classes = listOf(createClassModel),
                 )
                 scheduleRepository.addOrUpdateSchedule(createSchedule, targetUser).let {
                     createClassModel.uid
                 }
+            }.apply {
+                updateReminderServices(currentDate, targetDay)
             }
         }
 
@@ -127,7 +141,8 @@ internal interface BaseClassInteractor {
                     set(indexOf(oldModel), classModel)
                 }
             }
-            if (mondayDate.equalsDay(schedule.dateVersion.from)) {
+
+            return@wrap if (mondayDate.equalsDay(schedule.dateVersion.from)) {
                 val updatedSchedule = schedule.copy(classes = actualClasses)
                 scheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser)
             } else {
@@ -144,6 +159,9 @@ internal interface BaseClassInteractor {
                 scheduleRepository.addOrUpdateSchedule(actualSchedule, targetUser).let {
                     return@let updatedClassId
                 }
+            }.apply {
+                val targetDay = DayOfNumberedWeek(schedule.dayOfWeek, schedule.week)
+                updateReminderServices(currentDate, targetDay)
             }
         }
 
@@ -154,6 +172,7 @@ internal interface BaseClassInteractor {
             val actualClasses = schedule.classes.toMutableList().apply {
                 removeAll { it.uid == uid }
             }
+
             if (mondayDate.equalsDay(schedule.dateVersion.from)) {
                 val updatedSchedule = schedule.copy(classes = actualClasses)
                 scheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser)
@@ -169,6 +188,26 @@ internal interface BaseClassInteractor {
                     classes = actualClasses,
                 )
                 scheduleRepository.addOrUpdateSchedule(actualSchedule, targetUser)
+            }.apply {
+                val targetDay = DayOfNumberedWeek(schedule.dayOfWeek, schedule.week)
+                updateReminderServices(currentDate, targetDay)
+            }
+        }
+
+        private suspend fun updateReminderServices(currentDate: Instant, targetDay: DayOfNumberedWeek) {
+            val calendarSettings = calendarSettingsRepository.fetchSettings(targetUser).first()
+            val notificationSettings = notificationSettingsRepository.fetchSettings(targetUser).first()
+
+            val currentWeek = currentDate.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
+            val currentWeekDay = currentDate.dateTime().dayOfWeek
+
+            if (currentWeek == targetDay.week && currentWeekDay == targetDay.dayOfWeek) {
+                if (notificationSettings.beginningOfClasses != null) {
+                    startClassesReminderManager.startOrRetryReminderService()
+                }
+                if (notificationSettings.endOfClasses) {
+                    endClassesReminderManager.startOrRetryReminderService()
+                }
             }
         }
     }

@@ -19,11 +19,14 @@ package ru.aleshin.studyassistant.schedule.impl.di
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
@@ -45,6 +48,9 @@ interface ScheduleFeatureDependencies : BaseFeatureDependencies {
     val subjectsRepository: SubjectsRepository
     val employeeRepository: EmployeeRepository
     val calendarSettingsRepository: CalendarSettingsRepository
+    val notificationSettingsRepository: NotificationSettingsRepository
+    val startClassesReminderManager: StartClassesReminderManager
+    val endClassesReminderManager: EndClassesReminderManager
     val homeworkRepository: HomeworksRepository
     val todoRepository: TodoRepository
     val usersRepository: UsersRepository

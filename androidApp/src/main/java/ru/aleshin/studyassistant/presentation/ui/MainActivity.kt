@@ -48,7 +48,6 @@ class MainActivity : ComponentActivity() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 RequestNotificationPermission()
             }
-
             AppScreen()
         }
     }

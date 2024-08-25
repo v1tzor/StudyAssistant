@@ -25,7 +25,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
-import ru.aleshin.studyassistant.settings.impl.presentation.models.GeneralSettingsUi
+import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.GeneralSettingsUi
 
 /**
  * @author Stanislav Aleshin on 10.07.2024

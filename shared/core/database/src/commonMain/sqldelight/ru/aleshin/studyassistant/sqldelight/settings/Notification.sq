@@ -1,0 +1,23 @@
+import kotlin.String;
+import kotlin.collections.List;
+
+CREATE TABLE notificationSettingsEntity (
+  id INTEGER PRIMARY KEY NOT NULL,
+  beginning_of_classes INTEGER,
+  exceptions_for_beginning_of_classes TEXT AS List<String> NOT NULL,
+  end_of_classes INTEGER NOT NULL,
+  exceptions_for_end_of_classes TEXT AS List<String> NOT NULL,
+  unfinished_homeworks INTEGER,
+  high_workload INTEGER
+);
+
+INSERT INTO notificationSettingsEntity (id, beginning_of_classes, exceptions_for_beginning_of_classes, end_of_classes, exceptions_for_end_of_classes, unfinished_homeworks, high_workload)
+VALUES (1, 600000, '', 1, '', 72000000, 7);
+
+fetchSettings:
+SELECT *
+FROM notificationSettingsEntity;
+
+updateSettings:
+INSERT OR REPLACE INTO notificationSettingsEntity (id, beginning_of_classes, exceptions_for_beginning_of_classes, end_of_classes, exceptions_for_end_of_classes, unfinished_homeworks, high_workload)
+VALUES ?;

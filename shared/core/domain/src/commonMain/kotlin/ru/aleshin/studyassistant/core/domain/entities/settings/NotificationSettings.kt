@@ -16,13 +16,22 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.settings
 
+import ru.aleshin.studyassistant.core.common.functional.UID
+
 /**
  * @author Stanislav Aleshin on 10.07.2024.
  */
 data class NotificationSettings(
-    val notifyAboutDayStart: Long? = BEFORE_DAY_START_NOTIFY_TIME,
+    val beginningOfClasses: Long? = BEFORE_BEGINNING_CLASSES_NOTIFY_TIME,
+    val exceptionsForBeginningOfClasses: List<UID> = emptyList(),
+    val endOfClasses: Boolean = true,
+    val exceptionsForEndOfClasses: List<UID> = emptyList(),
+    val unfinishedHomeworks: Long? = UNFINISHED_HOMEWORKS_NOTIFY_TIME,
+    val highWorkload: Int? = WORKLOAD_HIGH_VALUE,
 ) {
     companion object {
-        const val BEFORE_DAY_START_NOTIFY_TIME = 300000L
+        const val BEFORE_BEGINNING_CLASSES_NOTIFY_TIME = 600000L
+        const val UNFINISHED_HOMEWORKS_NOTIFY_TIME = 72000000L
+        const val WORKLOAD_HIGH_VALUE = 7
     }
 }

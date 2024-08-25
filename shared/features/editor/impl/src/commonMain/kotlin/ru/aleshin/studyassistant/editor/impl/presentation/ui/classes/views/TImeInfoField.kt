@@ -44,7 +44,7 @@ import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseTimePickerDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.TimePickerDialog
 import ru.aleshin.studyassistant.core.ui.views.timeFormat
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 
@@ -132,7 +132,7 @@ internal fun TimeInfoField(
     }
 
     if (startTimePickerState) {
-        BaseTimePickerDialog(
+        TimePickerDialog(
             initTime = startTime,
             onDismiss = { startTimePickerState = false },
             onConfirmTime = { selectedStartTime ->
@@ -143,7 +143,7 @@ internal fun TimeInfoField(
     }
 
     if (endTimePickerState) {
-        BaseTimePickerDialog(
+        TimePickerDialog(
             initTime = endTime,
             onDismiss = { endTimePickerState = false },
             onConfirmTime = { selectedEndTime ->

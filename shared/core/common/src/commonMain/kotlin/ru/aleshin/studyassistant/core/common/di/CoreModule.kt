@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.common.payments.SubscriptionChecker
  * @author Stanislav Aleshin on 14.04.2024.
  */
 val coreCommonModule = DI.Module("CoreCommon") {
+    import(corePlatformModule)
     bindSingleton<CoroutineManager> { CoroutineManager.Base() }
     bindSingleton<DateManager> { DateManager.Base() }
     bindSingleton<TimeOverlayManager> { TimeOverlayManager.Base() }

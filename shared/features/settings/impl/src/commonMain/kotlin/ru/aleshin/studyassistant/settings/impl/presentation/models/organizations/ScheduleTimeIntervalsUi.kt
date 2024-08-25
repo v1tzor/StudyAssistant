@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.settings.impl.presentation.models
+package ru.aleshin.studyassistant.settings.impl.presentation.models.organizations
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
+import dev.icerock.moko.parcelize.TypeParceler
+import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
- * @author Stanislav Aleshin on 24.04.2024.
+ * @author Stanislav Aleshin on 25.08.2024.
  */
 @Parcelize
-internal data class GeneralSettingsUi(
-    val isFirstStart: Boolean = true,
-    val languageType: LanguageUiType = LanguageUiType.DEFAULT,
-    val themeType: ThemeUiType = ThemeUiType.DEFAULT,
+internal data class ScheduleTimeIntervalsUi(
+    @TypeParceler<Instant?, NullInstantParceler>
+    val firstClassTime: Instant? = null,
+    val baseClassDuration: Millis? = null,
+    val baseBreakDuration: Millis? = null,
+    val specificClassDuration: List<NumberedDurationUi> = emptyList(),
+    val specificBreakDuration: List<NumberedDurationUi> = emptyList(),
 ) : Parcelable

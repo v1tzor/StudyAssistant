@@ -29,10 +29,12 @@ import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.Either
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.firstRightOrNull
+import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.messages.PushServiceType
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
 import ru.aleshin.studyassistant.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.domain.interactors.GeneralSettingsInteractor
+import ru.aleshin.studyassistant.domain.interactors.ReminderInteractor
 import ru.aleshin.studyassistant.navigation.GlobalScreenProvider
 import ru.aleshin.studyassistant.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
@@ -48,6 +50,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
     class Base(
         private val userInteractor: AppUserInteractor,
         private val settingsInteractor: GeneralSettingsInteractor,
+        private val reminderInteractor: ReminderInteractor,
         private val deviceInfoProvider: DeviceInfoProvider,
         private val screenProvider: GlobalScreenProvider,
     ) : MainWorkProcessor {
@@ -56,6 +59,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
             is MainWorkCommand.LoadThemeSettings -> loadThemeWork()
             is MainWorkCommand.InitialNavigation -> initialNavigationWork()
             is MainWorkCommand.UpdatePushToken -> updatePushTokenWork()
+            is MainWorkCommand.UpdateReminderServices -> updateReminderServicesWork()
         }
 
         private fun loadThemeWork() = flow {
@@ -126,6 +130,23 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                 },
             )
         }
+
+        private fun updateReminderServicesWork() = flow {
+            userInteractor.fetchAuthStateChanged().collectAndHandle(
+                onLeftAction = { emit(EffectResult(MainEffect.ShowError(it))) },
+                onRightAction = { user ->
+                    if (user != null) {
+                        reminderInteractor.startOrRetryAvailableReminders().handle(
+                            onLeftAction = { emit(EffectResult(MainEffect.ShowError(it))) },
+                        )
+                    } else {
+                        reminderInteractor.stopReminders().handle(
+                            onLeftAction = { emit(EffectResult(MainEffect.ShowError(it))) },
+                        )
+                    }
+                },
+            )
+        }
     }
 }
 
@@ -133,4 +154,5 @@ sealed class MainWorkCommand : WorkCommand {
     data object LoadThemeSettings : MainWorkCommand()
     data object InitialNavigation : MainWorkCommand()
     data object UpdatePushToken : MainWorkCommand()
+    data object UpdateReminderServices : MainWorkCommand()
 }

@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.core.data.repositories.GeneralSettingsRepositor
 import ru.aleshin.studyassistant.core.data.repositories.HomeworksRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ManageUserRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.MessageRepositoryImpl
+import ru.aleshin.studyassistant.core.data.repositories.NotificationSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.OrganizationsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ShareHomeworksRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ShareSchedulesRepositoryImpl
@@ -47,6 +48,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsReposit
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
@@ -59,7 +61,7 @@ import ru.aleshin.studyassistant.core.remote.di.coreRemoteModule
  * @author Stanislav Aleshin on 22.04.2024.
  */
 val coreDataModule = DI.Module("CoreData") {
-    importAll(coreDatabaseModule, coreRemoteModule)
+    importAll(coreDataPlatformModule, coreDatabaseModule, coreRemoteModule)
 
     bindSingleton<AuthRepository> { AuthRepositoryImpl(instance()) }
     bindSingleton<ManageUserRepository> { ManageUserRepositoryImpl(instance()) }
@@ -72,6 +74,7 @@ val coreDataModule = DI.Module("CoreData") {
     bindSingleton<ShareSchedulesRepository> { ShareSchedulesRepositoryImpl(instance()) }
     bindProvider<GeneralSettingsRepository> { GeneralSettingsRepositoryImpl(instance()) }
     bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance(), instance()) }
+    bindProvider<NotificationSettingsRepository> { NotificationSettingsRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<BaseScheduleRepository> { BaseScheduleRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<CustomScheduleRepository> { CustomScheduleRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<SubjectsRepository> { SubjectsRepositoryImpl(instance(), instance(), instance()) }

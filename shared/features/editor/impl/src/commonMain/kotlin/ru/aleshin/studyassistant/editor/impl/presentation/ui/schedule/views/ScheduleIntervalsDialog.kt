@@ -54,7 +54,7 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
 import ru.aleshin.studyassistant.core.ui.views.DialogHeader
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseTimePickerDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.TimePickerDialog
 import ru.aleshin.studyassistant.core.ui.views.timeFormat
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
@@ -161,7 +161,7 @@ internal fun StartOfClassesField(
         )
 
         if (isOpenTimePickerDialog) {
-            BaseTimePickerDialog(
+            TimePickerDialog(
                 initTime = startOfClassTime,
                 onDismiss = { isOpenTimePickerDialog = false },
                 onConfirmTime = {

@@ -67,12 +67,12 @@ internal interface ShareSchedulesInteractor {
             )
 
             shareRepository.addOrUpdateSharedSchedules(
-                updatedCurrentSharedSchedules,
-                currentUser
+                schedules = updatedCurrentSharedSchedules,
+                targetUser = currentUser,
             )
             shareRepository.addOrUpdateSharedSchedules(
-                updatedSenderSharedSchedules,
-                schedules.sender.uid
+                schedules = updatedSenderSharedSchedules,
+                targetUser = schedules.sender.uid,
             )
         }
     }

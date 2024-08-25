@@ -46,7 +46,7 @@ import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseTimePickerDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.TimePickerDialog
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.core.ui.views.timeFormat
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
@@ -103,7 +103,7 @@ internal fun TodoDeadlineInfoFields(
         )
 
         if (timePickerState) {
-            BaseTimePickerDialog(
+            TimePickerDialog(
                 initTime = deadline,
                 onDismiss = { timePickerState = false },
                 onConfirmTime = { time ->

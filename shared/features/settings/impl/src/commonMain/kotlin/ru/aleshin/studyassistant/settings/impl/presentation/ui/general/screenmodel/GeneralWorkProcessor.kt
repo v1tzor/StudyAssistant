@@ -26,7 +26,7 @@ import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.GeneralSettingsInteractor
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.settings.impl.presentation.models.GeneralSettingsUi
+import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.GeneralSettingsUi
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralAction
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralEffect
 

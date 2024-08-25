@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.core.database.datasource.schedules.BaseSchedule
 import ru.aleshin.studyassistant.core.database.datasource.schedules.CustomScheduleLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.settings.CalendarSettingsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.settings.GeneralSettingsLocalDataSource
+import ru.aleshin.studyassistant.core.database.datasource.settings.NotificationSettingsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.subjects.SubjectsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.tasks.HomeworksLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.tasks.TodoLocalDataSource
@@ -45,6 +46,8 @@ import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleEntity
 import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleQueries
 import ru.aleshin.studyassistant.sqldelight.settings.CalendarQueries
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
+import ru.aleshin.studyassistant.sqldelight.settings.NotificationQueries
+import ru.aleshin.studyassistant.sqldelight.settings.NotificationSettingsEntity
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries
 import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkQueries
 import ru.aleshin.studyassistant.sqldelight.tasks.TodoQueries
@@ -53,9 +56,11 @@ import ru.aleshin.studyassistant.sqldelight.tasks.TodoQueries
  * @author Stanislav Aleshin on 22.04.2024.
  */
 val coreDatabaseModule = DI.Module("CoreDatabase") {
+    import(coreDatabasePlatformModule)
     bindEagerSingleton<SqlDriver> { instance<DriverFactory>().createDriver() }
     bindEagerSingleton<ColumnAdapter<List<String>, String>> { listOfStringsAdapter }
     bindEagerSingleton<ColumnAdapter<List<Int>, String>> { listOfIntAdapter }
+    bindEagerSingleton<NotificationSettingsEntity.Adapter> { NotificationSettingsEntity.Adapter(instance(), instance()) }
     bindEagerSingleton<CustomScheduleEntity.Adapter> { CustomScheduleEntity.Adapter(instance()) }
     bindEagerSingleton<BaseScheduleEntity.Adapter> { BaseScheduleEntity.Adapter(instance()) }
     bindEagerSingleton<OrganizationEntity.Adapter> {
@@ -65,10 +70,11 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
         EmployeeEntity.Adapter(instance(), instance(), instance(), instance())
     }
 
-    bindEagerSingleton<Database> { Database(instance<SqlDriver>(), instance(), instance(), instance(), instance()) }
+    bindEagerSingleton<Database> { Database(instance<SqlDriver>(), instance(), instance(), instance(), instance(), instance()) }
 
     bindSingleton<GeneralQueries> { instance<Database>().generalQueries }
     bindSingleton<CalendarQueries> { instance<Database>().calendarQueries }
+    bindSingleton<NotificationQueries> { instance<Database>().notificationQueries }
     bindSingleton<BaseScheduleQueries> { instance<Database>().baseScheduleQueries }
     bindSingleton<CustomScheduleQueries> { instance<Database>().customScheduleQueries }
     bindSingleton<HomeworkQueries> { instance<Database>().homeworkQueries }
@@ -78,6 +84,7 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
     bindSingleton<EmployeeQueries> { instance<Database>().employeeQueries }
 
     bindSingleton<GeneralSettingsLocalDataSource> { GeneralSettingsLocalDataSource.Base(instance(), instance()) }
+    bindSingleton<NotificationSettingsLocalDataSource> { NotificationSettingsLocalDataSource.Base(instance(), instance()) }
     bindSingleton<CalendarSettingsLocalDataSource> { CalendarSettingsLocalDataSource.Base(instance(), instance()) }
     bindSingleton<BaseScheduleLocalDataSource> { BaseScheduleLocalDataSource.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<CustomScheduleLocalDataSource> { CustomScheduleLocalDataSource.Base(instance(), instance(), instance(), instance(), instance()) }

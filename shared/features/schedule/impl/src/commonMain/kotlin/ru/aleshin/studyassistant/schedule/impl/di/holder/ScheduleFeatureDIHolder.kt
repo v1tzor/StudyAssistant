@@ -25,11 +25,14 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
@@ -47,8 +50,7 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-object ScheduleFeatureDIHolder :
-    BaseFeatureDIHolder<ScheduleFeatureApi, ScheduleFeatureDependencies> {
+object ScheduleFeatureDIHolder : BaseFeatureDIHolder<ScheduleFeatureApi, ScheduleFeatureDependencies> {
 
     private var directDi: DirectDI? = null
 
@@ -68,6 +70,9 @@ object ScheduleFeatureDIHolder :
                 bindSingleton<EmployeeRepository> { dependencies.employeeRepository }
                 bindSingleton<TodoRepository> { dependencies.todoRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
+                bindSingleton<NotificationSettingsRepository> { dependencies.notificationSettingsRepository }
+                bindSingleton<StartClassesReminderManager> { dependencies.startClassesReminderManager }
+                bindSingleton<EndClassesReminderManager> { dependencies.endClassesReminderManager }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<ScheduleFeatureApi> {

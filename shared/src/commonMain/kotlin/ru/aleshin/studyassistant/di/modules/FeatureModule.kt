@@ -28,6 +28,10 @@ import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
+import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
@@ -38,6 +42,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsReposit
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
@@ -142,6 +147,9 @@ val featureModule = DI.Module("Feature") {
             override val homeworkRepository = instance<HomeworksRepository>()
             override val todoRepository = instance<TodoRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
+            override val startClassesReminderManager = instance<StartClassesReminderManager>()
+            override val endClassesReminderManager = instance<EndClassesReminderManager>()
             override val usersRepository = instance<UsersRepository>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
@@ -255,6 +263,9 @@ val featureModule = DI.Module("Feature") {
             override val homeworksRepository = instance<HomeworksRepository>()
             override val todoRepository = instance<TodoRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
+            override val startClassesReminderManager = instance<StartClassesReminderManager>()
+            override val endClassesReminderManager = instance<EndClassesReminderManager>()
             override val usersRepository = instance<UsersRepository>()
             override val manageUserRepository = instance<ManageUserRepository>()
             override val dateManager = instance<DateManager>()
@@ -273,7 +284,13 @@ val featureModule = DI.Module("Feature") {
         object : SettingsFeatureDependencies {
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
+            override val organizationsRepository = instance<OrganizationsRepository>()
             override val usersRepository = instance<UsersRepository>()
+            override val startClassesReminderManager = instance<StartClassesReminderManager>()
+            override val endClassesReminderManager = instance<EndClassesReminderManager>()
+            override val homeworksReminderManager = instance<HomeworksReminderManager>()
+            override val workloadWarningManager = instance<WorkloadWarningManager>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
         }

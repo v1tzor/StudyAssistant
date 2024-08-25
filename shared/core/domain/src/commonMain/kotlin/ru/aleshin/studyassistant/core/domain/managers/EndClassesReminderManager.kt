@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.settings.impl.presentation.models
-
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
-import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
+package ru.aleshin.studyassistant.core.domain.managers
 
 /**
- * @author Stanislav Aleshin on 29.04.2024.
+ * @author Stanislav Aleshin on 22.08.2024.
  */
-@Parcelize
-internal data class CalendarSettingsUi(
-    val numberOfWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
-    val weekScheduleViewType: WeekScheduleViewType = WeekScheduleViewType.COMMON,
-) : Parcelable
+interface EndClassesReminderManager {
+    suspend fun fetchWorkStatus(): WorkStatus
+    fun startOrRetryReminderService()
+    fun stopReminderService()
+}

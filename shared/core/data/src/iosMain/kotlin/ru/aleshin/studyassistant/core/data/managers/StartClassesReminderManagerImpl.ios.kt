@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.di
+package ru.aleshin.studyassistant.core.data.managers
 
-import org.kodein.di.DirectDI
-import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.WorkStatus
 
 /**
- * @author Stanislav Aleshin on 14.04.2024.
+ * @author Stanislav Aleshin on 24.08.2024.
  */
-object MainDependenciesGraph {
+actual class StartClassesReminderManagerImpl : StartClassesReminderManager {
 
-    private var di: DirectDI? = null
-
-    fun initialize(di: DirectDI) {
-        this.di = di
+    override suspend fun fetchWorkStatus(): WorkStatus {
+        return WorkStatus.FAILED
     }
 
-    fun fetchDI() = checkNotNull(di) { "Main dependencies graph is not initialized" }
+    override fun startOrRetryReminderService() {
+        // TODO: In planned
+    }
 
-    inline fun <reified T> instance(): T {
-        return fetchDI().instance()
+    override fun stopReminderService() {
+        // TODO: In planned
     }
 }

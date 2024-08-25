@@ -24,8 +24,14 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.settings.api.di.SettingsFeatureApi
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
@@ -48,7 +54,13 @@ object SettingsFeatureDIHolder :
                 importAll(navigationModule, presentationModule, domainModule)
                 bindSingleton<GeneralSettingsRepository> { dependencies.generalSettingsRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
+                bindSingleton<NotificationSettingsRepository> { dependencies.notificationSettingsRepository }
+                bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
+                bindSingleton<StartClassesReminderManager> { dependencies.startClassesReminderManager }
+                bindSingleton<EndClassesReminderManager> { dependencies.endClassesReminderManager }
+                bindSingleton<WorkloadWarningManager> { dependencies.workloadWarningManager }
+                bindSingleton<HomeworksReminderManager> { dependencies.homeworksReminderManager }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<SettingsFeatureApi> {

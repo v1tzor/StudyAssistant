@@ -25,7 +25,10 @@ import android.media.RingtoneManager
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import ru.aleshin.studyassistant.core.common.extensions.generateRandomNumber
+import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationCategory
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationDefaults
+import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationImportance
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationPriority
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationProgress
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationStyles
@@ -47,6 +50,7 @@ interface NotificationCreator {
         priority: NotificationPriority = NotificationPriority.DEFAULT,
         actions: List<NotificationCompat.Action> = emptyList(),
         contentIntent: PendingIntent? = null,
+        category: NotificationCategory? = null,
         notificationDefaults: NotificationDefaults = NotificationDefaults(),
         autoCancel: Boolean = true,
         ongoing: Boolean = false,
@@ -59,11 +63,11 @@ interface NotificationCreator {
     fun createNotifyChannel(
         channelId: String,
         channelName: String,
-        priority: NotificationPriority,
+        importance: NotificationImportance,
         defaults: NotificationDefaults,
     )
 
-    fun showNotify(notification: Notification, notifyId: Int, tag: String? = null)
+    fun showNotify(notification: Notification, notifyId: Int = generateRandomNumber(), tag: String? = null)
 
     class Base constructor(
         private val context: Context,
@@ -83,6 +87,7 @@ interface NotificationCreator {
             priority: NotificationPriority,
             actions: List<NotificationCompat.Action>,
             contentIntent: PendingIntent?,
+            category: NotificationCategory?,
             notificationDefaults: NotificationDefaults,
             autoCancel: Boolean,
             ongoing: Boolean,
@@ -98,7 +103,7 @@ interface NotificationCreator {
                 setContentTitle(title)
                 setContentText(text)
                 setVisibility(visibility.visibility)
-                setPriority(priority.importance)
+                setPriority(priority.priority)
                 if (timeStamp == null) setShowWhen(false) else setWhen(timeStamp)
                 if (color != null) setColor(color)
                 setSmallIcon(smallIcon)
@@ -106,6 +111,7 @@ interface NotificationCreator {
                 if (contentIntent != null) setContentIntent(contentIntent)
                 setAutoCancel(autoCancel)
                 setOngoing(ongoing)
+                if (category != null) setCategory(category.category)
                 if (notificationDefaults.isVibrate) setDefaults(NotificationCompat.DEFAULT_VIBRATE)
                 if (notificationDefaults.isSound) {
                     setDefaults(NotificationCompat.DEFAULT_SOUND)
@@ -132,10 +138,10 @@ interface NotificationCreator {
         override fun createNotifyChannel(
             channelId: String,
             channelName: String,
-            priority: NotificationPriority,
+            importance: NotificationImportance,
             defaults: NotificationDefaults,
         ) {
-            val channel = NotificationChannel(channelId, channelName, priority.importance).apply {
+            val channel = NotificationChannel(channelId, channelName, importance.importance).apply {
                 enableLights(defaults.isLights)
                 enableVibration(defaults.isVibrate)
                 vibrationPattern = longArrayOf(500, 500, 500)

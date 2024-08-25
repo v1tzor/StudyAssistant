@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.settings.impl.presentation.mappers
 import ru.aleshin.studyassistant.core.domain.entities.settings.GeneralSettings
 import ru.aleshin.studyassistant.core.ui.mappers.mapToDomain
 import ru.aleshin.studyassistant.core.ui.mappers.mapToUi
-import ru.aleshin.studyassistant.settings.impl.presentation.models.GeneralSettingsUi
+import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.GeneralSettingsUi
 
 /**
  * @author Stanislav Aleshin on 10.07.2024.

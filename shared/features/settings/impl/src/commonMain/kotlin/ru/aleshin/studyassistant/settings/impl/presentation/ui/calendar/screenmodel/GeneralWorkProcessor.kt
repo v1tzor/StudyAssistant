@@ -26,7 +26,7 @@ import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.CalendarSettingsInteractor
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.settings.impl.presentation.models.CalendarSettingsUi
+import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.CalendarSettingsUi
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.contract.CalendarAction
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.contract.CalendarEffect
 

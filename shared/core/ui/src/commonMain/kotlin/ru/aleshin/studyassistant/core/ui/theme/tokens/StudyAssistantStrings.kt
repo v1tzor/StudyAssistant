@@ -159,9 +159,19 @@ data class StudyAssistantStrings(
     val shareScheduleMessageTitleSuffix: String,
     val shareScheduleMessageBody: String,
     val emptyMessageUser: String,
+    val homeworksReminderTitle: String,
+    val homeworksReminderBodyPrefix: String,
+    val homeworksRecommendationTitle: String,
+    val homeworksRecommendationBodyPrefix: String,
+    val homeworksRecommendationBodySuffix: String,
+    val startClassesReminderTitleSuffix: String,
+    val startClassesReminderTitlePrefix: String,
+    val endClassesReminderTitle: String,
+    val highWorkloadWarningTitle: String,
+    val highWorkloadWarningBody: String,
 )
 
-internal val russianFamelString = StudyAssistantStrings(
+internal val russianStudyAssistantString = StudyAssistantStrings(
     appName = "Study Assistant",
     cancelTitle = "Отменить",
     addTitle = "Добавить",
@@ -298,9 +308,19 @@ internal val russianFamelString = StudyAssistantStrings(
     shareScheduleMessageTitleSuffix = "поделился/лась с вами расписанием!",
     shareScheduleMessageBody = "Добавьте его прямо сейчас!",
     emptyMessageUser = "Пользователь",
+    homeworksReminderTitle = "Дедлайн домашних заданий близок!",
+    homeworksReminderBodyPrefix = "Вот предметы, которые вам ещё предстоит выполнить:",
+    homeworksRecommendationTitle = "На завтра заданий нету!",
+    homeworksRecommendationBodyPrefix = "Однако послезавтра тебе предстоит выполнить: ",
+    homeworksRecommendationBodySuffix = "заданий. Ты мог выполнить их сегодня или сделать часть их них",
+    startClassesReminderTitlePrefix = "Через ",
+    startClassesReminderTitleSuffix = " у тебя начнутся занятия!",
+    endClassesReminderTitle = "Занятия закончились! Осталось выполнить заданные задания",
+    highWorkloadWarningTitle = "Предупреждение! Завтра будет сложный день.",
+    highWorkloadWarningBody = "Тебе следует набраться сил и быть готовым на все 100%!",
 )
 
-internal val englishFamelString = StudyAssistantStrings(
+internal val englishStudyAssistantString = StudyAssistantStrings(
     appName = "Study Assistant",
     cancelTitle = "Cancel",
     addTitle = "Add",
@@ -437,6 +457,16 @@ internal val englishFamelString = StudyAssistantStrings(
     shareScheduleMessageTitleSuffix = "shared the schedule with you!",
     shareScheduleMessageBody = "Add it right now!",
     emptyMessageUser = "User",
+    homeworksReminderTitle = "The deadline for homework is close!",
+    homeworksReminderBodyPrefix = "Here are the subjects that you still need to complete:",
+    homeworksRecommendationTitle = "There are no tasks for tomorrow!",
+    homeworksRecommendationBodyPrefix = "However, the day after tomorrow you will have to complete: ",
+    homeworksRecommendationBodySuffix = " tasks. You could have completed them today or made a part of them.",
+    startClassesReminderTitlePrefix = "Your classes will start in ",
+    startClassesReminderTitleSuffix = "!",
+    endClassesReminderTitle = "Classes are over! It remains to complete the assigned tasks",
+    highWorkloadWarningTitle = "Warning! Tomorrow will be a difficult day.",
+    highWorkloadWarningBody = "You should gain strength and be fully prepared!",
 )
 
 fun StudyAssistantStrings.monthNames() = MonthNames(
@@ -479,6 +509,6 @@ val LocalStudyAssistantStrings = staticCompositionLocalOf<StudyAssistantStrings>
 }
 
 fun fetchCoreStrings(language: StudyAssistantLanguage) = when (language) {
-    StudyAssistantLanguage.EN -> englishFamelString
-    StudyAssistantLanguage.RU -> russianFamelString
+    StudyAssistantLanguage.EN -> englishStudyAssistantString
+    StudyAssistantLanguage.RU -> russianStudyAssistantString
 }

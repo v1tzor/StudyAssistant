@@ -19,8 +19,14 @@ package ru.aleshin.studyassistant.settings.impl.di
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
@@ -29,7 +35,13 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 interface SettingsFeatureDependencies : BaseFeatureDependencies {
     val generalSettingsRepository: GeneralSettingsRepository
     val calendarSettingsRepository: CalendarSettingsRepository
+    val notificationSettingsRepository: NotificationSettingsRepository
+    val organizationsRepository: OrganizationsRepository
     val usersRepository: UsersRepository
+    val startClassesReminderManager: StartClassesReminderManager
+    val endClassesReminderManager: EndClassesReminderManager
+    val homeworksReminderManager: HomeworksReminderManager
+    val workloadWarningManager: WorkloadWarningManager
     val dateManager: DateManager
     val coroutineManager: CoroutineManager
 }

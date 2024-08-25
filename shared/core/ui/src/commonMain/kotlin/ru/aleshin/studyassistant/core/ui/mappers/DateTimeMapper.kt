@@ -24,19 +24,24 @@ import ru.aleshin.studyassistant.core.common.extensions.toMinutesOrHoursSuffixSt
 import ru.aleshin.studyassistant.core.common.extensions.toString
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.core.ui.views.timeFormat
 import kotlin.time.Duration
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
  */
-@Composable
-fun Duration.toLanguageString(showAbsoluteValue: Boolean = true): String {
-    val daySuffix = StudyAssistantRes.strings.daySuffix
-    val minuteSuffix = StudyAssistantRes.strings.minuteSuffix
-    val hourSuffix = StudyAssistantRes.strings.hourSuffix
+fun Duration.toLanguageString(strings: StudyAssistantStrings, showAbsoluteValue: Boolean = true): String {
+    val daySuffix = strings.daySuffix
+    val minuteSuffix = strings.minuteSuffix
+    val hourSuffix = strings.hourSuffix
 
     return this.toString(daySuffix, minuteSuffix, hourSuffix, showAbsoluteValue)
+}
+
+@Composable
+fun Duration.toLanguageString(showAbsoluteValue: Boolean = true): String {
+    return toLanguageString(StudyAssistantRes.strings, showAbsoluteValue)
 }
 
 @Composable

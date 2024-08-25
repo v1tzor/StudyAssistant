@@ -26,9 +26,9 @@ import dev.gitlive.firebase.firestore.persistentCacheSettings
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
+import ru.aleshin.studyassistant.core.common.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.core.common.di.coreCommonModule
 import ru.aleshin.studyassistant.core.data.di.coreDataModule
-import ru.aleshin.studyassistant.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.aleshin.studyassistant.di.modules.domainModule
 import ru.aleshin.studyassistant.di.modules.featureModule

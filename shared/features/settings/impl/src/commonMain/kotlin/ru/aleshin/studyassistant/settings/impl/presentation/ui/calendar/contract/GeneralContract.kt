@@ -24,7 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
-import ru.aleshin.studyassistant.settings.impl.presentation.models.CalendarSettingsUi
+import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.CalendarSettingsUi
 
 /**
  * @author Stanislav Aleshin on 10.07.2024

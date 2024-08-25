@@ -20,10 +20,8 @@ import android.content.Context
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.messages.GoogleAuthTokenProvider
 import ru.aleshin.studyassistant.core.common.platform.Platform
-import ru.aleshin.studyassistant.core.database.datasource.DriverFactory
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.aleshin.studyassistant.presentation.services.RemoteMessageHandler
 
@@ -35,6 +33,4 @@ actual val platformModule = DI.Module("PlatformModule") {
     bindSingleton<Platform> { instance<PlatformConfiguration>().platform }
     bindSingleton<GoogleAuthTokenProvider> { instance<PlatformConfiguration>().serviceTokenProvider }
     bindSingleton<RemoteMessageHandler> { instance<PlatformConfiguration>().remoteMessageHandler }
-    bindSingleton<DriverFactory> { DriverFactory(instance()) }
-    bindSingleton<DeviceInfoProvider> { DeviceInfoProvider(instance()) }
 }

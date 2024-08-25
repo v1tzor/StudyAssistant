@@ -12,7 +12,7 @@ import com.google.firebase.FirebaseApp
 import ru.aleshin.studyassistant.PlatformSDK
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationDefaults
-import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationPriority
+import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationImportance
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.aleshin.studyassistant.presentation.services.RemoteMessageHandlerImpl
 
@@ -44,7 +44,7 @@ class StudyAssistantApp : Application() {
             createNotifyChannel(
                 channelId = Constants.Notification.CHANNEL_ID,
                 channelName = Constants.Notification.CHANNEL_NAME,
-                priority = NotificationPriority.MAX,
+                importance = NotificationImportance.MAX,
                 defaults = NotificationDefaults()
             )
         }
@@ -111,10 +111,10 @@ class StudyAssistantApp : Application() {
     private fun createNotifyChannel(
         channelId: String,
         channelName: String,
-        priority: NotificationPriority,
+        importance: NotificationImportance,
         defaults: NotificationDefaults,
     ) {
-        val channel = NotificationChannel(channelId, channelName, priority.importance).apply {
+        val channel = NotificationChannel(channelId, channelName, importance.importance).apply {
             enableLights(defaults.isLights)
             enableVibration(defaults.isVibrate)
             vibrationPattern = longArrayOf(500, 500, 500)

@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
+import kotlinx.coroutines.flow.first
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
@@ -23,7 +24,10 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
+import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
@@ -40,7 +44,10 @@ internal interface CustomClassInteractor {
 
     class Base(
         private val customScheduleRepository: CustomScheduleRepository,
+        private val notificationSettingsRepository: NotificationSettingsRepository,
         private val usersRepository: UsersRepository,
+        private val startClassesReminderManager: StartClassesReminderManager,
+        private val endClassesReminderManager: EndClassesReminderManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : CustomClassInteractor {
 
@@ -55,9 +62,10 @@ internal interface CustomClassInteractor {
             val updatedClasses = schedule.classes.toMutableList().apply { add(createClassModel) }
             val updatedSchedule = schedule.copy(classes = updatedClasses)
 
-            customScheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser).let {
-                createClassModel.uid
+            customScheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser).apply {
+                updateReminderServices()
             }
+            return@wrap createClassModel.uid
         }
 
         override suspend fun fetchClass(classId: UID, scheduleId: UID) = eitherWrapper.wrapFlow {
@@ -84,9 +92,10 @@ internal interface CustomClassInteractor {
             }
             val updatedSchedule = schedule.copy(classes = updatedClasses)
 
-            customScheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser).let {
-                updatedClassId
+            customScheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser).apply {
+                updateReminderServices()
             }
+            return@wrap updatedClassId
         }
 
         override suspend fun deleteClassBySchedule(
@@ -96,7 +105,19 @@ internal interface CustomClassInteractor {
             val updatedClasses = schedule.classes.toMutableList().apply { removeAll { it.uid == uid } }
             val updatedSchedule = schedule.copy(classes = updatedClasses)
 
-            customScheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser)
+            customScheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser).apply {
+                updateReminderServices()
+            }
+        }
+
+        private suspend fun updateReminderServices() {
+            val notificationSettings = notificationSettingsRepository.fetchSettings(targetUser).first()
+            if (notificationSettings.beginningOfClasses != null) {
+                startClassesReminderManager.startOrRetryReminderService()
+            }
+            if (notificationSettings.endOfClasses) {
+                endClassesReminderManager.startOrRetryReminderService()
+            }
         }
     }
 }

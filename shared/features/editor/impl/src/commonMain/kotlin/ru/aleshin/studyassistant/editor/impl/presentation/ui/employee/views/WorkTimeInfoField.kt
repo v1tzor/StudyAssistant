@@ -40,7 +40,7 @@ import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseTimePickerDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.TimePickerDialog
 import ru.aleshin.studyassistant.core.ui.views.timeFormat
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 
@@ -106,7 +106,7 @@ internal fun WorkTimeInfoField(
     }
 
     if (isOpenStartTimePicker) {
-        BaseTimePickerDialog(
+        TimePickerDialog(
             initTime = startTime,
             onDismiss = { isOpenStartTimePicker = false },
             onConfirmTime = { selectedStartTime ->
@@ -117,7 +117,7 @@ internal fun WorkTimeInfoField(
     }
 
     if (isOpenEndTimePicker) {
-        BaseTimePickerDialog(
+        TimePickerDialog(
             initTime = endTime,
             onDismiss = { isOpenEndTimePicker = false },
             onConfirmTime = { selectedEndTime ->

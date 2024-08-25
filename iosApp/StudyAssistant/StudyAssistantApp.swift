@@ -5,8 +5,9 @@ import FirebaseAuth
 import GoogleSignIn
 import shared
 import OAuth2
+import BackgroundTasks
 
-class AppDelegate: NSObject, UIApplicationDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, FIRMessagingDelegate {
     
     func requestNotificationPermission() {
         let center = UNUserNotificationCenter.current()
@@ -22,6 +23,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        UNUserNotificationCenter.current().delegate = self
+        Messaging.messaging().delegate = self
+        application.registerForRemoteNotifications()
         requestNotificationPermission()
         return true
     }

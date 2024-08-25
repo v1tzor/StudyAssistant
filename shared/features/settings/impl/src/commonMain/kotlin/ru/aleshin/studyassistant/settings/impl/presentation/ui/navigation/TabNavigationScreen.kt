@@ -18,12 +18,15 @@ package ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.CurrentScreen
+import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.di.withDirectDI
 import ru.aleshin.studyassistant.core.common.navigation.NestedFeatureNavigator
@@ -63,6 +66,10 @@ internal class TabNavigationScreen : SettingsRootScreen() {
             NestedFeatureNavigator(
                 screenProvider = rememberScreenProvider<SettingsScreenProvider, SettingsScreen, SettingsRootScreen>(),
                 navigatorManager = rememberNavigatorManager<SettingsNavigatorManager, SettingsScreen, SettingsRootScreen>(),
+                disposeBehavior = NavigatorDisposeBehavior(
+                    disposeNestedNavigators = false,
+                    disposeSteps = false,
+                )
             ) { navigator ->
                 SettingsTheme {
                     val selectedItem = when (navigator.lastItem) {
@@ -106,6 +113,7 @@ internal class TabNavigationScreen : SettingsRootScreen() {
                                 )
                             }
                         },
+                        contentWindowInsets = WindowInsets.navigationBars,
                     )
 
                     handleEffect { effect ->

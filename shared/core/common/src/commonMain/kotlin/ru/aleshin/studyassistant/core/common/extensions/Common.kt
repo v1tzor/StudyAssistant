@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.core.common.extensions
 
 import kotlinx.datetime.Clock
-import kotlin.math.abs
 import kotlin.random.Random
 
 /**
@@ -27,8 +26,12 @@ inline fun <T> List<List<T>>.extractAllItem() = buildList {
     this@extractAllItem.forEach { addAll(it) }
 }
 
+fun generateRandomNumber(): Int {
+    return Random(Clock.System.now().toEpochMilliseconds()).nextInt()
+}
+
 fun generateDigitCode(numbers: Int = 7): String {
-    return abs(Random(Clock.System.now().toEpochMilliseconds()).nextInt()).toString().substring(IntRange(0, numbers - 1))
+    return generateRandomNumber().toString().substring(IntRange(0, numbers - 1))
 }
 
 inline fun <T> Iterable<T>.forEachWith(action: T.() -> Unit) {

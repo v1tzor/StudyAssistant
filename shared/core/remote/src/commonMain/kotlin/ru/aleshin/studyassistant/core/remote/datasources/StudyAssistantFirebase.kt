@@ -41,6 +41,7 @@ object StudyAssistantFirebase {
 
         const val SETTINGS = "settings"
         const val CALENDAR_SETTINGS = "calendar"
+        const val NOTIFICATION_SETTINGS = "notification"
 
         const val UID = "uid"
         const val SCHEDULE_CLASSES = "classes"

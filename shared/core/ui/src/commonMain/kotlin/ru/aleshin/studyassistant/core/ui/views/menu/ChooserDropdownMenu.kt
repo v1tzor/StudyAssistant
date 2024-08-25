@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
@@ -48,6 +49,7 @@ fun <T> ChooserDropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
         modifier = modifier.sizeIn(maxHeight = 200.dp),
+        shape = MaterialTheme.shapes.large,
         scrollState = scrollState,
         properties = properties,
         offset = offset,

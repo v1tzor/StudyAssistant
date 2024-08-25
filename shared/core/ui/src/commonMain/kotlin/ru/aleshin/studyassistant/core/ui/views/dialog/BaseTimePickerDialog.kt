@@ -52,11 +52,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atDate
 import kotlinx.datetime.toInstant
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.functional.TimeFormat
@@ -67,16 +66,41 @@ import ru.aleshin.studyassistant.core.ui.views.TimeFormatSelector
  * @author Stanislav Aleshin on 12.06.2023.
  */
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
-fun BaseTimePickerDialog(
+fun TimePickerDialog(
     modifier: Modifier = Modifier,
     initTime: Instant?,
+    timeRestriction: LocalTime? = null,
     header: String = StudyAssistantRes.strings.timePickerDialogHeader,
+    showCurrentTimeSelector: Boolean = true,
     onDismiss: () -> Unit,
     onConfirmTime: (Instant) -> Unit,
 ) {
+    BaseTimePickerDialog(
+        modifier = modifier,
+        initTime = initTime?.dateTime()?.time,
+        timeRestriction = timeRestriction,
+        header = header,
+        showCurrentTimeSelector = showCurrentTimeSelector,
+        onDismiss = onDismiss,
+        onConfirmTime = { time ->
+            val dateTime = time.atDate(Clock.System.now().dateTime().date)
+            onConfirmTime.invoke(dateTime.toInstant(TimeZone.currentSystemDefault()))
+        }
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun BaseTimePickerDialog(
+    modifier: Modifier = Modifier,
+    initTime: LocalTime?,
+    timeRestriction: LocalTime? = null,
+    header: String = StudyAssistantRes.strings.timePickerDialogHeader,
+    showCurrentTimeSelector: Boolean = true,
+    onDismiss: () -> Unit,
+    onConfirmTime: (LocalTime) -> Unit,
+) {
     val is24Format = true // TODO: Real get 24 format
-    val initDateTime = initTime?.dateTime()
 
     BasicAlertDialog(onDismissRequest = onDismiss) {
         Surface(
@@ -91,8 +115,9 @@ fun BaseTimePickerDialog(
                 horizontalAlignment = Alignment.End,
             ) {
                 val currentDateTime = Clock.System.now().dateTime()
-                var hour by rememberSaveable { mutableStateOf(initDateTime?.hour) }
-                var minute by rememberSaveable { mutableStateOf(initDateTime?.minute) }
+                var hour by rememberSaveable { mutableStateOf(initTime?.hour) }
+                var minute by rememberSaveable { mutableStateOf(initTime?.minute) }
+                val localTime = remember(hour, minute) { LocalTime(hour ?: 0, minute ?: 0) }
                 var format by remember {
                     mutableStateOf(if (hour != null && hour!! > 11) TimeFormat.PM else TimeFormat.AM)
                 }
@@ -111,8 +136,12 @@ fun BaseTimePickerDialog(
                     },
                 )
                 TimePickerActions(
-                    enabled = minute in 0..59 && hour in 0..23,
-                    visibleCurrentTime = true,
+                    enabled = if (timeRestriction != null) {
+                        localTime <= timeRestriction
+                    } else {
+                        true
+                    },
+                    showCurrentTimeSelector = showCurrentTimeSelector,
                     onDismiss = onDismiss,
                     onCurrentTimeChoose = {
                         hour = currentDateTime.hour
@@ -120,16 +149,13 @@ fun BaseTimePickerDialog(
                         if (!is24Format && (hour!! > 12 || hour == 0)) format = TimeFormat.PM
                     },
                     onConfirm = {
-                        val time = LocalDateTime(
-                            date = currentDateTime.date,
-                            time = LocalTime(
-                                hour = checkNotNull(hour),
-                                minute = checkNotNull(minute),
-                                second = 0,
-                                nanosecond = 0,
-                            )
+                        val time = LocalTime(
+                            hour = hour ?: 0,
+                            minute = minute ?: 0,
+                            second = 0,
+                            nanosecond = 0,
                         )
-                        onConfirmTime.invoke(time.toInstant(TimeZone.currentSystemDefault()))
+                        onConfirmTime.invoke(time)
                     },
                 )
             }
@@ -241,11 +267,10 @@ internal fun TimePickerHourMinuteSelector(
 }
 
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun TimePickerActions(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    visibleCurrentTime: Boolean = false,
+    showCurrentTimeSelector: Boolean = false,
     onCurrentTimeChoose: (() -> Unit)? = null,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
@@ -254,7 +279,7 @@ internal fun TimePickerActions(
     horizontalArrangement = Arrangement.spacedBy(8.dp),
     verticalAlignment = Alignment.CenterVertically,
 ) {
-    if (visibleCurrentTime && onCurrentTimeChoose != null) {
+    if (showCurrentTimeSelector && onCurrentTimeChoose != null) {
         IconButton(onClick = onCurrentTimeChoose) {
             Icon(
                 painter = painterResource(StudyAssistantRes.icons.timeOutline),

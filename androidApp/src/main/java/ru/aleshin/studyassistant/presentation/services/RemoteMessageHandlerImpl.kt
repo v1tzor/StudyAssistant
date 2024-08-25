@@ -65,8 +65,7 @@ class RemoteMessageHandlerImpl(private val context: Context) : RemoteMessageHand
                 NotifyPushContentType.ADD_TO_FRIENDS -> showNotification(
                     title = coreStrings.addToFriendsMessageTitle,
                     body = buildString {
-                        val senderName =
-                            message.data[NotifyPushContent.AddToFriends.SENDER_NAME]
+                        val senderName = message.data[NotifyPushContent.AddToFriends.SENDER_NAME]
                         append(senderName ?: coreStrings.emptyMessageUser, " ")
                         append(coreStrings.addToFriendsMessageBodySuffix)
                     },
@@ -74,8 +73,7 @@ class RemoteMessageHandlerImpl(private val context: Context) : RemoteMessageHand
 
                 NotifyPushContentType.ACCEPT_FRIEND_REQUEST -> showNotification(
                     title = buildString {
-                        val senderName =
-                            message.data[NotifyPushContent.AcceptFriendRequest.SENDER_NAME]
+                        val senderName = message.data[NotifyPushContent.AcceptFriendRequest.SENDER_NAME]
                         append(senderName ?: coreStrings.emptyMessageUser, " ")
                         append(coreStrings.acceptFriendRequestMessageTitleSuffix)
                     },
@@ -84,8 +82,7 @@ class RemoteMessageHandlerImpl(private val context: Context) : RemoteMessageHand
 
                 NotifyPushContentType.REJECT_FRIEND_REQUEST -> showNotification(
                     title = buildString {
-                        val senderName =
-                            message.data[NotifyPushContent.RejectFriendRequest.SENDER_NAME]
+                        val senderName = message.data[NotifyPushContent.RejectFriendRequest.SENDER_NAME]
                         append(senderName ?: coreStrings.emptyMessageUser, " ")
                         append(coreStrings.rejectFriendRequestMessageTitleSuffix)
                     },
@@ -94,8 +91,7 @@ class RemoteMessageHandlerImpl(private val context: Context) : RemoteMessageHand
 
                 NotifyPushContentType.SHARE_HOMEWORK -> showNotification(
                     title = buildString {
-                        val senderName =
-                            message.data[NotifyPushContent.ShareHomework.SENDER_NAME]
+                        val senderName = message.data[NotifyPushContent.ShareHomework.SENDER_NAME]
                         append(senderName ?: coreStrings.emptyMessageUser, " ")
                         append(coreStrings.shareHomeworkMessageTitleSuffix)
                     },
@@ -108,8 +104,7 @@ class RemoteMessageHandlerImpl(private val context: Context) : RemoteMessageHand
 
                 NotifyPushContentType.SHARE_SCHEDULE -> showNotification(
                     title = buildString {
-                        val senderName =
-                            message.data[NotifyPushContent.ShareSchedule.SENDER_NAME]
+                        val senderName = message.data[NotifyPushContent.ShareSchedule.SENDER_NAME]
                         append(senderName ?: coreStrings.emptyMessageUser, " ")
                         append(coreStrings.shareScheduleMessageTitleSuffix)
                     },
