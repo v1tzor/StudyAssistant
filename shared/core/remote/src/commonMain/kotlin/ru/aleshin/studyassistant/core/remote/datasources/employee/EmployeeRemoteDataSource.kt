@@ -26,6 +26,7 @@ import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.exists
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Storage
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
@@ -40,8 +41,9 @@ interface EmployeeRemoteDataSource {
     suspend fun addOrUpdateEmployeeGroup(employees: List<EmployeePojo>, targetUser: UID)
     suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String
     suspend fun fetchEmployeeById(uid: UID, targetUser: UID): Flow<EmployeePojo?>
-    suspend fun fetchAllEmployeeByOrganization(organizationId: UID, targetUser: UID): Flow<List<EmployeePojo>>
+    suspend fun fetchAllEmployeeByOrganization(organizationId: UID?, targetUser: UID): Flow<List<EmployeePojo>>
     suspend fun deleteEmployee(targetId: UID, targetUser: UID)
+    suspend fun deleteAllEmployee(targetUser: UID)
     suspend fun deleteAvatar(uid: UID, targetUser: UID)
 
     class Base(
@@ -108,14 +110,18 @@ interface EmployeeRemoteDataSource {
         }
 
         override suspend fun fetchAllEmployeeByOrganization(
-            organizationId: UID,
+            organizationId: UID?,
             targetUser: UID
         ): Flow<List<EmployeePojo>> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.EMPLOYEE).where {
-                UserData.ORGANIZATION_ID equalTo organizationId
+            val reference = if (organizationId != null) {
+                userDataRoot.collection(UserData.EMPLOYEE).where {
+                    UserData.ORGANIZATION_ID equalTo organizationId
+                }
+            } else {
+                userDataRoot.collection(UserData.EMPLOYEE)
             }
 
             val employeeFlow = reference.snapshots.map { snapshot ->
@@ -132,6 +138,24 @@ interface EmployeeRemoteDataSource {
             val reference = userDataRoot.collection(UserData.EMPLOYEE).document(targetId)
 
             return reference.delete()
+        }
+
+        override suspend fun deleteAllEmployee(targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.EMPLOYEE)
+
+            val deletableEmployeeReferences = reference.snapshotGet().map { snapshot ->
+                snapshot.reference
+            }
+
+            database.batch().apply {
+                deletableEmployeeReferences.forEach { employeeReference ->
+                    delete(employeeReference)
+                }
+                return@apply commit()
+            }
         }
 
         override suspend fun deleteAvatar(uid: UID, targetUser: UID) {

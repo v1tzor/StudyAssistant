@@ -52,7 +52,7 @@ internal fun NotificationContent(
     onUpdateWorkloadWarningNotify: (Int?) -> Unit,
 ) = with(state) {
     Column(
-        modifier = modifier.verticalScroll(scrollState),
+        modifier = modifier.padding(vertical = 24.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         SettingsSwitchView(

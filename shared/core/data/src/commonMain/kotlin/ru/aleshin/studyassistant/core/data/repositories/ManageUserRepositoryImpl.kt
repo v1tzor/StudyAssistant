@@ -30,8 +30,8 @@ class ManageUserRepositoryImpl(
         remoteDataSource.sendPasswordResetEmail(email)
     }
 
-    override suspend fun sendVerifyEmail(email: String) {
-        remoteDataSource.sendVerifyEmail(email)
+    override suspend fun sendVerifyEmail() {
+        remoteDataSource.sendVerifyEmail()
     }
 
     override suspend fun updatePassword(oldPassword: String, newPassword: String) {

@@ -72,6 +72,7 @@ internal interface OverviewWorkProcessor :
 
         private fun loadScheduleWork(date: Instant) = channelFlow {
             var cycleUpdateJob: Job? = null
+            send(ActionResult(OverviewAction.UpdateSelectedDate(date)))
             scheduleInteractor.fetchDetailsScheduleByDate(date).collect { scheduleEither ->
                 cycleUpdateJob?.cancelAndJoin()
                 scheduleEither.handle(
@@ -122,8 +123,6 @@ internal interface OverviewWorkProcessor :
                 onCustomSchedule = { it?.classes }
             )
             while (currentCoroutineContext().isActive) {
-                delay(Delay.UPDATE_ACTIVE_CLASS)
-
                 var activeClassData: ActiveClassUi? = null
                 val currentInstant = dateManager.fetchCurrentInstant()
 
@@ -158,6 +157,7 @@ internal interface OverviewWorkProcessor :
                     }
                 }
                 emit(ActionResult(OverviewAction.UpdateActiveClass(activeClassData)))
+                delay(Delay.UPDATE_ACTIVE_CLASS)
             }
         }
     }

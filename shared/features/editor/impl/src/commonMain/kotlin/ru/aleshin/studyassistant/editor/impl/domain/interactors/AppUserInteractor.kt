@@ -34,6 +34,7 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 internal interface AppUserInteractor {
 
     suspend fun fetchAppUser(): FlowDomainResult<EditorFailures, AppUser>
+    suspend fun fetchAppUserPaidStatus(): FlowDomainResult<EditorFailures, Boolean>
     suspend fun updateUser(user: AppUser): UnitDomainResult<EditorFailures>
     suspend fun uploadAvatar(uid: UID, file: File): DomainResult<EditorFailures, String>
     suspend fun updatePassword(oldPassword: String, newPassword: String): UnitDomainResult<EditorFailures>
@@ -52,6 +53,10 @@ internal interface AppUserInteractor {
             usersRepository.fetchUserById(currentUser).map { appUser ->
                 checkNotNull(appUser)
             }
+        }
+
+        override suspend fun fetchAppUserPaidStatus() = eitherWrapper.wrapFlow {
+            usersRepository.fetchCurrentUserPaidStatus()
         }
 
         override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {

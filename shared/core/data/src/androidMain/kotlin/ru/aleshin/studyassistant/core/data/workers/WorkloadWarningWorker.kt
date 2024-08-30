@@ -21,8 +21,11 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
+import org.kodein.di.DI
+import org.kodein.di.DirectDIAware
+import org.kodein.di.bindProvider
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.di.MainDirectDIAware
+import ru.aleshin.studyassistant.core.common.di.coreCommonModule
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
 import ru.aleshin.studyassistant.core.common.functional.Constants
@@ -32,6 +35,7 @@ import ru.aleshin.studyassistant.core.common.notifications.NotificationCreator
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationCategory
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationPriority
 import ru.aleshin.studyassistant.core.data.R
+import ru.aleshin.studyassistant.core.data.di.coreDataModule
 import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.CLASS_MINUTE_DURATION_RATE
 import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.MAX_RATE
 import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.MOVEMENT_RATE
@@ -52,6 +56,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
+import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
 
@@ -61,7 +66,14 @@ import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
 class WorkloadWarningWorker(
     context: Context,
     workerParameters: WorkerParameters,
-) : CoroutineWorker(context, workerParameters), MainDirectDIAware {
+) : CoroutineWorker(context, workerParameters), DirectDIAware {
+
+    override val directDI = DI.direct {
+        bindProvider<Context> { applicationContext }
+        importAll(coreCommonModule, coreDataModule)
+    }
+    private val coreStrings: StudyAssistantStrings
+        get() = fetchCoreStrings(fetchAppLanguage(applicationContext.fetchCurrentLanguage()))
 
     private val dateManager = instance<DateManager>()
     private val notificationCreator = instance<NotificationCreator>()

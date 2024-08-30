@@ -34,7 +34,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowW
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.extensions.dateTimeByWeek
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
-import ru.aleshin.studyassistant.core.common.functional.Constants
+import ru.aleshin.studyassistant.core.common.functional.Constants.Delay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -101,8 +101,6 @@ internal interface DetailsWorkProcessor :
 
         private fun cycleUpdateActiveClass(schedule: WeekScheduleDetailsUi) = flow {
             while (currentCoroutineContext().isActive) {
-                delay(Constants.Delay.UPDATE_ACTIVE_CLASS)
-
                 var activeClassData: ActiveClassUi? = null
                 val currentInstant = dateManager.fetchCurrentInstant()
                 val currentDateTime = currentInstant.toLocalDateTime(TimeZone.currentSystemDefault())
@@ -133,6 +131,7 @@ internal interface DetailsWorkProcessor :
                     }
                 }
                 emit(ActionResult(DetailsAction.UpdateActiveClass(activeClassData)))
+                delay(Delay.UPDATE_ACTIVE_CLASS)
             }
         }
     }

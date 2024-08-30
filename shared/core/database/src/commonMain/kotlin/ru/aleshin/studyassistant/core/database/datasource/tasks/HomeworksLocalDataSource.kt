@@ -44,12 +44,13 @@ import kotlin.coroutines.CoroutineContext
 interface HomeworksLocalDataSource {
 
     suspend fun addOrUpdateHomework(homework: HomeworkEntity): UID
-    suspend fun addHomeworksGroup(homeworks: List<HomeworkEntity>)
+    suspend fun addOrUpdateHomeworksGroup(homeworks: List<HomeworkEntity>)
     suspend fun fetchHomeworkById(uid: UID): Flow<HomeworkDetailsEntity?>
     suspend fun fetchHomeworksByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsEntity>>
     suspend fun fetchOverdueHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
     suspend fun fetchActiveLinkedHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
     suspend fun deleteHomework(uid: UID)
+    suspend fun deleteAllHomework()
 
     class Base(
         private val homeworkQueries: HomeworkQueries,
@@ -69,7 +70,7 @@ interface HomeworksLocalDataSource {
             return uid
         }
 
-        override suspend fun addHomeworksGroup(homeworks: List<HomeworkEntity>) {
+        override suspend fun addOrUpdateHomeworksGroup(homeworks: List<HomeworkEntity>) {
             homeworks.forEach { addOrUpdateHomework(it) }
         }
 
@@ -203,6 +204,10 @@ interface HomeworksLocalDataSource {
 
         override suspend fun deleteHomework(uid: UID) {
             homeworkQueries.deleteHomework(uid)
+        }
+
+        override suspend fun deleteAllHomework() {
+            homeworkQueries.deleteAllHomeworks()
         }
     }
 }

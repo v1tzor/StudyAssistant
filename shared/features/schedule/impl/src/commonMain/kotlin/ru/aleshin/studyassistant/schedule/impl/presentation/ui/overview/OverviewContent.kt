@@ -17,8 +17,6 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder.OVERVIEW_ITEMS
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
@@ -77,11 +76,7 @@ internal fun OverviewContent(
     Crossfade(
         modifier = modifier.fillMaxSize().padding(top = 12.dp),
         targetState = isScheduleLoading,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMediumLow,
-            visibilityThreshold = Spring.DefaultDisplacementThreshold,
-        ),
+        animationSpec = floatSpring(),
     ) { loading ->
         if (!loading && schedule != null) {
             if (schedule.classes.isNotEmpty()) {

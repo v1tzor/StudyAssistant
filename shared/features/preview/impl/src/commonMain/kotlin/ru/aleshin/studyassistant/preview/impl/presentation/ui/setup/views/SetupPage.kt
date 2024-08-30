@@ -57,7 +57,7 @@ internal enum class SetupPage : SetupPageData {
     }
 }
 
-interface SetupPageData : Parcelable {
+internal interface SetupPageData : Parcelable {
     val id: Int
     val stepTitle: String @Composable get
     val buttonLabel: String @Composable get

@@ -56,8 +56,7 @@ internal enum class IntroPage : IntroPageData {
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
-interface IntroPageData {
+internal interface IntroPageData {
     val id: Int
     val headline: String @Composable get
     val body: String @Composable get

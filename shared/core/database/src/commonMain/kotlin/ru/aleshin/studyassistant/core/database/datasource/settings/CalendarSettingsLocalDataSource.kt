@@ -30,8 +30,8 @@ import kotlin.coroutines.CoroutineContext
 interface CalendarSettingsLocalDataSource {
 
     suspend fun fetchSettings(): Flow<CalendarSettingsEntity>
-
     suspend fun updateSettings(settings: CalendarSettingsEntity)
+    suspend fun deleteSettings()
 
     class Base(
         private val calendarQueries: CalendarQueries,
@@ -47,6 +47,10 @@ interface CalendarSettingsLocalDataSource {
 
         override suspend fun updateSettings(settings: CalendarSettingsEntity) {
             calendarQueries.updateSettings(settings)
+        }
+
+        override suspend fun deleteSettings() {
+            calendarQueries.deleteSettings()
         }
     }
 }

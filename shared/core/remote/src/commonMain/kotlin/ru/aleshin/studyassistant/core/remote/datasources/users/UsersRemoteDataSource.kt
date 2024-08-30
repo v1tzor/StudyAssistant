@@ -27,8 +27,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.exists
+import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Storage
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Users
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 
@@ -44,6 +46,7 @@ interface UsersRemoteDataSource {
     suspend fun uploadAvatar(uid: UID, avatar: File): String
     fun fetchCurrentAppUser(): FirebaseUser?
     suspend fun fetchAuthStateChanged(): Flow<FirebaseUser?>
+    suspend fun isExistRemoteData(uid: UID): Boolean
     suspend fun fetchUserById(uid: UID): Flow<AppUserPojo?>
     suspend fun fetchRealtimeUserById(uid: UID): AppUserPojo?
     suspend fun fetchUserFriends(uid: UID): Flow<List<AppUserPojo>>
@@ -84,6 +87,11 @@ interface UsersRemoteDataSource {
 
         override suspend fun fetchAuthStateChanged(): Flow<FirebaseUser?> {
             return auth.authStateChanged
+        }
+
+        override suspend fun isExistRemoteData(uid: UID): Boolean {
+            val root = database.collection(UserData.ROOT).document(uid)
+            return root.collection(UserData.ORGANIZATIONS).snapshotGet().isNotEmpty()
         }
 
         override suspend fun fetchUserById(uid: UID): Flow<AppUserPojo?> {

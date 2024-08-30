@@ -80,8 +80,8 @@ internal class TodoScreenModel(
             is TodoEvent.NextTimeRange -> with(state()) {
                 val currentTimeRange = checkNotNull(selectedTimeRange)
                 val targetTimeRange = TimeRange(
-                    from = currentTimeRange.from.shiftWeek(+1),
-                    to = currentTimeRange.to.shiftWeek(+1),
+                    from = currentTimeRange.to,
+                    to = currentTimeRange.to.shiftWeek(+3),
                 )
                 sendAction(TodoAction.UpdateTimeRange(targetTimeRange))
                 launchBackgroundWork(BackgroundKey.LOAD_TODOS) {
@@ -92,8 +92,8 @@ internal class TodoScreenModel(
             is TodoEvent.PreviousTimeRange -> with(state()) {
                 val currentTimeRange = checkNotNull(selectedTimeRange)
                 val targetTimeRange = TimeRange(
-                    from = currentTimeRange.from.shiftWeek(-1),
-                    to = currentTimeRange.to.shiftWeek(-1),
+                    from = currentTimeRange.from.shiftWeek(-3),
+                    to = currentTimeRange.from,
                 )
                 sendAction(TodoAction.UpdateTimeRange(targetTimeRange))
                 launchBackgroundWork(BackgroundKey.LOAD_TODOS) {

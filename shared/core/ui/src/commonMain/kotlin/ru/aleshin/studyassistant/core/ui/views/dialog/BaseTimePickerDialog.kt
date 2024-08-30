@@ -144,8 +144,12 @@ fun BaseTimePickerDialog(
                     showCurrentTimeSelector = showCurrentTimeSelector,
                     onDismiss = onDismiss,
                     onCurrentTimeChoose = {
-                        hour = currentDateTime.hour
-                        minute = currentDateTime.minute + 1
+                        hour = currentDateTime.hour + if (currentDateTime.minute == 59) 1 else 0
+                        minute = if (currentDateTime.minute != 59) {
+                            currentDateTime.minute + 1
+                        } else {
+                            0
+                        }
                         if (!is24Format && (hour!! > 12 || hour == 0)) format = TimeFormat.PM
                     },
                     onConfirm = {

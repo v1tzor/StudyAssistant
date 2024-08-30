@@ -35,7 +35,6 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.Reg
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterViewState
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.rememberRegisterScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
-import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 
@@ -80,7 +79,7 @@ internal class RegisterScreen : Screen {
         handleEffect { effect ->
             when (effect) {
                 is RegisterEffect.NavigateToLocal -> navigator.push(effect.pushScreen)
-                is RegisterEffect.ReplaceGlobalScreen -> navigator.root().replaceAll(effect.screen)
+                is RegisterEffect.ReplaceScreen -> navigator.replaceAll(effect.screen)
                 is RegisterEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

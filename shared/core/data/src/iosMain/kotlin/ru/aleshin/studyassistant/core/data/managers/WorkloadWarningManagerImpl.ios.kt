@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.core.data.managers
 
-import ru.aleshin.studyassistant.core.domain.managers.WorkStatus
+import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
 
 /**
@@ -24,8 +24,8 @@ import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
  */
 actual class WorkloadWarningManagerImpl : WorkloadWarningManager {
 
-    override suspend fun fetchWorkStatus(): WorkStatus {
-        return WorkStatus.FAILED
+    override suspend fun fetchWorkStatus(): RepeatWorkStatus {
+        return RepeatWorkStatus.CANCELED
     }
 
     override fun startOrRetryWarningService() {

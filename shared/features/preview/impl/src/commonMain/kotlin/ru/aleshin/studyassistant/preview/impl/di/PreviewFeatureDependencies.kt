@@ -29,13 +29,13 @@ import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStar
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
-interface PreviewFeatureDependencies : BaseFeatureDependencies {
-    val editorFeatureStarter: () -> EditorFeatureStarter
-    val navigationFeatureStarter: () -> NavigationFeatureStarter
-    val authFeatureStarter: () -> AuthFeatureStarter
-    val usersRepository: UsersRepository
-    val organizationsRepository: OrganizationsRepository
-    val calendarSettingsRepository: CalendarSettingsRepository
-    val deviceInfoProvider: DeviceInfoProvider
-    val coroutineManager: CoroutineManager
+public interface PreviewFeatureDependencies : BaseFeatureDependencies {
+    public val editorFeatureStarter: () -> EditorFeatureStarter
+    public val navigationFeatureStarter: () -> NavigationFeatureStarter
+    public val authFeatureStarter: () -> AuthFeatureStarter
+    public val usersRepository: UsersRepository
+    public val organizationsRepository: OrganizationsRepository
+    public val calendarSettingsRepository: CalendarSettingsRepository
+    public val deviceInfoProvider: DeviceInfoProvider
+    public val coroutineManager: CoroutineManager
 }

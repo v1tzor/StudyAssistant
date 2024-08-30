@@ -17,7 +17,9 @@
 package ru.aleshin.studyassistant.settings.impl.presentation.mappers
 
 import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
+import ru.aleshin.studyassistant.core.domain.entities.settings.Holidays
 import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.CalendarSettingsUi
+import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.HolidaysUi
 
 /**
  * @author Stanislav Aleshin on 10.07.2024.
@@ -25,9 +27,23 @@ import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.Cale
 internal fun CalendarSettings.mapToUi() = CalendarSettingsUi(
     numberOfWeek = numberOfWeek,
     weekScheduleViewType = weekScheduleViewType,
+    holidays = holidays.map { it.mapToUi() },
+)
+
+internal fun Holidays.mapToUi() = HolidaysUi(
+    organizations = organizations,
+    start = start,
+    end = end,
 )
 
 internal fun CalendarSettingsUi.mapToDomain() = CalendarSettings(
     numberOfWeek = numberOfWeek,
     weekScheduleViewType = weekScheduleViewType,
+    holidays = holidays.map { it.mapToDomain() },
+)
+
+internal fun HolidaysUi.mapToDomain() = Holidays(
+    organizations = organizations,
+    start = start,
+    end = end,
 )

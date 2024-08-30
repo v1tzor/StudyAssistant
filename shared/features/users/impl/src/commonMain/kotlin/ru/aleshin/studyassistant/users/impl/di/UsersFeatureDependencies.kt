@@ -29,13 +29,13 @@ import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 /**
  * @author Stanislav Aleshin on 19.06.2024.
  */
-interface UsersFeatureDependencies : BaseFeatureDependencies {
-    val editorFeatureStarter: () -> EditorFeatureStarter
-    val subjectsRepository: SubjectsRepository
-    val employeeRepository: EmployeeRepository
-    val friendRequestsRepository: FriendRequestsRepository
-    val usersRepository: UsersRepository
-    val messageRepository: MessageRepository
-    val dateManager: DateManager
-    val coroutineManager: CoroutineManager
+public interface UsersFeatureDependencies : BaseFeatureDependencies {
+    public val editorFeatureStarter: () -> EditorFeatureStarter
+    public val subjectsRepository: SubjectsRepository
+    public val employeeRepository: EmployeeRepository
+    public val friendRequestsRepository: FriendRequestsRepository
+    public val usersRepository: UsersRepository
+    public val messageRepository: MessageRepository
+    public val dateManager: DateManager
+    public val coroutineManager: CoroutineManager
 }

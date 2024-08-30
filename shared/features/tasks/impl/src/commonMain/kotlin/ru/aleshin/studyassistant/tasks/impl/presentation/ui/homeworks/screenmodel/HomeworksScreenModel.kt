@@ -87,8 +87,8 @@ internal class HomeworksScreenModel(
                 val currentDate = dateManager.fetchBeginningCurrentInstant()
                 val currentTimeRange = checkNotNull(selectedTimeRange)
                 val targetTimeRange = TimeRange(
-                    from = currentTimeRange.from.shiftWeek(+1),
-                    to = currentTimeRange.to.shiftWeek(+1),
+                    from = currentTimeRange.to,
+                    to = currentTimeRange.to.shiftWeek(+3),
                 )
                 sendAction(HomeworksAction.UpdateDates(currentDate, targetTimeRange))
                 launchBackgroundWork(BackgroundKey.LOAD_HOMEWORKS) {
@@ -100,8 +100,8 @@ internal class HomeworksScreenModel(
                 val currentDate = dateManager.fetchBeginningCurrentInstant()
                 val currentTimeRange = checkNotNull(selectedTimeRange)
                 val targetTimeRange = TimeRange(
-                    from = currentTimeRange.from.shiftWeek(-1),
-                    to = currentTimeRange.to.shiftWeek(-1),
+                    from = currentTimeRange.from.shiftWeek(-3),
+                    to = currentTimeRange.from,
                 )
                 sendAction(HomeworksAction.UpdateDates(currentDate, targetTimeRange))
                 launchBackgroundWork(BackgroundKey.LOAD_HOMEWORKS) {

@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.auth.impl.domain.entites
 
-import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
+import dev.gitlive.firebase.auth.FirebaseUser
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
 internal data class AuthResult(
-    val user: AppUser,
+    val firebaseUser: FirebaseUser,
     val isNewUser: Boolean,
 )

@@ -16,23 +16,24 @@
 
 package ru.aleshin.studyassistant.core.data.managers
 
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.WorkStatus
 
 /**
  * @author Stanislav Aleshin on 24.08.2024.
  */
 actual class StartClassesReminderManagerImpl : StartClassesReminderManager {
 
-    override suspend fun fetchWorkStatus(): WorkStatus {
-        return WorkStatus.FAILED
+    override suspend fun fetchWorkStatus(): RepeatWorkStatus {
+        return RepeatWorkStatus.CANCELED
     }
 
     override fun startOrRetryReminderService() {
         // TODO: In planned
     }
 
-    override fun stopReminderService() {
+    override fun stopReminderService(allOrganizations: List<UID>) {
         // TODO: In planned
     }
 }

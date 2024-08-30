@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.domain.repositories
 
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
 
 /**
@@ -26,4 +27,5 @@ import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
 interface CalendarSettingsRepository {
     suspend fun fetchSettings(targetUser: UID): Flow<CalendarSettings>
     suspend fun updateSettings(settings: CalendarSettings, targetUser: UID)
+    suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
 }

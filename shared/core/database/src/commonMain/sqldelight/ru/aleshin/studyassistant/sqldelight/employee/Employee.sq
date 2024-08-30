@@ -18,6 +18,10 @@ CREATE TABLE employeeEntity (
   webs TEXT AS List<String> NOT NULL
 );
 
+addOrUpdateEmployee:
+INSERT OR REPLACE INTO employeeEntity (uid, organization_id, first_name, second_name, patronymic, post, avatar, birthday, workTimeStart, workTimeEnd, emails, phones, locations, webs)
+VALUES ?;
+
 fetchEmployeesByOrganization:
 SELECT *
 FROM employeeEntity
@@ -28,10 +32,13 @@ SELECT *
 FROM employeeEntity
 WHERE uid = ?;
 
-addOrUpdateEmployee:
-INSERT OR REPLACE INTO employeeEntity (uid, organization_id, first_name, second_name, patronymic, post, avatar, birthday, workTimeStart, workTimeEnd, emails, phones, locations, webs)
-VALUES ?;
+fetchAllEmployees:
+SELECT *
+FROM employeeEntity;
 
 deleteEmployee:
 DELETE FROM employeeEntity
 WHERE uid = ?;
+
+deleteAllEmployee:
+DELETE FROM employeeEntity;

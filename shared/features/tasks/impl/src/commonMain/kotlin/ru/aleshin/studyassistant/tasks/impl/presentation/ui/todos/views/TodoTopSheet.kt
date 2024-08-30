@@ -16,7 +16,11 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.views
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
+import ru.aleshin.studyassistant.core.common.extensions.calculateProgress
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.ui.mappers.format
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
@@ -157,35 +163,45 @@ private fun TodoProgressView(
             maxLines = 1,
             style = MaterialTheme.typography.labelMedium,
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (!isLoading) {
-                LinearProgressIndicator(
-                    modifier = Modifier.height(10.dp).weight(1f).clip(MaterialTheme.shapes.full),
-                    progress = { progressList.count { it } / progressList.size.toFloat() },
-                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    strokeCap = StrokeCap.Square,
-                    gapSize = 0.dp,
-                    drawStopIndicator = {},
-                )
-                Text(
-                    text = buildString {
-                        append(progressList.count { it }, "/", progressList.size)
-                    },
-                    color = MaterialTheme.colorScheme.primary,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    style = MaterialTheme.typography.labelMedium,
-                )
-            } else {
-                PlaceholderBox(
-                    modifier = Modifier.fillMaxWidth().height(10.dp),
-                    shape = MaterialTheme.shapes.full,
-                    color = MaterialTheme.colorScheme.primary,
-                )
+        Crossfade(
+            targetState = isLoading,
+            animationSpec = spring(
+                stiffness = Spring.StiffnessMediumLow,
+                visibilityThreshold = Spring.DefaultDisplacementThreshold,
+            ),
+        ) { loading ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (!loading) {
+                    val progress by animateFloatAsState(targetValue = progressList.calculateProgress { it })
+                    LinearProgressIndicator(
+                        modifier = Modifier.height(10.dp).weight(1f).clip(MaterialTheme.shapes.full),
+                        progress = { progress },
+                        trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                        strokeCap = StrokeCap.Square,
+                        gapSize = 0.dp,
+                        drawStopIndicator = {},
+                    )
+                    Text(
+                        text = buildString {
+                            append(progressList.count { it }, "/", progressList.size)
+                        },
+                        color = MaterialTheme.colorScheme.primary,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                } else {
+                    PlaceholderBox(
+                        modifier = Modifier.fillMaxWidth().height(10.dp),
+                        shape = MaterialTheme.shapes.full,
+                        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    )
+                    Text(text = " ", style = MaterialTheme.typography.labelMedium)
+                }
             }
         }
     }

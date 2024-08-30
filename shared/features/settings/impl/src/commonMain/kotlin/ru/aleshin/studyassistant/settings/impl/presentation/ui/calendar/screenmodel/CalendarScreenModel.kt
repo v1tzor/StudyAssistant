@@ -61,10 +61,23 @@ internal class CalendarScreenModel(
                     val command = CalendarWorkCommand.LoadSettings
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_ORGANIZATION) {
+                    val command = CalendarWorkCommand.LoadOrganizations
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is CalendarEvent.ChangeNumberOfRepeatWeek -> with(state()) {
                 val settings = checkNotNull(settings)
                 val updatedSettings = settings.copy(numberOfWeek = event.numberOfWeek)
+
+                launchBackgroundWork(BackgroundKey.SETTINGS_ACTION) {
+                    val command = CalendarWorkCommand.UpdateSettings(updatedSettings)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is CalendarEvent.UpdateHolidays -> with(state()) {
+                val settings = checkNotNull(settings)
+                val updatedSettings = settings.copy(holidays = event.holidays)
 
                 launchBackgroundWork(BackgroundKey.SETTINGS_ACTION) {
                     val command = CalendarWorkCommand.UpdateSettings(updatedSettings)
@@ -81,10 +94,13 @@ internal class CalendarScreenModel(
         is CalendarAction.UpdateSettings -> currentState.copy(
             settings = action.settings,
         )
+        is CalendarAction.UpdateOrganizations -> currentState.copy(
+            allOrganizations = action.organizations,
+        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_SETTINGS, SETTINGS_ACTION,
+        LOAD_SETTINGS, LOAD_ORGANIZATION, SETTINGS_ACTION,
     }
 }
 

@@ -19,15 +19,15 @@ package ru.aleshin.studyassistant.core.data.managers
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.di.MainDirectDIAware
 import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.WorkStatus
+import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 
 /**
  * @author Stanislav Aleshin on 22.08.2024.
  */
 actual class HomeworksReminderManagerImpl : HomeworksReminderManager, MainDirectDIAware {
 
-    override suspend fun fetchWorkStatus(): WorkStatus {
-        return WorkStatus.FAILED
+    override suspend fun fetchWorkStatus(): RepeatWorkStatus {
+        return RepeatWorkStatus.CANCELED
     }
 
     override fun startOrRetryReminderService(time: Instant) {

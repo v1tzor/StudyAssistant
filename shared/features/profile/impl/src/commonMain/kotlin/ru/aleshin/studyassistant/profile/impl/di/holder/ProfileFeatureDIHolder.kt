@@ -26,6 +26,10 @@ import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
@@ -46,7 +50,7 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-object ProfileFeatureDIHolder : BaseFeatureDIHolder<ProfileFeatureApi, ProfileFeatureDependencies> {
+public object ProfileFeatureDIHolder : BaseFeatureDIHolder<ProfileFeatureApi, ProfileFeatureDependencies> {
 
     private var directDi: DirectDI? = null
 
@@ -68,6 +72,10 @@ object ProfileFeatureDIHolder : BaseFeatureDIHolder<ProfileFeatureApi, ProfileFe
                 bindSingleton<MessageRepository> { dependencies.messageRepository }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
+                bindSingleton<StartClassesReminderManager> { dependencies.startClassesReminderManager }
+                bindSingleton<EndClassesReminderManager> { dependencies.endClassesReminderManager }
+                bindSingleton<WorkloadWarningManager> { dependencies.workloadWarningManager }
+                bindSingleton<HomeworksReminderManager> { dependencies.homeworksReminderManager }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<ProfileFeatureApi> {
                     object : ProfileFeatureApi {

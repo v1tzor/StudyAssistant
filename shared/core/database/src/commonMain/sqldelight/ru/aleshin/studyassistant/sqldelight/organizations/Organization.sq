@@ -17,10 +17,18 @@ CREATE TABLE organizationEntity (
   is_hide INTEGER NOT NULL
 );
 
-fetchAllOrganizations:
+addOrUpdateOrganization:
+INSERT OR REPLACE INTO organizationEntity (uid, is_main, short_name, full_name, type, avatar, schedule_time_intervals, emails, phones, locations, webs, offices, is_hide)
+VALUES ?;
+
+fetchAllNotHideOrganizations:
 SELECT *
 FROM organizationEntity
 WHERE is_hide = 0;
+
+fetchAllOrganizations:
+SELECT *
+FROM organizationEntity;
 
 fetchOrganizationById:
 SELECT *
@@ -32,6 +40,5 @@ SELECT *
 FROM organizationEntity
 WHERE uid IN ?;
 
-addOrUpdateOrganization:
-INSERT OR REPLACE INTO organizationEntity (uid, is_main, short_name, full_name, type, avatar, schedule_time_intervals, emails, phones, locations, webs, offices, is_hide)
-VALUES ?;
+deleteAllOrganizations:
+DELETE FROM organizationEntity;

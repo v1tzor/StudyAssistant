@@ -16,6 +16,12 @@
 
 package ru.aleshin.studyassistant.core.data.managers
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_CANCEL_CURRENT
+import android.app.PendingIntent.FLAG_MUTABLE
+import android.content.Context
+import androidx.work.BackoffPolicy
 import androidx.work.ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE
 import androidx.work.ExistingWorkPolicy.REPLACE
 import androidx.work.OneTimeWorkRequestBuilder
@@ -24,31 +30,34 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.flow.first
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.data.workers.LocalNotificationReceiver
 import ru.aleshin.studyassistant.core.data.workers.StartClassesReminderWorker
-import ru.aleshin.studyassistant.core.data.workers.StartClassesReminderWorker.Companion.NOTIFICATION_WORK_TAG
+import ru.aleshin.studyassistant.core.data.workers.StartClassesReminderWorker.Companion.NOTIFICATION_ID_APPEND
 import ru.aleshin.studyassistant.core.data.workers.StartClassesReminderWorker.Companion.REPEAT_WORK_KEY
 import ru.aleshin.studyassistant.core.data.workers.StartClassesReminderWorker.Companion.WORK_KEY
+import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.WorkStatus
 import java.util.concurrent.TimeUnit
 
 /**
  * @author Stanislav Aleshin on 24.08.2024.
  */
 actual class StartClassesReminderManagerImpl(
+    private val context: Context,
+    private val alarmManager: AlarmManager,
     private val workManager: WorkManager,
     private val dateManager: DateManager,
 ) : StartClassesReminderManager {
 
-    override suspend fun fetchWorkStatus(): WorkStatus {
+    override suspend fun fetchWorkStatus(): RepeatWorkStatus {
         val workInfo = workManager.getWorkInfosForUniqueWorkFlow(REPEAT_WORK_KEY).first()
         return workInfo.firstOrNull()?.state.mapToWorkStatus()
     }
 
     override fun startOrRetryReminderService() {
         val workRequest = OneTimeWorkRequestBuilder<StartClassesReminderWorker>().build()
-        workManager.cancelAllWorkByTag(NOTIFICATION_WORK_TAG)
         workManager.enqueueUniqueWork(WORK_KEY, REPLACE, workRequest)
 
         val currentTime = dateManager.fetchCurrentInstant()
@@ -60,14 +69,24 @@ actual class StartClassesReminderManagerImpl(
             repeatIntervalTimeUnit = TimeUnit.DAYS,
         ).apply {
             setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            setBackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS)
         }.build()
 
         workManager.enqueueUniquePeriodicWork(REPEAT_WORK_KEY, CANCEL_AND_REENQUEUE, repeatWorkRequest)
     }
 
-    override fun stopReminderService() {
+    override fun stopReminderService(allOrganizations: List<UID>) {
         workManager.cancelUniqueWork(WORK_KEY)
         workManager.cancelUniqueWork(REPEAT_WORK_KEY)
-        workManager.cancelAllWorkByTag(NOTIFICATION_WORK_TAG)
+        allOrganizations.forEach { uid ->
+            val id = uid.hashCode() + NOTIFICATION_ID_APPEND
+            val intent = LocalNotificationReceiver.createCancelIntent(context)
+            val cancelFlag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
+            val cancelPendingIntent = PendingIntent.getBroadcast(context, id, intent, cancelFlag)
+            if (cancelPendingIntent != null) {
+                alarmManager.cancel(cancelPendingIntent)
+                cancelPendingIntent.cancel()
+            }
+        }
     }
 }

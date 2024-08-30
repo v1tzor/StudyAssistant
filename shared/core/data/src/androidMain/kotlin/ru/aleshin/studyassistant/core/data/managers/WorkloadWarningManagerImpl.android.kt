@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.data.managers
 
+import androidx.work.BackoffPolicy
 import androidx.work.ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -25,7 +26,7 @@ import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.data.workers.WorkloadWarningWorker
 import ru.aleshin.studyassistant.core.data.workers.WorkloadWarningWorker.Companion.WORK_KEY
-import ru.aleshin.studyassistant.core.domain.managers.WorkStatus
+import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
 import java.util.concurrent.TimeUnit
 
@@ -37,7 +38,7 @@ actual class WorkloadWarningManagerImpl(
     private val dateManager: DateManager,
 ) : WorkloadWarningManager {
 
-    override suspend fun fetchWorkStatus(): WorkStatus {
+    override suspend fun fetchWorkStatus(): RepeatWorkStatus {
         val workInfo = workManager.getWorkInfosForUniqueWorkFlow(WORK_KEY).first()
         return workInfo.firstOrNull()?.state.mapToWorkStatus()
     }
@@ -57,6 +58,7 @@ actual class WorkloadWarningManagerImpl(
             repeatIntervalTimeUnit = TimeUnit.DAYS,
         ).apply {
             setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            setBackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS)
         }.build()
 
         workManager.enqueueUniquePeriodicWork(WORK_KEY, CANCEL_AND_REENQUEUE, workRequest)

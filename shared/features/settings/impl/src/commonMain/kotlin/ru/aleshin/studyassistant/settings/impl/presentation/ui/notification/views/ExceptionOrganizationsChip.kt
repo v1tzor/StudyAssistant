@@ -17,11 +17,11 @@
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.views
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Text
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

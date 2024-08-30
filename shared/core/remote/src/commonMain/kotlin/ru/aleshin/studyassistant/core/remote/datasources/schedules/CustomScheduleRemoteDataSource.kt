@@ -44,11 +44,13 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 interface CustomScheduleRemoteDataSource {
 
     suspend fun addOrUpdateSchedule(schedule: CustomSchedulePojo, targetUser: UID): UID
+    suspend fun addOrUpdateSchedulesGroup(schedules: List<CustomSchedulePojo>, targetUser: UID)
     suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<CustomScheduleDetailsPojo?>
     suspend fun fetchScheduleByDate(date: Instant, targetUser: UID): Flow<CustomScheduleDetailsPojo?>
     suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant, targetUser: UID): Flow<List<CustomScheduleDetailsPojo>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<ClassDetailsPojo?>
     suspend fun deleteScheduleById(scheduleId: UID, targetUser: UID)
+    suspend fun deleteSchedulesByTimeRange(from: Instant, to: Instant, targetUser: UID)
 
     class Base(
         private val database: FirebaseFirestore,
@@ -67,6 +69,24 @@ interface CustomScheduleRemoteDataSource {
 
             return reference.document(uid).set(data = schedule.copy(uid = uid)).let {
                 return@let uid
+            }
+        }
+
+        override suspend fun addOrUpdateSchedulesGroup(
+            schedules: List<CustomSchedulePojo>,
+            targetUser: UID
+        ) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES)
+
+            database.batch().apply {
+                schedules.forEach { schedule ->
+                    val uid = schedule.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+                    set(reference.document(uid), schedule.copy(uid = uid))
+                }
+                return@apply commit()
             }
         }
 
@@ -162,6 +182,35 @@ interface CustomScheduleRemoteDataSource {
             val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES).document(scheduleId)
 
             return reference.delete()
+        }
+
+        override suspend fun deleteSchedulesByTimeRange(
+            from: Instant,
+            to: Instant,
+            targetUser: UID
+        ) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val fromMillis = from.toEpochMilliseconds()
+            val toMillis = to.toEpochMilliseconds()
+
+            val schedulesReference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES).where {
+                val firstDateFilter = UserData.CUSTOM_SCHEDULE_DATE greaterThanOrEqualTo fromMillis
+                val secondDateFilter = UserData.CUSTOM_SCHEDULE_DATE lessThanOrEqualTo toMillis
+                return@where firstDateFilter and secondDateFilter
+            }
+
+            val deletableScheduleReferences = schedulesReference.snapshotGet().map { snapshot ->
+                snapshot.reference
+            }
+
+            database.batch().apply {
+                deletableScheduleReferences.forEach { scheduleReference ->
+                    delete(scheduleReference)
+                }
+                return@apply commit()
+            }
         }
 
         private suspend fun ClassPojo.mapToDetails(userDataRoot: DocumentReference, scheduleId: UID): ClassDetailsPojo {

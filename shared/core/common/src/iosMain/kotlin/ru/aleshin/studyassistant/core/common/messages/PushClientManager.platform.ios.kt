@@ -36,6 +36,6 @@ actual class PushClientManager(
     }
 
     actual suspend fun deleteToken() {
-        firebaseMessaging.deleteToken()
+        // firebaseMessaging.deleteToken()
     }
 }

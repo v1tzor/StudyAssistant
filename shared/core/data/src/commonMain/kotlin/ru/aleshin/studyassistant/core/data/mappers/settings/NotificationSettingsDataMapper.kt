@@ -17,21 +17,11 @@
 package ru.aleshin.studyassistant.core.data.mappers.settings
 
 import ru.aleshin.studyassistant.core.domain.entities.settings.NotificationSettings
-import ru.aleshin.studyassistant.core.remote.models.settings.NotificationSettingsPojo
 import ru.aleshin.studyassistant.sqldelight.settings.NotificationSettingsEntity
 
 /**
  * @author Stanislav Aleshin on 01.05.2024.
  */
-fun NotificationSettingsPojo.mapToDomain() = NotificationSettings(
-    beginningOfClasses = beginningOfClasses,
-    exceptionsForBeginningOfClasses = exceptionsForBeginningOfClasses,
-    endOfClasses = endOfClasses,
-    exceptionsForEndOfClasses = exceptionsForEndOfClasses,
-    unfinishedHomeworks = unfinishedHomeworks,
-    highWorkload = highWorkload,
-)
-
 fun NotificationSettingsEntity.mapToDomain() = NotificationSettings(
     beginningOfClasses = beginning_of_classes,
     exceptionsForBeginningOfClasses = exceptions_for_beginning_of_classes,
@@ -39,15 +29,6 @@ fun NotificationSettingsEntity.mapToDomain() = NotificationSettings(
     exceptionsForEndOfClasses = exceptions_for_end_of_classes,
     unfinishedHomeworks = unfinished_homeworks,
     highWorkload = high_workload?.toInt(),
-)
-
-fun NotificationSettings.mapToRemoteData() = NotificationSettingsPojo(
-    beginningOfClasses = beginningOfClasses,
-    exceptionsForBeginningOfClasses = exceptionsForBeginningOfClasses,
-    endOfClasses = endOfClasses,
-    exceptionsForEndOfClasses = exceptionsForEndOfClasses,
-    unfinishedHomeworks = unfinishedHomeworks,
-    highWorkload = highWorkload,
 )
 
 fun NotificationSettings.mapToLocalData() = NotificationSettingsEntity(

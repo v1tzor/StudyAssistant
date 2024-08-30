@@ -31,15 +31,15 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 /**
  * @author Stanislav Aleshin on 16.06.2024.
  */
-interface InfoFeatureDependencies : BaseFeatureDependencies {
-    val editorFeatureStarter: () -> EditorFeatureStarter
-    val usersFeatureStarter: () -> UsersFeatureStarter
-    val baseScheduleRepository: BaseScheduleRepository
-    val organizationsRepository: OrganizationsRepository
-    val calendarSettingsRepository: CalendarSettingsRepository
-    val subjectsRepository: SubjectsRepository
-    val employeeRepository: EmployeeRepository
-    val usersRepository: UsersRepository
-    val dateManager: DateManager
-    val coroutineManager: CoroutineManager
+public interface InfoFeatureDependencies : BaseFeatureDependencies {
+    public val editorFeatureStarter: () -> EditorFeatureStarter
+    public val usersFeatureStarter: () -> UsersFeatureStarter
+    public val baseScheduleRepository: BaseScheduleRepository
+    public val organizationsRepository: OrganizationsRepository
+    public val calendarSettingsRepository: CalendarSettingsRepository
+    public val subjectsRepository: SubjectsRepository
+    public val employeeRepository: EmployeeRepository
+    public val usersRepository: UsersRepository
+    public val dateManager: DateManager
+    public val coroutineManager: CoroutineManager
 }

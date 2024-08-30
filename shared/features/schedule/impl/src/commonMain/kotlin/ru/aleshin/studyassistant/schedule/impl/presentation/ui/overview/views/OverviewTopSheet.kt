@@ -17,8 +17,7 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,15 +25,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.koalaplot.core.line.AreaBaseline
@@ -56,10 +57,11 @@ import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import io.github.koalaplot.core.xygraph.XYGraph
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.calculateProgress
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.extensions.toMinutesAndHoursString
-import ru.aleshin.studyassistant.core.common.functional.Constants.Animations.FADE_SLOW
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
@@ -76,7 +78,8 @@ import kotlin.math.roundToInt
 @Composable
 internal fun OverviewTopSheet(
     modifier: Modifier = Modifier,
-    isLoading: Boolean,
+    isLoadingSchedule: Boolean,
+    isLoadingAnalytics: Boolean,
     selectedDate: Instant?,
     weekAnalysis: List<DailyAnalysisUi>?,
     activeClass: ActiveClassUi?,
@@ -91,7 +94,9 @@ internal fun OverviewTopSheet(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val currentAnalysis = weekAnalysis?.find { it.date.equalsDay(selectedDate) }
+            val currentAnalysis = remember(selectedDate, isLoadingAnalytics, isLoadingSchedule) {
+                weekAnalysis?.find { it.date.equalsDay(selectedDate) }
+            }
 
             Column(
                 modifier = Modifier.weight(0.6f),
@@ -102,14 +107,14 @@ internal fun OverviewTopSheet(
                     weekAnalysis = weekAnalysis
                 )
                 OverviewTopSheetClassTime(
-                    isLoading = isLoading,
+                    isLoading = isLoadingSchedule || isLoadingAnalytics,
                     activeClass = activeClass,
                     homeworksProgressList = currentAnalysis?.numberOfHomeworks ?: emptyList(),
                     tasksProgressList = currentAnalysis?.numberOfTasks ?: emptyList(),
                 )
             }
             OverviewTopSheetAnalysis(
-                isLoading = isLoading,
+                isLoading = isLoadingAnalytics,
                 modifier = Modifier.weight(0.4f),
                 analysis = currentAnalysis,
             )
@@ -204,24 +209,25 @@ private fun OverviewTopSheetClassTime(
     Crossfade(
         modifier = modifier,
         targetState = isLoading,
-        animationSpec = tween(FADE_SLOW),
+        animationSpec = floatSpring(),
     ) { loading ->
         if (!loading) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                val homeworksProgress by derivedStateOf {
-                    homeworksProgressList.count { it } / homeworksProgressList.size.toFloat()
+                val homeworksProgress = remember(homeworksProgressList) {
+                    homeworksProgressList.calculateProgress { it }
                 }
-                val tasksProgress by derivedStateOf {
-                    tasksProgressList.count { it } / tasksProgressList.size.toFloat()
+                val tasksProgress = remember(tasksProgressList) {
+                    tasksProgressList.calculateProgress { it }
                 }
-                val progress = when {
-                    activeClass?.progress != null -> activeClass.progress
-                    homeworksProgressList.isNotEmpty() -> homeworksProgress
-                    tasksProgressList.isNotEmpty() -> tasksProgress
-                    else -> 0f
+                val progress by when {
+                    isLoading -> mutableFloatStateOf(0f)
+                    activeClass?.progress != null -> animateFloatAsState(activeClass.progress)
+                    homeworksProgressList.isNotEmpty() -> animateFloatAsState(homeworksProgress)
+                    tasksProgressList.isNotEmpty() -> animateFloatAsState(tasksProgress)
+                    else -> mutableFloatStateOf(0f)
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -311,10 +317,11 @@ private fun OverviewTopSheetAnalysis(
                 )
                 Crossfade(
                     targetState = isLoading,
-                    animationSpec = tween(FADE_SLOW),
+                    animationSpec = floatSpring(),
+                    label = "OverviewTopSheetAnalysis",
                 ) { loading ->
-                    if (!loading) {
-                        val assessment = ((analysis?.generalAssessment ?: 0f) * 10f).roundToInt() / 10f
+                    if (!loading && analysis != null) {
+                        val assessment = (analysis.generalAssessment * 10f).roundToInt() / 10f
                         SmallInfoBadge(
                             containerColor = when (assessment) {
                                 in 0f..2f -> StudyAssistantRes.colors.accents.greenContainer
@@ -348,10 +355,12 @@ private fun OverviewTopSheetAnalysis(
                 isLoading = isLoading,
                 icon = painterResource(StudyAssistantRes.icons.homeworks),
                 label = ScheduleThemeRes.strings.analysisHomeworksLabel,
-                value = buildString {
-                    append(analysis?.numberOfHomeworks?.count { it })
-                    append("/")
-                    append(analysis?.numberOfHomeworks?.size)
+                value = analysis?.let {
+                    buildString {
+                        append(analysis.numberOfHomeworks.count { it })
+                        append("/")
+                        append(analysis.numberOfHomeworks.size)
+                    }
                 },
                 valueColor = if (analysis?.numberOfHomeworks?.count { it } == analysis?.numberOfHomeworks?.size) {
                     if (analysis?.numberOfHomeworks?.isEmpty() == true) {
@@ -378,7 +387,7 @@ private fun OverviewTopSheetAnalysis(
                 isLoading = isLoading,
                 icon = painterResource(StudyAssistantRes.icons.classesList),
                 label = ScheduleThemeRes.strings.analysisClassesLabel,
-                value = analysis?.numberOfClasses.toString(),
+                value = analysis?.numberOfClasses?.toString(),
                 valueColor = MaterialTheme.colorScheme.onSurface,
             )
             OverviewTopSheetAnalysisItem(
@@ -396,10 +405,12 @@ private fun OverviewTopSheetAnalysis(
                 isLoading = isLoading,
                 icon = painterResource(StudyAssistantRes.icons.tasksOutline),
                 label = ScheduleThemeRes.strings.analysisTasksLabel,
-                value = buildString {
-                    append(analysis?.numberOfTasks?.count { it })
-                    append("/")
-                    append(analysis?.numberOfTasks?.size)
+                value = analysis?.let {
+                    buildString {
+                        append(analysis.numberOfTasks.count { it })
+                        append("/")
+                        append(analysis.numberOfTasks.size)
+                    }
                 },
                 valueColor = if (analysis?.numberOfTasks?.count { it } == analysis?.numberOfTasks?.size) {
                     if (analysis?.numberOfTasks?.isEmpty() == true) {
@@ -428,6 +439,7 @@ private fun OverviewTopSheetAnalysisItem(
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             modifier = Modifier.size(18.dp),
@@ -444,14 +456,17 @@ private fun OverviewTopSheetAnalysisItem(
             style = MaterialTheme.typography.labelMedium,
         )
         Crossfade(
-            modifier = Modifier.animateContentSize(),
+            modifier = Modifier,
             targetState = isLoading,
-            animationSpec = tween(FADE_SLOW),
+            animationSpec = floatSpring(),
+            label = label,
         ) { loading ->
-            if (!loading) {
+            if (!loading && value != null) {
                 Text(
-                    text = value ?: "-",
+                    modifier = Modifier.widthIn(min = 15.dp),
+                    text = value,
                     color = valueColor,
+                    textAlign = TextAlign.End,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.labelLarge,

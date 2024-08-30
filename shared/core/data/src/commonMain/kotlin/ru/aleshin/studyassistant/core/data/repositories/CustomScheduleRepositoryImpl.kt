@@ -17,8 +17,11 @@
 package ru.aleshin.studyassistant.core.data.repositories
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
+import kotlinx.datetime.Instant.Companion.DISTANT_FUTURE
+import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.payments.SubscriptionChecker
@@ -26,6 +29,7 @@ import ru.aleshin.studyassistant.core.data.mappers.schedules.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.schedules.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.schedules.mapToRemoteData
 import ru.aleshin.studyassistant.core.database.datasource.schedules.CustomScheduleLocalDataSource
+import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -121,6 +125,43 @@ class CustomScheduleRepositoryImpl(
             remoteDataSource.deleteScheduleById(scheduleId, targetUser)
         } else {
             localDataSource.deleteScheduleById(scheduleId)
+        }
+    }
+
+    override suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID) {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        if (isSubscriber) {
+            remoteDataSource.deleteSchedulesByTimeRange(timeRange.from, timeRange.to, targetUser)
+        } else {
+            localDataSource.deleteSchedulesByTimeRange(timeRange.from, timeRange.to)
+        }
+    }
+
+    override suspend fun transferData(direction: DataTransferDirection, targetUser: UID) {
+        when (direction) {
+            DataTransferDirection.REMOTE_TO_LOCAL -> {
+                val allSchedules = remoteDataSource.fetchSchedulesByTimeRange(
+                    from = DISTANT_PAST,
+                    to = DISTANT_FUTURE,
+                    targetUser = targetUser
+                ).let { schedulesFlow ->
+                    return@let schedulesFlow.first().map { it.mapToDomain().mapToLocalData() }
+                }
+                localDataSource.deleteSchedulesByTimeRange(DISTANT_PAST, DISTANT_FUTURE)
+                localDataSource.addOrUpdateSchedulesGroup(allSchedules)
+                remoteDataSource.deleteSchedulesByTimeRange(DISTANT_PAST, DISTANT_FUTURE, targetUser)
+            }
+            DataTransferDirection.LOCAL_TO_REMOTE -> {
+                val allSchedules = localDataSource.fetchSchedulesByTimeRange(
+                    from = DISTANT_PAST,
+                    to = DISTANT_FUTURE,
+                ).let { schedulesFlow ->
+                    return@let schedulesFlow.first().map { it.mapToDomain().mapToRemoteData() }
+                }
+                remoteDataSource.deleteSchedulesByTimeRange(DISTANT_PAST, DISTANT_FUTURE, targetUser)
+                remoteDataSource.addOrUpdateSchedulesGroup(allSchedules, targetUser)
+            }
         }
     }
 }

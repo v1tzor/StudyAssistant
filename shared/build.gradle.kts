@@ -11,13 +11,9 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvmToolchain(17)
+
+    androidTarget()
 
     listOf(
         iosX64(),
@@ -61,9 +57,9 @@ kotlin {
             api(project(":shared:core:common"))
             api(project(":shared:core:ui"))
             api(project(":shared:core:domain"))
+            api(project(":shared:core:data"))
             implementation(project(":shared:core:database"))
             implementation(project(":shared:core:remote"))
-            implementation(project(":shared:core:data"))
 
             implementation(compose.components.resources)
             implementation(libs.firebase.firestore)

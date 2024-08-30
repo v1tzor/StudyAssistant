@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -100,7 +101,7 @@ internal fun ProfileActionsSection(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item(key = "Friends") {
-            ProfileActionView(
+            ProfileActionViewItem(
                 onClick = onFriendsClick,
                 icon = painterResource(ProfileThemeRes.icons.friends),
                 title = ProfileThemeRes.strings.friendsTitle,
@@ -114,7 +115,7 @@ internal fun ProfileActionsSection(
                     ) { loading ->
                         if (loading) {
                             PlaceholderBox(
-                                modifier = Modifier.size(40.dp, 28.dp),
+                                modifier = Modifier.size(40.dp, 26.dp),
                                 shape = MaterialTheme.shapes.small,
                                 highlight = null,
                             )
@@ -140,35 +141,36 @@ internal fun ProfileActionsSection(
             )
         }
         item(key = "PrivacySettings") {
-            ProfileActionView(
+            ProfileActionViewItem(
+                modifier = Modifier,
                 onClick = onPrivacySettingsClick,
                 icon = painterResource(ProfileThemeRes.icons.privacySettings),
                 title = ProfileThemeRes.strings.privacySettingsTitle,
             )
         }
         item(key = "GeneralSettings") {
-            ProfileActionView(
+            ProfileActionViewItem(
                 onClick = onGeneralSettingsClick,
                 icon = painterResource(ProfileThemeRes.icons.generalSettings),
                 title = ProfileThemeRes.strings.generalSettingsTitle,
             )
         }
         item(key = "NotifySettings") {
-            ProfileActionView(
+            ProfileActionViewItem(
                 onClick = onNotifySettingsClick,
                 icon = painterResource(ProfileThemeRes.icons.notifySettings),
                 title = ProfileThemeRes.strings.notifySettingsTitle,
             )
         }
         item(key = "CalendarSettings") {
-            ProfileActionView(
+            ProfileActionViewItem(
                 onClick = onCalendarSettingsClick,
                 icon = painterResource(ProfileThemeRes.icons.calendarSettings),
                 title = ProfileThemeRes.strings.calendarSettingsTitle,
             )
         }
         item(key = "PaymentsSettings") {
-            ProfileActionView(
+            ProfileActionViewItem(
                 onClick = onPaymentsSettingsClick,
                 icon = painterResource(ProfileThemeRes.icons.paymentsSettings),
                 title = ProfileThemeRes.strings.paymentsSettingsTitle,
@@ -191,7 +193,7 @@ internal fun ProfileActionsSection(
 }
 
 @Composable
-internal fun ProfileActionView(
+internal fun ProfileActionViewItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     icon: Painter,
@@ -302,6 +304,8 @@ internal fun ShareScheduleView(
                                 ) {
                                     Text(text = (sharedSchedules?.sent?.size ?: 0).toString(), maxLines = 1)
                                 }
+                            } else {
+                                Spacer(modifier = Modifier.width(20.dp))
                             }
                             MediumInfoBadge(
                                 containerColor = StudyAssistantRes.colors.accents.orangeContainer,

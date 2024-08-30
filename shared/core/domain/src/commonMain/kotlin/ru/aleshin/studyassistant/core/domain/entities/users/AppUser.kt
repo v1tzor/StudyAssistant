@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.users
 
-import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.generateDigitCode
 import ru.aleshin.studyassistant.core.common.functional.UID
 
@@ -35,7 +34,7 @@ data class AppUser(
     val birthday: String? = null,
     val gender: Gender? = null,
     val friends: List<UID> = emptyList(),
-    val subscribePeriod: Instant? = null,
+    val subscriptionInfo: SubscribeInfo? = null,
     val socialNetworks: List<SocialNetwork> = emptyList(),
 ) {
     companion object {

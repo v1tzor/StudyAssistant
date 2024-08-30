@@ -28,10 +28,16 @@ import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.settings.api.di.SettingsFeatureApi
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
@@ -43,7 +49,7 @@ import ru.aleshin.studyassistant.settings.impl.di.modules.presentationModule
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-object SettingsFeatureDIHolder :
+public object SettingsFeatureDIHolder :
     BaseFeatureDIHolder<SettingsFeatureApi, SettingsFeatureDependencies> {
 
     private var directDi: DirectDI? = null
@@ -57,6 +63,12 @@ object SettingsFeatureDIHolder :
                 bindSingleton<NotificationSettingsRepository> { dependencies.notificationSettingsRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
+                bindSingleton<SubjectsRepository> { dependencies.subjectsRepository }
+                bindSingleton<EmployeeRepository> { dependencies.employeeRepository }
+                bindSingleton<HomeworksRepository> { dependencies.homeworksRepository }
+                bindSingleton<TodoRepository> { dependencies.todosRepository }
+                bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
+                bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
                 bindSingleton<StartClassesReminderManager> { dependencies.startClassesReminderManager }
                 bindSingleton<EndClassesReminderManager> { dependencies.endClassesReminderManager }
                 bindSingleton<WorkloadWarningManager> { dependencies.workloadWarningManager }

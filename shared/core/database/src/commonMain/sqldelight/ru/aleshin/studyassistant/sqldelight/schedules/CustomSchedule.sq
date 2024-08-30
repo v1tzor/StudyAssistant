@@ -7,6 +7,10 @@ CREATE TABLE customScheduleEntity (
   classes TEXT AS List<String> NOT NULL
 );
 
+addOrUpdateSchedule:
+INSERT OR REPLACE INTO customScheduleEntity (uid, date, classes)
+VALUES ?;
+
 fetchScheduleById:
 SELECT *
 FROM customScheduleEntity
@@ -28,6 +32,6 @@ deleteScheduleById:
 DELETE FROM customScheduleEntity
 WHERE uid = ?;
 
-addOrUpdateSchedule:
-INSERT OR REPLACE INTO customScheduleEntity (uid, date, classes)
-VALUES ?;
+deleteSchedulesByTimeRange:
+DELETE FROM customScheduleEntity
+WHERE date >= ? AND date <= ?;

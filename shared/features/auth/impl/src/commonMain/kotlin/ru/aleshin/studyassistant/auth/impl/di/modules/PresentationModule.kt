@@ -37,6 +37,10 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterScreenModel
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterStateCommunicator
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.screenmodel.RegisterWorkProcessor
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.screenmodel.VerificationEffectCommunicator
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.screenmodel.VerificationScreenModel
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.screenmodel.VerificationStateCommunicator
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.screenmodel.VerificationWorkProcessor
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.PasswordValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.UsernameValidator
@@ -71,4 +75,9 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<ForgotEffectCommunicator> { ForgotEffectCommunicator.Base() }
     bindProvider<ForgotWorkProcessor> { ForgotWorkProcessor.Base(instance(), instance()) }
     bindProvider<ForgotScreenModel> { ForgotScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
+
+    bindProvider<VerificationStateCommunicator> { VerificationStateCommunicator.Base() }
+    bindProvider<VerificationEffectCommunicator> { VerificationEffectCommunicator.Base() }
+    bindProvider<VerificationWorkProcessor> { VerificationWorkProcessor.Base(instance(), instance(), instance(), instance()) }
+    bindProvider<VerificationScreenModel> { VerificationScreenModel(instance(), instance(), instance(), instance()) }
 }

@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.domain.repositories
 
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 
 /**
@@ -31,4 +32,6 @@ interface SubjectsRepository {
     suspend fun fetchSubjectsByEmployee(employeeId: UID, targetUser: UID): Flow<List<Subject>>
     suspend fun fetchSubjectById(uid: UID, targetUser: UID): Flow<Subject?>
     suspend fun deleteSubject(targetId: UID, targetUser: UID)
+    suspend fun deleteAllSubjects(targetUser: UID)
+    suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
 }

@@ -69,7 +69,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun updatePushTokenWork(token: String) = coroutineManager.runOnBackground(serviceScope) {
-        appUserInteractor.fetchAppUser().first().handle(
+        appUserInteractor.fetchAppUserInfo().first().handle(
             onLeftAction = { error("Error get AppUser for update FCM token") },
             onRightAction = { appUser ->
                 val deviceId = deviceInfoProvider.fetchDeviceId()

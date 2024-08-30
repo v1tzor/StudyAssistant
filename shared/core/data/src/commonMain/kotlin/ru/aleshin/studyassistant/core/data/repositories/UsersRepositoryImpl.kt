@@ -21,6 +21,7 @@ import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.payments.SubscriptionChecker
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToRemoteData
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
@@ -32,6 +33,7 @@ import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSo
  */
 class UsersRepositoryImpl(
     private val remoteDataSource: UsersRemoteDataSource,
+    private val subscriptionChecker: SubscriptionChecker,
 ) : UsersRepository {
 
     override suspend fun addOrUpdateAppUser(user: AppUser): Boolean {
@@ -44,6 +46,18 @@ class UsersRepositoryImpl(
 
     override suspend fun fetchAuthStateChanged(): Flow<FirebaseUser?> {
         return remoteDataSource.fetchAuthStateChanged()
+    }
+
+    override suspend fun fetchCurrentUserPaidStatus(): Flow<Boolean> {
+        return remoteDataSource.fetchAuthStateChanged().map {
+            subscriptionChecker.checkSubscriptionActivity()
+        }
+    }
+
+    override suspend fun fetchExistRemoteDataStatus(uid: UID): Flow<Boolean> {
+        return remoteDataSource.fetchUserById(uid).map {
+            remoteDataSource.isExistRemoteData(uid)
+        }
     }
 
     override suspend fun fetchUserById(uid: UID): Flow<AppUser?> {

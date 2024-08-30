@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.FriendRequestsInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.OrganizationsInteractor
+import ru.aleshin.studyassistant.profile.impl.domain.interactors.ReminderInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.ShareSchedulesInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.UserInteractor
 import ru.aleshin.studyassistant.profile.impl.navigation.ProfileScreenProvider
@@ -54,6 +55,7 @@ internal interface ProfileWorkProcessor :
         private val friendRequestsInteractor: FriendRequestsInteractor,
         private val shareSchedulesInteractor: ShareSchedulesInteractor,
         private val organizationsInteractor: OrganizationsInteractor,
+        private val reminderInteractor: ReminderInteractor,
         private val screenProvider: ProfileScreenProvider,
         private val deviceInfoProvider: DeviceInfoProvider,
     ) : ProfileWorkProcessor {
@@ -134,12 +136,17 @@ internal interface ProfileWorkProcessor :
 
         private fun signOutWork() = flow {
             val deviceId = deviceInfoProvider.fetchDeviceId()
-            authInteractor.signOut(deviceId).handle(
+            reminderInteractor.stopReminders().handle(
                 onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
                 onRightAction = {
-                    val authScreen = screenProvider.provideAuthScreen(AuthScreen.Login)
-                    emit(EffectResult(ProfileEffect.ReplaceGlobalScreen(authScreen)))
-                },
+                    authInteractor.signOut(deviceId).handle(
+                        onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
+                        onRightAction = {
+                            val authScreen = screenProvider.provideAuthScreen(AuthScreen.Login)
+                            emit(EffectResult(ProfileEffect.ReplaceGlobalScreen(authScreen)))
+                        },
+                    )
+                }
             )
         }
     }

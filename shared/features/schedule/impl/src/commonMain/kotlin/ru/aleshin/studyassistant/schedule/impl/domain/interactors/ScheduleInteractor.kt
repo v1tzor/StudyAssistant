@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.dateTimeByWeek
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
@@ -103,8 +104,9 @@ internal interface ScheduleInteractor {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchDetailsWeekSchedule(week: TimeRange) = eitherWrapper.wrapFlow {
-            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
-            val numberOfWeek = week.from.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
+            val calendarSettings = calendarSettingsRepository.fetchSettings(targetUser).first()
+            val numberOfWeek = week.from.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
+            val holidays = calendarSettings.holidays
 
             val baseSchedulesFlow = baseScheduleRepository.fetchSchedulesByVersion(week, numberOfWeek, targetUser)
             val customSchedulesFlow = customScheduleRepository.fetchSchedulesByTimeRange(week, targetUser)
@@ -130,11 +132,19 @@ internal interface ScheduleInteractor {
                             }
                             baseSchedules.forEach { baseSchedule ->
                                 val dayOfWeek = baseSchedule.dayOfWeek
+                                val date = dayOfWeek.dateTimeByWeek(week.from)
                                 if (get(dayOfWeek) == null) {
                                     val baseDetailsSchedule = baseSchedule.convertToDetails { classModel ->
                                         classModel.convertToDetails(homeworks.find { it.classId == classModel.uid })
                                     }
-                                    val sortedClasses = baseDetailsSchedule.classes.sortedBy { classModel ->
+                                    val filteredClasses = baseDetailsSchedule.classes.filter { classModel ->
+                                        holidays.none {
+                                            val dateFilter = TimeRange(it.start, it.end).containsDate(date)
+                                            val orgFilter = it.organizations.contains(classModel.organization.uid)
+                                            return@none dateFilter && orgFilter
+                                        }
+                                    }
+                                    val sortedClasses = filteredClasses.sortedBy { classModel ->
                                         classModel.timeRange.from.dateTime().time
                                     }
                                     val detailsSchedule = ScheduleDetails.Base(
@@ -158,8 +168,9 @@ internal interface ScheduleInteractor {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchDetailsScheduleByDate(date: Instant) = eitherWrapper.wrapFlow {
-            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
-            val currentNumberOfWeek = date.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
+            val calendarSettings = calendarSettingsRepository.fetchSettings(targetUser).first()
+            val currentNumberOfWeek = date.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
+            val holidays = calendarSettings.holidays
 
             val homeworksFlow = homeworksRepository.fetchHomeworksByDate(date, targetUser)
 
@@ -171,7 +182,14 @@ internal interface ScheduleInteractor {
                         val sortedClasses = customSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
                         Schedule.Custom(customSchedule.copy(classes = sortedClasses))
                     } else {
-                        val sortedClasses = baseSchedule?.classes?.sortedBy { it.timeRange.from.dateTime().time }
+                        val filteredClasses = baseSchedule?.classes?.filter { classModel ->
+                            holidays.none {
+                                val dateFilter = TimeRange(it.start, it.end).containsDate(date)
+                                val organizationFilter = it.organizations.contains(classModel.organization.uid)
+                                return@none dateFilter && organizationFilter
+                            }
+                        }
+                        val sortedClasses = filteredClasses?.sortedBy { it.timeRange.from.dateTime().time }
                         Schedule.Base(baseSchedule?.copy(classes = sortedClasses ?: emptyList()))
                     }
                 }

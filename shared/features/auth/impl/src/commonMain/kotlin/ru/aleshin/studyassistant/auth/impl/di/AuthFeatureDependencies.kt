@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
+import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
@@ -28,12 +29,13 @@ import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-interface AuthFeatureDependencies : BaseFeatureDependencies {
-    val navigationFeatureStarter: () -> NavigationFeatureStarter
-    val previewFeatureStarter: () -> PreviewFeatureStarter
-    val authRepository: AuthRepository
-    val usersRepository: UsersRepository
-    val manageUserRepository: ManageUserRepository
-    val deviceInfoProvider: DeviceInfoProvider
-    val coroutineManager: CoroutineManager
+public interface AuthFeatureDependencies : BaseFeatureDependencies {
+    public val navigationFeatureStarter: () -> NavigationFeatureStarter
+    public val previewFeatureStarter: () -> PreviewFeatureStarter
+    public val authRepository: AuthRepository
+    public val messageRepository: MessageRepository
+    public val usersRepository: UsersRepository
+    public val manageUserRepository: ManageUserRepository
+    public val deviceInfoProvider: DeviceInfoProvider
+    public val coroutineManager: CoroutineManager
 }

@@ -169,6 +169,8 @@ data class StudyAssistantStrings(
     val endClassesReminderTitle: String,
     val highWorkloadWarningTitle: String,
     val highWorkloadWarningBody: String,
+    val foregroundInfoTitle: String,
+    val foregroundInfoBody: String,
 )
 
 internal val russianStudyAssistantString = StudyAssistantStrings(
@@ -318,6 +320,8 @@ internal val russianStudyAssistantString = StudyAssistantStrings(
     endClassesReminderTitle = "Занятия закончились! Осталось выполнить заданные задания",
     highWorkloadWarningTitle = "Предупреждение! Завтра будет сложный день.",
     highWorkloadWarningBody = "Тебе следует набраться сил и быть готовым на все 100%!",
+    foregroundInfoTitle = "Синхронизируем данные с хранилищем...",
+    foregroundInfoBody = "Это займёт совсем немного времени",
 )
 
 internal val englishStudyAssistantString = StudyAssistantStrings(
@@ -467,6 +471,8 @@ internal val englishStudyAssistantString = StudyAssistantStrings(
     endClassesReminderTitle = "Classes are over! It remains to complete the assigned tasks",
     highWorkloadWarningTitle = "Warning! Tomorrow will be a difficult day.",
     highWorkloadWarningBody = "You should gain strength and be fully prepared!",
+    foregroundInfoTitle = "Synchronizing the data with the storage...",
+    foregroundInfoBody = "It will take quite a bit of time"
 )
 
 fun StudyAssistantStrings.monthNames() = MonthNames(

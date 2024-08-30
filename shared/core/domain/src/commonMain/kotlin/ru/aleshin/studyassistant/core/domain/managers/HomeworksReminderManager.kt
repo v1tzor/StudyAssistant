@@ -22,7 +22,7 @@ import kotlinx.datetime.Instant
  * @author Stanislav Aleshin on 22.08.2024.
  */
 interface HomeworksReminderManager {
-    suspend fun fetchWorkStatus(): WorkStatus
+    suspend fun fetchWorkStatus(): RepeatWorkStatus
     fun startOrRetryReminderService(time: Instant)
     fun stopReminderService()
 }

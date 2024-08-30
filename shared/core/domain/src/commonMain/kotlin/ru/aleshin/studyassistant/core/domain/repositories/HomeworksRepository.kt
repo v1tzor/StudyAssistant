@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 
 /**
@@ -34,4 +35,6 @@ interface HomeworksRepository {
     suspend fun fetchActiveLinkedHomeworks(currentDate: Instant, targetUser: UID): Flow<List<Homework>>
     suspend fun fetchHomeworksByDate(date: Instant, targetUser: UID): Flow<List<Homework>>
     suspend fun deleteHomework(uid: UID, targetUser: UID)
+    suspend fun deleteAllHomeworks(targetUser: UID)
+    suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
 }

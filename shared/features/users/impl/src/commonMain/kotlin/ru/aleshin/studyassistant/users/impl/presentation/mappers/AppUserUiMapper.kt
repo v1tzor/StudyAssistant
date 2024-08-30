@@ -18,9 +18,11 @@ package ru.aleshin.studyassistant.users.impl.presentation.mappers
 
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetwork
+import ru.aleshin.studyassistant.core.domain.entities.users.SubscribeInfo
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
 import ru.aleshin.studyassistant.users.impl.presentation.models.AppUserUi
 import ru.aleshin.studyassistant.users.impl.presentation.models.SocialNetworkUi
+import ru.aleshin.studyassistant.users.impl.presentation.models.SubscribeInfoUi
 import ru.aleshin.studyassistant.users.impl.presentation.models.UserDeviceUi
 
 /**
@@ -38,7 +40,7 @@ internal fun AppUser.mapToUi() = AppUserUi(
     birthday = birthday,
     gender = gender,
     friends = friends,
-    subscribePeriod = subscribePeriod,
+    subscriptionInfo = subscriptionInfo?.mapToUi(),
     socialNetworks = socialNetworks.map { it.mapToUi() },
 )
 
@@ -54,8 +56,28 @@ internal fun AppUserUi.mapToDomain() = AppUser(
     birthday = birthday,
     gender = gender,
     friends = friends,
-    subscribePeriod = subscribePeriod,
+    subscriptionInfo = subscriptionInfo?.mapToDomain(),
     socialNetworks = socialNetworks.map { it.mapToDomain() },
+)
+
+internal fun SubscribeInfo.mapToUi() = SubscribeInfoUi(
+    deviceId = deviceId,
+    purchaseId = purchaseId,
+    productId = productId,
+    subscriptionToken = subscriptionToken,
+    purchaseDate = purchaseDate,
+    subscriptionPeriod = subscriptionPeriod,
+    store = store,
+)
+
+internal fun SubscribeInfoUi.mapToDomain() = SubscribeInfo(
+    deviceId = deviceId,
+    purchaseId = purchaseId,
+    productId = productId,
+    subscriptionToken = subscriptionToken,
+    purchaseDate = purchaseDate,
+    subscriptionPeriod = subscriptionPeriod,
+    store = store,
 )
 
 internal fun UserDevice.mapToUi() = UserDeviceUi(

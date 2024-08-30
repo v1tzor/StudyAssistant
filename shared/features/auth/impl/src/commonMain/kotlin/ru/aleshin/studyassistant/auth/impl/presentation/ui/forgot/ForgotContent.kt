@@ -54,7 +54,7 @@ internal fun ForgotContent(
     ) {
         AuthHeaderSection(
             modifier = Modifier.weight(1f),
-            text = AuthThemeRes.strings.forgotHeadline,
+            header = AuthThemeRes.strings.forgotHeadline,
             illustration = painterResource(AuthThemeRes.icons.forgotIllustration),
             contentDescription = AuthThemeRes.strings.forgotDesc,
         )

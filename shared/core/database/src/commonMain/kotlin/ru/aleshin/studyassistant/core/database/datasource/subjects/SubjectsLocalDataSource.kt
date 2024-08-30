@@ -39,10 +39,11 @@ interface SubjectsLocalDataSource {
     suspend fun addOrUpdateSubject(subject: SubjectEntity): UID
     suspend fun addOrUpdateSubjectsGroup(subjects: List<SubjectEntity>)
     suspend fun fetchSubjectById(uid: UID): Flow<SubjectDetailsEntity?>
-    suspend fun fetchAllSubjectsByOrganization(organizationId: UID): Flow<List<SubjectDetailsEntity>>
+    suspend fun fetchAllSubjectsByOrganization(organizationId: UID?): Flow<List<SubjectDetailsEntity>>
     suspend fun fetchAllSubjectsByNames(names: List<String>): List<SubjectDetailsEntity>
     suspend fun fetchSubjectsByEmployee(employeeId: UID): Flow<List<SubjectDetailsEntity>>
     suspend fun deleteSubject(targetId: UID)
+    suspend fun deleteAllSubjects()
 
     class Base(
         private val subjectQueries: SubjectQueries,
@@ -77,8 +78,12 @@ interface SubjectsLocalDataSource {
             }
         }
 
-        override suspend fun fetchAllSubjectsByOrganization(organizationId: UID): Flow<List<SubjectDetailsEntity>> {
-            val query = subjectQueries.fetchSubjectsByOrganization(organizationId)
+        override suspend fun fetchAllSubjectsByOrganization(organizationId: UID?): Flow<List<SubjectDetailsEntity>> {
+            val query = if (organizationId != null) {
+                subjectQueries.fetchSubjectsByOrganization(organizationId)
+            } else {
+                subjectQueries.fetchAllSubjects()
+            }
             val subjectEntityListFlow = query.asFlow().mapToList(coroutineContext)
 
             return subjectEntityListFlow.map { subjectEntityList ->
@@ -122,6 +127,10 @@ interface SubjectsLocalDataSource {
 
         override suspend fun deleteSubject(targetId: UID) {
             subjectQueries.deleteSubject(targetId)
+        }
+
+        override suspend fun deleteAllSubjects() {
+            subjectQueries.deleteAllSubjects()
         }
     }
 }

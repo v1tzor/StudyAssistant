@@ -41,7 +41,7 @@ import ru.aleshin.studyassistant.users.impl.di.modules.presentationModule
 /**
  * @author Stanislav Aleshin on 19.06.2024.
  */
-object UsersFeatureDIHolder : BaseFeatureDIHolder<UsersFeatureApi, UsersFeatureDependencies> {
+public object UsersFeatureDIHolder : BaseFeatureDIHolder<UsersFeatureApi, UsersFeatureDependencies> {
 
     private var directDi: DirectDI? = null
 

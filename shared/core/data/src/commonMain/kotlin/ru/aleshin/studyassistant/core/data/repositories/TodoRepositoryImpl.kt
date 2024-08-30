@@ -17,8 +17,11 @@
 package ru.aleshin.studyassistant.core.data.repositories
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
+import kotlinx.datetime.Instant.Companion.DISTANT_FUTURE
+import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import ru.aleshin.studyassistant.core.common.extensions.endThisDay
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
@@ -28,6 +31,7 @@ import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToRemoteData
 import ru.aleshin.studyassistant.core.database.datasource.tasks.TodoLocalDataSource
+import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.TodoRemoteDataSource
@@ -135,6 +139,43 @@ class TodoRepositoryImpl(
             remoteDataSource.deleteTodo(uid, targetUser)
         } else {
             localDataSource.deleteTodo(uid)
+        }
+    }
+
+    override suspend fun deleteAllTodos(targetUser: UID) {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.deleteAllTodos(targetUser)
+        } else {
+            localDataSource.deleteAllTodos()
+        }
+    }
+
+    override suspend fun transferData(direction: DataTransferDirection, targetUser: UID) {
+        when (direction) {
+            DataTransferDirection.REMOTE_TO_LOCAL -> {
+                val allTodos = remoteDataSource.fetchTodosByTimeRange(
+                    from = DISTANT_PAST.toEpochMilliseconds(),
+                    to = DISTANT_FUTURE.toEpochMilliseconds(),
+                    targetUser = targetUser,
+                ).let { todosFlow ->
+                    return@let todosFlow.first().map { it.mapToDomain().mapToLocalData() }
+                }
+                localDataSource.deleteAllTodos()
+                localDataSource.addOrUpdateTodosGroup(allTodos)
+                remoteDataSource.deleteAllTodos(targetUser)
+            }
+            DataTransferDirection.LOCAL_TO_REMOTE -> {
+                val allTodos = localDataSource.fetchTodosByTimeRange(
+                    from = DISTANT_PAST.toEpochMilliseconds(),
+                    to = DISTANT_FUTURE.toEpochMilliseconds(),
+                ).let { todosFlow ->
+                    return@let todosFlow.first().map { it.mapToDomain().mapToRemoteData() }
+                }
+                remoteDataSource.deleteAllTodos(targetUser)
+                remoteDataSource.addOrUpdateTodosGroup(allTodos, targetUser)
+            }
         }
     }
 }

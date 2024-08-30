@@ -44,6 +44,7 @@ internal interface ProfileWorkProcessor :
 
         override suspend fun work(command: ProfileWorkCommand) = when (command) {
             is ProfileWorkCommand.LoadAppUser -> loadAppUserWork()
+            is ProfileWorkCommand.LoadPaidUserStatus -> loadPaidUserStatusWork()
             is ProfileWorkCommand.UpdateAppUser -> updateAppUserWork(command.user)
             is ProfileWorkCommand.UpdatePassword -> updatePasswordWork(command.oldPassword, command.newPassword)
             is ProfileWorkCommand.UpdateAvatar -> updateAvatarWork(command.user, command.file)
@@ -55,6 +56,15 @@ internal interface ProfileWorkProcessor :
                 onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
                 onRightAction = { user ->
                     emit(ActionResult(ProfileAction.SetupAppUser(user.mapToUi())))
+                },
+            )
+        }
+
+        private fun loadPaidUserStatusWork() = flow {
+            appUserInteractor.fetchAppUserPaidStatus().collectAndHandle(
+                onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
+                onRightAction = { isPaidUser ->
+                    emit(ActionResult(ProfileAction.UpdatePaidUserStatus(isPaidUser)))
                 },
             )
         }
@@ -99,6 +109,7 @@ internal interface ProfileWorkProcessor :
 
 internal sealed class ProfileWorkCommand : WorkCommand {
     data object LoadAppUser : ProfileWorkCommand()
+    data object LoadPaidUserStatus : ProfileWorkCommand()
     data class UpdateAppUser(val user: AppUserUi) : ProfileWorkCommand()
     data class UpdateAvatar(val user: AppUserUi, val file: PlatformFile) : ProfileWorkCommand()
     data class DeleteAvatar(val user: AppUserUi) : ProfileWorkCommand()

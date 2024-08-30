@@ -20,8 +20,11 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
+import org.kodein.di.DI
+import org.kodein.di.DirectDIAware
+import org.kodein.di.bindProvider
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.di.MainDirectDIAware
+import ru.aleshin.studyassistant.core.common.di.coreCommonModule
 import ru.aleshin.studyassistant.core.common.extensions.endThisDay
 import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
@@ -34,9 +37,11 @@ import ru.aleshin.studyassistant.core.common.notifications.parameters.Notificati
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationPriority
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationStyles
 import ru.aleshin.studyassistant.core.data.R
+import ru.aleshin.studyassistant.core.data.di.coreDataModule
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
+import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
 
@@ -46,7 +51,14 @@ import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
 class HomeworksReminderWorker(
     context: Context,
     workerParameters: WorkerParameters,
-) : CoroutineWorker(context, workerParameters), MainDirectDIAware {
+) : CoroutineWorker(context, workerParameters), DirectDIAware {
+
+    override val directDI = DI.direct {
+        bindProvider<Context> { applicationContext }
+        importAll(coreCommonModule, coreDataModule)
+    }
+    private val coreStrings: StudyAssistantStrings
+        get() = fetchCoreStrings(fetchAppLanguage(applicationContext.fetchCurrentLanguage()))
 
     private val dateManager = instance<DateManager>()
     private val notificationCreator = instance<NotificationCreator>()
@@ -55,7 +67,6 @@ class HomeworksReminderWorker(
 
     override suspend fun doWork(): Result {
         val currentUser = usersRepository.fetchCurrentAppUser() ?: return Result.failure()
-
         val today = dateManager.fetchBeginningCurrentInstant()
         val tomorrow = today.shiftDay(1)
         val afterTomorrow = today.shiftDay(2)
@@ -78,9 +89,6 @@ class HomeworksReminderWorker(
         nearestHomeworks: List<Pair<Homework, Boolean>>,
         afterTomorrowHomeworks: List<Pair<Homework, Boolean>>,
     ) {
-        val appLanguage = fetchAppLanguage(applicationContext.fetchCurrentLanguage())
-        val coreStrings = fetchCoreStrings(appLanguage)
-
         if (nearestHomeworks.count { it.second } != 0) {
             val subjects = nearestHomeworks.mapNotNull { it.first.subject?.name }
             val notify = notificationCreator.createNotify(

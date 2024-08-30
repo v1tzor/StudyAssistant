@@ -242,10 +242,11 @@ fun Duration.toString(
 ) = buildString {
     val isNegative = isNegative()
     if (isNegative && !showAbsoluteValue) append('-')
-    absoluteValue.toComponents { days, hours, minutes, _, _ ->
+    absoluteValue.toComponents { days, hours, minutes, seconds, _ ->
         val hasDays = days != 0L
         val hasHours = hours != 0
         val hasMinutes = minutes != 0
+        val hasSeconds = seconds != 0
         var components = 0
         if (hasDays) {
             append(days).append(daySuffix)
@@ -257,7 +258,9 @@ fun Duration.toString(
         }
         if (!hasDays && !hasHours && hasMinutes) {
             append(minutes).append(minuteSuffix)
-        } else if (!hasDays && !hasHours && !hasMinutes) {
+        } else if (!hasDays && !hasHours && !hasMinutes && hasSeconds) {
+            append("< 0").append(minuteSuffix)
+        } else if (!hasDays && !hasHours && !hasMinutes && !hasSeconds) {
             append(0).append(minuteSuffix)
         }
     }

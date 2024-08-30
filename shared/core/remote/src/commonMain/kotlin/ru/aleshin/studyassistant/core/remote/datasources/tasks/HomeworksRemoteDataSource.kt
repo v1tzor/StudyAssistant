@@ -43,12 +43,13 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 interface HomeworksRemoteDataSource {
 
     suspend fun addOrUpdateHomework(homework: HomeworkPojo, targetUser: UID): UID
-    suspend fun addHomeworksGroup(homeworks: List<HomeworkPojo>, targetUser: UID)
+    suspend fun addOrUpdateHomeworksGroup(homeworks: List<HomeworkPojo>, targetUser: UID)
     suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<HomeworkDetailsPojo?>
     suspend fun fetchHomeworksByTimeRange(from: Long, to: Long, targetUser: UID): Flow<List<HomeworkDetailsPojo>>
     suspend fun fetchOverdueHomeworks(currentDate: Long, targetUser: UID): Flow<List<HomeworkDetailsPojo>>
     suspend fun fetchActiveLinkedHomeworks(currentDate: Long, targetUser: UID): Flow<List<HomeworkDetailsPojo>>
     suspend fun deleteHomework(uid: UID, targetUser: UID)
+    suspend fun deleteAllHomework(targetUser: UID)
 
     class Base(
         private val database: FirebaseFirestore,
@@ -73,7 +74,7 @@ interface HomeworksRemoteDataSource {
             }
         }
 
-        override suspend fun addHomeworksGroup(homeworks: List<HomeworkPojo>, targetUser: UID) {
+        override suspend fun addOrUpdateHomeworksGroup(homeworks: List<HomeworkPojo>, targetUser: UID) {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
@@ -178,6 +179,24 @@ interface HomeworksRemoteDataSource {
             val reference = userDataRoot.collection(UserData.HOMEWORKS).document(uid)
 
             return reference.delete()
+        }
+
+        override suspend fun deleteAllHomework(targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.HOMEWORKS)
+
+            val deletableHomeworkReferences = reference.snapshotGet().map { snapshot ->
+                snapshot.reference
+            }
+
+            database.batch().apply {
+                deletableHomeworkReferences.forEach { homeworkReference ->
+                    delete(homeworkReference)
+                }
+                return@apply commit()
+            }
         }
 
         private suspend fun HomeworkPojo.mapToDetails(userDataRoot: DocumentReference): HomeworkDetailsPojo {

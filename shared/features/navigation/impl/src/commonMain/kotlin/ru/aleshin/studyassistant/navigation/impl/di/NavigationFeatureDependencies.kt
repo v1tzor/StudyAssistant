@@ -26,10 +26,10 @@ import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-interface NavigationFeatureDependencies : BaseFeatureDependencies {
-    val scheduleFeatureStarter: () -> ScheduleFeatureStarter
-    val tasksFeatureStarter: () -> TasksFeatureStarter
-    val infoFeatureStarter: () -> InfoFeatureStarter
-    val profileFeatureStarter: () -> ProfileFeatureStarter
-    val coroutineManager: CoroutineManager
+public interface NavigationFeatureDependencies : BaseFeatureDependencies {
+    public val scheduleFeatureStarter: () -> ScheduleFeatureStarter
+    public val tasksFeatureStarter: () -> TasksFeatureStarter
+    public val infoFeatureStarter: () -> InfoFeatureStarter
+    public val profileFeatureStarter: () -> ProfileFeatureStarter
+    public val coroutineManager: CoroutineManager
 }

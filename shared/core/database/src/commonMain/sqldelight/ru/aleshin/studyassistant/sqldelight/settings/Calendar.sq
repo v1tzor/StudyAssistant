@@ -1,16 +1,23 @@
+import kotlin.String;
+import kotlin.collections.List;
+
 CREATE TABLE calendarSettingsEntity (
   id INTEGER PRIMARY KEY NOT NULL,
   number_of_week TEXT NOT NULL,
-  week_schedule_view_type TEXT NOT NULL
+  week_schedule_view_type TEXT NOT NULL,
+  holidays TEXT AS List<String>
 );
 
-INSERT INTO calendarSettingsEntity (id, number_of_week, week_schedule_view_type)
-VALUES (1, 'ONE', 'COMMON');
+INSERT INTO calendarSettingsEntity (id, number_of_week, week_schedule_view_type, holidays)
+VALUES (1, 'ONE', 'COMMON', NULL);
 
 fetchSettings:
 SELECT *
 FROM calendarSettingsEntity;
 
 updateSettings:
-INSERT OR REPLACE INTO calendarSettingsEntity (id, number_of_week, week_schedule_view_type)
+INSERT OR REPLACE INTO calendarSettingsEntity (id, number_of_week, week_schedule_view_type, holidays)
 VALUES ?;
+
+deleteSettings:
+DELETE FROM  calendarSettingsEntity;

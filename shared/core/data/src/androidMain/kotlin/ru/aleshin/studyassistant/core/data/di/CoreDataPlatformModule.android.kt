@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.data.di
 
+import android.app.AlarmManager
 import android.content.Context
 import androidx.work.WorkManager
 import org.kodein.di.DI
@@ -37,9 +38,10 @@ import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
  */
 actual val coreDataPlatformModule = DI.Module("CoreDataPlatform") {
     bindSingleton<WorkManager> { WorkManager.getInstance(instance<Context>()) }
+    bindSingleton<AlarmManager> { instance<Context>().getSystemService(AlarmManager::class.java) }
     bindProvider<WorkloadWarningManager> { WorkloadWarningManagerImpl(instance(), instance()) }
     bindProvider<HomeworksReminderManager> { HomeworksReminderManagerImpl(instance(), instance()) }
-    bindProvider<StartClassesReminderManager> { StartClassesReminderManagerImpl(instance(), instance()) }
-    bindProvider<EndClassesReminderManager> { EndClassesReminderManagerImpl(instance(), instance()) }
-    bindSingleton<NotificationScheduler> { NotificationScheduler(instance(), instance()) }
+    bindProvider<StartClassesReminderManager> { StartClassesReminderManagerImpl(instance(), instance(), instance(), instance()) }
+    bindProvider<EndClassesReminderManager> { EndClassesReminderManagerImpl(instance(), instance(), instance(), instance()) }
+    bindSingleton<NotificationScheduler> { NotificationScheduler(instance(), instance(), instance()) }
 }

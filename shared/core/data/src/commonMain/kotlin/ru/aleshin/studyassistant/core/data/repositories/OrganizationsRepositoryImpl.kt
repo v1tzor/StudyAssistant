@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.data.repositories
 
 import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.uriString
@@ -26,6 +27,7 @@ import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToRemoteData
 import ru.aleshin.studyassistant.core.database.datasource.organizations.OrganizationsLocalDataSource
+import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
@@ -140,11 +142,46 @@ class OrganizationsRepositoryImpl(
         }
     }
 
+    override suspend fun deleteAllOrganizations(targetUser: UID) {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.deleteAllOrganizations(targetUser)
+        } else {
+            localDataSource.deleteAllOrganizations()
+        }
+    }
+
     override suspend fun deleteAvatar(uid: UID, targetUser: UID) {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         if (isSubscriber) {
             remoteDataSource.deleteAvatar(uid, targetUser)
+        }
+    }
+
+    override suspend fun transferData(direction: DataTransferDirection, targetUser: UID) {
+        when (direction) {
+            DataTransferDirection.REMOTE_TO_LOCAL -> {
+                val allOrganizations = remoteDataSource.fetchAllOrganization(
+                    targetUser = targetUser,
+                    showHide = true,
+                ).let { organizationFlow ->
+                    return@let organizationFlow.first().map { it.mapToDomain().mapToLocalData() }
+                }
+                localDataSource.deleteAllOrganizations()
+                localDataSource.addOrUpdateOrganizationsGroup(allOrganizations)
+                remoteDataSource.deleteAllOrganizations(targetUser)
+            }
+            DataTransferDirection.LOCAL_TO_REMOTE -> {
+                val allOrganizations = localDataSource.fetchAllOrganization(
+                    showHide = true,
+                ).let { organizationFlow ->
+                    return@let organizationFlow.first().map { it.mapToDomain().mapToRemoteData() }
+                }
+                remoteDataSource.deleteAllOrganizations(targetUser)
+                remoteDataSource.addOrUpdateOrganizationsGroup(allOrganizations, targetUser)
+            }
         }
     }
 }

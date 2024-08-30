@@ -33,6 +33,7 @@ import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
+import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
@@ -40,7 +41,7 @@ import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeatureDependencies> {
+public object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeatureDependencies> {
 
     private var directDI: DirectDI? = null
 
@@ -53,6 +54,7 @@ object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeatureDepe
                 bindSingleton<AuthRepository> { dependencies.authRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
+                bindSingleton<MessageRepository> { dependencies.messageRepository }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<AuthFeatureApi> {

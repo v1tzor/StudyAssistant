@@ -34,6 +34,7 @@ internal interface AuthErrorHandler : ErrorHandler<AuthFailures> {
             is FirebaseDataAuthException -> AuthFailures.AuthorizationError
             is FirebaseAuthException -> AuthFailures.AuthorizationError
             is FirebaseUserException -> AuthFailures.NotFoundUserInfoError
+            is NullPointerException -> AuthFailures.NotFoundUserInfoError
             is FirebaseAuthInvalidCredentialsException -> AuthFailures.CredentialsError
             is IllegalArgumentException -> AuthFailures.CredentialsError
             else -> AuthFailures.OtherError(throwable)

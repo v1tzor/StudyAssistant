@@ -35,8 +35,9 @@ interface EmployeeLocalDataSource {
     suspend fun addOrUpdateEmployee(employee: EmployeeEntity): UID
     suspend fun addOrUpdateEmployeeGroup(employees: List<EmployeeEntity>)
     suspend fun fetchEmployeeById(uid: UID): Flow<EmployeeEntity?>
-    suspend fun fetchAllEmployeeByOrganization(organizationId: UID): Flow<List<EmployeeEntity>>
+    suspend fun fetchAllEmployeeByOrganization(organizationId: UID?): Flow<List<EmployeeEntity>>
     suspend fun deleteEmployee(targetId: UID)
+    suspend fun deleteAllEmployee()
 
     class Base(
         private val employeeQueries: EmployeeQueries,
@@ -62,13 +63,21 @@ interface EmployeeLocalDataSource {
             return query.asFlow().mapToOneOrNull(coroutineContext)
         }
 
-        override suspend fun fetchAllEmployeeByOrganization(organizationId: UID): Flow<List<EmployeeEntity>> {
-            val query = employeeQueries.fetchEmployeesByOrganization(organizationId)
+        override suspend fun fetchAllEmployeeByOrganization(organizationId: UID?): Flow<List<EmployeeEntity>> {
+            val query = if (organizationId != null) {
+                employeeQueries.fetchEmployeesByOrganization(organizationId)
+            } else {
+                employeeQueries.fetchAllEmployees()
+            }
             return query.asFlow().mapToList(coroutineContext)
         }
 
         override suspend fun deleteEmployee(targetId: UID) {
             employeeQueries.deleteEmployee(targetId)
+        }
+
+        override suspend fun deleteAllEmployee() {
+            employeeQueries.deleteAllEmployee()
         }
     }
 }

@@ -66,7 +66,6 @@ internal class OverviewScreenModel(
     ) {
         when (event) {
             is OverviewEvent.Init -> with(state()) {
-                sendAction(OverviewAction.UpdateSelectedDate(currentDate))
                 launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
                     val command = OverviewWorkCommand.LoadSchedule(currentDate)
                     workProcessor.work(command).collectAndHandleWork()
@@ -89,7 +88,6 @@ internal class OverviewScreenModel(
                     val command = OverviewWorkCommand.LoadSchedule(event.date)
                     workProcessor.work(command).collectAndHandleWork()
                 }
-                sendAction(OverviewAction.UpdateSelectedDate(event.date))
             }
             is OverviewEvent.SelectedCurrentDay -> with(state()) {
                 if (selectedDate?.isCurrentWeek(currentDate) != true) {
@@ -103,7 +101,6 @@ internal class OverviewScreenModel(
                     val command = OverviewWorkCommand.LoadSchedule(currentDate)
                     workProcessor.work(command).collectAndHandleWork()
                 }
-                sendAction(OverviewAction.UpdateSelectedDate(currentDate))
             }
             is OverviewEvent.CompleteHomework -> {
                 launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {

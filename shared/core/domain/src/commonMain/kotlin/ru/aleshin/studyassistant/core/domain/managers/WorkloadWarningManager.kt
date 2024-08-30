@@ -20,7 +20,7 @@ package ru.aleshin.studyassistant.core.domain.managers
  * @author Stanislav Aleshin on 22.08.2024.
  */
 interface WorkloadWarningManager {
-    suspend fun fetchWorkStatus(): WorkStatus
+    suspend fun fetchWorkStatus(): RepeatWorkStatus
     fun startOrRetryWarningService()
     fun stopWarningService()
 }

@@ -48,8 +48,9 @@ interface OrganizationsRemoteDataSource {
     suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsPojo?>
     suspend fun fetchOrganizationsById(uid: List<UID>, targetUser: UID): Flow<List<OrganizationDetailsPojo>>
     suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShortPojo?>
-    suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationDetailsPojo>>
+    suspend fun fetchAllOrganization(targetUser: UID, showHide: Boolean = false): Flow<List<OrganizationDetailsPojo>>
     suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShortPojo>>
+    suspend fun deleteAllOrganizations(targetUser: UID)
     suspend fun deleteAvatar(uid: UID, targetUser: UID)
 
     class Base(
@@ -186,12 +187,19 @@ interface OrganizationsRemoteDataSource {
             }
         }
 
-        override suspend fun fetchAllOrganization(targetUser: UID): Flow<List<OrganizationDetailsPojo>> {
+        override suspend fun fetchAllOrganization(
+            targetUser: UID,
+            showHide: Boolean,
+        ): Flow<List<OrganizationDetailsPojo>> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.ORGANIZATIONS).where {
-                UserData.ORGANIZATION_HIDE equalTo false
+            val reference = if (showHide) {
+                userDataRoot.collection(UserData.ORGANIZATIONS)
+            } else {
+                userDataRoot.collection(UserData.ORGANIZATIONS).where {
+                    UserData.ORGANIZATION_HIDE equalTo false
+                }
             }
 
             val organizationPojoListFlow = reference.snapshots.map { snapshot ->
@@ -234,6 +242,24 @@ interface OrganizationsRemoteDataSource {
 
             return reference.snapshots.map { snapshot ->
                 snapshot.documents.map { it.data(serializer<OrganizationShortPojo>()) }
+            }
+        }
+
+        override suspend fun deleteAllOrganizations(targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
+
+            val deletableOrganizationReferences = reference.snapshotGet().map { snapshot ->
+                snapshot.reference
+            }
+
+            database.batch().apply {
+                deletableOrganizationReferences.forEach { organizationReference ->
+                    delete(organizationReference)
+                }
+                return@apply commit()
             }
         }
 

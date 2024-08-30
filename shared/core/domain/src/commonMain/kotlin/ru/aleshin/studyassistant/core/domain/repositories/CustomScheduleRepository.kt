@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
 
@@ -33,4 +34,6 @@ interface CustomScheduleRepository {
     suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<CustomSchedule>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<Class?>
     suspend fun deleteScheduleById(scheduleId: UID, targetUser: UID)
+    suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID)
+    suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
 }

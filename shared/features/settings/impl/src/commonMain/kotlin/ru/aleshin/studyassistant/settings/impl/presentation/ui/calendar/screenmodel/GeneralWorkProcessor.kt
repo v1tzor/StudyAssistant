@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkC
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.CalendarSettingsInteractor
+import ru.aleshin.studyassistant.settings.impl.domain.interactors.OrganizationInteractor
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.CalendarSettingsUi
@@ -38,10 +39,12 @@ internal interface CalendarWorkProcessor :
 
     class Base(
         private val settingsInteractor: CalendarSettingsInteractor,
+        private val organizationsInteractor: OrganizationInteractor,
     ) : CalendarWorkProcessor {
 
         override suspend fun work(command: CalendarWorkCommand) = when (command) {
             is CalendarWorkCommand.LoadSettings -> loadSettingsWork()
+            is CalendarWorkCommand.LoadOrganizations -> loadOrganizationsWork()
             is CalendarWorkCommand.UpdateSettings -> updateSettingsWork(command.settings)
         }
 
@@ -50,6 +53,16 @@ internal interface CalendarWorkProcessor :
                 onLeftAction = { emit(EffectResult(CalendarEffect.ShowError(it))) },
                 onRightAction = { settings ->
                     emit(ActionResult(CalendarAction.UpdateSettings(settings.mapToUi())))
+                },
+            )
+        }
+
+        private fun loadOrganizationsWork() = flow {
+            organizationsInteractor.fetchAllShortOrganizations().collectAndHandle(
+                onLeftAction = { emit(EffectResult(CalendarEffect.ShowError(it))) },
+                onRightAction = { allOrganizations ->
+                    val organizations = allOrganizations.map { it.mapToUi() }
+                    emit(ActionResult(CalendarAction.UpdateOrganizations(organizations)))
                 },
             )
         }
@@ -64,5 +77,6 @@ internal interface CalendarWorkProcessor :
 
 internal sealed class CalendarWorkCommand : WorkCommand {
     data object LoadSettings : CalendarWorkCommand()
+    data object LoadOrganizations : CalendarWorkCommand()
     data class UpdateSettings(val settings: CalendarSettingsUi) : CalendarWorkCommand()
 }

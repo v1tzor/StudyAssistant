@@ -23,7 +23,7 @@ import dev.icerock.moko.parcelize.Parcelize
  * @author Stanislav Aleshin on 27.04.2024.
  */
 @Parcelize
-data class ContactInfoUi(
+internal data class ContactInfoUi(
     val label: String? = null,
     val value: String = "",
 ) : Parcelable

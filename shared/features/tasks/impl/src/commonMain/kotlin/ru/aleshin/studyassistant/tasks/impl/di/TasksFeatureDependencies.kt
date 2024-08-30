@@ -35,19 +35,19 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 /**
  * @author Stanislav Aleshin on 19.06.2024.
  */
-interface TasksFeatureDependencies : BaseFeatureDependencies {
-    val editorFeatureStarter: () -> EditorFeatureStarter
-    val usersFeatureStarter: () -> UsersFeatureStarter
-    val baseScheduleRepository: BaseScheduleRepository
-    val customScheduleRepository: CustomScheduleRepository
-    val organizationsRepository: OrganizationsRepository
-    val calendarSettingsRepository: CalendarSettingsRepository
-    val homeworkRepository: HomeworksRepository
-    val shareHomeworksRepository: ShareHomeworksRepository
-    val messageRepository: MessageRepository
-    val todoRepository: TodoRepository
-    val subjectsRepository: SubjectsRepository
-    val usersRepository: UsersRepository
-    val dateManager: DateManager
-    val coroutineManager: CoroutineManager
+public interface TasksFeatureDependencies : BaseFeatureDependencies {
+    public val editorFeatureStarter: () -> EditorFeatureStarter
+    public val usersFeatureStarter: () -> UsersFeatureStarter
+    public val baseScheduleRepository: BaseScheduleRepository
+    public val customScheduleRepository: CustomScheduleRepository
+    public val organizationsRepository: OrganizationsRepository
+    public val calendarSettingsRepository: CalendarSettingsRepository
+    public val homeworkRepository: HomeworksRepository
+    public val shareHomeworksRepository: ShareHomeworksRepository
+    public val messageRepository: MessageRepository
+    public val todoRepository: TodoRepository
+    public val subjectsRepository: SubjectsRepository
+    public val usersRepository: UsersRepository
+    public val dateManager: DateManager
+    public val coroutineManager: CoroutineManager
 }

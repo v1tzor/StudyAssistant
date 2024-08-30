@@ -18,10 +18,7 @@ package ru.aleshin.studyassistant.profile.impl.presentation.models.users
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
-import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 
 /**
@@ -40,7 +37,6 @@ internal data class AppUserUi(
     val birthday: String? = null,
     val gender: Gender? = null,
     val socialNetworks: List<SocialNetworkUi> = emptyList(),
-    @TypeParceler<Instant?, NullInstantParceler>
-    val subscribePeriod: Instant? = null,
+    val subscriptionInfo: SubscribeInfoUi? = null,
     val friends: List<UID> = emptyList(),
 ) : Parcelable

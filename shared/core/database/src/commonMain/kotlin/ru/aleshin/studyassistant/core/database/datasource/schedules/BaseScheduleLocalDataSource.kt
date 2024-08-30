@@ -54,6 +54,7 @@ interface BaseScheduleLocalDataSource {
     suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek): Flow<BaseScheduleDetailsEntity?>
     suspend fun fetchSchedulesByVersion(from: Instant, to: Instant, numberOfWeek: NumberOfRepeatWeek?): Flow<List<BaseScheduleDetailsEntity>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<ClassDetailsEntity?>
+    suspend fun deleteSchedulesByTimeRange(from: Instant, to: Instant)
 
     class Base(
         private val scheduleQueries: BaseScheduleQueries,
@@ -171,6 +172,13 @@ interface BaseScheduleLocalDataSource {
                 subject = subject,
                 employee = employee,
             )
+        }
+
+        override suspend fun deleteSchedulesByTimeRange(from: Instant, to: Instant) {
+            val fromMillis = from.toEpochMilliseconds()
+            val toMillis = to.toEpochMilliseconds()
+
+            scheduleQueries.deleteSchedulesByTimeRange(fromMillis, toMillis)
         }
     }
 }

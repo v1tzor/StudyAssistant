@@ -17,17 +17,17 @@
 package ru.aleshin.studyassistant.core.data.managers
 
 import androidx.work.WorkInfo
-import ru.aleshin.studyassistant.core.domain.managers.WorkStatus
+import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 
 /**
  * @author Stanislav Aleshin on 25.08.2024.
  */
 fun WorkInfo.State?.mapToWorkStatus() = when (this) {
-    WorkInfo.State.ENQUEUED -> WorkStatus.ENQUEUED
-    WorkInfo.State.RUNNING -> WorkStatus.RUNNING
-    WorkInfo.State.SUCCEEDED -> WorkStatus.SUCCEEDED
-    WorkInfo.State.FAILED -> WorkStatus.FAILED
-    WorkInfo.State.BLOCKED -> WorkStatus.FAILED
-    WorkInfo.State.CANCELLED -> WorkStatus.FAILED
-    null -> WorkStatus.NOT_PLANNED
+    WorkInfo.State.ENQUEUED -> RepeatWorkStatus.ENQUEUED
+    WorkInfo.State.RUNNING -> RepeatWorkStatus.RUNNING
+    WorkInfo.State.SUCCEEDED -> RepeatWorkStatus.CANCELED
+    WorkInfo.State.FAILED -> RepeatWorkStatus.CANCELED
+    WorkInfo.State.BLOCKED -> RepeatWorkStatus.CANCELED
+    WorkInfo.State.CANCELLED -> RepeatWorkStatus.CANCELED
+    null -> RepeatWorkStatus.NOT_PLANNED
 }

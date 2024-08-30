@@ -22,9 +22,9 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.preview.impl.domain.common.PreviewEitherWrapper
 import ru.aleshin.studyassistant.preview.impl.domain.common.PreviewErrorHandler
+import ru.aleshin.studyassistant.preview.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.CalendarSettingsInteractor
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.OrganizationsInteractor
-import ru.aleshin.studyassistant.preview.impl.domain.interactors.UsersInteractor
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
@@ -33,7 +33,7 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<PreviewErrorHandler> { PreviewErrorHandler.Base() }
     bindSingleton<PreviewEitherWrapper> { PreviewEitherWrapper.Base(instance()) }
 
-    bindProvider<UsersInteractor> { UsersInteractor.Base(instance(), instance()) }
+    bindProvider<AppUserInteractor> { AppUserInteractor.Base(instance(), instance()) }
     bindProvider<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance()) }
     bindProvider<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance(), instance()) }
 }

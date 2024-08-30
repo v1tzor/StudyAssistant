@@ -47,7 +47,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.mmk.kmpauth.google.GoogleButtonUiContainer
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 
@@ -55,7 +54,6 @@ import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
  * @author Stanislav Aleshin on 16.04.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun LoginActionsSection(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,

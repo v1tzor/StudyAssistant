@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.models.settings
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
@@ -26,4 +27,6 @@ import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 @Parcelize
 internal data class CalendarSettingsUi(
     val numberOfWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
+    val weekScheduleViewType: WeekScheduleViewType = WeekScheduleViewType.COMMON,
+    val holidays: List<HolidaysUi> = emptyList(),
 ) : Parcelable

@@ -35,7 +35,7 @@ actual class NotificationScheduler(
 ) {
 
     actual fun scheduleNotification(
-        id: String,
+        id: Int,
         title: String,
         body: String,
         time: Instant
@@ -51,7 +51,7 @@ actual class NotificationScheduler(
         }
 
         val trigger = UNTimeIntervalNotificationTrigger.triggerWithTimeInterval(delay, false)
-        val request = UNNotificationRequest.requestWithIdentifier(id, content, trigger)
+        val request = UNNotificationRequest.requestWithIdentifier(id.toString(), content, trigger)
 
         notificationCenter.addNotificationRequest(request) { error ->
             if (error != null) throw IllegalStateException(error.description)
@@ -59,7 +59,7 @@ actual class NotificationScheduler(
     }
 
     actual fun scheduleRepeatNotification(
-        id: String,
+        id: Int,
         title: String,
         body: String,
         time: Instant,
@@ -72,14 +72,14 @@ actual class NotificationScheduler(
             setSound(UNNotificationSound.defaultSound())
         }
         val trigger = UNTimeIntervalNotificationTrigger.triggerWithTimeInterval(interval.toDouble(), true)
-        val request = UNNotificationRequest.requestWithIdentifier(id, content, trigger)
+        val request = UNNotificationRequest.requestWithIdentifier(id.toString(), content, trigger)
 
         notificationCenter.addNotificationRequest(request) { error ->
             if (error != null) throw IllegalStateException(error.description)
         }
     }
 
-    actual fun cancelNotification(id: String) {
-        notificationCenter.removePendingNotificationRequestsWithIdentifiers(listOf(id))
+    actual fun cancelNotification(id: Int) {
+        notificationCenter.removePendingNotificationRequestsWithIdentifiers(listOf(id.toString()))
     }
 }

@@ -80,7 +80,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                         is Either.Right -> settingsEither.data
                     }
                 }
-                val isAuthorized = userInteractor.checkIsAuthorized().let { checkEither ->
+                val appUser = userInteractor.fetchAppUser().let { checkEither ->
                     when (checkEither) {
                         is Either.Left -> return@delayedAction EffectResult(MainEffect.ShowError(checkEither.data))
                         is Either.Right -> checkEither.data
@@ -90,8 +90,10 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                     settingsInteractor.updateSettings(settings.copy(isFirstStart = false))
                     screenProvider.providePreviewScreen(PreviewScreen.Intro)
                 } else {
-                    if (isAuthorized) {
+                    if (appUser != null && appUser.isEmailVerified) {
                         screenProvider.provideTabNavigationScreen()
+                    } else if (appUser != null) {
+                        screenProvider.provideAuthScreen(AuthScreen.Verification)
                     } else {
                         screenProvider.provideAuthScreen(AuthScreen.Login)
                     }
@@ -102,7 +104,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
         }
 
         private fun updatePushTokenWork() = flow {
-            userInteractor.fetchAppUser().collectAndHandle(
+            userInteractor.fetchAppUserInfo().collectAndHandle(
                 onLeftAction = { emit(EffectResult(MainEffect.ShowError(it))) },
                 onRightAction = { appUser ->
                     val token = userInteractor.fetchAppToken().firstRightOrNull {
@@ -137,10 +139,6 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                 onRightAction = { user ->
                     if (user != null) {
                         reminderInteractor.startOrRetryAvailableReminders().handle(
-                            onLeftAction = { emit(EffectResult(MainEffect.ShowError(it))) },
-                        )
-                    } else {
-                        reminderInteractor.stopReminders().handle(
                             onLeftAction = { emit(EffectResult(MainEffect.ShowError(it))) },
                         )
                     }

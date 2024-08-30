@@ -16,78 +16,54 @@
 
 package ru.aleshin.studyassistant.core.data.managers
 
-import androidx.work.Data
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import android.app.AlarmManager
+import android.app.AlarmManager.RTC_WAKEUP
+import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_NO_CREATE
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
+import android.content.Context
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.data.workers.NotificationWorker
-import java.util.concurrent.TimeUnit
+import ru.aleshin.studyassistant.core.data.workers.LocalNotificationReceiver
 
 /**
  * @author Stanislav Aleshin on 20.08.2024.
  */
 actual class NotificationScheduler(
-    private val workManager: WorkManager,
+    private val context: Context,
+    private val alarmManager: AlarmManager,
     private val dateManager: DateManager,
 ) {
 
     actual fun scheduleNotification(
-        id: String,
+        id: Int,
         title: String,
         body: String,
         time: Instant
     ) {
-        val currentTime = dateManager.fetchCurrentInstant()
-        val delayDuration = time - currentTime
-        val delay = if (delayDuration.isPositive()) delayDuration.inWholeMilliseconds else 0L
-
-        val inputData = Data.Builder().apply {
-            putString(TITLE_KEY, title)
-            putString(BODY_KEY, body)
-        }.build()
-
-        val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>().apply {
-            setInitialDelay(delay, TimeUnit.MILLISECONDS)
-            setInputData(inputData)
-        }.build()
-
-        workManager.enqueueUniqueWork(id, ExistingWorkPolicy.REPLACE, workRequest)
+        val intent = LocalNotificationReceiver.createIntent(context, title, body)
+        val pendingIntent = PendingIntent.getBroadcast(context, id, intent, FLAG_UPDATE_CURRENT)
+        val timeMillis = time.toEpochMilliseconds()
+        alarmManager.setExactAndAllowWhileIdle(RTC_WAKEUP, timeMillis, pendingIntent)
     }
 
     actual fun scheduleRepeatNotification(
-        id: String,
+        id: Int,
         title: String,
         body: String,
         time: Instant,
         interval: Long
     ) {
-        val currentTime = dateManager.fetchCurrentInstant()
-        val delayDuration = time - currentTime
-        val delay = if (delayDuration.isPositive()) delayDuration.inWholeMilliseconds else 0L
-
-        val inputData = Data.Builder().apply {
-            putString(TITLE_KEY, title)
-            putString(BODY_KEY, body)
-        }.build()
-
-        val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(interval, TimeUnit.MILLISECONDS).apply {
-            setInitialDelay(delay, TimeUnit.MILLISECONDS)
-            setInputData(inputData)
-        }.build()
-
-        workManager.enqueueUniquePeriodicWork(id, ExistingPeriodicWorkPolicy.UPDATE, workRequest)
+        val intent = LocalNotificationReceiver.createIntent(context, title, body)
+        val pendingIntent = PendingIntent.getBroadcast(context, id, intent, FLAG_UPDATE_CURRENT)
+        val timeMillis = time.toEpochMilliseconds()
+        alarmManager.setInexactRepeating(RTC_WAKEUP, timeMillis, interval, pendingIntent)
     }
 
-    actual fun cancelNotification(id: String) {
-        workManager.cancelUniqueWork(id)
-    }
-
-    companion object {
-        const val TITLE_KEY = "SCHEDULED_NOTIFICATION_TITLE"
-        const val BODY_KEY = "SCHEDULED_NOTIFICATION_BODY"
+    actual fun cancelNotification(id: Int) {
+        val intent = LocalNotificationReceiver.createCancelIntent(context)
+        val cancelFlag = FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        val cancelPendingIntent = PendingIntent.getBroadcast(context, id, intent, cancelFlag)
+        alarmManager.cancel(cancelPendingIntent)
     }
 }

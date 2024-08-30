@@ -47,7 +47,7 @@ internal interface PreviewScreenProvider : FeatureScreenProvider<PreviewScreen, 
 
         override fun provideFeatureScreen(screen: PreviewScreen) = when (screen) {
             is PreviewScreen.Intro -> IntroScreen()
-            is PreviewScreen.Setup -> SetupScreen(screen.createdUser)
+            is PreviewScreen.Setup -> SetupScreen()
         }
 
         override fun provideAuthScreen(screen: AuthScreen): Screen {

@@ -46,7 +46,7 @@ fun WarningAlertDialog(
     text: @Composable () -> Unit,
     confirmTitle: String,
     onDismiss: () -> Unit,
-    onDelete: () -> Unit,
+    onConfirm: () -> Unit,
 ) {
     BasicAlertDialog(
         onDismissRequest = onDismiss,
@@ -86,7 +86,7 @@ fun WarningAlertDialog(
                 DialogAlertButtons(
                     confirmTitle = confirmTitle,
                     onCancelClick = onDismiss,
-                    onConfirmClick = onDelete,
+                    onConfirmClick = onConfirm,
                 )
             }
         }

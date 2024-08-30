@@ -101,6 +101,7 @@ object Constants {
         const val SPLASH_TEXT = 600L
         const val UPDATE_ACTIVE_CLASS = 5000L
         const val UPDATE_TASK_STATUS = 5000L
+        const val UPDATE_EMAIL_VERIFICATION = 1000L
         const val PULL_REFRESH = 180L
     }
 

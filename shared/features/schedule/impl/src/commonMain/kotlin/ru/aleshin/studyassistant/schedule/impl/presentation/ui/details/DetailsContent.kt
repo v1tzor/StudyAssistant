@@ -17,8 +17,6 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -48,6 +46,7 @@ import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.dateTimeByWeek
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
@@ -117,10 +116,7 @@ private fun DetailsCommonSchedulesSection(
     Crossfade(
         modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
         targetState = isLoading,
-        animationSpec = spring(
-            stiffness = Spring.StiffnessMediumLow,
-            visibilityThreshold = Spring.DefaultDisplacementThreshold,
-        )
+        animationSpec = floatSpring(),
     ) { loading ->
         if (!loading && weekSchedule != null) {
             val scrollState = rememberScrollState()
@@ -209,10 +205,7 @@ private fun DetailsVerticalSchedulesSection(
     Crossfade(
         modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
         targetState = isLoading,
-        animationSpec = spring(
-            stiffness = Spring.StiffnessMediumLow,
-            visibilityThreshold = Spring.DefaultDisplacementThreshold,
-        )
+        animationSpec = floatSpring(),
     ) { loading ->
         if (!loading && weekSchedule != null) {
             val listState = rememberLazyListState()

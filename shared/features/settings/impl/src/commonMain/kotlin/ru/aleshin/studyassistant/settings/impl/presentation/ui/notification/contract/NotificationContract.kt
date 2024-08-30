@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.contract
 
-import androidx.compose.runtime.Immutable
 import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
@@ -30,7 +29,6 @@ import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.Noti
 /**
  * @author Stanislav Aleshin on 25.08.2024
  */
-@Immutable
 @Parcelize
 internal data class NotificationViewState(
     val settings: NotificationSettingsUi? = null,

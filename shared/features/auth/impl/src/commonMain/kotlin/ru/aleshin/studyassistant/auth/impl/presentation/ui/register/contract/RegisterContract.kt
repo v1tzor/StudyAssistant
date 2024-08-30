@@ -49,7 +49,7 @@ internal sealed class RegisterEvent : BaseEvent {
 internal sealed class RegisterEffect : BaseUiEffect {
     data class ShowError(val failures: AuthFailures) : RegisterEffect()
     data class NavigateToLocal(val pushScreen: Screen) : RegisterEffect()
-    data class ReplaceGlobalScreen(val screen: Screen) : RegisterEffect()
+    data class ReplaceScreen(val screen: Screen) : RegisterEffect()
 }
 
 internal sealed class RegisterAction : BaseAction {

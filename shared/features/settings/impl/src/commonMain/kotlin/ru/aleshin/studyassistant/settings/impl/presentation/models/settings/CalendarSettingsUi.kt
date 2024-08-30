@@ -28,4 +28,5 @@ import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewT
 internal data class CalendarSettingsUi(
     val numberOfWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val weekScheduleViewType: WeekScheduleViewType = WeekScheduleViewType.COMMON,
+    val holidays: List<HolidaysUi> = emptyList(),
 ) : Parcelable

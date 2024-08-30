@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.data.repositories
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.payments.SubscriptionChecker
@@ -24,6 +25,7 @@ import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToRemoteData
 import ru.aleshin.studyassistant.core.database.datasource.subjects.SubjectsLocalDataSource
+import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.remote.datasources.subjects.SubjectsRemoteDataSource
@@ -118,6 +120,40 @@ class SubjectsRepositoryImpl(
             remoteDataSource.deleteSubject(targetId, targetUser)
         } else {
             localDataSource.deleteSubject(targetId)
+        }
+    }
+
+    override suspend fun deleteAllSubjects(targetUser: UID) {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.deleteAllSubjects(targetUser)
+        } else {
+            localDataSource.deleteAllSubjects()
+        }
+    }
+
+    override suspend fun transferData(direction: DataTransferDirection, targetUser: UID) {
+        when (direction) {
+            DataTransferDirection.REMOTE_TO_LOCAL -> {
+                val allSubjects = remoteDataSource.fetchAllSubjectsByOrganization(
+                    organizationId = null,
+                    targetUser = targetUser,
+                ).let { subjectsFlow ->
+                    return@let subjectsFlow.first().map { it.mapToDomain().mapToLocalData() }
+                }
+                localDataSource.deleteAllSubjects()
+                localDataSource.addOrUpdateSubjectsGroup(allSubjects)
+            }
+            DataTransferDirection.LOCAL_TO_REMOTE -> {
+                val allSubjects = localDataSource.fetchAllSubjectsByOrganization(
+                    organizationId = null,
+                ).let { subjectsFlow ->
+                    return@let subjectsFlow.first().map { it.mapToDomain().mapToRemoteData() }
+                }
+                remoteDataSource.deleteAllSubjects(targetUser)
+                remoteDataSource.addOrUpdateSubjectsGroup(allSubjects, targetUser)
+            }
         }
     }
 }

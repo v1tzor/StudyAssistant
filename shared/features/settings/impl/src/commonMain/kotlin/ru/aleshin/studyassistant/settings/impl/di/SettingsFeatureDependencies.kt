@@ -23,25 +23,37 @@ import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface SettingsFeatureDependencies : BaseFeatureDependencies {
-    val generalSettingsRepository: GeneralSettingsRepository
-    val calendarSettingsRepository: CalendarSettingsRepository
-    val notificationSettingsRepository: NotificationSettingsRepository
-    val organizationsRepository: OrganizationsRepository
-    val usersRepository: UsersRepository
-    val startClassesReminderManager: StartClassesReminderManager
-    val endClassesReminderManager: EndClassesReminderManager
-    val homeworksReminderManager: HomeworksReminderManager
-    val workloadWarningManager: WorkloadWarningManager
-    val dateManager: DateManager
-    val coroutineManager: CoroutineManager
+public interface SettingsFeatureDependencies : BaseFeatureDependencies {
+    public val generalSettingsRepository: GeneralSettingsRepository
+    public val calendarSettingsRepository: CalendarSettingsRepository
+    public val notificationSettingsRepository: NotificationSettingsRepository
+    public val organizationsRepository: OrganizationsRepository
+    public val subjectsRepository: SubjectsRepository
+    public val employeeRepository: EmployeeRepository
+    public val homeworksRepository: HomeworksRepository
+    public val todosRepository: TodoRepository
+    public val baseScheduleRepository: BaseScheduleRepository
+    public val customScheduleRepository: CustomScheduleRepository
+    public val usersRepository: UsersRepository
+    public val startClassesReminderManager: StartClassesReminderManager
+    public val endClassesReminderManager: EndClassesReminderManager
+    public val homeworksReminderManager: HomeworksReminderManager
+    public val workloadWarningManager: WorkloadWarningManager
+    public val dateManager: DateManager
+    public val coroutineManager: CoroutineManager
 }

@@ -10,6 +10,10 @@ CREATE TABLE baseScheduleEntity (
   classes TEXT AS List<String> NOT NULL
 );
 
+addOrUpdateSchedule:
+INSERT OR REPLACE INTO baseScheduleEntity (uid, date_version_from, date_version_to, week_day_of_week, week, classes)
+VALUES ?;
+
 fetchScheduleById:
 SELECT *
 FROM baseScheduleEntity
@@ -33,6 +37,6 @@ FROM baseScheduleEntity
 WHERE date_version_to >= ? AND date_version_from <= ?
 ORDER BY date_version_to DESC;
 
-addOrUpdateSchedule:
-INSERT OR REPLACE INTO baseScheduleEntity (uid, date_version_from, date_version_to, week_day_of_week, week, classes)
-VALUES ?;
+deleteSchedulesByTimeRange:
+DELETE FROM baseScheduleEntity
+WHERE date_version_to >= ? AND date_version_from <= ?;

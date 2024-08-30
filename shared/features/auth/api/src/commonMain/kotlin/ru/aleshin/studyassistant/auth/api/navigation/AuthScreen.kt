@@ -26,4 +26,5 @@ sealed class AuthScreen : FeatureScreen<AuthRootScreen> {
     data object Login : AuthScreen()
     data object Register : AuthScreen()
     data object Forgot : AuthScreen()
+    data object Verification : AuthScreen()
 }

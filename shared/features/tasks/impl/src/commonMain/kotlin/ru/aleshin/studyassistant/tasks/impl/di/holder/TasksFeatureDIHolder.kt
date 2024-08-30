@@ -47,7 +47,7 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 /**
  * @author Stanislav Aleshin on 19.06.2024.
  */
-object TasksFeatureDIHolder : BaseFeatureDIHolder<TasksFeatureApi, TasksFeatureDependencies> {
+public object TasksFeatureDIHolder : BaseFeatureDIHolder<TasksFeatureApi, TasksFeatureDependencies> {
 
     private var directDi: DirectDI? = null
 

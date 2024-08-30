@@ -40,10 +40,11 @@ interface SubjectsRemoteDataSource {
     suspend fun addOrUpdateSubject(subject: SubjectPojo, targetUser: UID): UID
     suspend fun addOrUpdateSubjectsGroup(subjects: List<SubjectPojo>, targetUser: UID)
     suspend fun fetchSubjectById(uid: UID, targetUser: UID): Flow<SubjectDetailsPojo?>
-    suspend fun fetchAllSubjectsByOrganization(organizationId: UID, targetUser: UID): Flow<List<SubjectDetailsPojo>>
+    suspend fun fetchAllSubjectsByOrganization(organizationId: UID?, targetUser: UID): Flow<List<SubjectDetailsPojo>>
     suspend fun fetchAllSubjectsByNames(names: List<String>, targetUser: UID): List<SubjectDetailsPojo>
     suspend fun fetchSubjectsByEmployee(employeeId: UID, targetUser: UID): Flow<List<SubjectDetailsPojo>>
     suspend fun deleteSubject(targetId: UID, targetUser: UID)
+    suspend fun deleteAllSubjects(targetUser: UID)
 
     class Base(
         private val database: FirebaseFirestore,
@@ -105,14 +106,18 @@ interface SubjectsRemoteDataSource {
         }
 
         override suspend fun fetchAllSubjectsByOrganization(
-            organizationId: UID,
+            organizationId: UID?,
             targetUser: UID
         ): Flow<List<SubjectDetailsPojo>> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).where {
-                UserData.ORGANIZATION_ID equalTo organizationId
+            val subjectsReference = if (organizationId != null) {
+                userDataRoot.collection(UserData.SUBJECTS).where {
+                    UserData.ORGANIZATION_ID equalTo organizationId
+                }
+            } else {
+                userDataRoot.collection(UserData.SUBJECTS)
             }
 
             val subjectPojoListFlow = subjectsReference.snapshots.map { snapshot ->
@@ -190,6 +195,24 @@ interface SubjectsRemoteDataSource {
             val reference = userDataRoot.collection(UserData.SUBJECTS).document(targetId)
 
             return reference.delete()
+        }
+
+        override suspend fun deleteAllSubjects(targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.SUBJECTS)
+
+            val deletableSubjectReferences = reference.snapshotGet().map { snapshot ->
+                snapshot.reference
+            }
+
+            database.batch().apply {
+                deletableSubjectReferences.forEach { subjectReference ->
+                    delete(subjectReference)
+                }
+                return@apply commit()
+            }
         }
     }
 }

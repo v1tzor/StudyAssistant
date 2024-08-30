@@ -16,7 +16,9 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.general
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -63,6 +65,7 @@ internal class GeneralScreen : Screen {
                     snackbar = { ErrorSnackbar(it) },
                 )
             },
+            contentWindowInsets = WindowInsets.navigationBars
         )
 
         handleEffect { effect ->

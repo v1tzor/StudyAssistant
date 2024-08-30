@@ -21,6 +21,10 @@ import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
@@ -36,20 +40,24 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface ProfileFeatureDependencies : BaseFeatureDependencies {
-    val authFeatureStarter: () -> AuthFeatureStarter
-    val usersFeatureStarter: () -> UsersFeatureStarter
-    val settingsFeatureStarter: () -> SettingsFeatureStarter
-    val editorFeatureStarter: () -> EditorFeatureStarter
-    val scheduleFeatureStarter: () -> ScheduleFeatureStarter
-    val authRepository: AuthRepository
-    val usersRepository: UsersRepository
-    val friendRequestsRepository: FriendRequestsRepository
-    val baseSchedulesRepository: BaseScheduleRepository
-    val shareSchedulesRepository: ShareSchedulesRepository
-    val organizationsRepository: OrganizationsRepository
-    val messageRepository: MessageRepository
-    val deviceInfoProvider: DeviceInfoProvider
-    val coroutineManager: CoroutineManager
-    val dateManager: DateManager
+public interface ProfileFeatureDependencies : BaseFeatureDependencies {
+    public val authFeatureStarter: () -> AuthFeatureStarter
+    public val usersFeatureStarter: () -> UsersFeatureStarter
+    public val settingsFeatureStarter: () -> SettingsFeatureStarter
+    public val editorFeatureStarter: () -> EditorFeatureStarter
+    public val scheduleFeatureStarter: () -> ScheduleFeatureStarter
+    public val authRepository: AuthRepository
+    public val usersRepository: UsersRepository
+    public val friendRequestsRepository: FriendRequestsRepository
+    public val baseSchedulesRepository: BaseScheduleRepository
+    public val shareSchedulesRepository: ShareSchedulesRepository
+    public val organizationsRepository: OrganizationsRepository
+    public val messageRepository: MessageRepository
+    public val deviceInfoProvider: DeviceInfoProvider
+    public val startClassesReminderManager: StartClassesReminderManager
+    public val endClassesReminderManager: EndClassesReminderManager
+    public val homeworksReminderManager: HomeworksReminderManager
+    public val workloadWarningManager: WorkloadWarningManager
+    public val coroutineManager: CoroutineManager
+    public val dateManager: DateManager
 }

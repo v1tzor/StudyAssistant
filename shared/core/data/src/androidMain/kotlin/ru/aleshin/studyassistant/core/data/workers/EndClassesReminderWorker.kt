@@ -16,34 +16,39 @@
 
 package ru.aleshin.studyassistant.core.data.workers
 
+import android.app.AlarmManager
+import android.app.AlarmManager.RTC_WAKEUP
+import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_CANCEL_CURRENT
+import android.app.PendingIntent.FLAG_MUTABLE
 import android.content.Context
 import androidx.work.CoroutineWorker
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
+import org.kodein.di.DI
+import org.kodein.di.DirectDIAware
+import org.kodein.di.bindProvider
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.di.MainDirectDIAware
+import ru.aleshin.studyassistant.core.common.di.coreCommonModule
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.data.managers.NotificationScheduler.Companion.BODY_KEY
-import ru.aleshin.studyassistant.core.data.managers.NotificationScheduler.Companion.TITLE_KEY
+import ru.aleshin.studyassistant.core.data.di.coreDataModule
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
+import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
-import java.util.concurrent.TimeUnit
 
 /**
  * @author Stanislav Aleshin on 22.08.2024.
@@ -51,18 +56,27 @@ import java.util.concurrent.TimeUnit
 class EndClassesReminderWorker(
     context: Context,
     workerParameters: WorkerParameters,
-) : CoroutineWorker(context, workerParameters), MainDirectDIAware {
+) : CoroutineWorker(context, workerParameters), DirectDIAware {
 
-    private val workManager by lazy { WorkManager.getInstance(applicationContext) }
+    override val directDI = DI.direct {
+        bindProvider<Context> { applicationContext }
+        importAll(coreCommonModule, coreDataModule)
+    }
+    private val coreStrings: StudyAssistantStrings
+        get() = fetchCoreStrings(fetchAppLanguage(applicationContext.fetchCurrentLanguage()))
+
+    private val alarmManager by lazy { applicationContext.getSystemService(AlarmManager::class.java) }
     private val dateManager = instance<DateManager>()
     private val usersRepository = instance<UsersRepository>()
     private val calendarSettingsRepository = instance<CalendarSettingsRepository>()
     private val notificationSettingRepository = instance<NotificationSettingsRepository>()
     private val baseScheduleRepository = instance<BaseScheduleRepository>()
     private val customScheduleRepository = instance<CustomScheduleRepository>()
+    private val organizationsRepository = instance<OrganizationsRepository>()
 
     override suspend fun doWork(): Result {
         val currentUser = usersRepository.fetchCurrentAppUser()?.uid ?: return Result.failure()
+        val holidays = calendarSettingsRepository.fetchSettings(currentUser).first().holidays
         val notificationSettings = notificationSettingRepository.fetchSettings(currentUser).first()
 
         val currentDate = dateManager.fetchBeginningCurrentInstant()
@@ -70,37 +84,36 @@ class EndClassesReminderWorker(
         val groupedClasses = schedule.mapToValue(
             onBaseSchedule = { it?.classes?.groupBy { classModel -> classModel.organization } },
             onCustomSchedule = { it?.classes?.groupBy { classModel -> classModel.organization } },
-        )?.filter { classesEntry ->
+        )?.mapValues { entry ->
+            entry.value.filter { classModel ->
+                holidays.none {
+                    val dateFilter = TimeRange(it.start, it.end).containsDate(currentDate)
+                    val orgFilter = it.organizations.contains(classModel.organization.uid)
+                    return@none dateFilter && orgFilter
+                }
+            }
+        }?.filter { classesEntry ->
             notificationSettings.exceptionsForEndOfClasses.contains(classesEntry.key.uid).not() &&
                 classesEntry.value.isNotEmpty()
         }
 
-        val coreStrings = fetchCoreStrings(fetchAppLanguage(applicationContext.fetchCurrentLanguage()))
+        clearOldNotifications(currentUser)
 
         groupedClasses?.forEach { classesEntry ->
             val endClassesTime = classesEntry.value.last().timeRange.to
+            val currentTime = dateManager.fetchCurrentInstant()
             val targetTime = currentDate.setHoursAndMinutes(endClassesTime)
 
-            val currentTime = dateManager.fetchCurrentInstant()
-            val delayDuration = targetTime - currentTime
-
-            if (delayDuration.isPositive()) {
+            if (targetTime > currentTime) {
                 val title = coreStrings.endClassesReminderTitle
                 val body = classesEntry.key.shortName
 
-                val inputData = Data.Builder().apply {
-                    putString(TITLE_KEY, title)
-                    putString(BODY_KEY, body)
-                }.build()
-
-                val request = OneTimeWorkRequestBuilder<NotificationWorker>().apply {
-                    addTag(NOTIFICATION_WORK_TAG)
-                    setInitialDelay(delayDuration.inWholeMilliseconds, TimeUnit.MILLISECONDS)
-                    setInputData(inputData)
-                }.build()
-                val workKey = NOTIFICATION_KEY_PREFIX + classesEntry.key.uid
-
-                workManager.enqueueUniqueWork(workKey, ExistingWorkPolicy.REPLACE, request)
+                val id = classesEntry.key.uid.hashCode() + NOTIFICATION_ID_APPEND
+                val intent = LocalNotificationReceiver.createIntent(applicationContext, title, body)
+                val flag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
+                val pendingIntent = PendingIntent.getBroadcast(applicationContext, id, intent, flag)
+                val time = targetTime.toEpochMilliseconds()
+                alarmManager.setExactAndAllowWhileIdle(RTC_WAKEUP, time, pendingIntent)
             }
         }
 
@@ -127,10 +140,23 @@ class EndClassesReminderWorker(
         }
     }
 
+    private suspend fun clearOldNotifications(currentUser: UID) {
+        val organizations = organizationsRepository.fetchAllShortOrganization(currentUser).first()
+        organizations.forEach { organization ->
+            val id = organization.uid.hashCode() + NOTIFICATION_ID_APPEND
+            val intent = LocalNotificationReceiver.createCancelIntent(applicationContext)
+            val cancelFlag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
+            val cancelPendingIntent = PendingIntent.getBroadcast(applicationContext, id, intent, cancelFlag)
+            if (cancelPendingIntent != null) {
+                alarmManager.cancel(cancelPendingIntent)
+                cancelPendingIntent.cancel()
+            }
+        }
+    }
+
     companion object {
         const val WORK_KEY = "END_CLASSES_REMINDER_SCHEDULER"
         const val REPEAT_WORK_KEY = "END_CLASSES_REMINDER_SCHEDULER_REPEAT"
-        const val NOTIFICATION_KEY_PREFIX = "END_CLASSES_REMINDER_"
-        const val NOTIFICATION_WORK_TAG = "END_CLASSES_REMINDER"
+        const val NOTIFICATION_ID_APPEND = 924
     }
 }

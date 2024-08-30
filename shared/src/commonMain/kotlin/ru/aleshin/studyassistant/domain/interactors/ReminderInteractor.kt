@@ -40,7 +40,6 @@ import ru.aleshin.studyassistant.domain.entities.MainFailures
 interface ReminderInteractor {
 
     suspend fun startOrRetryAvailableReminders(): UnitDomainResult<MainFailures>
-    suspend fun stopReminders(): UnitDomainResult<MainFailures>
 
     class Base(
         private val notificationSettingsRepository: NotificationSettingsRepository,
@@ -77,13 +76,6 @@ interface ReminderInteractor {
                     workloadWarningManager.startOrRetryWarningService()
                 }
             }
-        }
-
-        override suspend fun stopReminders() = eitherWrapper.wrapUnit {
-            startClassesReminderManager.stopReminderService()
-            endClassesReminderManager.stopReminderService()
-            homeworksReminderManager.stopReminderService()
-            workloadWarningManager.stopWarningService()
         }
     }
 }

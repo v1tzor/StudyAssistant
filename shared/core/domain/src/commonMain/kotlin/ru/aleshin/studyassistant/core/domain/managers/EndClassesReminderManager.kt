@@ -16,11 +16,13 @@
 
 package ru.aleshin.studyassistant.core.domain.managers
 
+import ru.aleshin.studyassistant.core.common.functional.UID
+
 /**
  * @author Stanislav Aleshin on 22.08.2024.
  */
 interface EndClassesReminderManager {
-    suspend fun fetchWorkStatus(): WorkStatus
+    suspend fun fetchWorkStatus(): RepeatWorkStatus
     fun startOrRetryReminderService()
-    fun stopReminderService()
+    fun stopReminderService(allOrganizations: List<UID>)
 }

@@ -50,7 +50,7 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-object ScheduleFeatureDIHolder : BaseFeatureDIHolder<ScheduleFeatureApi, ScheduleFeatureDependencies> {
+public object ScheduleFeatureDIHolder : BaseFeatureDIHolder<ScheduleFeatureApi, ScheduleFeatureDependencies> {
 
     private var directDi: DirectDI? = null
 

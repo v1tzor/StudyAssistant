@@ -66,7 +66,7 @@ val coreDataModule = DI.Module("CoreData") {
     bindSingleton<AuthRepository> { AuthRepositoryImpl(instance()) }
     bindSingleton<ManageUserRepository> { ManageUserRepositoryImpl(instance()) }
 
-    bindSingleton<UsersRepository> { UsersRepositoryImpl(instance()) }
+    bindSingleton<UsersRepository> { UsersRepositoryImpl(instance(), instance()) }
 
     bindSingleton<FriendRequestsRepository> { FriendRequestsRepositoryImpl(instance()) }
 
@@ -74,7 +74,7 @@ val coreDataModule = DI.Module("CoreData") {
     bindSingleton<ShareSchedulesRepository> { ShareSchedulesRepositoryImpl(instance()) }
     bindProvider<GeneralSettingsRepository> { GeneralSettingsRepositoryImpl(instance()) }
     bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance(), instance()) }
-    bindProvider<NotificationSettingsRepository> { NotificationSettingsRepositoryImpl(instance(), instance(), instance()) }
+    bindProvider<NotificationSettingsRepository> { NotificationSettingsRepositoryImpl(instance()) }
     bindProvider<BaseScheduleRepository> { BaseScheduleRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<CustomScheduleRepository> { CustomScheduleRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<SubjectsRepository> { SubjectsRepositoryImpl(instance(), instance(), instance()) }

@@ -28,17 +28,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Surface
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.extensions.calculateProgress
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
@@ -92,24 +93,20 @@ internal fun TasksProgressView(
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleSmall,
             )
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                val tomorrowHomeworks by derivedStateOf {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                val tomorrowHomeworks = remember(homeworks, currentDate) {
                     homeworks.filter {
                         val timeRange = TimeRange(currentDate, currentDate.shiftDay(1))
                         return@filter timeRange.containsDate(it.key)
                     }
                 }
-                val weekHomeworks by derivedStateOf {
+                val weekHomeworks = remember(homeworks, currentDate) {
                     homeworks.filter {
                         val timeRange = currentDate.dateTime().weekTimeRange()
                         return@filter timeRange.containsDate(it.key)
                     }
                 }
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     InfoProgressView(
                         isLoading = isLoading,
                         items = tomorrowHomeworks.values.toList().extractAllItem().map { it.completeDate != null },
@@ -180,9 +177,7 @@ private fun InfoProgressView(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val progress by derivedStateOf {
-            items.count { it } / (items.size.takeIf { it != 0 }?.toFloat() ?: 1f)
-        }
+        val progress = remember(items) { items.calculateProgress { it } }
         InfoProgressViewIndicator(
             progress = if (isLoading) 0f else progress,
             icon = progressIcon,

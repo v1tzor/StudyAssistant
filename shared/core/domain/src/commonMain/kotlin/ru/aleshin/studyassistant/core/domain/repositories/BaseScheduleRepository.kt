@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
@@ -31,8 +32,26 @@ interface BaseScheduleRepository {
     suspend fun addOrUpdateSchedule(schedule: BaseSchedule, targetUser: UID): UID
     suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseSchedule>, targetUser: UID)
     suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<BaseSchedule?>
-    suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek, targetUser: UID): Flow<BaseSchedule?>
-    suspend fun fetchSchedulesByVersion(version: TimeRange, numberOfWeek: NumberOfRepeatWeek?, targetUser: UID): Flow<List<BaseSchedule>>
-    suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, maxNumberOfWeek: NumberOfRepeatWeek, targetUser: UID): Flow<Map<Instant, BaseSchedule?>>
+
+    suspend fun fetchScheduleByDate(
+        date: Instant,
+        numberOfWeek: NumberOfRepeatWeek,
+        targetUser: UID
+    ): Flow<BaseSchedule?>
+
+    suspend fun fetchSchedulesByVersion(
+        version: TimeRange,
+        numberOfWeek: NumberOfRepeatWeek?,
+        targetUser: UID
+    ): Flow<List<BaseSchedule>>
+
+    suspend fun fetchSchedulesByTimeRange(
+        timeRange: TimeRange,
+        maxNumberOfWeek: NumberOfRepeatWeek,
+        targetUser: UID
+    ): Flow<Map<Instant, BaseSchedule?>>
+
     suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<Class?>
+    suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID)
+    suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
 }

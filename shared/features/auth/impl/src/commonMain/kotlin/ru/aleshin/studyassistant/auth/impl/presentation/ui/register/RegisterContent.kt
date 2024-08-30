@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.AuthHeaderSection
@@ -39,7 +38,6 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.views.Regist
  * @author Stanislav Aleshin on 17.04.2024
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun RegisterContent(
     modifier: Modifier,
     state: RegisterViewState,
@@ -57,7 +55,7 @@ internal fun RegisterContent(
 
         AuthHeaderSection(
             modifier = Modifier.weight(1f),
-            text = AuthThemeRes.strings.registerHeadline,
+            header = AuthThemeRes.strings.registerHeadline,
             illustration = painterResource(AuthThemeRes.icons.registerIllustration),
             contentDescription = AuthThemeRes.strings.registerDesc,
         )

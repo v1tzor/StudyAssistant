@@ -46,8 +46,9 @@ interface OrganizationsLocalDataSource {
     suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationDetailsEntity?>
     suspend fun fetchOrganizationsById(uid: List<UID>): Flow<List<OrganizationDetailsEntity>>
     suspend fun fetchShortOrganizationById(uid: UID): Flow<OrganizationShortEntity?>
-    suspend fun fetchAllOrganization(): Flow<List<OrganizationDetailsEntity>>
+    suspend fun fetchAllOrganization(showHide: Boolean = false): Flow<List<OrganizationDetailsEntity>>
     suspend fun fetchAllShortOrganization(): Flow<List<OrganizationShortEntity>>
+    suspend fun deleteAllOrganizations()
 
     class Base(
         private val organizationQueries: OrganizationQueries,
@@ -123,8 +124,12 @@ interface OrganizationsLocalDataSource {
             return organization
         }
 
-        override suspend fun fetchAllOrganization(): Flow<List<OrganizationDetailsEntity>> {
-            val query = organizationQueries.fetchAllOrganizations()
+        override suspend fun fetchAllOrganization(showHide: Boolean): Flow<List<OrganizationDetailsEntity>> {
+            val query = if (showHide) {
+                organizationQueries.fetchAllOrganizations()
+            } else {
+                organizationQueries.fetchAllNotHideOrganizations()
+            }
             val organizationEntityListFlow = query.asFlow().mapToList(coroutineContext)
 
             return organizationEntityListFlow.map { organizations ->
@@ -153,6 +158,10 @@ interface OrganizationsLocalDataSource {
             }
 
             return organizations
+        }
+
+        override suspend fun deleteAllOrganizations() {
+            organizationQueries.deleteAllOrganizations()
         }
     }
 }

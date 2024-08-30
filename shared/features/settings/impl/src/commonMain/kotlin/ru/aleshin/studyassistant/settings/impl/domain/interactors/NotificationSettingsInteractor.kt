@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.settings.impl.domain.interactors
 
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -31,6 +32,7 @@ import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.settings.impl.domain.common.SettingsEitherWrapper
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
@@ -50,6 +52,7 @@ internal interface NotificationSettingsInteractor {
         private val endClassesReminderManager: EndClassesReminderManager,
         private val homeworksReminderManager: HomeworksReminderManager,
         private val workloadWarningManager: WorkloadWarningManager,
+        private val organizationsRepository: OrganizationsRepository,
         private val dateManager: DateManager,
         private val eitherWrapper: SettingsEitherWrapper,
     ) : NotificationSettingsInteractor {
@@ -62,16 +65,20 @@ internal interface NotificationSettingsInteractor {
         }
 
         override suspend fun updateSettings(settings: NotificationSettings) = eitherWrapper.wrapUnit {
+            val allOrganizations = organizationsRepository.fetchAllShortOrganization(targetUser).first()
+            val organizationIds = allOrganizations.map { it.uid }
+
             settingsRepository.updateSettings(settings, targetUser)
+
             if (settings.beginningOfClasses != null) {
                 startClassesReminderManager.startOrRetryReminderService()
             } else {
-                startClassesReminderManager.stopReminderService()
+                startClassesReminderManager.stopReminderService(organizationIds)
             }
             if (settings.endOfClasses) {
                 endClassesReminderManager.startOrRetryReminderService()
             } else {
-                endClassesReminderManager.stopReminderService()
+                endClassesReminderManager.stopReminderService(organizationIds)
             }
             if (settings.unfinishedHomeworks != null) {
                 val currentTime = dateManager.fetchCurrentInstant()

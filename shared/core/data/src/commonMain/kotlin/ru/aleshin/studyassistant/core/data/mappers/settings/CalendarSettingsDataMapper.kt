@@ -16,10 +16,16 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.settings
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.database.models.settings.HolidaysEntity
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
+import ru.aleshin.studyassistant.core.domain.entities.settings.Holidays
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 import ru.aleshin.studyassistant.core.remote.models.settings.CalendarSettingsPojo
+import ru.aleshin.studyassistant.core.remote.models.settings.HolidaysPojo
 import ru.aleshin.studyassistant.sqldelight.settings.CalendarSettingsEntity
 
 /**
@@ -28,20 +34,48 @@ import ru.aleshin.studyassistant.sqldelight.settings.CalendarSettingsEntity
 fun CalendarSettingsPojo.mapToDomain() = CalendarSettings(
     numberOfWeek = NumberOfRepeatWeek.valueOf(numberOfWeek),
     weekScheduleViewType = WeekScheduleViewType.valueOf(weekScheduleViewType),
+    holidays = holidays.map { it.mapToDomain() },
+)
+
+fun HolidaysPojo.mapToDomain() = Holidays(
+    organizations = organizations,
+    start = start.mapEpochTimeToInstant(),
+    end = end.mapEpochTimeToInstant(),
 )
 
 fun CalendarSettingsEntity.mapToDomain() = CalendarSettings(
     numberOfWeek = NumberOfRepeatWeek.valueOf(number_of_week),
     weekScheduleViewType = WeekScheduleViewType.valueOf(week_schedule_view_type),
+    holidays = holidays?.map { Json.decodeFromString<HolidaysEntity>(it).mapToDomain() } ?: emptyList(),
+)
+
+fun HolidaysEntity.mapToDomain() = Holidays(
+    organizations = organizations,
+    start = start.mapEpochTimeToInstant(),
+    end = end.mapEpochTimeToInstant(),
 )
 
 fun CalendarSettings.mapToRemoteData() = CalendarSettingsPojo(
     numberOfWeek = numberOfWeek.name,
     weekScheduleViewType = weekScheduleViewType.name,
+    holidays = holidays.map { it.mapToRemoteData() },
+)
+
+fun Holidays.mapToRemoteData() = HolidaysPojo(
+    organizations = organizations,
+    start = start.toEpochMilliseconds(),
+    end = end.toEpochMilliseconds(),
 )
 
 fun CalendarSettings.mapToLocalData() = CalendarSettingsEntity(
     id = 1L,
     number_of_week = numberOfWeek.name,
     week_schedule_view_type = weekScheduleViewType.name,
+    holidays = holidays.map { Json.encodeToString(it.mapToLocalData()) },
+)
+
+fun Holidays.mapToLocalData() = HolidaysEntity(
+    organizations = organizations,
+    start = start.toEpochMilliseconds(),
+    end = end.toEpochMilliseconds(),
 )

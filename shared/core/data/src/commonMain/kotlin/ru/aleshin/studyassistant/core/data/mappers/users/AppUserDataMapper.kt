@@ -22,9 +22,12 @@ import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetwork
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
+import ru.aleshin.studyassistant.core.domain.entities.users.Store
+import ru.aleshin.studyassistant.core.domain.entities.users.SubscribeInfo
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 import ru.aleshin.studyassistant.core.remote.models.users.SocialNetworkPojo
+import ru.aleshin.studyassistant.core.remote.models.users.SubscribeInfoPojo
 import ru.aleshin.studyassistant.core.remote.models.users.UserDevicePojo
 
 /**
@@ -42,7 +45,7 @@ fun AppUser.mapToRemoteData() = AppUserPojo(
     birthday = birthday,
     gender = gender?.name,
     friends = friends,
-    subscribePeriod = subscribePeriod?.toEpochMilliseconds(),
+    subscriptionInfo = subscriptionInfo?.mapToRemoteData(),
     socialNetworks = socialNetworks.map { it.mapToRemoteData() },
 )
 
@@ -58,7 +61,7 @@ fun AppUserPojo.mapToDomain() = AppUser(
     birthday = birthday,
     gender = gender?.let { Gender.valueOf(it) },
     friends = friends,
-    subscribePeriod = subscribePeriod?.mapEpochTimeToInstant(),
+    subscriptionInfo = subscriptionInfo?.mapToDomain(),
     socialNetworks = socialNetworks.map { it.mapToDomain() },
 )
 
@@ -68,6 +71,16 @@ internal fun UserDevice.mapToRemoteData() = UserDevicePojo(
     deviceName = deviceName,
     pushToken = pushToken,
     pushServiceType = pushServiceType.toString(),
+)
+
+internal fun SubscribeInfo.mapToRemoteData() = SubscribeInfoPojo(
+    deviceId = deviceId,
+    purchaseId = purchaseId,
+    productId = productId,
+    subscriptionToken = subscriptionToken,
+    purchaseDate = purchaseDate.toEpochMilliseconds(),
+    subscriptionPeriod = subscriptionPeriod,
+    store = store.name,
 )
 
 internal fun UserDevicePojo.mapToDomain() = UserDevice(
@@ -88,4 +101,14 @@ fun SocialNetworkPojo.mapToDomain() = SocialNetwork(
     type = SocialNetworkType.valueOf(type),
     otherType = otherType,
     data = data,
+)
+
+internal fun SubscribeInfoPojo.mapToDomain() = SubscribeInfo(
+    deviceId = deviceId,
+    purchaseId = purchaseId,
+    productId = productId,
+    subscriptionToken = subscriptionToken,
+    purchaseDate = purchaseDate.mapEpochTimeToInstant(),
+    subscriptionPeriod = subscriptionPeriod,
+    store = Store.valueOf(store),
 )

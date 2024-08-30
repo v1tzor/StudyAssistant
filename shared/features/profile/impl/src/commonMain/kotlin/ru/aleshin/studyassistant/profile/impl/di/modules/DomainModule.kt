@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.profile.impl.domain.common.ProfileErrorHandler
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.FriendRequestsInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.OrganizationsInteractor
+import ru.aleshin.studyassistant.profile.impl.domain.interactors.ReminderInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.ShareSchedulesInteractor
 import ru.aleshin.studyassistant.profile.impl.domain.interactors.UserInteractor
 
@@ -40,4 +41,5 @@ internal val domainModule = DI.Module("Domain") {
     bindProvider<FriendRequestsInteractor> { FriendRequestsInteractor.Base(instance(), instance(), instance()) }
     bindProvider<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance()) }
     bindProvider<ShareSchedulesInteractor> { ShareSchedulesInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<ReminderInteractor> { ReminderInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 }

@@ -36,3 +36,9 @@ fun min(a: Long?, b: Long?): Long? {
         else -> null
     }
 }
+
+fun <T> List<T>.calculateProgress(predicate: (T) -> Boolean): Float {
+    val allItems = size.toFloat().takeIf { it > 0f } ?: 1f
+    val items = count(predicate)
+    return items / allItems
+}

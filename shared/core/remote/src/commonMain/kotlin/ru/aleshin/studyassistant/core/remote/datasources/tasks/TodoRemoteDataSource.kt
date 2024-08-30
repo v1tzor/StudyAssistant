@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.exists
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
 import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojo
@@ -34,11 +36,13 @@ import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojo
 interface TodoRemoteDataSource {
 
     suspend fun addOrUpdateTodo(todo: TodoPojo, targetUser: UID): UID
+    suspend fun addOrUpdateTodosGroup(todos: List<TodoPojo>, targetUser: UID)
     suspend fun fetchTodoById(uid: UID, targetUser: UID): Flow<TodoPojo?>
     suspend fun fetchTodosByTimeRange(from: Long, to: Long, targetUser: UID): Flow<List<TodoPojo>>
     suspend fun fetchActiveTodos(targetUser: UID): Flow<List<TodoPojo>>
     suspend fun fetchOverdueTodos(currentDate: Long, targetUser: UID): Flow<List<TodoPojo>>
     suspend fun deleteTodo(uid: UID, targetUser: UID)
+    suspend fun deleteAllTodos(targetUser: UID)
 
     class Base(
         private val database: FirebaseFirestore,
@@ -60,6 +64,21 @@ interface TodoRemoteDataSource {
                     reference.document(uid).update(UserData.UID to uid)
                     return@runTransaction uid
                 }
+            }
+        }
+
+        override suspend fun addOrUpdateTodosGroup(todos: List<TodoPojo>, targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.TODOS)
+
+            database.batch().apply {
+                todos.forEach { todo ->
+                    val uid = todo.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+                    set(reference.document(uid), todo)
+                }
+                return@apply commit()
             }
         }
 
@@ -86,7 +105,8 @@ interface TodoRemoteDataSource {
             val reference = userDataRoot.collection(UserData.TODOS).where {
                 val fromDeadlineFilter = UserData.TODO_DEADLINE greaterThanOrEqualTo from
                 val toDeadlineFilter = UserData.TODO_DEADLINE lessThanOrEqualTo to
-                return@where fromDeadlineFilter and toDeadlineFilter
+                val noneDeadlineFilter = UserData.TODO_DEADLINE equalTo null
+                return@where fromDeadlineFilter and toDeadlineFilter or noneDeadlineFilter
             }.orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)
 
             return reference.snapshots.map { snapshot ->
@@ -135,6 +155,24 @@ interface TodoRemoteDataSource {
             val reference = userDataRoot.collection(UserData.TODOS).document(uid)
 
             return reference.delete()
+        }
+
+        override suspend fun deleteAllTodos(targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.TODOS)
+
+            val deletableTodoReferences = reference.snapshotGet().map { snapshot ->
+                snapshot.reference
+            }
+
+            database.batch().apply {
+                deletableTodoReferences.forEach { todoReference ->
+                    delete(todoReference)
+                }
+                return@apply commit()
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ import cafe.adriel.voyager.navigator.lifecycle.NavigatorDisposable
  * @author Stanislav Aleshin on 21.04.2024.
  */
 @InternalVoyagerApi
-internal object NestedNavigatorDisposable : NavigatorDisposable {
+object NestedNavigatorDisposable : NavigatorDisposable {
 
     override fun onDispose(navigator: Navigator) {
         navigator.items.forEach { navigator.dispose(it) }

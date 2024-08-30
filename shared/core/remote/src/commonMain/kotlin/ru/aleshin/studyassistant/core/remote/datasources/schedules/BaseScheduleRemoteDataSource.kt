@@ -50,18 +50,22 @@ interface BaseScheduleRemoteDataSource {
     suspend fun addOrUpdateSchedule(schedule: BaseSchedulePojo, targetUser: UID): UID
     suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseSchedulePojo>, targetUser: UID)
     suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<BaseScheduleDetailsPojo?>
+
     suspend fun fetchScheduleByDate(
         date: Instant,
         numberOfWeek: NumberOfRepeatWeek,
         targetUser: UID
     ): Flow<BaseScheduleDetailsPojo?>
+
     suspend fun fetchSchedulesByVersion(
         from: Instant,
         to: Instant,
         numberOfWeek: NumberOfRepeatWeek?,
         targetUser: UID
     ): Flow<List<BaseScheduleDetailsPojo>>
+
     suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<ClassDetailsPojo?>
+    suspend fun deleteSchedulesByTimeRange(from: Instant, to: Instant, targetUser: UID)
 
     class Base(
         private val database: FirebaseFirestore,
@@ -234,6 +238,35 @@ interface BaseScheduleRemoteDataSource {
                 subject = subject,
                 employee = employee,
             )
+        }
+
+        override suspend fun deleteSchedulesByTimeRange(
+            from: Instant,
+            to: Instant,
+            targetUser: UID
+        ) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val fromMillis = from.toEpochMilliseconds()
+            val toMillis = to.toEpochMilliseconds()
+
+            val schedulesReference = userDataRoot.collection(UserData.BASE_SCHEDULES).where {
+                val toDateFilter = UserData.VERSION_TO greaterThanOrEqualTo fromMillis
+                val fromDateFilter = UserData.VERSION_FROM lessThanOrEqualTo toMillis
+                return@where fromDateFilter and toDateFilter
+            }
+
+            val deletableScheduleReferences = schedulesReference.snapshotGet().map { snapshot ->
+                snapshot.reference
+            }
+
+            database.batch().apply {
+                deletableScheduleReferences.forEach { scheduleReference ->
+                    delete(scheduleReference)
+                }
+                return@apply commit()
+            }
         }
     }
 }

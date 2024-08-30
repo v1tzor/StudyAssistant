@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.AuthHeaderSection
@@ -40,7 +39,6 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.views.NotAccoun
  * @author Stanislav Aleshin on 16.04.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun LoginContent(
     state: LoginViewState,
     modifier: Modifier,
@@ -55,7 +53,7 @@ internal fun LoginContent(
     ) {
         AuthHeaderSection(
             modifier = Modifier.weight(1f),
-            text = AuthThemeRes.strings.loginHeadline,
+            header = AuthThemeRes.strings.loginHeadline,
             illustration = painterResource(AuthThemeRes.icons.loginIllustration),
             contentDescription = AuthThemeRes.strings.loginDesc,
         )

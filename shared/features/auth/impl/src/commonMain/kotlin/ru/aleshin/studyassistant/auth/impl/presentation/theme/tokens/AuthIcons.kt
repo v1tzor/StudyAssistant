@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.auth.impl.presentation.theme.tokens
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import studyassistant.shared.features.auth.impl.generated.resources.Res
 import studyassistant.shared.features.auth.impl.generated.resources.ic_google
 import studyassistant.shared.features.auth.impl.generated.resources.ic_mail_outline
@@ -32,15 +31,17 @@ import studyassistant.shared.features.auth.impl.generated.resources.il_login
 import studyassistant.shared.features.auth.impl.generated.resources.il_login_dark
 import studyassistant.shared.features.auth.impl.generated.resources.il_register
 import studyassistant.shared.features.auth.impl.generated.resources.il_register_dark
+import studyassistant.shared.features.auth.impl.generated.resources.il_verification
+import studyassistant.shared.features.auth.impl.generated.resources.il_verification_dark
 
 /**
  * @author Stanislav Aleshin on 14.06.2023.
  */
-@OptIn(ExperimentalResourceApi::class)
 internal data class AuthIcons(
     val loginIllustration: DrawableResource,
     val registerIllustration: DrawableResource,
     val forgotIllustration: DrawableResource,
+    val verificationIllustration: DrawableResource,
     val email: DrawableResource,
     val password: DrawableResource,
     val username: DrawableResource,
@@ -54,6 +55,7 @@ internal data class AuthIcons(
             loginIllustration = Res.drawable.il_login,
             registerIllustration = Res.drawable.il_register,
             forgotIllustration = Res.drawable.il_forgot,
+            verificationIllustration = Res.drawable.il_verification,
             email = Res.drawable.ic_mail_outline,
             password = Res.drawable.ic_password_outline,
             username = Res.drawable.ic_person_outline,
@@ -65,6 +67,7 @@ internal data class AuthIcons(
             loginIllustration = Res.drawable.il_login_dark,
             registerIllustration = Res.drawable.il_register_dark,
             forgotIllustration = Res.drawable.il_forgot_dark,
+            verificationIllustration = Res.drawable.il_verification_dark,
             email = Res.drawable.ic_mail_outline,
             password = Res.drawable.ic_password_outline,
             username = Res.drawable.ic_person_outline,

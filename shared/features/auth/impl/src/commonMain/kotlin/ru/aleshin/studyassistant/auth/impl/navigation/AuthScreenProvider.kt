@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.auth.api.presentation.AuthRootScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.ForgotScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.LoginScreen
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.RegisterScreen
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.VerificationScreen
 import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
@@ -45,6 +46,7 @@ internal interface AuthScreenProvider : FeatureScreenProvider<AuthScreen, AuthRo
             is AuthScreen.Login -> LoginScreen()
             is AuthScreen.Register -> RegisterScreen()
             is AuthScreen.Forgot -> ForgotScreen()
+            is AuthScreen.Verification -> VerificationScreen()
         }
 
         override fun providePreviewScreen(screen: PreviewScreen): Screen {

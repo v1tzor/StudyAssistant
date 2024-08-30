@@ -38,22 +38,22 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface ScheduleFeatureDependencies : BaseFeatureDependencies {
-    val editorFeatureStarter: () -> EditorFeatureStarter
-    val usersFeatureStarter: () -> UsersFeatureStarter
-    val baseScheduleRepository: BaseScheduleRepository
-    val customScheduleRepository: CustomScheduleRepository
-    val shareSchedulesRepository: ShareSchedulesRepository
-    val organizationsRepository: OrganizationsRepository
-    val subjectsRepository: SubjectsRepository
-    val employeeRepository: EmployeeRepository
-    val calendarSettingsRepository: CalendarSettingsRepository
-    val notificationSettingsRepository: NotificationSettingsRepository
-    val startClassesReminderManager: StartClassesReminderManager
-    val endClassesReminderManager: EndClassesReminderManager
-    val homeworkRepository: HomeworksRepository
-    val todoRepository: TodoRepository
-    val usersRepository: UsersRepository
-    val dateManager: DateManager
-    val coroutineManager: CoroutineManager
+public interface ScheduleFeatureDependencies : BaseFeatureDependencies {
+    public val editorFeatureStarter: () -> EditorFeatureStarter
+    public val usersFeatureStarter: () -> UsersFeatureStarter
+    public val baseScheduleRepository: BaseScheduleRepository
+    public val customScheduleRepository: CustomScheduleRepository
+    public val shareSchedulesRepository: ShareSchedulesRepository
+    public val organizationsRepository: OrganizationsRepository
+    public val subjectsRepository: SubjectsRepository
+    public val employeeRepository: EmployeeRepository
+    public val calendarSettingsRepository: CalendarSettingsRepository
+    public val notificationSettingsRepository: NotificationSettingsRepository
+    public val startClassesReminderManager: StartClassesReminderManager
+    public val endClassesReminderManager: EndClassesReminderManager
+    public val homeworkRepository: HomeworksRepository
+    public val todoRepository: TodoRepository
+    public val usersRepository: UsersRepository
+    public val dateManager: DateManager
+    public val coroutineManager: CoroutineManager
 }

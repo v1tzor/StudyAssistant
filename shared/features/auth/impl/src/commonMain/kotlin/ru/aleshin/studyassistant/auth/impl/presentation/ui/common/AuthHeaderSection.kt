@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.common
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 /**
@@ -37,7 +37,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal fun AuthHeaderSection(
     modifier: Modifier = Modifier,
-    text: String,
+    header: String,
+    title: String? = null,
     illustration: Painter,
     contentDescription: String?,
 ) {
@@ -53,13 +54,27 @@ internal fun AuthHeaderSection(
             contentScale = ContentScale.Fit,
             alignment = Alignment.Center,
         )
-        Text(
-            modifier = Modifier.padding(horizontal = 24.dp).fillMaxWidth(),
-            text = text,
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.headlineLarge.copy(
+        Column(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = header,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Black,
-            ),
-        )
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 4,
+                style = MaterialTheme.typography.headlineLarge,
+            )
+            if (title != null) {
+                Text(
+                    text = title,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 4,
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            }
+        }
     }
 }

@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.domain.repositories
 import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 
@@ -34,5 +35,7 @@ interface OrganizationsRepository {
     suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShort?>
     suspend fun fetchAllOrganization(targetUser: UID): Flow<List<Organization>>
     suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShort>>
+    suspend fun deleteAllOrganizations(targetUser: UID)
     suspend fun deleteAvatar(uid: UID, targetUser: UID)
+    suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
 }

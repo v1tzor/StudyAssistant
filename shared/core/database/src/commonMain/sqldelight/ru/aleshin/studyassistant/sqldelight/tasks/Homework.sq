@@ -40,7 +40,9 @@ SELECT *
 FROM homeworkEntity
 WHERE uid = ?;
 
-
 deleteHomework:
 DELETE FROM homeworkEntity
 WHERE uid = ?;
+
+deleteAllHomeworks:
+DELETE FROM homeworkEntity;

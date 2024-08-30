@@ -35,6 +35,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.users.SocialNet
 @Parcelize
 internal data class ProfileViewState(
     val isLoading: Boolean = true,
+    val isPaidUser: Boolean? = false,
     val appUser: AppUserUi? = null,
 ) : BaseViewState
 
@@ -60,4 +61,5 @@ internal sealed class ProfileEffect : BaseUiEffect {
 internal sealed class ProfileAction : BaseAction {
     data class SetupAppUser(val user: AppUserUi) : ProfileAction()
     data class UpdateLoading(val isLoading: Boolean) : ProfileAction()
+    data class UpdatePaidUserStatus(val isPaidUser: Boolean) : ProfileAction()
 }

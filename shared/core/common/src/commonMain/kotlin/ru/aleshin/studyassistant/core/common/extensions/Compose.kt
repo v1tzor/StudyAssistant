@@ -15,7 +15,10 @@
  */
 package ru.aleshin.studyassistant.core.common.extensions
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +29,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -66,6 +70,15 @@ fun WindowInsets.Companion.safeNavigationBarsInPx(density: Density): Int {
 @Composable
 fun WindowInsets.Companion.navigationBarsInDp(): Dp {
     return this.navigationBars.asPaddingValues().calculateBottomPadding()
+}
+
+@Stable
+fun floatSpring(
+    dampingRatio: Float = Spring.DampingRatioNoBouncy,
+    stiffness: Float = Spring.StiffnessMediumLow,
+    visibilityThreshold: Float? = 0.1f,
+): SpringSpec<Float> {
+    return spring(dampingRatio, stiffness, visibilityThreshold)
 }
 
 @Composable

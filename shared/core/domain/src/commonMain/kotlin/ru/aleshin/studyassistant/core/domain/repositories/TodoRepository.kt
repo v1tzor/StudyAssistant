@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
 
 /**
@@ -33,4 +34,6 @@ interface TodoRepository {
     suspend fun fetchOverdueTodos(currentDate: Instant, targetUser: UID): Flow<List<Todo>>
     suspend fun fetchTodosByDate(date: Instant, targetUser: UID): Flow<List<Todo>>
     suspend fun deleteTodo(uid: UID, targetUser: UID)
+    suspend fun deleteAllTodos(targetUser: UID)
+    suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
 }

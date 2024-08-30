@@ -33,11 +33,13 @@ import kotlin.coroutines.CoroutineContext
 interface TodoLocalDataSource {
 
     suspend fun addOrUpdateTodo(todo: TodoEntity): UID
+    suspend fun addOrUpdateTodosGroup(todos: List<TodoEntity>)
     suspend fun fetchTodoById(uid: UID): Flow<TodoEntity?>
     suspend fun fetchTodosByTimeRange(from: Long, to: Long): Flow<List<TodoEntity>>
     suspend fun fetchActiveTodos(): Flow<List<TodoEntity>>
     suspend fun fetchOverdueTodos(currentDate: Long): Flow<List<TodoEntity>>
     suspend fun deleteTodo(uid: UID)
+    suspend fun deleteAllTodos()
 
     class Base(
         private val todoQueries: TodoQueries,
@@ -52,6 +54,10 @@ interface TodoLocalDataSource {
             todoQueries.addOrUpdateTodo(todo.copy(uid = uid))
 
             return uid
+        }
+
+        override suspend fun addOrUpdateTodosGroup(todos: List<TodoEntity>) {
+            todos.forEach { todo -> addOrUpdateTodo(todo) }
         }
 
         override suspend fun fetchTodoById(uid: UID): Flow<TodoEntity?> {
@@ -76,6 +82,10 @@ interface TodoLocalDataSource {
 
         override suspend fun deleteTodo(uid: UID) {
             todoQueries.deleteTodo(uid)
+        }
+
+        override suspend fun deleteAllTodos() {
+            todoQueries.deleteAllTodos()
         }
     }
 }

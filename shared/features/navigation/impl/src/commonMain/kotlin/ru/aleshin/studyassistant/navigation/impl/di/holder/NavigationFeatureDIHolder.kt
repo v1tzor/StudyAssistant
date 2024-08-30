@@ -35,7 +35,7 @@ import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
-object NavigationFeatureDIHolder :
+public object NavigationFeatureDIHolder :
     BaseFeatureDIHolder<NavigationFeatureApi, NavigationFeatureDependencies> {
 
     private var directDI: DirectDI? = null

@@ -31,6 +31,8 @@ interface UsersRepository {
     fun fetchCurrentAppUser(): FirebaseUser?
     fun fetchCurrentUserOrError() = fetchCurrentAppUser() ?: throw FirebaseUserException()
     suspend fun fetchAuthStateChanged(): Flow<FirebaseUser?>
+    suspend fun fetchCurrentUserPaidStatus(): Flow<Boolean>
+    suspend fun fetchExistRemoteDataStatus(uid: UID): Flow<Boolean>
     suspend fun fetchUserById(uid: UID): Flow<AppUser?>
     suspend fun fetchRealtimeUserById(uid: UID): AppUser?
     suspend fun fetchUserFriends(uid: UID): Flow<List<AppUser>>

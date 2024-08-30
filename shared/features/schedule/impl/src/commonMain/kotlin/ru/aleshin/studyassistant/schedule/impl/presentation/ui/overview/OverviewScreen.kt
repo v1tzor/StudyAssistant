@@ -78,7 +78,8 @@ internal class OverviewScreen : Screen {
                         onDetailsClick = { dispatchEvent(OverviewEvent.NavigateToDetails) },
                     )
                     OverviewTopSheet(
-                        isLoading = state.isAnalyticsLoading,
+                        isLoadingSchedule = state.isScheduleLoading,
+                        isLoadingAnalytics = state.isAnalyticsLoading,
                         selectedDate = state.selectedDate,
                         weekAnalysis = state.weekAnalysis,
                         activeClass = state.activeClass,

@@ -22,7 +22,7 @@ import kotlinx.datetime.Instant
  * @author Stanislav Aleshin on 20.08.2024.
  */
 expect class NotificationScheduler {
-    fun scheduleNotification(id: String, title: String, body: String, time: Instant)
-    fun scheduleRepeatNotification(id: String, title: String, body: String, time: Instant, interval: Long)
-    fun cancelNotification(id: String)
+    fun scheduleNotification(id: Int, title: String, body: String, time: Instant)
+    fun scheduleRepeatNotification(id: Int, title: String, body: String, time: Instant, interval: Long)
+    fun cancelNotification(id: Int)
 }

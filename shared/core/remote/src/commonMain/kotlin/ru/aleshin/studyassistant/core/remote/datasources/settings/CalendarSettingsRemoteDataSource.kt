@@ -31,8 +31,8 @@ import ru.aleshin.studyassistant.core.remote.models.settings.CalendarSettingsPoj
 interface CalendarSettingsRemoteDataSource {
 
     suspend fun addOrUpdateSettings(settings: CalendarSettingsPojo, targetUser: UID)
-
     suspend fun fetchSettings(targetUser: UID): Flow<CalendarSettingsPojo>
+    suspend fun deleteSettings(targetUser: UID)
 
     class Base(
         private val database: FirebaseFirestore
@@ -49,12 +49,22 @@ interface CalendarSettingsRemoteDataSource {
         override suspend fun fetchSettings(targetUser: UID): Flow<CalendarSettingsPojo> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
             val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
 
             return reference.snapshots.map { snapshot ->
                 val settings = snapshot.data(serializer<CalendarSettingsPojo?>()) ?: CalendarSettingsPojo.default()
                 return@map settings
             }
+        }
+
+        override suspend fun deleteSettings(targetUser: UID) {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
+
+            reference.delete()
         }
     }
 }

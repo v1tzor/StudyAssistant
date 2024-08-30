@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
+import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
 import ru.aleshin.studyassistant.auth.impl.navigation.AuthScreenProvider
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToDomain
@@ -80,7 +81,9 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
                 onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
                 onRightAction = { result ->
                     val targetScreen = if (result.isNewUser) {
-                        screenProvider.providePreviewScreen(PreviewScreen.Setup(result.user.uid))
+                        screenProvider.providePreviewScreen(PreviewScreen.Setup)
+                    } else if (!result.firebaseUser.isEmailVerified) {
+                        screenProvider.provideFeatureScreen(AuthScreen.Verification)
                     } else {
                         screenProvider.provideTabNavigationScreen()
                     }

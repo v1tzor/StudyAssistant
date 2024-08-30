@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.profile.impl.presentation.ui.views
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,7 @@ internal fun ProfileInfoSection(
 ) {
     Crossfade(
         targetState = isLoading,
+        modifier = Modifier.animateContentSize(),
         animationSpec = spring(
             stiffness = Spring.StiffnessMediumLow,
             visibilityThreshold = Spring.DefaultDisplacementThreshold,
@@ -123,7 +125,7 @@ internal fun ContactInfoViewPlaceholder(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         PlaceholderBox(
-            modifier = Modifier.size(200.dp, 28.dp),
+            modifier = Modifier.size(200.dp, 26.dp),
             highlight = null,
         )
         PlaceholderBox(

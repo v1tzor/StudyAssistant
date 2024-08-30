@@ -12,13 +12,9 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvmToolchain(17)
+
+    androidTarget()
 
     listOf(
         iosX64(),
@@ -35,7 +31,8 @@ kotlin {
         androidMain.dependencies {
             api(libs.androidx.core.ktx)
             api(libs.androidx.activity.compose)
-            api(libs.androidx.workmanager)
+            api(libs.androidx.workmanager.ktx)
+            api(libs.androidx.guava)
             api(libs.kodein.android)
 
             implementation(project.dependencies.platform(libs.rustore.bom))

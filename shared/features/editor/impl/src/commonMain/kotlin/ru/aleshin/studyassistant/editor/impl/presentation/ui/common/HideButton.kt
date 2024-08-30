@@ -102,7 +102,7 @@ internal fun HideButton(
             text = { Text(text = warningMessage) },
             confirmTitle = StudyAssistantRes.strings.hideTitle,
             onDismiss = { warningDialogStatus = false },
-            onDelete = {
+            onConfirm = {
                 onHide()
                 warningDialogStatus = false
             },

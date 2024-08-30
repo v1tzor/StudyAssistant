@@ -9,6 +9,10 @@ CREATE TABLE subjectEntity (
     location TEXT
 );
 
+addOrUpdateSubject:
+INSERT OR REPLACE INTO subjectEntity (uid, organization_id, event_type, name, teacher_id, office, color, location)
+VALUES ?;
+
 fetchSubjectsByOrganization:
 SELECT *
 FROM subjectEntity
@@ -29,10 +33,13 @@ SELECT *
 FROM subjectEntity
 WHERE uid = ?;
 
-addOrUpdateSubject:
-INSERT OR REPLACE INTO subjectEntity (uid, organization_id, event_type, name, teacher_id, office, color, location)
-VALUES ?;
+fetchAllSubjects:
+SELECT *
+FROM subjectEntity;
 
 deleteSubject:
 DELETE FROM subjectEntity
 WHERE uid = ?;
+
+deleteAllSubjects:
+DELETE FROM subjectEntity;

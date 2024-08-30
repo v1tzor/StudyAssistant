@@ -38,7 +38,7 @@ interface AuthRemoteDataSource {
 
     suspend fun sendPasswordResetEmail(email: String)
 
-    suspend fun sendVerifyEmail(email: String)
+    suspend fun sendVerifyEmail()
 
     suspend fun updatePassword(oldPassword: String, newPassword: String)
 
@@ -73,7 +73,7 @@ interface AuthRemoteDataSource {
             firebaseAuth.sendPasswordResetEmail(email)
         }
 
-        override suspend fun sendVerifyEmail(email: String) {
+        override suspend fun sendVerifyEmail() {
             val currentUser = firebaseAuth.currentUser ?: throw FirebaseUserException()
             currentUser.sendEmailVerification()
         }

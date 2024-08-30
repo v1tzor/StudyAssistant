@@ -81,6 +81,7 @@ internal class ProfileScreen : Screen {
                     )
                     ProfileTopSheet(
                         isLoading = state.isLoading,
+                        isPaidUser = state.isPaidUser,
                         appUser = state.appUser,
                         onUpdateAvatar = { file -> dispatchEvent(ProfileEvent.UpdateAvatar(file)) },
                         onDeleteAvatar = { dispatchEvent(ProfileEvent.DeleteAvatar) },

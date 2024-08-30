@@ -8,10 +8,14 @@ CREATE TABLE todoEntity (
     complete_date INTEGER
 );
 
+addOrUpdateTodo:
+INSERT OR REPLACE INTO todoEntity (uid, deadline, name, priority, notification, is_done, complete_date)
+VALUES ?;
+
 fetchTodosByTimeRange:
 SELECT *
 FROM todoEntity
-WHERE deadline BETWEEN ? AND ?
+WHERE deadline BETWEEN ? AND ? OR deadline IS NULL
 ORDER BY deadline DESC;
 
 fetchActiveTodos:
@@ -31,10 +35,9 @@ SELECT *
 FROM todoEntity
 WHERE uid = ?;
 
-addOrUpdateTodo:
-INSERT OR REPLACE INTO todoEntity (uid, deadline, name, priority, notification, is_done, complete_date)
-VALUES ?;
-
 deleteTodo:
 DELETE FROM todoEntity
 WHERE uid = ?;
+
+deleteAllTodos:
+DELETE FROM todoEntity;

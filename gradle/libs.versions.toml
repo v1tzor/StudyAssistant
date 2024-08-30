@@ -8,7 +8,7 @@ version-name = "0.0.1-alpha"
 version-code = "1"
 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 agp = "8.5.2"
-kotlin = "2.0.20-Beta2"
+kotlin = "2.0.20"
 kotlin-coroutines = "1.9.0-RC"
 kotlin-datetime = "0.6.0"
 kotlin-serialization = "1.7.0"
@@ -45,6 +45,7 @@ sketch = "4.0.0-alpha03"
 drag-and-drop = "0.2.0"
 filekit = "0.7.0"
 konfig = "0.15.1"
+guava = "33.2.1-android"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -55,7 +56,9 @@ moko-parcelize = { module = "dev.icerock.moko:parcelize", version.ref = "mokoPar
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
-androidx-workmanager = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager" }
+androidx-workmanager = { module = "androidx.work:work-runtime", version.ref = "workmanager" }
+androidx-workmanager-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager" }
+androidx-guava = { module = "com.google.guava:guava", version.ref = "guava" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }

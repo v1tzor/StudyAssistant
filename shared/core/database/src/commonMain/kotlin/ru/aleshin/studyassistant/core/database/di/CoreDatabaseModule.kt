@@ -45,6 +45,7 @@ import ru.aleshin.studyassistant.sqldelight.schedules.BaseScheduleQueries
 import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleEntity
 import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleQueries
 import ru.aleshin.studyassistant.sqldelight.settings.CalendarQueries
+import ru.aleshin.studyassistant.sqldelight.settings.CalendarSettingsEntity
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
 import ru.aleshin.studyassistant.sqldelight.settings.NotificationQueries
 import ru.aleshin.studyassistant.sqldelight.settings.NotificationSettingsEntity
@@ -60,6 +61,7 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
     bindEagerSingleton<SqlDriver> { instance<DriverFactory>().createDriver() }
     bindEagerSingleton<ColumnAdapter<List<String>, String>> { listOfStringsAdapter }
     bindEagerSingleton<ColumnAdapter<List<Int>, String>> { listOfIntAdapter }
+    bindEagerSingleton<CalendarSettingsEntity.Adapter> { CalendarSettingsEntity.Adapter(instance()) }
     bindEagerSingleton<NotificationSettingsEntity.Adapter> { NotificationSettingsEntity.Adapter(instance(), instance()) }
     bindEagerSingleton<CustomScheduleEntity.Adapter> { CustomScheduleEntity.Adapter(instance()) }
     bindEagerSingleton<BaseScheduleEntity.Adapter> { BaseScheduleEntity.Adapter(instance()) }
@@ -70,7 +72,7 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
         EmployeeEntity.Adapter(instance(), instance(), instance(), instance())
     }
 
-    bindEagerSingleton<Database> { Database(instance<SqlDriver>(), instance(), instance(), instance(), instance(), instance()) }
+    bindEagerSingleton<Database> { Database(instance<SqlDriver>(), instance(), instance(), instance(), instance(), instance(), instance()) }
 
     bindSingleton<GeneralQueries> { instance<Database>().generalQueries }
     bindSingleton<CalendarQueries> { instance<Database>().calendarQueries }

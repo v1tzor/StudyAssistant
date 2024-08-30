@@ -47,11 +47,13 @@ import kotlin.coroutines.CoroutineContext
 interface CustomScheduleLocalDataSource {
 
     suspend fun addOrUpdateSchedule(schedule: CustomScheduleEntity): UID
+    suspend fun addOrUpdateSchedulesGroup(schedules: List<CustomScheduleEntity>)
     suspend fun fetchScheduleById(uid: UID): Flow<CustomScheduleDetailsEntity?>
     suspend fun fetchScheduleByDate(date: Instant): Flow<CustomScheduleDetailsEntity?>
     suspend fun fetchSchedulesByTimeRange(from: Instant, to: Instant): Flow<List<CustomScheduleDetailsEntity>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<ClassDetailsEntity?>
     suspend fun deleteScheduleById(scheduleId: UID)
+    suspend fun deleteSchedulesByTimeRange(from: Instant, to: Instant)
 
     class Base(
         private val scheduleQueries: CustomScheduleQueries,
@@ -69,6 +71,10 @@ interface CustomScheduleLocalDataSource {
             scheduleQueries.addOrUpdateSchedule(schedule.copy(uid = uid))
 
             return uid
+        }
+
+        override suspend fun addOrUpdateSchedulesGroup(schedules: List<CustomScheduleEntity>) {
+            return schedules.forEach { schedule -> addOrUpdateSchedule(schedule) }
         }
 
         override suspend fun fetchScheduleById(uid: UID): Flow<CustomScheduleDetailsEntity?> {
@@ -123,6 +129,13 @@ interface CustomScheduleLocalDataSource {
 
         override suspend fun deleteScheduleById(scheduleId: UID) {
             scheduleQueries.deleteScheduleById(scheduleId)
+        }
+
+        override suspend fun deleteSchedulesByTimeRange(from: Instant, to: Instant) {
+            val fromMillis = from.toEpochMilliseconds()
+            val toMillis = to.toEpochMilliseconds()
+
+            scheduleQueries.deleteSchedulesByTimeRange(fromMillis, toMillis)
         }
 
         private suspend fun ClassEntity.mapToDetails(scheduleId: UID): ClassDetailsEntity {

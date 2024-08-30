@@ -23,13 +23,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -78,35 +78,101 @@ fun AvatarView(
     secondName: String?,
     imageUrl: String?,
     shape: Shape = MaterialTheme.shapes.full,
+    sideIcon: @Composable (() -> Unit)? = null,
+    iconPosition: Alignment = Alignment.BottomEnd,
+    iconOffset: DpOffset = DpOffset(0.dp, 0.dp),
     contentScale: ContentScale = ContentScale.Crop,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.primary,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
 ) {
-    Surface(
-        modifier = modifier.defaultMinSize(48.dp, 48.dp),
-        shape = shape,
-        color = containerColor,
-        contentColor = contentColor,
-    ) {
-        if (imageUrl != null) {
-            AsyncImage(
-                uri = imageUrl,
-                contentDescription = firstName,
-                modifier = Modifier.fillMaxSize().clip(shape),
-                state = state,
-                contentScale = contentScale,
-            )
-        } else {
-            Box(contentAlignment = Alignment.Center) {
-                Text(
-                    text = buildString {
-                        append(firstName.firstOrNull()?.uppercase() ?: "")
-                        if (!secondName.isNullOrBlank()) append(secondName.first().uppercase())
-                    },
-                    style = style,
+    Box {
+        Surface(
+            modifier = modifier.defaultMinSize(48.dp, 48.dp),
+            shape = shape,
+            color = containerColor,
+            contentColor = contentColor,
+        ) {
+            if (imageUrl != null) {
+                AsyncImage(
+                    uri = imageUrl,
+                    contentDescription = firstName,
+                    modifier = Modifier.fillMaxSize().clip(shape),
+                    state = state,
+                    contentScale = contentScale,
                 )
+            } else {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = buildString {
+                            append(firstName.firstOrNull()?.uppercase() ?: "")
+                            if (!secondName.isNullOrBlank()) append(secondName.first().uppercase())
+                        },
+                        style = style,
+                    )
+                }
             }
+        }
+        Box(modifier = Modifier.align(iconPosition).offset(iconOffset.x, iconOffset.y)) {
+            sideIcon?.invoke()
+        }
+    }
+}
+
+@Composable
+fun ClickableAvatarView(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    state: AsyncImageState = rememberAsyncImageState(
+        options = ComposableImageOptions {
+            crossfade(Constants.Animations.STANDARD_TWEEN)
+            placeholder(MaterialTheme.colorScheme.secondaryContainer)
+        }
+    ),
+    firstName: String,
+    secondName: String?,
+    imageUrl: String?,
+    shape: Shape = MaterialTheme.shapes.full,
+    sideIcon: @Composable (() -> Unit)? = null,
+    iconPosition: Alignment = Alignment.BottomEnd,
+    iconOffset: DpOffset = DpOffset(0.dp, 0.dp),
+    contentScale: ContentScale = ContentScale.Crop,
+    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    contentColor: Color = MaterialTheme.colorScheme.primary,
+    style: TextStyle = MaterialTheme.typography.bodyLarge,
+) {
+    Box {
+        Surface(
+            onClick = onClick,
+            modifier = modifier.defaultMinSize(48.dp, 48.dp),
+            enabled = enabled,
+            shape = shape,
+            color = containerColor,
+            contentColor = contentColor,
+        ) {
+            if (imageUrl != null) {
+                AsyncImage(
+                    uri = imageUrl,
+                    contentDescription = firstName,
+                    modifier = Modifier.fillMaxSize().clip(shape),
+                    state = state,
+                    contentScale = contentScale,
+                )
+            } else {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = buildString {
+                            append(firstName.firstOrNull()?.uppercase() ?: "")
+                            if (!secondName.isNullOrBlank()) append(secondName.first().uppercase())
+                        },
+                        style = style,
+                    )
+                }
+            }
+        }
+        Box(modifier = Modifier.align(iconPosition).offset(iconOffset.x, iconOffset.y)) {
+            sideIcon?.invoke()
         }
     }
 }
@@ -150,61 +216,48 @@ fun SelectableAvatarView(
             }
         }
 
-        Surface(
+        ClickableAvatarView(
             onClick = { isExpandAvatarMenu = true },
             modifier = modifier.defaultMinSize(90.dp, 90.dp),
             enabled = enabled || imageUrl != null,
-            shape = shape,
-            color = containerColor,
-            contentColor = contentColor,
-        ) {
-            if (imageUrl != null) {
-                AsyncImage(
-                    uri = imageUrl,
-                    contentDescription = firstName,
-                    modifier = Modifier.fillMaxSize().clip(shape),
-                    state = state,
-                    contentScale = contentScale,
+            state = state,
+            firstName = firstName,
+            secondName = secondName,
+            imageUrl = imageUrl,
+            sideIcon = {
+                Icon(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(MaterialTheme.shapes.full)
+                        .border(2.dp, MaterialTheme.colorScheme.surfaceContainerLow),
+                    painter = painterResource(StudyAssistantRes.icons.upload),
+                    contentDescription = StudyAssistantRes.strings.avatarDesc,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-            } else {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = buildString {
-                            append(firstName.firstOrNull()?.uppercase() ?: "")
-                            if (!secondName.isNullOrBlank()) append(secondName.first().uppercase())
-                        },
-                        style = style,
-                    )
-                }
-            }
-        }
-        Box(modifier = Modifier.align(Alignment.BottomEnd).offset(iconOffset.x, iconOffset.y)) {
-            Icon(
-                modifier = Modifier
-                    .size(24.dp)
-                    .clip(MaterialTheme.shapes.full)
-                    .border(2.dp, MaterialTheme.colorScheme.surfaceContainerLow),
-                painter = painterResource(StudyAssistantRes.icons.upload),
-                contentDescription = StudyAssistantRes.strings.avatarDesc,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            AvatarDropdownMenu(
-                isExpanded = isExpandAvatarMenu,
-                enabledAdd = enabled,
-                alreadyHaveAvatar = imageUrl != null,
-                onDelete = {
-                    onDelete()
-                    isExpandAvatarMenu = false
-                },
-                onDismiss = {
-                    isExpandAvatarMenu = false
-                },
-                onAddOrUpdate = {
-                    imagePickerLauncher.launch()
-                    isExpandAvatarMenu = false
-                },
-            )
-        }
+                AvatarDropdownMenu(
+                    isExpanded = isExpandAvatarMenu,
+                    enabledAdd = enabled,
+                    alreadyHaveAvatar = imageUrl != null,
+                    onDelete = {
+                        onDelete()
+                        isExpandAvatarMenu = false
+                    },
+                    onDismiss = {
+                        isExpandAvatarMenu = false
+                    },
+                    onAddOrUpdate = {
+                        imagePickerLauncher.launch()
+                        isExpandAvatarMenu = false
+                    },
+                )
+            },
+            iconOffset = iconOffset,
+            shape = shape,
+            contentScale = contentScale,
+            containerColor = containerColor,
+            contentColor = contentColor,
+            style = style,
+        )
     }
 }
 

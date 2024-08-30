@@ -16,19 +16,70 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
+import co.touchlab.kermit.Logger
+import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionEffect
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionEvent
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionViewState
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.screenmodel.rememberSubscriptionScreenModel
 
 /**
- * @author Stanislav Aleshin on 08.07.2024.
+ * @author Stanislav Aleshin on 28.08.2024
  */
 internal class SubscriptionScreen : Screen {
 
     @Composable
-    override fun Content() {
-        Text(modifier = Modifier.fillMaxSize(), text = "In develop...")
+    override fun Content() = ScreenContent(
+        screenModel = rememberSubscriptionScreenModel(),
+        initialState = SubscriptionViewState(),
+    ) { state ->
+        val strings = SettingsThemeRes.strings
+        val snackbarState = remember { SnackbarHostState() }
+
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            content = { paddingValues ->
+                SubscriptionContent(
+                    state = state,
+                    modifier = Modifier.padding(paddingValues),
+                    onTransferRemoteData = { dispatchEvent(SubscriptionEvent.TransferRemoteData) },
+                    onTransferLocalData = { dispatchEvent(SubscriptionEvent.TransferLocalData) },
+                )
+            },
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarState,
+                    snackbar = { ErrorSnackbar(it) },
+                )
+            },
+            contentWindowInsets = WindowInsets.navigationBars,
+        )
+
+        handleEffect { effect ->
+            when (effect) {
+                is SubscriptionEffect.ShowError -> {
+                    snackbarState.showSnackbar(
+                        message = effect.failures.apply {
+                            Logger.i("test") { this.toString() }
+                        }.mapToMessage(strings),
+                        withDismissAction = true,
+                    )
+                }
+            }
+        }
     }
 }

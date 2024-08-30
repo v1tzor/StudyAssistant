@@ -17,13 +17,13 @@
 package ru.aleshin.studyassistant.auth.impl.domain.common
 
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
-import ru.aleshin.studyassistant.core.common.wrappers.EitherWrapper
+import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
 
 /**
  * @author Stanislav Aleshin on 16.04.2024
  */
-internal interface AuthEitherWrapper : EitherWrapper<AuthFailures> {
+internal interface AuthEitherWrapper : FlowEitherWrapper<AuthFailures> {
 
     class Base(errorHandler: AuthErrorHandler) : AuthEitherWrapper,
-        EitherWrapper.Abstract<AuthFailures>(errorHandler)
+        FlowEitherWrapper.Abstract<AuthFailures>(errorHandler)
 }

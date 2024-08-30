@@ -35,11 +35,11 @@ import ru.aleshin.studyassistant.domain.entities.MainFailures
  */
 interface AppUserInteractor {
 
-    suspend fun fetchAppUser(): FlowDomainResult<MainFailures, AppUser?>
-    suspend fun fetchAppToken(): FlowDomainResult<MainFailures, UniversalPushToken>
+    suspend fun fetchAppUser(): DomainResult<MainFailures, FirebaseUser?>
+    suspend fun fetchAppUserInfo(): FlowDomainResult<MainFailures, AppUser?>
     suspend fun fetchAuthStateChanged(): FlowDomainResult<MainFailures, FirebaseUser?>
+    suspend fun fetchAppToken(): FlowDomainResult<MainFailures, UniversalPushToken>
     suspend fun updateUser(user: AppUser): UnitDomainResult<MainFailures>
-    suspend fun checkIsAuthorized(): DomainResult<MainFailures, Boolean>
 
     class Base(
         private val usersRepository: UsersRepository,
@@ -47,27 +47,27 @@ interface AppUserInteractor {
         private val eitherWrapper: MainEitherWrapper,
     ) : AppUserInteractor {
 
-        override suspend fun fetchAppToken() = eitherWrapper.wrapFlow {
-            messagingRepository.fetchToken()
-        }
-
-        override suspend fun fetchAuthStateChanged() = eitherWrapper.wrapFlow {
-            usersRepository.fetchAuthStateChanged()
+        override suspend fun fetchAppUser() = eitherWrapper.wrap {
+            usersRepository.fetchCurrentAppUser()?.apply { reload() }
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
-        override suspend fun fetchAppUser() = eitherWrapper.wrapFlow {
+        override suspend fun fetchAppUserInfo() = eitherWrapper.wrapFlow {
             usersRepository.fetchAuthStateChanged().flatMapLatest { authUser ->
                 val appUserId = authUser?.uid ?: return@flatMapLatest flowOf(null)
                 usersRepository.fetchUserById(appUserId)
             }
         }
-        override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {
-            usersRepository.addOrUpdateAppUser(user)
+
+        override suspend fun fetchAuthStateChanged() = eitherWrapper.wrapFlow {
+            usersRepository.fetchAuthStateChanged()
+        }
+        override suspend fun fetchAppToken() = eitherWrapper.wrapFlow {
+            messagingRepository.fetchToken()
         }
 
-        override suspend fun checkIsAuthorized() = eitherWrapper.wrap {
-            usersRepository.fetchCurrentAppUser() != null
+        override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {
+            usersRepository.addOrUpdateAppUser(user)
         }
     }
 }

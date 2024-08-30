@@ -23,7 +23,6 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
@@ -37,8 +36,8 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupP
 @Parcelize
 @Immutable
 internal data class SetupViewState(
-    val currentPage: SetupPage = SetupPage.PROFILE,
     val profile: AppUserUi? = null,
+    val currentPage: SetupPage = SetupPage.PROFILE,
     val actionWithProfileAvatar: ActionWithAvatar = ActionWithAvatar.None(null),
     val organization: OrganizationUi? = null,
     val actionWithOrganizationAvatar: ActionWithAvatar = ActionWithAvatar.None(null),
@@ -46,7 +45,7 @@ internal data class SetupViewState(
 ) : BaseViewState
 
 internal sealed class SetupEvent : BaseEvent {
-    data class Init(val createdUserId: UID) : SetupEvent()
+    data object Init : SetupEvent()
     data object NavigateToBackPage : SetupEvent()
     data class UpdateProfile(val userProfile: AppUserUi) : SetupEvent()
     data class UpdateProfileAvatar(val imageUri: String) : SetupEvent()

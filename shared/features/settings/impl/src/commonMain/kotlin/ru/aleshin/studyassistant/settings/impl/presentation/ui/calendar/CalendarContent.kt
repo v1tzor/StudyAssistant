@@ -29,8 +29,10 @@ import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.HolidaysUi
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.contract.CalendarViewState
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.views.HolidaysView
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.common.SettingsSelectorView
 
 /**
@@ -42,9 +44,10 @@ internal fun CalendarContent(
     modifier: Modifier,
     scrollState: ScrollState = rememberScrollState(),
     onSelectedNumberOfWeek: (NumberOfRepeatWeek) -> Unit,
+    onUpdateHolidays: (List<HolidaysUi>) -> Unit,
 ) = with(state) {
     Column(
-        modifier = modifier.verticalScroll(scrollState),
+        modifier = modifier.padding(vertical = 24.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         SettingsSelectorView(
@@ -56,6 +59,12 @@ internal fun CalendarContent(
             icon = painterResource(SettingsThemeRes.icons.numberOfWeek),
             title = SettingsThemeRes.strings.numberOfRepeatWeekViewTitle,
             itemName = { it.mapToSting(StudyAssistantRes.strings) },
+        )
+        HolidaysView(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            allOrganizations = allOrganizations,
+            holidays = settings?.holidays ?: emptyList(),
+            onUpdateHolidays = onUpdateHolidays,
         )
     }
 }

@@ -30,7 +30,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.uriString
 import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
@@ -38,7 +37,6 @@ import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupDeps
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEffect
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEvent
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupViewState
@@ -49,12 +47,11 @@ import toStorageFile
 /**
  * @author Stanislav Aleshin on 17.04.2024
  */
-internal data class SetupScreen(private val createdUser: UID) : Screen {
+internal class SetupScreen : Screen {
 
     @Composable
     override fun Content() = ScreenContent(
         screenModel = rememberSetupScreenModel(),
-        dependencies = SetupDeps(createdUser),
         initialState = SetupViewState(),
     ) { state ->
         val strings = PreviewThemeRes.strings

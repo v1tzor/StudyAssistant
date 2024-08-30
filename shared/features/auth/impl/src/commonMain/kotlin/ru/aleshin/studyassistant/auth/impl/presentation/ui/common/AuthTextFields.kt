@@ -40,7 +40,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.vectorResource
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
@@ -49,10 +48,10 @@ import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
  * @author Stanislav Aleshin on 19.04.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun UsernameTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean,
+    readOnly: Boolean = false,
     username: String,
     onUsernameChanged: (String) -> Unit,
     isError: Boolean,
@@ -71,6 +70,7 @@ internal fun UsernameTextField(
         OutlinedTextField(
             modifier = Modifier.sizeIn(minHeight = 57.dp).fillMaxWidth(),
             enabled = enabled,
+            readOnly = readOnly,
             value = username,
             onValueChange = onUsernameChanged,
             placeholder = { Text(text = AuthThemeRes.strings.usernamePlaceholder) },
@@ -106,15 +106,15 @@ internal fun UsernameTextField(
 }
 
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun EmailTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean,
+    readOnly: Boolean = false,
     email: String,
     onEmailChanged: (String) -> Unit,
-    isError: Boolean,
-    errorText: String?,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
+    isError: Boolean = false,
+    errorText: String? = null,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
     Column(
         modifier = modifier.animateContentSize(),
@@ -128,6 +128,7 @@ internal fun EmailTextField(
         OutlinedTextField(
             modifier = Modifier.sizeIn(minHeight = 57.dp).fillMaxWidth(),
             enabled = enabled,
+            readOnly = readOnly,
             value = email,
             onValueChange = onEmailChanged,
             placeholder = { Text(text = AuthThemeRes.strings.emailPlaceholder) },
@@ -164,11 +165,11 @@ internal fun EmailTextField(
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun PasswordTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean,
+    readOnly: Boolean = false,
     password: String,
     onPasswordChanged: (String) -> Unit,
     isError: Boolean,
@@ -188,6 +189,7 @@ internal fun PasswordTextField(
         OutlinedTextField(
             modifier = Modifier.sizeIn(minHeight = 57.dp).fillMaxWidth(),
             enabled = enabled,
+            readOnly = readOnly,
             value = password,
             onValueChange = onPasswordChanged,
             placeholder = { Text(text = AuthThemeRes.strings.passwordPlaceholder) },

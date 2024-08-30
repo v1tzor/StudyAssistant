@@ -61,6 +61,10 @@ internal class ProfileScreenModel(
                     val command = ProfileWorkCommand.LoadAppUser
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_PAID_STATUS) {
+                    val command = ProfileWorkCommand.LoadPaidUserStatus
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is ProfileEvent.UpdateAvatar -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
@@ -141,10 +145,13 @@ internal class ProfileScreenModel(
         is ProfileAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )
+        is ProfileAction.UpdatePaidUserStatus -> currentState.copy(
+            isPaidUser = action.isPaidUser,
+        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_APP_USER, USER_ACTION
+        LOAD_APP_USER, LOAD_PAID_STATUS, USER_ACTION
     }
 }
 

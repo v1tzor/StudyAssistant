@@ -43,7 +43,7 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 /**
  * @author Stanislav Aleshin on 16.06.2024.
  */
-object InfoFeatureDIHolder : BaseFeatureDIHolder<InfoFeatureApi, InfoFeatureDependencies> {
+public object InfoFeatureDIHolder : BaseFeatureDIHolder<InfoFeatureApi, InfoFeatureDependencies> {
 
     private var directDi: DirectDI? = null
 

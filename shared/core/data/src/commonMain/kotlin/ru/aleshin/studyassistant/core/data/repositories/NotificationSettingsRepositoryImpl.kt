@@ -19,41 +19,26 @@ package ru.aleshin.studyassistant.core.data.repositories
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.payments.SubscriptionChecker
 import ru.aleshin.studyassistant.core.data.mappers.settings.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.settings.mapToLocalData
-import ru.aleshin.studyassistant.core.data.mappers.settings.mapToRemoteData
 import ru.aleshin.studyassistant.core.database.datasource.settings.NotificationSettingsLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.settings.NotificationSettings
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
-import ru.aleshin.studyassistant.core.remote.datasources.settings.NotificationSettingsRemoteDataSource
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
 class NotificationSettingsRepositoryImpl(
     private val localDataSource: NotificationSettingsLocalDataSource,
-    private val remoteDataSource: NotificationSettingsRemoteDataSource,
-    private val subscriptionChecker: SubscriptionChecker,
 ) : NotificationSettingsRepository {
 
     override suspend fun fetchSettings(targetUser: UID): Flow<NotificationSettings> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchSettings(targetUser).map { settingsPojo -> settingsPojo.mapToDomain() }
-        } else {
-            localDataSource.fetchSettings().map { settingsEntity -> settingsEntity.mapToDomain() }
+        return localDataSource.fetchSettings().map { settingsEntity ->
+            settingsEntity.mapToDomain()
         }
     }
 
     override suspend fun updateSettings(settings: NotificationSettings, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateSettings(settings.mapToRemoteData(), targetUser)
-        } else {
-            localDataSource.updateSettings(settings.mapToLocalData())
-        }
+        localDataSource.updateSettings(settings.mapToLocalData())
     }
 }

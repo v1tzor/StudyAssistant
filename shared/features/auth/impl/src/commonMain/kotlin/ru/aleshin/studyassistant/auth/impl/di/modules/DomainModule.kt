@@ -21,6 +21,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.impl.domain.common.AuthEitherWrapper
 import ru.aleshin.studyassistant.auth.impl.domain.common.AuthErrorHandler
+import ru.aleshin.studyassistant.auth.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
 
 /**
@@ -29,5 +30,6 @@ import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<AuthErrorHandler> { AuthErrorHandler.Base() }
     bindSingleton<AuthEitherWrapper> { AuthEitherWrapper.Base(instance()) }
-    bindSingleton<AuthInteractor> { AuthInteractor.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<AuthInteractor> { AuthInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance()) }
 }

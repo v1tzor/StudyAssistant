@@ -20,11 +20,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
@@ -113,7 +113,7 @@ internal class TabNavigationScreen : SettingsRootScreen() {
                                 )
                             }
                         },
-                        contentWindowInsets = WindowInsets.navigationBars,
+                        contentWindowInsets = WindowInsets(0.dp),
                     )
 
                     handleEffect { effect ->

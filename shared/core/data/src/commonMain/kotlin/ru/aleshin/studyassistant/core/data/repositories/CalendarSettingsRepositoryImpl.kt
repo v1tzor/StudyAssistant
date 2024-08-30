@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.data.repositories
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.payments.SubscriptionChecker
@@ -24,6 +25,7 @@ import ru.aleshin.studyassistant.core.data.mappers.settings.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.settings.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.settings.mapToRemoteData
 import ru.aleshin.studyassistant.core.database.datasource.settings.CalendarSettingsLocalDataSource
+import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.remote.datasources.settings.CalendarSettingsRemoteDataSource
@@ -54,6 +56,28 @@ class CalendarSettingsRepositoryImpl(
             remoteDataSource.addOrUpdateSettings(settings.mapToRemoteData(), targetUser)
         } else {
             localDataSource.updateSettings(settings.mapToLocalData())
+        }
+    }
+
+    override suspend fun transferData(direction: DataTransferDirection, targetUser: UID) {
+        when (direction) {
+            DataTransferDirection.REMOTE_TO_LOCAL -> {
+                val allSettings = remoteDataSource.fetchSettings(
+                    targetUser = targetUser,
+                ).let { settingsFlow ->
+                    return@let settingsFlow.first().mapToDomain().mapToLocalData()
+                }
+                localDataSource.deleteSettings()
+                localDataSource.updateSettings(allSettings)
+                remoteDataSource.deleteSettings(targetUser)
+            }
+            DataTransferDirection.LOCAL_TO_REMOTE -> {
+                val allSettings = localDataSource.fetchSettings().let { settingsFlow ->
+                    return@let settingsFlow.first().mapToDomain().mapToRemoteData()
+                }
+                remoteDataSource.deleteSettings(targetUser)
+                remoteDataSource.addOrUpdateSettings(allSettings, targetUser)
+            }
         }
     }
 }
