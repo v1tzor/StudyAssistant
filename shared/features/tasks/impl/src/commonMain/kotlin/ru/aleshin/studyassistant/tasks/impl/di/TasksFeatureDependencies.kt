@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.tasks.impl.di
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -46,6 +47,7 @@ public interface TasksFeatureDependencies : BaseFeatureDependencies {
     public val shareHomeworksRepository: ShareHomeworksRepository
     public val messageRepository: MessageRepository
     public val todoRepository: TodoRepository
+    public val todoReminderManager: TodoReminderManager
     public val subjectsRepository: SubjectsRepository
     public val usersRepository: UsersRepository
     public val dateManager: DateManager

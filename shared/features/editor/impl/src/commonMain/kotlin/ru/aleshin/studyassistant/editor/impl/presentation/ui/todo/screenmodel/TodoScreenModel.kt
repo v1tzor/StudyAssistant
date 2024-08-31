@@ -74,11 +74,11 @@ internal class TodoScreenModel(
                 val updatedTodo = editableTodo?.copy(priority = event.priority)
                 sendAction(TodoAction.UpdateEditModel(updatedTodo))
             }
-            is TodoEvent.UpdateNotification -> with(state()) {
-                val updatedTodo = editableTodo?.copy(notification = event.notification)
+            is TodoEvent.UpdateNotifications -> with(state()) {
+                val updatedTodo = editableTodo?.copy(notifications = event.notifications)
                 sendAction(TodoAction.UpdateEditModel(updatedTodo))
             }
-            is TodoEvent.SaveTodo -> with(state()){
+            is TodoEvent.SaveTodo -> with(state()) {
                 launchBackgroundWork(BackgroundKey.TODO_ACTION) {
                     val todo = checkNotNull(editableTodo)
                     val command = TodoWorkCommand.SaveTodo(todo)

@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
+import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
@@ -38,6 +39,7 @@ internal interface TodoInteractor {
     class Base(
         private val todoRepository: TodoRepository,
         private val usersRepository: UsersRepository,
+        private val todoReminderManager: TodoReminderManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : TodoInteractor {
 
@@ -45,7 +47,9 @@ internal interface TodoInteractor {
             get() = usersRepository.fetchCurrentUserOrError().uid
 
         override suspend fun addOrUpdateTodo(todo: Todo) = eitherWrapper.wrap {
-            todoRepository.addOrUpdateTodo(todo, targetUser)
+            todoRepository.addOrUpdateTodo(todo, targetUser).apply {
+                todoReminderManager.scheduleReminders(this, todo.name, todo.deadline, todo.notifications)
+            }
         }
 
         override suspend fun fetchTodoById(uid: UID) = eitherWrapper.wrapFlow {
@@ -54,6 +58,7 @@ internal interface TodoInteractor {
 
         override suspend fun deleteTodo(targetId: UID) = eitherWrapper.wrapUnit {
             todoRepository.deleteTodo(targetId, targetUser)
+            todoReminderManager.clearAllReminders(targetId)
         }
     }
 }

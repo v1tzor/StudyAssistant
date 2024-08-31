@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -48,7 +49,7 @@ import ru.aleshin.studyassistant.editor.impl.di.modules.presentationModule
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-object EditorFeatureDIHolder : BaseFeatureDIHolder<EditorFeatureApi, EditorFeatureDependencies> {
+public object EditorFeatureDIHolder : BaseFeatureDIHolder<EditorFeatureApi, EditorFeatureDependencies> {
 
     private var directDi: DirectDI? = null
 
@@ -67,6 +68,7 @@ object EditorFeatureDIHolder : BaseFeatureDIHolder<EditorFeatureApi, EditorFeatu
                 bindSingleton<NotificationSettingsRepository> { dependencies.notificationSettingsRepository }
                 bindSingleton<StartClassesReminderManager> { dependencies.startClassesReminderManager }
                 bindSingleton<EndClassesReminderManager> { dependencies.endClassesReminderManager }
+                bindSingleton<TodoReminderManager> { dependencies.todoReminderManager }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
                 bindSingleton<TimeOverlayManager> { dependencies.overlayManager }

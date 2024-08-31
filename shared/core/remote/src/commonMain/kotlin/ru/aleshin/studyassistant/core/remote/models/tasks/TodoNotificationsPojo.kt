@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.functional
+package ru.aleshin.studyassistant.core.remote.models.tasks
 
-import ru.aleshin.studyassistant.core.common.platform.Platform
+import kotlinx.serialization.Serializable
 
 /**
- * @author Stanislav Aleshin on 07.09.2024.
+ * @author Stanislav Aleshin on 31.08.2024.
  */
-expect class DeviceInfoProvider {
-    fun fetchDevicePlatform(): Platform
-    fun fetchDeviceName(): String
-    fun fetchDeviceId(): String
-}
+@Serializable
+data class TodoNotificationsPojo(
+    val beforeStart: Boolean = true,
+    val fifteenMinutesBefore: Boolean = false,
+    val oneHourBefore: Boolean = false,
+    val threeHourBefore: Boolean = false,
+    val oneDayBefore: Boolean = false,
+    val oneWeekBefore: Boolean = false,
+)

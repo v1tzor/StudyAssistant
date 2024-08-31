@@ -3,13 +3,18 @@ CREATE TABLE todoEntity (
     deadline INTEGER,
     name TEXT NOT NULL,
     priority TEXT NOT NULL,
-    notification INTEGER NOT NULL,
+    notify_before_start INTEGER NOT NULL,
+    notify_fifteen_minutes_before INTEGER NOT NULL,
+    notify_one_hour_before INTEGER NOT NULL,
+    notify_three_hour_before INTEGER NOT NULL,
+    notify_one_day_before INTEGER NOT NULL,
+    notify_one_week_before INTEGER NOT NULL,
     is_done INTEGER NOT NULL,
     complete_date INTEGER
 );
 
 addOrUpdateTodo:
-INSERT OR REPLACE INTO todoEntity (uid, deadline, name, priority, notification, is_done, complete_date)
+INSERT OR REPLACE INTO todoEntity (uid, deadline, name, priority, notify_before_start, notify_fifteen_minutes_before, notify_one_hour_before, notify_three_hour_before, notify_one_day_before, notify_one_week_before, is_done, complete_date)
 VALUES ?;
 
 fetchTodosByTimeRange:

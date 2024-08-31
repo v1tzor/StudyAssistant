@@ -40,7 +40,7 @@ internal data class TodoDetailsUi(
     val name: String,
     val status: TodoStatus,
     val priority: TaskPriority,
-    val notification: Boolean = true,
+    val notifications: TodoNotificationsUi = TodoNotificationsUi(),
     val isDone: Boolean = false,
     @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant? = null,

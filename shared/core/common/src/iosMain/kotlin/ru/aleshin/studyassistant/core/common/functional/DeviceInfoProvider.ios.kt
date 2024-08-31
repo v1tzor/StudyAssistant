@@ -16,32 +16,29 @@
 
 package ru.aleshin.studyassistant.core.common.functional
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.os.Build
-import android.provider.Settings.Secure
+import platform.UIKit.UIDevice
+import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
+import ru.aleshin.studyassistant.core.common.platform.IosUUIDProvider
 import ru.aleshin.studyassistant.core.common.platform.Platform
 
 /**
  * @author Stanislav Aleshin on 07.09.2024.
  */
-actual class DeviceInfoProvider(
-    private val applicationContext: Context,
-) {
+actual class DeviceInfoProvider(private val uuidProvider: IosUUIDProvider) {
 
     actual fun fetchDevicePlatform(): Platform {
-        return Platform.Android
+        return Platform.IOS
     }
 
     actual fun fetchDeviceName(): String {
-        return buildString {
-            append(Build.MANUFACTURER.capitalize(), " ")
-            append(Build.MODEL)
-        }
+        return UIDevice.currentDevice.name
     }
 
-    @SuppressLint("HardwareIds")
     actual fun fetchDeviceId(): String {
-        return Secure.getString(applicationContext.contentResolver, Secure.ANDROID_ID)
+        return uuidProvider.uuidForDevice()
+    }
+
+    actual fun fetchDeviceLanguage(): String {
+        return fetchCurrentLanguage()
     }
 }

@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
+import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
@@ -43,6 +44,7 @@ internal interface TodoInteractor {
 
     class Base(
         private val todoRepository: TodoRepository,
+        private val todoReminderManager: TodoReminderManager,
         private val usersRepository: UsersRepository,
         private val eitherWrapper: TasksEitherWrapper,
     ) : TodoInteractor {
@@ -76,6 +78,11 @@ internal interface TodoInteractor {
 
         override suspend fun updateTodo(todo: Todo) = eitherWrapper.wrapUnit {
             todoRepository.addOrUpdateTodo(todo, targetUser)
+            if (todo.isDone) {
+                todoReminderManager.clearAllReminders(todo.uid)
+            } else {
+                todoReminderManager.scheduleReminders(todo.uid, todo.name, todo.deadline, todo.notifications)
+            }
         }
     }
 }

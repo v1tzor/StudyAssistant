@@ -20,21 +20,15 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
-import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 14.08.2023.
@@ -85,24 +79,4 @@ fun <T> CheckedDropdownMenu(
             )
         }
     }
-}
-
-@Composable
-fun BackMenuItem(
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    onClick: () -> Unit,
-) {
-    DropdownMenuItem(
-        modifier = modifier.alphaByEnabled(enabled),
-        enabled = enabled,
-        text = { Text(text = StudyAssistantRes.strings.backTitle) },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = StudyAssistantRes.strings.backTitle
-            )
-        },
-        onClick = onClick,
-    )
 }

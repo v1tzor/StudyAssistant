@@ -16,24 +16,14 @@
 
 package ru.aleshin.studyassistant.core.common.functional
 
-import platform.UIKit.UIDevice
-import ru.aleshin.studyassistant.core.common.platform.IosUUIDProvider
 import ru.aleshin.studyassistant.core.common.platform.Platform
 
 /**
  * @author Stanislav Aleshin on 07.09.2024.
  */
-actual class DeviceInfoProvider(private val uuidProvider: IosUUIDProvider) {
-
-    actual fun fetchDevicePlatform(): Platform {
-        return Platform.IOS
-    }
-
-    actual fun fetchDeviceName(): String {
-        return UIDevice.currentDevice.name
-    }
-
-    actual fun fetchDeviceId(): String {
-        return uuidProvider.uuidForDevice()
-    }
+expect class DeviceInfoProvider {
+    fun fetchDevicePlatform(): Platform
+    fun fetchDeviceName(): String
+    fun fetchDeviceId(): String
+    fun fetchDeviceLanguage(): String
 }

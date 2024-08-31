@@ -43,5 +43,5 @@ actual val coreDataPlatformModule = DI.Module("CoreDataPlatform") {
     bindProvider<HomeworksReminderManager> { HomeworksReminderManagerImpl(instance(), instance()) }
     bindProvider<StartClassesReminderManager> { StartClassesReminderManagerImpl(instance(), instance(), instance(), instance()) }
     bindProvider<EndClassesReminderManager> { EndClassesReminderManagerImpl(instance(), instance(), instance(), instance()) }
-    bindSingleton<NotificationScheduler> { NotificationScheduler(instance(), instance(), instance()) }
+    bindSingleton<NotificationScheduler> { NotificationScheduler(instance(), instance()) }
 }

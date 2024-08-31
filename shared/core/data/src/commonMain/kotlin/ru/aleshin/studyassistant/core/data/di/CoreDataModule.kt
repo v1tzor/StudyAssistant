@@ -20,6 +20,7 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.data.managers.TodoReminderManagerImpl
 import ru.aleshin.studyassistant.core.data.repositories.AuthRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.BaseScheduleRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.CalendarSettingsRepositoryImpl
@@ -38,6 +39,7 @@ import ru.aleshin.studyassistant.core.data.repositories.SubjectsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.TodoRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.UsersRepositoryImpl
 import ru.aleshin.studyassistant.core.database.di.coreDatabaseModule
+import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
@@ -65,11 +67,8 @@ val coreDataModule = DI.Module("CoreData") {
 
     bindSingleton<AuthRepository> { AuthRepositoryImpl(instance()) }
     bindSingleton<ManageUserRepository> { ManageUserRepositoryImpl(instance()) }
-
     bindSingleton<UsersRepository> { UsersRepositoryImpl(instance(), instance()) }
-
     bindSingleton<FriendRequestsRepository> { FriendRequestsRepositoryImpl(instance()) }
-
     bindSingleton<ShareHomeworksRepository> { ShareHomeworksRepositoryImpl(instance()) }
     bindSingleton<ShareSchedulesRepository> { ShareSchedulesRepositoryImpl(instance()) }
     bindProvider<GeneralSettingsRepository> { GeneralSettingsRepositoryImpl(instance()) }
@@ -83,4 +82,6 @@ val coreDataModule = DI.Module("CoreData") {
     bindProvider<TodoRepository> { TodoRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<OrganizationsRepository> { OrganizationsRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<MessageRepository> { MessageRepositoryImpl(instance()) }
+
+    bindProvider<TodoReminderManager> { TodoReminderManagerImpl(instance(), instance(), instance()) }
 }

@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.EditTodoUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.TodoNotificationsUi
 
 /**
  * @author Stanislav Aleshin on 26.07.2024
@@ -43,7 +44,7 @@ internal sealed class TodoEvent : BaseEvent {
     data class UpdateTodoName(val todo: String) : TodoEvent()
     data class UpdateDeadline(val deadline: Instant?) : TodoEvent()
     data class UpdatePriority(val priority: TaskPriority) : TodoEvent()
-    data class UpdateNotification(val notification: Boolean) : TodoEvent()
+    data class UpdateNotifications(val notifications: TodoNotificationsUi) : TodoEvent()
     data object DeleteTodo : TodoEvent()
     data object SaveTodo : TodoEvent()
     data object NavigateToBack : TodoEvent()

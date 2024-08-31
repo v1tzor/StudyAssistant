@@ -17,10 +17,12 @@
 package ru.aleshin.studyassistant.tasks.impl.presentation.mappers
 
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoNotifications
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TodoErrors
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoNotificationsUi
 import kotlin.time.Duration
 
 /**
@@ -36,9 +38,18 @@ internal fun Todo.mapToUi(
     name = name,
     status = status,
     priority = priority,
-    notification = notification,
+    notifications = notifications.mapToUi(),
     isDone = isDone,
     completeDate = completeDate,
+)
+
+internal fun TodoNotifications.mapToUi() = TodoNotificationsUi(
+    beforeStart = beforeStart,
+    fifteenMinutesBefore = fifteenMinutesBefore,
+    oneHourBefore = oneHourBefore,
+    threeHourBefore = threeHourBefore,
+    oneDayBefore = oneDayBefore,
+    oneWeekBefore = oneWeekBefore,
 )
 
 internal fun TodoDetailsUi.mapToDomain() = Todo(
@@ -46,9 +57,18 @@ internal fun TodoDetailsUi.mapToDomain() = Todo(
     deadline = deadline,
     name = name,
     priority = priority,
-    notification = notification,
+    notifications = notifications.mapToDomain(),
     isDone = isDone,
     completeDate = completeDate,
+)
+
+internal fun TodoNotificationsUi.mapToDomain() = TodoNotifications(
+    beforeStart = beforeStart,
+    fifteenMinutesBefore = fifteenMinutesBefore,
+    oneHourBefore = oneHourBefore,
+    threeHourBefore = threeHourBefore,
+    oneDayBefore = oneDayBefore,
+    oneWeekBefore = oneWeekBefore,
 )
 
 internal fun TodoErrors.mapToUi() = TodoErrorsUi(

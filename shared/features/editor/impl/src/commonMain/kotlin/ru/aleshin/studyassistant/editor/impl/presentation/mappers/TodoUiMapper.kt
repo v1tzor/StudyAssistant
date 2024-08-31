@@ -17,6 +17,8 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoNotifications
+import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.TodoNotificationsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.TodoUi
 
 /**
@@ -27,17 +29,34 @@ internal fun Todo.mapToUi() = TodoUi(
     deadline = deadline,
     name = name,
     priority = priority,
-    notification = notification,
+    notifications = notifications.mapToUi(),
     isDone = isDone,
     completeDate = completeDate,
 )
 
+internal fun TodoNotifications.mapToUi() = TodoNotificationsUi(
+    beforeStart = beforeStart,
+    fifteenMinutesBefore = fifteenMinutesBefore,
+    oneHourBefore = oneHourBefore,
+    threeHourBefore = threeHourBefore,
+    oneDayBefore = oneDayBefore,
+    oneWeekBefore = oneWeekBefore,
+)
 internal fun TodoUi.mapToDomain() = Todo(
     uid = uid,
     deadline = deadline,
     name = name,
     priority = priority,
-    notification = notification,
+    notifications = notifications.mapToDomain(),
     isDone = isDone,
     completeDate = completeDate,
+)
+
+internal fun TodoNotificationsUi.mapToDomain() = TodoNotifications(
+    beforeStart = beforeStart,
+    fifteenMinutesBefore = fifteenMinutesBefore,
+    oneHourBefore = oneHourBefore,
+    threeHourBefore = threeHourBefore,
+    oneDayBefore = oneDayBefore,
+    oneWeekBefore = oneWeekBefore,
 )

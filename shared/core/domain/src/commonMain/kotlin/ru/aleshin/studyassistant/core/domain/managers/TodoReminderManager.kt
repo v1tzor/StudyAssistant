@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.remote.models.tasks
+package ru.aleshin.studyassistant.core.domain.managers
 
-import kotlinx.serialization.Serializable
+import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoNotifications
 
 /**
- * @author Stanislav Aleshin on 01.07.2024.
+ * @author Stanislav Aleshin on 31.08.2024.
  */
-@Serializable
-data class TodoPojo(
-    val uid: UID,
-    val deadline: Long? = null,
-    val name: String = "",
-    val priority: String = TaskPriority.STANDARD.name,
-    val notifications: TodoNotificationsPojo = TodoNotificationsPojo(),
-    val done: Boolean = false,
-    val completeDate: Long? = null,
-)
+interface TodoReminderManager {
+    fun scheduleReminders(targetId: UID, name: String, deadline: Instant?, notifications: TodoNotifications)
+    fun clearAllReminders(targetId: UID)
+}

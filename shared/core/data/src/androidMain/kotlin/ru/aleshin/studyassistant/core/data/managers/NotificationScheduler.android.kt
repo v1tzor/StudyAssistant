@@ -19,11 +19,10 @@ package ru.aleshin.studyassistant.core.data.managers
 import android.app.AlarmManager
 import android.app.AlarmManager.RTC_WAKEUP
 import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_NO_CREATE
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
+import android.app.PendingIntent.FLAG_CANCEL_CURRENT
+import android.app.PendingIntent.FLAG_MUTABLE
 import android.content.Context
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.data.workers.LocalNotificationReceiver
 
 /**
@@ -32,7 +31,6 @@ import ru.aleshin.studyassistant.core.data.workers.LocalNotificationReceiver
 actual class NotificationScheduler(
     private val context: Context,
     private val alarmManager: AlarmManager,
-    private val dateManager: DateManager,
 ) {
 
     actual fun scheduleNotification(
@@ -42,7 +40,8 @@ actual class NotificationScheduler(
         time: Instant
     ) {
         val intent = LocalNotificationReceiver.createIntent(context, title, body)
-        val pendingIntent = PendingIntent.getBroadcast(context, id, intent, FLAG_UPDATE_CURRENT)
+        val flag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
+        val pendingIntent = PendingIntent.getBroadcast(context, id, intent, flag)
         val timeMillis = time.toEpochMilliseconds()
         alarmManager.setExactAndAllowWhileIdle(RTC_WAKEUP, timeMillis, pendingIntent)
     }
@@ -55,15 +54,17 @@ actual class NotificationScheduler(
         interval: Long
     ) {
         val intent = LocalNotificationReceiver.createIntent(context, title, body)
-        val pendingIntent = PendingIntent.getBroadcast(context, id, intent, FLAG_UPDATE_CURRENT)
+        val flag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
+        val pendingIntent = PendingIntent.getBroadcast(context, id, intent, flag)
         val timeMillis = time.toEpochMilliseconds()
         alarmManager.setInexactRepeating(RTC_WAKEUP, timeMillis, interval, pendingIntent)
     }
 
     actual fun cancelNotification(id: Int) {
         val intent = LocalNotificationReceiver.createCancelIntent(context)
-        val cancelFlag = FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        val cancelFlag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
         val cancelPendingIntent = PendingIntent.getBroadcast(context, id, intent, cancelFlag)
         alarmManager.cancel(cancelPendingIntent)
+        cancelPendingIntent.cancel()
     }
 }

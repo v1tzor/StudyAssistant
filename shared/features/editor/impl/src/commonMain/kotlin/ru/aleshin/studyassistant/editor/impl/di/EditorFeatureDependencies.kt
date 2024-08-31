@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -37,21 +38,22 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
-interface EditorFeatureDependencies : BaseFeatureDependencies {
-    val baseScheduleRepository: BaseScheduleRepository
-    val customScheduleRepository: CustomScheduleRepository
-    val employeeRepository: EmployeeRepository
-    val subjectsRepository: SubjectsRepository
-    val organizationsRepository: OrganizationsRepository
-    val homeworksRepository: HomeworksRepository
-    val todoRepository: TodoRepository
-    val calendarSettingsRepository: CalendarSettingsRepository
-    val notificationSettingsRepository: NotificationSettingsRepository
-    val startClassesReminderManager: StartClassesReminderManager
-    val endClassesReminderManager: EndClassesReminderManager
-    val usersRepository: UsersRepository
-    val manageUserRepository: ManageUserRepository
-    val dateManager: DateManager
-    val overlayManager: TimeOverlayManager
-    val coroutineManager: CoroutineManager
+public interface EditorFeatureDependencies : BaseFeatureDependencies {
+    public val baseScheduleRepository: BaseScheduleRepository
+    public val customScheduleRepository: CustomScheduleRepository
+    public val employeeRepository: EmployeeRepository
+    public val subjectsRepository: SubjectsRepository
+    public val organizationsRepository: OrganizationsRepository
+    public val homeworksRepository: HomeworksRepository
+    public val todoRepository: TodoRepository
+    public val calendarSettingsRepository: CalendarSettingsRepository
+    public val notificationSettingsRepository: NotificationSettingsRepository
+    public val startClassesReminderManager: StartClassesReminderManager
+    public val endClassesReminderManager: EndClassesReminderManager
+    public val todoReminderManager: TodoReminderManager
+    public val usersRepository: UsersRepository
+    public val manageUserRepository: ManageUserRepository
+    public val dateManager: DateManager
+    public val overlayManager: TimeOverlayManager
+    public val coroutineManager: CoroutineManager
 }

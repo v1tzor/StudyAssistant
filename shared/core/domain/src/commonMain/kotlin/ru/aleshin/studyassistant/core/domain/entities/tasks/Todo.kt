@@ -27,7 +27,7 @@ data class Todo(
     val deadline: Instant?,
     val name: String,
     val priority: TaskPriority,
-    val notification: Boolean = true,
+    val notifications: TodoNotifications = TodoNotifications(),
     val isDone: Boolean = false,
     val completeDate: Instant? = null,
 )

@@ -21,7 +21,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
-import android.media.RingtoneManager
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -113,15 +112,7 @@ interface NotificationCreator {
                 setOngoing(ongoing)
                 if (category != null) setCategory(category.category)
                 if (notificationDefaults.isVibrate) setDefaults(NotificationCompat.DEFAULT_VIBRATE)
-                if (notificationDefaults.isSound) {
-                    setDefaults(NotificationCompat.DEFAULT_SOUND)
-                    try {
-                        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                        RingtoneManager.getRingtone(context, soundUri).play()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
+                if (notificationDefaults.isSound) setDefaults(NotificationCompat.DEFAULT_SOUND)
                 if (notificationDefaults.isLights) setDefaults(NotificationCompat.DEFAULT_LIGHTS)
                 if (progress != null) with(progress) { setProgress(max, value, isIndeterminate) }
                 if (style != null) setStyle(style.style)

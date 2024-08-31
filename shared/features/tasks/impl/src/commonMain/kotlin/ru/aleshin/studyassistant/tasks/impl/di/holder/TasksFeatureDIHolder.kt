@@ -25,6 +25,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -66,6 +67,7 @@ public object TasksFeatureDIHolder : BaseFeatureDIHolder<TasksFeatureApi, TasksF
                 bindSingleton<SubjectsRepository> { dependencies.subjectsRepository }
                 bindSingleton<MessageRepository> { dependencies.messageRepository }
                 bindSingleton<TodoRepository> { dependencies.todoRepository }
+                bindSingleton<TodoReminderManager> { dependencies.todoReminderManager }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }

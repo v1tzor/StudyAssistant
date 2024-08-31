@@ -18,24 +18,16 @@ package ru.aleshin.studyassistant.editor.impl.presentation.models.tasks
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
-import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
-import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 
 /**
- * @author Stanislav Aleshin on 26.07.2024.
+ * @author Stanislav Aleshin on 31.08.2024.
  */
 @Parcelize
-internal data class TodoUi(
-    val uid: UID,
-    @TypeParceler<Instant?, NullInstantParceler>
-    val deadline: Instant?,
-    val name: String,
-    val priority: TaskPriority,
-    val notifications: TodoNotificationsUi = TodoNotificationsUi(),
-    val isDone: Boolean = false,
-    @TypeParceler<Instant?, NullInstantParceler>
-    val completeDate: Instant? = null,
+internal data class TodoNotificationsUi(
+    val beforeStart: Boolean = true,
+    val fifteenMinutesBefore: Boolean = false,
+    val oneHourBefore: Boolean = false,
+    val threeHourBefore: Boolean = false,
+    val oneDayBefore: Boolean = false,
+    val oneWeekBefore: Boolean = false,
 ) : Parcelable

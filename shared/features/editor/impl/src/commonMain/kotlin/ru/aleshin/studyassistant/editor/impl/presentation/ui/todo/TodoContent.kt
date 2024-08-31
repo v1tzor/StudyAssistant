@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.TodoNotificationsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.TaskPriorityInfoView
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.contract.TodoViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.views.TodoDeadlineInfoFields
@@ -44,7 +45,7 @@ internal fun TodoContent(
     onTodoNameChange: (String) -> Unit,
     onChangeDeadline: (Instant?) -> Unit,
     onChangePriority: (TaskPriority) -> Unit,
-    onChangeNotification: (Boolean) -> Unit,
+    onChangeNotifications: (TodoNotificationsUi) -> Unit,
 ) = with(state) {
     Column(
         modifier = modifier.padding(top = 16.dp).verticalScroll(scrollState),
@@ -66,9 +67,8 @@ internal fun TodoContent(
             onChangePriority = onChangePriority,
         )
         TodoNotificationSelector(
-            isLoading = isLoading,
-            notification = editableTodo?.notification ?: true,
-            onChangeNotification = onChangeNotification,
+            notifications = editableTodo?.notifications,
+            onChangeNotifications = onChangeNotifications,
         )
     }
 }

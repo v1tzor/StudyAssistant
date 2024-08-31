@@ -65,7 +65,7 @@ internal data class TodoScreen(private val todoId: UID?) : Screen {
                     onTodoNameChange = { dispatchEvent(TodoEvent.UpdateTodoName(it)) },
                     onChangeDeadline = { dispatchEvent(TodoEvent.UpdateDeadline(it)) },
                     onChangePriority = { dispatchEvent(TodoEvent.UpdatePriority(it)) },
-                    onChangeNotification = { dispatchEvent(TodoEvent.UpdateNotification(it)) },
+                    onChangeNotifications = { dispatchEvent(TodoEvent.UpdateNotifications(it)) },
                 )
             },
             topBar = {

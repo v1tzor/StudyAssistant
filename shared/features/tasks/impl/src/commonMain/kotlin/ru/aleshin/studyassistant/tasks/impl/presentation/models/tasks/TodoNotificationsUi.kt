@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.remote.models.tasks
+package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
-import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 
 /**
- * @author Stanislav Aleshin on 01.07.2024.
+ * @author Stanislav Aleshin on 31.08.2024.
  */
-@Serializable
-data class TodoPojo(
-    val uid: UID,
-    val deadline: Long? = null,
-    val name: String = "",
-    val priority: String = TaskPriority.STANDARD.name,
-    val notifications: TodoNotificationsPojo = TodoNotificationsPojo(),
-    val done: Boolean = false,
-    val completeDate: Long? = null,
-)
+@Parcelize
+internal data class TodoNotificationsUi(
+    val beforeStart: Boolean = true,
+    val fifteenMinutesBefore: Boolean = false,
+    val oneHourBefore: Boolean = false,
+    val threeHourBefore: Boolean = false,
+    val oneDayBefore: Boolean = false,
+    val oneWeekBefore: Boolean = false,
+) : Parcelable

@@ -19,6 +19,8 @@ package ru.aleshin.studyassistant.core.data.mappers.tasks
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoNotifications
+import ru.aleshin.studyassistant.core.remote.models.tasks.TodoNotificationsPojo
 import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojo
 import ru.aleshin.studyassistant.sqldelight.tasks.TodoEntity
 
@@ -30,9 +32,18 @@ fun TodoPojo.mapToDomain() = Todo(
     deadline = deadline?.mapEpochTimeToInstant(),
     name = name,
     priority = TaskPriority.valueOf(priority),
-    notification = notification,
+    notifications = notifications.mapToDomain(),
     isDone = done,
     completeDate = completeDate?.mapEpochTimeToInstant(),
+)
+
+fun TodoNotificationsPojo.mapToDomain() = TodoNotifications(
+    beforeStart = beforeStart,
+    fifteenMinutesBefore = fifteenMinutesBefore,
+    oneHourBefore = oneHourBefore,
+    threeHourBefore = threeHourBefore,
+    oneDayBefore = oneDayBefore,
+    oneWeekBefore = oneWeekBefore,
 )
 
 fun TodoEntity.mapToDomain() = Todo(
@@ -40,7 +51,14 @@ fun TodoEntity.mapToDomain() = Todo(
     deadline = deadline?.mapEpochTimeToInstant(),
     name = name,
     priority = TaskPriority.valueOf(priority),
-    notification = notification == 1L,
+    notifications = TodoNotifications(
+        beforeStart = notify_before_start == 1L,
+        fifteenMinutesBefore = notify_fifteen_minutes_before == 1L,
+        oneHourBefore = notify_one_hour_before == 1L,
+        threeHourBefore = notify_three_hour_before == 1L,
+        oneDayBefore = notify_one_day_before == 1L,
+        oneWeekBefore = notify_one_week_before == 1L,
+    ),
     isDone = is_done == 1L,
     completeDate = complete_date?.mapEpochTimeToInstant(),
 )
@@ -50,17 +68,31 @@ fun Todo.mapToRemoteData() = TodoPojo(
     deadline = deadline?.toEpochMilliseconds(),
     name = name,
     priority = priority.name,
-    notification = notification,
+    notifications = notifications.mapToDomain(),
     done = isDone,
     completeDate = completeDate?.toEpochMilliseconds(),
+)
+
+fun TodoNotifications.mapToDomain() = TodoNotificationsPojo(
+    beforeStart = beforeStart,
+    fifteenMinutesBefore = fifteenMinutesBefore,
+    oneHourBefore = oneHourBefore,
+    threeHourBefore = threeHourBefore,
+    oneDayBefore = oneDayBefore,
+    oneWeekBefore = oneWeekBefore,
 )
 
 fun Todo.mapToLocalData() = TodoEntity(
     uid = uid,
     deadline = deadline?.toEpochMilliseconds(),
     name = name,
+    notify_before_start = if (notifications.beforeStart) 1L else 0L,
+    notify_fifteen_minutes_before = if (notifications.fifteenMinutesBefore) 1L else 0L,
+    notify_one_hour_before = if (notifications.oneHourBefore) 1L else 0L,
+    notify_three_hour_before = if (notifications.threeHourBefore) 1L else 0L,
+    notify_one_day_before = if (notifications.oneDayBefore) 1L else 0L,
+    notify_one_week_before = if (notifications.oneWeekBefore) 1L else 0L,
     priority = priority.toString(),
-    notification = if (notification) 1L else 0L,
     is_done = if (isDone) 1L else 0L,
     complete_date = completeDate?.toEpochMilliseconds(),
 )

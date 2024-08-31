@@ -34,7 +34,7 @@ internal data class EditTodoUi(
     val deadline: Instant? = null,
     val name: String = "",
     val priority: TaskPriority = TaskPriority.STANDARD,
-    val notification: Boolean = true,
+    val notifications: TodoNotificationsUi = TodoNotificationsUi(),
     val isDone: Boolean = false,
     @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant? = null,
@@ -52,7 +52,7 @@ internal fun TodoUi.convertToEdit() = EditTodoUi(
     deadline = deadline,
     name = name,
     priority = priority,
-    notification = notification,
+    notifications = notifications,
     isDone = isDone,
     completeDate = completeDate,
 )
@@ -62,7 +62,7 @@ internal fun EditTodoUi.convertToBase() = TodoUi(
     deadline = deadline,
     name = name,
     priority = priority,
-    notification = notification,
+    notifications = notifications,
     isDone = isDone,
     completeDate = completeDate,
 )

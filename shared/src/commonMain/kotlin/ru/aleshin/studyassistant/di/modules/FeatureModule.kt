@@ -31,6 +31,7 @@ import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
@@ -174,6 +175,7 @@ val featureModule = DI.Module("Feature") {
             override val shareHomeworksRepository = instance<ShareHomeworksRepository>()
             override val messageRepository = instance<MessageRepository>()
             override val todoRepository = instance<TodoRepository>()
+            override val todoReminderManager = instance<TodoReminderManager>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
             override val usersRepository = instance<UsersRepository>()
@@ -271,6 +273,7 @@ val featureModule = DI.Module("Feature") {
             override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
             override val startClassesReminderManager = instance<StartClassesReminderManager>()
             override val endClassesReminderManager = instance<EndClassesReminderManager>()
+            override val todoReminderManager = instance<TodoReminderManager>()
             override val usersRepository = instance<UsersRepository>()
             override val manageUserRepository = instance<ManageUserRepository>()
             override val dateManager = instance<DateManager>()
