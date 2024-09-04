@@ -32,7 +32,7 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EventTypeSelectorDialog
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EventTypeSelectorBottomSheet
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -44,10 +44,10 @@ internal fun EventTypeInfoField(
     eventType: EventType?,
     onSelected: (EventType?) -> Unit,
 ) {
-    var isOpenEventTypeSelector by remember { mutableStateOf(false) }
+    var openEventTypeSelectorSheet by remember { mutableStateOf(false) }
 
     ClickableInfoTextField(
-        onClick = { isOpenEventTypeSelector = true },
+        onClick = { openEventTypeSelectorSheet = true },
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
         value = eventType?.mapToString(StudyAssistantRes.strings),
@@ -56,19 +56,19 @@ internal fun EventTypeInfoField(
         infoIcon = painterResource(StudyAssistantRes.icons.classes),
         trailingIcon = {
             ExpandedIcon(
-                isExpanded = isOpenEventTypeSelector,
+                isExpanded = openEventTypeSelectorSheet,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
     )
 
-    if (isOpenEventTypeSelector) {
-        EventTypeSelectorDialog(
+    if (openEventTypeSelectorSheet) {
+        EventTypeSelectorBottomSheet(
             selected = eventType,
-            onDismiss = { isOpenEventTypeSelector = false },
+            onDismiss = { openEventTypeSelectorSheet = false },
             onConfirm = { selectedEventType ->
                 onSelected(selectedEventType)
-                isOpenEventTypeSelector = false
+                openEventTypeSelectorSheet = false
             },
         )
     }

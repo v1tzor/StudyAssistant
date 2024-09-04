@@ -52,9 +52,9 @@ import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.ui.mappers.toLanguageString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.views.MediumDragHandle
 import ru.aleshin.studyassistant.core.ui.views.MediumInfoBadge
 import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
+import ru.aleshin.studyassistant.core.ui.views.sheet.MediumDragHandle
 import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.ReceivedMediatedSchedulesShortUi
 import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.SentMediatedSchedulesUi
 import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.SharedSchedulesShortUi

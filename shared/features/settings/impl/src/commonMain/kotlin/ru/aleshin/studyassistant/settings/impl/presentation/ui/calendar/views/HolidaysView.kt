@@ -73,7 +73,7 @@ import ru.aleshin.studyassistant.core.ui.views.DialogHeader
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseCheckedDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.CheckedDialogItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.CheckedItemView
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.settings.impl.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.EditHolidaysUi
@@ -521,7 +521,7 @@ internal fun OrganizationsSelectorDialog(
         title = null,
         itemView = { organization ->
             val isSelected = selectedOrganizations.contains(organization)
-            CheckedDialogItemView(
+            CheckedItemView(
                 onClick = {
                     selectedOrganizations = if (isSelected) {
                         selectedOrganizations.toMutableList().apply { remove(organization) }

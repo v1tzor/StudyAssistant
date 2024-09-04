@@ -39,6 +39,10 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -53,8 +57,10 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.endSide
 import ru.aleshin.studyassistant.core.ui.views.InfoBadge
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
+import ru.aleshin.studyassistant.core.ui.views.dialog.WarningAlertDialog
 import ru.aleshin.studyassistant.info.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
 
 /**
  * @author Stanislav Aleshin on 18.06.2024.
@@ -73,16 +79,17 @@ internal fun DetailsSubjectViewItem(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
+    var deleteWarningDialogStatus by remember { mutableStateOf(false) }
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissBoxValue ->
             when (dismissBoxValue) {
-                SwipeToDismissBoxValue.EndToStart -> {
-                    onDelete()
-                    true
+                SwipeToDismissBoxValue.EndToStart -> Unit
+                SwipeToDismissBoxValue.StartToEnd -> {
+                    deleteWarningDialogStatus = true
                 }
-                SwipeToDismissBoxValue.StartToEnd -> false
-                SwipeToDismissBoxValue.Settled -> false
+                SwipeToDismissBoxValue.Settled -> Unit
             }
+            return@rememberSwipeToDismissBoxState false
         },
         positionalThreshold = { it * .50f },
     )
@@ -92,17 +99,17 @@ internal fun DetailsSubjectViewItem(
         backgroundContent = {
             SwipeToDismissBackground(
                 dismissState = dismissState,
-                endToStartContent = {
+                startToEndContent = {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
                     )
                 },
-                endToStartColor = MaterialTheme.colorScheme.errorContainer,
+                startToEndColor = MaterialTheme.colorScheme.errorContainer,
             )
         },
-        enableDismissFromEndToStart = enabled,
-        enableDismissFromStartToEnd = false,
+        enableDismissFromEndToStart = false,
+        enableDismissFromStartToEnd = enabled,
     ) {
         DetailsSubjectView(
             onClick = onEdit,
@@ -113,6 +120,26 @@ internal fun DetailsSubjectViewItem(
             name = name,
             teacher = teacher,
             location = location,
+        )
+    }
+
+    if (deleteWarningDialogStatus) {
+        WarningAlertDialog(
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            },
+            title = { Text(text = StudyAssistantRes.strings.warningDialogTitle) },
+            text = { Text(text = InfoThemeRes.strings.deleteSubjectWarningTitle) },
+            confirmTitle = StudyAssistantRes.strings.warningDeleteConfirmTitle,
+            onDismiss = { deleteWarningDialogStatus = false },
+            onConfirm = {
+                onDelete()
+                deleteWarningDialogStatus = false
+            },
         )
     }
 }

@@ -52,6 +52,8 @@ internal fun ClassContent(
     onAddOrganization: () -> Unit,
     onAddSubject: () -> Unit,
     onAddTeacher: () -> Unit,
+    onEditSubject: (SubjectUi) -> Unit,
+    onEditEmployee: (EmployeeDetailsUi) -> Unit,
     onUpdateLocations: (List<ContactInfoUi>) -> Unit,
     onUpdateOffices: (List<String>) -> Unit,
     onSelectOrganization: (OrganizationShortUi?) -> Unit,
@@ -81,6 +83,7 @@ internal fun ClassContent(
             eventType = editableClass?.eventType,
             allSubjects = subjects,
             onAddSubject = onAddSubject,
+            onEditSubject = onEditSubject,
             onSelectedEventType = { onSelectSubject(it, editableClass?.subject) },
             onSelectedSubject = { onSelectSubject(it?.eventType, it) },
         )
@@ -90,6 +93,7 @@ internal fun ClassContent(
             teacher = editableClass?.teacher,
             allEmployee = employees,
             onAddTeacher = onAddTeacher,
+            onEditTeacher = onEditEmployee,
             onSelected = onSelectTeacher,
         )
         LocationInfoField(

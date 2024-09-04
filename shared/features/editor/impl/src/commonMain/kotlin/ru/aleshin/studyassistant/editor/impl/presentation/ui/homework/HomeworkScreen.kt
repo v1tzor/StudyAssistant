@@ -74,6 +74,7 @@ internal data class HomeworkScreen(
                     modifier = Modifier.padding(paddingValues),
                     onAddOrganization = { dispatchEvent(HomeworkEvent.NavigateToOrganizationEditor(null)) },
                     onAddSubject = { dispatchEvent(HomeworkEvent.NavigateToSubjectEditor(null)) },
+                    onEditSubject = { dispatchEvent(HomeworkEvent.NavigateToSubjectEditor(it.uid)) },
                     onSelectedOrganization = { dispatchEvent(HomeworkEvent.UpdateOrganization(it)) },
                     onSelectedSubject = { dispatchEvent(HomeworkEvent.UpdateSubject(it)) },
                     onSelectedDate = { dispatchEvent(HomeworkEvent.UpdateDate(it)) },
@@ -96,6 +97,7 @@ internal data class HomeworkScreen(
             },
             bottomBar = {
                 HomeworkBottomActions(
+                    isLoadingSave = state.isLoadingSave,
                     saveEnabled = state.editableHomework?.isValid() == true,
                     showDeleteAction = homeworkId != null,
                     onCancelClick = { dispatchEvent(HomeworkEvent.NavigateToBack) },

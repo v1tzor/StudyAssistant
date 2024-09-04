@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -45,12 +46,13 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
 import ru.aleshin.studyassistant.core.ui.views.dialog.ContactInfoEditorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogAddItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogSwipeItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogTextField
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorAddItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorSwipeItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorTextField
+import ru.aleshin.studyassistant.core.ui.views.dialog.WarningAlertDialog
+import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 
@@ -71,8 +73,8 @@ internal fun LocationInfoField(
     onSelectedLocation: (ContactInfoUi?) -> Unit,
     onSelectedOffice: (String?) -> Unit,
 ) {
-    var isOpenLocationSelector by remember { mutableStateOf(false) }
-    var isOpenOfficeSelector by remember { mutableStateOf(false) }
+    var openLocationSelectorSheet by remember { mutableStateOf(false) }
+    var openOfficeSelectorSheet by remember { mutableStateOf(false) }
 
     Row(
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
@@ -89,13 +91,13 @@ internal fun LocationInfoField(
             ClickableTextField(
                 enabled = !isLoading,
                 modifier = Modifier.weight(0.6f),
-                onClick = { isOpenLocationSelector = true },
+                onClick = { openLocationSelectorSheet = true },
                 value = (location?.label ?: location?.value)?.ifEmpty { null },
                 label = EditorThemeRes.strings.locationFieldLabel,
                 placeholder = EditorThemeRes.strings.locationFieldPlaceholder,
                 trailingIcon = {
                     ExpandedIcon(
-                        isExpanded = isOpenLocationSelector,
+                        isExpanded = openLocationSelectorSheet,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
@@ -103,13 +105,13 @@ internal fun LocationInfoField(
             ClickableTextField(
                 enabled = !isLoading,
                 modifier = Modifier.weight(0.4f),
-                onClick = { isOpenOfficeSelector = true },
+                onClick = { openOfficeSelectorSheet = true },
                 value = office,
                 label = EditorThemeRes.strings.officeFieldLabel,
                 placeholder = EditorThemeRes.strings.officeFieldPlaceholder,
                 trailingIcon = {
                     ExpandedIcon(
-                        isExpanded = isOpenOfficeSelector,
+                        isExpanded = openOfficeSelectorSheet,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
@@ -117,30 +119,30 @@ internal fun LocationInfoField(
         }
     }
 
-    if (isOpenLocationSelector) {
-        LocationSelectorDialog(
+    if (openLocationSelectorSheet) {
+        LocationSelectorBottomSheet(
             enabledAdd = enabledAdd,
             selected = location,
             locations = allLocations,
             onUpdateLocations = onUpdateLocations,
-            onDismiss = { isOpenLocationSelector = false },
+            onDismiss = { openLocationSelectorSheet = false },
             onConfirm = {
                 onSelectedLocation(it)
-                isOpenLocationSelector = false
+                openLocationSelectorSheet = false
             },
         )
     }
 
-    if (isOpenOfficeSelector) {
-        OfficeSelectorDialog(
+    if (openOfficeSelectorSheet) {
+        OfficeSelectorBottomSheet(
             enabledAdd = enabledAdd,
             selected = office,
             offices = allOffices,
             onUpdateOffices = onUpdateOffices,
-            onDismiss = { isOpenOfficeSelector = false },
+            onDismiss = { openOfficeSelectorSheet = false },
             onConfirm = {
                 onSelectedOffice(it)
-                isOpenOfficeSelector = false
+                openOfficeSelectorSheet = false
             },
         )
     }
@@ -148,7 +150,7 @@ internal fun LocationInfoField(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun LocationSelectorDialog(
+internal fun LocationSelectorBottomSheet(
     enabledAdd: Boolean,
     modifier: Modifier = Modifier,
     selected: ContactInfoUi?,
@@ -161,26 +163,29 @@ internal fun LocationSelectorDialog(
     var editableContactInfo by remember { mutableStateOf<ContactInfoUi?>(null) }
     var selectedLocation by remember { mutableStateOf(selected) }
 
-    BaseSelectorDialog(
+    BaseSelectorBottomSheet(
         modifier = modifier,
         selected = selectedLocation,
         items = locations,
+        itemKeys = { it.value },
         header = EditorThemeRes.strings.locationSelectorHeader,
         title = EditorThemeRes.strings.locationSelectorTitle,
         itemView = { location ->
+            var deleteWarningDialogStatus by remember { mutableStateOf(false) }
             val dismissState = rememberSwipeToDismissBoxState(
                 confirmValueChange = { dismissBoxValue ->
-                    if (dismissBoxValue == SwipeToDismissBoxValue.StartToEnd) {
-                        val updatedLocations = locations.toMutableList().apply { remove(location) }
-                        onUpdateLocations(updatedLocations)
-                        true
-                    } else {
-                        false
+                    when (dismissBoxValue) {
+                        SwipeToDismissBoxValue.StartToEnd -> {
+                            deleteWarningDialogStatus = true
+                        }
+                        SwipeToDismissBoxValue.EndToStart -> Unit
+                        SwipeToDismissBoxValue.Settled -> Unit
                     }
+                    return@rememberSwipeToDismissBoxState false
                 },
                 positionalThreshold = { it * .60f },
             )
-            SelectorDialogSwipeItemView(
+            SelectorSwipeItemView(
                 onClick = { selectedLocation = location },
                 state = dismissState,
                 selected = location == selectedLocation,
@@ -200,20 +205,40 @@ internal fun LocationSelectorDialog(
                     )
                 },
             )
+            if (deleteWarningDialogStatus) {
+                WarningAlertDialog(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    },
+                    title = { Text(text = StudyAssistantRes.strings.warningDialogTitle) },
+                    text = { Text(text = EditorThemeRes.strings.deleteLocationWarningTitle) },
+                    confirmTitle = StudyAssistantRes.strings.warningDeleteConfirmTitle,
+                    onDismiss = { deleteWarningDialogStatus = false },
+                    onConfirm = {
+                        val updatedLocations = locations.toMutableList().apply { remove(location) }
+                        onUpdateLocations(updatedLocations)
+                        deleteWarningDialogStatus = false
+                    },
+                )
+            }
         },
         addItemView = {
-            SelectorDialogAddItemView(
+            SelectorAddItemView(
                 enabled = enabledAdd,
                 onClick = { contactInfoEditorDialogState = true }
             )
         },
         notSelectedItem = {
-            SelectorDialogNotSelectedItemView(
+            SelectorNotSelectedItemView(
                 selected = selectedLocation == null,
                 onClick = { selectedLocation = null },
             )
         },
-        onDismiss = onDismiss,
+        onDismissRequest = onDismiss,
         onConfirm = onConfirm,
     )
 
@@ -258,7 +283,7 @@ internal fun LocationSelectorDialog(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun OfficeSelectorDialog(
+internal fun OfficeSelectorBottomSheet(
     modifier: Modifier = Modifier,
     enabledAdd: Boolean = true,
     selected: String?,
@@ -272,26 +297,29 @@ internal fun OfficeSelectorDialog(
     var isEdited by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
-    BaseSelectorDialog(
+    BaseSelectorBottomSheet(
         modifier = modifier,
         selected = selectedOffice,
-        items = offices,
+        items = offices.sortedBy { it },
+        itemKeys = { it },
         header = EditorThemeRes.strings.officeSelectorHeader,
         title = EditorThemeRes.strings.officeSelectorTitle,
         itemView = { office ->
+            var deleteWarningDialogStatus by remember { mutableStateOf(false) }
             val dismissState = rememberSwipeToDismissBoxState(
                 confirmValueChange = { dismissBoxValue ->
-                    if (dismissBoxValue == SwipeToDismissBoxValue.StartToEnd) {
-                        val updatedOffices = offices.toMutableList().apply { remove(office) }
-                        onUpdateOffices(updatedOffices)
-                        true
-                    } else {
-                        false
+                    when (dismissBoxValue) {
+                        SwipeToDismissBoxValue.StartToEnd -> {
+                            deleteWarningDialogStatus = true
+                        }
+                        SwipeToDismissBoxValue.EndToStart -> Unit
+                        SwipeToDismissBoxValue.Settled -> Unit
                     }
+                    return@rememberSwipeToDismissBoxState false
                 },
                 positionalThreshold = { it * .60f },
             )
-            SelectorDialogSwipeItemView(
+            SelectorSwipeItemView(
                 onClick = { selectedOffice = office },
                 state = dismissState,
                 selected = office == selectedOffice,
@@ -311,11 +339,31 @@ internal fun OfficeSelectorDialog(
                     )
                 },
             )
+            if (deleteWarningDialogStatus) {
+                WarningAlertDialog(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    },
+                    title = { Text(text = StudyAssistantRes.strings.warningDialogTitle) },
+                    text = { Text(text = EditorThemeRes.strings.deleteOfficeWarningTitle) },
+                    confirmTitle = StudyAssistantRes.strings.warningDeleteConfirmTitle,
+                    onDismiss = { deleteWarningDialogStatus = false },
+                    onConfirm = {
+                        val updatedOffices = offices.toMutableList().apply { remove(office) }
+                        onUpdateOffices(updatedOffices)
+                        deleteWarningDialogStatus = false
+                    },
+                )
+            }
         },
         addItemView = {
             AnimatedContent(targetState = isEdited) { edit ->
                 if (edit) {
-                    SelectorDialogTextField(
+                    SelectorTextField(
                         modifier = Modifier.focusRequester(focusRequester),
                         value = editableOffice,
                         onValueChange = {
@@ -327,6 +375,7 @@ internal fun OfficeSelectorDialog(
                             editableOffice = ""
                             isEdited = false
                         },
+                        maxLines = 1,
                         onConfirm = {
                             val updatedOffices = offices.toMutableList().apply { add(editableOffice) }
                             onUpdateOffices(updatedOffices)
@@ -336,7 +385,7 @@ internal fun OfficeSelectorDialog(
                     )
                     SideEffect { focusRequester.requestFocus() }
                 } else {
-                    SelectorDialogAddItemView(
+                    SelectorAddItemView(
                         enabled = enabledAdd,
                         onClick = { isEdited = true }
                     )
@@ -344,12 +393,12 @@ internal fun OfficeSelectorDialog(
             }
         },
         notSelectedItem = {
-            SelectorDialogNotSelectedItemView(
+            SelectorNotSelectedItemView(
                 selected = selectedOffice == null,
                 onClick = { selectedOffice = null },
             )
         },
-        onDismiss = onDismiss,
+        onDismissRequest = onDismiss,
         onConfirm = onConfirm,
     )
 }

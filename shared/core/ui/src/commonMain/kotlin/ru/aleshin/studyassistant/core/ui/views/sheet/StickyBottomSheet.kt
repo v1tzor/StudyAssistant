@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.ui.views
+package ru.aleshin.studyassistant.core.ui.views.sheet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

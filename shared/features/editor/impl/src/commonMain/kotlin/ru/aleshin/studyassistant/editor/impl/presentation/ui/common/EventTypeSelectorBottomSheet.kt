@@ -30,9 +30,9 @@ import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 
 /**
@@ -40,7 +40,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
  */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun EventTypeSelectorDialog(
+internal fun EventTypeSelectorBottomSheet(
     modifier: Modifier = Modifier,
     selected: EventType?,
     onDismiss: () -> Unit,
@@ -48,14 +48,14 @@ internal fun EventTypeSelectorDialog(
 ) {
     var selectedEventType by remember { mutableStateOf(selected) }
 
-    BaseSelectorDialog(
+    BaseSelectorBottomSheet(
         modifier = modifier,
         selected = selectedEventType,
         items = EventType.entries,
         header = EditorThemeRes.strings.eventTypeSelectorHeader,
         title = EditorThemeRes.strings.eventTypeSelectorTitle,
         itemView = { eventType ->
-            SelectorDialogItemView(
+            SelectorItemView(
                 onClick = { selectedEventType = eventType },
                 selected = eventType == selectedEventType,
                 title = eventType.mapToString(StudyAssistantRes.strings),
@@ -70,12 +70,12 @@ internal fun EventTypeSelectorDialog(
             )
         },
         notSelectedItem = {
-            SelectorDialogNotSelectedItemView(
+            SelectorNotSelectedItemView(
                 selected = selectedEventType == null,
                 onClick = { selectedEventType = null },
             )
         },
-        onDismiss = onDismiss,
+        onDismissRequest = onDismiss,
         onConfirm = onConfirm,
     )
 }

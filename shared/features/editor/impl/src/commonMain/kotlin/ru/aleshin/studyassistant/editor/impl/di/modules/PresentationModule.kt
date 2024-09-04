@@ -100,7 +100,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<HomeworkStateCommunicator> { HomeworkStateCommunicator.Base() }
     bindProvider<HomeworkEffectCommunicator> { HomeworkEffectCommunicator.Base() }
     bindProvider<HomeworkWorkProcessor> { HomeworkWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<HomeworkScreenModel> { HomeworkScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<HomeworkScreenModel> { HomeworkScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<TodoStateCommunicator> { TodoStateCommunicator.Base() }
     bindProvider<TodoEffectCommunicator> { TodoEffectCommunicator.Base() }

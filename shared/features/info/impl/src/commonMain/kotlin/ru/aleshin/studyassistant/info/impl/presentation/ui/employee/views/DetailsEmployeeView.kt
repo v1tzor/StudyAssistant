@@ -36,6 +36,10 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -48,10 +52,12 @@ import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
+import ru.aleshin.studyassistant.core.ui.views.dialog.WarningAlertDialog
 import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
 import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.EmployeeSubjectView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.NoneEmployeeSubjectView
+import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.
@@ -74,19 +80,19 @@ internal fun DetailsEmployeeViewItem(
     onDelete: () -> Unit,
     onEdit: () -> Unit,
 ) {
+    var deleteWarningDialogStatus by remember { mutableStateOf(false) }
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissBoxValue ->
             when (dismissBoxValue) {
                 SwipeToDismissBoxValue.EndToStart -> {
-                    onDelete()
-                    true
+                    onEdit()
                 }
                 SwipeToDismissBoxValue.StartToEnd -> {
-                    onEdit()
-                    false
+                    deleteWarningDialogStatus = true
                 }
-                SwipeToDismissBoxValue.Settled -> false
+                SwipeToDismissBoxValue.Settled -> Unit
             }
+            return@rememberSwipeToDismissBoxState false
         },
         positionalThreshold = { it * .50f },
     )
@@ -96,20 +102,20 @@ internal fun DetailsEmployeeViewItem(
         backgroundContent = {
             SwipeToDismissBackground(
                 dismissState = dismissState,
-                endToStartContent = {
+                startToEndContent = {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
                     )
                 },
-                startToEndContent = {
+                endToStartContent = {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = null,
                     )
                 },
-                endToStartColor = MaterialTheme.colorScheme.errorContainer,
-                startToEndColor = StudyAssistantRes.colors.accents.orangeContainer,
+                startToEndColor = MaterialTheme.colorScheme.errorContainer,
+                endToStartColor = StudyAssistantRes.colors.accents.orangeContainer,
             )
         },
         enableDismissFromEndToStart = enabled,
@@ -126,6 +132,26 @@ internal fun DetailsEmployeeViewItem(
             isHavePhone = isHavePhone,
             isHaveEmail = isHaveEmail,
             isHaveWebsite = isHaveWebsite,
+        )
+    }
+
+    if (deleteWarningDialogStatus) {
+        WarningAlertDialog(
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            },
+            title = { Text(text = StudyAssistantRes.strings.warningDialogTitle) },
+            text = { Text(text = InfoThemeRes.strings.deleteEmployeeWarningTitle) },
+            confirmTitle = StudyAssistantRes.strings.warningDeleteConfirmTitle,
+            onDismiss = { deleteWarningDialogStatus = false },
+            onConfirm = {
+                onDelete()
+                deleteWarningDialogStatus = false
+            },
         )
     }
 }
@@ -159,7 +185,7 @@ private fun DetailsEmployeeView(
             AvatarView(
                 modifier = modifier.size(40.dp),
                 firstName = firstName,
-                secondName = secondName ?: patronymic,
+                secondName = patronymic ?: secondName,
                 imageUrl = avatar,
                 style = MaterialTheme.typography.titleMedium,
             )

@@ -68,6 +68,7 @@ internal data class SubjectScreen(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
                     onAddTeacher = { dispatchEvent(SubjectEvent.NavigateToEmployeeEditor(null)) },
+                    onEditTeacher = { dispatchEvent(SubjectEvent.NavigateToEmployeeEditor(it.uid)) },
                     onUpdateLocations = { dispatchEvent(SubjectEvent.UpdateOrganizationLocations(it)) },
                     onUpdateOffices = { dispatchEvent(SubjectEvent.UpdateOrganizationOffices(it)) },
                     onSelectEventType = { dispatchEvent(SubjectEvent.SelectEventType(it)) },

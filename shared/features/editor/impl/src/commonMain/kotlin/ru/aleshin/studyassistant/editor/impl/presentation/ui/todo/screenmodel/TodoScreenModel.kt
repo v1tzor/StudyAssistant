@@ -112,6 +112,9 @@ internal class TodoScreenModel(
         is TodoAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )
+        is TodoAction.UpdateLoadingSave -> currentState.copy(
+            isLoadingSave = action.isLoading,
+        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {

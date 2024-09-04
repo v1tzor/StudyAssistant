@@ -63,6 +63,7 @@ fun <T> BaseCheckedDialog(
     confirmEnabled: Boolean = true,
     selected: List<T>,
     items: List<T>,
+    itemKeys: ((T) -> Any)? = null,
     header: String,
     title: String?,
     itemView: @Composable LazyItemScope.(T) -> Unit,
@@ -105,7 +106,7 @@ fun <T> BaseCheckedDialog(
                     state = itemsListState,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(items = items, itemContent = itemView)
+                    items(items = items, key = itemKeys, itemContent = itemView)
                     if (addItemView != null) {
                         item(content = addItemView)
                     }
@@ -123,7 +124,7 @@ fun <T> BaseCheckedDialog(
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-fun LazyItemScope.CheckedDialogItemView(
+fun LazyItemScope.CheckedItemView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,

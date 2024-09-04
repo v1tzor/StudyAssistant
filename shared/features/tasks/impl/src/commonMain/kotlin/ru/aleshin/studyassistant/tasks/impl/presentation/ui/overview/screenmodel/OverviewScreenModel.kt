@@ -24,7 +24,10 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.shiftMinutes
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
@@ -144,8 +147,22 @@ internal class OverviewScreenModel(
             }
             is OverviewEvent.AddHomeworkInEditor -> with(state()) {
                 val currentTime = dateManager.fetchCurrentInstant()
-                val activeClass = activeSchedule?.classes?.find {
-                    it.timeRange.containsTime(currentTime)
+                val activeClass = if (activeSchedule != null && activeSchedule.classes.isNotEmpty()) {
+                    val dailyTimeRange = TimeRange(
+                        from = activeSchedule.classes.first().timeRange.from,
+                        to = activeSchedule.classes.last().timeRange.to.shiftMinutes(10),
+                    )
+                    if (dailyTimeRange.containsTime(currentTime)) {
+                        activeSchedule.classes.findLast { classModel ->
+                            val firstFilter = classModel.timeRange.to.dateTime().time < currentTime.dateTime().time
+                            val secondFilter = classModel.timeRange.containsTime(currentTime)
+                            return@findLast firstFilter || secondFilter
+                        }
+                    } else {
+                        null
+                    }
+                } else {
+                    null
                 }
                 val featureScreen = EditorScreen.Homework(
                     homeworkId = null,

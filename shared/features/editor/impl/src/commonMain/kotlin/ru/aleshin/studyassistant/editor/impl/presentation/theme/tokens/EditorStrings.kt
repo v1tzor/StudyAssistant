@@ -170,9 +170,12 @@ internal data class EditorStrings(
     val passwordFieldPlaceholder: String,
     val credentialsErrorMessage: String,
     val hideOrganizationWarning: String,
+    val deleteOfficeWarningTitle: String,
+    val deleteLocationWarningTitle: String,
+    val subjectsSearchBarPlaceholder: String,
+    val employeeSearchBarPlaceholder: String,
     val otherErrorMessage: String,
 ) {
-
     companion object {
         val RUSSIAN = EditorStrings(
             weekScheduleEditorHeader = "Редактор расписания",
@@ -322,6 +325,10 @@ internal data class EditorStrings(
             shiftTimeError = "Ошибка сдвига занятий! Нарушение временных рамок",
             credentialsErrorMessage = "Данные пользователя, неверны или неполны!",
             hideOrganizationWarning = "Вы уверены что хотите скрыть организацию? После этого вы больше не сможете её использовать",
+            deleteOfficeWarningTitle = "Вы уверены что хотите удалить данный кабинет?",
+            deleteLocationWarningTitle = "Вы уверены что хотите удалить данную локацию?",
+            subjectsSearchBarPlaceholder = "Поиск предметов",
+            employeeSearchBarPlaceholder = "Поиск преподавателей",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = EditorStrings(
@@ -472,6 +479,10 @@ internal data class EditorStrings(
             shiftTimeError = "Classes shift error! Violation of the time frame",
             credentialsErrorMessage = "The user's data seems to be incorrect or incomplete!",
             hideOrganizationWarning = "Are you sure you want to hide the organization? After that, you won't be able to use it anymore",
+            deleteOfficeWarningTitle = "Are you sure you want to delete this office?",
+            deleteLocationWarningTitle = "Are you sure you want to delete this location?",
+            subjectsSearchBarPlaceholder = "Search for subjects",
+            employeeSearchBarPlaceholder = "Search for teachers",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

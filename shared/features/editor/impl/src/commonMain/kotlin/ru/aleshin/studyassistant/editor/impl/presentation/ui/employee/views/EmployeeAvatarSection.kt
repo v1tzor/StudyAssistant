@@ -17,8 +17,6 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -28,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.vinceglb.filekit.core.PlatformFile
+import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.menu.SelectableAvatarView
@@ -52,7 +51,7 @@ internal fun EmployeeAvatarSection(
     ) {
         Crossfade(
             targetState = isLoading,
-            animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+            animationSpec = floatSpring(),
         ) { loading ->
             if (loading) {
                 EmployeeAvatarViewPlaceholder()
@@ -62,8 +61,8 @@ internal fun EmployeeAvatarSection(
                     onSelect = onUpdateAvatar,
                     onDelete = onDeleteAvatar,
                     onExceedingLimit = onExceedingAvatarSizeLimit,
-                    firstName = firstName?.split(' ')?.getOrNull(0) ?: "*",
-                    secondName = lastName?.split(' ')?.getOrNull(1),
+                    firstName = firstName ?: "*",
+                    secondName = lastName,
                     imageUrl = avatar,
                     style = MaterialTheme.typography.displaySmall,
                 )

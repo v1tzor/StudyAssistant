@@ -21,7 +21,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.extensions.endOfWeek
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
+import ru.aleshin.studyassistant.core.common.extensions.shiftWeek
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -64,7 +66,7 @@ internal interface LinkingClassInteractor {
 
             val searchedTimeRange = TimeRange(
                 from = date.shiftDay(-1),
-                to = date.shiftDay(14),
+                to = date.endOfWeek().shiftWeek(1),
             )
 
             val customSchedulesFlow = customScheduleRepository.fetchSchedulesByTimeRange(

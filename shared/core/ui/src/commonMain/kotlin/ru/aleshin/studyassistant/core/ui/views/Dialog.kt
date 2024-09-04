@@ -150,7 +150,7 @@ fun DialogAlertButtons(
         TextButton(onClick = onCancelClick) {
             Text(
                 text = StudyAssistantRes.strings.cancelTitle,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelLarge,
             )
         }

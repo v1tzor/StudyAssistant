@@ -116,7 +116,7 @@ internal fun TimeInfoField(
                 if (!loading) {
                     ClassTimeRangeChooser(
                         enabled = !isLoading,
-                        currentTime = if (startTime != null && endTime != null) {
+                        selectedTime = if (startTime != null && endTime != null) {
                             TimeRange(startTime, endTime)
                         } else {
                             null

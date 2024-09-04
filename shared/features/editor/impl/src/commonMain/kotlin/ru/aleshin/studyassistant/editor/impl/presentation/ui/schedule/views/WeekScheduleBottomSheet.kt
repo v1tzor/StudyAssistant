@@ -61,7 +61,7 @@ import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.SegmentedButtons
-import ru.aleshin.studyassistant.core.ui.views.StickyBottomSheet
+import ru.aleshin.studyassistant.core.ui.views.sheet.StickyBottomSheet
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseWeekScheduleUi

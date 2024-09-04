@@ -164,8 +164,8 @@ private fun EmployeeTopSheetFooterPlaceholder(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 private fun EmployeeTopSheetHeader(
     modifier: Modifier = Modifier,
     firstName: String,
@@ -182,7 +182,7 @@ private fun EmployeeTopSheetHeader(
         AvatarView(
             modifier = modifier.size(120.dp),
             firstName = firstName,
-            secondName = secondName,
+            secondName = patronymic ?: secondName,
             imageUrl = avatar,
             style = MaterialTheme.typography.headlineLarge,
         )

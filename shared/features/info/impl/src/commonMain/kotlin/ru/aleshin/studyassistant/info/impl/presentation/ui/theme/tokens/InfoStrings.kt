@@ -52,6 +52,8 @@ internal data class InfoStrings(
     val organizationSelectorTitle: String,
     val subjectSortedTypeSelectorHeader: String,
     val subjectSortedTypeSelectorTitle: String,
+    val deleteSubjectWarningTitle: String,
+    val deleteEmployeeWarningTitle: String,
     val otherErrorMessage: String,
 ) {
     companion object {
@@ -85,6 +87,8 @@ internal data class InfoStrings(
             organizationSelectorTitle = "Выберите необходимую организацию",
             subjectSortedTypeSelectorHeader = "Сортировка",
             subjectSortedTypeSelectorTitle = "Выберите тип сортировки",
+            deleteSubjectWarningTitle = "Вы уверены что хотите удалить данный предмет? После этого некоторые занятия могут показывать некорректно",
+            deleteEmployeeWarningTitle = "Вы уверены что хотите удалить данного сотрудника? После этого некоторые занятия могут показывать некорректно",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = InfoStrings(
@@ -117,6 +121,8 @@ internal data class InfoStrings(
             organizationSelectorTitle = "Select the desired organization",
             subjectSortedTypeSelectorHeader = "Sorting",
             subjectSortedTypeSelectorTitle = "Select the sort type",
+            deleteSubjectWarningTitle = "Are you sure you want to delete this subject? After that, some classes may not be displayed correctly",
+            deleteEmployeeWarningTitle = "Are you sure you want to delete this employee? After that, some classes may not be displayed correctly",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

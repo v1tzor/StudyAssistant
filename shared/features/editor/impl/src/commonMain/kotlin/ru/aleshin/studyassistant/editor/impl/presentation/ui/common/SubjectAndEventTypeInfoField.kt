@@ -45,7 +45,7 @@ import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.SubjectSelectorDialog
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.SubjectSelectorBottomSheet
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -59,11 +59,12 @@ internal fun SubjectAndEventTypeInfoField(
     eventType: EventType?,
     allSubjects: List<SubjectUi>,
     onAddSubject: () -> Unit,
+    onEditSubject: (SubjectUi) -> Unit,
     onSelectedSubject: (SubjectUi?) -> Unit,
     onSelectedEventType: (EventType?) -> Unit,
 ) {
-    var eventTypeSelectorState by remember { mutableStateOf(false) }
-    var subjectSelectorState by remember { mutableStateOf(false) }
+    var openEventTypeSelectorSheet by remember { mutableStateOf(false) }
+    var openSubjectSelectorSheet by remember { mutableStateOf(false) }
 
     Row(
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
@@ -79,7 +80,7 @@ internal fun SubjectAndEventTypeInfoField(
         }
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             ClickableTextField(
-                onClick = { subjectSelectorState = true },
+                onClick = { openSubjectSelectorSheet = true },
                 enabled = !isLoading,
                 value = subject?.name,
                 label = EditorThemeRes.strings.subjectFieldLabel,
@@ -94,7 +95,7 @@ internal fun SubjectAndEventTypeInfoField(
                 },
                 trailingIcon = {
                     ExpandedIcon(
-                        isExpanded = subjectSelectorState,
+                        isExpanded = openSubjectSelectorSheet,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
@@ -102,14 +103,14 @@ internal fun SubjectAndEventTypeInfoField(
                 maxLines = 3,
             )
             ClickableTextField(
-                onClick = { eventTypeSelectorState = true },
+                onClick = { openEventTypeSelectorSheet = true },
                 enabled = !isLoading,
                 value = eventType?.mapToString(StudyAssistantRes.strings),
                 label = EditorThemeRes.strings.eventTypeFieldLabel,
                 placeholder = EditorThemeRes.strings.eventTypeFieldPlaceholder,
                 trailingIcon = {
                     ExpandedIcon(
-                        isExpanded = eventTypeSelectorState,
+                        isExpanded = openEventTypeSelectorSheet,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
@@ -117,28 +118,29 @@ internal fun SubjectAndEventTypeInfoField(
         }
     }
 
-    if (eventTypeSelectorState) {
-        EventTypeSelectorDialog(
+    if (openEventTypeSelectorSheet) {
+        EventTypeSelectorBottomSheet(
             selected = eventType,
-            onDismiss = { eventTypeSelectorState = false },
+            onDismiss = { openEventTypeSelectorSheet = false },
             onConfirm = {
                 onSelectedEventType(it)
-                eventTypeSelectorState = false
+                openEventTypeSelectorSheet = false
             },
         )
     }
 
-    if (subjectSelectorState) {
-        SubjectSelectorDialog(
+    if (openSubjectSelectorSheet) {
+        SubjectSelectorBottomSheet(
             enabledAdd = enabledAddSubject,
             selected = subject,
             eventType = eventType,
             subjects = allSubjects,
             onAddSubject = onAddSubject,
-            onDismiss = { subjectSelectorState = false },
+            onEditSubject = onEditSubject,
+            onDismiss = { openSubjectSelectorSheet = false },
             onConfirm = {
                 onSelectedSubject(it)
-                subjectSelectorState = false
+                openSubjectSelectorSheet = false
             },
         )
     }
@@ -152,6 +154,7 @@ internal fun SubjectInfoField(
     subject: SubjectUi?,
     allSubjects: List<SubjectUi>,
     onAddSubject: () -> Unit,
+    onEditSubject: (SubjectUi) -> Unit,
     onSelectedSubject: (SubjectUi?) -> Unit,
 ) {
     var subjectSelectorState by remember { mutableStateOf(false) }
@@ -182,12 +185,13 @@ internal fun SubjectInfoField(
     )
 
     if (subjectSelectorState) {
-        SubjectSelectorDialog(
+        SubjectSelectorBottomSheet(
             enabledAdd = enabledAddSubject,
             selected = subject,
             eventType = EventType.CLASS,
             subjects = allSubjects,
             onAddSubject = onAddSubject,
+            onEditSubject = onEditSubject,
             onDismiss = { subjectSelectorState = false },
             onConfirm = {
                 onSelectedSubject(it)

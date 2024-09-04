@@ -47,7 +47,6 @@ internal interface SubjectsWorkProcessor :
         override suspend fun work(command: SubjectsWorkCommand) = when (command) {
             is SubjectsWorkCommand.LoadOrganizations -> loadOrganizationsWork(command.organization)
             is SubjectsWorkCommand.LoadSubjects -> loadSubjectsWork(command.organization, command.sortedType)
-            is SubjectsWorkCommand.SortSubjects -> sortSubjectsWork(command.subjects, command.sortedType)
             is SubjectsWorkCommand.SearchSubjects -> searchSubjectsWork(command.query, command.organization, command.sortedType)
             is SubjectsWorkCommand.DeleteSubject -> deleteSubjectWork(command.targetId)
         }
@@ -73,11 +72,6 @@ internal interface SubjectsWorkProcessor :
             )
         }.onStart {
             emit(ActionResult(SubjectsAction.UpdateLoading(true)))
-        }
-
-        private fun sortSubjectsWork(subjects: List<SubjectUi>, sortedType: SubjectSortedType) = flow {
-            val sortedSubjects = subjects.sortSubjectsByType(sortedType)
-            emit(ActionResult(SubjectsAction.UpdateSubjects(sortedSubjects, sortedType)))
         }
 
         private fun searchSubjectsWork(query: String, organization: UID, sortedType: SubjectSortedType) = flow {
@@ -115,7 +109,6 @@ internal interface SubjectsWorkProcessor :
 internal sealed class SubjectsWorkCommand : WorkCommand {
     data class LoadOrganizations(val organization: UID) : SubjectsWorkCommand()
     data class LoadSubjects(val organization: UID, val sortedType: SubjectSortedType) : SubjectsWorkCommand()
-    data class SortSubjects(val subjects: List<SubjectUi>, val sortedType: SubjectSortedType) : SubjectsWorkCommand()
     data class SearchSubjects(val query: String, val organization: UID, val sortedType: SubjectSortedType) : SubjectsWorkCommand()
     data class DeleteSubject(val targetId: UID) : SubjectsWorkCommand()
 }

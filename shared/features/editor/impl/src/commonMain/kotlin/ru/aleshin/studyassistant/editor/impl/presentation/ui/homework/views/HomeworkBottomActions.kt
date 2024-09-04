@@ -42,6 +42,7 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 @Composable
 internal fun HomeworkBottomActions(
     modifier: Modifier = Modifier,
+    isLoadingSave: Boolean,
     saveEnabled: Boolean,
     showDeleteAction: Boolean,
     onCancelClick: () -> Unit,
@@ -68,7 +69,7 @@ internal fun HomeworkBottomActions(
         FilledTonalButton(onClick = onCancelClick) {
             Text(text = StudyAssistantRes.strings.cancelTitle)
         }
-        Button(onClick = onSaveClick, enabled = saveEnabled) {
+        Button(onClick = onSaveClick, enabled = saveEnabled && !isLoadingSave) {
             Text(text = StudyAssistantRes.strings.saveConfirmTitle)
         }
     }

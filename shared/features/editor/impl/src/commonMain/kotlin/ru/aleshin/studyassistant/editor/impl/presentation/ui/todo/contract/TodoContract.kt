@@ -36,6 +36,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.TodoNotif
 @Parcelize
 internal data class TodoViewState(
     val isLoading: Boolean = true,
+    val isLoadingSave: Boolean = false,
     val editableTodo: EditTodoUi? = null,
 ) : BaseViewState
 
@@ -59,4 +60,5 @@ internal sealed class TodoAction : BaseAction {
     data class SetupEditModel(val editModel: EditTodoUi) : TodoAction()
     data class UpdateEditModel(val editModel: EditTodoUi?) : TodoAction()
     data class UpdateLoading(val isLoading: Boolean) : TodoAction()
+    data class UpdateLoadingSave(val isLoading: Boolean) : TodoAction()
 }

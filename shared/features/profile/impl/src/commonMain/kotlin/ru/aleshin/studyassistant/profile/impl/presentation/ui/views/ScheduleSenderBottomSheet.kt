@@ -75,8 +75,8 @@ import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.CircularStepsRow
-import ru.aleshin.studyassistant.core.ui.views.MediumDragHandle
 import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
+import ru.aleshin.studyassistant.core.ui.views.sheet.MediumDragHandle
 import ru.aleshin.studyassistant.profile.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.ShareSchedulesSendDataUi
 import ru.aleshin.studyassistant.profile.impl.presentation.models.users.AppUserUi

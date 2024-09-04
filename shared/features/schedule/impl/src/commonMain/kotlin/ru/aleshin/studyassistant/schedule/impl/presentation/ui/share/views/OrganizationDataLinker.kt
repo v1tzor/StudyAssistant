@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
@@ -109,14 +110,14 @@ private fun OrganizationsSelectorSection(
         )
         Crossfade(
             targetState = isLoading,
-            animationSpec = spring(
-                stiffness = Spring.StiffnessMediumLow,
-                visibilityThreshold = Spring.DefaultDisplacementThreshold,
-            ),
+            animationSpec = floatSpring(),
         ) { loading ->
             if (!loading && organizationsLinkData.isNotEmpty()) {
-                HorizontalPager(state = pagerState) { organizationIndex ->
-                    var organizationLinkedDialogState by remember { mutableStateOf(false) }
+                HorizontalPager(
+                    state = pagerState,
+                    pageSpacing = 16.dp,
+                ) { organizationIndex ->
+                    var openOrganizationLinkerSheet by remember { mutableStateOf(false) }
                     val linkData = organizationsLinkData[organizationIndex]
 
                     SharedOrganizationView(
@@ -129,21 +130,21 @@ private fun OrganizationsSelectorSection(
                             if (linkData.linkedOrganization != null) {
                                 onLinkOrganization(linkData.sharedOrganization.uid, null)
                             } else {
-                                organizationLinkedDialogState = true
+                                openOrganizationLinkerSheet = true
                             }
                         },
                     )
 
-                    if (organizationLinkedDialogState) {
-                        OrganizationLinkedDialog(
+                    if (openOrganizationLinkerSheet) {
+                        OrganizationLinkerBottomSheet(
                             selected = linkData.linkedOrganization?.convertToShort(),
                             organizations = allOrganizations.filter { organization ->
                                 organizationsLinkData.find { it.linkedOrganization?.uid == organization.uid } == null
                             },
-                            onDismiss = { organizationLinkedDialogState = false },
+                            onDismiss = { openOrganizationLinkerSheet = false },
                             onConfirm = {
                                 onLinkOrganization(linkData.sharedOrganization.uid, it?.uid)
-                                organizationLinkedDialogState = false
+                                openOrganizationLinkerSheet = false
                             },
                         )
                     }
@@ -173,20 +174,17 @@ private fun SubjectsLinkerSection(
             style = MaterialTheme.typography.titleMedium,
         )
         Crossfade(
-            targetState = isLoading,
-            animationSpec = spring(
-                stiffness = Spring.StiffnessMediumLow,
-                visibilityThreshold = Spring.DefaultDisplacementThreshold,
-            ),
-        ) { loading ->
-            if (!loading && organizationLinkData != null) {
+            targetState = if (isLoading || organizationLinkData == null) null else organizationLinkData,
+            animationSpec = floatSpring(),
+        ) { linkData ->
+            if (linkData != null) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    organizationLinkData.sharedOrganization.subjects.forEach { sharedSubject ->
+                    linkData.sharedOrganization.subjects.forEach { sharedSubject ->
                         var subjectLinkedDialogState by remember { mutableStateOf(false) }
-                        val linkedSubject = organizationLinkData.linkedSubjects[sharedSubject.uid]
+                        val linkedSubject = linkData.linkedSubjects[sharedSubject.uid]
 
                         LinkedSubjectsView(
-                            enabledLink = organizationLinkData.linkedOrganization != null,
+                            enabledLink = linkData.linkedOrganization != null,
                             sharedSubject = sharedSubject,
                             linkedSubject = linkedSubject,
                             onLinkSubject = { subjectLinkedDialogState = true }
@@ -194,13 +192,13 @@ private fun SubjectsLinkerSection(
 
                         if (subjectLinkedDialogState) {
                             SubjectLinkerDialog(
-                                selected = organizationLinkData.linkedSubjects[sharedSubject.uid],
-                                subjects = organizationLinkData.linkedOrganization?.subjects ?: emptyList(),
+                                selected = linkData.linkedSubjects[sharedSubject.uid],
+                                subjects = linkData.linkedOrganization?.subjects ?: emptyList(),
                                 onDismiss = { subjectLinkedDialogState = false },
                                 onConfirm = { subject ->
-                                    val sharedOrganizationId = organizationLinkData.sharedOrganization.uid
+                                    val sharedOrganizationId = linkData.sharedOrganization.uid
                                     val subjects = buildMap {
-                                        putAll(organizationLinkData.linkedSubjects)
+                                        putAll(linkData.linkedSubjects)
                                         if (subject != null) {
                                             put(sharedSubject.uid, subject)
                                         } else {
@@ -244,34 +242,34 @@ private fun EmployeeLinkerSection(
             style = MaterialTheme.typography.titleMedium,
         )
         Crossfade(
-            targetState = isLoading,
+            targetState = if (isLoading || organizationLinkData == null) null else organizationLinkData,
             animationSpec = spring(
                 stiffness = Spring.StiffnessMediumLow,
                 visibilityThreshold = Spring.DefaultDisplacementThreshold,
             ),
-        ) { loading ->
-            if (!loading && organizationLinkData != null) {
+        ) { linkData ->
+            if (linkData != null) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    organizationLinkData.sharedOrganization.employee.forEach { shareEmployee ->
-                        var employeesLinkedDialogState by remember { mutableStateOf(false) }
-                        val linkedEmployee = organizationLinkData.linkedTeachers[shareEmployee.uid]
+                    linkData.sharedOrganization.employee.forEach { shareEmployee ->
+                        var openEmployeesLinkerSheet by remember { mutableStateOf(false) }
+                        val linkedEmployee = linkData.linkedTeachers[shareEmployee.uid]
 
                         LinkedEmployeesView(
-                            enabledLink = organizationLinkData.linkedOrganization != null,
+                            enabledLink = linkData.linkedOrganization != null,
                             sharedTeacher = shareEmployee,
                             linkedTeacher = linkedEmployee,
-                            onLinkEmployee = { employeesLinkedDialogState = true }
+                            onLinkEmployee = { openEmployeesLinkerSheet = true }
                         )
 
-                        if (employeesLinkedDialogState) {
-                            EmployeeLinkerDialog(
-                                selected = organizationLinkData.linkedTeachers[shareEmployee.uid],
-                                employees = organizationLinkData.linkedOrganization?.employee ?: emptyList(),
-                                onDismiss = { employeesLinkedDialogState = false },
+                        if (openEmployeesLinkerSheet) {
+                            EmployeeLinkerBottomSheet(
+                                selected = linkData.linkedTeachers[shareEmployee.uid],
+                                employees = linkData.linkedOrganization?.employee ?: emptyList(),
+                                onDismiss = { openEmployeesLinkerSheet = false },
                                 onConfirm = { employee ->
-                                    val sharedOrganizationId = organizationLinkData.sharedOrganization.uid
+                                    val sharedOrganizationId = linkData.sharedOrganization.uid
                                     val employees = buildMap {
-                                        putAll(organizationLinkData.linkedTeachers)
+                                        putAll(linkData.linkedTeachers)
                                         if (employee != null) {
                                             put(shareEmployee.uid, employee)
                                         } else {
@@ -280,7 +278,7 @@ private fun EmployeeLinkerSection(
                                         Unit
                                     }
                                     onLinkTeachers(sharedOrganizationId, employees)
-                                    employeesLinkedDialogState = false
+                                    openEmployeesLinkerSheet = false
                                 },
                             )
                         }

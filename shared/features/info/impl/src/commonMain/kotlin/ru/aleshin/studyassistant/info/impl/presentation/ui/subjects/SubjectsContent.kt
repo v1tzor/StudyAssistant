@@ -17,8 +17,6 @@
 package ru.aleshin.studyassistant.info.impl.presentation.ui.subjects
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
@@ -59,7 +58,7 @@ internal fun SubjectsContent(
     Crossfade(
         modifier = modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
         targetState = isLoading,
-        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+        animationSpec = floatSpring(),
     ) { loading ->
         if (loading) {
             LazyVerticalStaggeredGrid(

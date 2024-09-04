@@ -133,7 +133,7 @@ internal interface ClassWorkProcessor :
             }
             val classOrganization = organizationId?.let { organizationId ->
                 organizationInteractor.fetchShortOrganizationById(organizationId).firstHandleAndGet(
-                    onLeftAction = { error(it) },
+                    onLeftAction = { emit(EffectResult(ClassEffect.ShowError(it))).let { null } },
                     onRightAction = { organization -> organization.mapToUi() }
                 )
             }

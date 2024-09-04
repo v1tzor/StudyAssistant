@@ -75,6 +75,7 @@ internal data class TodoScreen(private val todoId: UID?) : Screen {
             },
             bottomBar = {
                 TodoBottomActions(
+                    isLoadingSave = state.isLoadingSave,
                     saveEnabled = state.editableTodo?.isValid() == true,
                     showDeleteAction = state.editableTodo?.uid?.isNotBlank() == true,
                     onCancelClick = { dispatchEvent(TodoEvent.NavigateToBack) },

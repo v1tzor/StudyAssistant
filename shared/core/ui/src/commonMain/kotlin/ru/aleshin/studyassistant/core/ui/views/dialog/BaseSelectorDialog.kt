@@ -79,6 +79,7 @@ fun <T> BaseSelectorDialog(
     confirmEnabled: Boolean = true,
     selected: T?,
     items: List<T>,
+    itemKeys: ((T) -> Any)? = null,
     header: String,
     title: String?,
     itemView: @Composable LazyItemScope.(T) -> Unit,
@@ -125,7 +126,7 @@ fun <T> BaseSelectorDialog(
                     if (notSelectedItem != null) {
                         item(content = notSelectedItem)
                     }
-                    items(items = items, itemContent = itemView)
+                    items(items = items, key = itemKeys, itemContent = itemView)
                     if (addItemView != null) {
                         item(content = addItemView)
                     }
@@ -143,7 +144,7 @@ fun <T> BaseSelectorDialog(
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-fun LazyItemScope.SelectorDialogItemView(
+fun LazyItemScope.SelectorItemView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -211,7 +212,7 @@ fun LazyItemScope.SelectorDialogItemView(
 }
 
 @Composable
-fun LazyItemScope.SelectorDialogSwipeItemView(
+fun LazyItemScope.SelectorSwipeItemView(
     onClick: () -> Unit,
     state: SwipeToDismissBoxState,
     modifier: Modifier = Modifier,
@@ -233,7 +234,7 @@ fun LazyItemScope.SelectorDialogSwipeItemView(
         enableDismissFromStartToEnd = enableDismissFromStartToEnd,
         gesturesEnabled = gesturesEnabled,
     ) {
-        SelectorDialogItemView(
+        SelectorItemView(
             onClick = onClick,
             enabled = enabled,
             selected = selected,
@@ -245,7 +246,7 @@ fun LazyItemScope.SelectorDialogSwipeItemView(
 }
 
 @Composable
-fun LazyItemScope.SelectorDialogAddItemView(
+fun LazyItemScope.SelectorAddItemView(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onClick: () -> Unit,
@@ -279,7 +280,7 @@ fun LazyItemScope.SelectorDialogAddItemView(
 }
 
 @Composable
-fun LazyItemScope.SelectorDialogTextField(
+fun LazyItemScope.SelectorTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     value: String,
@@ -354,12 +355,12 @@ fun LazyItemScope.SelectorDialogTextField(
 }
 
 @Composable
-fun LazyItemScope.SelectorDialogNotSelectedItemView(
+fun LazyItemScope.SelectorNotSelectedItemView(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     selected: Boolean,
     onClick: () -> Unit,
-) = SelectorDialogItemView(
+) = SelectorItemView(
     modifier = modifier,
     enabled = enabled,
     onClick = onClick,

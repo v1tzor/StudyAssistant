@@ -48,6 +48,7 @@ internal fun HomeworkContent(
     scrollState: ScrollState = rememberScrollState(),
     onAddOrganization: () -> Unit,
     onAddSubject: () -> Unit,
+    onEditSubject: (SubjectUi) -> Unit,
     onSelectedOrganization: (OrganizationShortUi?) -> Unit,
     onSelectedSubject: (SubjectUi?) -> Unit,
     onSelectedDate: (Instant?) -> Unit,
@@ -73,10 +74,12 @@ internal fun HomeworkContent(
             subject = editableHomework?.subject,
             allSubjects = subjects,
             onAddSubject = onAddSubject,
+            onEditSubject = onEditSubject,
             onSelectedSubject = onSelectedSubject,
         )
         LinkedClassInfoField(
             isLoading = isLoading || isClassesLoading,
+            currentDate = currentDate,
             selectedDate = editableHomework?.deadline,
             linkedClass = editableHomework?.classId,
             classesForLinked = classesForLinking,

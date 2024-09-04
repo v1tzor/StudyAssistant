@@ -46,9 +46,9 @@ import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.MediatedEmployeeUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
@@ -147,7 +147,7 @@ internal fun LinkedEmployeesViewPlaceholder(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun EmployeeLinkerDialog(
+internal fun EmployeeLinkerBottomSheet(
     modifier: Modifier = Modifier,
     selected: EmployeeUi?,
     employees: List<EmployeeUi>,
@@ -159,14 +159,14 @@ internal fun EmployeeLinkerDialog(
     val otherEmployee by remember { derivedStateOf { employees.filter { it.post != EmployeePost.TEACHER } } }
     var selectedTeacher by remember { mutableStateOf(selectedEmployee) }
 
-    BaseSelectorDialog(
+    BaseSelectorBottomSheet(
         modifier = modifier,
         selected = selectedTeacher,
         items = teachers + otherEmployee,
         header = ScheduleThemeRes.strings.employeeLinkerDialogHeader,
         title = ScheduleThemeRes.strings.employeeLinkerDialogTitle,
         itemView = { employee ->
-            SelectorDialogItemView(
+            SelectorItemView(
                 onClick = { selectedTeacher = employee },
                 selected = employee.uid == selectedTeacher?.uid,
                 title = employee.officialName(),
@@ -174,12 +174,12 @@ internal fun EmployeeLinkerDialog(
             )
         },
         notSelectedItem = {
-            SelectorDialogNotSelectedItemView(
+            SelectorNotSelectedItemView(
                 selected = selectedTeacher == null,
                 onClick = { selectedTeacher = null },
             )
         },
-        onDismiss = onDismiss,
+        onDismissRequest = onDismiss,
         onConfirm = onConfirm,
     )
 }

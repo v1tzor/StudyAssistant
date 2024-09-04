@@ -58,9 +58,9 @@ import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
 import ru.aleshin.studyassistant.core.ui.views.DialogHeader
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.SocialNetworkUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.AddContactInfoItem
@@ -201,7 +201,7 @@ internal fun SocialNetworkEditorDialog(
     var editableService by remember { mutableStateOf(socialNetwork?.type) }
     var editableServiceName by remember { mutableStateOf(socialNetwork?.otherType) }
     var editableData by remember { mutableStateOf(socialNetwork?.data) }
-    var socialNetworkTypeSelectorState by remember { mutableStateOf(false) }
+    var openSocialNetworkTypeSelectorSheet by remember { mutableStateOf(false) }
 
     BasicAlertDialog(
         onDismissRequest = onDismiss,
@@ -221,7 +221,7 @@ internal fun SocialNetworkEditorDialog(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     ClickableTextField(
-                        onClick = { socialNetworkTypeSelectorState = true },
+                        onClick = { openSocialNetworkTypeSelectorSheet = true },
                         modifier = modifier.fillMaxWidth(),
                         value = editableService?.mapToString(StudyAssistantRes.strings),
                         label = EditorThemeRes.strings.socialNetworkServiceLabel,
@@ -230,16 +230,16 @@ internal fun SocialNetworkEditorDialog(
                         singleLine = true,
                     )
 
-                    if (socialNetworkTypeSelectorState) {
+                    if (openSocialNetworkTypeSelectorSheet) {
                         var selectedType by remember { mutableStateOf(editableService) }
-                        BaseSelectorDialog(
+                        BaseSelectorBottomSheet(
                             modifier = modifier,
                             selected = selectedType,
                             items = SocialNetworkType.entries,
                             header = EditorThemeRes.strings.socialNetworkServiceLabel,
                             title = null,
                             itemView = { socialNetworkType ->
-                                SelectorDialogItemView(
+                                SelectorItemView(
                                     onClick = { selectedType = socialNetworkType },
                                     selected = socialNetworkType == selectedType,
                                     label = null,
@@ -265,15 +265,15 @@ internal fun SocialNetworkEditorDialog(
                                 )
                             },
                             notSelectedItem = {
-                                SelectorDialogNotSelectedItemView(
+                                SelectorNotSelectedItemView(
                                     selected = selectedType == null,
                                     onClick = { selectedType = null },
                                 )
                             },
-                            onDismiss = { socialNetworkTypeSelectorState = false },
+                            onDismissRequest = { openSocialNetworkTypeSelectorSheet = false },
                             onConfirm = {
                                 editableService = selectedType
-                                socialNetworkTypeSelectorState = false
+                                openSocialNetworkTypeSelectorSheet = false
                             },
                         )
                     }

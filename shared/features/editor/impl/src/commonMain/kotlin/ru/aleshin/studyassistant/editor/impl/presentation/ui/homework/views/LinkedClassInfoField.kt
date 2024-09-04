@@ -18,8 +18,6 @@ package ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.views
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,6 +45,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,9 +57,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -78,6 +80,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 internal fun LinkedClassInfoField(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    currentDate: Instant,
     selectedDate: Instant?,
     linkedClass: UID?,
     classesForLinked: ClassesForLinkedMapUi,
@@ -116,6 +119,7 @@ internal fun LinkedClassInfoField(
             )
             LinkClassView(
                 isLoading = isLoading,
+                currentDate = currentDate,
                 selectedDate = selectedDate,
                 linkedClass = linkedClass,
                 classesForLinked = classesForLinked,
@@ -139,6 +143,7 @@ private fun LinkClassView(
     modifier: Modifier = Modifier,
     gridState: LazyGridState = rememberLazyGridState(),
     isLoading: Boolean,
+    currentDate: Instant,
     selectedDate: Instant?,
     linkedClass: UID?,
     classesForLinked: ClassesForLinkedMapUi,
@@ -161,7 +166,7 @@ private fun LinkClassView(
             )
             Crossfade(
                 targetState = classesForLinked,
-                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                animationSpec = floatSpring(),
             ) { linkClasses ->
                 if (isLoading) {
                     Box(
@@ -176,6 +181,9 @@ private fun LinkClassView(
                 } else if (linkClasses.isNotEmpty()) {
                     val classes = buildList {
                         linkClasses.forEach { entry -> addAll(entry.value.map { Pair(entry.key, it) }) }
+                    }
+                    val nextClass = classes.find {
+                        currentDate.daysUntil(it.first, TimeZone.currentSystemDefault()) >= 1
                     }
                     LazyHorizontalGrid(
                         rows = GridCells.Fixed(2),
@@ -195,9 +203,16 @@ private fun LinkClassView(
                                 onClick = { onSelectedClass(dateClassModel.second, dateClassModel.first) },
                                 selected = linkedClass == dateClassModel.second.uid &&
                                     dateClassModel.first.equalsDay(selectedDate),
+                                isNext = nextClass == dateClassModel,
                                 date = dateClassModel.first,
                                 numberOfClass = dateClassModel.second.number,
                             )
+                        }
+                    }
+
+                    LaunchedEffect(classes, nextClass) {
+                        if (linkedClass == null && nextClass != null && selectedDate == null) {
+                            onSelectedClass(nextClass.second, nextClass.first)
                         }
                     }
                 } else {
@@ -219,16 +234,19 @@ private fun LinkClassItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     selected: Boolean,
+    isNext: Boolean,
     date: Instant,
     numberOfClass: Int,
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.width(100.dp),
+        modifier = modifier.width(110.dp),
         enabled = enabled,
         shape = MaterialTheme.shapes.small,
         color = if (selected) {
             MaterialTheme.colorScheme.primaryContainer
+        } else if (isNext) {
+            StudyAssistantRes.colors.accents.orangeContainer
         } else {
             MaterialTheme.colorScheme.surfaceContainer
         },
@@ -238,7 +256,11 @@ private fun LinkClassItem(
                 text = date.formatByTimeZone(
                     format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings)
                 ),
-                color = MaterialTheme.colorScheme.primary,
+                color = if (isNext) {
+                    StudyAssistantRes.colors.accents.orange
+                } else {
+                    MaterialTheme.colorScheme.primary
+                },
                 fontWeight = FontWeight.Bold,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
@@ -251,6 +273,8 @@ private fun LinkClassItem(
                 },
                 color = if (selected) {
                     MaterialTheme.colorScheme.onPrimaryContainer
+                } else if (isNext) {
+                    StudyAssistantRes.colors.accents.onOrangeContainer
                 } else {
                     MaterialTheme.colorScheme.onSurface
                 },

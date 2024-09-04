@@ -62,9 +62,9 @@ import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
@@ -266,7 +266,7 @@ internal fun SharedOrganizationViewPlaceholder(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun OrganizationLinkedDialog(
+internal fun OrganizationLinkerBottomSheet(
     modifier: Modifier = Modifier,
     selected: OrganizationShortUi?,
     organizations: List<OrganizationShortUi>,
@@ -275,14 +275,14 @@ internal fun OrganizationLinkedDialog(
 ) {
     var selectedOrganization by remember { mutableStateOf(selected) }
 
-    BaseSelectorDialog(
+    BaseSelectorBottomSheet(
         modifier = modifier,
         selected = selectedOrganization,
         items = organizations,
         header = ScheduleThemeRes.strings.organizationLinkerDialogHeader,
         title = ScheduleThemeRes.strings.organizationLinkerDialogTitle,
         itemView = { organization ->
-            SelectorDialogItemView(
+            SelectorItemView(
                 onClick = { selectedOrganization = organization },
                 selected = organization.uid == selectedOrganization?.uid,
                 title = organization.shortName,
@@ -290,12 +290,12 @@ internal fun OrganizationLinkedDialog(
             )
         },
         notSelectedItem = {
-            SelectorDialogNotSelectedItemView(
+            SelectorNotSelectedItemView(
                 selected = selectedOrganization == null,
                 onClick = { selectedOrganization = null },
             )
         },
-        onDismiss = onDismiss,
+        onDismissRequest = onDismiss,
         onConfirm = onConfirm,
     )
 }

@@ -43,18 +43,17 @@ internal data class MediatedBaseScheduleUi(
 internal fun MediatedBaseScheduleUi.convertToBase(
     linkDataMapper: (UID) -> OrganizationLinkData
 ): BaseScheduleUi {
-    val groupedClasses = classes.groupBy { it.organizationId }
+    val sortedClasses = classes.sortedBy { classModel -> classModel.timeRange.from.dateTime().time }
+    val groupedClasses = sortedClasses.groupBy { it.organizationId }
     return BaseScheduleUi(
         uid = uid,
         dateVersion = dateVersion.mapToUi(),
         dayOfWeek = dayOfWeek,
         week = week,
-        classes = classes.map { classModel ->
+        classes = sortedClasses.map { classModel ->
             val number = groupedClasses[classModel.organizationId]?.indexOf(classModel)?.inc() ?: 0
             val linkData = linkDataMapper(classModel.organizationId)
             classModel.convertToBase(linkData, number)
-        }.sortedBy { classModel ->
-            classModel.timeRange.from.dateTime().time
         },
     )
 }

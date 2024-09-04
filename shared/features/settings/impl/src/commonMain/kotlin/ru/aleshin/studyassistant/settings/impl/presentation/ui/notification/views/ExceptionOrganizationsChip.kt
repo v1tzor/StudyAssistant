@@ -35,7 +35,7 @@ import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseCheckedDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.CheckedDialogItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.CheckedItemView
 import ru.aleshin.studyassistant.settings.impl.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
 
@@ -121,7 +121,7 @@ private fun OrganizationSelectorDialog(
         title = SettingsThemeRes.strings.exceptionOrganizationsDialogTitle,
         itemView = { organization ->
             val isSelected = selectedOrganization.contains(organization)
-            CheckedDialogItemView(
+            CheckedItemView(
                 onClick = {
                     selectedOrganization = if (isSelected) {
                         selectedOrganization.toMutableList().apply { remove(organization) }

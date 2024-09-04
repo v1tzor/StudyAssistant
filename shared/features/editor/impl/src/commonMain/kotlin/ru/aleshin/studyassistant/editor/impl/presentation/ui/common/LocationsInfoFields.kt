@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
@@ -46,7 +45,6 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
  * @author Stanislav Aleshin on 06.06.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun LocationsInfoFields(
     modifier: Modifier = Modifier,
     isLoading: Boolean,

@@ -93,8 +93,11 @@ internal class ClassScreenModel(
                     teacher = null,
                     office = null,
                     location = null,
+                    startTime = null,
+                    endTime = null,
                 )
                 sendAction(ClassAction.UpdateEditModel(updatedClass))
+                sendAction(ClassAction.UpdateFreeClasses(null))
                 launchBackgroundWork(BackgroundKey.LOAD_SUBJECTS) {
                     val command = ClassWorkCommand.LoadSubjects(event.organization?.uid)
                     workProcessor.work(command).collectAndHandleWork()

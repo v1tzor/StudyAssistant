@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.Backg
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
 import ru.aleshin.studyassistant.editor.impl.navigation.EditorScreenProvider
@@ -40,6 +41,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.contarct.H
 internal class HomeworkScreenModel(
     private val workProcessor: HomeworkWorkProcessor,
     private val screenProvider: EditorScreenProvider,
+    private val dateManager: DateManager,
     stateCommunicator: HomeworkStateCommunicator,
     effectCommunicator: HomeworkEffectCommunicator,
     coroutineManager: CoroutineManager,
@@ -62,6 +64,7 @@ internal class HomeworkScreenModel(
         when (event) {
             is HomeworkEvent.Init -> with(event) {
                 val date = date?.mapEpochTimeToInstant()
+                sendAction(HomeworkAction.UpdateCurrentDate(dateManager.fetchBeginningCurrentInstant()))
                 launchBackgroundWork(BackgroundKey.LOAD_HOMEWORK) {
                     val command = HomeworkWorkCommand.LoadEditModel(
                         homeworkId = homeworkId,
@@ -104,12 +107,12 @@ internal class HomeworkScreenModel(
                 val updatedHomework = editableHomework?.copy(
                     subject = event.subject,
                     classId = null,
+                    deadline = null,
                 )
                 sendAction(HomeworkAction.UpdateEditModel(updatedHomework))
                 launchBackgroundWork(BackgroundKey.LOAD_CLASSES) {
                     val subjectId = event.subject?.uid
-                    val instant = editableHomework?.deadline
-                    val command = HomeworkWorkCommand.LoadClassesForLinked(subjectId, instant)
+                    val command = HomeworkWorkCommand.LoadClassesForLinked(subjectId, currentDate)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -206,8 +209,14 @@ internal class HomeworkScreenModel(
             classesForLinking = action.classes,
             isClassesLoading = false,
         )
+        is HomeworkAction.UpdateCurrentDate -> currentState.copy(
+            currentDate = action.date,
+        )
         is HomeworkAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
+        )
+        is HomeworkAction.UpdateLoadingSave -> currentState.copy(
+            isLoadingSave = action.isLoading,
         )
         is HomeworkAction.UpdateClassesLoading -> currentState.copy(
             isClassesLoading = action.isLoading,

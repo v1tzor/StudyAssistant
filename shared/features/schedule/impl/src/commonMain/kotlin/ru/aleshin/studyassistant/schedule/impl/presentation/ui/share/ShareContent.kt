@@ -17,8 +17,6 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.share
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,6 +47,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
 import kotlinx.datetime.isoDayNumber
+import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.BaseScheduleUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.NumberOfWeekItem
@@ -126,10 +125,7 @@ private fun SenderSection(
         )
         Crossfade(
             targetState = isLoading,
-            animationSpec = spring(
-                stiffness = Spring.StiffnessMediumLow,
-                visibilityThreshold = Spring.DefaultDisplacementThreshold,
-            ),
+            animationSpec = floatSpring(),
         ) { loading ->
             if (!loading && receivedMediatedSchedules != null) {
                 SenderUserView(
@@ -183,10 +179,7 @@ private fun SharedScheduleSection(
         }
         Crossfade(
             targetState = isLoading,
-            animationSpec = spring(
-                stiffness = Spring.StiffnessMediumLow,
-                visibilityThreshold = Spring.DefaultDisplacementThreshold,
-            )
+            animationSpec = floatSpring(),
         ) { loading ->
             if (!loading) {
                 LazyRow(

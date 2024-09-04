@@ -38,9 +38,9 @@ import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogAddItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorAddItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.NumberedClassUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
@@ -71,7 +71,7 @@ internal fun SubjectSelectorDialog(
         header = TasksThemeRes.strings.subjectSelectorHeader,
         title = TasksThemeRes.strings.subjectSelectorTitle,
         itemView = { subject ->
-            SelectorDialogItemView(
+            SelectorItemView(
                 onClick = { selectedSubject = subject },
                 selected = subject.uid == selectedSubject?.uid,
                 title = subject.name,
@@ -87,13 +87,13 @@ internal fun SubjectSelectorDialog(
             )
         },
         addItemView = {
-            SelectorDialogAddItemView(
+            SelectorAddItemView(
                 enabled = targetOrganization != null,
                 onClick = { if (targetOrganization != null) onAddSubject(targetOrganization.uid) }
             )
         },
         notSelectedItem = {
-            SelectorDialogNotSelectedItemView(
+            SelectorNotSelectedItemView(
                 selected = selectedSubject == null,
                 onClick = { selectedSubject = null },
             )
@@ -130,7 +130,7 @@ internal fun LinkedClassSelectorDialog(
         header = TasksThemeRes.strings.linkedClassSelectorHeader,
         title = TasksThemeRes.strings.linkedClassSelectorTitle,
         itemView = { classModel ->
-            SelectorDialogItemView(
+            SelectorItemView(
                 onClick = { selectedClass = classModel },
                 selected = classModel.data.uid == selectedClass?.data?.uid,
                 title = classModel.data.subject?.name ?: StudyAssistantRes.strings.noneTitle,
@@ -149,7 +149,7 @@ internal fun LinkedClassSelectorDialog(
             )
         },
         notSelectedItem = {
-            SelectorDialogNotSelectedItemView(
+            SelectorNotSelectedItemView(
                 selected = selectedClass == null,
                 onClick = { selectedClass = null },
             )

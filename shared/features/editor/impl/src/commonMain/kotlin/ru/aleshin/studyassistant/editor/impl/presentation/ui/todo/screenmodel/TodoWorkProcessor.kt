@@ -17,10 +17,13 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.screenmodel
 
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.firstRightOrNull
 import ru.aleshin.studyassistant.core.common.functional.handle
@@ -58,11 +61,15 @@ internal interface TodoWorkProcessor : FlowWorkProcessor<TodoWorkCommand, TodoAc
             emit(ActionResult(TodoAction.SetupEditModel(editModel)))
         }
 
-        private fun saveTodoWork(todo: EditTodoUi) = flow {
+        private fun saveTodoWork(todo: EditTodoUi) = flow<TodoWorkResult> {
             todoInteractor.addOrUpdateTodo(todo.convertToBase().mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(TodoEffect.ShowError(it))) },
                 onRightAction = { emit(EffectResult(TodoEffect.NavigateToBack)) },
             )
+        }.onStart {
+            emit(ActionResult(TodoAction.UpdateLoadingSave(true)))
+        }.onCompletion {
+            emit(ActionResult(TodoAction.UpdateLoadingSave(false)))
         }
 
         private fun deleteTodoWork(todo: EditTodoUi) = flow {
@@ -79,3 +86,5 @@ internal sealed class TodoWorkCommand : WorkCommand {
     data class SaveTodo(val todo: EditTodoUi) : TodoWorkCommand()
     data class DeleteTodo(val todo: EditTodoUi) : TodoWorkCommand()
 }
+
+internal typealias TodoWorkResult = WorkResult<TodoAction, TodoEffect>

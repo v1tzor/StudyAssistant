@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
+import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -48,7 +49,9 @@ internal interface SubjectInteractor {
         }
 
         override suspend fun fetchAllSubjectsByOrganization(organizationId: UID) = eitherWrapper.wrapFlow {
-            subjectsRepository.fetchAllSubjectsByOrganization(organizationId, targetUser)
+            subjectsRepository.fetchAllSubjectsByOrganization(organizationId, targetUser).map { subjects ->
+                subjects.sortedBy { subject -> subject.name }
+            }
         }
 
         override suspend fun fetchSubjectById(uid: UID) = eitherWrapper.wrapFlow {

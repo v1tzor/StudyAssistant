@@ -32,9 +32,9 @@ import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 
 /**
@@ -47,10 +47,10 @@ internal fun OrganizationTypeInfoField(
     type: OrganizationType?,
     onSelected: (OrganizationType?) -> Unit,
 ) {
-    var organizationTypeSelectorState by remember { mutableStateOf(false) }
+    var openOrganizationTypeSelector by remember { mutableStateOf(false) }
 
     ClickableInfoTextField(
-        onClick = { organizationTypeSelectorState = true },
+        onClick = { openOrganizationTypeSelector = true },
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
         value = type?.mapToSting(StudyAssistantRes.strings),
@@ -59,19 +59,19 @@ internal fun OrganizationTypeInfoField(
         infoIcon = painterResource(StudyAssistantRes.icons.organizationType),
         trailingIcon = {
             ExpandedIcon(
-                isExpanded = organizationTypeSelectorState,
+                isExpanded = openOrganizationTypeSelector,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
     )
 
-    if (organizationTypeSelectorState) {
-        OrganizationTypeSelectorDialog(
+    if (openOrganizationTypeSelector) {
+        OrganizationTypeSelectorBottomSheet(
             selected = type,
-            onDismiss = { organizationTypeSelectorState = false },
+            onDismiss = { openOrganizationTypeSelector = false },
             onConfirm = { selectedEventType ->
                 onSelected(selectedEventType)
-                organizationTypeSelectorState = false
+                openOrganizationTypeSelector = false
             },
         )
     }
@@ -79,7 +79,7 @@ internal fun OrganizationTypeInfoField(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun OrganizationTypeSelectorDialog(
+internal fun OrganizationTypeSelectorBottomSheet(
     modifier: Modifier = Modifier,
     selected: OrganizationType?,
     onDismiss: () -> Unit,
@@ -87,14 +87,14 @@ internal fun OrganizationTypeSelectorDialog(
 ) {
     var selectedType by remember { mutableStateOf(selected) }
 
-    BaseSelectorDialog(
+    BaseSelectorBottomSheet(
         modifier = modifier,
         selected = selectedType,
         items = OrganizationType.entries,
         header = EditorThemeRes.strings.orgTypeSelectorHeader,
         title = null,
         itemView = { type ->
-            SelectorDialogItemView(
+            SelectorItemView(
                 onClick = { selectedType = type },
                 selected = type == selectedType,
                 title = type.mapToSting(StudyAssistantRes.strings),
@@ -102,12 +102,12 @@ internal fun OrganizationTypeSelectorDialog(
             )
         },
         notSelectedItem = {
-            SelectorDialogNotSelectedItemView(
+            SelectorNotSelectedItemView(
                 selected = selectedType == null,
                 onClick = { selectedType = null },
             )
         },
-        onDismiss = onDismiss,
+        onDismissRequest = onDismiss,
         onConfirm = onConfirm,
     )
 }

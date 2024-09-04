@@ -84,8 +84,9 @@ internal class SubjectsScreenModel(
                 }
             }
             is SubjectsEvent.SelectedSortedType -> with(state()) {
-                launchBackgroundWork(BackgroundKey.SORT_SUBJECTS) {
-                    val command = SubjectsWorkCommand.SortSubjects(subjects, event.sortedType)
+                launchBackgroundWork(BackgroundKey.LOAD_SUBJECTS) {
+                    val selectedOrganization = checkNotNull(selectedOrganization)
+                    val command = SubjectsWorkCommand.LoadSubjects(selectedOrganization, event.sortedType)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -129,7 +130,7 @@ internal class SubjectsScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_ORGANIZATIONS, LOAD_SUBJECTS, SORT_SUBJECTS, DELETE_SUBJECT
+        LOAD_ORGANIZATIONS, LOAD_SUBJECTS, DELETE_SUBJECT
     }
 }
 

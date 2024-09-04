@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
+package ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -23,9 +23,11 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -37,127 +39,77 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
-import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorAddItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorSwipeItemView
-import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
 import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 
 /**
- * @author Stanislav Aleshin on 05.06.2024.
+ * @author Stanislav Aleshin on 02.06.2024.
  */
 @Composable
-internal fun TeacherInfoField(
-    modifier: Modifier = Modifier,
-    enabledAddTeacher: Boolean,
-    isLoading: Boolean,
-    teacher: EmployeeUi?,
-    allEmployee: List<EmployeeDetailsUi>,
-    onAddTeacher: () -> Unit,
-    onEditTeacher: (EmployeeDetailsUi) -> Unit,
-    onSelected: (EmployeeDetailsUi?) -> Unit,
-) {
-    var openTeacherSelectorSheet by remember { mutableStateOf(false) }
-
-    ClickableInfoTextField(
-        onClick = { openTeacherSelectorSheet = true },
-        modifier = modifier.padding(start = 16.dp, end = 24.dp),
-        enabled = !isLoading,
-        value = teacher?.fullName(),
-        label = EditorThemeRes.strings.teacherFieldLabel,
-        placeholder = EditorThemeRes.strings.teacherFieldPlaceholder,
-        infoIcon = painterResource(StudyAssistantRes.icons.employee),
-        trailingIcon = {
-            ExpandedIcon(
-                isExpanded = openTeacherSelectorSheet,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        },
-    )
-
-    if (openTeacherSelectorSheet) {
-        TeacherSelectorBottomSheet(
-            enabledAdd = enabledAddTeacher,
-            selected = teacher,
-            employees = allEmployee,
-            onAddTeacher = onAddTeacher,
-            onEditTeacher = onEditTeacher,
-            onDismiss = { openTeacherSelectorSheet = false },
-            onConfirm = {
-                onSelected(it)
-                openTeacherSelectorSheet = false
-            },
-        )
-    }
-}
-
-@Composable
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun TeacherSelectorBottomSheet(
-    modifier: Modifier = Modifier,
+internal fun SubjectSelectorBottomSheet(
     enabledAdd: Boolean,
-    selected: EmployeeUi?,
-    employees: List<EmployeeDetailsUi>,
-    onAddTeacher: () -> Unit,
-    onEditTeacher: (EmployeeDetailsUi) -> Unit,
+    modifier: Modifier = Modifier,
+    eventType: EventType?,
+    selected: SubjectUi?,
+    subjects: List<SubjectUi>,
+    onAddSubject: () -> Unit,
+    onEditSubject: (SubjectUi) -> Unit,
     onDismiss: () -> Unit,
-    onConfirm: (EmployeeDetailsUi?) -> Unit,
+    onConfirm: (SubjectUi?) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val searchInteractionSource = remember { MutableInteractionSource() }
     val isFocus = searchInteractionSource.collectIsFocusedAsState().value
-    var searchQuery by remember { mutableStateOf<String?>(null) }
-    val selectedEmployee by derivedStateOf { employees.find { it.uid == selected?.uid } }
-    val searchedTeachers = remember(searchQuery, employees) {
-        employees.filter { employee ->
-            val firstNameFilter = employee.firstName.contains(searchQuery ?: "", true)
-            val secondNameFilter = employee.secondName?.contains(searchQuery ?: "", true) ?: false
-            val patronymicFilter = employee.patronymic?.contains(searchQuery ?: "", true) ?: false
-            return@filter searchQuery == null || (firstNameFilter or secondNameFilter or patronymicFilter)
+    var searchQuery by rememberSaveable { mutableStateOf<String?>(null) }
+    val searchedSubjects = remember(searchQuery, subjects) {
+        subjects.filter { subject ->
+            searchQuery == null || subject.name.contains(searchQuery ?: "", true)
         }
     }
-    val teachers = remember(searchedTeachers) {
-        searchedTeachers.filter { it.post == EmployeePost.TEACHER }
+    val subjectsByEventType = remember(searchedSubjects, eventType) {
+        searchedSubjects.filter { it.eventType == eventType }
     }
-    val otherEmployee = remember(searchedTeachers) {
-        searchedTeachers.filter { it.post != EmployeePost.TEACHER }
+    val otherSubjects = remember(searchedSubjects, eventType) {
+        searchedSubjects.filter { it.eventType != eventType }.sortedBy { it.eventType }
     }
-    var selectedTeacher by remember { mutableStateOf(selectedEmployee) }
+    var selectedSubject by remember { mutableStateOf(selected) }
 
     BaseSelectorBottomSheet(
         modifier = modifier,
-        selected = selectedTeacher,
-        items = teachers + otherEmployee,
-        header = EditorThemeRes.strings.teacherSelectorHeader,
-        title = EditorThemeRes.strings.teacherSelectorTitle,
-        itemView = { employee ->
+        selected = selectedSubject,
+        items = subjectsByEventType + otherSubjects,
+        header = EditorThemeRes.strings.subjectSelectorHeader,
+        title = EditorThemeRes.strings.subjectSelectorTitle,
+        itemView = { subject ->
             val dismissState = rememberSwipeToDismissBoxState(
                 confirmValueChange = { dismissBoxValue ->
                     when (dismissBoxValue) {
                         SwipeToDismissBoxValue.StartToEnd -> Unit
-                        SwipeToDismissBoxValue.EndToStart -> onEditTeacher(employee)
+                        SwipeToDismissBoxValue.EndToStart -> onEditSubject(subject)
                         SwipeToDismissBoxValue.Settled -> Unit
                     }
                     return@rememberSwipeToDismissBoxState false
@@ -167,21 +119,18 @@ internal fun TeacherSelectorBottomSheet(
             SelectorSwipeItemView(
                 onClick = {
                     if (isFocus) focusManager.clearFocus()
-                    selectedTeacher = employee
+                    selectedSubject = subject
                 },
                 state = dismissState,
-                selected = employee.uid == selectedTeacher?.uid,
-                title = employee.fullName(),
-                label = employee.subjects.firstOrNull()?.name ?: employee.post.mapToString(StudyAssistantRes.strings),
+                selected = subject.uid == selectedSubject?.uid,
+                title = subject.name,
+                label = subject.eventType.mapToString(StudyAssistantRes.strings),
                 leadingIcon = {
-                    AvatarView(
-                        modifier = modifier.size(40.dp),
-                        firstName = employee.firstName,
-                        secondName = employee.patronymic ?: employee.secondName,
-                        imageUrl = employee.avatar,
-                        style = MaterialTheme.typography.titleMedium,
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    Surface(
+                        modifier = Modifier.height(IntrinsicSize.Min),
+                        shape = MaterialTheme.shapes.full,
+                        color = Color(subject.color),
+                        content = { Box(modifier = Modifier.size(8.dp, 24.dp)) },
                     )
                 },
                 enableDismissFromStartToEnd = false,
@@ -199,17 +148,25 @@ internal fun TeacherSelectorBottomSheet(
                 },
             )
         },
-        addItemView = {
-            SelectorAddItemView(
-                enabled = enabledAdd,
-                onClick = onAddTeacher,
-            )
+        addItemView = if (searchQuery == null) {
+            {
+                SelectorAddItemView(
+                    enabled = enabledAdd,
+                    onClick = onAddSubject
+                )
+            }
+        } else {
+            null
         },
-        notSelectedItem = {
-            SelectorNotSelectedItemView(
-                selected = selectedTeacher == null,
-                onClick = { selectedTeacher = null },
-            )
+        notSelectedItem = if (searchQuery == null) {
+            {
+                SelectorNotSelectedItemView(
+                    selected = selectedSubject == null,
+                    onClick = { selectedSubject = null },
+                )
+            }
+        } else {
+            null
         },
         searchBar = {
             SearchBar(
@@ -225,7 +182,7 @@ internal fun TeacherSelectorBottomSheet(
                         onExpandedChange = {},
                         enabled = true,
                         placeholder = {
-                            Text(text = EditorThemeRes.strings.employeeSearchBarPlaceholder)
+                            Text(text = EditorThemeRes.strings.subjectsSearchBarPlaceholder)
                         },
                         leadingIcon = {
                             Icon(

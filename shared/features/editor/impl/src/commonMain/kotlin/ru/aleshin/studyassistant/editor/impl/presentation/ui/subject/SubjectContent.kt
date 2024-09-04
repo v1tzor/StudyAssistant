@@ -45,6 +45,7 @@ internal fun SubjectContent(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     onAddTeacher: () -> Unit,
+    onEditTeacher: (EmployeeDetailsUi) -> Unit,
     onUpdateLocations: (List<ContactInfoUi>) -> Unit,
     onUpdateOffices: (List<String>) -> Unit,
     onSelectEventType: (EventType?) -> Unit,
@@ -81,6 +82,7 @@ internal fun SubjectContent(
                 teacher = editableSubject?.teacher,
                 allEmployee = employees,
                 onAddTeacher = onAddTeacher,
+                onEditTeacher = onEditTeacher,
                 onSelected = onSelectTeacher,
             )
             LocationInfoField(

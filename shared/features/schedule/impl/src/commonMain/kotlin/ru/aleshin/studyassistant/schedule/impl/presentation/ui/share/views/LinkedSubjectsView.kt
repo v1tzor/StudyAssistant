@@ -51,8 +51,8 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.MediatedSubjectUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
@@ -183,7 +183,7 @@ internal fun SubjectLinkerDialog(
         header = ScheduleThemeRes.strings.subjectLinkerDialogHeader,
         title = ScheduleThemeRes.strings.subjectLinkerDialogTitle,
         itemView = { subject ->
-            SelectorDialogItemView(
+            SelectorItemView(
                 onClick = { selectedSubject = subject },
                 selected = subject.uid == selectedSubject?.uid,
                 title = subject.name,
@@ -199,7 +199,7 @@ internal fun SubjectLinkerDialog(
             )
         },
         notSelectedItem = {
-            SelectorDialogNotSelectedItemView(
+            SelectorNotSelectedItemView(
                 selected = selectedSubject == null,
                 onClick = { selectedSubject = null },
             )

@@ -20,11 +20,13 @@ import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
@@ -41,8 +43,11 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.EditHomew
 @Parcelize
 internal data class HomeworkViewState(
     val isLoading: Boolean = true,
+    val isLoadingSave: Boolean = false,
     val isClassesLoading: Boolean = true,
     val editableHomework: EditHomeworkUi? = null,
+    @TypeParceler<Instant, InstantParceler>
+    val currentDate: Instant = Clock.System.now().startThisDay(),
     val organizations: List<OrganizationShortUi> = emptyList(),
     val subjects: List<SubjectUi> = emptyList(),
     @TypeParceler<Instant, InstantParceler>
@@ -83,6 +88,8 @@ internal sealed class HomeworkAction : BaseAction {
     data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : HomeworkAction()
     data class UpdateSubjects(val subjects: List<SubjectUi>) : HomeworkAction()
     data class UpdateClassesForLinked(val classes: ClassesForLinkedMapUi) : HomeworkAction()
+    data class UpdateCurrentDate(val date: Instant) : HomeworkAction()
     data class UpdateLoading(val isLoading: Boolean) : HomeworkAction()
+    data class UpdateLoadingSave(val isLoading: Boolean) : HomeworkAction()
     data class UpdateClassesLoading(val isLoading: Boolean) : HomeworkAction()
 }

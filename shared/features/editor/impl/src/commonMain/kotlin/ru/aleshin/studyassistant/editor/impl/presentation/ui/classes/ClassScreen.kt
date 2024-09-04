@@ -27,6 +27,8 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
@@ -44,13 +46,14 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.Class
 /**
  * @author Stanislav Aleshin on 02.06.2024
  */
+@Parcelize
 internal class ClassScreen(
     private val classId: UID?,
     private val scheduleId: UID?,
     private val organizationId: UID?,
     private val customSchedule: Boolean,
     private val weekDay: DayOfNumberedWeekUi,
-) : Screen {
+) : Screen, Parcelable {
 
     @Composable
     override fun Content() = ScreenContent(
@@ -77,6 +80,8 @@ internal class ClassScreen(
                     onAddOrganization = { dispatchEvent(ClassEvent.NavigateToOrganizationEditor(null)) },
                     onAddSubject = { dispatchEvent(ClassEvent.NavigateToSubjectEditor(null)) },
                     onAddTeacher = { dispatchEvent(ClassEvent.NavigateToEmployeeEditor(null)) },
+                    onEditSubject = { dispatchEvent(ClassEvent.NavigateToSubjectEditor(it.uid)) },
+                    onEditEmployee = { dispatchEvent(ClassEvent.NavigateToEmployeeEditor(it.uid)) },
                     onUpdateLocations = { dispatchEvent(ClassEvent.UpdateOrganizationLocations(it)) },
                     onUpdateOffices = { dispatchEvent(ClassEvent.UpdateOrganizationOffices(it)) },
                     onSelectOrganization = { dispatchEvent(ClassEvent.UpdateOrganization(it)) },

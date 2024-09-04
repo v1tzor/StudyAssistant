@@ -22,7 +22,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_FUTURE
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.dateTimeByWeek
+import ru.aleshin.studyassistant.core.common.extensions.shiftWeek
+import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.functional.Constants.Date.DAYS_IN_WEEK
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.payments.SubscriptionChecker
@@ -107,12 +113,7 @@ class BaseScheduleRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.fetchSchedulesByVersion(
-                version.from,
-                version.to,
-                numberOfWeek,
-                targetUser
-            ).map { schedules ->
+            remoteDataSource.fetchSchedulesByVersion(version.from, version.to, numberOfWeek, targetUser).map { schedules ->
                 schedules.map { baseSchedulePojo -> baseSchedulePojo.mapToDomain() }
             }
         } else {
@@ -130,15 +131,22 @@ class BaseScheduleRepositoryImpl(
         val scheduleListFlow = fetchSchedulesByVersion(timeRange, null, targetUser)
         return scheduleListFlow.map { schedules ->
             return@map buildMap<Instant, BaseSchedule?> {
-                timeRange.periodDates().forEach { targetDate ->
-                    val targetWeekDay = targetDate.dateTime().dayOfWeek
-                    val targetWeek = targetDate.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
-                    val schedulesByDate = schedules.find { schedule ->
-                        val versionFilter = schedule.dateVersion.containsDate(targetDate)
-                        val dateFilter = schedule.week == targetWeek && schedule.dayOfWeek == targetWeekDay
-                        return@find versionFilter && dateFilter
+                schedules.forEach { schedule ->
+                    val firstDate = schedule.dayOfWeek.dateTimeByWeek(schedule.dateVersion.from)
+                    val firstWeek = firstDate.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
+                    val targetDate = firstDate.shiftWeek(schedule.week.isoRepeatWeekNumber - firstWeek.isoRepeatWeekNumber)
+                    val untilEnd = if (timeRange.to > schedule.dateVersion.to) {
+                        targetDate.daysUntil(schedule.dateVersion.to, TimeZone.currentSystemDefault())
+                    } else {
+                        targetDate.daysUntil(timeRange.to, TimeZone.currentSystemDefault())
                     }
-                    put(targetDate, schedulesByDate)
+                    if (untilEnd >= 0) {
+                        val repeats = untilEnd / (maxNumberOfWeek.isoRepeatWeekNumber * DAYS_IN_WEEK)
+                        for (i in 0..repeats) {
+                            val date = targetDate.shiftWeek(i * maxNumberOfWeek.isoRepeatWeekNumber)
+                            if (timeRange.containsDate(date)) put(date.startThisDay(), schedule)
+                        }
+                    }
                 }
             }
         }

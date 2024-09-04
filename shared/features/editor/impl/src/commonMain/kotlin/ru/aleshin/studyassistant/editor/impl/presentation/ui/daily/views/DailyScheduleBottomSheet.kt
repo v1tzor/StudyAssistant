@@ -54,7 +54,7 @@ import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.tokens.dayOfWeekNames
 import ru.aleshin.studyassistant.core.ui.theme.tokens.monthNames
-import ru.aleshin.studyassistant.core.ui.views.StickyBottomSheet
+import ru.aleshin.studyassistant.core.ui.views.sheet.StickyBottomSheet
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.FastEditDurations
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.CustomScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes

@@ -44,7 +44,7 @@ import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
 import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToString
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectSortedType
@@ -154,7 +154,7 @@ private fun SortedTypePickerDialog(
         header = InfoThemeRes.strings.subjectSortedTypeSelectorHeader,
         title = InfoThemeRes.strings.subjectSortedTypeSelectorTitle,
         itemView = { sortedType ->
-            SelectorDialogItemView(
+            SelectorItemView(
                 onClick = { selectedSortedType = sortedType },
                 selected = sortedType == selectedSortedType,
                 title = sortedType.mapToString(InfoThemeRes.strings),

@@ -28,11 +28,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,16 +55,18 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 internal fun ClassTimeRangeChooser(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    currentTime: TimeRange?,
+    selectedTime: TimeRange?,
     freeClassTimeRanges: Map<TimeRange, Boolean>?,
     onChoose: (TimeRange) -> Unit,
 ) {
+    val rowState = rememberLazyListState()
     LazyRow(
         modifier = modifier
             .fillMaxWidth()
             .height(28.dp)
             .clip(MaterialTheme.shapes.small)
             .background(MaterialTheme.colorScheme.surfaceContainer),
+        state = rowState,
         horizontalArrangement = Arrangement.spacedBy(2.dp),
         verticalAlignment = Alignment.CenterVertically,
         userScrollEnabled = enabled,
@@ -71,7 +75,7 @@ internal fun ClassTimeRangeChooser(
             items(freeClassTimeRanges.keys.toList(), key = { it.from.toString() }) { timeRange ->
                 ClassTimeRangeItem(
                     enabled = enabled,
-                    selected = timeRange.timeEquals(currentTime),
+                    selected = timeRange.timeEquals(selectedTime),
                     startTime = timeRange.from,
                     endTime = timeRange.to,
                     isFree = freeClassTimeRanges[timeRange] ?: false,
@@ -90,6 +94,16 @@ internal fun ClassTimeRangeChooser(
                     )
                 )
             }
+        }
+    }
+
+    LaunchedEffect(enabled, selectedTime, freeClassTimeRanges) {
+        if (enabled && !freeClassTimeRanges.isNullOrEmpty() && selectedTime == null) {
+            val freeClassTimeRangesList = freeClassTimeRanges.toList()
+            val nextFreeTimeRange = freeClassTimeRangesList.first { it.second }.first
+            val itemIndex = freeClassTimeRangesList.indexOfFirst { it.first == nextFreeTimeRange }
+            if (itemIndex >= 1) rowState.animateScrollToItem(itemIndex.dec())
+            onChoose(nextFreeTimeRange)
         }
     }
 }

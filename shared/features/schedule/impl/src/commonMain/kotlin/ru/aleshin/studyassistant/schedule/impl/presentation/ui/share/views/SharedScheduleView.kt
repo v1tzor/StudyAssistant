@@ -22,12 +22,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,7 +41,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DayOfWeek
-import ru.aleshin.studyassistant.core.common.extensions.forEachWith
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
@@ -62,7 +64,7 @@ internal fun SharedScheduleView(
     ) {
         Column {
             CommonScheduleViewHeader(dayOfWeek = dayOfWeek.mapToSting(StudyAssistantRes.strings))
-            CommonScheduleViewContent(classes = classes)
+            CommonScheduleViewContent(modifier = Modifier.weight(1f), classes = classes)
         }
     }
 }
@@ -143,16 +145,19 @@ private fun CommonScheduleViewContent(
         if (classes.isEmpty()) {
             EmptyClassesView()
         } else {
-            classes.forEachWith {
-                CommonClassView(
-                    onClick = {},
-                    enabled = false,
-                    number = number,
-                    timeRange = timeRange,
-                    subject = subject,
-                    office = office,
-                    organization = organization,
-                )
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(classes, key = { it.uid }) { classModel ->
+                    CommonClassView(
+                        onClick = {},
+                        enabled = false,
+                        number = classModel.number,
+                        timeRange = classModel.timeRange,
+                        subject = classModel.subject,
+                        office = classModel.office,
+                        organization = classModel.organization,
+                    )
+                }
+                item { Spacer(modifier = Modifier.height(40.dp)) }
             }
         }
     }

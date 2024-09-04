@@ -37,7 +37,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
 
 /**
  * @author Stanislav Aleshin on 10.07.2024.
@@ -99,7 +99,7 @@ internal fun <T> SettingsSelectorView(
             header = title,
             title = null,
             itemView = { setting ->
-                SelectorDialogItemView(
+                SelectorItemView(
                     onClick = { selectedSetting = setting },
                     selected = setting == selectedSetting,
                     title = itemName(setting),

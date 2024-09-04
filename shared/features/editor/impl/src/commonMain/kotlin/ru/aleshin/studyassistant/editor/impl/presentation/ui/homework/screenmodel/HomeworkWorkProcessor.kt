@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel
 
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
@@ -167,12 +168,16 @@ internal interface HomeworkWorkProcessor :
             )
         }
 
-        private fun saveHomeworkWork(editModel: EditHomeworkUi) = flow {
+        private fun saveHomeworkWork(editModel: EditHomeworkUi) = flow<HomeworkWorkResult> {
             val homework = editModel.convertToBase().mapToDomain()
             homeworkInteractor.addOrUpdateHomework(homework).handle(
                 onLeftAction = { emit(EffectResult(HomeworkEffect.ShowError(it))) },
                 onRightAction = { emit(EffectResult(HomeworkEffect.NavigateToBack)) },
             )
+        }.onStart {
+            emit(ActionResult(HomeworkAction.UpdateLoadingSave(true)))
+        }.onCompletion {
+            emit(ActionResult(HomeworkAction.UpdateLoadingSave(false)))
         }
     }
 }

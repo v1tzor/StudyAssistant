@@ -70,7 +70,7 @@ internal interface EmployeeInteractor {
             return@wrapFlow employeesFlow.flatMapLatest { employeeList ->
                 subjectsFlow.map { subjects ->
                     val groupedSubjectsByTeacher = subjects.groupBy { it.teacher?.uid }
-                    employeeList.map { employee ->
+                    employeeList.sortedBy { employee -> employee.firstName }.map { employee ->
                         val employeeSubjects = groupedSubjectsByTeacher[employee.uid] ?: emptyList()
                         employee.convertToDetails(subjects = employeeSubjects)
                     }

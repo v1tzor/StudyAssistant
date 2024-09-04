@@ -20,9 +20,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -31,10 +33,10 @@ import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogAddItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorAddItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 
@@ -50,10 +52,10 @@ internal fun OrganizationInfoField(
     onAddOrganization: () -> Unit,
     onSelected: (OrganizationShortUi?) -> Unit,
 ) {
-    var organizationSelectorState by remember { mutableStateOf(false) }
+    var openOrganizationSelectorSheet by remember { mutableStateOf(false) }
 
     ClickableInfoTextField(
-        onClick = { organizationSelectorState = true },
+        onClick = { openOrganizationSelectorSheet = true },
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
         value = organization?.shortName,
@@ -62,29 +64,37 @@ internal fun OrganizationInfoField(
         infoIcon = painterResource(StudyAssistantRes.icons.organization),
         trailingIcon = {
             ExpandedIcon(
-                isExpanded = organizationSelectorState,
+                isExpanded = openOrganizationSelectorSheet,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
     )
 
-    if (organizationSelectorState) {
-        OrganizationSelectorDialog(
+    if (openOrganizationSelectorSheet) {
+        OrganizationSelectorBottomSheet(
             selected = organization,
             organizations = allOrganization,
             onAddOrganization = onAddOrganization,
-            onDismiss = { organizationSelectorState = false },
+            onDismiss = { openOrganizationSelectorSheet = false },
             onConfirm = {
                 onSelected(it)
-                organizationSelectorState = false
+                openOrganizationSelectorSheet = false
             },
         )
+    }
+
+    var isShowedOrganization by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(isLoading, allOrganization, organization) {
+        if (!isLoading && allOrganization.isNotEmpty() && organization == null && !isShowedOrganization) {
+            isShowedOrganization = true
+            onSelected(allOrganization.find { it.isMain } ?: allOrganization[0])
+        }
     }
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun OrganizationSelectorDialog(
+internal fun OrganizationSelectorBottomSheet(
     modifier: Modifier = Modifier,
     selected: OrganizationShortUi?,
     organizations: List<OrganizationShortUi>,
@@ -94,14 +104,14 @@ internal fun OrganizationSelectorDialog(
 ) {
     var selectedOrganization by remember { mutableStateOf(selected) }
 
-    BaseSelectorDialog(
+    BaseSelectorBottomSheet(
         modifier = modifier,
         selected = selectedOrganization,
         items = organizations,
         header = EditorThemeRes.strings.organizationSelectorHeader,
         title = EditorThemeRes.strings.organizationSelectorTitle,
         itemView = { organization ->
-            SelectorDialogItemView(
+            SelectorItemView(
                 onClick = { selectedOrganization = organization },
                 selected = organization.uid == selectedOrganization?.uid,
                 title = organization.shortName,
@@ -109,15 +119,15 @@ internal fun OrganizationSelectorDialog(
             )
         },
         addItemView = {
-            SelectorDialogAddItemView(onClick = onAddOrganization)
+            SelectorAddItemView(onClick = onAddOrganization)
         },
         notSelectedItem = {
-            SelectorDialogNotSelectedItemView(
+            SelectorNotSelectedItemView(
                 selected = selectedOrganization == null,
                 onClick = { selectedOrganization = null },
             )
         },
-        onDismiss = onDismiss,
+        onDismissRequest = onDismiss,
         onConfirm = onConfirm,
     )
 }

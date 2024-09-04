@@ -43,8 +43,8 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
+import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
 
@@ -61,7 +61,7 @@ internal fun OrganizationPicker(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val organization by derivedStateOf { allOrganizations.find { it.uid == selectedOrganization } }
-    var organizationSelectorState by remember { mutableStateOf(false) }
+    var openOrganizationSelector by remember { mutableStateOf(false) }
 
     Row(
         modifier = modifier
@@ -71,7 +71,7 @@ internal fun OrganizationPicker(
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
                 enabled = enabled,
-                onClick = { organizationSelectorState = true },
+                onClick = { openOrganizationSelector = true },
             )
             .padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -90,17 +90,17 @@ internal fun OrganizationPicker(
             style = MaterialTheme.typography.titleSmall,
         )
         ExpandedIcon(
-            isExpanded = organizationSelectorState,
+            isExpanded = openOrganizationSelector,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
-    if (organizationSelectorState) {
-        OrganizationSelectorDialog(
+    if (openOrganizationSelector) {
+        OrganizationSelectorBottomSheet(
             selected = organization,
             organizations = allOrganizations,
-            onDismiss = { organizationSelectorState = false },
+            onDismiss = { openOrganizationSelector = false },
             onConfirm = {
-                organizationSelectorState = false
+                openOrganizationSelector = false
                 onSelectOrganization(it)
             },
         )
@@ -109,7 +109,7 @@ internal fun OrganizationPicker(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun OrganizationSelectorDialog(
+private fun OrganizationSelectorBottomSheet(
     modifier: Modifier = Modifier,
     selected: OrganizationShortUi?,
     organizations: List<OrganizationShortUi>,
@@ -118,21 +118,21 @@ private fun OrganizationSelectorDialog(
 ) {
     var selectedOrganization by remember { mutableStateOf(selected) }
 
-    BaseSelectorDialog(
+    BaseSelectorBottomSheet(
         modifier = modifier,
         selected = selectedOrganization,
         items = organizations,
         header = InfoThemeRes.strings.organizationSelectorHeader,
         title = InfoThemeRes.strings.organizationSelectorTitle,
         itemView = { organization ->
-            SelectorDialogItemView(
+            SelectorItemView(
                 onClick = { selectedOrganization = organization },
                 selected = organization.uid == selectedOrganization?.uid,
                 title = organization.shortName,
                 label = organization.type.mapToSting(StudyAssistantRes.strings),
             )
         },
-        onDismiss = onDismiss,
+        onDismissRequest = onDismiss,
         onConfirm = { organization ->
             if (organization != null) onConfirm(organization)
         },

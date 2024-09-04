@@ -32,9 +32,9 @@ import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogItemView
-import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorDialogNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
+import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
+import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 
 /**
@@ -66,7 +66,7 @@ internal fun EmployeePostInfoField(
     )
 
     if (employeePostSelectorState) {
-        EmployeePostSelectorDialog(
+        EmployeePostSelectorBottomSheet(
             selected = post,
             onDismiss = { employeePostSelectorState = false },
             onConfirm = { selectedEventType ->
@@ -79,7 +79,7 @@ internal fun EmployeePostInfoField(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun EmployeePostSelectorDialog(
+internal fun EmployeePostSelectorBottomSheet(
     modifier: Modifier = Modifier,
     selected: EmployeePost?,
     onDismiss: () -> Unit,
@@ -87,14 +87,14 @@ internal fun EmployeePostSelectorDialog(
 ) {
     var selectedPost by remember { mutableStateOf(selected) }
 
-    BaseSelectorDialog(
+    BaseSelectorBottomSheet(
         modifier = modifier,
         selected = selectedPost,
         items = EmployeePost.entries,
         header = EditorThemeRes.strings.employeePostSelectorHeader,
         title = EditorThemeRes.strings.employeePostSelectorTitle,
         itemView = { post ->
-            SelectorDialogItemView(
+            SelectorItemView(
                 onClick = { selectedPost = post },
                 selected = post == selectedPost,
                 title = post.mapToString(StudyAssistantRes.strings),
@@ -102,12 +102,12 @@ internal fun EmployeePostSelectorDialog(
             )
         },
         notSelectedItem = {
-            SelectorDialogNotSelectedItemView(
+            SelectorNotSelectedItemView(
                 selected = selectedPost == null,
                 onClick = { selectedPost = null },
             )
         },
-        onDismiss = onDismiss,
+        onDismissRequest = onDismiss,
         onConfirm = onConfirm,
     )
 }

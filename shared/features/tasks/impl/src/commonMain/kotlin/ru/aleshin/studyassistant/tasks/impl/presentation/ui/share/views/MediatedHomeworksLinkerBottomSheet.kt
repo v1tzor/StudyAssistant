@@ -71,7 +71,7 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.topSide
-import ru.aleshin.studyassistant.core.ui.views.MediumDragHandle
+import ru.aleshin.studyassistant.core.ui.views.sheet.MediumDragHandle
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.NumberedClassUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.ScheduleUi
@@ -477,10 +477,10 @@ private fun SubjectSelectorView(
     onLoadSubjects: (organizationId: UID) -> Unit,
     onSelectSubject: (SubjectUi?) -> Unit,
 ) {
-    var subjectSelectorDialogState by remember { mutableStateOf(false) }
+    var openSubjectSelectorSheet by remember { mutableStateOf(false) }
 
     Surface(
-        onClick = { subjectSelectorDialogState = true },
+        onClick = { openSubjectSelectorSheet = true },
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.primaryContainer
@@ -499,7 +499,7 @@ private fun SubjectSelectorView(
         }
     }
 
-    if (subjectSelectorDialogState) {
+    if (openSubjectSelectorSheet) {
         var organization by remember {
             mutableStateOf(organizations.find { it.isMain } ?: organizations.getOrNull(0))
         }
@@ -508,7 +508,7 @@ private fun SubjectSelectorView(
             targetOrganization = organization,
             subjects = linkSubjects,
             organizations = organizations,
-            onDismiss = { subjectSelectorDialogState = false },
+            onDismiss = { openSubjectSelectorSheet = false },
             onChangeOrganization = {
                 organization = it
                 onLoadSubjects(it.uid)
@@ -516,7 +516,7 @@ private fun SubjectSelectorView(
             onAddSubject = onAddSubject,
             onConfirm = {
                 onSelectSubject(it)
-                subjectSelectorDialogState = false
+                openSubjectSelectorSheet = false
             },
         )
     }

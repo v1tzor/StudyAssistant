@@ -360,7 +360,10 @@ internal fun ShareScheduleView(
             sharedSchedules = sharedSchedules,
             currentTime = currentTime,
             onDismissRequest = { openSharedSchedulesSheet = false },
-            onShowSchedule = onShowSchedule,
+            onShowSchedule = {
+                onShowSchedule(it)
+                openSharedSchedulesSheet = false
+            },
             onCancelSentSchedule = onCancelSentSchedule,
         )
     }
