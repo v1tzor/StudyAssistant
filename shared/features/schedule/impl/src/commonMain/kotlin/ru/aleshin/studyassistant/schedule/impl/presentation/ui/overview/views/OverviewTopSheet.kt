@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.painter.Painter
@@ -94,7 +95,7 @@ internal fun OverviewTopSheet(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val currentAnalysis = remember(selectedDate, isLoadingAnalytics, isLoadingSchedule) {
+            val currentAnalysis = remember(weekAnalysis, selectedDate) {
                 weekAnalysis?.find { it.date.equalsDay(selectedDate) }
             }
 
@@ -187,6 +188,7 @@ private fun OverviewTopSheetChart(
             data = axisPoints,
             lineStyle = LineStyle(
                 brush = SolidColor(MaterialTheme.colorScheme.primary),
+                pathEffect = PathEffect.cornerPathEffect(15f),
                 strokeWidth = 2.dp
             ),
             areaStyle = AreaStyle(
@@ -324,14 +326,14 @@ private fun OverviewTopSheetAnalysis(
                         val assessment = (analysis.generalAssessment * 10f).roundToInt() / 10f
                         SmallInfoBadge(
                             containerColor = when (assessment) {
-                                in 0f..2f -> StudyAssistantRes.colors.accents.greenContainer
-                                in 3f..5f -> StudyAssistantRes.colors.accents.yellowContainer
+                                in 0f..3f -> StudyAssistantRes.colors.accents.greenContainer
+                                in 3f..6f -> StudyAssistantRes.colors.accents.yellowContainer
                                 in 6f..8f -> StudyAssistantRes.colors.accents.orangeContainer
                                 else -> StudyAssistantRes.colors.accents.redContainer
                             },
                             contentColor = when (assessment) {
-                                in 0f..2f -> StudyAssistantRes.colors.accents.green
-                                in 3f..5f -> StudyAssistantRes.colors.accents.yellow
+                                in 0f..3f -> StudyAssistantRes.colors.accents.green
+                                in 3f..6f -> StudyAssistantRes.colors.accents.yellow
                                 in 6f..8f -> StudyAssistantRes.colors.accents.orange
                                 else -> StudyAssistantRes.colors.accents.red
                             },

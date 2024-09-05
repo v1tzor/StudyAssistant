@@ -32,12 +32,12 @@ data class DailyAnalysis(
 ) {
     companion object {
         const val MAX_RATE = 31f
-        const val CLASS_MINUTE_DURATION_RATE = 1f / 60f
+        const val CLASS_MINUTE_DURATION_RATE = 1f / 45f
         const val TEST_RATE = 2f
         const val MOVEMENT_RATE = 2f
-        const val THEORY_RATE = 0.2f
-        const val PRACTICE_RATE = 0.4f
-        const val PRESENTATION_RATE = 1.5f
+        const val THEORY_RATE = 0.9f
+        const val PRACTICE_RATE = 0.5f
+        const val PRESENTATION_RATE = 2f
         const val TODO_RATE = 1.0
         const val TODO_PRIORITY_RATE = 2.0
     }

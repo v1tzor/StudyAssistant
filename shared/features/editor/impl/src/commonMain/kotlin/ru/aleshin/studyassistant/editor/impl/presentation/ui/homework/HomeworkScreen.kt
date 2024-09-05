@@ -45,10 +45,10 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.views.Home
  * @author Stanislav Aleshin on 23.06.2024
  */
 internal data class HomeworkScreen(
-    val homeworkId: UID?,
-    val date: Long?,
-    val subjectId: UID?,
-    val organizationId: UID?,
+    private val homeworkId: UID?,
+    private val date: Long?,
+    private val subjectId: UID?,
+    private val organizationId: UID?,
 ) : Screen {
 
     @Composable

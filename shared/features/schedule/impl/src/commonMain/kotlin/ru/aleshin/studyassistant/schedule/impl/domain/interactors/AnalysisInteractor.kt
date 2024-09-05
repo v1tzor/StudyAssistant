@@ -79,12 +79,13 @@ internal interface AnalysisInteractor {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchWeekAnalysis(weekTimeRange: TimeRange) = eitherWrapper.wrapFlow {
-            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
-            val week = weekTimeRange.from.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
+            val calendarSettings = calendarSettingsRepository.fetchSettings(targetUser).first()
+            val week = weekTimeRange.from.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
+            val holidays = calendarSettings.holidays
 
             val baseSchedulesFlow = baseScheduleRepository.fetchSchedulesByVersion(weekTimeRange, week, targetUser)
             val customSchedulesFlow = customScheduleRepository.fetchSchedulesByTimeRange(weekTimeRange, targetUser)
-            val todosFlow = todoRepository.fetchTodosByTimeRange(weekTimeRange, targetUser)
+            val todosFlow = todoRepository.fetchActiveTodos(targetUser)
             val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(weekTimeRange, targetUser)
 
             return@wrapFlow baseSchedulesFlow.flatMapLatest { baseSchedules ->
@@ -99,7 +100,15 @@ internal interface AnalysisInteractor {
                                 val baseSchedule = baseSchedules.find { it.dayOfWeek == instant.dateTime().dayOfWeek }
                                 val analysis = fetchDailyAnalysis(
                                     date = instant,
-                                    baseSchedule = baseSchedule,
+                                    baseSchedule = baseSchedule?.copy(
+                                        classes = baseSchedule.classes.filter { classModel ->
+                                            holidays.none {
+                                                val dateFilter = TimeRange(it.start, it.end).containsDate(instant)
+                                                val orgFilter = it.organizations.contains(classModel.organization.uid)
+                                                return@none dateFilter && orgFilter
+                                            }
+                                        }
+                                    ),
                                     customSchedule = customSchedule,
                                     groupedHomeworks = groupedHomeworks,
                                     todos = todos,
@@ -127,7 +136,9 @@ internal interface AnalysisInteractor {
             }
 
             val dailyHomeworks = groupedHomeworks[date]
-            val dailyTodos = todos.filter { it.deadline?.equalsDay(date) == true }
+            val dailyTodos = todos.filter { todo ->
+                todo.deadline.let { deadline -> deadline == null || deadline > date }
+            }
 
             val testsNumberAndRate = fetchNumberAndRateOfTests(dailyHomeworks)
             val classesNumberAndRate = fetchNumberAndRateOfClasses(classes)
@@ -145,7 +156,7 @@ internal interface AnalysisInteractor {
 
             return DailyAnalysis(
                 date = date,
-                generalAssessment = rateList.sum() / MAX_RATE,
+                generalAssessment = (rateList.sum() / MAX_RATE) * 10,
                 numberOfClasses = classesNumberAndRate.first,
                 numberOfTests = testsNumberAndRate.first,
                 numberOfMovements = movementsNumberAndRate.first,

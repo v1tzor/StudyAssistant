@@ -78,7 +78,7 @@ internal fun HomeworkContent(
             onSelectedSubject = onSelectedSubject,
         )
         LinkedClassInfoField(
-            isLoading = isLoading || isClassesLoading,
+            isLoading = isClassesLoading,
             currentDate = currentDate,
             selectedDate = editableHomework?.deadline,
             linkedClass = editableHomework?.classId,

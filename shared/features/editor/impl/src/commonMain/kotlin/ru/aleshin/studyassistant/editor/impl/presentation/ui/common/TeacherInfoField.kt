@@ -125,9 +125,6 @@ internal fun TeacherSelectorBottomSheet(
     onDismiss: () -> Unit,
     onConfirm: (EmployeeDetailsUi?) -> Unit,
 ) {
-    val focusManager = LocalFocusManager.current
-    val searchInteractionSource = remember { MutableInteractionSource() }
-    val isFocus = searchInteractionSource.collectIsFocusedAsState().value
     var searchQuery by remember { mutableStateOf<String?>(null) }
     val selectedEmployee by derivedStateOf { employees.find { it.uid == selected?.uid } }
     val searchedTeachers = remember(searchQuery, employees) {
@@ -165,10 +162,7 @@ internal fun TeacherSelectorBottomSheet(
                 positionalThreshold = { it * .60f },
             )
             SelectorSwipeItemView(
-                onClick = {
-                    if (isFocus) focusManager.clearFocus()
-                    selectedTeacher = employee
-                },
+                onClick = { selectedTeacher = employee },
                 state = dismissState,
                 selected = employee.uid == selectedTeacher?.uid,
                 title = employee.fullName(),
@@ -199,21 +193,33 @@ internal fun TeacherSelectorBottomSheet(
                 },
             )
         },
-        addItemView = {
-            SelectorAddItemView(
-                enabled = enabledAdd,
-                onClick = onAddTeacher,
-            )
+        addItemView = if (searchQuery == null) {
+            {
+                SelectorAddItemView(
+                    enabled = enabledAdd,
+                    onClick = onAddTeacher,
+                )
+            }
+        } else {
+            null
         },
-        notSelectedItem = {
-            SelectorNotSelectedItemView(
-                selected = selectedTeacher == null,
-                onClick = { selectedTeacher = null },
-            )
+        notSelectedItem = if (searchQuery == null) {
+            {
+                SelectorNotSelectedItemView(
+                    selected = selectedTeacher == null,
+                    onClick = { selectedTeacher = null },
+                )
+            }
+        } else {
+            null
         },
         searchBar = {
             SearchBar(
                 inputField = {
+                    val focusManager = LocalFocusManager.current
+                    val searchInteractionSource = remember { MutableInteractionSource() }
+                    val isFocus = searchInteractionSource.collectIsFocusedAsState().value
+
                     SearchBarDefaults.InputField(
                         query = searchQuery ?: "",
                         onQueryChange = { searchQuery = it.takeIf { it.isNotBlank() } },

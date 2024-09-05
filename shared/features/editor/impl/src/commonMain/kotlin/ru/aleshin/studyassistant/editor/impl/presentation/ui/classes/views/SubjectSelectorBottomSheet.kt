@@ -81,9 +81,6 @@ internal fun SubjectSelectorBottomSheet(
     onDismiss: () -> Unit,
     onConfirm: (SubjectUi?) -> Unit,
 ) {
-    val focusManager = LocalFocusManager.current
-    val searchInteractionSource = remember { MutableInteractionSource() }
-    val isFocus = searchInteractionSource.collectIsFocusedAsState().value
     var searchQuery by rememberSaveable { mutableStateOf<String?>(null) }
     val searchedSubjects = remember(searchQuery, subjects) {
         subjects.filter { subject ->
@@ -117,10 +114,7 @@ internal fun SubjectSelectorBottomSheet(
                 positionalThreshold = { it * .60f },
             )
             SelectorSwipeItemView(
-                onClick = {
-                    if (isFocus) focusManager.clearFocus()
-                    selectedSubject = subject
-                },
+                onClick = { selectedSubject = subject },
                 state = dismissState,
                 selected = subject.uid == selectedSubject?.uid,
                 title = subject.name,
@@ -171,12 +165,16 @@ internal fun SubjectSelectorBottomSheet(
         searchBar = {
             SearchBar(
                 inputField = {
+                    val focusManager = LocalFocusManager.current
+                    val searchInteractionSource = remember { MutableInteractionSource() }
+                    val isFocus = searchInteractionSource.collectIsFocusedAsState().value
+
                     SearchBarDefaults.InputField(
                         query = searchQuery ?: "",
                         onQueryChange = { searchQuery = it.takeIf { it.isNotBlank() } },
                         onSearch = {
-                            focusManager.clearFocus()
                             searchQuery = it.takeIf { it.isNotBlank() }
+                            focusManager.clearFocus()
                         },
                         expanded = false,
                         onExpandedChange = {},
@@ -199,8 +197,8 @@ internal fun SubjectSelectorBottomSheet(
                             ) {
                                 IconButton(
                                     onClick = {
-                                        searchQuery = null
                                         focusManager.clearFocus()
+                                        searchQuery = null
                                     }
                                 ) {
                                     Icon(
