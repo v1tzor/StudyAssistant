@@ -77,6 +77,18 @@ internal class TodoScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+            is TodoEvent.CurrentTimeRange -> {
+                val currentDate = dateManager.fetchBeginningCurrentInstant()
+                val targetTimeRange = TimeRange(
+                    from = currentDate.startOfWeek().shiftWeek(-1),
+                    to = currentDate.endOfWeek().shiftWeek(+1),
+                )
+                sendAction(TodoAction.UpdateTimeRange(targetTimeRange))
+                launchBackgroundWork(BackgroundKey.LOAD_TODOS) {
+                    val command = TodoWorkCommand.LoadTodos(targetTimeRange)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
             is TodoEvent.NextTimeRange -> with(state()) {
                 val currentTimeRange = checkNotNull(selectedTimeRange)
                 val targetTimeRange = TimeRange(

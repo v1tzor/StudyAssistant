@@ -157,7 +157,9 @@ internal interface ShareWorkProcessor :
                                 val matchingSubject = targetTeachers.findLast {
                                     val firstNameMatching = it.firstName.contains(sharedEmployee.firstName)
                                     val secondNameMatching = it.secondName?.contains(sharedEmployee.secondName ?: "-")
-                                    val patronymicNameMatching = it.patronymic?.contains(sharedEmployee.patronymic ?: "-")
+                                    val patronymicNameMatching = it.patronymic?.contains(
+                                        sharedEmployee.patronymic ?: "-"
+                                    )
                                     return@findLast firstNameMatching && (secondNameMatching == true || patronymicNameMatching == true)
                                 }
                                 if (matchingSubject != null) put(sharedEmployee.uid, matchingSubject)
@@ -241,13 +243,25 @@ internal interface ShareWorkProcessor :
                 if (linkedOrganization != null) {
                     val newSubjects = baseSharedOrganization.subjects.filter { subject ->
                         linkData.linkedSubjects.containsKey(subject.uid).not()
+                    }.map { subject ->
+                        subject.copy(organizationId = linkedOrganization.uid)
                     }
                     val newTeachers = baseSharedOrganization.employee.filter { teacher ->
                         linkData.linkedTeachers.containsKey(teacher.uid).not()
+                    }.map { employee ->
+                        employee.copy(organizationId = linkedOrganization.uid)
+                    }
+                    val newOffices = baseSharedOrganization.offices.filter { office ->
+                        linkedOrganization.offices.contains(office).not()
+                    }
+                    val newLocations = baseSharedOrganization.locations.filter { location ->
+                        linkedOrganization.locations.find { it.value == location.value } == null
                     }
                     val updatedLinkedOrganization = linkedOrganization.copy(
                         subjects = linkedOrganization.subjects + newSubjects,
                         employee = linkedOrganization.employee + newTeachers,
+                        offices = linkedOrganization.offices + newOffices,
+                        locations = linkedOrganization.locations + newLocations,
                     )
                     return@map updatedLinkedOrganization.mapToDomain()
                 } else {

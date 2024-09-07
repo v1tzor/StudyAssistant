@@ -69,6 +69,13 @@ internal class UserProfileScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+            is UserProfileEvent.AcceptFriendRequest -> with(state()) {
+                launchBackgroundWork(BackgroundKey.USER_ACTION) {
+                    val userId = checkNotNull(user?.uid)
+                    val command = UserProfileWorkCommand.AcceptFriendRequest(userId)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
             is UserProfileEvent.CancelSendFriendRequest -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
                     val userId = checkNotNull(user?.uid)

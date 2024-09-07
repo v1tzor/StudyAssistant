@@ -115,11 +115,11 @@ fun <T> BaseSelectorBottomSheet(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 if (notSelectedItem != null) {
-                    item(content = notSelectedItem)
+                    item(content = notSelectedItem, key = "NotSelectedItem")
                 }
                 items(items = items, key = itemKeys, itemContent = itemView)
                 if (addItemView != null) {
-                    item(content = addItemView)
+                    item(content = addItemView, key = "AddItem")
                 }
             }
             Row(

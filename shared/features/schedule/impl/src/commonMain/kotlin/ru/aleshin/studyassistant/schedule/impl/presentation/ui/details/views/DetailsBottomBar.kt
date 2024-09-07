@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
@@ -152,7 +152,6 @@ internal fun WeekPickerView(
 }
 
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun ScheduleViewTypePicker(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -167,34 +166,38 @@ internal fun ScheduleViewTypePicker(
             }
             onSelected(viewType)
         },
-        modifier = modifier,
+        modifier = modifier.animateContentSize(),
         enabled = enabled,
         shape = MaterialTheme.shapes.full,
         color = Color.Transparent,
     ) {
-        Row(
-            modifier = Modifier.padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = when (selectedType) {
-                    WeekScheduleViewType.COMMON -> ScheduleThemeRes.strings.commonScheduleViewType
-                    WeekScheduleViewType.VERTICAL -> ScheduleThemeRes.strings.verticalScheduleViewType
-                },
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                style = MaterialTheme.typography.labelMedium,
-            )
-            Icon(
-                modifier = Modifier.size(18.dp),
-                painter = when (selectedType) {
-                    WeekScheduleViewType.COMMON -> painterResource(ScheduleThemeRes.icons.formatGrid)
-                    WeekScheduleViewType.VERTICAL -> painterResource(ScheduleThemeRes.icons.formatColumns)
-                },
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface,
-            )
+        BoxWithConstraints {
+            Row(
+                modifier = Modifier.padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (this@BoxWithConstraints.maxWidth > 158.dp) {
+                    Text(
+                        text = when (selectedType) {
+                            WeekScheduleViewType.COMMON -> ScheduleThemeRes.strings.commonScheduleViewType
+                            WeekScheduleViewType.VERTICAL -> ScheduleThemeRes.strings.verticalScheduleViewType
+                        },
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    painter = when (selectedType) {
+                        WeekScheduleViewType.COMMON -> painterResource(ScheduleThemeRes.icons.formatGrid)
+                        WeekScheduleViewType.VERTICAL -> painterResource(ScheduleThemeRes.icons.formatColumns)
+                    },
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            }
         }
     }
 }

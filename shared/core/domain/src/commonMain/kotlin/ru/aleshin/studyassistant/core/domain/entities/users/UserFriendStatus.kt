@@ -20,5 +20,5 @@ package ru.aleshin.studyassistant.core.domain.entities.users
  * @author Stanislav Aleshin on 16.07.2024.
  */
 enum class UserFriendStatus {
-    NOT_FRIENDS, REQUEST_SENT, IN_FRIENDS
+    NOT_FRIENDS, REQUEST_SENT, REQUEST_RECEIVE, IN_FRIENDS
 }

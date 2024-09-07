@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel
 
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
@@ -176,8 +175,6 @@ internal interface HomeworkWorkProcessor :
             )
         }.onStart {
             emit(ActionResult(HomeworkAction.UpdateLoadingSave(true)))
-        }.onCompletion {
-            emit(ActionResult(HomeworkAction.UpdateLoadingSave(false)))
         }
     }
 }

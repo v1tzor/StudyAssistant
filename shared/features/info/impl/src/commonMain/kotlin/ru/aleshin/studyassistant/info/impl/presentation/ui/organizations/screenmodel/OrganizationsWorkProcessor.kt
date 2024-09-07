@@ -67,11 +67,15 @@ internal interface OrganizationsWorkProcessor :
                 onLeftAction = { emit(EffectResult(OrganizationsEffect.ShowError(it))) },
                 onRightAction = { organizationModel ->
                     val organization = organizationModel?.mapToUi()
+                    val compactOrganization = organization?.copy(
+                        subjects = organization.subjects.sortedBy { it.name },
+                        employee = organization.employee.sortedBy { it.firstName },
+                    )
                     val classesInfo = classesInfoInteractor.fetchClassesInfo(organizationId).handleAndGet(
                         onLeftAction = { emit(EffectResult(OrganizationsEffect.ShowError(it))).let { null } },
                         onRightAction = { classesInfo -> classesInfo.mapToUi() },
                     )
-                    emit(ActionResult(OrganizationsAction.UpdateOrganizationData(organization, classesInfo)))
+                    emit(ActionResult(OrganizationsAction.UpdateOrganizationData(compactOrganization, classesInfo)))
                 },
             )
         }

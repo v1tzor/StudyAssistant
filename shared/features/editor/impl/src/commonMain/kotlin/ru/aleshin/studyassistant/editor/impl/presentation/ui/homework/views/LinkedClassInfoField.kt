@@ -165,10 +165,10 @@ private fun LinkClassView(
                 style = MaterialTheme.typography.bodySmall,
             )
             Crossfade(
-                targetState = classesForLinked,
+                targetState = if (isLoading) null else classesForLinked,
                 animationSpec = floatSpring(),
             ) { linkClasses ->
-                if (isLoading) {
+                if (linkClasses == null) {
                     Box(
                         modifier = Modifier.fillMaxWidth().height(100.dp),
                         contentAlignment = Alignment.Center,

@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.common
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -54,27 +55,39 @@ internal fun AuthHeaderSection(
             contentScale = ContentScale.Fit,
             alignment = Alignment.Center,
         )
-        Column(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = header,
-                color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Black,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 4,
-                style = MaterialTheme.typography.headlineLarge,
-            )
-            if (title != null) {
+        if (title != null) {
+            Column(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = header,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontWeight = FontWeight.Black,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 4,
+                    style = MaterialTheme.typography.headlineLarge,
+                )
                 Text(
                     text = title,
+                    modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 4,
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
+        } else {
+            Text(
+                text = header,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Black,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 4,
+                style = MaterialTheme.typography.headlineLarge,
+            )
         }
     }
 }

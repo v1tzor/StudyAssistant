@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
-import ru.aleshin.studyassistant.core.common.extensions.exists
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -61,16 +60,10 @@ interface HomeworksRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.HOMEWORKS)
 
-            return database.runTransaction {
-                val isExist = homework.uid.isNotEmpty() && reference.document(homework.uid).exists()
-                if (isExist) {
-                    reference.document(homework.uid).set(data = homework)
-                    return@runTransaction homework.uid
-                } else {
-                    val uid = reference.add(homework).id
-                    reference.document(uid).update(UserData.UID to uid)
-                    return@runTransaction uid
-                }
+            val homeworkId = homework.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+
+            return reference.document(homeworkId).set(homework.copy(uid = homeworkId)).let {
+                return@let homeworkId
             }
         }
 

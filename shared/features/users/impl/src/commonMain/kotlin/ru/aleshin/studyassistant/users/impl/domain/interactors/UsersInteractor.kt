@@ -65,9 +65,12 @@ internal interface UsersInteractor {
                 userFriendRequests.map { friendRequests ->
                     val isFriend = userInfo?.friends?.contains(userId) ?: false
                     val isSendRequest = friendRequests.send.containsKey(userId)
+                    val isReceiveRequest = friendRequests.received.containsKey(userId)
 
                     return@map if (isFriend) {
                         UserFriendStatus.IN_FRIENDS
+                    } else if (isReceiveRequest) {
+                        UserFriendStatus.REQUEST_RECEIVE
                     } else if (isSendRequest) {
                         UserFriendStatus.REQUEST_SENT
                     } else {

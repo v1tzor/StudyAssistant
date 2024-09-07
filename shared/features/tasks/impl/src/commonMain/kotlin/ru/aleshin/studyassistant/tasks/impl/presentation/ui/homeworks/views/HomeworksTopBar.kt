@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,18 +38,27 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun HomeworksTopBar(
     modifier: Modifier = Modifier,
-    onOverviewClick: () -> Unit,
+    onCurrentTimeRange: () -> Unit,
+    onBackClick: () -> Unit,
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = {
             Text(text = TasksThemeRes.strings.homeworksHeader)
         },
-        actions = {
-            IconButton(onClick = onOverviewClick) {
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
                 Icon(
-                    painter = painterResource(TasksThemeRes.icons.viewShortTasks),
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = StudyAssistantRes.strings.backIconDesc,
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onCurrentTimeRange) {
+                Icon(
+                    painter = painterResource(StudyAssistantRes.icons.calendarToday),
+                    contentDescription = TasksThemeRes.strings.currentTimeRangeDesc,
                 )
             }
         },

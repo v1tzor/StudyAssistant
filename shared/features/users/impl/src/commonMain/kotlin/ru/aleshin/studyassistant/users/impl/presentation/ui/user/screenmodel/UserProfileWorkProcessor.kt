@@ -32,7 +32,8 @@ import ru.aleshin.studyassistant.users.impl.presentation.ui.user.contract.UserPr
 /**
  * @author Stanislav Aleshin on 15.07.2024.
  */
-internal interface UserProfileWorkProcessor : FlowWorkProcessor<UserProfileWorkCommand, UserProfileAction, UserProfileEffect> {
+internal interface UserProfileWorkProcessor :
+    FlowWorkProcessor<UserProfileWorkCommand, UserProfileAction, UserProfileEffect> {
 
     class Base(
         private val usersInteractor: UsersInteractor,
@@ -42,6 +43,7 @@ internal interface UserProfileWorkProcessor : FlowWorkProcessor<UserProfileWorkC
         override suspend fun work(command: UserProfileWorkCommand) = when (command) {
             is UserProfileWorkCommand.LoadUser -> loadUserWork(command.userId)
             is UserProfileWorkCommand.SendFriendRequest -> sendFriendRequestWork(command.userId)
+            is UserProfileWorkCommand.AcceptFriendRequest -> acceptFriendRequestWork(command.userId)
             is UserProfileWorkCommand.CancelSendFriendRequest -> cancelSendFriendRequestWork(command.userId)
             is UserProfileWorkCommand.DeleteFriend -> deleteFriendWork(command.userId)
         }
@@ -67,6 +69,18 @@ internal interface UserProfileWorkProcessor : FlowWorkProcessor<UserProfileWorkC
                 onLeftAction = { emit(EffectResult(UserProfileEffect.ShowError(it))) },
             )
         }
+
+        private fun acceptFriendRequestWork(userId: UID) = flow {
+            usersInteractor.addUserToFriends(userId).handle(
+                onLeftAction = { emit(EffectResult(UserProfileEffect.ShowError(it))) },
+                onRightAction = {
+                    requestsInteractor.acceptRequest(userId).handle(
+                        onLeftAction = { emit(EffectResult(UserProfileEffect.ShowError(it))) },
+                    )
+                },
+            )
+        }
+
         private fun cancelSendFriendRequestWork(userId: UID) = flow {
             requestsInteractor.cancelSendRequest(userId).handle(
                 onLeftAction = { emit(EffectResult(UserProfileEffect.ShowError(it))) },
@@ -83,6 +97,7 @@ internal interface UserProfileWorkProcessor : FlowWorkProcessor<UserProfileWorkC
 internal sealed class UserProfileWorkCommand : WorkCommand {
     data class LoadUser(val userId: UID) : UserProfileWorkCommand()
     data class SendFriendRequest(val userId: UID) : UserProfileWorkCommand()
+    data class AcceptFriendRequest(val userId: UID) : UserProfileWorkCommand()
     data class CancelSendFriendRequest(val userId: UID) : UserProfileWorkCommand()
     data class DeleteFriend(val userId: UID) : UserProfileWorkCommand()
 }

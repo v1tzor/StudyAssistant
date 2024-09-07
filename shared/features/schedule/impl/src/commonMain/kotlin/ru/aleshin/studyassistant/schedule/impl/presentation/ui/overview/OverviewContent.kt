@@ -94,6 +94,7 @@ internal fun OverviewContent(
                             modifier = Modifier.animateItemPlacement(),
                             onClick = { openClassBottomSheet = true },
                             isActive = activeClass?.uid == classModel.uid,
+                            number = classModel.number,
                             progress = activeClass?.progress?.takeIf { activeClass.isStarted } ?: -1f,
                             timeRange = classModel.timeRange,
                             subject = classModel.subject,

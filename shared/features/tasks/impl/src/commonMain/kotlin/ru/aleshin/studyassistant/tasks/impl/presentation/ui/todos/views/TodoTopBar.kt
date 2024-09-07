@@ -27,6 +27,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 
 /**
@@ -36,6 +38,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun TodoTopBar(
     modifier: Modifier = Modifier,
+    onCurrentTimeRange: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     CenterAlignedTopAppBar(
@@ -45,7 +48,16 @@ internal fun TodoTopBar(
             IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = null,
+                    contentDescription = StudyAssistantRes.strings.backIconDesc,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onCurrentTimeRange) {
+                Icon(
+                    painter = painterResource(StudyAssistantRes.icons.calendarToday),
+                    contentDescription = TasksThemeRes.strings.currentTimeRangeDesc,
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
             }

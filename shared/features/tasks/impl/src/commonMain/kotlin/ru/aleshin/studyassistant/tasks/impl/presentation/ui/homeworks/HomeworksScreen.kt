@@ -83,7 +83,8 @@ internal data class HomeworksScreen(val targetDate: Long?) : Screen {
             topBar = {
                 Column {
                     HomeworksTopBar(
-                        onOverviewClick = { dispatchEvent(HomeworksEvent.NavigateToOverview) },
+                        onCurrentTimeRange = { dispatchEvent(HomeworksEvent.CurrentTimeRange) },
+                        onBackClick = { dispatchEvent(HomeworksEvent.NavigateToBack) },
                     )
                     HomeworksTopSheet(
                         isLoading = state.isLoading,

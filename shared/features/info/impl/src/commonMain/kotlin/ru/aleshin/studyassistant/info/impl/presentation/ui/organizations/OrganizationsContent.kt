@@ -22,8 +22,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -36,6 +34,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -65,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.DISABLED_ALPHA
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
+import ru.aleshin.studyassistant.core.common.extensions.limitSize
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
@@ -81,6 +81,7 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.O
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.OrganizationView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.ShortEmployeeView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.ShortSubjectView
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.ShowAllItemView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
 
 /**
@@ -303,9 +304,8 @@ private fun OrganizationsEmployeesSection(
                         state = gridState,
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
-                        flingBehavior = rememberSnapFlingBehavior(SnapLayoutInfoProvider(gridState)),
                     ) {
-                        items(organizationData.employee, key = { it.uid }) { employee ->
+                        items(organizationData.employee.limitSize(7), key = { it.uid }) { employee ->
                             ShortEmployeeView(
                                 onClick = { onShowEmployeeProfile(employee.uid) },
                                 avatar = employee.avatar,
@@ -317,6 +317,11 @@ private fun OrganizationsEmployeesSection(
                                 },
                             )
                         }
+                        if (organizationData.employee.size > 6) {
+                            item(key = "ShowAll", span = { GridItemSpan(2) }) {
+                                ShowAllItemView(onClick = onShowAllEmployee)
+                            }
+                        }
                     }
                 } else if (organizationData != null && organizationData.employee.isNotEmpty()) {
                     val listState = rememberLazyListState()
@@ -324,7 +329,6 @@ private fun OrganizationsEmployeesSection(
                         modifier = Modifier.fillMaxWidth().height(88.dp),
                         state = listState,
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        flingBehavior = rememberSnapFlingBehavior(listState),
                     ) {
                         items(organizationData.employee, key = { it.uid }) { employee ->
                             ShortEmployeeView(
@@ -409,9 +413,8 @@ private fun OrganizationsSubjectsSection(
                         state = gridState,
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
-                        flingBehavior = rememberSnapFlingBehavior(SnapLayoutInfoProvider(gridState)),
                     ) {
-                        items(organizationData.subjects, key = { it.uid }) { subject ->
+                        items(organizationData.subjects.limitSize(7), key = { it.uid }) { subject ->
                             ShortSubjectView(
                                 onClick = { onShowSubjectEditor(subject.uid) },
                                 eventType = subject.eventType,
@@ -421,6 +424,11 @@ private fun OrganizationsSubjectsSection(
                                 teacher = subject.teacher,
                             )
                         }
+                        if (organizationData.subjects.size > 6) {
+                            item(key = "ShowAll", span = { GridItemSpan(2) }) {
+                                ShowAllItemView(onClick = onShowAllSubjects)
+                            }
+                        }
                     }
                 } else if (organizationData != null && organizationData.subjects.isNotEmpty()) {
                     val listState = rememberLazyListState()
@@ -428,7 +436,6 @@ private fun OrganizationsSubjectsSection(
                         modifier = Modifier.fillMaxWidth().height(92.dp),
                         state = listState,
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        flingBehavior = rememberSnapFlingBehavior(listState),
                     ) {
                         items(organizationData.subjects, key = { it.uid }) { subject ->
                             ShortSubjectView(

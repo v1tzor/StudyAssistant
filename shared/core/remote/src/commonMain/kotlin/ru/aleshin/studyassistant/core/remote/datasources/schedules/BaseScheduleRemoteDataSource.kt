@@ -26,7 +26,6 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
-import ru.aleshin.studyassistant.core.common.extensions.exists
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -80,16 +79,10 @@ interface BaseScheduleRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.BASE_SCHEDULES)
 
-            return database.runTransaction {
-                val isExist = schedule.uid.isNotEmpty() && reference.document(schedule.uid).exists()
-                if (isExist) {
-                    reference.document(schedule.uid).set(data = schedule)
-                    return@runTransaction schedule.uid
-                } else {
-                    val uid = reference.add(schedule).id
-                    reference.document(uid).update(UserData.UID to uid)
-                    return@runTransaction uid
-                }
+            val scheduleId = schedule.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+
+            return reference.document(scheduleId).set(schedule.copy(uid = scheduleId)).let {
+                return@let scheduleId
             }
         }
 

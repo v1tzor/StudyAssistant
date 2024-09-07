@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
-import ru.aleshin.studyassistant.core.common.extensions.exists
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -57,16 +56,10 @@ interface EmployeeRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.EMPLOYEE)
 
-            return database.runTransaction {
-                val isExist = employee.uid.isNotEmpty() && reference.document(employee.uid).exists()
-                if (isExist) {
-                    reference.document(employee.uid).set(employee)
-                    return@runTransaction employee.uid
-                } else {
-                    val uid = reference.add(employee).id
-                    reference.document(uid).update(UserData.UID to uid)
-                    return@runTransaction uid
-                }
+            val employeeId = employee.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+
+            return reference.document(employeeId).set(employee.copy(uid = employeeId)).let {
+                return@let employeeId
             }
         }
 

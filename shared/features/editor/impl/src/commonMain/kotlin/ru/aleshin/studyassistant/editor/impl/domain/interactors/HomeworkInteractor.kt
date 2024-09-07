@@ -44,12 +44,12 @@ internal interface HomeworkInteractor {
         private val targetUser: UID
             get() = usersRepository.fetchCurrentUserOrError().uid
 
-        override suspend fun fetchHomeworkById(homeworkId: UID) = eitherWrapper.wrapFlow {
-            homeworksRepository.fetchHomeworkById(homeworkId, targetUser)
-        }
-
         override suspend fun addOrUpdateHomework(homework: Homework) = eitherWrapper.wrap {
             homeworksRepository.addOrUpdateHomework(homework, targetUser)
+        }
+
+        override suspend fun fetchHomeworkById(homeworkId: UID) = eitherWrapper.wrapFlow {
+            homeworksRepository.fetchHomeworkById(homeworkId, targetUser)
         }
 
         override suspend fun deleteHomework(targetId: UID) = eitherWrapper.wrap {

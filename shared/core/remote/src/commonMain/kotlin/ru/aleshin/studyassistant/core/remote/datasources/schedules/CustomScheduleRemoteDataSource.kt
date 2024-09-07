@@ -65,10 +65,10 @@ interface CustomScheduleRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES)
 
-            val uid = schedule.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+            val scheduleId = schedule.uid.takeIf { it.isNotBlank() } ?: randomUUID()
 
-            return reference.document(uid).set(data = schedule.copy(uid = uid)).let {
-                return@let uid
+            return reference.document(scheduleId).set(data = schedule.copy(uid = scheduleId)).let {
+                return@let scheduleId
             }
         }
 

@@ -39,7 +39,7 @@ fun VerticalLeftTimeProgress(
     leftTimeProgress: Float?,
     trackWidth: Dp = 3.dp,
     thumbHeight: Dp = 4.dp,
-    verticalSpacing: Dp = 4.dp,
+    verticalSpacing: Dp = 3.dp,
     passTrackColor: Color = MaterialTheme.colorScheme.primary,
     nextTrackColor: Color = MaterialTheme.colorScheme.primaryContainer,
     thumbColor: Color = MaterialTheme.colorScheme.primary,
@@ -64,14 +64,14 @@ fun VerticalLeftTimeProgress(
             )
             drawLine(
                 color = thumbColor,
-                start = Offset(x = 0f, y = passTrackHeight + verticalSpacingPx),
-                end = Offset(x = canvasWidth, y = passTrackHeight + verticalSpacingPx),
+                start = Offset(x = 0f, y = passTrackHeight + verticalSpacingPx + thumbHeightPx),
+                end = Offset(x = canvasWidth, y = passTrackHeight + verticalSpacingPx + thumbHeightPx),
                 strokeWidth = thumbHeightPx,
                 cap = StrokeCap.Round
             )
             drawLine(
                 color = nextTrackColor,
-                start = Offset(x = canvasWidth / 2f, y = passTrackHeight + 2 * verticalSpacingPx + thumbHeightPx),
+                start = Offset(x = canvasWidth / 2f, y = passTrackHeight + 2 * verticalSpacingPx + thumbHeightPx * 2),
                 end = Offset(x = canvasWidth / 2f, y = canvasHeight),
                 strokeWidth = trackWidthPx,
                 cap = StrokeCap.Round
@@ -119,14 +119,14 @@ fun HorizontalLeftTimeProgress(
             )
             drawLine(
                 color = thumbColor,
-                start = Offset(x = passTrackWidth + horizontalSpacingPx, y = 0f),
-                end = Offset(x = passTrackWidth + horizontalSpacingPx, y = canvasHeight),
+                start = Offset(x = passTrackWidth + horizontalSpacingPx + thumbWidthPx, y = 0f),
+                end = Offset(x = passTrackWidth + horizontalSpacingPx + thumbWidthPx, y = canvasHeight),
                 strokeWidth = thumbWidthPx,
                 cap = StrokeCap.Round
             )
             drawLine(
                 color = nextTrackColor,
-                start = Offset(x = passTrackWidth + 2 * horizontalSpacingPx + thumbWidthPx, y = canvasHeight / 2f),
+                start = Offset(x = passTrackWidth + 2 * horizontalSpacingPx + thumbWidthPx * 2, y = canvasHeight / 2f),
                 end = Offset(x = canvasWidth, y = canvasHeight / 2f),
                 strokeWidth = trackHeightPx,
                 cap = StrokeCap.Round

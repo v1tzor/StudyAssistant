@@ -41,6 +41,7 @@ internal data class UserProfileViewState(
 internal sealed class UserProfileEvent : BaseEvent {
     data class Init(val userId: UID) : UserProfileEvent()
     data object SendFriendRequest : UserProfileEvent()
+    data object AcceptFriendRequest : UserProfileEvent()
     data object CancelSendFriendRequest : UserProfileEvent()
     data object DeleteFromFriends : UserProfileEvent()
     data object NavigateToBack : UserProfileEvent()

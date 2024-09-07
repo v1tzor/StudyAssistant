@@ -40,6 +40,7 @@ internal data class TodoViewState(
 
 internal sealed class TodoEvent : BaseEvent {
     data object Init : TodoEvent()
+    data object CurrentTimeRange : TodoEvent()
     data object NextTimeRange : TodoEvent()
     data object PreviousTimeRange : TodoEvent()
     data class UpdateTodoDone(val todo: TodoDetailsUi, val isDone: Boolean) : TodoEvent()

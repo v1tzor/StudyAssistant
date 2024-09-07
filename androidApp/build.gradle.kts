@@ -6,27 +6,26 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kapt)
     alias(libs.plugins.compose.compiler)
-    // alias(libs.plugins.gms)
 }
 
 android {
-    val localProperties = gradleLocalProperties(rootDir, providers)
-
     namespace = "ru.aleshin.studyassistant.android"
-    compileSdk = libs.versions.compileSdk.get().toIntOrNull()
+    flavorDimensions += "production"
+
+    val localProperties = gradleLocalProperties(rootDir, providers)
 
     defaultConfig {
         applicationId = libs.versions.applicationId.get()
         minSdk = libs.versions.minSdk.get().toIntOrNull()
         targetSdk = libs.versions.targetSdk.get().toIntOrNull()
+        compileSdk = libs.versions.compileSdk.get().toIntOrNull()
 
         versionCode = libs.versions.version.code.get().toIntOrNull()
         versionName = libs.versions.version.name.get()
 
         testInstrumentationRunner = libs.versions.testInstrumentationRunner.get()
-        vectorDrawables {
-            useSupportLibrary = true
-        }
+        vectorDrawables.useSupportLibrary = true
+        resourceConfigurations.addAll(listOf("en", "ru"))
     }
 
     signingConfigs {
@@ -63,7 +62,6 @@ android {
         }
     }
 
-    flavorDimensions += "production"
     productFlavors {
         create("google") {
             // FCM
@@ -129,6 +127,7 @@ dependencies {
     implementation(project(":shared"))
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.workmanager.ktx)
     implementation(libs.androidx.workmanager)
     implementation(libs.compose.material)
 

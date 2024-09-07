@@ -100,10 +100,10 @@ internal fun ClassTimeRangeChooser(
     LaunchedEffect(enabled, selectedTime, freeClassTimeRanges) {
         if (enabled && !freeClassTimeRanges.isNullOrEmpty() && selectedTime == null) {
             val freeClassTimeRangesList = freeClassTimeRanges.toList()
-            val nextFreeTimeRange = freeClassTimeRangesList.first { it.second }.first
+            val nextFreeTimeRange = freeClassTimeRangesList.find { it.second }?.first
             val itemIndex = freeClassTimeRangesList.indexOfFirst { it.first == nextFreeTimeRange }
             if (itemIndex >= 1) rowState.animateScrollToItem(itemIndex.dec())
-            onChoose(nextFreeTimeRange)
+            if (nextFreeTimeRange != null) onChoose(nextFreeTimeRange)
         }
     }
 }

@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
-import ru.aleshin.studyassistant.core.common.extensions.exists
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -54,16 +53,10 @@ interface TodoRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.TODOS)
 
-            return database.runTransaction {
-                val isExist = todo.uid.isNotEmpty() && reference.document(todo.uid).exists()
-                if (isExist) {
-                    reference.document(todo.uid).set(data = todo)
-                    return@runTransaction todo.uid
-                } else {
-                    val uid = reference.add(todo).id
-                    reference.document(uid).update(UserData.UID to uid)
-                    return@runTransaction uid
-                }
+            val todoId = todo.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+
+            return reference.document(todoId).set(todo.copy(uid = todoId)).let {
+                return@let todoId
             }
         }
 

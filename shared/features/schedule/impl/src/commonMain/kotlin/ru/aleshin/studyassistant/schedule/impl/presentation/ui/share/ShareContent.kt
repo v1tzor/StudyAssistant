@@ -221,6 +221,7 @@ private fun NewAndLinkedDataSectionDivider(
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         HorizontalDivider(modifier = Modifier.weight(1f))
         Text(

@@ -20,11 +20,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -97,9 +95,9 @@ internal fun HomeworkTaskView(
     tasks: List<HomeworkTaskComponentUi>,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min),
+        modifier = modifier.fillMaxWidth(), //.height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
     ) {
         Box(
             modifier = Modifier.fillMaxHeight(),
@@ -123,7 +121,7 @@ internal fun HomeworkTaskView(
             }
         }
         FlowRow(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.padding(top = 7.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {

@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.screenmodel
 
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
@@ -68,8 +67,6 @@ internal interface TodoWorkProcessor : FlowWorkProcessor<TodoWorkCommand, TodoAc
             )
         }.onStart {
             emit(ActionResult(TodoAction.UpdateLoadingSave(true)))
-        }.onCompletion {
-            emit(ActionResult(TodoAction.UpdateLoadingSave(false)))
         }
 
         private fun deleteTodoWork(todo: EditTodoUi) = flow {

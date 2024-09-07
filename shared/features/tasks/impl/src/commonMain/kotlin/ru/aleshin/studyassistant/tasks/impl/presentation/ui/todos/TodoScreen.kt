@@ -76,6 +76,7 @@ internal class TodoScreen : Screen {
             topBar = {
                 Column {
                     TodoTopBar(
+                        onCurrentTimeRange = { dispatchEvent(TodoEvent.CurrentTimeRange) },
                         onBackClick = { dispatchEvent(TodoEvent.NavigateToBack) },
                     )
                     TodoTopSheet(

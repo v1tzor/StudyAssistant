@@ -64,10 +64,10 @@ interface OrganizationsRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
 
-            val uid = organization.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+            val organizationId = organization.uid.takeIf { it.isNotBlank() } ?: randomUUID()
 
-            return reference.document(uid).set(organization.copy(uid = uid)).let {
-                return@let uid
+            return reference.document(organizationId).set(organization.copy(uid = organizationId)).let {
+                return@let organizationId
             }
         }
 

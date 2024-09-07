@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
@@ -75,6 +76,7 @@ internal fun DetailsClassViewItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isActive: Boolean,
+    number: Int,
     progress: Progress,
     timeRange: TimeRange,
     subject: SubjectUi?,
@@ -93,6 +95,7 @@ internal fun DetailsClassViewItem(
         DetailsClassTime(
             modifier = Modifier.fillMaxHeight(),
             isActive = isActive,
+            number = number,
             progress = progress,
             timeRange = timeRange,
         )
@@ -165,6 +168,7 @@ internal fun DetailsClassViewPlaceholder(
 private fun DetailsClassTime(
     modifier: Modifier = Modifier,
     isActive: Boolean,
+    number: Int,
     progress: Progress,
     timeRange: TimeRange,
 ) {
@@ -198,7 +202,15 @@ private fun DetailsClassTime(
                     leftTimeProgress = progress,
                 )
             } else {
-                Spacer(modifier = Modifier.fillMaxHeight())
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = number.toString(),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
+                }
             }
         }
         Text(

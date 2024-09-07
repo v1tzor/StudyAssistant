@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
-import ru.aleshin.studyassistant.core.common.extensions.exists
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -56,16 +55,10 @@ interface SubjectsRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.SUBJECTS)
 
-            return database.runTransaction {
-                val isExist = subject.uid.isNotEmpty() && reference.document(subject.uid).exists()
-                if (isExist) {
-                    reference.document(subject.uid).set(data = subject)
-                    return@runTransaction subject.uid
-                } else {
-                    val uid = reference.add(subject).id
-                    reference.document(uid).update(UserData.UID to uid)
-                    return@runTransaction uid
-                }
+            val subjectId = subject.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+
+            return reference.document(subjectId).set(subject.copy(uid = subjectId)).let {
+                return@let subjectId
             }
         }
 

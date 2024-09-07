@@ -74,6 +74,7 @@ internal fun UserProfileTopSheet(
     user: AppUserUi?,
     friendStatus: UserFriendStatus?,
     onAddToFriends: () -> Unit,
+    onAcceptRequest: () -> Unit,
     onCancelSendRequest: () -> Unit,
     onDeleteFromFriends: () -> Unit,
 ) {
@@ -110,6 +111,7 @@ internal fun UserProfileTopSheet(
                         description = user?.description,
                         friendStatus = friendStatus,
                         onAddToFriends = onAddToFriends,
+                        onAcceptRequest = onAcceptRequest,
                         onCancelSendRequest = onCancelSendRequest,
                         onDeleteFromFriends = onDeleteFromFriends,
                     )
@@ -374,6 +376,7 @@ private fun UserProfileTopSheetFooter(
     description: String?,
     friendStatus: UserFriendStatus?,
     onAddToFriends: () -> Unit,
+    onAcceptRequest: () -> Unit,
     onCancelSendRequest: () -> Unit,
     onDeleteFromFriends: () -> Unit,
 ) {
@@ -402,6 +405,17 @@ private fun UserProfileTopSheetFooter(
                     contentColor = MaterialTheme.colorScheme.error,
                 ),
                 content = { Text(text = UsersThemeRes.strings.cancelSendFriendRequestTitle) },
+            )
+            UserFriendStatus.REQUEST_RECEIVE -> FilledTonalButton(
+                onClick = onAcceptRequest,
+                modifier = Modifier.fillMaxWidth().height(36.dp),
+                shape = MaterialTheme.shapes.medium,
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = StudyAssistantRes.colors.accents.greenContainer,
+                    contentColor = StudyAssistantRes.colors.accents.green,
+                ),
+                content = { Text(text = UsersThemeRes.strings.acceptRequestTitle) },
             )
             UserFriendStatus.IN_FRIENDS -> FilledTonalButton(
                 onClick = onDeleteFromFriends,

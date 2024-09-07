@@ -80,6 +80,7 @@ internal data class TasksStrings(
     val specifyRecipientsStepHeader: String,
     val specifyRecipientsStepLabel: String,
     val specifyRecipientsStepAction: String,
+    val currentTimeRangeDesc: String,
     val otherErrorMessage: String,
 ) {
     companion object {
@@ -141,6 +142,7 @@ internal data class TasksStrings(
             specifyRecipientsStepHeader = "2. Укажите пользователей",
             specifyRecipientsStepLabel = "Укажите с кем вы хотите поделиться заданием",
             specifyRecipientsStepAction = "Отправить",
+            currentTimeRangeDesc = "Отобразить текущие даты",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = TasksStrings(
@@ -201,6 +203,7 @@ internal data class TasksStrings(
             specifyRecipientsStepHeader = "2. Specify the users",
             specifyRecipientsStepLabel = "Please specify who you would like to share this task with",
             specifyRecipientsStepAction = "Send",
+            currentTimeRangeDesc = "Display current dates",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

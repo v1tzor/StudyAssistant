@@ -75,6 +75,7 @@ internal class UserProfileScreen(val userId: UID) : Screen {
                         user = state.user,
                         friendStatus = state.friendStatus,
                         onAddToFriends = { dispatchEvent(UserProfileEvent.SendFriendRequest) },
+                        onAcceptRequest = { dispatchEvent(UserProfileEvent.AcceptFriendRequest) },
                         onCancelSendRequest = { dispatchEvent(UserProfileEvent.CancelSendFriendRequest) },
                         onDeleteFromFriends = { dispatchEvent(UserProfileEvent.DeleteFromFriends) },
                     )

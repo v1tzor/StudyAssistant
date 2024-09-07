@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.common.extensions
 
 import kotlinx.datetime.Clock
+import kotlin.math.abs
 import kotlin.random.Random
 
 /**
@@ -31,7 +32,7 @@ fun generateRandomNumber(): Int {
 }
 
 fun generateDigitCode(numbers: Int = 7): String {
-    return generateRandomNumber().toString().substring(IntRange(0, numbers - 1))
+    return abs(generateRandomNumber()).toString().substring(IntRange(0, numbers - 1))
 }
 
 inline fun <T> Iterable<T>.forEachWith(action: T.() -> Unit) {
