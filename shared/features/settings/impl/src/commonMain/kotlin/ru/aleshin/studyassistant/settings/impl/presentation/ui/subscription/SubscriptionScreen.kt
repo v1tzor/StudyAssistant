@@ -27,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
-import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
@@ -73,9 +72,7 @@ internal class SubscriptionScreen : Screen {
             when (effect) {
                 is SubscriptionEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.apply {
-                            Logger.i("test") { this.toString() }
-                        }.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

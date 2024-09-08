@@ -76,7 +76,7 @@ internal interface ShareHomeworksInteractor {
 
             homeworks.recipients.forEach { recipient ->
                 val recipientSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(recipient.uid)
-                val updatedRecipientSharedHomeworks = currentSharedHomeworks.copy(
+                val updatedRecipientSharedHomeworks = recipientSharedHomeworks.copy(
                     received = buildMap {
                         putAll(recipientSharedHomeworks.received)
                         put(homeworks.uid, homeworks.convertToBase().convertToReceived(currentUser))

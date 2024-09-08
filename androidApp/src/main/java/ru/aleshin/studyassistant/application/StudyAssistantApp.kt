@@ -13,8 +13,8 @@ import ru.aleshin.studyassistant.PlatformSDK
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationDefaults
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationImportance
+import ru.aleshin.studyassistant.data.services.RemoteMessageHandlerImpl
 import ru.aleshin.studyassistant.di.PlatformConfiguration
-import ru.aleshin.studyassistant.presentation.services.RemoteMessageHandlerImpl
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
@@ -51,7 +51,6 @@ class StudyAssistantApp : Application() {
     }
 
     private fun initPlatformSDK() {
-        // val options = FirebaseOptions.Builder().build() TODO: Set FirebaseOptions
         FirebaseApp.initializeApp(this)
 
         pushClientFactory.createPushClient()

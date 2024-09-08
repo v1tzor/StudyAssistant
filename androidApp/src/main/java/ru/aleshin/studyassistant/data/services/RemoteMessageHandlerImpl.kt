@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.presentation.services
+package ru.aleshin.studyassistant.data.services
 
 import android.app.PendingIntent
 import android.content.Context
@@ -34,6 +34,7 @@ import ru.aleshin.studyassistant.core.domain.entities.message.NotifyPushContent
 import ru.aleshin.studyassistant.core.domain.entities.message.NotifyPushContentType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
+import ru.aleshin.studyassistant.presentation.services.RemoteMessageHandler
 import ru.aleshin.studyassistant.presentation.ui.MainActivity
 import ru.rustore.sdk.universalpush.domain.model.UniversalRemoteMessage
 

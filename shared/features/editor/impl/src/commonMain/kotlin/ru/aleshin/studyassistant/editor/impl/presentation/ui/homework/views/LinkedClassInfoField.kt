@@ -181,7 +181,7 @@ private fun LinkClassView(
                 } else if (linkClasses.isNotEmpty()) {
                     val classes = buildList {
                         linkClasses.forEach { entry -> addAll(entry.value.map { Pair(entry.key, it) }) }
-                    }
+                    }.sortedBy { it.first }
                     val nextClass = classes.find {
                         currentDate.daysUntil(it.first, TimeZone.currentSystemDefault()) >= 1
                     }

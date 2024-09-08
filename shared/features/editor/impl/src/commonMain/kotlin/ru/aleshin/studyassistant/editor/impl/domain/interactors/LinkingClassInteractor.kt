@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.endOfWeek
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.extensions.shiftWeek
@@ -85,7 +86,7 @@ internal interface LinkingClassInteractor {
                         customSchedules.forEach { customSchedule ->
                             if (customSchedule.classes.isNotEmpty()) {
                                 val groupedClasses = customSchedule.classes.groupBy { it.organization.uid }.mapValues {
-                                    it.value.sortedBy { classModel -> classModel.timeRange.from }
+                                    it.value.sortedBy { classModel -> classModel.timeRange.from.dateTime().time }
                                 }
                                 val classesWithTargetSubject = customSchedule.classes.filter { classModel ->
                                     val subjectFilter = classModel.subject?.uid == subject
@@ -106,7 +107,7 @@ internal interface LinkingClassInteractor {
                             val baseSchedule = baseScheduleEntry.second
                             if (baseSchedule?.classes?.isNotEmpty() == true) {
                                 val groupedClasses = baseSchedule.classes.groupBy { it.organization.uid }.mapValues {
-                                    it.value.sortedBy { classModel -> classModel.timeRange.from }
+                                    it.value.sortedBy { classModel -> classModel.timeRange.from.dateTime().time }
                                 }
                                 val classesWithTargetSubject = baseSchedule.classes.filter { classModel ->
                                     val subjectFilter = classModel.subject?.uid == subject

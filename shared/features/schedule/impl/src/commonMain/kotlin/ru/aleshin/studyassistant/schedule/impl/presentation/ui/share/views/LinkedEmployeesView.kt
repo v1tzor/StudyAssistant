@@ -98,6 +98,7 @@ internal fun LinkedEmployeesView(
                 tint = StudyAssistantRes.colors.accents.green,
             )
             Surface(
+                onClick = onLinkEmployee,
                 modifier = Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 shape = MaterialTheme.shapes.large,
