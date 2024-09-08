@@ -15,6 +15,7 @@ StudyAssistant
   <img alt="material" src="https://custom-icon-badges.demolab.com/badge/material%20you-lightblue?style=for-the-badge&logoColor=333&logo=material-you"/></a>
   </br>
   </br>
+  <a href=""><img src="https://tokei.rs/b1/github/v1tzor/StudyAssistant?category=code&color=purple&include_prereleases&logo=github&style=for-the-badge"/></a>
   <a href=""><img src="https://img.shields.io/github/v/release/v1tzor/StudyAssistant?color=purple&include_prereleases&logo=github&style=for-the-badge"/></a>
   <a href="https://github.com/v1tzor/StudyAssistant/stargazers"><img src="https://img.shields.io/github/stars/v1tzor/StudyAssistant?color=ffff00&style=for-the-badge"/></a>
   <a href=""><img src="https://img.shields.io/github/forks/v1tzor/StudyAssistant?style=for-the-badge"/></a>
@@ -124,16 +125,16 @@ Start today with the Study Assistant app—a powerful tool to make your learning
       <tr>
         <th>Profile</th>
         <th>Friends</th>
-        <th>Notification Settings</th>
-        <th>Calendar Settings</th>
+        <th>Share Schedule</th>
+        <th>Share Tasks</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td><img src="config/images/screenshots/Profile_dark_en.png" width="400"></td>
         <td><img src="config/images/screenshots/Friends_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Settings_Notifcation_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Settings_Calendar_dark_en.png" width="400"></td>
+        <td><img src="config/images/screenshots/Shrare_Schedule_dark_en.png" width="400"></td>
+        <td><img src="config/images/screenshots/Tasks_Share_dark_en.png" width="400"></td>
       </tr>
     </tbody>
     <thead>
