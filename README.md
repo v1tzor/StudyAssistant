@@ -26,6 +26,11 @@ StudyAssistant
   </br>
 </p>
 
+<div align="center">
+</br>
+<img src="https://i.imgur.com/NPR9yeO.png"/>
+<div align="start">
+
 ## Your Ultimate Academic Organizer
 
 ### 📚 Convenient Organization of Classes
