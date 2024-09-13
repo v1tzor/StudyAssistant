@@ -31,7 +31,7 @@ import ru.aleshin.studyassistant.preview.impl.domain.interactors.OrganizationsIn
  */
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<PreviewErrorHandler> { PreviewErrorHandler.Base() }
-    bindSingleton<PreviewEitherWrapper> { PreviewEitherWrapper.Base(instance()) }
+    bindSingleton<PreviewEitherWrapper> { PreviewEitherWrapper.Base(instance(), instance()) }
 
     bindProvider<AppUserInteractor> { AppUserInteractor.Base(instance(), instance()) }
     bindProvider<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance()) }

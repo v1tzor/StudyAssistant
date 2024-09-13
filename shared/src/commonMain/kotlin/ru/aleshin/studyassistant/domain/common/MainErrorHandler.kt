@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.domain.common
 
+import dev.gitlive.firebase.FirebaseNetworkException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 import ru.aleshin.studyassistant.domain.entities.MainFailures
 
@@ -26,6 +27,7 @@ interface MainErrorHandler : ErrorHandler<MainFailures> {
 
     class Base : MainErrorHandler {
         override fun handle(throwable: Throwable) = when (throwable) {
+            is FirebaseNetworkException -> MainFailures.FirebaseNetworkError
             else -> MainFailures.OtherError(throwable)
         }
     }

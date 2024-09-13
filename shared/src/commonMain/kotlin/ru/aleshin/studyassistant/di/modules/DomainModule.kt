@@ -30,7 +30,7 @@ import ru.aleshin.studyassistant.domain.interactors.ReminderInteractor
  */
 val domainModule = DI.Module("DomainModule") {
     bindSingleton<MainErrorHandler> { MainErrorHandler.Base() }
-    bindSingleton<MainEitherWrapper> { MainEitherWrapper.Base(instance()) }
+    bindSingleton<MainEitherWrapper> { MainEitherWrapper.Base(instance(), instance()) }
 
     bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<GeneralSettingsInteractor> { GeneralSettingsInteractor.Base(instance(), instance()) }

@@ -63,7 +63,7 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<LoginStateCommunicator> { LoginStateCommunicator.Base() }
     bindProvider<LoginEffectCommunicator> { LoginEffectCommunicator.Base() }
-    bindProvider<LoginWorkProcessor> { LoginWorkProcessor.Base(instance(), instance(), instance()) }
+    bindProvider<LoginWorkProcessor> { LoginWorkProcessor.Base(instance(), instance(), instance(), instance()) }
     bindProvider<LoginScreenModel> { LoginScreenModel(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<RegisterStateCommunicator> { RegisterStateCommunicator.Base() }

@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.editor.impl.di
 
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
@@ -56,4 +57,5 @@ public interface EditorFeatureDependencies : BaseFeatureDependencies {
     public val dateManager: DateManager
     public val overlayManager: TimeOverlayManager
     public val coroutineManager: CoroutineManager
+    public val crashlyticsService: CrashlyticsService
 }

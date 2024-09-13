@@ -16,12 +16,13 @@
 
 package ru.aleshin.studyassistant.di
 
-import ru.aleshin.studyassistant.core.common.platform.Platform
+import ru.aleshin.studyassistant.core.common.inject.AppService
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 expect class PlatformConfiguration {
-    val platform: Platform
-    val serviceTokenProvider: PlatformGoogleAuthTokenProvider
+    val appService: AppService
+    val crashlyticsService: CrashlyticsService
 }

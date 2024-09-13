@@ -44,14 +44,16 @@ struct iOSApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     init() {
-        FirebaseConfiguration.shared.setLoggerLevel(.min)
-        let filePath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist")
-        guard let fileopts = FirebaseOptions(contentsOfFile: filePath!) else { assert(false, "Couldn't load config file") }
-        FirebaseApp.configure(options: fileopts)
-        
+        let appService = AppServiceImpl()
+        let crashlyticsService = CrashlyticsServiceImpl()
         let tokenProvider = GoogleAuthTokenProvider()
         let uuidProvider = UUIDProvider()
-        let configuration = PlatformConfiguration(serviceTokenProvider: tokenProvider, uuidProvider: uuidProvider)
+        let configuration = PlatformConfiguration(
+            appService: appService,
+            crashlyticsService: crashlyticsService,
+            serviceTokenProvider: tokenProvider,
+            uuidProvider: uuidProvider
+        )
         
         PlatformSDK().doInit(configuration: configuration)
     }

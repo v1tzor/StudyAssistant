@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.domain.common
 
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
 import ru.aleshin.studyassistant.domain.entities.MainFailures
 
@@ -24,6 +25,11 @@ import ru.aleshin.studyassistant.domain.entities.MainFailures
  */
 interface MainEitherWrapper : FlowEitherWrapper<MainFailures> {
 
-    class Base constructor(errorHandler: MainErrorHandler) : MainEitherWrapper,
-        FlowEitherWrapper.Abstract<MainFailures>(errorHandler)
+    class Base(
+        errorHandler: MainErrorHandler,
+        crashlyticsService: CrashlyticsService
+    ) : MainEitherWrapper, FlowEitherWrapper.Abstract<MainFailures>(
+        errorHandler = errorHandler,
+        crashlyticsService = crashlyticsService,
+    )
 }

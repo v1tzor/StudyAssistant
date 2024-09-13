@@ -32,11 +32,11 @@ import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.messages.LocalNotificationReceiver
 import ru.aleshin.studyassistant.core.data.workers.EndClassesReminderWorker
 import ru.aleshin.studyassistant.core.data.workers.EndClassesReminderWorker.Companion.NOTIFICATION_ID_APPEND
 import ru.aleshin.studyassistant.core.data.workers.EndClassesReminderWorker.Companion.REPEAT_WORK_KEY
 import ru.aleshin.studyassistant.core.data.workers.EndClassesReminderWorker.Companion.WORK_KEY
-import ru.aleshin.studyassistant.core.data.workers.LocalNotificationReceiver
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 import java.util.concurrent.TimeUnit

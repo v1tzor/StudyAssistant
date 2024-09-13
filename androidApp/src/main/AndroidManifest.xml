@@ -31,6 +31,16 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="app"
+                    android:host="studyassistant.com"
+                    android:pathPrefix="/openMain" />
+            </intent-filter>
         </activity>
 
         <service
@@ -41,7 +51,7 @@
             tools:replace="android:directBootAware" />
 
         <receiver
-            android:name="ru.aleshin.studyassistant.core.data.workers.LocalNotificationReceiver"
+            android:name="ru.aleshin.studyassistant.core.common.messages.LocalNotificationReceiver"
             android:enabled="true"
             android:exported="false">
 

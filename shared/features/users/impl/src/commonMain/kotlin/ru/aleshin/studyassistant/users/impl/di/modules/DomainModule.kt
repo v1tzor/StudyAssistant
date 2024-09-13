@@ -30,7 +30,7 @@ import ru.aleshin.studyassistant.users.impl.domain.interactors.UsersInteractor
  */
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<UsersErrorHandler> { UsersErrorHandler.Base() }
-    bindSingleton<UsersEitherWrapper> { UsersEitherWrapper.Base(instance()) }
+    bindSingleton<UsersEitherWrapper> { UsersEitherWrapper.Base(instance(), instance()) }
 
     bindSingleton<EmployeeInteractor> { EmployeeInteractor.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<FriendRequestsInteractor> { FriendRequestsInteractor.Base(instance(), instance(), instance(), instance(), instance()) }

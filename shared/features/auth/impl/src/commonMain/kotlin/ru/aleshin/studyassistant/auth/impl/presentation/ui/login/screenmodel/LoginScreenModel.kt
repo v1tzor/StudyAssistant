@@ -53,10 +53,23 @@ internal class LoginScreenModel(
     coroutineManager = coroutineManager,
 ) {
 
+    override fun init(deps: EmptyDeps) {
+        if (!isInitialize) {
+            super.init(deps)
+            dispatchEvent(LoginEvent.Init)
+        }
+    }
+
     override suspend fun WorkScope<LoginViewState, LoginAction, LoginEffect>.handleEvent(
         event: LoginEvent,
     ) {
         when (event) {
+            is LoginEvent.Init -> {
+                launchBackgroundWork(BackgroundKey.CHECK_GOOGLE) {
+                    val command = LoginWorkCommand.CheckGoogleAvailable
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
             is LoginEvent.LoginWithEmail -> launchBackgroundWork(BackgroundKey.LOGIN) {
                 val emailValidResult = emailValidator.validate(event.credentials.email)
                 val passwordValidResult = passwordValidator.validate(event.credentials.password)
@@ -100,6 +113,9 @@ internal class LoginScreenModel(
             emailValidError = action.email,
             passwordValidError = action.password,
         )
+        is LoginAction.UpdateGoogleAvailable -> currentState.copy(
+            isAvailableGoogle = action.isAvailable,
+        )
         is LoginAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
             emailValidError = null,
@@ -108,7 +124,7 @@ internal class LoginScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOGIN, LOGIN_VIA_GOOGLE
+        CHECK_GOOGLE, LOGIN, LOGIN_VIA_GOOGLE
     }
 }
 

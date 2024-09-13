@@ -25,6 +25,8 @@
 		747545432C6400BA0032B546 /* UUIDProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 747545422C6400BA0032B546 /* UUIDProvider.swift */; };
 		74B9770E2C5E5ECF0097BB27 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 74B9770D2C5E5ECF0097BB27 /* FirebaseStorage */; };
 		74C67ECF2BDC149A001D880F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 74C67ECE2BDC149A001D880F /* GoogleService-Info.plist */; };
+		74F623AF2C9407E200E86642 /* AppServiceImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F623AE2C9407E200E86642 /* AppServiceImpl.swift */; };
+		74F623B12C940AC500E86642 /* CrashlyticsServiceImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F623B02C940AC500E86642 /* CrashlyticsServiceImpl.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -49,6 +51,8 @@
 		7475453D2C62A1950032B546 /* GoogleAuthTokenProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleAuthTokenProvider.swift; sourceTree = "<group>"; };
 		747545422C6400BA0032B546 /* UUIDProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UUIDProvider.swift; sourceTree = "<group>"; };
 		74C67ECE2BDC149A001D880F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		74F623AE2C9407E200E86642 /* AppServiceImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppServiceImpl.swift; sourceTree = "<group>"; };
+		74F623B02C940AC500E86642 /* CrashlyticsServiceImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashlyticsServiceImpl.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -113,6 +117,8 @@
 				058557D7273AAEEB004C7B11 /* Preview Content */,
 				7475453D2C62A1950032B546 /* GoogleAuthTokenProvider.swift */,
 				747545422C6400BA0032B546 /* UUIDProvider.swift */,
+				74F623AE2C9407E200E86642 /* AppServiceImpl.swift */,
+				74F623B02C940AC500E86642 /* CrashlyticsServiceImpl.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -182,6 +188,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
@@ -239,9 +246,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				2152FB042600AC8F00CF470E /* StudyAssistantApp.swift in Sources */,
+				74F623AF2C9407E200E86642 /* AppServiceImpl.swift in Sources */,
 				7475453E2C62A1950032B546 /* GoogleAuthTokenProvider.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				747545432C6400BA0032B546 /* UUIDProvider.swift in Sources */,
+				74F623B12C940AC500E86642 /* CrashlyticsServiceImpl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

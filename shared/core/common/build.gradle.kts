@@ -1,6 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import com.codingfeline.buildkonfig.compiler.FieldSpec
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
@@ -8,7 +5,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.serialization)
     alias(libs.plugins.parcelize)
-    alias(libs.plugins.konfig)
 }
 
 kotlin {
@@ -28,6 +24,10 @@ kotlin {
     }
 
     sourceSets {
+        androidMain.dependencies {
+            implementation(project.dependencies.platform(libs.rustore.bom))
+            implementation(libs.rustore.universalpush.core)
+        }
         androidMain.dependencies {
             api(libs.androidx.core.ktx)
             api(libs.androidx.activity.compose)
@@ -80,17 +80,5 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-}
-
-buildkonfig {
-    packageName = "ru.aleshin.studyassistant.core.common"
-
-    val rustoreProjectId = gradleLocalProperties(rootDir, providers).getProperty("rustoreProjectId")
-    val rustoreAuthToken = gradleLocalProperties(rootDir, providers).getProperty("rustoreServiceAuthToken")
-
-    defaultConfigs {
-        buildConfigField(FieldSpec.Type.STRING, "RUSTORE_PROJECT_ID", rustoreProjectId)
-        buildConfigField(FieldSpec.Type.STRING, "RUSTORE_SERVICE_AUTH_TOKEN", rustoreAuthToken)
     }
 }

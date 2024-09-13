@@ -31,7 +31,7 @@ import ru.aleshin.studyassistant.info.impl.domain.interactors.SubjectsInteractor
  */
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<InfoErrorHandler> { InfoErrorHandler.Base() }
-    bindSingleton<InfoEitherWrapper> { InfoEitherWrapper.Base(instance()) }
+    bindSingleton<InfoEitherWrapper> { InfoEitherWrapper.Base(instance(), instance()) }
 
     bindSingleton<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<SubjectsInteractor> { SubjectsInteractor.Base(instance(), instance(), instance()) }

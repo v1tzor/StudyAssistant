@@ -64,20 +64,25 @@ android {
 
     productFlavors {
         create("google") {
-            // FCM
             dimension = "production"
         }
         create("github") {
-            // FCM
             dimension = "production"
+            isDefault = true
         }
         create("fdroid") {
-            // None
             dimension = "production"
-            applicationIdSuffix = ".fdroid"
+            val firebaseProjectId = localProperties.getProperty("firebaseProjectId")
+            val firebaseApplicationId = localProperties.getProperty("firebaseApplicationId")
+            val firebaseStorageBucket = localProperties.getProperty("firebaseStorageBucket")
+            val firebaseApiKey = localProperties.getProperty("firebaseApiKey")
+
+            buildConfigField("String", "PROJECT_ID", firebaseProjectId)
+            buildConfigField("String", "APPLICATION_ID", firebaseApplicationId)
+            buildConfigField("String", "STORAGE_BUCKET", firebaseStorageBucket)
+            buildConfigField("String", "FIREBASE_API_KEY", firebaseApiKey)
         }
         create("rustore") {
-            // FCM, RuStore
             dimension = "production"
 
             val projectId = localProperties.getProperty("rustoreProjectId")
@@ -111,12 +116,13 @@ android {
     }
 }
 
-androidComponents {
-    beforeVariants { variant ->
-        if (!variant.productFlavors.joinToString().contains("fdroid")) {
-            apply(plugin = libs.plugins.gms.get().pluginId)
-        }
-    }
+val hasFdroid = gradle.startParameter.taskNames.any {
+    it.contains("FdroidDebug", ignoreCase = true) || it.contains("FdroidRelease", ignoreCase = true)
+}
+
+if (!hasFdroid) {
+    apply(plugin = libs.plugins.gms.get().pluginId)
+    apply(plugin = libs.plugins.crashlytics.get().pluginId)
 }
 
 val rustoreImplementation = "rustoreImplementation"
@@ -139,14 +145,14 @@ dependencies {
     googleImplementation(libs.google.gsm.services)
     rustoreImplementation(libs.google.gsm.services)
     githubImplementation(libs.google.gsm.services)
-    implementation(platform(libs.google.oauth.bom.android))
-    implementation(libs.google.oauth.android)
-    implementation(libs.google.oauth.credentials.android)
 
     implementation(platform(libs.firebase.bom.android))
     implementation(libs.firebase.auth.android)
     implementation(libs.firebase.messaging.android)
     implementation(libs.firebase.messaging.directboot.android)
+    googleImplementation(libs.firebase.crashlytics.android)
+    rustoreImplementation(libs.firebase.crashlytics.android)
+    githubImplementation(libs.firebase.crashlytics.android)
 
     implementation(platform(libs.rustore.bom))
     implementation(libs.rustore.universalpush.core)

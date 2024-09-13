@@ -23,7 +23,7 @@ import android.app.PendingIntent.FLAG_CANCEL_CURRENT
 import android.app.PendingIntent.FLAG_MUTABLE
 import android.content.Context
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.data.workers.LocalNotificationReceiver
+import ru.aleshin.studyassistant.core.common.messages.LocalNotificationReceiver
 
 /**
  * @author Stanislav Aleshin on 20.08.2024.

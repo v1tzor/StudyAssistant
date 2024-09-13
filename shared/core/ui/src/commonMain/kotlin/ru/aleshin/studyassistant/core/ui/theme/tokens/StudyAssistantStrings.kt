@@ -170,6 +170,8 @@ data class StudyAssistantStrings(
     val highWorkloadWarningTitle: String,
     val highWorkloadWarningBody: String,
     val todoReminderTitleSuffix: String,
+    val networkErrorMessage: String,
+    val otherErrorMessage: String,
 )
 
 internal val russianStudyAssistantString = StudyAssistantStrings(
@@ -319,7 +321,9 @@ internal val russianStudyAssistantString = StudyAssistantStrings(
     endClassesReminderTitle = "Занятия закончились! Осталось выполнить заданные задания",
     highWorkloadWarningTitle = "Предупреждение! Завтра будет сложный день.",
     highWorkloadWarningBody = "Тебе следует набраться сил и быть готовым на все 100%!",
-    todoReminderTitleSuffix = "Дедлайн задачи заканчивается через: "
+    todoReminderTitleSuffix = "Дедлайн задачи заканчивается через: ",
+    networkErrorMessage = "Отсутствует подключение к интернету! Повторите попытку позже",
+    otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
 )
 
 internal val englishStudyAssistantString = StudyAssistantStrings(
@@ -470,6 +474,8 @@ internal val englishStudyAssistantString = StudyAssistantStrings(
     highWorkloadWarningTitle = "Warning! Tomorrow will be a difficult day.",
     highWorkloadWarningBody = "You should gain strength and be fully prepared!",
     todoReminderTitleSuffix = "The deadline for the TODO ends in: ",
+    networkErrorMessage = "There is no internet connection! Please try again later",
+    otherErrorMessage = "Error! Contact the developer!",
 )
 
 fun StudyAssistantStrings.monthNames() = MonthNames(

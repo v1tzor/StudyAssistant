@@ -38,6 +38,7 @@ import ru.aleshin.studyassistant.core.common.extensions.shiftMillis
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.messages.LocalNotificationReceiver
 import ru.aleshin.studyassistant.core.data.di.coreDataModule
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule

@@ -15,12 +15,14 @@
  */
 package ru.aleshin.studyassistant.core.common.wrappers
 
+import cafe.adriel.voyager.core.platform.multiplatformName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.core.common.functional.DomainFailures
 import ru.aleshin.studyassistant.core.common.functional.Either
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -33,15 +35,26 @@ interface EitherWrapper<F : DomainFailures> {
 
     abstract class Abstract<F : DomainFailures>(
         private val errorHandler: ErrorHandler<F>,
+        private val crashlyticsService: CrashlyticsService,
     ) : EitherWrapper<F> {
 
         override suspend fun <O> wrap(block: suspend () -> O) = try {
             Either.Right(data = block.invoke())
         } catch (error: Throwable) {
-            Either.Left(data = errorHandler.handle(error))
+            val failure = errorHandler.handle(error)
+            crashlyticsService.recordException(
+                tag = ERROR_TAG,
+                message = failure::class.multiplatformName.toString(),
+                exception = error,
+            )
+            Either.Left(data = failure)
         }
 
         override suspend fun wrapUnit(block: suspend () -> Unit) = wrap(block)
+
+        companion object {
+            const val ERROR_TAG = "DomainError"
+        }
     }
 }
 
@@ -51,7 +64,8 @@ interface FlowEitherWrapper<F : DomainFailures> : EitherWrapper<F> {
 
     abstract class Abstract<F : DomainFailures>(
         private val errorHandler: ErrorHandler<F>,
-    ) : FlowEitherWrapper<F>, EitherWrapper.Abstract<F>(errorHandler) {
+        crashlyticsService: CrashlyticsService,
+    ) : FlowEitherWrapper<F>, EitherWrapper.Abstract<F>(errorHandler, crashlyticsService) {
 
         override suspend fun <O> wrapFlow(block: suspend () -> Flow<O>) = flow {
             block.invoke().catch { error ->

@@ -24,6 +24,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
@@ -77,6 +78,7 @@ public object ProfileFeatureDIHolder : BaseFeatureDIHolder<ProfileFeatureApi, Pr
                 bindSingleton<WorkloadWarningManager> { dependencies.workloadWarningManager }
                 bindSingleton<HomeworksReminderManager> { dependencies.homeworksReminderManager }
                 bindSingleton<DateManager> { dependencies.dateManager }
+                bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
                 bindSingleton<ProfileFeatureApi> {
                     object : ProfileFeatureApi {
                         override fun fetchStarter() = instance<ProfileFeatureStarter>()

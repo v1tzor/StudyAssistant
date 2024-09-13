@@ -78,6 +78,7 @@ internal fun LoginContent(
             )
             LoginActionsSection(
                 enabled = !state.isLoading && email.isNotEmpty() && password.isNotEmpty(),
+                enabledGoogle = state.isAvailableGoogle,
                 isLoading = state.isLoading,
                 onLoginClick = { onLoginClick(email, password) },
                 onLoginViaGoogleClick = { onLoginViaGoogleClick(it) },

@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.profile.impl.di
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
@@ -60,4 +61,5 @@ public interface ProfileFeatureDependencies : BaseFeatureDependencies {
     public val workloadWarningManager: WorkloadWarningManager
     public val coroutineManager: CoroutineManager
     public val dateManager: DateManager
+    public val crashlyticsService: CrashlyticsService
 }

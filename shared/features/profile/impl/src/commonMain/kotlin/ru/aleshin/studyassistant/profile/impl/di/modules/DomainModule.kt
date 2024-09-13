@@ -34,7 +34,7 @@ import ru.aleshin.studyassistant.profile.impl.domain.interactors.UserInteractor
  */
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<ProfileErrorHandler> { ProfileErrorHandler.Base() }
-    bindSingleton<ProfileEitherWrapper> { ProfileEitherWrapper.Base(instance()) }
+    bindSingleton<ProfileEitherWrapper> { ProfileEitherWrapper.Base(instance(), instance()) }
 
     bindProvider<AuthInteractor> { AuthInteractor.Base(instance(), instance(), instance(), instance()) }
     bindProvider<UserInteractor> { UserInteractor.Base(instance(), instance()) }

@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.navigation.impl.di
 
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
@@ -32,4 +33,5 @@ public interface NavigationFeatureDependencies : BaseFeatureDependencies {
     public val infoFeatureStarter: () -> InfoFeatureStarter
     public val profileFeatureStarter: () -> ProfileFeatureStarter
     public val coroutineManager: CoroutineManager
+    public val crashlyticsService: CrashlyticsService
 }

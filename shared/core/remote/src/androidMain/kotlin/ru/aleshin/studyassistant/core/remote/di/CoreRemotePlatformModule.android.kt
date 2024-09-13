@@ -19,7 +19,10 @@ package ru.aleshin.studyassistant.core.remote.di
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.messages.PushClientManager
+import ru.aleshin.studyassistant.core.common.inject.MessagingService
+import ru.aleshin.studyassistant.core.remote.datasources.message.GoogleAuthTokenProvider
+import ru.aleshin.studyassistant.core.remote.datasources.message.GoogleAuthTokenProviderImpl
+import ru.aleshin.studyassistant.core.remote.datasources.message.MessagingServiceImpl
 import ru.rustore.sdk.universalpush.RuStoreUniversalPushClient
 
 /**
@@ -27,5 +30,6 @@ import ru.rustore.sdk.universalpush.RuStoreUniversalPushClient
  */
 actual val coreRemotePlatformModule = DI.Module("CoreRemotePlatform") {
     bindSingleton<RuStoreUniversalPushClient> { RuStoreUniversalPushClient }
-    bindSingleton<PushClientManager> { PushClientManager(instance(), instance()) }
+    bindSingleton<MessagingService> { MessagingServiceImpl(instance(), instance()) }
+    bindSingleton<GoogleAuthTokenProvider> { GoogleAuthTokenProviderImpl(instance()) }
 }

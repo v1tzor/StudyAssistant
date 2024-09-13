@@ -32,7 +32,7 @@ import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.data.workers.LocalNotificationReceiver
+import ru.aleshin.studyassistant.core.common.messages.LocalNotificationReceiver
 import ru.aleshin.studyassistant.core.data.workers.StartClassesReminderWorker
 import ru.aleshin.studyassistant.core.data.workers.StartClassesReminderWorker.Companion.NOTIFICATION_ID_APPEND
 import ru.aleshin.studyassistant.core.data.workers.StartClassesReminderWorker.Companion.REPEAT_WORK_KEY

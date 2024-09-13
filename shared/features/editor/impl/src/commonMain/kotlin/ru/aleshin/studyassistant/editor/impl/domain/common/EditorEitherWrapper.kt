@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 
@@ -24,6 +25,11 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
  */
 internal interface EditorEitherWrapper : FlowEitherWrapper<EditorFailures> {
 
-    class Base(errorHandler: EditorErrorHandler) : EditorEitherWrapper,
-        FlowEitherWrapper.Abstract<EditorFailures>(errorHandler)
+    class Base(
+        errorHandler: EditorErrorHandler,
+        crashlyticsService: CrashlyticsService,
+    ) : EditorEitherWrapper, FlowEitherWrapper.Abstract<EditorFailures>(
+        errorHandler = errorHandler,
+        crashlyticsService = crashlyticsService,
+    )
 }

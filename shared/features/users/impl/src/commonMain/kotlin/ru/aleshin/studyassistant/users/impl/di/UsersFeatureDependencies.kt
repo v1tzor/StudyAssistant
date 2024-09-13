@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.users.impl.di
 
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
@@ -38,4 +39,5 @@ public interface UsersFeatureDependencies : BaseFeatureDependencies {
     public val messageRepository: MessageRepository
     public val dateManager: DateManager
     public val coroutineManager: CoroutineManager
+    public val crashlyticsService: CrashlyticsService
 }

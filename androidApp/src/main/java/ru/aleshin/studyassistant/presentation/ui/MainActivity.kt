@@ -32,8 +32,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import io.github.vinceglb.filekit.core.FileKit
 import ru.aleshin.studyassistant.android.R
+import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
 import ru.aleshin.studyassistant.core.common.extensions.isAllowPermission
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
+import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
 
 class MainActivity : ComponentActivity() {
 
@@ -44,6 +46,7 @@ class MainActivity : ComponentActivity() {
         FileKit.init(this)
 
         enableEdgeToEdge(navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT))
+
         setContent {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 RequestNotificationPermission()
@@ -55,7 +58,8 @@ class MainActivity : ComponentActivity() {
     @Composable
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun RequestNotificationPermission() {
-        val warningMessage = StudyAssistantRes.strings.warningGrantedPermissionMessage
+        val coreStrings = fetchCoreStrings(fetchAppLanguage(fetchCurrentLanguage()))
+        val warningMessage = coreStrings.warningGrantedPermissionMessage
         val permissionLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission()
         ) { isGranted ->

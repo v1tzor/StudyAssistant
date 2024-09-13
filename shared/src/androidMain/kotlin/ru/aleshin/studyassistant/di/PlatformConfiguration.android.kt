@@ -17,14 +17,16 @@
 package ru.aleshin.studyassistant.di
 
 import android.content.Context
-import ru.aleshin.studyassistant.core.common.platform.Platform
-import ru.aleshin.studyassistant.presentation.services.RemoteMessageHandler
+import ru.aleshin.studyassistant.core.common.inject.AppService
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.messages.RemoteMessageHandler
 
+/**
+ * @author Stanislav Aleshin on 14.04.2024.
+ */
 actual data class PlatformConfiguration constructor(
-    actual val serviceTokenProvider: PlatformGoogleAuthTokenProvider,
+    actual val appService: AppService,
+    actual val crashlyticsService: CrashlyticsService,
     val remoteMessageHandler: RemoteMessageHandler,
     val applicationContext: Context,
-) {
-    actual val platform: Platform
-        get() = Platform.Android
-}
+)

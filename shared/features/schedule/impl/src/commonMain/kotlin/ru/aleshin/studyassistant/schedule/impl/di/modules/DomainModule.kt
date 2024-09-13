@@ -32,7 +32,7 @@ import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ShareSchedules
  */
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<ScheduleErrorHandler> { ScheduleErrorHandler.Base() }
-    bindSingleton<ScheduleEitherWrapper> { ScheduleEitherWrapper.Base(instance()) }
+    bindSingleton<ScheduleEitherWrapper> { ScheduleEitherWrapper.Base(instance(), instance()) }
 
     bindSingleton<ScheduleInteractor> { ScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<HomeworkInteractor> { HomeworkInteractor.Base(instance(), instance(), instance()) }

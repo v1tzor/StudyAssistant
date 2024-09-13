@@ -12,5 +12,6 @@ plugins {
     alias(libs.plugins.kapt) apply false
     alias(libs.plugins.sqlitedelight) apply false
     alias(libs.plugins.gms) apply false
+    alias(libs.plugins.crashlytics) apply false
     alias(libs.plugins.konfig) apply false
 }

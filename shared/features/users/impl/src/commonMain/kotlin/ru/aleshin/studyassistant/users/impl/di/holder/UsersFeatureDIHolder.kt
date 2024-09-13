@@ -23,6 +23,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
@@ -57,6 +58,7 @@ public object UsersFeatureDIHolder : BaseFeatureDIHolder<UsersFeatureApi, UsersF
                 bindSingleton<MessageRepository> { dependencies.messageRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
+                bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
                 bindSingleton<UsersFeatureApi> {
                     object : UsersFeatureApi {
                         override fun fetchStarter() = instance<UsersFeatureStarter>()

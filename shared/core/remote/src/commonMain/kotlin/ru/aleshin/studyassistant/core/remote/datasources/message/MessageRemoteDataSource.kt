@@ -19,14 +19,16 @@ package ru.aleshin.studyassistant.core.remote.datasources.message
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.exceptions.RemoteException
-import ru.aleshin.studyassistant.core.common.messages.PushClientManager
-import ru.aleshin.studyassistant.core.common.messages.PushServiceAuthTokenFactory
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.inject.MessagingService
 import ru.aleshin.studyassistant.core.common.messages.UniversalPushToken
+import ru.aleshin.studyassistant.core.common.wrappers.EitherWrapper.Abstract.Companion.ERROR_TAG
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.UniversalMessaging.HOST
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.UniversalMessaging.SEND_TOKENS
 import ru.aleshin.studyassistant.core.remote.mappers.message.mapToRemote
@@ -45,11 +47,12 @@ interface MessageRemoteDataSource {
     class Base(
         private val httpClient: HttpClient,
         private val tokenProviderFactory: PushServiceAuthTokenFactory,
-        private val clientManager: PushClientManager,
+        private val messagingService: MessagingService,
+        private val crashlyticsService: CrashlyticsService,
     ) : MessageRemoteDataSource {
 
         override suspend fun fetchToken(): Flow<UniversalPushToken> {
-            return clientManager.fetchToken()
+            return messagingService.fetchToken()
         }
 
         override suspend fun sendMessage(message: UniversalMessageData) {
@@ -60,17 +63,23 @@ interface MessageRemoteDataSource {
                     authToken = tokenProvider.fetchAuthToken(),
                 )
             }
-            val httpResponse = httpClient.post(HOST + SEND_TOKENS) {
-                contentType(ContentType.Application.Json)
-                setBody(universalMessage)
-            }
-            if (!httpResponse.status.isSuccess()) {
-                throw RemoteException(httpResponse.status.value, httpResponse.status.description)
+            if (universalMessage.isAvailable()) {
+                val httpResponse = httpClient.post(HOST + SEND_TOKENS) {
+                    contentType(ContentType.Application.Json)
+                    setBody(universalMessage)
+                }
+                if (!httpResponse.status.isSuccess()) {
+                    crashlyticsService.recordException(
+                        tag = ERROR_TAG,
+                        message = httpResponse.bodyAsText(),
+                        exception = RemoteException(httpResponse.status.value, httpResponse.status.description),
+                    )
+                }
             }
         }
 
         override suspend fun deleteToken() {
-            clientManager.deleteToken()
+            messagingService.deleteToken()
         }
     }
 }

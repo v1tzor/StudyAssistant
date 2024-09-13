@@ -27,4 +27,6 @@ data class UniversalPushProvidersPojo(
     val fcm: PushProviderPojo? = null,
     val hms: PushProviderPojo? = null,
     val apns: PushProviderPojo? = null,
-)
+) {
+    fun isEmpty() = rustore == null && fcm == null && hms == null && apns == null
+}

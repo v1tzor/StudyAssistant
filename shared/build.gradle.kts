@@ -28,10 +28,6 @@ kotlin {
     }
 
     sourceSets {
-        androidMain.dependencies {
-            implementation(project.dependencies.platform(libs.rustore.bom))
-            implementation(libs.rustore.universalpush.core)
-        }
         commonMain.dependencies {
             implementation(project(":shared:features:navigation:api"))
             implementation(project(":shared:features:navigation:impl"))

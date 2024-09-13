@@ -35,11 +35,13 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 @Parcelize
 internal data class LoginViewState(
     val isLoading: Boolean = false,
+    val isAvailableGoogle: Boolean = false,
     val emailValidError: EmailValidError? = null,
     val passwordValidError: PasswordValidError? = null,
 ) : BaseViewState
 
 internal sealed class LoginEvent : BaseEvent {
+    data object Init : LoginEvent()
     data class LoginWithEmail(val credentials: LoginCredentialsUi) : LoginEvent()
     data class LoginViaGoogle(val idToken: String?) : LoginEvent()
     data object NavigateToRegister : LoginEvent()
@@ -57,5 +59,6 @@ internal sealed class LoginAction : BaseAction {
         val email: EmailValidError?,
         val password: PasswordValidError?
     ) : LoginAction()
+    data class UpdateGoogleAvailable(val isAvailable: Boolean) : LoginAction()
     data class UpdateLoading(val isLoading: Boolean) : LoginAction()
 }

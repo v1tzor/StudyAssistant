@@ -22,6 +22,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.navigation.api.di.NavigationFeatureApi
@@ -49,6 +50,7 @@ public object NavigationFeatureDIHolder :
                 bindSingleton<() -> TasksFeatureStarter> { dependencies.tasksFeatureStarter }
                 bindSingleton<() -> InfoFeatureStarter> { dependencies.infoFeatureStarter }
                 bindSingleton<() -> ProfileFeatureStarter> { dependencies.profileFeatureStarter }
+                bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
                 bindSingleton<NavigationFeatureApi> {
                     object : NavigationFeatureApi {
                         override fun fetchStarter() = instance<NavigationFeatureStarter>()

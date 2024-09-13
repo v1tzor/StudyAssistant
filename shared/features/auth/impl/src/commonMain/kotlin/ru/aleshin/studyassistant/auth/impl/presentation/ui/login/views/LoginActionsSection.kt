@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.mmk.kmpauth.google.GoogleButtonUiContainer
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
+import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
@@ -57,6 +58,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 internal fun LoginActionsSection(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    enabledGoogle: Boolean,
     isLoading: Boolean,
     onLoginClick: () -> Unit,
     onLoginViaGoogleClick: (idToken: String?) -> Unit,
@@ -108,8 +110,8 @@ internal fun LoginActionsSection(
         ) {
             OutlinedButton(
                 onClick = { this.onClick() },
-                modifier = Modifier.fillMaxWidth().height(44.dp),
-                enabled = !isLoading,
+                modifier = Modifier.alphaByEnabled(enabledGoogle).fillMaxWidth().height(44.dp),
+                enabled = !isLoading && enabledGoogle,
                 shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = MaterialTheme.colorScheme.background,

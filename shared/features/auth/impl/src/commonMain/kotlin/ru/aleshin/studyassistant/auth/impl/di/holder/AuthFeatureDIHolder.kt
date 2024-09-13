@@ -29,7 +29,9 @@ import ru.aleshin.studyassistant.auth.impl.di.modules.domainModule
 import ru.aleshin.studyassistant.auth.impl.di.modules.navigationModule
 import ru.aleshin.studyassistant.auth.impl.di.modules.presentationModule
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
+import ru.aleshin.studyassistant.core.common.inject.AppService
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
@@ -57,6 +59,8 @@ public object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeat
                 bindSingleton<MessageRepository> { dependencies.messageRepository }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
+                bindSingleton<AppService> { dependencies.appService }
+                bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
                 bindSingleton<AuthFeatureApi> {
                     object : AuthFeatureApi {
                         override fun fetchStarter() = instance<AuthFeatureStarter>()

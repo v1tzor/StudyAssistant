@@ -33,7 +33,7 @@ import ru.aleshin.studyassistant.settings.impl.domain.interactors.SyncInteractor
  */
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<SettingsErrorHandler> { SettingsErrorHandler.Base() }
-    bindSingleton<SettingsEitherWrapper> { SettingsEitherWrapper.Base(instance()) }
+    bindSingleton<SettingsEitherWrapper> { SettingsEitherWrapper.Base(instance(), instance()) }
 
     bindSingleton<GeneralSettingsInteractor> { GeneralSettingsInteractor.Base(instance(), instance()) }
     bindSingleton<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance(), instance()) }

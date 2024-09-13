@@ -8,29 +8,24 @@ import android.net.TrafficStats
 import android.os.Build
 import android.os.StrictMode
 import androidx.annotation.RequiresApi
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.FirebaseApp
 import ru.aleshin.studyassistant.PlatformSDK
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationDefaults
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationImportance
-import ru.aleshin.studyassistant.data.services.RemoteMessageHandlerImpl
+import ru.aleshin.studyassistant.data.remote.AppServiceImpl
+import ru.aleshin.studyassistant.data.remote.CrashlyticsServiceImpl
 import ru.aleshin.studyassistant.di.PlatformConfiguration
+import ru.aleshin.studyassistant.presentation.services.RemoteMessageHandlerImpl
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
  */
 class StudyAssistantApp : Application() {
 
-    private val googleAuthTokenProvider by lazy {
-        GoogleAuthTokenProvider(applicationContext)
-    }
-
     private val pushClientFactory by lazy {
         UniversalPushClientFactory.Base(applicationContext)
-    }
-
-    private val remoteMessageHandler by lazy {
-        RemoteMessageHandlerImpl(applicationContext)
     }
 
     private val notificationManager: NotificationManager
@@ -57,8 +52,14 @@ class StudyAssistantApp : Application() {
 
         PlatformSDK.doInit(
             configuration = PlatformConfiguration(
-                serviceTokenProvider = googleAuthTokenProvider,
-                remoteMessageHandler = remoteMessageHandler,
+                appService = AppServiceImpl(
+                    applicationContext = applicationContext,
+                    googleApiAvailability = GoogleApiAvailability.getInstance(),
+                ),
+                remoteMessageHandler = RemoteMessageHandlerImpl(
+                    context = applicationContext,
+                ),
+                crashlyticsService = CrashlyticsServiceImpl(),
                 applicationContext = applicationContext,
             )
         )

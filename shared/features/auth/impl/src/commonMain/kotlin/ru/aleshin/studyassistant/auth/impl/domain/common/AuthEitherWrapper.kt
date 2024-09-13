@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.auth.impl.domain.common
 
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
 
 /**
@@ -24,6 +25,11 @@ import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
  */
 internal interface AuthEitherWrapper : FlowEitherWrapper<AuthFailures> {
 
-    class Base(errorHandler: AuthErrorHandler) : AuthEitherWrapper,
-        FlowEitherWrapper.Abstract<AuthFailures>(errorHandler)
+    class Base(
+        errorHandler: AuthErrorHandler,
+        crashlyticsService: CrashlyticsService
+    ) : AuthEitherWrapper, FlowEitherWrapper.Abstract<AuthFailures>(
+        errorHandler = errorHandler,
+        crashlyticsService = crashlyticsService,
+    )
 }

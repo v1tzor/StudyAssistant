@@ -16,12 +16,24 @@
 
 package ru.aleshin.studyassistant.presentation.ui.main
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import cafe.adriel.voyager.transitions.CrossfadeTransition
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantTheme
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainViewState
 import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.rememberMainScreenModel
@@ -39,19 +51,38 @@ fun MainScreen() = ScreenContent(
         themeType = state.generalSettings.themeType,
         languageType = state.generalSettings.languageType,
     ) {
-        Navigator(
-            screen = SplashScreen(),
-            disposeBehavior = NavigatorDisposeBehavior(
-                disposeNestedNavigators = false,
-                disposeSteps = true,
-            ),
-        ) { navigator ->
-            CrossfadeTransition(navigator = navigator)
+        val coreStrings = StudyAssistantRes.strings
+        val snackbarState = remember { SnackbarHostState() }
 
-            handleEffect { effect ->
-                when (effect) {
-                    is MainEffect.ReplaceGlobalScreen -> navigator.replaceAll(effect.screen)
-                    is MainEffect.ShowError -> error(effect.failures)
+        Scaffold(
+            contentWindowInsets = WindowInsets(0.dp),
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarState,
+                    snackbar = { ErrorSnackbar(it) },
+                )
+            },
+        ) { paddingValues ->
+            Navigator(
+                screen = SplashScreen(),
+                disposeBehavior = NavigatorDisposeBehavior(
+                    disposeNestedNavigators = false,
+                    disposeSteps = true,
+                ),
+            ) { navigator ->
+                CrossfadeTransition(
+                    modifier = Modifier.padding(paddingValues),
+                    navigator = navigator,
+                )
+
+                handleEffect { effect ->
+                    when (effect) {
+                        is MainEffect.ReplaceGlobalScreen -> navigator.replaceAll(effect.screen)
+                        is MainEffect.ShowError -> snackbarState.showSnackbar(
+                            message = effect.failures.mapToMessage(coreStrings),
+                            duration = SnackbarDuration.Indefinite,
+                        )
+                    }
                 }
             }
         }

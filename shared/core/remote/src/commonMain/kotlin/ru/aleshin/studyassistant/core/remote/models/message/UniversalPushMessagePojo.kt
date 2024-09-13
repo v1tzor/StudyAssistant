@@ -27,4 +27,6 @@ data class UniversalPushMessagePojo(
     val tokens: UniversalPushTokensPojo?,
     val topic: String?,
     val message: UniversalPushMessageBodyPojo,
-)
+) {
+    fun isAvailable() = !providers.isEmpty() && (tokens?.isEmpty() == false || topic != null)
+}

@@ -39,7 +39,7 @@ import ru.aleshin.studyassistant.editor.impl.domain.interactors.TodoInteractor
  */
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<EditorErrorHandler> { EditorErrorHandler.Base() }
-    bindSingleton<EditorEitherWrapper> { EditorEitherWrapper.Base(instance()) }
+    bindSingleton<EditorEitherWrapper> { EditorEitherWrapper.Base(instance(), instance()) }
 
     bindSingleton<BaseScheduleInteractor> { BaseScheduleInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<CustomScheduleInteractor> { CustomScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }

@@ -25,6 +25,8 @@ import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
+import ru.aleshin.studyassistant.core.common.inject.AppService
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
@@ -89,6 +91,7 @@ val featureModule = DI.Module("Feature") {
             override val infoFeatureStarter = provider<InfoFeatureStarter>()
             override val profileFeatureStarter = provider<ProfileFeatureStarter>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
     bindProvider<NavigationFeatureStarter> {
@@ -108,6 +111,7 @@ val featureModule = DI.Module("Feature") {
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
     bindProvider<PreviewFeatureStarter> {
@@ -127,6 +131,8 @@ val featureModule = DI.Module("Feature") {
             override val manageUserRepository = instance<ManageUserRepository>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val appService = instance<AppService>()
+            override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
     bindProvider<AuthFeatureStarter> {
@@ -155,6 +161,7 @@ val featureModule = DI.Module("Feature") {
             override val usersRepository = instance<UsersRepository>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
     bindProvider<ScheduleFeatureStarter> {
@@ -181,6 +188,7 @@ val featureModule = DI.Module("Feature") {
             override val usersRepository = instance<UsersRepository>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
     bindProvider<TasksFeatureStarter> {
@@ -202,6 +210,7 @@ val featureModule = DI.Module("Feature") {
             override val usersRepository = instance<UsersRepository>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
     bindProvider<InfoFeatureStarter> {
@@ -232,6 +241,7 @@ val featureModule = DI.Module("Feature") {
             override val workloadWarningManager = instance<WorkloadWarningManager>()
             override val coroutineManager = instance<CoroutineManager>()
             override val dateManager = instance<DateManager>()
+            override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
     bindProvider<ProfileFeatureStarter> {
@@ -251,6 +261,7 @@ val featureModule = DI.Module("Feature") {
             override val messageRepository = instance<MessageRepository>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
     bindProvider<UsersFeatureStarter> {
@@ -279,6 +290,7 @@ val featureModule = DI.Module("Feature") {
             override val dateManager = instance<DateManager>()
             override val overlayManager = instance<TimeOverlayManager>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
     bindProvider<EditorFeatureStarter> {
@@ -307,6 +319,7 @@ val featureModule = DI.Module("Feature") {
             override val workloadWarningManager = instance<WorkloadWarningManager>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
     bindProvider<SettingsFeatureStarter> {

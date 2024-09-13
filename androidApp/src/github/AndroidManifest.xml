@@ -5,7 +5,7 @@
 
     <application>
         <service
-            android:name="ru.aleshin.studyassistant.services.FirebaseMessagingService"
+            android:name="ru.aleshin.studyassistant.presentation.services.FirebaseMessagingService"
             android:directBootAware="true"
             android:exported="true">
 

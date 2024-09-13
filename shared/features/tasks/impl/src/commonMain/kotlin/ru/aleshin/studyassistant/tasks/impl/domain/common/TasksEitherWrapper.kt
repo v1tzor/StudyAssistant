@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 
@@ -24,6 +25,11 @@ import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
  */
 internal interface TasksEitherWrapper : FlowEitherWrapper<TasksFailures> {
 
-    class Base(errorHandler: TasksErrorHandler) : TasksEitherWrapper,
-        FlowEitherWrapper.Abstract<TasksFailures>(errorHandler)
+    class Base(
+        errorHandler: TasksErrorHandler,
+        crashlyticsService: CrashlyticsService
+    ) : TasksEitherWrapper, FlowEitherWrapper.Abstract<TasksFailures>(
+        errorHandler = errorHandler,
+        crashlyticsService = crashlyticsService,
+    )
 }

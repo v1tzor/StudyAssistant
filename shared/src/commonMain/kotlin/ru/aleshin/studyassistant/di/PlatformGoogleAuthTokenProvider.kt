@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.di
 
-import ru.aleshin.studyassistant.core.common.messages.GoogleAuthTokenProvider
+import ru.aleshin.studyassistant.core.remote.datasources.message.GoogleAuthTokenProvider
 
 /**
  * @author Stanislav Aleshin on 07.08.2024.

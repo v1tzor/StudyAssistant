@@ -23,6 +23,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
@@ -75,6 +76,7 @@ public object ScheduleFeatureDIHolder : BaseFeatureDIHolder<ScheduleFeatureApi, 
                 bindSingleton<EndClassesReminderManager> { dependencies.endClassesReminderManager }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
+                bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
                 bindSingleton<ScheduleFeatureApi> {
                     object : ScheduleFeatureApi {
                         override fun fetchStarter() = instance<ScheduleFeatureStarter>()

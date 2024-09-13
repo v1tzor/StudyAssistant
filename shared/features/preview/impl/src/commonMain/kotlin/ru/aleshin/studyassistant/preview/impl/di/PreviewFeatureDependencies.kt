@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.preview.impl.di
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
@@ -38,4 +39,5 @@ public interface PreviewFeatureDependencies : BaseFeatureDependencies {
     public val calendarSettingsRepository: CalendarSettingsRepository
     public val deviceInfoProvider: DeviceInfoProvider
     public val coroutineManager: CoroutineManager
+    public val crashlyticsService: CrashlyticsService
 }

@@ -25,6 +25,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
@@ -41,7 +42,7 @@ import ru.aleshin.studyassistant.preview.impl.di.modules.presentationModule
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
-object PreviewFeatureDIHolder : BaseFeatureDIHolder<PreviewFeatureApi, PreviewFeatureDependencies> {
+public object PreviewFeatureDIHolder : BaseFeatureDIHolder<PreviewFeatureApi, PreviewFeatureDependencies> {
 
     private var directDi: DirectDI? = null
 
@@ -57,6 +58,7 @@ object PreviewFeatureDIHolder : BaseFeatureDIHolder<PreviewFeatureApi, PreviewFe
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
+                bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
                 bindSingleton<PreviewFeatureApi> {
                     object : PreviewFeatureApi {
                         override fun fetchStarter() = instance<PreviewFeatureStarter>()

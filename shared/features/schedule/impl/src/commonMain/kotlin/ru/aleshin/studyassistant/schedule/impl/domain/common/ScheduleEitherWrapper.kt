@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 
@@ -24,6 +25,11 @@ import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
  */
 internal interface ScheduleEitherWrapper : FlowEitherWrapper<ScheduleFailures> {
 
-    class Base(errorHandler: ScheduleErrorHandler) : ScheduleEitherWrapper,
-        FlowEitherWrapper.Abstract<ScheduleFailures>(errorHandler)
+    class Base(
+        errorHandler: ScheduleErrorHandler,
+        crashlyticsService: CrashlyticsService,
+    ) : ScheduleEitherWrapper, FlowEitherWrapper.Abstract<ScheduleFailures>(
+        errorHandler = errorHandler,
+        crashlyticsService = crashlyticsService,
+    )
 }

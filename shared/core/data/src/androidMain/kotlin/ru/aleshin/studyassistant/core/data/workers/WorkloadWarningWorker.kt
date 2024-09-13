@@ -16,7 +16,12 @@
 
 package ru.aleshin.studyassistant.core.data.workers
 
+import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
+import android.content.Intent
+import android.content.Intent.ACTION_VIEW
+import android.net.Uri
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
@@ -28,6 +33,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.di.coreCommonModule
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
+import ru.aleshin.studyassistant.core.common.extensions.generateDigitCode
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -64,7 +70,7 @@ import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
  * @author Stanislav Aleshin on 22.08.2024.
  */
 class WorkloadWarningWorker(
-    context: Context,
+    private val context: Context,
     workerParameters: WorkerParameters,
 ) : CoroutineWorker(context, workerParameters), DirectDIAware {
 
@@ -95,6 +101,10 @@ class WorkloadWarningWorker(
 
         val value = fetchDailyWorkload(currentUser, currentDate)
         if (value.toInt() >= maxWorkloadValue) {
+            val mainActivityUri = Uri.parse("app://studyassistant.com/openMain")
+            val contentIntent = Intent(ACTION_VIEW, mainActivityUri)
+            val requestCode = generateDigitCode().toInt()
+            val pContentIntent = PendingIntent.getActivity(context, requestCode, contentIntent, FLAG_IMMUTABLE)
             val notify = notificationCreator.createNotify(
                 channelId = Constants.Notification.CHANNEL_ID,
                 title = coreStrings.highWorkloadWarningTitle,
@@ -102,6 +112,7 @@ class WorkloadWarningWorker(
                 smallIcon = R.drawable.ic_launcher_notification,
                 category = NotificationCategory.CATEGORY_REMINDER,
                 priority = NotificationPriority.MAX,
+                contentIntent = pContentIntent,
             )
 
             notificationCreator.showNotify(notify)

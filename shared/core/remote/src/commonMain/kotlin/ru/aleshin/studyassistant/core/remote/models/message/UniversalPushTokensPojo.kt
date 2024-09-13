@@ -27,4 +27,6 @@ data class UniversalPushTokensPojo(
     val fcm: List<String>? = null,
     val hms: List<String>? = null,
     val apns: List<String>? = null,
-)
+) {
+    fun isEmpty() = rustore.isNullOrEmpty() && fcm.isNullOrEmpty() && hms.isNullOrEmpty() && apns.isNullOrEmpty()
+}

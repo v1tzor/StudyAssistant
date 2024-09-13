@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.settings.impl.di
 
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
@@ -56,4 +57,5 @@ public interface SettingsFeatureDependencies : BaseFeatureDependencies {
     public val workloadWarningManager: WorkloadWarningManager
     public val dateManager: DateManager
     public val coroutineManager: CoroutineManager
+    public val crashlyticsService: CrashlyticsService
 }

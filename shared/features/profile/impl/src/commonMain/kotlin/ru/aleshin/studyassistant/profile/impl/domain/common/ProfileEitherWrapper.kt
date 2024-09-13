@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.profile.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 
@@ -24,6 +25,11 @@ import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
  */
 internal interface ProfileEitherWrapper : FlowEitherWrapper<ProfileFailures> {
 
-    class Base(errorHandler: ProfileErrorHandler) : ProfileEitherWrapper,
-        FlowEitherWrapper.Abstract<ProfileFailures>(errorHandler)
+    class Base(
+        errorHandler: ProfileErrorHandler,
+        crashlyticsService: CrashlyticsService,
+    ) : ProfileEitherWrapper, FlowEitherWrapper.Abstract<ProfileFailures>(
+        errorHandler = errorHandler,
+        crashlyticsService = crashlyticsService,
+    )
 }

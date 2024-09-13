@@ -16,15 +16,16 @@
 
 package ru.aleshin.studyassistant.di
 
+import ru.aleshin.studyassistant.core.common.inject.AppService
+import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.IosUUIDProvider
-import ru.aleshin.studyassistant.core.common.platform.Platform
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 actual data class PlatformConfiguration(
-    actual val serviceTokenProvider: PlatformGoogleAuthTokenProvider,
+    actual val appService: AppService,
+    actual val crashlyticsService: CrashlyticsService,
+    val serviceTokenProvider: PlatformGoogleAuthTokenProvider,
     val uuidProvider: IosUUIDProvider,
-) {
-    actual val platform = Platform.IOS
-}
+)

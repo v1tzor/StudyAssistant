@@ -41,23 +41,26 @@ import ru.aleshin.studyassistant.di.modules.presentationModule
 object PlatformSDK {
 
     fun doInit(configuration: PlatformConfiguration) {
-        val graph = DI {
-            bindSingleton<PlatformConfiguration> { configuration }
-            importAll(
-                platformModule,
-                coreCommonModule,
-                coreDataModule,
-                featureModule,
-                presentationModule,
-                domainModule,
-            )
-        }
+        configuration.appService.initializeApp()
+        configuration.crashlyticsService.initializeService()
         Firebase.firestore.settings = firestoreSettings {
             persistentCacheSettings {
                 cacheSettings = LocalCacheSettings.Persistent.newBuilder().build()
             }
         }
         GoogleAuthProvider.create(GoogleAuthCredentials(serverId = BuildKonfig.WEB_CLIENT_ID))
-        MainDependenciesGraph.initialize(graph.direct)
+        MainDependenciesGraph.initialize(
+            di = DI {
+                bindSingleton<PlatformConfiguration> { configuration }
+                importAll(
+                    platformModule,
+                    coreCommonModule,
+                    coreDataModule,
+                    featureModule,
+                    presentationModule,
+                    domainModule,
+                )
+            }.direct
+        )
     }
 }

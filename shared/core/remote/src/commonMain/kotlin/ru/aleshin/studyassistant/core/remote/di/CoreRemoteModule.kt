@@ -18,8 +18,6 @@ package ru.aleshin.studyassistant.core.remote.di
 
 import HttpEngineFactory
 import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.app
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.FirebaseFirestore
@@ -39,11 +37,11 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
-import ru.aleshin.studyassistant.core.common.messages.PushServiceAuthTokenFactory
-import ru.aleshin.studyassistant.core.common.messages.PushServiceAuthTokenProvider
 import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.message.MessageRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.message.PushServiceAuthTokenFactory
+import ru.aleshin.studyassistant.core.remote.datasources.message.PushServiceAuthTokenProvider
 import ru.aleshin.studyassistant.core.remote.datasources.organizations.OrganizationsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.requests.FriendRequestsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.schedules.BaseScheduleRemoteDataSource
@@ -62,7 +60,6 @@ import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSo
 val coreRemoteModule = DI.Module("CoreRemote") {
     import(coreRemotePlatformModule)
 
-    bindProvider<FirebaseApp> { Firebase.app }
     bindProvider<FirebaseAuth> { Firebase.auth }
     bindProvider<FirebaseFirestore> { Firebase.firestore }
     bindProvider<FirebaseStorage> { Firebase.storage }
@@ -111,10 +108,10 @@ val coreRemoteModule = DI.Module("CoreRemote") {
     bindSingleton<HomeworksRemoteDataSource> { HomeworksRemoteDataSource.Base(instance()) }
     bindSingleton<TodoRemoteDataSource> { TodoRemoteDataSource.Base(instance()) }
     bindSingleton<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance(), instance()) }
-    bindSingleton<MessageRemoteDataSource> { MessageRemoteDataSource.Base(instance(), instance(), instance()) }
+    bindSingleton<MessageRemoteDataSource> { MessageRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
 
     bindProvider<PushServiceAuthTokenFactory> { PushServiceAuthTokenFactory.Base(instance(), instance(), instance()) }
-    bindProvider<PushServiceAuthTokenProvider.Firebase> { PushServiceAuthTokenProvider.Firebase(instance(), instance()) }
+    bindProvider<PushServiceAuthTokenProvider.Firebase> { PushServiceAuthTokenProvider.Firebase(instance()) }
     bindProvider<PushServiceAuthTokenProvider.RuStore> { PushServiceAuthTokenProvider.RuStore() }
     bindProvider<PushServiceAuthTokenProvider.Huawei> { PushServiceAuthTokenProvider.Huawei() }
 }

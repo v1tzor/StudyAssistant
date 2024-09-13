@@ -33,6 +33,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkC
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.common.inject.AppService
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 
@@ -45,11 +46,18 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
         private val authInteractor: AuthInteractor,
         private val screenProvider: AuthScreenProvider,
         private val deviceInfoProvider: DeviceInfoProvider,
+        private val appService: AppService,
     ) : LoginWorkProcessor {
 
         override suspend fun work(command: LoginWorkCommand) = when (command) {
+            is LoginWorkCommand.CheckGoogleAvailable -> checkGoogleAvailableWork()
             is LoginWorkCommand.LoginWithEmail -> loginWithEmailWork(command.credentials)
             is LoginWorkCommand.LoginWithGoogle -> loginWithGoogleWork(command.idToken)
+        }
+
+        private fun checkGoogleAvailableWork() = flow {
+            val isAvailable = appService.isAvailableServices
+            emit(ActionResult(LoginAction.UpdateGoogleAvailable(isAvailable)))
         }
 
         private fun loginWithEmailWork(credentials: LoginCredentialsUi) = flow<LoginWorkResult> {
@@ -99,6 +107,7 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
 }
 
 internal sealed class LoginWorkCommand : WorkCommand {
+    data object CheckGoogleAvailable : LoginWorkCommand()
     data class LoginWithEmail(val credentials: LoginCredentialsUi) : LoginWorkCommand()
     data class LoginWithGoogle(val idToken: String?) : LoginWorkCommand()
 }
