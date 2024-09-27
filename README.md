@@ -26,6 +26,11 @@ StudyAssistant
   </br>
 </p>
 
+<div align="center">
+</br>
+<img src="https://i.imgur.com/NPR9yeO.png"/>
+<div align="start">
+
 ## Your Ultimate Academic Organizer
 
 ### 📚 Convenient Organization of Classes
@@ -156,6 +161,25 @@ Start today with the Study Assistant app—a powerful tool to make your learning
   </table>
 </div>
 
+## Markets
+| Service        | Free version   | Subscription version |
+| -------------- | -------------- | -------------------- |
+| Github         | &check;        | &cross;              |
+| Fdoroid        | In progress    | &cross;              |
+| RuStore        | In planned     | In planned           |
+| Play Market    | In planned     | In planned           |
+| App gallery    | In planned     | In planned           |
+| App Store      | In planned     | In planned           |
+
+## Technical capabilities
+| Flavor         | Crashlytics    | Firestore         | Messaging      | Reminders |
+| -------------- | -------------- | ----------------- | -------------- | --------- |
+| Github         | &check;        | &check; (GMS)     | FMS            | &check; |
+| Fdoroid        | &cross;        | Only Network      | &cross;        | &check; |
+| RuStore        | &check;        | &check; (GMS)     | FCM, RUSTORE   | &check; |
+| Google         | &check;        | &check; (GMS)     | FCM            | &check; |
+| Huawei         | In planned     | In planned        | In planned (HCM, FMS) | &check; |
+| Apple          | In progress    | &check;           | In planned (APNS) | In planned |
 
 # Project Dependencies
 
