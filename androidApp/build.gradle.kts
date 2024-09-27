@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -6,6 +7,15 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kapt)
     alias(libs.plugins.compose.compiler)
+}
+
+val hasFdroid = gradle.startParameter.taskNames.any {
+    it.contains("FdroidDebug", ignoreCase = true) || it.contains("FdroidRelease", ignoreCase = true)
+}
+
+if (!hasFdroid) {
+    apply(plugin = libs.plugins.gms.get().pluginId)
+    apply(plugin = libs.plugins.crashlytics.get().pluginId)
 }
 
 android {
@@ -54,6 +64,7 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
+            if (!hasFdroid) configure<CrashlyticsExtension> { mappingFileUploadEnabled = false }
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"
@@ -68,7 +79,6 @@ android {
         }
         create("github") {
             dimension = "production"
-            isDefault = true
         }
         create("fdroid") {
             dimension = "production"
@@ -77,10 +87,10 @@ android {
             val firebaseStorageBucket = localProperties.getProperty("firebaseStorageBucket")
             val firebaseApiKey = localProperties.getProperty("firebaseApiKey")
 
-            buildConfigField("String", "PROJECT_ID", firebaseProjectId)
-            buildConfigField("String", "APPLICATION_ID", firebaseApplicationId)
-            buildConfigField("String", "STORAGE_BUCKET", firebaseStorageBucket)
-            buildConfigField("String", "FIREBASE_API_KEY", firebaseApiKey)
+            buildConfigField("String", "PROJECT_ID", "\"$firebaseProjectId\"")
+            buildConfigField("String", "APPLICATION_ID", "\"$firebaseApplicationId\"")
+            buildConfigField("String", "STORAGE_BUCKET", "\"$firebaseStorageBucket\"")
+            buildConfigField("String", "FIREBASE_API_KEY", "\"$firebaseApiKey\"")
         }
         create("rustore") {
             dimension = "production"
@@ -88,8 +98,8 @@ android {
             val projectId = localProperties.getProperty("rustoreProjectId")
             val serviceAuthToken = localProperties.getProperty("rustoreServiceAuthToken")
 
-            buildConfigField("String", "PROJECT_ID", projectId)
-            buildConfigField("String", "SERVICE_AUTH_TOKEN", serviceAuthToken)
+            buildConfigField("String", "PROJECT_ID", "\"$projectId\"")
+            buildConfigField("String", "SERVICE_AUTH_TOKEN", "\"$serviceAuthToken\"")
         }
     }
 
@@ -116,15 +126,6 @@ android {
     }
 }
 
-val hasFdroid = gradle.startParameter.taskNames.any {
-    it.contains("FdroidDebug", ignoreCase = true) || it.contains("FdroidRelease", ignoreCase = true)
-}
-
-if (!hasFdroid) {
-    apply(plugin = libs.plugins.gms.get().pluginId)
-    apply(plugin = libs.plugins.crashlytics.get().pluginId)
-}
-
 val rustoreImplementation = "rustoreImplementation"
 val googleImplementation = "googleImplementation"
 val githubImplementation = "githubImplementation"
@@ -142,9 +143,9 @@ dependencies {
 
     implementation(libs.kodein.android)
 
-    googleImplementation(libs.google.gsm.services)
-    rustoreImplementation(libs.google.gsm.services)
-    githubImplementation(libs.google.gsm.services)
+    googleImplementation(libs.google.gms.services)
+    rustoreImplementation(libs.google.gms.services)
+    githubImplementation(libs.google.gms.services)
 
     implementation(platform(libs.firebase.bom.android))
     implementation(libs.firebase.auth.android)

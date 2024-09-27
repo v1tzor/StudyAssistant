@@ -316,11 +316,10 @@ private fun ScheduleTimeIntervalsItem(
                         )
                         Text(
                             text = buildAnnotatedString {
-                                append(
-                                    minDuration?.toMinutesOrHoursTitle()
-                                        ?: StudyAssistantRes.strings.noneTitle
-                                )
-                                if (maxDuration != null) append(" - " + maxDuration.toMinutesOrHoursTitle())
+                                append(minDuration?.toMinutesOrHoursTitle() ?: StudyAssistantRes.strings.noneTitle)
+                                if (maxDuration != null && maxDuration != minDuration) {
+                                    append(" - " + maxDuration.toMinutesOrHoursTitle())
+                                }
                             },
                             color = MaterialTheme.colorScheme.onSurface,
                             style = MaterialTheme.typography.labelLarge,
@@ -347,11 +346,10 @@ private fun ScheduleTimeIntervalsItem(
                         )
                         Text(
                             text = buildAnnotatedString {
-                                append(
-                                    minDuration?.toMinutesOrHoursTitle()
-                                        ?: StudyAssistantRes.strings.noneTitle
-                                )
-                                if (maxDuration != null) append(" - " + maxDuration.toMinutesOrHoursTitle())
+                                append(minDuration?.toMinutesOrHoursTitle() ?: StudyAssistantRes.strings.noneTitle)
+                                if (maxDuration != null && maxDuration != minDuration) {
+                                    append(" - " + maxDuration.toMinutesOrHoursTitle())
+                                }
                             },
                             color = MaterialTheme.colorScheme.onSurface,
                             style = MaterialTheme.typography.labelLarge,

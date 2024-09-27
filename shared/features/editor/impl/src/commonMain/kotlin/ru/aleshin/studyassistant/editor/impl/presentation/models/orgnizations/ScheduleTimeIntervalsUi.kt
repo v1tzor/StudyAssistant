@@ -51,15 +51,15 @@ internal data class ScheduleTimeIntervalsUi(
     }
 
     fun maxClassDuration(): Millis? {
-        val specificMin = specificClassDuration.maxOfOrNull { it.duration }
-        val baseMin = baseClassDuration
-        return max(specificMin, baseMin)
+        val specificMax = specificClassDuration.maxOfOrNull { it.duration }
+        val baseMax = baseClassDuration
+        return max(specificMax, baseMax)
     }
 
     fun maxBreakDuration(): Millis? {
-        val specificMin = specificBreakDuration.maxOfOrNull { it.duration }
-        val baseMin = baseBreakDuration
-        return max(specificMin, baseMin)
+        val specificMax = specificBreakDuration.maxOfOrNull { it.duration }
+        val baseMax = baseBreakDuration
+        return max(specificMax, baseMax)
     }
 
     fun averageClassDuration(): Millis? {

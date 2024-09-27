@@ -152,7 +152,7 @@ interface OrganizationsLocalDataSource {
         }
 
         override suspend fun fetchAllShortOrganization(): Flow<List<OrganizationShortEntity>> {
-            val query = organizationQueries.fetchAllOrganizations()
+            val query = organizationQueries.fetchAllNotHideOrganizations()
             val organizations = query.asFlow().mapToList(coroutineContext).map { entities ->
                 entities.map { it.mapToShort() }
             }

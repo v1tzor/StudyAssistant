@@ -9,6 +9,11 @@ captures
 .cxx
 local.properties
 xcuserdata
+androidApp/fdroid/
+androidApp/github/
+androidApp/google/
+androidApp/rustore/
+androidApp/mapping.txt
 androidApp/src/main/assets/service-account-file.json
 iosApp/iosApp/service-account-file.json
 iosApp/service-account-file.json

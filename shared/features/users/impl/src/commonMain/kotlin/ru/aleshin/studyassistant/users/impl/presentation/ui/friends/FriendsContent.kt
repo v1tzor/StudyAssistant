@@ -338,8 +338,8 @@ private fun FriendsViewItem(
                             isExpand = isExpandedFriendMenu,
                             onDismiss = { isExpandedFriendMenu = false },
                             onDeleteFromFriend = {
-                                onDeleteFriend(friend.uid)
                                 isExpandedFriendMenu = false
+                                onDeleteFriend(friend.uid)
                             },
                         )
                         IconButton(

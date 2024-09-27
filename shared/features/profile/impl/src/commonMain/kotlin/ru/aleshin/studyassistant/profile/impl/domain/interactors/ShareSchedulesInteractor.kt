@@ -138,7 +138,7 @@ internal interface ShareSchedulesInteractor {
                     put(shareId, sentMediatedSchedules)
                 }
             )
-            val updatedRecipientSharedSchedules = currentSharedSchedules.copy(
+            val updatedRecipientSharedSchedules = recipientSharedSchedules.copy(
                 received = buildMap {
                     putAll(recipientSharedSchedules.received)
                     put(shareId, receivedMediatedSchedules)

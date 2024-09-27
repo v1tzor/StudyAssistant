@@ -27,6 +27,8 @@ import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.UserFriendStatus
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.users.impl.domain.common.UsersEitherWrapper
 import ru.aleshin.studyassistant.users.impl.domain.entities.UsersFailures
@@ -45,6 +47,8 @@ internal interface UsersInteractor {
 
     class Base(
         private val usersRepository: UsersRepository,
+        private val shareSchedulesRepository: ShareSchedulesRepository,
+        private val shareHomeworksRepository: ShareHomeworksRepository,
         private val requestsRepository: FriendRequestsRepository,
         private val eitherWrapper: UsersEitherWrapper,
     ) : UsersInteractor {
@@ -111,6 +115,46 @@ internal interface UsersInteractor {
         }
 
         override suspend fun removeUserFromFriends(userId: UID) = eitherWrapper.wrapUnit {
+            shareSchedulesRepository.fetchRealtimeSharedSchedulesByUser(currentUser).apply {
+                val updatedCurrentSharedSchedules = copy(
+                    received = received.filter { it.value.sender.uid != userId },
+                    sent = sent.filter { it.value.recipient.uid != userId },
+                )
+                shareSchedulesRepository.addOrUpdateSharedSchedules(updatedCurrentSharedSchedules, currentUser)
+            }
+
+            shareSchedulesRepository.fetchRealtimeSharedSchedulesByUser(userId).apply {
+                val updatedSenderSharedSchedules = copy(
+                    received = received.filter { it.value.sender.uid != currentUser },
+                    sent = sent.filter { it.value.recipient.uid != currentUser },
+                )
+                shareSchedulesRepository.addOrUpdateSharedSchedules(updatedSenderSharedSchedules, userId)
+            }
+
+            shareHomeworksRepository.fetchRealtimeSharedHomeworksByUser(currentUser).apply {
+                val updatedCurrentSharedHomeworks = copy(
+                    received = received.filter { it.value.sender != userId },
+                    sent = sent.filter { entry ->
+                        (entry.value.recipients.size == 1 && entry.value.recipients.contains(userId)).not()
+                    }.mapValues { entry ->
+                        entry.value.copy(recipients = entry.value.recipients.filter { it != userId })
+                    }
+                )
+                shareHomeworksRepository.addOrUpdateSharedHomework(updatedCurrentSharedHomeworks, currentUser)
+            }
+
+            shareHomeworksRepository.fetchRealtimeSharedHomeworksByUser(userId).apply {
+                val updatedSenderSharedHomeworks = copy(
+                    received = received.filter { it.value.sender != currentUser },
+                    sent = sent.filter { entry ->
+                        (entry.value.recipients.size == 1 && entry.value.recipients.contains(currentUser)).not()
+                    }.mapValues { entry ->
+                        entry.value.copy(recipients = entry.value.recipients.filter { it != currentUser })
+                    },
+                )
+                shareHomeworksRepository.addOrUpdateSharedHomework(updatedSenderSharedHomeworks, userId)
+            }
+
             val currentUserInfo = usersRepository.fetchUserById(currentUser).first()
             val targetUserInfo = usersRepository.fetchUserById(userId).first()
 

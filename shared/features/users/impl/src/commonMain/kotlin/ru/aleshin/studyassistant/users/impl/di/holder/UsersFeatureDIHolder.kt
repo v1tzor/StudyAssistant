@@ -29,6 +29,8 @@ import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
@@ -54,6 +56,8 @@ public object UsersFeatureDIHolder : BaseFeatureDIHolder<UsersFeatureApi, UsersF
                 bindSingleton<EmployeeRepository> { dependencies.employeeRepository }
                 bindSingleton<SubjectsRepository> { dependencies.subjectsRepository }
                 bindSingleton<FriendRequestsRepository> { dependencies.friendRequestsRepository }
+                bindSingleton<ShareSchedulesRepository> { dependencies.shareSchedulesRepository }
+                bindSingleton<ShareHomeworksRepository> { dependencies.shareHomeworksRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<MessageRepository> { dependencies.messageRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }
