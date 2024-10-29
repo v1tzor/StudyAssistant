@@ -18,7 +18,7 @@ compose-compiler = "1.5.11"
 compose-material3 = "1.3.0"
 compose-adaptive = "1.0.0-alpha01"
 compose-material = "1.12.0"
-compose-plugin = "1.7.0-beta02"
+compose-plugin = "1.7.0"
 androidx-activityCompose = "1.9.2"
 workmanager = "2.9.1"
 gms = "4.4.2"
@@ -103,9 +103,6 @@ sqldelight-prmimitiveAdapters = { module = "app.cash.sqldelight:primitive-adapte
 sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-desktop = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
-mokoResources-generator = { module = "dev.icerock.moko:resources-generator", version.ref = "mokoResources" }
-mokoResources-core = { module = "dev.icerock.moko:resources", version.ref = "mokoResources" }
-mokoResources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "mokoResources" }
 logger = { module = "co.touchlab:kermit", version.ref = "loggerKermit" }
 networkcheker = { module = "com.github.ln-12:multiplatform-connectivity-status", version.ref = "networkchecker" }
 koalaplot-charts = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot-charts" }
@@ -123,7 +120,6 @@ filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "file
 filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekit" }
 
 [bundles]
-mokoResources = ["mokoResources-core", "mokoResources-compose"]
 firebase = ["firebase-auth", "firebase-firestore", "firebase-storage", "firebase-messaging"]
 voyager = ["voyager-navigator", "voyager-screenModel", "voyager-transitions", "voyager-kodein"]
 sketch = ["sketch-compose", "sketch-compose-resources", "sketch-compose-extnsions-resources"]

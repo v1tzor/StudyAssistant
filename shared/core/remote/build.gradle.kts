@@ -9,13 +9,9 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvmToolchain(17)
+
+    androidTarget()
 
     listOf(
         iosX64(),
@@ -80,11 +76,13 @@ android {
 buildkonfig {
     packageName = "ru.aleshin.studyassistant.core.remote"
 
+    val isDebug = gradle.startParameter.taskNames.any { it.contains("debug", ignoreCase = true) }
     val firebaseProjectId = gradleLocalProperties(rootDir, providers).getProperty("firebaseProjectId")
     val rustoreProjectId = gradleLocalProperties(rootDir, providers).getProperty("rustoreProjectId")
     val rustoreAuthToken = gradleLocalProperties(rootDir, providers).getProperty("rustoreServiceAuthToken")
 
     defaultConfigs {
+        buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", isDebug.toString())
         buildConfigField(FieldSpec.Type.STRING, "FIREBASE_PROJECT_ID", firebaseProjectId)
         buildConfigField(FieldSpec.Type.STRING, "RUSTORE_PROJECT_ID", rustoreProjectId)
         buildConfigField(FieldSpec.Type.STRING, "RUSTORE_SERVICE_AUTH_TOKEN", rustoreAuthToken)

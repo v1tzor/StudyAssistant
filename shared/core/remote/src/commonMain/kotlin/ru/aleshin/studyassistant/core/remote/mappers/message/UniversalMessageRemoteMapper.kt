@@ -60,7 +60,12 @@ suspend fun UniversalMessageData.mapToRemote(
             apns = providerMapper(PushServiceType.APNS),
         )
     } else {
-        throw IllegalArgumentException("Require not empty tokens or topic")
+        UniversalPushProvidersPojo(
+            rustore = null,
+            fcm = null,
+            hms = null,
+            apns = null,
+        )
     },
     tokens = if (tokens != null) {
         UniversalPushTokensPojo(

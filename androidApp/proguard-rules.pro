@@ -1,10 +1,14 @@
 -keep class app.cash.sqldelight.** { *; }
 -keep class kotlin.** { *; }
 
+-keep class com.google.api.client.** { *; }
+-keep class com.google.auth.** { *; }
+
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
 -keep public class * extends java.lang.Exception
 -printmapping mapping.txt
+
 
 -dontwarn org.slf4j.impl.StaticLoggerBinder
 -dontwarn com.squareup.okhttp.CipherSuite

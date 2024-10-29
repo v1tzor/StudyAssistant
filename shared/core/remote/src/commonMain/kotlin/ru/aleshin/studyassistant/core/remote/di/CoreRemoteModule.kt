@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.core.remote.di
 
-import HttpEngineFactory
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
@@ -37,6 +36,7 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
+import ru.aleshin.studyassistant.core.remote.BuildKonfig
 import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.message.MessageRemoteDataSource
@@ -53,6 +53,7 @@ import ru.aleshin.studyassistant.core.remote.datasources.subjects.SubjectsRemote
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.HomeworksRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.TodoRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.ktor.HttpEngineFactory
 
 /**
  * @author Stanislav Aleshin on 01.08.2024.
@@ -75,7 +76,7 @@ val coreRemoteModule = DI.Module("CoreRemote") {
     bindSingleton<HttpClient> {
         HttpClient(instance<HttpEngineFactory>().createEngine()) {
             install(Logging) {
-                level = LogLevel.ALL
+                level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
                 logger = object : Logger {
                     override fun log(message: String) {
                         co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }

@@ -1,3 +1,5 @@
+package ru.aleshin.studyassistant.core.remote.ktor
+
 import io.ktor.client.engine.HttpClientEngineConfig
 import io.ktor.client.engine.HttpClientEngineFactory
 

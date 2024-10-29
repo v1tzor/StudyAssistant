@@ -67,14 +67,14 @@ interface FriendRequestsRemoteDataSource {
             }
 
             return requestsPojoFlow.flatMapLatest { request ->
-                val users = buildList {
+                val users = buildSet {
                     addAll(request.received.keys.toList())
                     addAll(request.send.keys.toList())
                     addAll(request.lastActions.keys.toList())
                 }
                 val targetUsersReference = users.let {
                     if (users.isEmpty()) return@let null
-                    userRoot.where { Users.UID inArray users }
+                    userRoot.where { Users.UID inArray users.toList() }
                 }
 
                 val targetUsersFlow = targetUsersReference?.snapshots?.map { snapshot ->
@@ -83,15 +83,21 @@ interface FriendRequestsRemoteDataSource {
 
                 targetUsersFlow.map { targetUsers ->
                     return@map FriendRequestsDetailsPojo(
-                        received = request.received.mapKeys { entry ->
-                            checkNotNull(targetUsers?.find { it.uid == entry.key })
-                        },
-                        send = request.send.mapKeys { entry ->
-                            checkNotNull(targetUsers?.find { it.uid == entry.key })
-                        },
-                        lastActions = request.lastActions.mapKeys { entry ->
-                            checkNotNull(targetUsers?.find { it.uid == entry.key })
-                        },
+                        received = targetUsers?.filter { user ->
+                            request.received.containsKey(user.uid)
+                        }?.associate { user ->
+                            Pair(user, request.received[user.uid] ?: 0L)
+                        } ?: emptyMap(),
+                        send = targetUsers?.filter { user ->
+                            request.send.containsKey(user.uid)
+                        }?.associate { user ->
+                            Pair(user, request.send[user.uid] ?: 0L)
+                        } ?: emptyMap(),
+                        lastActions = targetUsers?.filter { user ->
+                            request.lastActions.containsKey(user.uid)
+                        }?.associate { user ->
+                            Pair(user, request.lastActions[user.uid] ?: false)
+                        } ?: emptyMap(),
                     )
                 }
             }

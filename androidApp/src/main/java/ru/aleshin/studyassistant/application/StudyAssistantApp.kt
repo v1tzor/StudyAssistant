@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.StrictMode
 import androidx.annotation.RequiresApi
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.firebase.FirebaseApp
 import ru.aleshin.studyassistant.PlatformSDK
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationDefaults
@@ -46,14 +45,11 @@ class StudyAssistantApp : Application() {
     }
 
     private fun initPlatformSDK() {
-        FirebaseApp.initializeApp(this)
-
         pushClientFactory.createPushClient()
-
         PlatformSDK.doInit(
             configuration = PlatformConfiguration(
                 appService = AppServiceImpl(
-                    applicationContext = applicationContext,
+                    applicationContext = this,
                     googleApiAvailability = GoogleApiAvailability.getInstance(),
                 ),
                 remoteMessageHandler = RemoteMessageHandlerImpl(

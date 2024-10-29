@@ -135,7 +135,7 @@ class RemoteMessageHandlerImpl(private val context: Context) : RemoteMessageHand
             context,
             requestCode,
             contentIntent,
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_IMMUTABLE,
         )
         val largeIcon = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && image != null) {
             val source = ImageDecoder.createSource(context.contentResolver, image)
