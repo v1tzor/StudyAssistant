@@ -1,0 +1,29 @@
+Study Assistant — a powerful tool to make your learning more efficient and organized! 🚀
+
+📚 Convenient Organization of Classes:
+Divide all classes, subjects and assignments by educational organizations – colleges, schools, courses, universities, etc.
+Work comfortably with each of them and get the most out of your learning processes.
+
+👥 Share with Friends:
+Stay connected with your friends! Add them to your network and share your schedules and homework from any organization.
+Share valuable information, stay in sync, and help each other succeed!
+
+⏰ Flexible Scheduling:
+Design your recurring schedules with ease and make one-time adjustments for specific days.
+Change class durations, swap subjects, and keep a history of all schedule changes so you’re always on top of your time management.
+
+📝 Smart Homework Management:
+Simplify your homework routine! Quickly add tasks and link them directly to your upcoming classes.
+During lessons, the app automatically determines the next subject, saving you time and effort.
+
+📊 Workload Statistics:
+Stay ahead of your tasks with real-time workload tracking!
+Monitor your weekly workload right on the home screen, and get detailed statistics on the number of tasks for each day, helping you plan your time more effectively.
+
+🔔 Smart Notifications:
+Never miss a beat! Receive timely notifications about high workloads, incomplete assignments, and alerts for the beginning or end of lessons.
+Keeping up-to-date with your schedule has never been easier!
+
+✅ Create Your Todo List:
+Organize your tasks effortlessly!
+Create and manage your personal TODO list, ensuring that you never miss an important deadline and stay one step ahead in your studies.
