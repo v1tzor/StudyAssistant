@@ -74,8 +74,7 @@ class RemoteMessageHandlerImpl(private val context: Context) : RemoteMessageHand
 
                 NotifyPushContentType.ACCEPT_FRIEND_REQUEST -> showNotification(
                     title = buildString {
-                        val senderName =
-                            message.data[NotifyPushContent.AcceptFriendRequest.SENDER_NAME]
+                        val senderName = message.data[NotifyPushContent.AcceptFriendRequest.SENDER_NAME]
                         append(senderName ?: coreStrings.emptyMessageUser, " ")
                         append(coreStrings.acceptFriendRequestMessageTitleSuffix)
                     },
@@ -84,8 +83,7 @@ class RemoteMessageHandlerImpl(private val context: Context) : RemoteMessageHand
 
                 NotifyPushContentType.REJECT_FRIEND_REQUEST -> showNotification(
                     title = buildString {
-                        val senderName =
-                            message.data[NotifyPushContent.RejectFriendRequest.SENDER_NAME]
+                        val senderName = message.data[NotifyPushContent.RejectFriendRequest.SENDER_NAME]
                         append(senderName ?: coreStrings.emptyMessageUser, " ")
                         append(coreStrings.rejectFriendRequestMessageTitleSuffix)
                     },
@@ -99,7 +97,7 @@ class RemoteMessageHandlerImpl(private val context: Context) : RemoteMessageHand
                         append(coreStrings.shareHomeworkMessageTitleSuffix)
                     },
                     body = buildString {
-                        val subjects = message.data[NotifyPushContent.ShareHomework.SENDER_NAME]
+                        val subjects = message.data[NotifyPushContent.ShareHomework.SUBJECT_NAMES]
                         append(coreStrings.shareHomeworkMessageBody)
                         append(subjects ?: coreStrings.noneTitle)
                     },
