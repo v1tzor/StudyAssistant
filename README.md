@@ -58,6 +58,15 @@ Organize your tasks effortlessly! Create and manage your personal TODO list, ens
 
 Start today with the Study Assistant app—a powerful tool to make your learning more efficient and organized! 🚀
 
+---
+
+> <picture>
+>   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Mqxx/GitHub-Markdown/main/blockquotes/badge/light-theme/info.svg">
+>   <img alt="Info" src="https://raw.githubusercontent.com/Mqxx/GitHub-Markdown/main/blockquotes/badge/dark-theme/info.svg">
+> </picture><br>
+>
+> We do not share your account data with third parties without your consent. All information is securely stored on our Firestore servers (Data of schedules, tasks, etc. are currently stored only in your phone's memory).
+
 # Screenshots
 
 <div style="overflow-x:auto;">
