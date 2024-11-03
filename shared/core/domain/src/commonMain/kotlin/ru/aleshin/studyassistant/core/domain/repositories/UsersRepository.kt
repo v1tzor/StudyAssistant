@@ -38,5 +38,6 @@ interface UsersRepository {
     suspend fun fetchUserFriends(uid: UID): Flow<List<AppUser>>
     suspend fun findUsersByCode(code: String): Flow<List<AppUser>>
     suspend fun uploadUserAvatar(uid: UID, avatar: File): String
+    suspend fun reloadUser(firebaseUser: FirebaseUser): FirebaseUser?
     suspend fun deleteUserAvatar(uid: UID)
 }

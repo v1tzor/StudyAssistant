@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.core.remote.di
 
+import android.content.Context
+import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
@@ -32,4 +34,5 @@ actual val coreRemotePlatformModule = DI.Module("CoreRemotePlatform") {
     bindSingleton<RuStoreUniversalPushClient> { RuStoreUniversalPushClient }
     bindSingleton<MessagingService> { MessagingServiceImpl(instance(), instance()) }
     bindSingleton<GoogleAuthTokenProvider> { GoogleAuthTokenProviderImpl(instance()) }
+    bindSingleton<Konnection> { Konnection.createInstance(instance<Context>()) }
 }

@@ -46,6 +46,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
+            implementation(libs.networkcheker)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

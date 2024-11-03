@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.remote.di
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.messaging.FirebaseMessaging
 import dev.gitlive.firebase.messaging.messaging
+import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
@@ -31,4 +32,5 @@ import ru.aleshin.studyassistant.core.remote.datasources.message.MessagingServic
 actual val coreRemotePlatformModule = DI.Module("CoreRemotePlatform") {
     bindSingleton<FirebaseMessaging> { Firebase.messaging }
     bindSingleton<MessagingService> { MessagingServiceImpl(instance()) }
+    bindSingleton<Konnection> { Konnection.createInstance() }
 }

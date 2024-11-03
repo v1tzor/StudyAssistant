@@ -22,6 +22,7 @@ import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.storage.File
 import dev.gitlive.firebase.storage.FirebaseStorage
+import dev.tmapps.konnection.Konnection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
@@ -51,12 +52,14 @@ interface UsersRemoteDataSource {
     suspend fun fetchRealtimeUserById(uid: UID): AppUserPojo?
     suspend fun fetchUserFriends(uid: UID): Flow<List<AppUserPojo>>
     suspend fun findUsersByCode(code: String): Flow<List<AppUserPojo>>
+    suspend fun reloadUser(firebaseUser: FirebaseUser): FirebaseUser?
     suspend fun deleteAvatar(uid: UID)
 
     class Base(
         private val auth: FirebaseAuth,
         private val database: FirebaseFirestore,
         private val storage: FirebaseStorage,
+        private val connectivityChecker: Konnection,
     ) : UsersRemoteDataSource {
 
         override suspend fun addOrUpdateUser(user: AppUserPojo): Boolean {
@@ -131,6 +134,14 @@ interface UsersRemoteDataSource {
 
             return queryReference.snapshots.map { snapshot ->
                 snapshot.documents.map { it.data<AppUserPojo>() }
+            }
+        }
+
+        override suspend fun reloadUser(firebaseUser: FirebaseUser): FirebaseUser? {
+            return if (connectivityChecker.isConnected()) {
+                firebaseUser.apply { reload() }
+            } else {
+                null
             }
         }
 

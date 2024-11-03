@@ -37,11 +37,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
+import ru.aleshin.studyassistant.core.common.functional.Constants.App.PRIVACY_POLICY
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
@@ -58,25 +63,43 @@ internal fun RegisterActionsSection(
         modifier = modifier.padding(start = 24.dp, end = 24.dp, top = 8.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        Button(
-            onClick = onRegisterClick,
-            modifier = Modifier.fillMaxWidth().height(44.dp),
-            enabled = enabled,
-            shape = MaterialTheme.shapes.large,
-        ) {
-            if (!isLoading) {
-                Text(
-                    text = AuthThemeRes.strings.registerLabel,
-                    style = MaterialTheme.typography.titleSmall,
-                )
-            } else {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.outlineVariant,
-                    strokeWidth = 2.dp,
-                )
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Button(
+                onClick = onRegisterClick,
+                modifier = Modifier.fillMaxWidth().height(44.dp),
+                enabled = enabled,
+                shape = MaterialTheme.shapes.large,
+            ) {
+                if (!isLoading) {
+                    Text(
+                        text = AuthThemeRes.strings.registerLabel,
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                } else {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.outlineVariant,
+                        strokeWidth = 2.dp,
+                    )
+                }
             }
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = buildAnnotatedString {
+                    append(AuthThemeRes.strings.registerTermsAndConditionsBody)
+                    withLink(
+                        link = LinkAnnotation.Url(
+                            url = PRIVACY_POLICY,
+                            styles = TextLinkStyles(style = SpanStyle(color = MaterialTheme.colorScheme.primary))
+                        )
+                    ) {
+                        append(AuthThemeRes.strings.privacyPolicyLabel)
+                    }
+                },
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
         AlreadyHaveAccountButton(
             enabled = !isLoading,

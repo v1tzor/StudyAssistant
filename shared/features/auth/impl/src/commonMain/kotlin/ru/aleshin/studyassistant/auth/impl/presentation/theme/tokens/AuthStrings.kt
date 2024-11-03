@@ -59,6 +59,9 @@ internal data class AuthStrings(
     val authErrorMessage: String,
     val userNotFoundErrorMessage: String,
     val credentialsErrorMessage: String,
+    val loginTermsAndConditionsBody: String,
+    val registerTermsAndConditionsBody: String,
+    val privacyPolicyLabel: String,
     val otherErrorMessage: String,
 ) {
 
@@ -100,6 +103,9 @@ internal data class AuthStrings(
             authErrorMessage = "Неправильный логин или пароль!",
             userNotFoundErrorMessage = "Данные пользователя не найдены!",
             credentialsErrorMessage = "Данные пользователя, неверны или неполны!",
+            loginTermsAndConditionsBody = "Осуществляя вход, вы принимаете ",
+            registerTermsAndConditionsBody = "Осуществляя регистарцию, вы принимаете ",
+            privacyPolicyLabel = "Политику конфиденциальности",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
         val ENGLISH = AuthStrings(
@@ -139,6 +145,9 @@ internal data class AuthStrings(
             verificationTitle = "In the near future, we will send you an email with a link that you will need to click on.",
             verificationButtonLabel = "Send it again",
             retryAvailableTimeLabelPrefix = "It will be available in ",
+            loginTermsAndConditionsBody = "By logging in, you agree to the ",
+            registerTermsAndConditionsBody = "By registering, you agree to the ",
+            privacyPolicyLabel = "Privacy Policy",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

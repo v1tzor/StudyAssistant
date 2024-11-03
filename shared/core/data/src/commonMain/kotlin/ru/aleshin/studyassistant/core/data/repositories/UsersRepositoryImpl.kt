@@ -84,6 +84,10 @@ class UsersRepositoryImpl(
         return remoteDataSource.uploadAvatar(uid, avatar)
     }
 
+    override suspend fun reloadUser(firebaseUser: FirebaseUser): FirebaseUser? {
+        return remoteDataSource.reloadUser(firebaseUser)
+    }
+
     override suspend fun deleteUserAvatar(uid: UID) {
         return remoteDataSource.deleteAvatar(uid)
     }

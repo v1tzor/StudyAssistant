@@ -18,7 +18,10 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +29,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
@@ -34,6 +43,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginV
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.views.LoginActionsSection
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.views.LoginInputSection
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.views.NotAccountButton
+import ru.aleshin.studyassistant.core.common.functional.Constants.App.PRIVACY_POLICY
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
@@ -82,6 +92,22 @@ internal fun LoginContent(
                 isLoading = state.isLoading,
                 onLoginClick = { onLoginClick(email, password) },
                 onLoginViaGoogleClick = { onLoginViaGoogleClick(it) },
+            )
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = buildAnnotatedString {
+                    append(AuthThemeRes.strings.loginTermsAndConditionsBody)
+                    withLink(
+                        link = LinkAnnotation.Url(
+                            url = PRIVACY_POLICY,
+                            styles = TextLinkStyles(style = SpanStyle(color = MaterialTheme.colorScheme.primary))
+                        )
+                    ) {
+                        append(AuthThemeRes.strings.privacyPolicyLabel)
+                    }
+                },
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
         NotAccountButton(

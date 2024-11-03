@@ -48,7 +48,8 @@ interface AppUserInteractor {
     ) : AppUserInteractor {
 
         override suspend fun fetchAppUser() = eitherWrapper.wrap {
-            usersRepository.fetchCurrentAppUser()?.apply { reload() }
+            val currentUser = usersRepository.fetchCurrentAppUser()
+            return@wrap currentUser?.let { user -> usersRepository.reloadUser(user) ?: user }
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)

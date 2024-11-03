@@ -27,6 +27,7 @@ object Constants {
         const val LOGGER_TAG = "study_assistant"
         const val DEVELOPER = "Stanislav Aleshin"
         const val LICENCE = "Apache Licence v2.0"
+        const val PRIVACY_POLICY = "https://www.termsfeed.com/live/32b56f45-28c2-4942-89b8-f900516d2129"
         const val GITHUB_URI = "https://github.com/v1tzor/StudyAssistant"
         const val ISSUES_URI = "https://github.com/v1tzor/StudyAssistant/issues"
         const val PERMISSION_TAG = "Notificatio_Permission"
