@@ -68,7 +68,7 @@ fun <Item : BottomBarItem> BottomNavigationBar(
                 selected = selectedItem == item,
                 onClick = { if (selectedItem != item) onItemSelected.invoke(item) },
                 icon = {
-                    BottomBarIcon(
+                    NavigationBarIcon(
                         selected = selectedItem == item,
                         enabledIcon = painterResource(item.enabledIcon),
                         disabledIcon = painterResource(item.disabledIcon),
@@ -94,7 +94,7 @@ fun <Item : BottomBarItem> BottomNavigationBar(
 }
 
 @Composable
-fun BottomBarIcon(
+fun NavigationBarIcon(
     selected: Boolean,
     enabledIcon: Painter,
     disabledIcon: Painter,

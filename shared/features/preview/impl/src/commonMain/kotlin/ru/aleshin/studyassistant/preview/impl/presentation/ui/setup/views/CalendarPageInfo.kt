@@ -58,7 +58,7 @@ internal fun CalendarPageInfo(
     ) {
         items(NumberOfRepeatWeek.entries, key = { it.name }) { week ->
             NumberOfWeekView(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 selected = week == calendarSettings.numberOfWeek,
                 week = week,
                 onSelected = { onUpdateCalendarSettings(calendarSettings.copy(numberOfWeek = week)) },

@@ -15,16 +15,12 @@
  */
 package ru.aleshin.studyassistant.navigation.impl.ui
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.lifecycle.DisposableEffectIgnoringConfiguration
 import cafe.adriel.voyager.core.stack.StackEvent
 import cafe.adriel.voyager.navigator.CurrentScreen
@@ -40,7 +36,7 @@ import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsEvent
 import ru.aleshin.studyassistant.navigation.impl.ui.contract.TabsViewState
 import ru.aleshin.studyassistant.navigation.impl.ui.screenmodel.rememberTabsScreenModel
 import ru.aleshin.studyassistant.navigation.impl.ui.views.TabsBottomBarItems
-import ru.aleshin.studyassistant.navigation.impl.ui.views.TabsBottomNavigationBar
+import ru.aleshin.studyassistant.navigation.impl.ui.views.TabsNavigationSuiteItems
 import ru.aleshin.studyassistant.profile.api.presentation.ProfileRootScreen
 import ru.aleshin.studyassistant.schedule.api.presentation.ScheduleRootScreen
 import ru.aleshin.studyassistant.tasks.api.presentation.TasksRootScreen
@@ -63,15 +59,9 @@ internal class TabsScreen : TabsRootScreen() {
                 disposeSteps = false
             ),
         ) { navigator ->
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                content = { paddingValues ->
-                    Box(modifier = Modifier.padding(paddingValues)) {
-                        CurrentScreen()
-                    }
-                },
-                bottomBar = {
-                    TabsBottomNavigationBar(
+            NavigationSuiteScaffold(
+                navigationSuiteItems = {
+                    TabsNavigationSuiteItems(
                         selectedItem = when (navigator.lastItem) {
                             is ScheduleRootScreen -> TabsBottomBarItems.SCHEDULE
                             is TasksRootScreen -> TabsBottomBarItems.TASKS
@@ -90,8 +80,18 @@ internal class TabsScreen : TabsRootScreen() {
                         },
                     )
                 },
-                contentWindowInsets = WindowInsets(0.dp),
-            )
+                navigationSuiteColors = NavigationSuiteDefaults.colors(
+                    navigationBarContainerColor = when (navigator.lastItem) {
+                        is ScheduleRootScreen -> TabsBottomBarItems.SCHEDULE.containerColor
+                        is TasksRootScreen -> TabsBottomBarItems.TASKS.containerColor
+                        is InfoRootScreen -> TabsBottomBarItems.INFO.containerColor
+                        is ProfileRootScreen -> TabsBottomBarItems.PROFILE.containerColor
+                        else -> MaterialTheme.colorScheme.background
+                    },
+                )
+            ) {
+                CurrentScreen()
+            }
             DisposableEffectIgnoringConfiguration {
                 onDispose {
                     if (navigator.parent?.lastEvent != StackEvent.Push) {

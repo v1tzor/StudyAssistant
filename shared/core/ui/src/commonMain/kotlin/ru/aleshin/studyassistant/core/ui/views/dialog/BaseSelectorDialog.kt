@@ -160,7 +160,7 @@ fun LazyItemScope.SelectorItemView(
             .alphaByEnabled(enabled)
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .animateItemPlacement(),
+            .animateItem(),
         shape = MaterialTheme.shapes.large,
         color = when (selected) {
             true -> MaterialTheme.colorScheme.primaryContainer

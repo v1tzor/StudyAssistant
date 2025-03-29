@@ -85,7 +85,7 @@ internal fun SubjectsContent(
             ) {
                 items(subjects, key = { it.uid }) { subject ->
                     DetailsSubjectViewItem(
-                        modifier = Modifier.animateItemPlacement(),
+                        modifier = Modifier.animateItem(),
                         eventType = subject.eventType,
                         office = subject.office,
                         color = Color(subject.color),

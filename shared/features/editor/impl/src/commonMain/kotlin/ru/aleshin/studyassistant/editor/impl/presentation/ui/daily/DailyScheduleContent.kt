@@ -146,7 +146,7 @@ internal fun DailyScheduleContent(
                 } else if (baseSchedule != null && baseSchedule.classes.isNotEmpty()) {
                     items(baseSchedule.classes, key = { it.uid }) { classModel ->
                         DetailsClassViewItem(
-                            modifier = Modifier.animateItemPlacement(),
+                            modifier = Modifier.animateItem(),
                             onClick = {},
                             enabled = false,
                             number = baseSchedule.classes.indexOf(classModel).inc(),

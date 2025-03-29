@@ -26,9 +26,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -63,102 +61,76 @@ import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 
 /**
  * @author Stanislav Aleshin on 29.06.2024.
  */
 @Composable
-internal fun TasksProgressView(
+internal fun ComingHomeworksExecutionAnalysisView(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     currentDate: Instant,
-    homeworks: Map<Instant, List<HomeworkDetailsUi>>,
-    todos: List<TodoDetailsUi>,
+    homeworks: Map<Instant, DailyHomeworksUi>,
 ) {
-    Surface(
+    Column(
         modifier = modifier,
-        shape = MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Text(
-                text = TasksThemeRes.strings.tasksProgressViewHeader,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleSmall,
-            )
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                val tomorrowHomeworks = remember(homeworks, currentDate) {
-                    homeworks.filter {
-                        val timeRange = TimeRange(currentDate, currentDate.shiftDay(1))
-                        return@filter timeRange.containsDate(it.key)
-                    }
-                }
-                val weekHomeworks = remember(homeworks, currentDate) {
-                    homeworks.filter {
-                        val timeRange = currentDate.dateTime().weekTimeRange()
-                        return@filter timeRange.containsDate(it.key)
-                    }
-                }
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    InfoProgressView(
-                        isLoading = isLoading,
-                        items = tomorrowHomeworks.values.toList().extractAllItem().map { it.completeDate != null },
-                        progressIcon = painterResource(TasksThemeRes.icons.tomorrowTime),
-                        infoLabel = {
-                            Text(
-                                text = TasksThemeRes.strings.tasksProgressTomorrowLabel,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                            )
-                        },
-                        accentColor = StudyAssistantRes.colors.accents.orange,
-                    )
-                    InfoProgressView(
-                        isLoading = isLoading,
-                        items = weekHomeworks.values.toList().extractAllItem().map { it.completeDate != null },
-                        progressIcon = painterResource(TasksThemeRes.icons.weekTime),
-                        infoLabel = {
-                            Text(
-                                text = TasksThemeRes.strings.tasksProgressInTheWeekLabel,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                            )
-                        },
-                        accentColor = MaterialTheme.colorScheme.primary,
-                    )
-                }
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = TasksThemeRes.strings.todosProgressTitle,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.labelSmall,
-                    )
-                    HorizontalDivider(modifier = Modifier.weight(1f))
-                }
-                InfoProgressView(
-                    isLoading = isLoading,
-                    items = todos.map { it.completeDate != null },
-                    progressIcon = painterResource(StudyAssistantRes.icons.tasksOutline),
-                    infoLabel = {
-                        Text(
-                            text = TasksThemeRes.strings.todosProgressLabel,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                        )
-                    },
-                    accentColor = StudyAssistantRes.colors.accents.yellow,
-                )
+        val tomorrowHomeworks = remember(homeworks, currentDate) {
+            homeworks.filter {
+                val timeRange = TimeRange(currentDate, currentDate.shiftDay(1))
+                return@filter timeRange.containsDate(it.key)
             }
+        }
+        val weekHomeworks = remember(homeworks, currentDate) {
+            homeworks.filter {
+                val timeRange = currentDate.dateTime().weekTimeRange()
+                return@filter timeRange.containsDate(it.key)
+            }
+        }
+        Text(
+            text = TasksThemeRes.strings.comingHomeworksExecutionAnalysisTitle,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleSmall,
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            InfoProgressView(
+                isLoading = isLoading,
+                items = remember(homeworks) {
+                    tomorrowHomeworks.values.toList().map { it.homeworks }.extractAllItem().map {
+                        it.completeDate != null
+                    }
+                },
+                progressIcon = painterResource(TasksThemeRes.icons.tomorrowTime),
+                infoLabel = {
+                    Text(
+                        text = TasksThemeRes.strings.tasksProgressTomorrowLabel,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                    )
+                },
+                accentColor = StudyAssistantRes.colors.accents.orange,
+            )
+            InfoProgressView(
+                isLoading = isLoading,
+                items = remember(homeworks) {
+                    weekHomeworks.values.toList().map { it.homeworks }.extractAllItem().map {
+                        it.completeDate != null
+                    }
+                },
+                progressIcon = painterResource(TasksThemeRes.icons.weekTime),
+                infoLabel = {
+                    Text(
+                        text = TasksThemeRes.strings.tasksProgressInTheWeekLabel,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                    )
+                },
+                accentColor = MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }

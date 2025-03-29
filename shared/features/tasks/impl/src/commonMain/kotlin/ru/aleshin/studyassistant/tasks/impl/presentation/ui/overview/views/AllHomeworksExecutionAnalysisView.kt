@@ -20,14 +20,11 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,38 +38,33 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 
 /**
  * @author Stanislav Aleshin on 29.06.2024.
  */
 @Composable
-internal fun HomeworkErrorsView(
+internal fun AllHomeworksExecutionAnalysisView(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    totalCompleted: Int,
     homeworkErrors: HomeworkErrorsUi?,
-    todoErrors: TodoErrorsUi?,
     onShowErrors: () -> Unit,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                text = TasksThemeRes.strings.homeworkErrorsViewHeader,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleSmall,
-            )
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = TasksThemeRes.strings.allHomeworksExecutionAnalysisTitle,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleSmall,
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Surface(
-                    modifier = Modifier,
+                    modifier = Modifier.height(44.dp).fillMaxWidth(),
                     shape = MaterialTheme.shapes.large,
                     color = MaterialTheme.colorScheme.errorContainer,
                 ) {
@@ -98,11 +90,10 @@ internal fun HomeworkErrorsView(
                             modifier = Modifier.animateContentSize(),
                             targetState = isLoading,
                         ) { loading ->
-                            if (!loading && homeworkErrors != null && todoErrors != null) {
+                            if (!loading && homeworkErrors != null) {
                                 val errors = listOf(
                                     homeworkErrors.overdueTasks.count(),
                                     homeworkErrors.detachedActiveTasks.count(),
-                                    todoErrors.overdueTodos.count(),
                                 )
                                 Text(
                                     text = errors.sum().toString(),
@@ -122,21 +113,21 @@ internal fun HomeworkErrorsView(
                         }
                     }
                 }
-                Button(
-                    onClick = onShowErrors,
-                    modifier = Modifier.fillMaxWidth().height(32.dp),
-                    enabled = !isLoading,
-                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onError,
-                    ),
-                ) {
-                    Text(
-                        text = TasksThemeRes.strings.showHomeworkErrorsTitle,
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
+//                Button(
+//                    onClick = onShowErrors,
+//                    modifier = Modifier.fillMaxWidth().height(32.dp),
+//                    enabled = !isLoading,
+//                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
+//                    colors = ButtonDefaults.buttonColors(
+//                        containerColor = MaterialTheme.colorScheme.error,
+//                        contentColor = MaterialTheme.colorScheme.onError,
+//                    ),
+//                ) {
+//                    Text(
+//                        text = TasksThemeRes.strings.showHomeworkErrorsTitle,
+//                        style = MaterialTheme.typography.labelMedium,
+//                    )
+//                }
             }
         }
     }

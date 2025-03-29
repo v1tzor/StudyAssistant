@@ -44,6 +44,7 @@ import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.entities.tasks.DailyHomeworksStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.HomeworksInteractor
@@ -54,6 +55,7 @@ import ru.aleshin.studyassistant.tasks.impl.domain.interactors.UsersInteractor
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
@@ -100,8 +102,8 @@ internal interface OverviewWorkProcessor :
                 homeworksEither.handle(
                     onLeftAction = { send(EffectResult(OverviewEffect.ShowError(it))) },
                     onRightAction = { homeworkList ->
+                        val currentTime = dateManager.fetchCurrentInstant()
                         val homeworks = homeworkList.map { homework ->
-                            val currentTime = dateManager.fetchCurrentInstant()
                             val status = HomeworkStatus.calculate(
                                 isDone = homework.isDone,
                                 completeDate = homework.completeDate,
@@ -115,7 +117,16 @@ internal interface OverviewWorkProcessor :
                         }
                         val homeworksMap = buildMap {
                             targetTimeRange.periodDates().forEach { date ->
-                                put(date, groupedHomeworks[date] ?: emptyList<HomeworkDetailsUi>())
+                                val homeworksByDate = groupedHomeworks[date] ?: emptyList<HomeworkDetailsUi>()
+                                val dailyHomeworks = DailyHomeworksUi(
+                                    dailyStatus = DailyHomeworksStatus.calculate(
+                                        targetDate = date,
+                                        currentDate = currentTime.startThisDay(),
+                                        homeworkStatuses = homeworksByDate.map { it.status }
+                                    ),
+                                    homeworks = homeworksByDate,
+                                )
+                                put(date, dailyHomeworks)
                             }
                         }
                         val homeworksScope = calculateHomeworkScope(homeworksMap)
@@ -226,7 +237,7 @@ internal interface OverviewWorkProcessor :
             )
         }
 
-        private fun cycleUpdateHomeworkStatus(homeworksMap: Map<Instant, List<HomeworkDetailsUi>>) =
+        private fun cycleUpdateHomeworkStatus(homeworksMap: Map<Instant, DailyHomeworksUi>) =
             flow {
                 val updatedHomeworksMap = homeworksMap.toMutableMap()
                 while (currentCoroutineContext().isActive) {
@@ -234,7 +245,8 @@ internal interface OverviewWorkProcessor :
 
                     var isUpdated = false
                     val currentInstant = dateManager.fetchCurrentInstant()
-                    val updatedHomeworks = updatedHomeworksMap.values.toList().extractAllItem()
+                    val updatedDailyHomeworks = updatedHomeworksMap.values.toList()
+                    val updatedHomeworks = updatedDailyHomeworks.map { it.homeworks }.extractAllItem()
 
                     updatedHomeworks.forEach { homework ->
                         val status = homework.status
@@ -249,11 +261,18 @@ internal interface OverviewWorkProcessor :
                                 isUpdated = true
                                 val date = homework.deadline.startThisDay()
                                 val newHomework = homework.copy(status = newStatus)
-                                val newHomeworks = updatedHomeworksMap[date]!!.toMutableList().apply {
+                                val newHomeworks = updatedHomeworksMap[date]!!.homeworks.toMutableList().apply {
                                     remove(homework)
                                     add(newHomework)
                                 }
-                                updatedHomeworksMap[date] = newHomeworks
+                                updatedHomeworksMap[date] = updatedHomeworksMap[date]!!.copy(
+                                    dailyStatus = DailyHomeworksStatus.calculate(
+                                        targetDate = date,
+                                        currentDate = currentInstant.startThisDay(),
+                                        homeworkStatuses = newHomeworks.map { it.status },
+                                    ),
+                                    homeworks = newHomeworks,
+                                )
                             }
                         }
                     }
@@ -284,21 +303,21 @@ internal interface OverviewWorkProcessor :
         }
 
         private fun calculateHomeworkScope(
-            homeworksMap: Map<Instant, List<HomeworkDetailsUi>>
+            homeworksMap: Map<Instant, DailyHomeworksUi>
         ): HomeworkScopeUi {
             return HomeworkScopeUi(
                 theoreticalTasks = homeworksMap.mapValues { homeworkEntry ->
-                    homeworkEntry.value.sumOf { homework ->
+                    homeworkEntry.value.homeworks.sumOf { homework ->
                         return@sumOf homework.theoreticalTasks.components.fetchAllTasks().size
                     }
                 },
                 practicalTasks = homeworksMap.mapValues { homeworkEntry ->
-                    homeworkEntry.value.sumOf { homework ->
+                    homeworkEntry.value.homeworks.sumOf { homework ->
                         return@sumOf homework.practicalTasks.components.fetchAllTasks().size
                     }
                 },
                 presentationTasks = homeworksMap.mapValues { homeworkEntry ->
-                    homeworkEntry.value.sumOf { homework ->
+                    homeworkEntry.value.homeworks.sumOf { homework ->
                         return@sumOf homework.presentationTasks.components.fetchAllTasks().size
                     }
                 },

@@ -140,7 +140,7 @@ private fun EmployeeProfileSubjectsSection(
                     if (subjects.isNotEmpty()) {
                         items(subjects, key = { it.uid }) { subject ->
                             EmployeeSubjectViewItem(
-                                modifier = Modifier.animateItemPlacement(),
+                                modifier = Modifier.animateItem(),
                                 eventType = subject.eventType,
                                 color = Color(subject.color),
                                 name = subject.name,

@@ -16,14 +16,17 @@
 package ru.aleshin.studyassistant.navigation.impl.ui.views
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.core.screen.Screen
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.BottomBarItem
 import ru.aleshin.studyassistant.core.ui.views.BottomNavigationBar
+import ru.aleshin.studyassistant.core.ui.views.NavigationBarIcon
 import ru.aleshin.studyassistant.info.api.presentation.InfoRootScreen
 import ru.aleshin.studyassistant.profile.api.presentation.ProfileRootScreen
 import ru.aleshin.studyassistant.schedule.api.presentation.ScheduleRootScreen
@@ -45,6 +48,27 @@ internal fun TabsBottomNavigationBar(
         showLabel = false,
         onItemSelected = onItemSelected,
     )
+}
+
+internal fun NavigationSuiteScope.TabsNavigationSuiteItems(
+    selectedItem: TabsBottomBarItems?,
+    onItemSelected: (TabsBottomBarItems) -> Unit,
+) {
+    TabsBottomBarItems.entries.forEach { item ->
+        item(
+            selected = selectedItem == item,
+            onClick = { if (selectedItem != item) onItemSelected.invoke(item) },
+            icon = {
+                NavigationBarIcon(
+                    selected = selectedItem == item,
+                    enabledIcon = painterResource(item.enabledIcon),
+                    disabledIcon = painterResource(item.disabledIcon),
+                    description = item.label,
+                )
+            },
+            label = { item.label },
+        )
+    }
 }
 
 internal enum class TabsBottomBarItems : BottomBarItem {

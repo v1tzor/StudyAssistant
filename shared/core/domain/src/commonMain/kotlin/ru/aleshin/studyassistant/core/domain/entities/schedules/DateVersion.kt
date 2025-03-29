@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.core.domain.entities.schedules
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
-import kotlinx.datetime.DayOfWeek.MONDAY
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateOfWeekDay
 import ru.aleshin.studyassistant.core.common.extensions.endThisDay
@@ -43,12 +43,12 @@ data class DateVersion(
     fun containsDate(instant: Instant) = instant in from..to
 
     fun makeDeprecated(currentDate: Instant): DateVersion {
-        return copy(to = currentDate.dateOfWeekDay(MONDAY).shiftDay(-1).endThisDay())
+        return copy(to = currentDate.dateOfWeekDay(DayOfWeek.MONDAY).shiftDay(-1).endThisDay())
     }
 
     companion object {
         fun createNewVersion(currentDate: Instant) = DateVersion(
-            from = currentDate.dateOfWeekDay(MONDAY).startThisDay(),
+            from = currentDate.dateOfWeekDay(DayOfWeek.MONDAY).startThisDay(),
             to = currentDate.shiftDay(MAX_DAYS_SHIFT),
         )
     }

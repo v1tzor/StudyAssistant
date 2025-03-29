@@ -91,7 +91,7 @@ internal fun HomeworksContent(
                 homeworks.forEach { homeworksEntry ->
                     stickyHeader(key = homeworksEntry.key.toString()) {
                         HomeworkDateHeader(
-                            modifier = Modifier.animateItemPlacement(),
+                            modifier = Modifier.animateItem(),
                             currentDate = state.currentDate,
                             date = homeworksEntry.key,
                             progressList = homeworksEntry.value.map { it.completeDate != null },
@@ -100,7 +100,7 @@ internal fun HomeworksContent(
                     if (homeworksEntry.value.isNotEmpty()) {
                         items(homeworksEntry.value, key = { it.uid }) { homework ->
                             HomeworksDetailsViewItem(
-                                modifier = Modifier.padding(horizontal = 16.dp).animateItemPlacement(),
+                                modifier = Modifier.padding(horizontal = 16.dp).animateItem(),
                                 subject = homework.subject,
                                 organization = homework.organization,
                                 status = homework.status,
@@ -119,7 +119,7 @@ internal fun HomeworksContent(
                     } else {
                         item {
                             HomeworksDetailsViewNoneItem(
-                                modifier = Modifier.padding(horizontal = 16.dp).animateItemPlacement(),
+                                modifier = Modifier.padding(horizontal = 16.dp).animateItem(),
                             )
                         }
                     }

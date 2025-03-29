@@ -31,6 +31,7 @@ import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.ScheduleUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
@@ -51,7 +52,7 @@ internal data class OverviewViewState(
     val currentDate: Instant = Clock.System.now().startThisDay(),
     val activeSchedule: ScheduleUi? = null,
     @TypeParceler<Instant, InstantParceler>
-    val homeworks: Map<Instant, List<HomeworkDetailsUi>> = mapOf(),
+    val homeworks: Map<Instant, DailyHomeworksUi> = mapOf(),
     val friends: List<AppUserUi> = emptyList(),
     val sharedHomeworks: SharedHomeworksUi? = null,
     val todos: List<TodoDetailsUi> = emptyList(),
@@ -83,7 +84,7 @@ internal sealed class OverviewEffect : BaseUiEffect {
 
 internal sealed class OverviewAction : BaseAction {
     data class UpdateHomeworks(
-        val homeworks: Map<Instant, List<HomeworkDetailsUi>>,
+        val homeworks: Map<Instant, DailyHomeworksUi>,
         val homeworkScope: HomeworkScopeUi,
     ) : OverviewAction()
     data class UpdateTodos(val todos: List<TodoDetailsUi>) : OverviewAction()

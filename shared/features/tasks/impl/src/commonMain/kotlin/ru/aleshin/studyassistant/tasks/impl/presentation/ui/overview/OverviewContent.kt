@@ -20,76 +20,62 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewItem
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewItemPlaceholder
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewNoneItem
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewViewState
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.DailyHomeworksView
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.DailyHomeworksViewPlaceholder
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.HomeworkErrorsView
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.HomeworkTasksChart
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.ShareHomeworksBottomSheet
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.SharedHomeworksStatusView
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TaskErrorsBottomSheet
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.TasksProgressView
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.DailyGoalsView
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.HomeworksExecutionAnalysisView
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.HomeworksOverview
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.ScopeOfHomeworksView
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.ShareHomeworksView
 
 /**
  * @author Stanislav Aleshin on 29.06.2024
  */
+internal enum class OverviewTasksTab {
+    HOMEWORKS, TODO
+}
+
 @Composable
 internal fun OverviewContent(
     state: OverviewViewState,
@@ -106,167 +92,153 @@ internal fun OverviewContent(
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
 ) = with(state) {
+    var overviewTasksTab by rememberSaveable { mutableStateOf(OverviewTasksTab.HOMEWORKS) }
     Column(
         modifier = modifier.fillMaxSize().padding(top = 8.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        TasksProgressControlSection(
-            isLoadingHomeworks = isLoadingHomeworks,
-            isLoadingErrors = isLoadingErrors,
-            isLoadingShare = isLoadingShare,
-            currentDate = currentDate,
-            homeworks = homeworks,
-            sharedHomeworks = sharedHomeworks,
-            todos = todos,
-            homeworkErrors = homeworkErrors,
-            todoErrors = todoErrors,
-            onOpenSharedHomeworks = onOpenSharedHomeworks,
-            onEditHomework = onOpenHomeworkTasks,
-            onDoHomework = onDoHomework,
-            onSkipHomework = onSkipHomework,
-            onChangeTodoDone = { todo, done -> onChangeTodoDone(todo, done) },
+        DailyGoalsSection(
+            isLoadingGoals = false,
         )
-        HomeworkAnalyticsSection(
-            isLoading = isLoadingHomeworks,
-            currentDate = currentDate,
-            homeworksScope = homeworksScope,
+        HorizontalDivider()
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            OverviewTasksTabSelector(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                currentTab = overviewTasksTab,
+                onChangeTab = { overviewTasksTab = it }
+            )
+            Crossfade(
+                targetState = overviewTasksTab,
+                animationSpec = tween(),
+            ) { tab ->
+                when (tab) {
+                    OverviewTasksTab.HOMEWORKS -> HomeworksSection(
+                        isLoadingHomeworks = isLoadingHomeworks,
+                        isLoadingErrors = isLoadingErrors,
+                        isLoadingShare = isLoadingShare,
+                        currentDate = currentDate,
+                        dailyHomeworks = homeworks,
+                        sharedHomeworks = sharedHomeworks,
+                        homeworksScope = homeworksScope,
+                        homeworkErrors = homeworkErrors,
+                        allFriends = friends,
+                        onOpenHomeworkTasks = onOpenHomeworkTasks,
+                        onOpenSharedHomeworks = onOpenSharedHomeworks,
+                        onShowAllHomeworkTasks = onShowAllHomeworkTasks,
+                        onDoHomework = onDoHomework,
+                        onSkipHomework = onSkipHomework,
+                        onRepeatHomework = onRepeatHomework,
+                        onShareHomeworks = onShareHomeworks,
+                    )
+                    OverviewTasksTab.TODO -> TodosSection(
+                        isLoadingTasks = isLoadingTasks,
+                        todos = todos,
+                        onShowAllTodoTasks = onShowAllTodoTasks,
+                        onOpenTodoTask = onOpenTodoTask,
+                        onChangeTodoDone = onChangeTodoDone,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DailyGoalsSection(
+    modifier: Modifier = Modifier,
+    isLoadingGoals: Boolean,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            modifier = Modifier.padding(16.dp),
+            text = TasksThemeRes.strings.dailyGoalsSectionHeader,
+            color = MaterialTheme.colorScheme.onBackground,
+            maxLines = 1,
+            style = MaterialTheme.typography.titleMedium,
         )
-        HomeworksSection(
-            isLoading = isLoadingHomeworks,
-            currentDate = currentDate,
-            homeworks = homeworks,
-            allFriends = friends,
-            onOpenHomeworkTasks = onOpenHomeworkTasks,
-            onShowAllHomeworkTasks = onShowAllHomeworkTasks,
-            onDoHomework = onDoHomework,
-            onSkipHomework = onSkipHomework,
-            onRepeatHomework = onRepeatHomework,
-            onShareHomeworks = onShareHomeworks,
-        )
-        TodosSection(
-            isLoading = isLoadingTasks,
-            todos = todos,
-            onShowAllTodoTasks = onShowAllTodoTasks,
-            onOpenTodoTask = onOpenTodoTask,
-            onChangeTodoDone = onChangeTodoDone,
+        DailyGoalsView(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            isLoadingGoals = isLoadingGoals,
         )
     }
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun TasksProgressControlSection(
+private fun OverviewTasksTabSelector(
+    modifier: Modifier = Modifier,
+    currentTab: OverviewTasksTab,
+    onChangeTab: (OverviewTasksTab) -> Unit,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        OverviewTasksTab.entries.forEach { tab ->
+            OverviewTasksTabSelectorItem(
+                onClick = { onChangeTab(tab) },
+                isSelected = tab == currentTab,
+                text = when (tab) {
+                    OverviewTasksTab.HOMEWORKS -> TasksThemeRes.strings.homeworksTasksTab
+                    OverviewTasksTab.TODO -> TasksThemeRes.strings.todosTasksTab
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun OverviewTasksTabSelectorItem(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    isSelected: Boolean,
+    text: String,
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        shape = MaterialTheme.shapes.large,
+        color = when (isSelected) {
+            true -> MaterialTheme.colorScheme.primaryContainer
+            false -> Color.Transparent
+        },
+        border = when (isSelected) {
+            true -> null
+            false -> BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+        },
+    ) {
+        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            Text(
+                text = text,
+                color = when (isSelected) {
+                    true -> MaterialTheme.colorScheme.onPrimaryContainer
+                    false -> MaterialTheme.colorScheme.onSurface
+                },
+                maxLines = 1,
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
+    }
+}
+
+@Composable
+private fun HomeworksSection(
     modifier: Modifier = Modifier,
     isLoadingHomeworks: Boolean,
     isLoadingErrors: Boolean,
     isLoadingShare: Boolean,
     currentDate: Instant,
-    homeworks: Map<Instant, List<HomeworkDetailsUi>>,
+    dailyHomeworks: Map<Instant, DailyHomeworksUi>,
     sharedHomeworks: SharedHomeworksUi?,
-    todos: List<TodoDetailsUi>,
-    homeworkErrors: HomeworkErrorsUi?,
-    todoErrors: TodoErrorsUi?,
-    onOpenSharedHomeworks: () -> Unit,
-    onEditHomework: (HomeworkDetailsUi) -> Unit,
-    onDoHomework: (HomeworkDetailsUi) -> Unit,
-    onSkipHomework: (HomeworkDetailsUi) -> Unit,
-    onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
-) {
-    var taskErrorsSheetState by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-    )
-
-    Row(
-        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        TasksProgressView(
-            modifier = Modifier.weight(1f),
-            isLoading = isLoadingHomeworks,
-            currentDate = currentDate,
-            homeworks = homeworks,
-            todos = todos,
-        )
-        Column(
-            modifier = Modifier.fillMaxHeight().weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            HomeworkErrorsView(
-                modifier = Modifier.fillMaxWidth(),
-                isLoading = isLoadingErrors,
-                homeworkErrors = homeworkErrors,
-                todoErrors = todoErrors,
-                onShowErrors = { taskErrorsSheetState = true },
-            )
-            SharedHomeworksStatusView(
-                modifier = Modifier.fillMaxWidth(),
-                isLoading = isLoadingShare,
-                sharedHomeworks = sharedHomeworks,
-                onOpenSharedHomeworks = onOpenSharedHomeworks,
-            )
-        }
-    }
-
-    if (taskErrorsSheetState) {
-        TaskErrorsBottomSheet(
-            sheetState = sheetState,
-            homeworkErrors = homeworkErrors,
-            todoErrors = todoErrors,
-            onDismissRequest = { taskErrorsSheetState = false },
-            onEditHomework = onEditHomework,
-            onDoHomework = onDoHomework,
-            onSkipHomework = onSkipHomework,
-            onChangeTodoDone = { todo, done -> onChangeTodoDone(todo, done) },
-        )
-    }
-}
-
-@Composable
-private fun HomeworkAnalyticsSection(
-    modifier: Modifier = Modifier,
-    isLoading: Boolean,
-    currentDate: Instant,
     homeworksScope: HomeworkScopeUi?,
-) {
-    Surface(
-        modifier = modifier.padding(horizontal = 16.dp).animateContentSize(),
-        shape = MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = TasksThemeRes.strings.homeworkAnalyticsHeader,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleSmall,
-                )
-            }
-            HomeworkTasksChart(
-                isLoading = isLoading,
-                currentDate = currentDate,
-                homeworkScope = homeworksScope,
-            )
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun HomeworksSection(
-    modifier: Modifier = Modifier,
-    isLoading: Boolean,
-    currentDate: Instant,
-    homeworks: Map<Instant, List<HomeworkDetailsUi>>,
+    homeworkErrors: HomeworkErrorsUi?,
     allFriends: List<AppUserUi>,
+    onOpenSharedHomeworks: () -> Unit,
     onShowAllHomeworkTasks: () -> Unit,
     onOpenHomeworkTasks: (HomeworkDetailsUi) -> Unit,
     onDoHomework: (HomeworkDetailsUi) -> Unit,
@@ -276,119 +248,47 @@ private fun HomeworksSection(
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = TasksThemeRes.strings.homeworksSectionHeader,
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(
-                modifier = Modifier.size(32.dp),
-                onClick = onShowAllHomeworkTasks,
-            ) {
-                Icon(
-                    painter = painterResource(TasksThemeRes.icons.viewAllTasks),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
-            }
-        }
-        var isShowTargetDay by rememberSaveable { mutableStateOf(true) }
-        Crossfade(
-            targetState = isLoading,
-            animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-        ) { loading ->
-            if (!loading) {
-                val listState = rememberLazyListState()
-                val homeworksMapList = homeworks.toList()
-
-                LazyRow(
-                    modifier = Modifier.height(350.dp).fillMaxWidth(),
-                    state = listState,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    userScrollEnabled = true,
-                ) {
-                    items(homeworksMapList, key = { it.first.toString() }) { homeworksEntry ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            var isShowSharedHomeworksSheet by remember { mutableStateOf(false) }
-                            val isCurrent = currentDate.equalsDay(homeworksEntry.first)
-
-                            if (isCurrent) {
-                                VerticalDivider(
-                                    modifier = Modifier.padding(vertical = 16.dp),
-                                    color = MaterialTheme.colorScheme.secondaryContainer,
-                                )
-                            }
-                            DailyHomeworksView(
-                                date = homeworksEntry.first,
-                                isCurrent = isCurrent,
-                                isPassed = homeworksEntry.first < currentDate,
-                                homeworks = homeworksEntry.second,
-                                onDoHomework = onDoHomework,
-                                onOpenHomeworkTask = onOpenHomeworkTasks,
-                                onSkipHomework = onSkipHomework,
-                                onRepeatHomework = onRepeatHomework,
-                                onShareHomeworks = { isShowSharedHomeworksSheet = true },
-                            )
-                            if (isCurrent) {
-                                VerticalDivider(
-                                    modifier = Modifier.padding(vertical = 16.dp),
-                                    color = MaterialTheme.colorScheme.secondaryContainer,
-                                )
-                            }
-
-                            if (isShowSharedHomeworksSheet) {
-                                ShareHomeworksBottomSheet(
-                                    currentTime = Clock.System.now(),
-                                    targetDate = homeworksEntry.first,
-                                    homeworks = homeworksEntry.second,
-                                    allFriends = allFriends,
-                                    onDismissRequest = { isShowSharedHomeworksSheet = false },
-                                    onConfirm = {
-                                        onShareHomeworks(it)
-                                        isShowSharedHomeworksSheet = false
-                                    },
-                                )
-                            }
-                        }
-                    }
-                }
-                LaunchedEffect(true) {
-                    if (isShowTargetDay) {
-                        val currentDateIndex = homeworksMapList.indexOfFirst { currentDate.equalsDay(it.first) }
-                        if (currentDateIndex != -1) {
-                            listState.animateScrollToItem(currentDateIndex)
-                            isShowTargetDay = false
-                        }
-                    }
-                }
-            } else {
-                LazyRow(
-                    modifier = Modifier.height(350.dp).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    userScrollEnabled = false,
-                ) {
-                    items(Placeholder.HOMEWORKS) {
-                        DailyHomeworksViewPlaceholder()
-                    }
-                }
-            }
-        }
+        HomeworksOverview(
+            isLoadingHomeworks = isLoadingHomeworks,
+            currentDate = currentDate,
+            homeworks = dailyHomeworks,
+            allFriends = allFriends,
+            onOpenHomeworkTasks = onOpenHomeworkTasks,
+            onShowAllHomeworkTasks = onShowAllHomeworkTasks,
+            onDoHomework = onDoHomework,
+            onSkipHomework = onSkipHomework,
+            onRepeatHomework = onRepeatHomework,
+            onShareHomeworks = onShareHomeworks,
+        )
+        HomeworksExecutionAnalysisView(
+            isLoadingHomeworks = isLoadingHomeworks,
+            isLoadingErrors = isLoadingErrors,
+            currentDate = currentDate,
+            dailyHomeworks = dailyHomeworks,
+            homeworkErrors = homeworkErrors,
+            onEditHomework = onOpenHomeworkTasks,
+            onDoHomework = onDoHomework,
+            onSkipHomework = onSkipHomework,
+        )
+        ScopeOfHomeworksView(
+            isLoading = isLoadingHomeworks,
+            currentDate = currentDate,
+            homeworksScope = homeworksScope,
+        )
+        ShareHomeworksView(
+            isLoadingShare = isLoadingShare,
+            sharedHomeworks = sharedHomeworks,
+            onOpenSharedHomeworks = onOpenSharedHomeworks,
+        )
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TodosSection(
     modifier: Modifier = Modifier,
-    isLoading: Boolean,
+    isLoadingTasks: Boolean,
     todos: List<TodoDetailsUi>,
     onShowAllTodoTasks: () -> Unit,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
@@ -419,7 +319,7 @@ private fun TodosSection(
             )
         }
         Crossfade(
-            targetState = isLoading,
+            targetState = isLoadingTasks,
             animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         ) { loading ->
             if (!loading) {

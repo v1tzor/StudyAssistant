@@ -91,7 +91,7 @@ internal fun OverviewContent(
                         var openClassBottomSheet by remember { mutableStateOf(false) }
 
                         DetailsClassViewItem(
-                            modifier = Modifier.animateItemPlacement(),
+                            modifier = Modifier.animateItem(),
                             onClick = { openClassBottomSheet = true },
                             isActive = activeClass?.uid == classModel.uid,
                             number = classModel.number,
