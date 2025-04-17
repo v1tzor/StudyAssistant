@@ -4,7 +4,7 @@
 
     <application>
         <service
-            android:name="ru.aleshin.studyassistant.application.services.FirebaseMessagingService"
+            android:name="ru.aleshin.studyassistant.presentation.services.FirebaseMessagingService"
             android:directBootAware="true"
             android:exported="true">
 
@@ -26,7 +26,7 @@
         </service>
 
         <service
-            android:name="ru.aleshin.studyassistant.application.services.RuStoreMessagingService"
+            android:name="ru.aleshin.studyassistant.presentation.services.RuStoreMessagingService"
             android:exported="true"
             tools:ignore="ExportedService">
 
@@ -43,6 +43,16 @@
 
             <intent-filter>
                 <action android:name="ru.rustore.sdk.pushclient.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="ru.aleshin.studyassistant.presentation.services.HmsMessagingService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+
+            <intent-filter>
+                <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
             </intent-filter>
         </service>
     </application>

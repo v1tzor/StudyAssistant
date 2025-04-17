@@ -31,6 +31,8 @@ import ru.aleshin.studyassistant.core.common.messages.PushServiceType.FCM
 import ru.aleshin.studyassistant.core.common.messages.RemoteMessageHandler
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
 import ru.aleshin.studyassistant.domain.interactors.AppUserInteractor
+import ru.rustore.sdk.universalpush.RuStoreUniversalPushManager
+import ru.rustore.sdk.universalpush.UNIVERSAL_FCM_PROVIDER
 import ru.rustore.sdk.universalpush.firebase.messaging.toUniversalRemoteMessage
 
 /**
@@ -61,11 +63,18 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         remoteMessageHandler.handleMessage(message.toUniversalRemoteMessage())
+        RuStoreUniversalPushManager.processMessage(message.toUniversalRemoteMessage())
     }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         updatePushTokenWork(token)
+        RuStoreUniversalPushManager.processToken(UNIVERSAL_FCM_PROVIDER, token)
+    }
+
+    override fun onDeletedMessages() {
+        super.onDeletedMessages()
+        RuStoreUniversalPushManager.processDeletedMessages(UNIVERSAL_FCM_PROVIDER)
     }
 
     private fun updatePushTokenWork(token: String) = coroutineManager.runOnBackground(serviceScope) {

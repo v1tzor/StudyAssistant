@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.data.remote
+package ru.aleshin.studyassistant.data
 
 import android.content.Context
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.FirebaseApp
-import ru.aleshin.studyassistant.core.common.inject.AppService
-import ru.aleshin.studyassistant.core.common.inject.Flavor
+import com.huawei.hms.api.HuaweiApiAvailability
+import ru.aleshin.studyassistant.core.common.platform.services.AppService
+import ru.aleshin.studyassistant.core.common.platform.services.Flavor
 
 /**
  * @author Stanislav Aleshin on 11.09.2024.
@@ -29,14 +30,16 @@ import ru.aleshin.studyassistant.core.common.inject.Flavor
 class AppServiceImpl(
     private val applicationContext: Context,
     private val googleApiAvailability: GoogleApiAvailability,
+    private val huaweiApiAvailability: HuaweiApiAvailability,
 ) : AppService {
 
-    override val flavor: Flavor = Flavor.RUSTORE
+    override val flavor: Flavor = Flavor.GITHUB
 
     override val isAvailableServices: Boolean
         get() {
-            val status: Int = googleApiAvailability.isGooglePlayServicesAvailable(applicationContext)
-            return status == ConnectionResult.SUCCESS
+            val googleStatus = googleApiAvailability.isGooglePlayServicesAvailable(applicationContext)
+            val hmsStatus: Int = huaweiApiAvailability.isHuaweiMobileServicesAvailable(applicationContext)
+            return googleStatus == ConnectionResult.SUCCESS || hmsStatus == ConnectionResult.SUCCESS
         }
 
     override fun initializeApp() {

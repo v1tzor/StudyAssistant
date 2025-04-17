@@ -61,13 +61,17 @@ interface PushServiceAuthTokenProvider {
         }
     }
 
-    class Huawei : PushServiceAuthTokenProvider {
+    class Huawei(
+        private val hmsAuthTokenProvider: HmsAuthTokenProvider,
+    ) : PushServiceAuthTokenProvider {
         override suspend fun fetchAuthToken(): String {
-            TODO("In planned")
+            return checkNotNull(hmsAuthTokenProvider.fetchAccessToken()) {
+                "Hms auth token was null."
+            }
         }
 
         override suspend fun fetchProjectId(): String {
-            TODO("In planned")
+            return BuildKonfig.HMS_PROJECT_ID
         }
     }
 }

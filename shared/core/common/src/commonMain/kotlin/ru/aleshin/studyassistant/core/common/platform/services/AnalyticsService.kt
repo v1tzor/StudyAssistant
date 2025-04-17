@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2023 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package ru.aleshin.studyassistant.core.common.inject
+package ru.aleshin.studyassistant.core.common.platform.services
 
 /**
- * @author Stanislav Aleshin on 11.09.2024.
+ * @author Stanislav Aleshin on 13.04.2025.
  */
-interface CrashlyticsService {
-    fun recordException(tag: String, message: String, exception: Throwable)
+interface AnalyticsService {
+
+    fun trackEvent(name: String, eventParams: Map<String, String>)
+
     fun initializeService()
+
+    class Empty : AnalyticsService {
+        override fun trackEvent(name: String, eventParams: Map<String, String>) = Unit
+        override fun initializeService() = Unit
+    }
 }

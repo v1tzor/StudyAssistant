@@ -16,26 +16,27 @@
 
 package ru.aleshin.studyassistant.presentation.services
 
-import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.core.common.messages.PushServiceType.FCM
+import ru.aleshin.studyassistant.core.common.messages.PushServiceType
 import ru.aleshin.studyassistant.core.common.messages.RemoteMessageHandler
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
-import ru.aleshin.studyassistant.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.domain.interactors.AppUserInteractor
-import ru.rustore.sdk.universalpush.firebase.messaging.toUniversalRemoteMessage
+import ru.rustore.sdk.pushclient.messaging.model.RemoteMessage
+import ru.rustore.sdk.pushclient.messaging.service.RuStoreMessagingService
+import ru.rustore.sdk.universalpush.rustore.messaging.toUniversalRemoteMessage
 
 /**
  * @author Stanislav Aleshin on 11.08.2024.
  */
-class FirebaseMessagingService : FirebaseMessagingService() {
+class RuStoreMessagingService : RuStoreMessagingService() {
 
     private val remoteMessageHandler by lazy {
         MainDependenciesGraph.fetchDI().instance<RemoteMessageHandler>()
@@ -68,18 +69,18 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun updatePushTokenWork(token: String) = coroutineManager.runOnBackground(serviceScope) {
-        appUserInteractor.fetchAppUser().first().handle(
+        appUserInteractor.fetchAppUserInfo().first().handle(
             onLeftAction = { error("Error get AppUser for update FCM token") },
             onRightAction = { appUser ->
                 val deviceId = deviceInfoProvider.fetchDeviceId()
                 val currentDeviceInfo = appUser?.devices?.find { it.deviceId == deviceId }
-                if (appUser != null && currentDeviceInfo != null && currentDeviceInfo.pushServiceType == FCM) {
+                if (appUser != null && currentDeviceInfo != null && currentDeviceInfo.pushServiceType == PushServiceType.FCM) {
                     val actualDeviceInfo = UserDevice(
                         platform = deviceInfoProvider.fetchDevicePlatform(),
                         deviceId = deviceId,
                         deviceName = deviceInfoProvider.fetchDeviceName(),
                         pushToken = token,
-                        pushServiceType = FCM,
+                        pushServiceType = PushServiceType.FCM,
                     )
                     val updatedUser = appUser.copy(
                         devices = buildList {

@@ -3,6 +3,7 @@ pluginManagement {
         google()
         gradlePluginPortal()
         mavenCentral()
+        maven("https://developer.huawei.com/repo/")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }

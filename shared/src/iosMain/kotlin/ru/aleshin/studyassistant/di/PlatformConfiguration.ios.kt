@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.di
 
-import ru.aleshin.studyassistant.core.common.inject.AppService
-import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.IosUUIDProvider
+import ru.aleshin.studyassistant.core.common.platform.services.AppService
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.

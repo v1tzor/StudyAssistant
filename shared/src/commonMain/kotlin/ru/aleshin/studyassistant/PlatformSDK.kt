@@ -42,13 +42,16 @@ object PlatformSDK {
 
     fun doInit(configuration: PlatformConfiguration) {
         configuration.appService.initializeApp()
+        configuration.analyticsService.initializeService()
         configuration.crashlyticsService.initializeService()
+
         Firebase.firestore.settings = firestoreSettings {
             persistentCacheSettings {
                 cacheSettings = LocalCacheSettings.Persistent.newBuilder().build()
             }
         }
         GoogleAuthProvider.create(GoogleAuthCredentials(serverId = BuildKonfig.WEB_CLIENT_ID))
+
         MainDependenciesGraph.initialize(
             di = DI {
                 bindSingleton<PlatformConfiguration> { configuration }

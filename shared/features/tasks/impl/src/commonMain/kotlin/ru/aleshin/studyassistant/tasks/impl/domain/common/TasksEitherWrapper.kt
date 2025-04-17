@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.impl.domain.common
 
-import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 

@@ -21,15 +21,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.messages.PushServiceType
 import ru.aleshin.studyassistant.core.common.messages.RemoteMessageHandler
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
-import ru.aleshin.studyassistant.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.domain.interactors.AppUserInteractor
 import ru.rustore.sdk.pushclient.messaging.model.RemoteMessage
+import ru.rustore.sdk.pushclient.messaging.service.RuStoreMessagingService
 import ru.rustore.sdk.universalpush.rustore.messaging.toUniversalRemoteMessage
 
 /**
@@ -68,7 +69,7 @@ class RuStoreMessagingService : RuStoreMessagingService() {
     }
 
     private fun updatePushTokenWork(token: String) = coroutineManager.runOnBackground(serviceScope) {
-        appUserInteractor.fetchAppUser().first().handle(
+        appUserInteractor.fetchAppUserInfo().first().handle(
             onLeftAction = { error("Error get AppUser for update FCM token") },
             onRightAction = { appUser ->
                 val deviceId = deviceInfoProvider.fetchDeviceId()

@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.inject
+package ru.aleshin.studyassistant.core.common.platform.services
 
 /**
  * @author Stanislav Aleshin on 11.09.2024.
  */
-enum class Flavor {
-    APPLE, GOOGLE, HMS, RUSTORE, FOSS
+interface CrashlyticsService {
+
+    fun sendLog(message: String)
+    
+    fun recordException(tag: String, message: String, exception: Throwable)
+
+    fun initializeService()
+
+    class Empty : CrashlyticsService {
+        override fun sendLog(message: String) = Unit
+        override fun recordException(tag: String, message: String, exception: Throwable) = Unit
+        override fun initializeService() = Unit
+    }
 }

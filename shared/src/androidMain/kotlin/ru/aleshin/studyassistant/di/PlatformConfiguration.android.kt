@@ -17,16 +17,18 @@
 package ru.aleshin.studyassistant.di
 
 import android.content.Context
-import ru.aleshin.studyassistant.core.common.inject.AppService
-import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
-import ru.aleshin.studyassistant.core.common.messages.RemoteMessageHandler
+import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.AppService
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 actual data class PlatformConfiguration constructor(
-    actual val appService: AppService,
-    actual val crashlyticsService: CrashlyticsService,
-    val remoteMessageHandler: RemoteMessageHandler,
     val applicationContext: Context,
+    actual val appService: AppService,
+    actual val analyticsService: AnalyticsService,
+    actual val crashlyticsService: CrashlyticsService,
+    actual val messagingService: MessagingService,
 )

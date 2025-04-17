@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.inject
+package ru.aleshin.studyassistant.core.common.platform.services
+
+import kotlinx.coroutines.flow.Flow
+import ru.aleshin.studyassistant.core.common.messages.PushServiceType
+import ru.aleshin.studyassistant.core.common.messages.UniversalPushToken
 
 /**
- * @author Stanislav Aleshin on 11.09.2024.
+ * @author Stanislav Aleshin on 13.09.2024.
  */
-interface AppService {
-
-    val flavor: Flavor
-
-    val isAvailableServices: Boolean
-
-    fun initializeApp()
+interface MessagingService {
+    fun fetchAvailablePushServices(): List<PushServiceType>
+    suspend fun fetchToken(): Flow<UniversalPushToken>
+    suspend fun deleteToken()
 }

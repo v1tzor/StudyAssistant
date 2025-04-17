@@ -32,7 +32,7 @@ class AppServiceImpl(
     private val googleApiAvailability: GoogleApiAvailability,
 ) : AppService {
 
-    override val flavor: Flavor = Flavor.FOSS
+    override val flavor: Flavor = Flavor.GITHUB
 
     override val isAvailableServices: Boolean = false
 

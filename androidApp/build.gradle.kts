@@ -1,6 +1,6 @@
 
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
+import com.huawei.agconnect.agcp.AGCPExtension
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -8,15 +8,20 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kapt)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.tracer)
 }
 
-val hasFdroid = gradle.startParameter.taskNames.any {
-    it.contains("FdroidDebug", ignoreCase = true) || it.contains("FdroidRelease", ignoreCase = true)
+val hasHuawei = gradle.startParameter.taskNames.any {
+    it.contains("HuaweiDebug", ignoreCase = true) || it.contains("HuaweiRelease", ignoreCase = true)
 }
 
-if (!hasFdroid) {
-    apply(plugin = libs.plugins.gms.get().pluginId)
-    apply(plugin = libs.plugins.crashlytics.get().pluginId)
+if (!hasHuawei) {
+    plugins.apply(libs.plugins.gms.get().pluginId)
+    plugins.apply(libs.plugins.hms.get().pluginId)
+    project.extensions.configure<AGCPExtension> { manifest = false }
+} else {
+    plugins.apply(libs.plugins.hms.get().pluginId)
+    project.extensions.configure<AGCPExtension> { manifest = false }
 }
 
 android {
@@ -37,6 +42,20 @@ android {
         testInstrumentationRunner = libs.versions.testInstrumentationRunner.get()
         vectorDrawables.useSupportLibrary = true
         resourceConfigurations.addAll(listOf("en", "ru"))
+
+        val firebaseProjectId = localProperties.getProperty("firebaseProjectId")
+        val firebaseApplicationId = localProperties.getProperty("firebaseApplicationId")
+        val firebaseStorageBucket = localProperties.getProperty("firebaseStorageBucket")
+        val firebaseApiKey = localProperties.getProperty("firebaseApiKey")
+        val myTrackerKey = localProperties.getProperty("myTrackerKey")
+        val hmsAppId = localProperties.getProperty("hmsAppId")
+
+        buildConfigField("String", "HMS_APP_ID", "\"$hmsAppId\"")
+        buildConfigField("String", "MY_TRACKER_KEY", "\"$myTrackerKey\"")
+        buildConfigField("String", "PROJECT_ID", "\"$firebaseProjectId\"")
+        buildConfigField("String", "APPLICATION_ID", "\"$firebaseApplicationId\"")
+        buildConfigField("String", "STORAGE_BUCKET", "\"$firebaseStorageBucket\"")
+        buildConfigField("String", "FIREBASE_API_KEY", "\"$firebaseApiKey\"")
     }
 
     signingConfigs {
@@ -63,12 +82,8 @@ android {
             isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
-            if (!hasFdroid) configure<CrashlyticsExtension> { mappingFileUploadEnabled = false }
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"
@@ -78,32 +93,18 @@ android {
     }
 
     productFlavors {
-        create("google") {
+        create("huawei") {
             dimension = "production"
         }
         create("github") {
             dimension = "production"
-        }
-        create("fdroid") {
-            dimension = "production"
-            val firebaseProjectId = localProperties.getProperty("firebaseProjectId")
-            val firebaseApplicationId = localProperties.getProperty("firebaseApplicationId")
-            val firebaseStorageBucket = localProperties.getProperty("firebaseStorageBucket")
-            val firebaseApiKey = localProperties.getProperty("firebaseApiKey")
-
-            buildConfigField("String", "PROJECT_ID", "\"$firebaseProjectId\"")
-            buildConfigField("String", "APPLICATION_ID", "\"$firebaseApplicationId\"")
-            buildConfigField("String", "STORAGE_BUCKET", "\"$firebaseStorageBucket\"")
-            buildConfigField("String", "FIREBASE_API_KEY", "\"$firebaseApiKey\"")
+            val rustoreProjectId = localProperties.getProperty("rustoreProjectId")
+            buildConfigField("String", "PROJECT_ID", "\"$rustoreProjectId\"")
         }
         create("rustore") {
             dimension = "production"
-
-            val projectId = localProperties.getProperty("rustoreProjectId")
-            val serviceAuthToken = localProperties.getProperty("rustoreServiceAuthToken")
-
-            buildConfigField("String", "PROJECT_ID", "\"$projectId\"")
-            buildConfigField("String", "SERVICE_AUTH_TOKEN", "\"$serviceAuthToken\"")
+            val rustoreProjectId = localProperties.getProperty("rustoreProjectId")
+            buildConfigField("String", "PROJECT_ID", "\"$rustoreProjectId\"")
         }
     }
 
@@ -131,7 +132,7 @@ android {
 }
 
 val rustoreImplementation = "rustoreImplementation"
-val googleImplementation = "googleImplementation"
+val huaweiImplementation = "huaweiImplementation"
 val githubImplementation = "githubImplementation"
 
 dependencies {
@@ -147,22 +148,43 @@ dependencies {
 
     implementation(libs.kodein.android)
 
-    googleImplementation(libs.google.gms.services)
-    rustoreImplementation(libs.google.gms.services)
-    githubImplementation(libs.google.gms.services)
+    implementation(platform(libs.tracer.bom))
+    implementation(libs.bundles.tracer)
+    implementation(libs.mytracker.core)
 
     implementation(platform(libs.firebase.bom.android))
     implementation(libs.firebase.auth.android)
     implementation(libs.firebase.messaging.android)
     implementation(libs.firebase.messaging.directboot.android)
-    googleImplementation(libs.firebase.crashlytics.android)
-    rustoreImplementation(libs.firebase.crashlytics.android)
-    githubImplementation(libs.firebase.crashlytics.android)
+    implementation(libs.firebase.messaging.android)
+    rustoreImplementation(libs.google.gms.services)
+    githubImplementation(libs.google.gms.services)
+    huaweiImplementation(libs.google.gms.services)
+
+    rustoreImplementation(libs.hms.core)
+    githubImplementation(libs.hms.core)
+    huaweiImplementation(libs.hms.core)
+    rustoreImplementation(libs.hms.push)
+    githubImplementation(libs.hms.push)
+    huaweiImplementation(libs.hms.push)
 
     implementation(platform(libs.rustore.bom))
     implementation(libs.rustore.universalpush.core)
-    googleImplementation(libs.rustore.universalpush.fcm)
+    huaweiImplementation(libs.rustore.universalpush.hms)
     rustoreImplementation(libs.rustore.universalpush.fcm)
-    githubImplementation(libs.rustore.universalpush.fcm)
+    rustoreImplementation(libs.rustore.universalpush.hms)
     rustoreImplementation(libs.rustore.universalpush.rustore)
+    githubImplementation(libs.rustore.universalpush.fcm)
+    githubImplementation(libs.rustore.universalpush.hms)
+    githubImplementation(libs.rustore.universalpush.rustore)
+}
+
+tracer {
+    create("defaultConfig") {
+        val localProperties = gradleLocalProperties(rootDir, providers)
+        pluginToken = localProperties.getProperty("tracerPluginToken")
+        appToken = localProperties.getProperty("tracerAppToken")
+        uploadMapping = true
+        uploadNativeSymbols = true
+    }
 }

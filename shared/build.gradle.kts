@@ -28,6 +28,9 @@ kotlin {
     }
 
     sourceSets {
+        androidMain.dependencies {
+            implementation(libs.rustore.universalpush.core)
+        }
         commonMain.dependencies {
             implementation(project(":shared:features:navigation:api"))
             implementation(project(":shared:features:navigation:impl"))
@@ -54,8 +57,8 @@ kotlin {
             api(project(":shared:core:ui"))
             api(project(":shared:core:domain"))
             api(project(":shared:core:data"))
-            implementation(project(":shared:core:database"))
-            implementation(project(":shared:core:remote"))
+            api(project(":shared:core:database"))
+            api(project(":shared:core:remote"))
 
             implementation(compose.components.resources)
             implementation(libs.firebase.firestore)

@@ -14,32 +14,40 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.data.remote
+package ru.aleshin.studyassistant.data
 
 import android.content.Context
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.FirebaseApp
-import ru.aleshin.studyassistant.core.common.inject.AppService
-import ru.aleshin.studyassistant.core.common.inject.Flavor
+import com.google.firebase.FirebaseOptions
+import com.huawei.hms.api.ConnectionResult
+import com.huawei.hms.api.HuaweiApiAvailability
+import ru.aleshin.studyassistant.android.BuildConfig
+import ru.aleshin.studyassistant.core.common.platform.services.AppService
+import ru.aleshin.studyassistant.core.common.platform.services.Flavor
 
 /**
  * @author Stanislav Aleshin on 11.09.2024.
  */
 class AppServiceImpl(
     private val applicationContext: Context,
-    private val googleApiAvailability: GoogleApiAvailability,
+    private val huaweiApiAvailability: HuaweiApiAvailability,
 ) : AppService {
 
-    override val flavor: Flavor = Flavor.GOOGLE
+    override val flavor: Flavor = Flavor.HMS
 
     override val isAvailableServices: Boolean
         get() {
-            val status: Int = googleApiAvailability.isGooglePlayServicesAvailable(applicationContext)
+            val status: Int = huaweiApiAvailability.isHuaweiMobileServicesAvailable(applicationContext)
             return status == ConnectionResult.SUCCESS
         }
 
     override fun initializeApp() {
-        FirebaseApp.initializeApp(applicationContext)
+        val options = FirebaseOptions.Builder().apply {
+            setApplicationId(BuildConfig.APPLICATION_ID)
+            setProjectId(BuildConfig.PROJECT_ID)
+            setStorageBucket(BuildConfig.STORAGE_BUCKET)
+            setApiKey(BuildConfig.FIREBASE_API_KEY)
+        }.build()
+        FirebaseApp.initializeApp(applicationContext, options)
     }
 }

@@ -17,10 +17,10 @@
 package ru.aleshin.studyassistant.auth.impl.di
 
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
-import ru.aleshin.studyassistant.core.common.inject.AppService
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
-import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.platform.services.AppService
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository

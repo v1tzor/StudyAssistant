@@ -13,25 +13,28 @@ kotlin-coroutines = "1.9.0"
 kotlin-datetime = "0.6.1"
 kotlin-serialization = "1.7.1"
 mokoParcelize = "0.9.0"
-compose = "1.7.5"
+compose = "1.7.8"
 compose-compiler = "1.5.11"
 compose-material3 = "1.3.1"
 compose-adaptive = "1.0.0-alpha01"
 compose-material = "1.12.0"
 compose-plugin = "1.8.0-alpha03"
-androidx-activityCompose = "1.9.2"
-workmanager = "2.9.1"
+androidx-activityCompose = "1.10.1"
+workmanager = "2.10.0"
 gms = "4.4.2"
+hms = "1.9.1.304"
 oauth = "1.24.0"
-firebase-bom = "33.5.1"
-crashlytics = "3.0.2"
+firebase-bom = "33.12.0"
+crashlytics = "3.0.3"
 rustore-bom = "6.0.0"
 firebase-gitlive = "2.0.0"
-ksp = "2.0.0-1.0.22"
+tracer = "1.0.4"
+mytracker = "3.4.1"
+ksp = "2.1.20-2.0.0"
 voyager = "1.1.0-beta02"
 kodein = "7.22.0"
 ktor = "2.3.12"
-accompanist = "0.34.0"
+accompanist = "0.36.0"
 coreKtx = "1.13.1"
 bignum = "0.3.9"
 sqldelight = "2.0.2"
@@ -55,6 +58,7 @@ kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.r
 kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlin-serialization" }
 moko-parcelize = { module = "dev.icerock.moko:parcelize", version.ref = "mokoParcelize" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
+androidx-tools = { module = "com.android.tools.build:gradle", version.ref="agp" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-workmanager = { module = "androidx.work:work-runtime", version.ref = "workmanager" }
@@ -74,6 +78,9 @@ google-oauth-bom-android = { module = "com.google.auth:google-auth-library-bom",
 google-oauth-android = { module = "com.google.auth:google-auth-library-oauth2-http" }
 google-oauth-credentials-android = { module = "com.google.auth:google-auth-library-credentials" }
 google-auth = { module = "io.github.mirzemehdi:kmpauth-google", version.ref = "kmpauth-google" }
+hms-core = { module = "com.huawei.agconnect:agconnect-core", version.ref="hms" }
+hms-push = { module = "com.huawei.hms:push", version.ref="hms" }
+hms-agcp = { module = "com.huawei.agconnect:agcp", version.ref="hms" }
 placeholder = { group = "com.eygraber", name = "compose-placeholder-material3", version.ref = "placeholder" }
 firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebase-gitlive" }
 firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebase-gitlive" }
@@ -89,6 +96,15 @@ rustore-universalpush-core = { module = "ru.rustore.sdk:universalpush" }
 rustore-universalpush-rustore = { module = "ru.rustore.sdk:universalrustore" }
 rustore-universalpush-fcm = { module = "ru.rustore.sdk:universalfcm" }
 rustore-universalpush-hms = { module = "ru.rustore.sdk:universalhms" }
+tracer-plugin = { module = "ru.ok.tracer:tracer-plugin", version.ref = "tracer" }
+tracer-bom = { module = "ru.ok.tracer:tracer-platform", version.ref = "tracer" }
+tracer-crashReport = { module = "ru.ok.tracer:tracer-crash-report" }
+tracer-crashReportNative = { module = "ru.ok.tracer:tracer-crash-report-native" }
+tracer-heapDumps = { module = "ru.ok.tracer:tracer-heap-dumps" }
+tracer-diskUsage = { module = "ru.ok.tracer:tracer-disk-usage" }
+tracer-samplingProfiler = { module = "ru.ok.tracer:tracer-profiler-sampling" }
+tracer-systraceProfiler = { module = "ru.ok.tracer:tracer-profiler-systrace" }
+mytracker-core = { module = "com.my.tracker:mytracker-sdk", version.ref = "mytracker" }
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-screenModel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
@@ -123,6 +139,7 @@ filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref =
 firebase = ["firebase-auth", "firebase-firestore", "firebase-storage", "firebase-messaging"]
 voyager = ["voyager-navigator", "voyager-screenModel", "voyager-transitions", "voyager-kodein"]
 sketch = ["sketch-compose", "sketch-compose-resources", "sketch-compose-extnsions-resources"]
+tracer = ["tracer-crashReport", "tracer-crashReportNative", "tracer-heapDumps", "tracer-diskUsage", "tracer-samplingProfiler", "tracer-systraceProfiler"]
 filekit = ["filekit-core", "filekit-compose"]
 
 [plugins]
@@ -139,5 +156,6 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 sqlitedelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 gms = { id = "com.google.gms.google-services", version.ref = "gms" }
-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
+hms = { id = "com.huawei.agconnect", version.ref = "hms" }
 konfig = { id = "com.codingfeline.buildkonfig", version.ref = "konfig" }
+tracer = { id = "ru.ok.tracer", version.ref = "tracer" }

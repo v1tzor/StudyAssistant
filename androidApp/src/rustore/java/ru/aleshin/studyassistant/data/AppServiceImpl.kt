@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.data.remote
+package ru.aleshin.studyassistant.data
 
 import android.content.Context
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.FirebaseApp
-import ru.aleshin.studyassistant.core.common.inject.AppService
-import ru.aleshin.studyassistant.core.common.inject.Flavor
+import ru.aleshin.studyassistant.core.common.platform.services.AppService
+import ru.aleshin.studyassistant.core.common.platform.services.Flavor
 
 /**
  * @author Stanislav Aleshin on 11.09.2024.
@@ -31,7 +31,7 @@ class AppServiceImpl(
     private val googleApiAvailability: GoogleApiAvailability,
 ) : AppService {
 
-    override val flavor: Flavor = Flavor.FOSS
+    override val flavor: Flavor = Flavor.RUSTORE
 
     override val isAvailableServices: Boolean
         get() {

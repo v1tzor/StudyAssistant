@@ -81,11 +81,17 @@ buildkonfig {
     val firebaseProjectId = gradleLocalProperties(rootDir, providers).getProperty("firebaseProjectId")
     val rustoreProjectId = gradleLocalProperties(rootDir, providers).getProperty("rustoreProjectId")
     val rustoreAuthToken = gradleLocalProperties(rootDir, providers).getProperty("rustoreServiceAuthToken")
+    val hmsAppId = gradleLocalProperties(rootDir, providers).getProperty("hmsAppId")
+    val hmsClientId = gradleLocalProperties(rootDir, providers).getProperty("hmsClientId")
+    val hmsClientSecret = gradleLocalProperties(rootDir, providers).getProperty("hmsClientSecret")
 
     defaultConfigs {
         buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", isDebug.toString())
         buildConfigField(FieldSpec.Type.STRING, "FIREBASE_PROJECT_ID", firebaseProjectId)
         buildConfigField(FieldSpec.Type.STRING, "RUSTORE_PROJECT_ID", rustoreProjectId)
         buildConfigField(FieldSpec.Type.STRING, "RUSTORE_SERVICE_AUTH_TOKEN", rustoreAuthToken)
+        buildConfigField(FieldSpec.Type.STRING, "HMS_PROJECT_ID", hmsAppId)
+        buildConfigField(FieldSpec.Type.STRING, "HMS_CLIENT_ID", hmsAppId)
+        buildConfigField(FieldSpec.Type.STRING, "HMS_CLIENT_SECRET", hmsAppId)
     }
 }

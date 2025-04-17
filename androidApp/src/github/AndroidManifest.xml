@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application>
         <service
@@ -23,6 +22,37 @@
 
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="ru.aleshin.studyassistant.presentation.services.RuStoreMessagingService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+
+            <meta-data
+                android:name="ru.rustore.sdk.pushclient.default_notification_icon"
+                android:resource="@drawable/ic_launcher_notification" />
+            <meta-data
+                android:name="ru.rustore.sdk.pushclient.default_notification_color"
+                android:resource="@color/colorAccent" />
+
+            <meta-data
+                android:name="ru.rustore.sdk.pushclient.default_notification_channel_id"
+                android:value="@string/default_notification_channel_id" />
+
+            <intent-filter>
+                <action android:name="ru.rustore.sdk.pushclient.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="ru.aleshin.studyassistant.presentation.services.HmsMessagingService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+
+            <intent-filter>
+                <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
             </intent-filter>
         </service>
     </application>

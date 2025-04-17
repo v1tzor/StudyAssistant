@@ -21,18 +21,16 @@ import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.inject.MessagingService
 import ru.aleshin.studyassistant.core.remote.datasources.message.GoogleAuthTokenProvider
 import ru.aleshin.studyassistant.core.remote.datasources.message.GoogleAuthTokenProviderImpl
-import ru.aleshin.studyassistant.core.remote.datasources.message.MessagingServiceImpl
-import ru.rustore.sdk.universalpush.RuStoreUniversalPushClient
+import ru.aleshin.studyassistant.core.remote.datasources.message.HmsAuthTokenProvider
+import ru.aleshin.studyassistant.core.remote.datasources.message.HmsAuthTokenProviderImpl
 
 /**
  * @author Stanislav Aleshin on 08.08.2024.
  */
 actual val coreRemotePlatformModule = DI.Module("CoreRemotePlatform") {
-    bindSingleton<RuStoreUniversalPushClient> { RuStoreUniversalPushClient }
-    bindSingleton<MessagingService> { MessagingServiceImpl(instance(), instance()) }
+    bindSingleton<HmsAuthTokenProvider> { HmsAuthTokenProviderImpl() }
     bindSingleton<GoogleAuthTokenProvider> { GoogleAuthTokenProviderImpl(instance()) }
     bindSingleton<Konnection> { Konnection.createInstance(instance<Context>()) }
 }

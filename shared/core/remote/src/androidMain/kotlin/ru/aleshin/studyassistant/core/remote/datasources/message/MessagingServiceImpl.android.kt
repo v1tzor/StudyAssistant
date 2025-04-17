@@ -20,9 +20,9 @@ import android.content.Context
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.callbackFlow
-import ru.aleshin.studyassistant.core.common.inject.MessagingService
 import ru.aleshin.studyassistant.core.common.messages.PushServiceType
 import ru.aleshin.studyassistant.core.common.messages.UniversalPushToken
+import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
 import ru.rustore.sdk.universalpush.RuStoreUniversalPushClient
 import ru.rustore.sdk.universalpush.UNIVERSAL_FCM_PROVIDER
 import ru.rustore.sdk.universalpush.UNIVERSAL_HMS_PROVIDER
@@ -37,8 +37,9 @@ import kotlin.coroutines.suspendCoroutine
  */
 actual class MessagingServiceImpl(
     private val context: Context,
-    private val pushClient: RuStoreUniversalPushClient,
 ) : MessagingService {
+
+    private val pushClient = RuStoreUniversalPushClient
 
     override fun fetchAvailablePushServices(): List<PushServiceType> {
         return buildList {

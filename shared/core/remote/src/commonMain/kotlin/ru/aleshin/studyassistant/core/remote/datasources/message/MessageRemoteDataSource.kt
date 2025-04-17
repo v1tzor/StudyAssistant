@@ -25,9 +25,9 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.exceptions.RemoteException
-import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
-import ru.aleshin.studyassistant.core.common.inject.MessagingService
 import ru.aleshin.studyassistant.core.common.messages.UniversalPushToken
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
 import ru.aleshin.studyassistant.core.common.wrappers.EitherWrapper.Abstract.Companion.ERROR_TAG
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.UniversalMessaging.HOST
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.UniversalMessaging.SEND_TOKENS

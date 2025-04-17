@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.auth.impl.domain.common
 
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
-import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
 
 /**

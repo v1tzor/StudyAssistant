@@ -1,6 +1,5 @@
 package ru.aleshin.studyassistant.application
 
-import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -8,31 +7,19 @@ import android.net.TrafficStats
 import android.os.Build
 import android.os.StrictMode
 import androidx.annotation.RequiresApi
-import com.google.android.gms.common.GoogleApiAvailability
-import ru.aleshin.studyassistant.PlatformSDK
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationDefaults
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationImportance
-import ru.aleshin.studyassistant.data.remote.AppServiceImpl
-import ru.aleshin.studyassistant.data.remote.CrashlyticsServiceImpl
-import ru.aleshin.studyassistant.di.PlatformConfiguration
-import ru.aleshin.studyassistant.presentation.services.RemoteMessageHandlerImpl
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
  */
-class StudyAssistantApp : Application() {
-
-    private val pushClientFactory by lazy {
-        UniversalPushClientFactory.Base(applicationContext)
-    }
+class StudyAssistantApp : BaseFlavorApplication() {
 
     private val notificationManager: NotificationManager
         get() = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-    override fun onCreate() {
-        super.onCreate()
-        initPlatformSDK()
+    override fun initSettings() {
         setupStrictMode()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotifyChannel(
@@ -42,23 +29,6 @@ class StudyAssistantApp : Application() {
                 defaults = NotificationDefaults()
             )
         }
-    }
-
-    private fun initPlatformSDK() {
-        pushClientFactory.createPushClient()
-        PlatformSDK.doInit(
-            configuration = PlatformConfiguration(
-                appService = AppServiceImpl(
-                    applicationContext = this,
-                    googleApiAvailability = GoogleApiAvailability.getInstance(),
-                ),
-                remoteMessageHandler = RemoteMessageHandlerImpl(
-                    context = applicationContext,
-                ),
-                crashlyticsService = CrashlyticsServiceImpl(),
-                applicationContext = applicationContext,
-            )
-        )
     }
 
     private fun setupStrictMode() {
@@ -75,13 +45,11 @@ class StudyAssistantApp : Application() {
             in Build.VERSION_CODES.O..Build.VERSION_CODES.Q ->
                 vmPolicyBuilder
                     .detectContentUriWithoutPermission()
-
             in Build.VERSION_CODES.Q..Build.VERSION_CODES.S ->
                 vmPolicyBuilder
                     .detectContentUriWithoutPermission()
                     .detectCredentialProtectedWhileLocked()
                     .detectImplicitDirectBoot()
-
             in Build.VERSION_CODES.S..Int.MAX_VALUE ->
                 vmPolicyBuilder
                     .detectContentUriWithoutPermission()
@@ -89,7 +57,6 @@ class StudyAssistantApp : Application() {
                     .detectImplicitDirectBoot()
                     .detectIncorrectContextUse()
                     .detectUnsafeIntentLaunch()
-
             else -> vmPolicyBuilder
         }.build()
 

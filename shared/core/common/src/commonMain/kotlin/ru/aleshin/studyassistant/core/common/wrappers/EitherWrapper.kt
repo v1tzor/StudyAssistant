@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.core.common.functional.DomainFailures
 import ru.aleshin.studyassistant.core.common.functional.Either
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
-import ru.aleshin.studyassistant.core.common.inject.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.

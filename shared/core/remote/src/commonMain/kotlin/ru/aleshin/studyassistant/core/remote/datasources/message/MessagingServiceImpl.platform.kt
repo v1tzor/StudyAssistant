@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.message
 
-import ru.aleshin.studyassistant.core.common.inject.MessagingService
+import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
 
 /**
  * @author Stanislav Aleshin on 07.08.2024.

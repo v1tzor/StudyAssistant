@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.login.screenmodel
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
@@ -33,7 +34,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkC
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.handle
-import ru.aleshin.studyassistant.core.common.inject.AppService
+import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 
@@ -67,7 +68,7 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
                 deviceName = deviceInfoProvider.fetchDeviceName(),
             )
             authInteractor.loginWithEmail(credentials.mapToDomain(), device).handle(
-                onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
+                onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))); Logger.i("test") { it.toString() } },
                 onRightAction = {
                     val targetScreen = screenProvider.provideTabNavigationScreen()
                     emit(EffectResult(LoginEffect.ReplaceGlobalScreen(targetScreen)))
