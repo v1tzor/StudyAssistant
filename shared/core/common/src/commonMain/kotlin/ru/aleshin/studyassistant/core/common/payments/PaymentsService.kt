@@ -17,13 +17,8 @@
 package ru.aleshin.studyassistant.core.common.payments
 
 /**
- * @author Stanislav Aleshin on 30.04.2024.
+ * @author Stanislav Aleshin on 18.04.2025.
  */
-interface SubscriptionChecker {
-
-    fun checkSubscriptionActivity(): Boolean
-
-    object FreeApp : SubscriptionChecker {
-        override fun checkSubscriptionActivity() = true
-    }
+interface PaymentsService {
+    fun init()
 }

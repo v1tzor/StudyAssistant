@@ -20,11 +20,11 @@ import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.extensions.deleteAll
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
+import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
+import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
 import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojo
@@ -80,11 +80,7 @@ interface TodoRemoteDataSource {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.TODOS).document(uid)
-
-            return reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<TodoPojo?>())
-            }
+            return userDataRoot.collection(UserData.TODOS).document(uid).snapshotFlowGet<TodoPojo>()
         }
 
         override suspend fun fetchTodosByTimeRange(
@@ -95,31 +91,33 @@ interface TodoRemoteDataSource {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.TODOS).where {
-                val fromDeadlineFilter = UserData.TODO_DEADLINE greaterThanOrEqualTo from
-                val toDeadlineFilter = UserData.TODO_DEADLINE lessThanOrEqualTo to
-                val noneDeadlineFilter = UserData.TODO_DEADLINE equalTo null
-                return@where fromDeadlineFilter and toDeadlineFilter or noneDeadlineFilter
-            }.orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)
+            val todosFlow = userDataRoot.collection(UserData.TODOS)
+                .where {
+                    val fromDeadlineFilter = UserData.TODO_DEADLINE greaterThanOrEqualTo from
+                    val toDeadlineFilter = UserData.TODO_DEADLINE lessThanOrEqualTo to
+                    val noneDeadlineFilter = UserData.TODO_DEADLINE equalTo null
+                    return@where fromDeadlineFilter and toDeadlineFilter or noneDeadlineFilter
+                }
+                .orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)
+                .snapshotListFlowGet<TodoPojo>()
 
-            return reference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data(serializer<TodoPojo>()) }
-            }
+            return todosFlow
         }
 
         override suspend fun fetchActiveTodos(targetUser: UID): Flow<List<TodoPojo>> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.TODOS).where {
-                val doneFilter = UserData.TODO_DONE equalTo false
-                val completeDateFilter = UserData.TODO_COMPLETE_DATE equalTo null
-                return@where doneFilter and completeDateFilter
-            }.orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)
+            val todosFlow = userDataRoot.collection(UserData.TODOS)
+                .where {
+                    val doneFilter = UserData.TODO_DONE equalTo false
+                    val completeDateFilter = UserData.TODO_COMPLETE_DATE equalTo null
+                    return@where doneFilter and completeDateFilter
+                }
+                .orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)
+                .snapshotListFlowGet<TodoPojo>()
 
-            return reference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data(serializer<TodoPojo>()) }
-            }
+            return todosFlow
         }
 
         override suspend fun fetchOverdueTodos(
@@ -129,16 +127,17 @@ interface TodoRemoteDataSource {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.TODOS).where {
-                val deadlineFilter = UserData.TODO_DEADLINE lessThan currentDate
-                val doneFilter = UserData.TODO_DONE equalTo false
-                val completeDateFilter = UserData.TODO_COMPLETE_DATE equalTo null
-                return@where deadlineFilter and doneFilter and completeDateFilter
-            }.orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)
+            val todosFlow = userDataRoot.collection(UserData.TODOS)
+                .where {
+                    val deadlineFilter = UserData.TODO_DEADLINE lessThan currentDate
+                    val doneFilter = UserData.TODO_DONE equalTo false
+                    val completeDateFilter = UserData.TODO_COMPLETE_DATE equalTo null
+                    return@where deadlineFilter and doneFilter and completeDateFilter
+                }
+                .orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)
+                .snapshotListFlowGet<TodoPojo>()
 
-            return reference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data(serializer<TodoPojo>()) }
-            }
+            return todosFlow
         }
 
         override suspend fun deleteTodo(uid: UID, targetUser: UID) {
@@ -156,16 +155,7 @@ interface TodoRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.TODOS)
 
-            val deletableTodoReferences = reference.snapshotGet().map { snapshot ->
-                snapshot.reference
-            }
-
-            database.batch().apply {
-                deletableTodoReferences.forEach { todoReference ->
-                    delete(todoReference)
-                }
-                return@apply commit()
-            }
+            database.deleteAll(reference)
         }
     }
 }

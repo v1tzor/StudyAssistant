@@ -19,11 +19,17 @@ package ru.aleshin.studyassistant.core.database.datasource.schedules
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.extractAllItemToSet
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
@@ -52,7 +58,11 @@ interface BaseScheduleLocalDataSource {
     suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseScheduleEntity>)
     suspend fun fetchScheduleById(uid: UID): Flow<BaseScheduleDetailsEntity?>
     suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek): Flow<BaseScheduleDetailsEntity?>
-    suspend fun fetchSchedulesByVersion(from: Instant, to: Instant, numberOfWeek: NumberOfRepeatWeek?): Flow<List<BaseScheduleDetailsEntity>>
+    suspend fun fetchSchedulesByVersion(
+        from: Instant,
+        to: Instant,
+        numberOfWeek: NumberOfRepeatWeek?
+    ): Flow<List<BaseScheduleDetailsEntity>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<ClassDetailsEntity?>
     suspend fun deleteSchedulesByTimeRange(from: Instant, to: Instant)
 
@@ -80,13 +90,7 @@ interface BaseScheduleLocalDataSource {
 
         override suspend fun fetchScheduleById(uid: UID): Flow<BaseScheduleDetailsEntity?> {
             val query = scheduleQueries.fetchScheduleById(uid)
-            val scheduleEntityFlow = query.asFlow().mapToOneOrNull(coroutineContext)
-
-            return scheduleEntityFlow.map { scheduleEntity ->
-                scheduleEntity?.mapToDetails(
-                    classesMapper = { it.mapToDetails(scheduleEntity.uid) }
-                )
-            }
+            return query.asFlow().mapToOneOrNull(coroutineContext).flatMapToDetails()
         }
 
         override suspend fun fetchScheduleByDate(
@@ -99,13 +103,7 @@ interface BaseScheduleLocalDataSource {
             val week = numberOfWeek.toString()
 
             val query = scheduleQueries.fetchSchedulesByDate(week, dayOfWeek, dateMillis, dateMillis)
-            val scheduleEntityFlow = query.asFlow().mapToOneOrNull(coroutineContext)
-
-            return scheduleEntityFlow.map { scheduleEntity ->
-                scheduleEntity?.mapToDetails(
-                    classesMapper = { it.mapToDetails(scheduleEntity.uid) }
-                )
-            }
+            return query.asFlow().mapToOneOrNull(coroutineContext).flatMapToDetails()
         }
 
         override suspend fun fetchSchedulesByVersion(
@@ -122,56 +120,13 @@ interface BaseScheduleLocalDataSource {
             } else {
                 scheduleQueries.fetchSchedulesByTimeRangeWithWeek(week, fromMillis, toMillis)
             }
-            val scheduleEntityListFlow = query.asFlow().mapToList(coroutineContext)
 
-            return scheduleEntityListFlow.map { scheduleEntityList ->
-                scheduleEntityList.map { scheduleEntity ->
-                    scheduleEntity.mapToDetails(
-                        classesMapper = { it.mapToDetails(scheduleEntity.uid) }
-                    )
-                }
-            }
+            return query.asFlow().mapToList(coroutineContext).flatMapListToDetails()
         }
 
         override suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<ClassDetailsEntity?> {
-            val scheduleFlow = scheduleQueries.fetchScheduleById(scheduleId).asFlow().mapToOneOrNull(coroutineContext)
-
-            return scheduleFlow.map { schedule ->
-                val classes = schedule?.classes?.map { Json.decodeFromString<ClassEntity>(it) }
-                val foundClass = classes?.find { it.uid == uid }
-                return@map foundClass?.mapToDetails(scheduleId)
-            }
-        }
-
-        private suspend fun ClassEntity.mapToDetails(scheduleId: UID): ClassDetailsEntity {
-            val subjectQuery = subjectId?.let { subjectQueries.fetchSubjectById(it) }
-            val organizationQuery = organizationsQueries.fetchOrganizationById(
-                uid = organizationId,
-                mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel,
-                           _, _, locationList, _, offices, _ ->
-                    val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsEntity>(timeIntervalsModel)
-                    val locations = locationList.map { Json.decodeFromString<ContactInfoEntity>(it) }
-                    OrganizationShortEntity(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
-                },
-            )
-
-            val organization = organizationQuery.executeAsOne()
-            val subject = subjectQuery?.executeAsOneOrNull().let { subjectEntity ->
-                val employeeQuery = subjectEntity?.teacher_id?.let { employeeQueries.fetchEmployeeById(it) }
-                val employee = employeeQuery?.executeAsOneOrNull()
-                subjectEntity?.mapToDetails(employee)
-            }
-            val employee = teacherId?.let { teacherId ->
-                val employeeQuery = employeeQueries.fetchEmployeeById(teacherId)
-                employeeQuery.executeAsOneOrNull()
-            }
-
-            return mapToDetails(
-                scheduleId = scheduleId,
-                organization = organization,
-                subject = subject,
-                employee = employee,
-            )
+            val query = scheduleQueries.fetchScheduleById(scheduleId).asFlow().mapToOneOrNull(coroutineContext)
+            return query.flatMapToDetails().map { schedule -> schedule?.classes?.find { it.uid == uid } }
         }
 
         override suspend fun deleteSchedulesByTimeRange(from: Instant, to: Instant) {
@@ -179,6 +134,76 @@ interface BaseScheduleLocalDataSource {
             val toMillis = to.toEpochMilliseconds()
 
             scheduleQueries.deleteSchedulesByTimeRange(fromMillis, toMillis)
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private fun Flow<List<BaseScheduleEntity>>.flatMapListToDetails() = flatMapLatest { schedules ->
+            if (schedules.isEmpty()) {
+                flowOf(emptyList())
+            } else {
+                val organizationsIds = schedules.map { schedulePojo ->
+                    schedulePojo.classes.map { Json.decodeFromString<ClassEntity>(it).organizationId }
+                }.extractAllItemToSet()
+
+                val organizationsMapFlow = organizationsQueries
+                    .fetchOrganizationsById(
+                        uid = organizationsIds,
+                        mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel,
+                                   _, _, locationList, _, offices, _ ->
+                            val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsEntity>(timeIntervalsModel)
+                            val locations = locationList.map { Json.decodeFromString<ContactInfoEntity>(it) }
+                            OrganizationShortEntity(
+                                uid,
+                                isMain == 1L,
+                                name,
+                                type,
+                                avatar,
+                                locations,
+                                offices,
+                                timeIntervals
+                            )
+                        },
+                    )
+                    .asFlow()
+                    .mapToList(coroutineContext)
+                    .map { organization -> organization.associateBy { it.uid } }
+
+                val subjectsMapFlow = subjectQueries.fetchSubjectsByOrganizations(organizationsIds)
+                    .asFlow()
+                    .mapToList(coroutineContext)
+                    .map { subject -> subject.associateBy { it.uid } }
+
+                val employeesMapFlow = employeeQueries.fetchEmployeesByOrganizations(organizationsIds)
+                    .asFlow()
+                    .mapToList(coroutineContext)
+                    .map { employee -> employee.associateBy { it.uid } }
+
+                combine(
+                    flowOf(schedules),
+                    organizationsMapFlow,
+                    subjectsMapFlow,
+                    employeesMapFlow,
+                ) { schedulesList, organizationsMap, subjectsMap, employeesMap ->
+                    schedulesList.map { schedule ->
+                        schedule.mapToDetails { classPojo ->
+                            classPojo.mapToDetails(
+                                scheduleId = schedule.uid,
+                                organization = checkNotNull(organizationsMap[classPojo.organizationId]),
+                                employee = employeesMap[classPojo.teacherId],
+                                subject = subjectsMap[classPojo.subjectId]?.mapToDetails(
+                                    employee = employeesMap[subjectsMap[classPojo.subjectId]?.teacher_id]
+                                ),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        private fun Flow<BaseScheduleEntity?>.flatMapToDetails(): Flow<BaseScheduleDetailsEntity?> {
+            return mapNotNull { it?.let { listOf(it) } ?: emptyList() }
+                .flatMapListToDetails()
+                .map { it.getOrNull(0) }
         }
     }
 }

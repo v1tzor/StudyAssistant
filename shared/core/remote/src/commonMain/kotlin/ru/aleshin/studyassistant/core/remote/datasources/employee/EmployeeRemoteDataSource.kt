@@ -21,11 +21,11 @@ import dev.gitlive.firebase.storage.File
 import dev.gitlive.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.extensions.deleteAll
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
+import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
+import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Storage
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
@@ -95,11 +95,7 @@ interface EmployeeRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.EMPLOYEE).document(uid)
 
-            val employeeFlow = reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<EmployeePojo?>())
-            }
-
-            return employeeFlow
+            return reference.snapshotFlowGet<EmployeePojo>()
         }
 
         override suspend fun fetchAllEmployeeByOrganization(
@@ -117,9 +113,7 @@ interface EmployeeRemoteDataSource {
                 userDataRoot.collection(UserData.EMPLOYEE)
             }
 
-            val employeeFlow = reference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data(serializer<EmployeePojo>()) }
-            }
+            val employeeFlow = reference.snapshotListFlowGet<EmployeePojo>()
 
             return employeeFlow
         }
@@ -139,16 +133,7 @@ interface EmployeeRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.EMPLOYEE)
 
-            val deletableEmployeeReferences = reference.snapshotGet().map { snapshot ->
-                snapshot.reference
-            }
-
-            database.batch().apply {
-                deletableEmployeeReferences.forEach { employeeReference ->
-                    delete(employeeReference)
-                }
-                return@apply commit()
-            }
+            database.deleteAll(reference)
         }
 
         override suspend fun deleteAvatar(uid: UID, targetUser: UID) {

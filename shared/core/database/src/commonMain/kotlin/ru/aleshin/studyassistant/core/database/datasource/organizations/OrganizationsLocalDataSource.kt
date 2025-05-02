@@ -19,7 +19,10 @@ package ru.aleshin.studyassistant.core.database.datasource.organizations
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
@@ -74,47 +77,12 @@ interface OrganizationsLocalDataSource {
         override suspend fun fetchOrganizationById(uid: UID): Flow<OrganizationDetailsEntity?> {
             if (uid.isEmpty()) return flowOf(null)
             val query = organizationQueries.fetchOrganizationById(uid)
-            val organizationEntityFlow = query.asFlow().mapToOneOrNull(coroutineContext)
-
-            return organizationEntityFlow.map { organizationEntity ->
-                if (organizationEntity == null) return@map null
-                val organizationId = organizationEntity.uid
-                val employeeQuery = employeeQueries.fetchEmployeesByOrganization(organizationId)
-                val subjectQuery = subjectQueries.fetchSubjectsByOrganization(organizationId)
-
-                val employeeList = employeeQuery.executeAsList()
-                val subjectList = subjectQuery.executeAsList().map { entity ->
-                    entity.mapToDetails(employeeList.find { it.uid == entity.teacher_id })
-                }
-
-                organizationEntity.mapToDetails(
-                    employee = employeeList,
-                    subjects = subjectList,
-                )
-            }
+            return query.asFlow().mapToOneOrNull(coroutineContext).flatMapToDetails()
         }
 
         override suspend fun fetchOrganizationsById(uid: List<UID>): Flow<List<OrganizationDetailsEntity>> {
             val query = organizationQueries.fetchOrganizationsById(uid)
-            val organizationEntityListFlow = query.asFlow().mapToList(coroutineContext)
-
-            return organizationEntityListFlow.map { organizations ->
-                organizations.map { organizationEntity ->
-                    val organizationId = organizationEntity.uid
-                    val employeeQuery = employeeQueries.fetchEmployeesByOrganization(organizationId)
-                    val subjectQuery = subjectQueries.fetchSubjectsByOrganization(organizationId)
-
-                    val employeeList = employeeQuery.executeAsList()
-                    val subjectList = subjectQuery.executeAsList().map { entity ->
-                        entity.mapToDetails(employeeList.find { it.uid == entity.teacher_id })
-                    }
-
-                    organizationEntity.mapToDetails(
-                        employee = employeeList,
-                        subjects = subjectList,
-                    )
-                }
-            }
+            return query.asFlow().mapToList(coroutineContext).flatMapListToDetails()
         }
 
         override suspend fun fetchShortOrganizationById(uid: UID): Flow<OrganizationShortEntity?> {
@@ -130,25 +98,7 @@ interface OrganizationsLocalDataSource {
             } else {
                 organizationQueries.fetchAllNotHideOrganizations()
             }
-            val organizationEntityListFlow = query.asFlow().mapToList(coroutineContext)
-
-            return organizationEntityListFlow.map { organizations ->
-                organizations.map { organizationEntity ->
-                    val organizationId = organizationEntity.uid
-                    val employeeQuery = employeeQueries.fetchEmployeesByOrganization(organizationId)
-                    val subjectQuery = subjectQueries.fetchSubjectsByOrganization(organizationId)
-
-                    val employeeList = employeeQuery.executeAsList()
-                    val subjectList = subjectQuery.executeAsList().map { entity ->
-                        entity.mapToDetails(employeeList.find { it.uid == entity.teacher_id })
-                    }
-
-                    organizationEntity.mapToDetails(
-                        employee = employeeList,
-                        subjects = subjectList,
-                    )
-                }
-            }
+            return query.asFlow().mapToList(coroutineContext).flatMapListToDetails()
         }
 
         override suspend fun fetchAllShortOrganization(): Flow<List<OrganizationShortEntity>> {
@@ -162,6 +112,47 @@ interface OrganizationsLocalDataSource {
 
         override suspend fun deleteAllOrganizations() {
             organizationQueries.deleteAllOrganizations()
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private fun Flow<List<OrganizationEntity>>.flatMapListToDetails() = flatMapLatest { organizations ->
+            if (organizations.isEmpty()) {
+                flowOf(emptyList())
+            } else {
+                val organizationsIds = organizations.map { it.uid }.toSet()
+
+                val subjectsMapFlow = subjectQueries.fetchSubjectsByOrganizations(organizationsIds)
+                    .asFlow()
+                    .mapToList(coroutineContext)
+                    .map { subject -> subject.groupBy { it.organization_id } }
+
+                val employeesMapFlow = employeeQueries.fetchEmployeesByOrganizations(organizationsIds)
+                    .asFlow()
+                    .mapToList(coroutineContext)
+                    .map { employee -> employee.groupBy { it.organization_id } }
+
+                combine(
+                    flowOf(organizations),
+                    subjectsMapFlow,
+                    employeesMapFlow,
+                ) { organizationsList, subjectsMap, employeesMap ->
+                    organizationsList.map { organization ->
+                        organization.mapToDetails(
+                            employee = checkNotNull(employeesMap[organization.uid]),
+                            subjects = checkNotNull(subjectsMap[organization.uid]).map { subject ->
+                                val employee = employeesMap[organization.uid]?.find { it.uid == subject.teacher_id }
+                                subject.mapToDetails(employee = employee)
+                            },
+                        )
+                    }
+                }
+            }
+        }
+
+        private fun Flow<OrganizationEntity?>.flatMapToDetails(): Flow<OrganizationDetailsEntity?> {
+            return map { it?.let { listOf(it) } ?: emptyList() }
+                .flatMapListToDetails()
+                .map { it.getOrNull(0) }
         }
     }
 }

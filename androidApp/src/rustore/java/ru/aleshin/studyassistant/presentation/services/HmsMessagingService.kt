@@ -80,7 +80,7 @@ class HmsMessagingService : HmsMessageService() {
                         deviceId = deviceId,
                         deviceName = deviceInfoProvider.fetchDeviceName(),
                         pushToken = token,
-                        pushServiceType = PushServiceType.FCM,
+                        pushServiceType = PushServiceType.HMS,
                     )
                     val updatedUser = appUser.copy(
                         devices = buildList {

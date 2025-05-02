@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.payments
+package ru.aleshin.studyassistant.core.domain.entities.goals
+
+import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
- * @author Stanislav Aleshin on 30.04.2024.
+ * @author Stanislav Aleshin on 18.04.2025.
  */
-interface SubscriptionChecker {
-
-    fun checkSubscriptionActivity(): Boolean
-
-    object FreeApp : SubscriptionChecker {
-        override fun checkSubscriptionActivity() = true
-    }
-}
+data class GoalDetails(
+    val uid: UID,
+    val type: GoalType,
+    val number: Int = 0,
+    val contentId: UID,
+    val targetDate: Instant,
+    val desiredTime: Millis?,
+    val time: GoalTime,
+    val completeAfterTimeElapsed: Boolean = false,
+    val isDone: Boolean = false,
+    val completeDate: Instant?,
+)

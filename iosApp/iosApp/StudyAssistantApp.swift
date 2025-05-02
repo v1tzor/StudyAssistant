@@ -46,11 +46,15 @@ struct iOSApp: App {
     init() {
         let appService = AppServiceImpl()
         let crashlyticsService = CrashlyticsServiceImpl()
+        let analyticsService = AnalyticsServiceImpl()
+        let messagingService = MessagingServiceImpl()
         let tokenProvider = GoogleAuthTokenProvider()
         let uuidProvider = UUIDProvider()
         let configuration = PlatformConfiguration(
             appService: appService,
+            analyticsService: analyticsService,
             crashlyticsService: crashlyticsService,
+            messagingService: messagingService,
             serviceTokenProvider: tokenProvider,
             uuidProvider: uuidProvider
         )

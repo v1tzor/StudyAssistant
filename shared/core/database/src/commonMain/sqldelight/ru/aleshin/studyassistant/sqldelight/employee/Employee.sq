@@ -27,6 +27,11 @@ SELECT *
 FROM employeeEntity
 WHERE organization_id = ?;
 
+fetchEmployeesByOrganizations:
+SELECT *
+FROM employeeEntity
+WHERE organization_id IN ?;
+
 fetchEmployeeById:
 SELECT *
 FROM employeeEntity

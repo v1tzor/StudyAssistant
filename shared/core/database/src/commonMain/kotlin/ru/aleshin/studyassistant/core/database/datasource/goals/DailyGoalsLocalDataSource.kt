@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.database.datasource.tasks
+package ru.aleshin.studyassistant.core.database.datasource.goals
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
@@ -30,93 +30,106 @@ import kotlinx.serialization.json.Json
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.database.mappers.goals.mapToDetails
 import ru.aleshin.studyassistant.core.database.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.database.mappers.tasks.mapToDetails
-import ru.aleshin.studyassistant.core.database.mappers.tasks.mapToEntity
+import ru.aleshin.studyassistant.core.database.models.goals.GoalEntityDetails
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationShortEntity
 import ru.aleshin.studyassistant.core.database.models.organizations.ScheduleTimeIntervalsEntity
-import ru.aleshin.studyassistant.core.database.models.tasks.HomeworkDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.users.ContactInfoEntity
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
+import ru.aleshin.studyassistant.sqldelight.goals.GoalEntity
+import ru.aleshin.studyassistant.sqldelight.goals.GoalQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries
-import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkEntity
 import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkQueries
+import ru.aleshin.studyassistant.sqldelight.tasks.TodoQueries
 import kotlin.coroutines.CoroutineContext
 
 /**
- * @author Stanislav Aleshin on 04.05.2024.
+ * @author Stanislav Aleshin on 19.04.2025.
  */
-interface HomeworksLocalDataSource {
+interface DailyGoalsLocalDataSource {
 
-    suspend fun addOrUpdateHomework(homework: HomeworkEntity): UID
-    suspend fun addOrUpdateHomeworksGroup(homeworks: List<HomeworkEntity>)
-    suspend fun fetchHomeworkById(uid: UID): Flow<HomeworkDetailsEntity?>
-    suspend fun fetchHomeworksByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsEntity>>
-    suspend fun fetchOverdueHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
-    suspend fun fetchActiveLinkedHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
-    suspend fun deleteHomework(uid: UID)
-    suspend fun deleteAllHomework()
+    suspend fun addOrUpdateGoal(goal: GoalEntity): UID
+    suspend fun addDailyDailyGoals(dailyGoals: List<GoalEntity>)
+    suspend fun fetchGoalById(uid: UID): Flow<GoalEntityDetails?>
+    suspend fun fetchDailyGoalsByTimeRange(from: Long, to: Long): Flow<List<GoalEntityDetails>>
+    suspend fun fetchOverdueDailyGoals(currentDate: Long): Flow<List<GoalEntityDetails>>
+    suspend fun fetchDailyGoalsByDate(date: Long): Flow<List<GoalEntityDetails>>
+    suspend fun deleteGoal(uid: UID)
+    suspend fun deleteAllDailyGoals()
 
     class Base(
+        private val goalQueries: GoalQueries,
         private val homeworkQueries: HomeworkQueries,
         private val organizationsQueries: OrganizationQueries,
         private val employeeQueries: EmployeeQueries,
         private val subjectQueries: SubjectQueries,
+        private val todoQueries: TodoQueries,
         private val coroutineManager: CoroutineManager,
-    ) : HomeworksLocalDataSource {
+    ) : DailyGoalsLocalDataSource {
 
         private val coroutineContext: CoroutineContext
             get() = coroutineManager.backgroundDispatcher
 
-        override suspend fun addOrUpdateHomework(homework: HomeworkEntity): UID {
-            val uid = homework.uid.ifEmpty { randomUUID() }
-            homeworkQueries.addOrUpdateHomework(homework.copy(uid = uid))
+        override suspend fun addOrUpdateGoal(goal: GoalEntity): UID {
+            val uid = goal.uid.ifEmpty { randomUUID() }
+            goalQueries.addOrUpdateGoal(goal.copy(uid = uid))
 
             return uid
         }
 
-        override suspend fun addOrUpdateHomeworksGroup(homeworks: List<HomeworkEntity>) {
-            homeworks.forEach { addOrUpdateHomework(it) }
+        override suspend fun addDailyDailyGoals(dailyGoals: List<GoalEntity>) {
+            dailyGoals.forEach { goalEntity -> addOrUpdateGoal(goalEntity) }
         }
 
-        override suspend fun fetchHomeworkById(uid: UID): Flow<HomeworkDetailsEntity?> {
-            val query = homeworkQueries.fetchHomeworkById(uid)
+        override suspend fun fetchGoalById(uid: UID): Flow<GoalEntityDetails?> {
+            val query = goalQueries.fetchGoalById(uid)
             return query.asFlow().mapToOneOrNull(coroutineContext).flatMapToDetails()
         }
 
-        override suspend fun fetchHomeworksByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsEntity>> {
-            val query = homeworkQueries.fetchHomeworksByTimeRange(from, to)
+        override suspend fun fetchDailyGoalsByTimeRange(from: Long, to: Long): Flow<List<GoalEntityDetails>> {
+            val query = goalQueries.fetchDailyGoaslByTimeRange(from, to)
             return query.asFlow().mapToList(coroutineContext).flatMapListToDetails()
         }
 
-        override suspend fun fetchOverdueHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>> {
-            val query = homeworkQueries.fetchOverdueHomeworks(currentDate)
+        override suspend fun fetchOverdueDailyGoals(currentDate: Long): Flow<List<GoalEntityDetails>> {
+            val query = goalQueries.fetchOverdueGoals(currentDate)
             return query.asFlow().mapToList(coroutineContext).flatMapListToDetails()
         }
 
-        override suspend fun fetchActiveLinkedHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>> {
-            val query = homeworkQueries.fetchActiveAndLinkedHomeworks(currentDate)
-            val homeworksFlow = query.asFlow().mapToList(coroutineContext).map { homeworksList ->
-                homeworksList.map { it.mapToEntity() }
-            }
-            return homeworksFlow.flatMapListToDetails()
+        override suspend fun fetchDailyGoalsByDate(date: Long): Flow<List<GoalEntityDetails>> {
+            val query = goalQueries.fetchGoalsByDate(date)
+            return query.asFlow().mapToList(coroutineContext).flatMapListToDetails()
         }
 
-        override suspend fun deleteHomework(uid: UID) {
-            homeworkQueries.deleteHomework(uid)
+        override suspend fun deleteGoal(uid: UID) {
+            goalQueries.deleteGoal(uid)
         }
 
-        override suspend fun deleteAllHomework() {
-            homeworkQueries.deleteAllHomeworks()
+        override suspend fun deleteAllDailyGoals() {
+            goalQueries.deleteAllGoals()
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
-        private fun Flow<List<HomeworkEntity>>.flatMapListToDetails() = flatMapLatest { homeworks ->
-            if (homeworks.isEmpty()) {
+        private fun Flow<List<GoalEntity>>.flatMapListToDetails() = flatMapLatest { goals ->
+            if (goals.isEmpty()) {
                 flowOf(emptyList())
             } else {
-                val organizationsIds = homeworks.map { it.organization_id }.toSet()
+                val organizationsIds = goals.mapNotNull { it.content_organization_id }.toSet()
+                val fromDeadline = goals.minOf { it.content_deadline ?: 0 }
+                val toDeadline = goals.maxOf { it.content_deadline ?: Long.MAX_VALUE }
+
+                val todosMapFlow = todoQueries.fetchTodosByTimeRange(fromDeadline, toDeadline)
+                    .asFlow()
+                    .mapToList(coroutineContext)
+                    .map { todos -> todos.associateBy { it.uid } }
+
+                val homeworksMapFlow = homeworkQueries.fetchHomeworksByTimeRange(fromDeadline, toDeadline)
+                    .asFlow()
+                    .mapToList(coroutineContext)
+                    .map { homeworks -> homeworks.associateBy { it.uid } }
 
                 val organizationsMapFlow = organizationsQueries
                     .fetchOrganizationsById(
@@ -142,25 +155,38 @@ interface HomeworksLocalDataSource {
                     .mapToList(coroutineContext)
                     .map { employee -> employee.associateBy { it.uid } }
 
-                combine(
-                    flowOf(homeworks),
+                val homeworksDetailsMapFlow = combine(
+                    homeworksMapFlow,
                     organizationsMapFlow,
                     subjectsMapFlow,
                     employeesMapFlow,
-                ) { homeworksList, organizationsMap, subjectsMap, employeesMap ->
-                    homeworksList.map { homework ->
-                        homework.mapToDetails(
-                            organization = checkNotNull(organizationsMap[homework.organization_id]),
-                            subject = subjectsMap[homework.subject_id]?.mapToDetails(
-                                employee = employeesMap[subjectsMap[homework.subject_id]?.teacher_id]
+                ) { homeworksMap, organizationsMap, subjectsMap, employeesMap ->
+                    homeworksMap.mapValues { homework ->
+                        homework.value.mapToDetails(
+                            organization = checkNotNull(organizationsMap[homework.value.organization_id]),
+                            subject = subjectsMap[homework.value.subject_id]?.mapToDetails(
+                                employee = employeesMap[subjectsMap[homework.value.subject_id]?.teacher_id]
                             ),
+                        )
+                    }
+                }
+
+                combine(
+                    flowOf(goals),
+                    homeworksDetailsMapFlow,
+                    todosMapFlow,
+                ) { goalsList, homeworksMap, todosMap ->
+                    goalsList.map { goal ->
+                        goal.mapToDetails(
+                            homeworksMapper = { homeworksMap[goal.content_id] },
+                            todoMapper = { todosMap[goal.content_id] },
                         )
                     }
                 }
             }
         }
 
-        private fun Flow<HomeworkEntity?>.flatMapToDetails(): Flow<HomeworkDetailsEntity?> {
+        private fun Flow<GoalEntity?>.flatMapToDetails(): Flow<GoalEntityDetails?> {
             return mapNotNull { it?.let { listOf(it) } ?: emptyList() }
                 .flatMapListToDetails()
                 .map { it.getOrNull(0) }

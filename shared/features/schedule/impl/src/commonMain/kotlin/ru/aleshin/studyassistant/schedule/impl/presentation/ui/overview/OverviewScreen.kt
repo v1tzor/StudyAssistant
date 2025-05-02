@@ -107,7 +107,7 @@ internal class OverviewScreen : Screen {
                 is OverviewEffect.NavigateToGlobal -> navigator.root().push(effect.pushScreen)
                 is OverviewEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.apply { Logger.i("test") { this.toString() } }.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

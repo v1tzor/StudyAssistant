@@ -16,16 +16,21 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.organizations
 
+import dev.gitlive.firebase.firestore.DocumentReference
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.storage.File
 import dev.gitlive.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.extensions.deleteAll
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
+import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
+import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Storage
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
@@ -58,7 +63,10 @@ interface OrganizationsRemoteDataSource {
         private val storage: FirebaseStorage
     ) : OrganizationsRemoteDataSource {
 
-        override suspend fun addOrUpdateOrganization(organization: OrganizationPojo, targetUser: UID): UID {
+        override suspend fun addOrUpdateOrganization(
+            organization: OrganizationPojo,
+            targetUser: UID
+        ): UID {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
@@ -99,40 +107,19 @@ interface OrganizationsRemoteDataSource {
             return avatarReference.getDownloadUrl()
         }
 
-        override suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsPojo?> {
+        override suspend fun fetchOrganizationById(
+            uid: UID,
+            targetUser: UID
+        ): Flow<OrganizationDetailsPojo?> {
             if (uid.isEmpty()) return flowOf(null)
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.ORGANIZATIONS).document(uid)
+            val organizationFlow = userDataRoot.collection(UserData.ORGANIZATIONS).document(uid)
+                .snapshotFlowGet<OrganizationPojo>()
+                .flatMapToDetails(userDataRoot)
 
-            val organizationPojoFlow = reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<OrganizationPojo?>())
-            }
-
-            return organizationPojoFlow.map { organizationPojo ->
-                if (organizationPojo == null) return@map null
-                val employeeReference = userDataRoot.collection(UserData.EMPLOYEE).where {
-                    UserData.ORGANIZATION_ID equalTo organizationPojo.uid
-                }
-                val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).where {
-                    UserData.ORGANIZATION_ID equalTo organizationPojo.uid
-                }
-
-                val employeeList = employeeReference.snapshotGet().map { snapshot ->
-                    snapshot.data(serializer<EmployeePojo?>())
-                }
-                val subjectList = subjectsReference.snapshotGet().map { snapshot ->
-                    snapshot.data(serializer<SubjectPojo?>())
-                }.map { subjectPojo ->
-                    subjectPojo?.mapToDetails(employeeList.find { it?.uid == subjectPojo.teacherId })
-                }
-
-                organizationPojo.mapToDetails(
-                    subjects = subjectList.filterNotNull(),
-                    employee = employeeList.filterNotNull(),
-                )
-            }
+            return organizationFlow
         }
 
         override suspend fun fetchOrganizationsById(
@@ -146,45 +133,17 @@ interface OrganizationsRemoteDataSource {
                 UserData.UID inArray uid
             }
 
-            val organizationPojoListFlow = reference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data(serializer<OrganizationPojo>()) }
-            }
-
-            return organizationPojoListFlow.map { organizations ->
-                organizations.map { organizationPojo ->
-                    val employeeReference = userDataRoot.collection(UserData.EMPLOYEE).where {
-                        UserData.ORGANIZATION_ID equalTo organizationPojo.uid
-                    }
-                    val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).where {
-                        UserData.ORGANIZATION_ID equalTo organizationPojo.uid
-                    }
-
-                    val employeeList = employeeReference.snapshotGet().map { snapshot ->
-                        snapshot.data(serializer<EmployeePojo?>())
-                    }
-                    val subjectList = subjectsReference.snapshotGet().map { snapshot ->
-                        snapshot.data(serializer<SubjectPojo?>())
-                    }.map { subjectPojo ->
-                        subjectPojo?.mapToDetails(employeeList.find { it?.uid == subjectPojo.teacherId })
-                    }
-
-                    organizationPojo.mapToDetails(
-                        employee = employeeList.filterNotNull(),
-                        subjects = subjectList.filterNotNull(),
-                    )
-                }
-            }
+            return reference.snapshotListFlowGet<OrganizationPojo>().flatMapListToDetails(userDataRoot)
         }
 
-        override suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShortPojo?> {
+        override suspend fun fetchShortOrganizationById(
+            uid: UID,
+            targetUser: UID
+        ): Flow<OrganizationShortPojo?> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.ORGANIZATIONS).document(uid)
-
-            return reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<OrganizationShortPojo?>())
-            }
+            return userDataRoot.collection(UserData.ORGANIZATIONS).document(uid).snapshotFlowGet()
         }
 
         override suspend fun fetchAllOrganization(
@@ -202,47 +161,17 @@ interface OrganizationsRemoteDataSource {
                 }
             }
 
-            val organizationPojoListFlow = reference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data(serializer<OrganizationPojo>()) }
-            }
-
-            return organizationPojoListFlow.map { organizations ->
-                organizations.map { organizationPojo ->
-                    val employeeReference = userDataRoot.collection(UserData.EMPLOYEE).where {
-                        UserData.ORGANIZATION_ID equalTo organizationPojo.uid
-                    }
-                    val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).where {
-                        UserData.ORGANIZATION_ID equalTo organizationPojo.uid
-                    }
-
-                    val employeeList = employeeReference.snapshotGet().map { snapshot ->
-                        snapshot.data(serializer<EmployeePojo?>())
-                    }
-                    val subjectList = subjectsReference.snapshotGet().map { snapshot ->
-                        snapshot.data(serializer<SubjectPojo?>())
-                    }.map { subjectPojo ->
-                        subjectPojo?.mapToDetails(employeeList.find { it?.uid == subjectPojo.teacherId })
-                    }
-
-                    organizationPojo.mapToDetails(
-                        employee = employeeList.filterNotNull(),
-                        subjects = subjectList.filterNotNull(),
-                    )
-                }
-            }
+            return reference.snapshotListFlowGet<OrganizationPojo>().flatMapListToDetails(userDataRoot)
         }
 
         override suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShortPojo>> {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.ORGANIZATIONS).where {
-                UserData.ORGANIZATION_HIDE equalTo false
-            }
-
-            return reference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data(serializer<OrganizationShortPojo>()) }
-            }
+            return userDataRoot
+                .collection(UserData.ORGANIZATIONS)
+                .where { UserData.ORGANIZATION_HIDE equalTo false }
+                .snapshotListFlowGet<OrganizationShortPojo>()
         }
 
         override suspend fun deleteAllOrganizations(targetUser: UID) {
@@ -251,16 +180,7 @@ interface OrganizationsRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
 
-            val deletableOrganizationReferences = reference.snapshotGet().map { snapshot ->
-                snapshot.reference
-            }
-
-            database.batch().apply {
-                deletableOrganizationReferences.forEach { organizationReference ->
-                    delete(organizationReference)
-                }
-                return@apply commit()
-            }
+            database.deleteAll(reference)
         }
 
         override suspend fun deleteAvatar(uid: UID, targetUser: UID) {
@@ -269,6 +189,53 @@ interface OrganizationsRemoteDataSource {
 
             val avatarReference = storageRoot.child(Storage.ORGANIZATION_AVATAR).child(Storage.ORGANIZATION_AVATAR_FILE)
             avatarReference.delete()
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private fun Flow<List<OrganizationPojo>>.flatMapListToDetails(
+            userDataRoot: DocumentReference
+        ): Flow<List<OrganizationDetailsPojo>> = flatMapLatest { organizations ->
+            if (organizations.isEmpty()) {
+                flowOf(emptyList())
+            } else {
+                val organizationsIds = organizations.map { it.uid }.toSet()
+
+                val employeesMapFlow = userDataRoot
+                    .collection(UserData.EMPLOYEE)
+                    .where { UserData.ORGANIZATION_ID inArray organizationsIds.toList() }
+                    .snapshotListFlowGet<EmployeePojo>()
+                    .map { items -> items.groupBy { it.organizationId } }
+
+                val subjectsMapFlow = userDataRoot
+                    .collection(UserData.SUBJECTS)
+                    .where { UserData.ORGANIZATION_ID inArray organizationsIds.toList() }
+                    .snapshotListFlowGet<SubjectPojo>()
+                    .map { items -> items.groupBy { it.organizationId } }
+
+                combine(
+                    flowOf(organizations),
+                    subjectsMapFlow,
+                    employeesMapFlow,
+                ) { organizationsList, subjectsMap, employeesMap ->
+                    organizationsList.map { organization ->
+                        organization.mapToDetails(
+                            employee = checkNotNull(employeesMap[organization.uid]),
+                            subjects = checkNotNull(subjectsMap[organization.uid]).map { subject ->
+                                val employee = employeesMap[organization.uid]?.find { it.uid == subject.teacherId }
+                                subject.mapToDetails(employee = employee)
+                            },
+                        )
+                    }
+                }
+            }
+        }
+
+        private fun Flow<OrganizationPojo?>.flatMapToDetails(
+            userDataRoot: DocumentReference
+        ): Flow<OrganizationDetailsPojo?> {
+            return map { it?.let { listOf(it) } ?: emptyList() }
+                .flatMapListToDetails(userDataRoot)
+                .map { it.getOrNull(0) }
         }
     }
 }

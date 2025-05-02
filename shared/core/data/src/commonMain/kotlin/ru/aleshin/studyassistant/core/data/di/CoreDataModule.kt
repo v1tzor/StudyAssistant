@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.data.repositories.AuthRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.BaseScheduleRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.CalendarSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.CustomScheduleRepositoryImpl
+import ru.aleshin.studyassistant.core.data.repositories.DailyGoalsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.EmployeeRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.FriendRequestsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.GeneralSettingsRepositoryImpl
@@ -44,6 +45,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
@@ -79,6 +81,7 @@ val coreDataModule = DI.Module("CoreData") {
     bindProvider<SubjectsRepository> { SubjectsRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<EmployeeRepository> { EmployeeRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<HomeworksRepository> { HomeworksRepositoryImpl(instance(), instance(), instance()) }
+    bindProvider<DailyGoalsRepository> { DailyGoalsRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<TodoRepository> { TodoRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<OrganizationsRepository> { OrganizationsRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<MessageRepository> { MessageRepositoryImpl(instance()) }

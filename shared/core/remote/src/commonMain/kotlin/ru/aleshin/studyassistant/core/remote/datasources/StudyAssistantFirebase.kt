@@ -33,6 +33,7 @@ object StudyAssistantFirebase {
 
         const val ORGANIZATIONS = "organizations"
         const val HOMEWORKS = "homeworks"
+        const val GOALS = "goals"
         const val TODOS = "todos"
         const val BASE_SCHEDULES = "baseSchedules"
         const val CUSTOM_SCHEDULES = "customSchedules"
@@ -56,6 +57,9 @@ object StudyAssistantFirebase {
         const val TODO_COMPLETE_DATE = "completeDate"
         const val VERSION_FROM = "dateVersionFrom"
         const val VERSION_TO = "dateVersionTo"
+        const val GOAL_TARGET_DATA = "targetDate"
+        const val GOAL_DONE = "done"
+        const val GOAL_COMPLETE_DATE = "completeDate"
         const val CLASS_SCHEDULE_ID = "scheduleId"
         const val CUSTOM_SCHEDULE_DATE = "date"
         const val WEEK = "week"

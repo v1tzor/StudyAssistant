@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Requests
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Users
@@ -62,11 +63,11 @@ interface FriendRequestsRemoteDataSource {
 
             val reference = database.collection(Requests.ROOT).document(uid)
 
-            val requestsPojoFlow = reference.snapshots.map { snapshot ->
+            val requestsFlow = reference.snapshots.map { snapshot ->
                 snapshot.data(serializer<FriendRequestsPojo?>()) ?: FriendRequestsPojo.default()
             }
 
-            return requestsPojoFlow.flatMapLatest { request ->
+            return requestsFlow.flatMapLatest { request ->
                 val users = buildSet {
                     addAll(request.received.keys.toList())
                     addAll(request.send.keys.toList())
@@ -77,9 +78,7 @@ interface FriendRequestsRemoteDataSource {
                     userRoot.where { Users.UID inArray users.toList() }
                 }
 
-                val targetUsersFlow = targetUsersReference?.snapshots?.map { snapshot ->
-                    snapshot.documents.map { it.data(serializer<AppUserPojo>()) }
-                } ?: flowOf(null)
+                val targetUsersFlow = targetUsersReference?.snapshotListFlowGet<AppUserPojo>() ?: flowOf(null)
 
                 targetUsersFlow.map { targetUsers ->
                     return@map FriendRequestsDetailsPojo(

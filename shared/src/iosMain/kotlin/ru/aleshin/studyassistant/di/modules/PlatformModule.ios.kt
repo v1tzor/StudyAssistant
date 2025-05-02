@@ -20,8 +20,10 @@ import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.platform.IosUUIDProvider
+import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
 import ru.aleshin.studyassistant.core.remote.datasources.message.GoogleAuthTokenProvider
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 
@@ -30,6 +32,8 @@ import ru.aleshin.studyassistant.di.PlatformConfiguration
  */
 actual val platformModule = DI.Module("PlatformModule") {
     bindSingleton<AppService> { instance<PlatformConfiguration>().appService }
+    bindSingleton<AnalyticsService> { instance<PlatformConfiguration>().analyticsService }
+    bindSingleton<MessagingService> { instance<PlatformConfiguration>().messagingService }
     bindSingleton<CrashlyticsService> { instance<PlatformConfiguration>().crashlyticsService }
     bindSingleton<GoogleAuthTokenProvider> { instance<PlatformConfiguration>().serviceTokenProvider }
     bindSingleton<IosUUIDProvider> { instance<PlatformConfiguration>().uuidProvider }

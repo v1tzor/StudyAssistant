@@ -16,14 +16,22 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.subjects
 
+import dev.gitlive.firebase.firestore.DocumentReference
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.serializer
+import kotlinx.coroutines.flow.mapNotNull
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.extensions.deleteAll
+import ru.aleshin.studyassistant.core.common.extensions.observeCollectionMapByField
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
+import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
+import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
@@ -82,20 +90,9 @@ interface SubjectsRemoteDataSource {
             if (uid.isEmpty()) return flowOf(null)
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).document(uid)
+            val reference = userDataRoot.collection(UserData.SUBJECTS).document(uid)
 
-            val subjectsPojoFlow = subjectsReference.snapshots.map { snapshot ->
-                snapshot.data(serializer<SubjectPojo?>())
-            }
-
-            return subjectsPojoFlow.map { subjectPojo ->
-                val employeeReferenceRoot = userDataRoot.collection(UserData.EMPLOYEE)
-
-                val employeeReference = subjectPojo?.teacherId?.let { employeeReferenceRoot.document(it) }
-                val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeePojo?>())
-
-                return@map subjectPojo?.mapToDetails(employee = employee)
-            }
+            return reference.snapshotFlowGet<SubjectPojo>().flatMapToDetails(userDataRoot)
         }
 
         override suspend fun fetchAllSubjectsByOrganization(
@@ -113,20 +110,11 @@ interface SubjectsRemoteDataSource {
                 userDataRoot.collection(UserData.SUBJECTS)
             }
 
-            val subjectPojoListFlow = subjectsReference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data(serializer<SubjectPojo>()) }
-            }
+            val subjectsFlow = subjectsReference
+                .snapshotListFlowGet<SubjectPojo>()
+                .flatMapListToDetails(userDataRoot)
 
-            return subjectPojoListFlow.map { subjectPojoList ->
-                subjectPojoList.map { subjectPojo ->
-                    val employeeReferenceRoot = userDataRoot.collection(UserData.EMPLOYEE)
-
-                    val employeeReference = subjectPojo.teacherId?.let { employeeReferenceRoot.document(it) }
-                    val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeePojo?>())
-
-                    subjectPojo.mapToDetails(employee = employee)
-                }
-            }
+            return subjectsFlow
         }
 
         override suspend fun fetchAllSubjectsByNames(
@@ -136,22 +124,12 @@ interface SubjectsRemoteDataSource {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).where {
-                UserData.SUBJECT_NAME inArray names
-            }
+            val subjectsFlow = userDataRoot.collection(UserData.SUBJECTS)
+                .where { UserData.SUBJECT_NAME inArray names }
+                .snapshotListFlowGet<SubjectPojo>()
+                .flatMapListToDetails(userDataRoot)
 
-            val subjectPojoList = subjectsReference.snapshotGet().map { snapshot ->
-                snapshot.data(serializer<SubjectPojo>())
-            }
-
-            return subjectPojoList.map { subjectPojo ->
-                val employeeReferenceRoot = userDataRoot.collection(UserData.EMPLOYEE)
-
-                val employeeReference = subjectPojo.teacherId?.let { employeeReferenceRoot.document(it) }
-                val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeePojo?>())
-
-                subjectPojo.mapToDetails(employee = employee)
-            }
+            return subjectsFlow.first()
         }
 
         override suspend fun fetchSubjectsByEmployee(
@@ -161,24 +139,13 @@ interface SubjectsRemoteDataSource {
             if (targetUser.isEmpty()) throw FirebaseUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val subjectsReference = userDataRoot.collection(UserData.SUBJECTS).where {
-                UserData.SUBJECT_TEACHER_ID equalTo employeeId
-            }.orderBy(UserData.SUBJECT_TEACHER_ID)
+            val subjectsFlow = userDataRoot.collection(UserData.SUBJECTS)
+                .where { UserData.SUBJECT_TEACHER_ID equalTo employeeId }
+                .orderBy(UserData.SUBJECT_TEACHER_ID)
+                .snapshotListFlowGet<SubjectPojo>()
+                .flatMapListToDetails(userDataRoot)
 
-            val subjectPojoListFlow = subjectsReference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data(serializer<SubjectPojo>()) }
-            }
-
-            return subjectPojoListFlow.map { subjectPojoList ->
-                subjectPojoList.map { subjectPojo ->
-                    val employeeReferenceRoot = userDataRoot.collection(UserData.EMPLOYEE)
-
-                    val employeeReference = subjectPojo.teacherId?.let { employeeReferenceRoot.document(it) }
-                    val employee = employeeReference?.snapshotGet()?.data(serializer<EmployeePojo?>())
-
-                    subjectPojo.mapToDetails(employee = employee)
-                }
-            }
+            return subjectsFlow
         }
 
         override suspend fun deleteSubject(targetId: UID, targetUser: UID) {
@@ -196,16 +163,40 @@ interface SubjectsRemoteDataSource {
 
             val reference = userDataRoot.collection(UserData.SUBJECTS)
 
-            val deletableSubjectReferences = reference.snapshotGet().map { snapshot ->
-                snapshot.reference
-            }
+            database.deleteAll(reference)
+        }
 
-            database.batch().apply {
-                deletableSubjectReferences.forEach { subjectReference ->
-                    delete(subjectReference)
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private fun Flow<List<SubjectPojo>>.flatMapListToDetails(
+            userDataRoot: DocumentReference,
+        ): Flow<List<SubjectDetailsPojo>> = flatMapLatest { subjects ->
+            if (subjects.isEmpty()) {
+                flowOf(emptyList())
+            } else {
+                val employeesMapFlow = userDataRoot.collection(UserData.EMPLOYEE)
+                    .observeCollectionMapByField<EmployeePojo>(
+                        ids = subjects.map { it.organizationId }.toSet(),
+                        fieldName = UserData.ORGANIZATION_ID,
+                        associateKey = { it.uid }
+                    )
+
+                combine(
+                    flowOf(subjects),
+                    employeesMapFlow,
+                ) { subjectsList, employeesMap ->
+                    subjectsList.map { subject ->
+                        subject.mapToDetails(employee = employeesMap[subject.teacherId])
+                    }
                 }
-                return@apply commit()
             }
+        }
+
+        private fun Flow<SubjectPojo?>.flatMapToDetails(
+            userDataRoot: DocumentReference,
+        ): Flow<SubjectDetailsPojo?> {
+            return mapNotNull { it?.let { listOf(it) } ?: emptyList() }
+                .flatMapListToDetails(userDataRoot)
+                .map { it.getOrNull(0) }
         }
     }
 }

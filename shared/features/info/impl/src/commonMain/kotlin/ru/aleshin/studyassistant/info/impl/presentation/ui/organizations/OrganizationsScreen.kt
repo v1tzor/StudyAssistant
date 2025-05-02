@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -38,6 +37,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.root
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEffect
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEvent
@@ -115,7 +115,7 @@ internal class OrganizationsScreen : Screen {
             snackbarHost = {
                 SnackbarHost(
                     hostState = snackbarState,
-                    snackbar = { Snackbar(it) },
+                    snackbar = { ErrorSnackbar(it) },
                 )
             },
         )

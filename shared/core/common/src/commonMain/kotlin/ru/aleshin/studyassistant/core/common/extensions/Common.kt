@@ -27,6 +27,10 @@ inline fun <T> List<List<T>>.extractAllItem() = buildList {
     this@extractAllItem.forEach { addAll(it) }
 }
 
+inline fun <T> List<List<T>>.extractAllItemToSet() = buildSet {
+    this@extractAllItemToSet.forEach { addAll(it) }
+}
+
 fun generateRandomNumber(): Int {
     return Random(Clock.System.now().toEpochMilliseconds()).nextInt()
 }

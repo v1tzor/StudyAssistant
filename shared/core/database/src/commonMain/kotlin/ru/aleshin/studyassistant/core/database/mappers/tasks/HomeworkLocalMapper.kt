@@ -58,20 +58,17 @@ fun HomeworkEntity.mapToDetails(
     completeDate = complete_date,
 )
 
-fun FetchActiveAndLinkedHomeworks.mapToDetails(
-    organization: OrganizationShortEntity,
-    subject: SubjectDetailsEntity?,
-) = HomeworkDetailsEntity(
+fun FetchActiveAndLinkedHomeworks.mapToEntity() = HomeworkEntity(
     uid = uid,
-    classId = class_id,
+    class_id = class_id,
     deadline = deadline,
-    subject = subject,
-    organization = organization,
-    theoreticalTasks = theoretical_tasks,
-    practicalTasks = practical_tasks,
+    subject_id = subject_id,
+    organization_id = organization_id,
+    theoretical_tasks = theoretical_tasks,
+    practical_tasks = practical_tasks,
     presentations = presentations,
     test = test,
     priority = priority,
-    isDone = is_done == 1L,
-    completeDate = complete_date,
+    is_done = is_done,
+    complete_date = complete_date,
 )

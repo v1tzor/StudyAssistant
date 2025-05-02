@@ -18,6 +18,11 @@ SELECT *
 FROM subjectEntity
 WHERE organization_id = ?;
 
+fetchSubjectsByOrganizations:
+SELECT *
+FROM subjectEntity
+WHERE organization_id IN ?;
+
 fetchSubjectsByEmployee:
 SELECT *
 FROM subjectEntity

@@ -25,6 +25,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.data.Database
 import ru.aleshin.studyassistant.core.database.datasource.DriverFactory
 import ru.aleshin.studyassistant.core.database.datasource.employee.EmployeeLocalDataSource
+import ru.aleshin.studyassistant.core.database.datasource.goals.DailyGoalsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.listOfIntAdapter
 import ru.aleshin.studyassistant.core.database.datasource.listOfStringsAdapter
 import ru.aleshin.studyassistant.core.database.datasource.organizations.OrganizationsLocalDataSource
@@ -38,6 +39,7 @@ import ru.aleshin.studyassistant.core.database.datasource.tasks.HomeworksLocalDa
 import ru.aleshin.studyassistant.core.database.datasource.tasks.TodoLocalDataSource
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
+import ru.aleshin.studyassistant.sqldelight.goals.GoalQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationEntity
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
 import ru.aleshin.studyassistant.sqldelight.schedules.BaseScheduleEntity
@@ -80,6 +82,7 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
     bindSingleton<BaseScheduleQueries> { instance<Database>().baseScheduleQueries }
     bindSingleton<CustomScheduleQueries> { instance<Database>().customScheduleQueries }
     bindSingleton<HomeworkQueries> { instance<Database>().homeworkQueries }
+    bindSingleton<GoalQueries> { instance<Database>().goalQueries }
     bindSingleton<TodoQueries> { instance<Database>().todoQueries }
     bindSingleton<OrganizationQueries> { instance<Database>().organizationQueries }
     bindSingleton<SubjectQueries> { instance<Database>().subjectQueries }
@@ -93,6 +96,7 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
     bindSingleton<SubjectsLocalDataSource> { SubjectsLocalDataSource.Base(instance(), instance(), instance()) }
     bindSingleton<EmployeeLocalDataSource> { EmployeeLocalDataSource.Base(instance(), instance()) }
     bindSingleton<HomeworksLocalDataSource> { HomeworksLocalDataSource.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<DailyGoalsLocalDataSource> { DailyGoalsLocalDataSource.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<TodoLocalDataSource> { TodoLocalDataSource.Base(instance(), instance()) }
     bindSingleton<OrganizationsLocalDataSource> { OrganizationsLocalDataSource.Base(instance(), instance(), instance(), instance()) }
 }

@@ -16,6 +16,7 @@
 		7445A6BF2BDA55F400612ADC /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 7445A6BE2BDA55F400612ADC /* FirebaseFirestore */; };
 		7445A6C42BDAC8F500612ADC /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 7445A6C32BDAC8F500612ADC /* GoogleSignIn */; };
 		7445A6C62BDAC8F500612ADC /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 7445A6C52BDAC8F500612ADC /* GoogleSignInSwift */; };
+		74537DD62DB2D1E400462278 /* AnalyticsServiceImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74537DD52DB2D1DC00462278 /* AnalyticsServiceImpl.swift */; };
 		747545322C61778D0032B546 /* OAuth2 in Frameworks */ = {isa = PBXBuildFile; productRef = 747545312C61778D0032B546 /* OAuth2 */; };
 		747545342C61778D0032B546 /* SwiftyBase64 in Frameworks */ = {isa = PBXBuildFile; productRef = 747545332C61778D0032B546 /* SwiftyBase64 */; };
 		747545362C61778D0032B546 /* TinyHTTPServer in Frameworks */ = {isa = PBXBuildFile; productRef = 747545352C61778D0032B546 /* TinyHTTPServer */; };
@@ -47,6 +48,7 @@
 		058557BA273AAA24004C7B11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* StudyAssistantApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyAssistantApp.swift; sourceTree = "<group>"; };
+		74537DD52DB2D1DC00462278 /* AnalyticsServiceImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsServiceImpl.swift; sourceTree = "<group>"; };
 		7475453B2C6293660032B546 /* service-account-file.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "service-account-file.json"; sourceTree = "<group>"; };
 		7475453D2C62A1950032B546 /* GoogleAuthTokenProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleAuthTokenProvider.swift; sourceTree = "<group>"; };
 		747545422C6400BA0032B546 /* UUIDProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UUIDProvider.swift; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				74537DD52DB2D1DC00462278 /* AnalyticsServiceImpl.swift */,
 				7475453B2C6293660032B546 /* service-account-file.json */,
 				74C67ECE2BDC149A001D880F /* GoogleService-Info.plist */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
@@ -247,6 +250,7 @@
 			files = (
 				2152FB042600AC8F00CF470E /* StudyAssistantApp.swift in Sources */,
 				74F623AF2C9407E200E86642 /* AppServiceImpl.swift in Sources */,
+				74537DD62DB2D1E400462278 /* AnalyticsServiceImpl.swift in Sources */,
 				7475453E2C62A1950032B546 /* GoogleAuthTokenProvider.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				747545432C6400BA0032B546 /* UUIDProvider.swift in Sources */,

@@ -39,6 +39,7 @@ import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.remote.BuildKonfig
 import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.goals.DailyGoalsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.message.MessageRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.message.PushServiceAuthTokenFactory
 import ru.aleshin.studyassistant.core.remote.datasources.message.PushServiceAuthTokenProvider
@@ -107,6 +108,7 @@ val coreRemoteModule = DI.Module("CoreRemote") {
     bindSingleton<SubjectsRemoteDataSource> { SubjectsRemoteDataSource.Base(instance()) }
     bindSingleton<EmployeeRemoteDataSource> { EmployeeRemoteDataSource.Base(instance(), instance()) }
     bindSingleton<HomeworksRemoteDataSource> { HomeworksRemoteDataSource.Base(instance()) }
+    bindSingleton<DailyGoalsRemoteDataSource> { DailyGoalsRemoteDataSource.Base(instance()) }
     bindSingleton<TodoRemoteDataSource> { TodoRemoteDataSource.Base(instance()) }
     bindSingleton<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance(), instance()) }
     bindSingleton<MessageRemoteDataSource> { MessageRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
