@@ -20,3 +20,4 @@ iosApp/service-account-file.json
 iosApp/GoogleService-Info.plist
 iosApp/iosApp/GoogleService-Info.plist
 androidApp/google-services.json
+androidApp/agconnect-services.json
