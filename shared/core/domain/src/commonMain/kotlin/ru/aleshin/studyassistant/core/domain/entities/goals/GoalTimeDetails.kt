@@ -20,34 +20,32 @@ import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
- * @author Stanislav Aleshin on 18.04.2025.
+ * @author Stanislav Aleshin on 02.06.2025.
  */
-sealed class GoalTime {
+sealed class GoalTimeDetails {
 
-    abstract val type: Type
+    abstract val type: GoalTime.Type
 
     data class Timer(
         val targetTime: Millis,
         val pastStopTime: Millis = 0,
         val startTimePoint: Instant,
+        val leftTime: Millis,
         val isActive: Boolean = false,
-    ) : GoalTime() {
-        override val type = Type.TIMER
+    ) : GoalTimeDetails() {
+        override val type = GoalTime.Type.TIMER
     }
 
     data class Stopwatch(
         val pastStopTime: Millis = 0,
         val startTimePoint: Instant,
+        val elapsedTime: Millis = 0,
         val isActive: Boolean = false,
-    ) : GoalTime() {
-        override val type = Type.STOPWATCH
+    ) : GoalTimeDetails() {
+        override val type = GoalTime.Type.STOPWATCH
     }
 
-    data object None : GoalTime() {
-        override val type = Type.NONE
-    }
-
-    enum class Type {
-        TIMER, STOPWATCH, NONE
+    data object None : GoalTimeDetails() {
+        override val type = GoalTime.Type.NONE
     }
 }

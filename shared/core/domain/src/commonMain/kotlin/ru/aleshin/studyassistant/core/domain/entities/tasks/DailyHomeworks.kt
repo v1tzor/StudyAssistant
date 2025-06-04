@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.domain.entities.goals
+package ru.aleshin.studyassistant.core.domain.entities.tasks
 
 /**
- * @author Stanislav Aleshin on 18.04.2025.
+ * @author Stanislav Aleshin on 03.06.2025.
  */
-data class DailyGoalsProgress(
-    val goalsCount: Int,
-    val homeworkGoals: List<Boolean>,
-    val todoGoals: List<Boolean>,
-    val progress: Float,
+data class DailyHomeworks(
+    val dailyStatus: DailyHomeworksStatus,
+    val homeworks: Map<HomeworkStatus, List<HomeworkDetails>>,
 )

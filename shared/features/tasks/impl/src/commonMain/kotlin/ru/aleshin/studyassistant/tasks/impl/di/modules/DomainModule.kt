@@ -21,6 +21,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksErrorHandler
+import ru.aleshin.studyassistant.tasks.impl.domain.interactors.GoalsInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.HomeworksInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.OrganizationInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ScheduleInteractor
@@ -36,11 +37,12 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<TasksErrorHandler> { TasksErrorHandler.Base() }
     bindSingleton<TasksEitherWrapper> { TasksEitherWrapper.Base(instance(), instance()) }
 
-    bindSingleton<HomeworksInteractor> { HomeworksInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<HomeworksInteractor> { HomeworksInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<UsersInteractor> { UsersInteractor.Base(instance(), instance()) }
     bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<ScheduleInteractor> { ScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<ShareHomeworksInteractor> { ShareHomeworksInteractor.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<GoalsInteractor> { GoalsInteractor.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<SubjectsInteractor> { SubjectsInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<TodoInteractor> { TodoInteractor.Base(instance(), instance(), instance(), instance()) }
 }

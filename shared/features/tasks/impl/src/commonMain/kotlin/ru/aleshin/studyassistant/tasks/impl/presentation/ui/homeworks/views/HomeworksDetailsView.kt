@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views
+package ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -91,7 +91,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
  * @author Stanislav Aleshin on 29.06.2024.
  */
 @Composable
-internal fun DailyHomeworksView(
+internal fun HomeworksDetailsView(
     modifier: Modifier = Modifier,
     date: Instant,
     currentDate: Instant,
@@ -121,9 +121,7 @@ internal fun DailyHomeworksView(
             targetDate = date,
             currentDate = currentDate,
             totalHomeworks = remember(homeworks) { homeworks.count() },
-            completedHomeworks = remember(homeworks) {
-                homeworks[HomeworkStatus.COMPLETE]?.size ?: 0
-            },
+            completedHomeworks = remember(homeworks) { homeworks[HomeworkStatus.COMPLETE]?.size ?: 0 },
             listStatus = dailyHomeworks.dailyStatus,
         )
         LazyColumn(

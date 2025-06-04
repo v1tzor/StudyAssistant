@@ -14,40 +14,46 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.domain.entities.goals
+package ru.aleshin.studyassistant.tasks.impl.presentation.models.goals
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
+import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
- * @author Stanislav Aleshin on 18.04.2025.
+ * @author Stanislav Aleshin on 01.06.2025.
  */
-sealed class GoalTime {
+@Parcelize
+internal sealed class GoalTimeUi : Parcelable {
 
-    abstract val type: Type
+    abstract val type: GoalTime.Type
 
     data class Timer(
         val targetTime: Millis,
         val pastStopTime: Millis = 0,
+        @TypeParceler<Instant, InstantParceler>
         val startTimePoint: Instant,
+        val leftTime: Millis,
         val isActive: Boolean = false,
-    ) : GoalTime() {
-        override val type = Type.TIMER
+    ) : GoalTimeUi() {
+        override val type = GoalTime.Type.TIMER
     }
 
     data class Stopwatch(
         val pastStopTime: Millis = 0,
+        @TypeParceler<Instant, InstantParceler>
         val startTimePoint: Instant,
+        val elapsedTime: Millis = 0,
         val isActive: Boolean = false,
-    ) : GoalTime() {
-        override val type = Type.STOPWATCH
+    ) : GoalTimeUi() {
+        override val type = GoalTime.Type.STOPWATCH
     }
 
-    data object None : GoalTime() {
-        override val type = Type.NONE
-    }
-
-    enum class Type {
-        TIMER, STOPWATCH, NONE
+    data object None : GoalTimeUi() {
+        override val type = GoalTime.Type.NONE
     }
 }

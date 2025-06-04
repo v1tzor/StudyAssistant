@@ -16,37 +16,24 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel
 
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.isActive
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
-import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
-import ru.aleshin.studyassistant.core.common.extensions.startThisDay
-import ru.aleshin.studyassistant.core.common.functional.Constants.Delay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.HomeworksInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ScheduleInteractor
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToBase
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToDetails
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksAction
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksEffect
 
@@ -68,41 +55,14 @@ internal interface HomeworksWorkProcessor :
             is HomeworksWorkCommand.UpdateHomework -> updateHomeworkWork(command.homework)
         }
 
-        private fun loadHomeworksWork(timeRange: TimeRange) = channelFlow<HomeworksWorkResult> {
-            var cycleUpdateJob: Job? = null
-            homeworksInteractor.fetchHomeworksByTimeRange(timeRange).collect { homeworkEither ->
-                cycleUpdateJob?.cancelAndJoin()
-                homeworkEither.handle(
-                    onLeftAction = { send(EffectResult(HomeworksEffect.ShowError(it))) },
-                    onRightAction = { homeworkList ->
-                        val homeworks = homeworkList.map { homework ->
-                            val currentTime = dateManager.fetchCurrentInstant()
-                            val status = HomeworkStatus.calculate(
-                                isDone = homework.isDone,
-                                completeDate = homework.completeDate,
-                                deadline = homework.deadline,
-                                currentTime = currentTime,
-                            )
-                            return@map homework.mapToUi().convertToDetails(status)
-                        }
-                        val groupedHomeworks = homeworks.groupBy { homework ->
-                            homework.deadline.startThisDay()
-                        }
-                        val homeworksMap = buildMap {
-                            timeRange.periodDates().forEach { date ->
-                                put(date, groupedHomeworks[date] ?: emptyList<HomeworkDetailsUi>())
-                            }
-                        }
-
-                        send(ActionResult(HomeworksAction.UpdateHomeworks(homeworksMap)))
-
-                        cycleUpdateJob = cycleUpdateHomeworkStatus(homeworksMap)
-                            .onEach { send(it) }
-                            .launchIn(this)
-                            .apply { start() }
-                    },
-                )
-            }
+        private fun loadHomeworksWork(timeRange: TimeRange) = flow<HomeworksWorkResult> {
+            homeworksInteractor.fetchHomeworksByTimeRange(timeRange).collectAndHandle(
+                onLeftAction = { emit(EffectResult(HomeworksEffect.ShowError(it))) },
+                onRightAction = { homeworks ->
+                    val homeworksMap = homeworks.mapValues { it.value.mapToUi() }
+                    emit(ActionResult(HomeworksAction.UpdateHomeworks(homeworksMap)))
+                },
+            )
         }.onStart {
             emit(ActionResult(HomeworksAction.UpdateLoading(true)))
         }
@@ -120,42 +80,6 @@ internal interface HomeworksWorkProcessor :
             homeworksInteractor.updateHomework(homework.convertToBase().mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(HomeworksEffect.ShowError(it))) },
             )
-        }
-
-        private fun cycleUpdateHomeworkStatus(homeworksMap: Map<Instant, List<HomeworkDetailsUi>>) = flow {
-            val updatedHomeworksMap = homeworksMap.toMutableMap()
-            while (currentCoroutineContext().isActive) {
-                delay(Delay.UPDATE_TASK_STATUS)
-
-                var isUpdated = false
-                val currentInstant = dateManager.fetchCurrentInstant()
-                val updatedHomeworks = updatedHomeworksMap.values.toList().extractAllItem()
-
-                updatedHomeworks.forEach { homework ->
-                    val status = homework.status
-                    if (status == HomeworkStatus.WAIT || status == HomeworkStatus.IN_FUTURE) {
-                        val newStatus = HomeworkStatus.calculate(
-                            isDone = homework.isDone,
-                            completeDate = homework.completeDate,
-                            deadline = homework.deadline,
-                            currentTime = currentInstant,
-                        )
-                        if (newStatus != status) {
-                            isUpdated = true
-                            val date = homework.deadline.startThisDay()
-                            val newHomework = homework.copy(status = newStatus)
-                            val newHomeworks = updatedHomeworksMap[date]!!.toMutableList().apply {
-                                remove(homework)
-                                add(newHomework)
-                            }
-                            updatedHomeworksMap[date] = newHomeworks
-                        }
-                    }
-                }
-                if (isUpdated) {
-                    emit(ActionResult(HomeworksAction.UpdateHomeworks(updatedHomeworksMap)))
-                }
-            }
         }
     }
 }

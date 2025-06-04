@@ -41,7 +41,8 @@ import kotlin.time.Duration
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
-fun Instant.dateTime(timeZone: TimeZone = TimeZone.currentSystemDefault()) = toLocalDateTime(timeZone)
+fun Instant.dateTime(timeZone: TimeZone = TimeZone.currentSystemDefault()) =
+    toLocalDateTime(timeZone)
 
 fun Instant.formatByTimeZone(
     format: DateTimeFormat<DateTimeComponents>,
@@ -89,7 +90,10 @@ fun Instant.shiftMillis(
     }
 }
 
-fun TimeRange.shiftWeek(value: Int, timeZone: TimeZone = TimeZone.currentSystemDefault()): TimeRange {
+fun TimeRange.shiftWeek(
+    value: Int,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+): TimeRange {
     return copy(
         from = from.shiftDay(value * DAYS_IN_WEEK, timeZone),
         to = to.shiftDay(value * DAYS_IN_WEEK, timeZone),
@@ -100,15 +104,31 @@ fun LocalDate.equalsDay(date: LocalDate?): Boolean {
     return dayOfYear == date?.dayOfYear
 }
 
-fun Instant.equalsDay(date: LocalDate?, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {
+fun Instant.equalsDay(
+    date: LocalDate?,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+): Boolean {
     return toLocalDateTime(timeZone).date.equalsDay(date)
 }
 
-fun Instant.equalsDay(date: Instant?, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {
+fun Instant.equalsDay(
+    date: Instant?,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+): Boolean {
     return equalsDay(date?.toLocalDateTime(timeZone)?.date)
 }
 
-fun Instant.isCurrentWeek(date: Instant?, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {
+fun Instant.isNextDay(
+    date: Instant?,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+): Boolean {
+    return this.shiftDay(1).equalsDay(date, timeZone)
+}
+
+fun Instant.isCurrentWeek(
+    date: Instant?,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+): Boolean {
     val weekTimeRange = dateTime().weekTimeRange()
     return date?.let { weekTimeRange.containsDate(it) } ?: false
 }
@@ -143,14 +163,21 @@ fun LocalDateTime.setEndDay() = LocalDateTime(
     time = LocalTime(23, 59, 59, 59)
 )
 
-fun Instant.setHoursAndMinutes(instance: Instant, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
+fun Instant.setHoursAndMinutes(
+    instance: Instant,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+): Instant {
     val dateTime = instance.toLocalDateTime(timeZone)
     val hour = dateTime.hour
     val minute = dateTime.minute
     return setHoursAndMinutes(hour, minute)
 }
 
-fun Instant.setHoursAndMinutes(hour: Int, minute: Int, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
+fun Instant.setHoursAndMinutes(
+    hour: Int,
+    minute: Int,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+): Instant {
     return toLocalDateTime(timeZone).setHoursAndMinutes(hour, minute).toInstant(timeZone)
 }
 
@@ -266,6 +293,20 @@ fun Duration.toString(
     }
 }
 
+fun Long.toShortTimeString(): String {
+    val hours = this.toHorses()
+    val minutes = this.toMinutesInHours()
+    val seconds = this.toSeconds() - this.toMinutes().toSeconds()
+
+    return buildString {
+        append(hours.toString().padStart(2, '0'))
+        append(':')
+        append(minutes.toString().padStart(2, '0'))
+        append(':')
+        append(seconds.toString().padStart(2, '0'))
+    }
+}
+
 fun Long.toMinutesOrHoursSuffixString(minutesSuffix: String, hoursSuffix: String): String {
     val minutes = this.toMinutes()
     val hours = this.toHorses()
@@ -327,7 +368,10 @@ fun Instant.endOfWeek(timeZone: TimeZone = TimeZone.currentSystemDefault()): Ins
     return shiftDay(DayOfWeek.entries.lastIndex - dateTime.dayOfWeek.ordinal, timeZone).endThisDay()
 }
 
-fun Instant.dateOfWeekDay(dayOfWeek: DayOfWeek, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
+fun Instant.dateOfWeekDay(
+    dayOfWeek: DayOfWeek,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+): Instant {
     return startOfWeek(timeZone).shiftDay(dayOfWeek.ordinal, timeZone)
 }
 
@@ -336,7 +380,10 @@ fun LocalDateTime.weekTimeRange(timeZone: TimeZone = TimeZone.currentSystemDefau
     return TimeRange(from = instant.startOfWeek(timeZone), to = instant.endOfWeek(timeZone))
 }
 
-fun DayOfWeek.dateTimeByWeek(mondayDate: Instant, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
+fun DayOfWeek.dateTimeByWeek(
+    mondayDate: Instant,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+): Instant {
     return mondayDate.shiftDay(ordinal, timeZone)
 }
 

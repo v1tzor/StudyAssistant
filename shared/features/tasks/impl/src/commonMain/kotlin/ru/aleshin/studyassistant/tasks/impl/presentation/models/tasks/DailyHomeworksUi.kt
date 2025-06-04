@@ -18,7 +18,9 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.domain.entities.tasks.DailyHomeworksStatus
+import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 
 /**
  * @author Stanislav Aleshin on 26.03.2025.
@@ -26,5 +28,7 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.DailyHomeworksStatus
 @Parcelize
 internal data class DailyHomeworksUi(
     val dailyStatus: DailyHomeworksStatus,
-    val homeworks: List<HomeworkDetailsUi>,
-) : Parcelable
+    val homeworks: Map<HomeworkStatus, List<HomeworkDetailsUi>>,
+) : Parcelable {
+    fun fetchAllHomeworks() = homeworks.values.toList().extractAllItem()
+}

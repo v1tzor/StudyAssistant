@@ -23,6 +23,7 @@ import studyassistant.shared.features.tasks.impl.generated.resources.ic_account_
 import studyassistant.shared.features.tasks.impl.generated.resources.ic_alert_triangular
 import studyassistant.shared.features.tasks.impl.generated.resources.ic_calendar_clock_outline
 import studyassistant.shared.features.tasks.impl.generated.resources.ic_timeline_in_progress
+import studyassistant.shared.features.tasks.impl.generated.resources.ic_timer
 import studyassistant.shared.features.tasks.impl.generated.resources.ic_view_array_outline
 import studyassistant.shared.features.tasks.impl.generated.resources.ic_view_day_outline
 
@@ -36,6 +37,7 @@ internal data class TasksIcons(
     val sharedHomeworks: DrawableResource,
     val viewAllTasks: DrawableResource,
     val viewShortTasks: DrawableResource,
+    val timer: DrawableResource,
 ) {
 
     companion object {
@@ -46,6 +48,7 @@ internal data class TasksIcons(
             sharedHomeworks = Res.drawable.ic_account_file_outline,
             viewAllTasks = Res.drawable.ic_view_day_outline,
             viewShortTasks = Res.drawable.ic_view_array_outline,
+            timer = Res.drawable.ic_timer,
         )
         val DARK = TasksIcons(
             tomorrowTime = Res.drawable.ic_timeline_in_progress,
@@ -54,6 +57,7 @@ internal data class TasksIcons(
             sharedHomeworks = Res.drawable.ic_account_file_outline,
             viewAllTasks = Res.drawable.ic_view_day_outline,
             viewShortTasks = Res.drawable.ic_view_array_outline,
+            timer = Res.drawable.ic_timer,
         )
     }
 }

@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.common.di
 
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
+import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
@@ -29,7 +30,7 @@ import ru.aleshin.studyassistant.core.common.payments.SubscriptionChecker
 val coreCommonModule = DI.Module("CoreCommon") {
     import(corePlatformModule)
     bindSingleton<CoroutineManager> { CoroutineManager.Base() }
-    bindSingleton<DateManager> { DateManager.Base() }
+    bindSingleton<DateManager> { DateManager.Base(workDispatchersProvider = instance<CoroutineManager>()) }
     bindSingleton<TimeOverlayManager> { TimeOverlayManager.Base() }
     bindSingleton<SubscriptionChecker> { SubscriptionChecker.FreeApp }
 }

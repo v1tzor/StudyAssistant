@@ -100,7 +100,7 @@ internal fun ComingHomeworksExecutionAnalysisView(
             InfoProgressView(
                 isLoading = isLoading,
                 items = remember(homeworks) {
-                    tomorrowHomeworks.values.toList().map { it.homeworks }.extractAllItem().map {
+                    tomorrowHomeworks.values.map { it.fetchAllHomeworks() }.extractAllItem().map {
                         it.completeDate != null
                     }
                 },
@@ -117,7 +117,7 @@ internal fun ComingHomeworksExecutionAnalysisView(
             InfoProgressView(
                 isLoading = isLoading,
                 items = remember(homeworks) {
-                    weekHomeworks.values.toList().map { it.homeworks }.extractAllItem().map {
+                    weekHomeworks.values.map { it.fetchAllHomeworks() }.extractAllItem().map {
                         it.completeDate != null
                     }
                 },

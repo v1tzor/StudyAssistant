@@ -49,6 +49,7 @@ kotlin {
 
             api(libs.koalaplot.charts)
             api(libs.bundles.filekit)
+            api(libs.dragAndDrop)
 
             api(libs.bundles.sketch)
 

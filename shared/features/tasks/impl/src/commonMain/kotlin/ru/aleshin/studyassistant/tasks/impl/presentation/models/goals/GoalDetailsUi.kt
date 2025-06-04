@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
+package ru.aleshin.studyassistant.tasks.impl.presentation.models.goals
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
@@ -23,29 +23,25 @@ import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
-import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
-import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.domain.entities.goals.GoalType
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
 
 /**
- * @author Stanislav Aleshin on 09.06.2024.
+ * @author Stanislav Aleshin on 01.06.2025.
  */
 @Parcelize
-internal data class HomeworkDetailsUi(
+internal data class GoalDetailsUi(
     val uid: UID,
-    val classId: UID? = null,
-    @TypeParceler<Instant, InstantParceler>
-    val deadline: Instant,
-    val subject: SubjectUi? = null,
-    val organization: OrganizationShortUi,
-    val theoreticalTasks: HomeworkTasksDetailsUi,
-    val practicalTasks: HomeworkTasksDetailsUi,
-    val presentationTasks: HomeworkTasksDetailsUi,
-    val test: String? = null,
-    val priority: TaskPriority = TaskPriority.STANDARD,
+    val contentType: GoalType,
+    val contentHomework: HomeworkUi? = null,
+    val contentTodo: TodoDetailsUi? = null,
+    val number: Int = 0,
+    @TypeParceler<Instant, InstantParceler> val targetDate: Instant,
+    val desiredTime: Millis?,
+    val time: GoalTimeUi,
+    val completeAfterTimeElapsed: Boolean = false,
     val isDone: Boolean = false,
-    val status: HomeworkStatus,
-    @TypeParceler<Instant?, NullInstantParceler>
-    val completeDate: Instant?,
+    @TypeParceler<Instant?, NullInstantParceler> val completeDate: Instant?,
 ) : Parcelable

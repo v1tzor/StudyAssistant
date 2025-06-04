@@ -1,0 +1,18 @@
+CREATE TABLE IF NOT EXISTS `goalEntity` (
+    uid TEXT PRIMARY KEY NOT NULL,
+    type TEXT NOT NULL,
+    number INTEGER NOT NULL,
+    content_id TEXT NOT NULL,
+    content_organization_id TEXT,
+    content_deadline INTEGER,
+    target_date INTEGER NOT NULL,
+    desired_time INTEGER,
+    goal_time_type TEXT NOT NULL,
+    target_time INTEGER,
+    past_stop_time INTEGER NOT NULL,
+    start_time_point INTEGER NOT NULL,
+    is_active INTEGER NOT NULL,
+    complete_after_time_elapsed INTEGER NOT NULL,
+    is_done INTEGER NOT NULL,
+    complete_date INTEGER
+);

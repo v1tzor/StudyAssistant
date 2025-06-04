@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.domain.entities.goals
+package ru.aleshin.studyassistant.core.domain.entities.tasks
+
+import kotlinx.datetime.Instant
 
 /**
- * @author Stanislav Aleshin on 18.04.2025.
+ * @author Stanislav Aleshin on 03.06.2025.
  */
-data class DailyGoalsProgress(
-    val goalsCount: Int,
-    val homeworkGoals: List<Boolean>,
-    val todoGoals: List<Boolean>,
-    val progress: Float,
+data class HomeworkScope(
+    val theoreticalTasks: Map<Instant, Int>,
+    val practicalTasks: Map<Instant, Int>,
+    val presentationTasks: Map<Instant, Int>,
 )

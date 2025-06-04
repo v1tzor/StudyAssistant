@@ -31,6 +31,7 @@ import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.ScheduleUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 
 /**
@@ -45,7 +46,7 @@ internal data class HomeworksViewState(
     val selectedTimeRange: TimeRange? = null,
     val activeSchedule: ScheduleUi? = null,
     @TypeParceler<Instant, InstantParceler>
-    val homeworks: Map<Instant, List<HomeworkDetailsUi>> = mapOf(),
+    val homeworks: Map<Instant, DailyHomeworksUi> = mapOf(),
 ) : BaseViewState
 
 internal sealed class HomeworksEvent : BaseEvent {
@@ -69,7 +70,7 @@ internal sealed class HomeworksEffect : BaseUiEffect {
 }
 
 internal sealed class HomeworksAction : BaseAction {
-    data class UpdateHomeworks(val homeworks: Map<Instant, List<HomeworkDetailsUi>>) : HomeworksAction()
+    data class UpdateHomeworks(val homeworks: Map<Instant, DailyHomeworksUi>) : HomeworksAction()
     data class UpdateActiveSchedule(val activeSchedule: ScheduleUi?) : HomeworksAction()
     data class UpdateDates(val currentDate: Instant, val selectedTimeRange: TimeRange?) : HomeworksAction()
     data class UpdateLoading(val isLoading: Boolean) : HomeworksAction()

@@ -40,15 +40,16 @@ fun GoalEntityDetails.mapToDomain() = Goal(
     time = when (GoalTime.Type.valueOf(goalTimeType)) {
         GoalTime.Type.TIMER -> GoalTime.Timer(
             targetTime = checkNotNull(targetTime),
-            pastStopTime = pastStopTime,
-            startTimePoint = startTimePoint.mapEpochTimeToInstant(),
+            pastStopTime = checkNotNull(pastStopTime),
+            startTimePoint = checkNotNull(startTimePoint).mapEpochTimeToInstant(),
             isActive = isActive,
         )
         GoalTime.Type.STOPWATCH -> GoalTime.Stopwatch(
-            pastStopTime = pastStopTime,
-            startTimePoint = startTimePoint.mapEpochTimeToInstant(),
+            pastStopTime = checkNotNull(pastStopTime),
+            startTimePoint = checkNotNull(startTimePoint).mapEpochTimeToInstant(),
             isActive = isActive,
         )
+        GoalTime.Type.NONE -> GoalTime.None
     },
     completeAfterTimeElapsed = completeAfterTimeElapsed,
     isDone = isDone,
@@ -66,15 +67,16 @@ fun GoalDetailsPojo.mapToDomain() = Goal(
     time = when (GoalTime.Type.valueOf(goalTimeType)) {
         GoalTime.Type.TIMER -> GoalTime.Timer(
             targetTime = checkNotNull(targetTime),
-            pastStopTime = pastStopTime,
-            startTimePoint = startTimePoint.mapEpochTimeToInstant(),
+            pastStopTime = checkNotNull(pastStopTime),
+            startTimePoint = checkNotNull(startTimePoint).mapEpochTimeToInstant(),
             isActive = isActive,
         )
         GoalTime.Type.STOPWATCH -> GoalTime.Stopwatch(
-            pastStopTime = pastStopTime,
-            startTimePoint = startTimePoint.mapEpochTimeToInstant(),
+            pastStopTime = checkNotNull(pastStopTime),
+            startTimePoint = checkNotNull(startTimePoint).mapEpochTimeToInstant(),
             isActive = isActive,
         )
+        GoalTime.Type.NONE -> GoalTime.None
     },
     completeAfterTimeElapsed = completeAfterTimeElapsed,
     isDone = isDone,
@@ -94,18 +96,22 @@ fun Goal.mapToRemoteData() = GoalPojo(
     targetTime = when (time) {
         is GoalTime.Timer -> (time as? GoalTime.Timer)?.targetTime
         is GoalTime.Stopwatch -> null
+        is GoalTime.None -> null
     },
     pastStopTime = when (time) {
         is GoalTime.Timer -> (time as GoalTime.Timer).pastStopTime
         is GoalTime.Stopwatch -> (time as GoalTime.Stopwatch).pastStopTime
+        is GoalTime.None -> null
     },
     startTimePoint = when (time) {
         is GoalTime.Timer -> (time as GoalTime.Timer).startTimePoint.toEpochMilliseconds()
         is GoalTime.Stopwatch -> (time as GoalTime.Stopwatch).startTimePoint.toEpochMilliseconds()
+        is GoalTime.None -> null
     },
     active = when (time) {
         is GoalTime.Timer -> (time as GoalTime.Timer).isActive
         is GoalTime.Stopwatch -> (time as GoalTime.Stopwatch).isActive
+        is GoalTime.None -> false
     },
     completeAfterTimeElapsed = completeAfterTimeElapsed,
     done = isDone,
@@ -125,18 +131,22 @@ fun Goal.mapToLocalData() = GoalEntity(
     target_time = when (time) {
         is GoalTime.Timer -> (time as? GoalTime.Timer)?.targetTime
         is GoalTime.Stopwatch -> null
+        is GoalTime.None -> null
     },
     past_stop_time = when (time) {
         is GoalTime.Timer -> (time as GoalTime.Timer).pastStopTime
         is GoalTime.Stopwatch -> (time as GoalTime.Stopwatch).pastStopTime
+        is GoalTime.None -> null
     },
     start_time_point = when (time) {
         is GoalTime.Timer -> (time as GoalTime.Timer).startTimePoint.toEpochMilliseconds()
         is GoalTime.Stopwatch -> (time as GoalTime.Stopwatch).startTimePoint.toEpochMilliseconds()
+        is GoalTime.None -> null
     },
     is_active = when (time) {
         is GoalTime.Timer -> (time as GoalTime.Timer).isActive
         is GoalTime.Stopwatch -> (time as GoalTime.Stopwatch).isActive
+        is GoalTime.None -> false
     }.let { if (it) 1L else 0L },
     complete_after_time_elapsed = if (completeAfterTimeElapsed) 1L else 0L,
     is_done = if (isDone) 1L else 0L,

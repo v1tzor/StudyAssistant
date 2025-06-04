@@ -57,15 +57,15 @@ internal fun HomeworkUi.convertToDetails(status: HomeworkStatus) = HomeworkDetai
     deadline = deadline,
     subject = subject,
     organization = organization,
-    theoreticalTasks = HomeworkTasksUi(
+    theoreticalTasks = HomeworkTasksDetailsUi(
         origin = theoreticalTasks,
         components = theoreticalTasks.toHomeworkComponents().map { it.mapToUi() }
     ),
-    practicalTasks = HomeworkTasksUi(
+    practicalTasks = HomeworkTasksDetailsUi(
         origin = practicalTasks,
         components = practicalTasks.toHomeworkComponents().map { it.mapToUi() }
     ),
-    presentationTasks = HomeworkTasksUi(
+    presentationTasks = HomeworkTasksDetailsUi(
         origin = presentationTasks,
         components = presentationTasks.toHomeworkComponents().map { it.mapToUi() }
     ),

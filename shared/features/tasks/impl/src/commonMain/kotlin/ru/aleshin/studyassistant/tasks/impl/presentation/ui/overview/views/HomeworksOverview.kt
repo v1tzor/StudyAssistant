@@ -204,7 +204,7 @@ private fun HomeworksOverviewContent(
                             ShareHomeworksBottomSheet(
                                 currentTime = Clock.System.now(),
                                 targetDate = homeworksEntry.first,
-                                homeworks = homeworksEntry.second.homeworks,
+                                homeworks = homeworksEntry.second.fetchAllHomeworks(),
                                 allFriends = allFriends,
                                 onDismissRequest = { isShowSharedHomeworksSheet = false },
                                 onConfirm = {

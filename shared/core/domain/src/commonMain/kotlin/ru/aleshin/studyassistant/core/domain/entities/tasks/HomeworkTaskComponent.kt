@@ -26,6 +26,11 @@ sealed class HomeworkTaskComponent {
     data class Tasks(val taskList: List<String>) : HomeworkTaskComponent()
 }
 
+data class HomeworkTasksDetails(
+    val origin: String,
+    val components: List<HomeworkTaskComponent>,
+)
+
 typealias HomeworkTasks = List<HomeworkTaskComponent>
 
 fun HomeworkTasks.fetchAllTasks(): List<String> {

@@ -16,29 +16,17 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -47,8 +35,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.format.DateTimeComponents
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
-import ru.aleshin.studyassistant.core.common.extensions.endOfWeek
-import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
@@ -56,9 +42,6 @@ import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksViewState
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.HomeworksDetailsViewItem
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.HomeworksDetailsViewNoneItem
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.HomeworksDetailsViewPlaceholder
 import kotlin.time.Duration.Companion.days
 
 /**
@@ -76,86 +59,86 @@ internal fun HomeworksContent(
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
     onRepeatHomework: (HomeworkDetailsUi) -> Unit,
 ) = with(state) {
-    var isShowTargetDay by rememberSaveable { mutableStateOf(true) }
-    Crossfade(
-        modifier = modifier,
-        targetState = isLoading,
-        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-    ) { loading ->
-        if (!loading) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                homeworks.forEach { homeworksEntry ->
-                    stickyHeader(key = homeworksEntry.key.toString()) {
-                        HomeworkDateHeader(
-                            modifier = Modifier.animateItem(),
-                            currentDate = state.currentDate,
-                            date = homeworksEntry.key,
-                            progressList = homeworksEntry.value.map { it.completeDate != null },
-                        )
-                    }
-                    if (homeworksEntry.value.isNotEmpty()) {
-                        items(homeworksEntry.value, key = { it.uid }) { homework ->
-                            HomeworksDetailsViewItem(
-                                modifier = Modifier.padding(horizontal = 16.dp).animateItem(),
-                                subject = homework.subject,
-                                organization = homework.organization,
-                                status = homework.status,
-                                theoreticalTasks = homework.theoreticalTasks.components,
-                                practicalTasks = homework.practicalTasks.components,
-                                presentationTasks = homework.presentationTasks.components,
-                                testTopic = homework.test,
-                                priority = homework.priority,
-                                completeDate = homework.completeDate,
-                                onEdit = { onEditHomework(homework) },
-                                onRepeat = { onRepeatHomework(homework) },
-                                onSkip = { onSkipHomework(homework) },
-                                onDone = { onDoHomework(homework) },
-                            )
-                        }
-                    } else {
-                        item {
-                            HomeworksDetailsViewNoneItem(
-                                modifier = Modifier.padding(horizontal = 16.dp).animateItem(),
-                            )
-                        }
-                    }
-                    if (homeworksEntry.key.endOfWeek().equalsDay(homeworksEntry.key)) {
-                        item {
-                            HorizontalDivider(modifier = Modifier.fillMaxWidth())
-                        }
-                    }
-                }
-            }
-            LaunchedEffect(true) {
-                if (isShowTargetDay && selectedTimeRange?.containsDate(targetDate) == true) {
-                    val index = homeworks.toList().filter { it.first < targetDate }.sumOf {
-                        val header = 1
-                        val homeworks = it.second.size.takeIf { size -> size > 0 } ?: 1
-                        val divider = if (it.first.endOfWeek().equalsDay(it.first)) 1 else 0
-                        return@sumOf header + homeworks + divider
-                    }
-                    listState.animateScrollToItem(index)
-                    isShowTargetDay = false
-                }
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.padding(top = 12.dp).fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                userScrollEnabled = false,
-            ) {
-                item {
-                    HomeworksDetailsViewPlaceholder(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                    )
-                }
-            }
-        }
-    }
+//    var isShowTargetDay by rememberSaveable { mutableStateOf(true) }
+//    Crossfade(
+//        modifier = modifier,
+//        targetState = isLoading,
+//        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+//    ) { loading ->
+//        if (!loading) {
+//            LazyColumn(
+//                modifier = Modifier.fillMaxSize(),
+//                state = listState,
+//                verticalArrangement = Arrangement.spacedBy(12.dp),
+//            ) {
+//                homeworks.forEach { homeworksEntry ->
+//                    stickyHeader(key = homeworksEntry.key.toString()) {
+//                        HomeworkDateHeader(
+//                            modifier = Modifier.animateItem(),
+//                            currentDate = state.currentDate,
+//                            date = homeworksEntry.key,
+//                            progressList = homeworksEntry.value.map { it.completeDate != null },
+//                        )
+//                    }
+//                    if (homeworksEntry.value.isNotEmpty()) {
+//                        items(homeworksEntry.value, key = { it.uid }) { homework ->
+//                            HomeworksDetailsViewItem(
+//                                modifier = Modifier.padding(horizontal = 16.dp).animateItem(),
+//                                subject = homework.subject,
+//                                organization = homework.organization,
+//                                status = homework.status,
+//                                theoreticalTasks = homework.theoreticalTasks.components,
+//                                practicalTasks = homework.practicalTasks.components,
+//                                presentationTasks = homework.presentationTasks.components,
+//                                testTopic = homework.test,
+//                                priority = homework.priority,
+//                                completeDate = homework.completeDate,
+//                                onEdit = { onEditHomework(homework) },
+//                                onRepeat = { onRepeatHomework(homework) },
+//                                onSkip = { onSkipHomework(homework) },
+//                                onDone = { onDoHomework(homework) },
+//                            )
+//                        }
+//                    } else {
+//                        item {
+//                            HomeworksDetailsViewNoneItem(
+//                                modifier = Modifier.padding(horizontal = 16.dp).animateItem(),
+//                            )
+//                        }
+//                    }
+//                    if (homeworksEntry.key.endOfWeek().equalsDay(homeworksEntry.key)) {
+//                        item {
+//                            HorizontalDivider(modifier = Modifier.fillMaxWidth())
+//                        }
+//                    }
+//                }
+//            }
+//            LaunchedEffect(true) {
+//                if (isShowTargetDay && selectedTimeRange?.containsDate(targetDate) == true) {
+//                    val index = homeworks.toList().filter { it.first < targetDate }.sumOf {
+//                        val header = 1
+//                        val homeworks = it.second.size.takeIf { size -> size > 0 } ?: 1
+//                        val divider = if (it.first.endOfWeek().equalsDay(it.first)) 1 else 0
+//                        return@sumOf header + homeworks + divider
+//                    }
+//                    listState.animateScrollToItem(index)
+//                    isShowTargetDay = false
+//                }
+//            }
+//        } else {
+//            LazyColumn(
+//                modifier = Modifier.padding(top = 12.dp).fillMaxSize(),
+//                verticalArrangement = Arrangement.spacedBy(12.dp),
+//                userScrollEnabled = false,
+//            ) {
+//                item {
+//                    HomeworksDetailsViewPlaceholder(
+//                        modifier = Modifier.padding(horizontal = 16.dp),
+//                    )
+//                }
+//            }
+//        }
+//    }
 }
 
 @Composable

@@ -15,6 +15,10 @@
  */
 package ru.aleshin.studyassistant.core.common.managers
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalTime
@@ -42,10 +46,19 @@ interface DateManager {
     fun calculateLeftDateTime(endDateTime: Instant): Long
     fun calculateLeftTime(endTime: LocalTime): Long
     fun calculateProgress(startTime: Instant, endTime: Instant): Float
+    fun secondTicker(): Flow<Unit>
 
     class Base(
-        private val timeZone: TimeZone = TimeZone.currentSystemDefault()
+        private val timeZone: TimeZone = TimeZone.currentSystemDefault(),
+        workDispatchersProvider: WorkDispatchersProvider,
     ) : DateManager {
+
+        private val ticker = flow {
+            while (true) {
+                emit(Unit)
+                delay(1000)
+            }
+        }.flowOn(workDispatchersProvider.backgroundDispatcher)
 
         override fun fetchCurrentInstant() = Clock.System.now()
 
@@ -85,5 +98,7 @@ interface DateManager {
 
             return if (progress < 0f) -1f else if (progress > 1f) 1f else progress
         }
+
+        override fun secondTicker() = ticker
     }
 }

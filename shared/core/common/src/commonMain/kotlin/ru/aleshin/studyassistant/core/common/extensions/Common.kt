@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.common.extensions
 
+import androidx.compose.ui.util.fastForEach
 import kotlinx.datetime.Clock
 import kotlin.math.abs
 import kotlin.random.Random
@@ -23,11 +24,11 @@ import kotlin.random.Random
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
-inline fun <T> List<List<T>>.extractAllItem() = buildList {
-    this@extractAllItem.forEach { addAll(it) }
+fun <T> List<List<T>>.extractAllItem() = buildList {
+    this@extractAllItem.fastForEach { addAll(it) }
 }
 
-inline fun <T> List<List<T>>.extractAllItemToSet() = buildSet {
+fun <T> List<List<T>>.extractAllItemToSet() = buildSet {
     this@extractAllItemToSet.forEach { addAll(it) }
 }
 
@@ -43,6 +44,10 @@ inline fun <T> Iterable<T>.forEachWith(action: T.() -> Unit) {
     for (element in this) action(element)
 }
 
-inline fun <T> List<T>.limitSize(maxSize: Int): List<T> {
+fun <T> List<T>.limitSize(maxSize: Int): List<T> {
     return if (size >= maxSize) subList(fromIndex = 0, toIndex = maxSize - 1) else this
+}
+
+inline fun <T, R> Iterable<T>.mapWith(transform: T.() -> R): List<R> {
+    return map { transform(it) }
 }

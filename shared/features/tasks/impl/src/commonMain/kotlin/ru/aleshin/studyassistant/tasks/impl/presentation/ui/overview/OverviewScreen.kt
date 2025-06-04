@@ -72,6 +72,7 @@ internal class OverviewScreen : Screen {
                     onSkipHomework = { dispatchEvent(OverviewEvent.SkipHomework(it)) },
                     onRepeatHomework = { dispatchEvent(OverviewEvent.RepeatHomework(it)) },
                     onShareHomeworks = { dispatchEvent(OverviewEvent.ShareHomeworks(it)) },
+                    onSelectGoalsDate = {dispatchEvent(OverviewEvent.SelectedGoalsDate(it)) },
                     onShowAllTodoTasks = { dispatchEvent(OverviewEvent.NavigateToTodos) },
                     onOpenTodoTask = { dispatchEvent(OverviewEvent.NavigateToTodoEditor(it)) },
                     onChangeTodoDone = { task, done -> dispatchEvent(OverviewEvent.UpdateTodoDone(task, done)) },

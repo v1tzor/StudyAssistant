@@ -34,7 +34,7 @@ internal sealed interface HomeworkTaskComponentUi : Parcelable {
 }
 
 @Parcelize
-internal data class HomeworkTasksUi(
+internal data class HomeworkTasksDetailsUi(
     val origin: String,
     val components: List<HomeworkTaskComponentUi>,
 ) : Parcelable

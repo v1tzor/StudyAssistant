@@ -90,7 +90,7 @@ internal data class HomeworksScreen(val targetDate: Long?) : Screen {
                         isLoading = state.isLoading,
                         selectedTimeRange = state.selectedTimeRange,
                         progressList = state.homeworks.map { entry ->
-                            entry.value.map { it.completeDate != null }
+                            entry.value.fetchAllHomeworks().map { it.completeDate != null }
                         }.extractAllItem(),
                         onNextTimeRange = { dispatchEvent(HomeworksEvent.NextTimeRange) },
                         onPreviousTimeRange = { dispatchEvent(HomeworksEvent.PreviousTimeRange) },

@@ -81,6 +81,10 @@ internal class OverviewScreenModel(
                     val command = OverviewWorkCommand.LoadTodos(currentDate)
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_GOALS) {
+                    val command = OverviewWorkCommand.LoadGoals(currentDate)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
                 launchBackgroundWork(BackgroundKey.LOAD_ACTIVE_SCHEDULE) {
                     val command = OverviewWorkCommand.LoadActiveSchedule(currentDate)
                     workProcessor.work(command).collectAndHandleWork()
@@ -110,6 +114,12 @@ internal class OverviewScreenModel(
                 val updatedHomework = homework.copy(isDone = false, completeDate = null)
                 launchBackgroundWork(BackgroundKey.TASK_ACTION) {
                     val command = OverviewWorkCommand.UpdateHomework(updatedHomework)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.SelectedGoalsDate -> with(event) {
+                launchBackgroundWork(BackgroundKey.LOAD_GOALS) {
+                    val command = OverviewWorkCommand.LoadGoals(date)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -205,6 +215,12 @@ internal class OverviewScreenModel(
             todos = action.todos,
             isLoadingTasks = false,
         )
+        is OverviewAction.UpdateGoals -> currentState.copy(
+            selectedGoalsDate = action.selectedGoalsDate,
+            dailyGoals = action.dailyGoals,
+            goalsProgress = action.goalsProgress,
+            isLoadingGoals = false,
+        )
         is OverviewAction.UpdateTaskErrors -> currentState.copy(
             homeworkErrors = action.homeworkErrors,
             todoErrors = action.todoErrors,
@@ -233,10 +249,13 @@ internal class OverviewScreenModel(
         is OverviewAction.UpdateShareLoading -> currentState.copy(
             isLoadingShare = action.isLoading,
         )
+        is OverviewAction.UpdateGoalsLoading -> currentState.copy(
+            isLoadingGoals = action.isLoading,
+        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_HOMEWORKS, LOAD_ACTIVE_SCHEDULE, LOAD_ERRORS, LOAD_TASKS, LOAD_SHARE, TASK_ACTION,
+        LOAD_HOMEWORKS, LOAD_ACTIVE_SCHEDULE, LOAD_GOALS, LOAD_ERRORS, LOAD_TASKS, LOAD_SHARE, TASK_ACTION,
     }
 }
 

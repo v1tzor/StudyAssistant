@@ -56,7 +56,7 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<OverviewStateCommunicator> { OverviewStateCommunicator.Base() }
     bindProvider<OverviewEffectCommunicator> { OverviewEffectCommunicator.Base() }
-    bindProvider<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindProvider<OverviewScreenModel> { OverviewScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<HomeworksStateCommunicator> { HomeworksStateCommunicator.Base() }

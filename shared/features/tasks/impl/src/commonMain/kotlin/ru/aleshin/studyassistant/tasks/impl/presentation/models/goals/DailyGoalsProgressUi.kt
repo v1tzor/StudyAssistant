@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.domain.entities.goals
+package ru.aleshin.studyassistant.tasks.impl.presentation.models.goals
+
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 
 /**
  * @author Stanislav Aleshin on 18.04.2025.
  */
-data class DailyGoalsProgress(
+@Parcelize
+internal data class DailyGoalsProgressUi(
     val goalsCount: Int,
     val homeworkGoals: List<Boolean>,
     val todoGoals: List<Boolean>,
     val progress: Float,
-)
+) : Parcelable

@@ -50,6 +50,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.DailyGoalsProgressUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
@@ -88,6 +90,7 @@ internal fun OverviewContent(
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
     onRepeatHomework: (HomeworkDetailsUi) -> Unit,
     onShareHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
+    onSelectGoalsDate: (Instant) -> Unit,
     onShowAllTodoTasks: () -> Unit,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
@@ -98,7 +101,12 @@ internal fun OverviewContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         DailyGoalsSection(
-            isLoadingGoals = false,
+            isLoadingGoals = isLoadingGoals,
+            currentDate = currentDate,
+            selectedGoalsDate = selectedGoalsDate,
+            dailyGoals = dailyGoals,
+            goalsProgress = goalsProgress,
+            onSelectDate = onSelectGoalsDate,
         )
         HorizontalDivider()
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -147,6 +155,11 @@ internal fun OverviewContent(
 private fun DailyGoalsSection(
     modifier: Modifier = Modifier,
     isLoadingGoals: Boolean,
+    currentDate: Instant,
+    selectedGoalsDate: Instant,
+    dailyGoals: List<GoalDetailsUi>,
+    goalsProgress: Map<Instant, DailyGoalsProgressUi>,
+    onSelectDate: (Instant) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -162,6 +175,11 @@ private fun DailyGoalsSection(
         DailyGoalsView(
             modifier = Modifier.padding(horizontal = 16.dp),
             isLoadingGoals = isLoadingGoals,
+            currentDate = currentDate,
+            selectedGoalsDate = selectedGoalsDate,
+            dailyGoals = dailyGoals,
+            goalsProgress = goalsProgress,
+            onSelectDate = onSelectDate,
         )
     }
 }

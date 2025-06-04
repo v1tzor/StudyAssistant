@@ -84,6 +84,7 @@ object Constants {
         const val SHORT_SUBJECTS = 9
         const val LINK_SUBJECTS = 6
         const val LINK_EMPLOYEES = 5
+        const val GOALS = 5
         const val EMPLOYEES_OR_SUBJECTS = 12
         const val HOMEWORKS = 7
         const val USER_CONTACT_INFO = 4

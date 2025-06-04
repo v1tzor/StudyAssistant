@@ -39,6 +39,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
@@ -179,6 +180,7 @@ val featureModule = DI.Module("Feature") {
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val homeworkRepository = instance<HomeworksRepository>()
+            override val goalsRepository = instance<DailyGoalsRepository>()
             override val shareHomeworksRepository = instance<ShareHomeworksRepository>()
             override val messageRepository = instance<MessageRepository>()
             override val todoRepository = instance<TodoRepository>()

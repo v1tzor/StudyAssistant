@@ -82,7 +82,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.HomeworkTaskV
  * @author Stanislav Aleshin on 03.07.2024.
  */
 @Composable
-internal fun HomeworksDetailsViewItem(
+internal fun HomeworksDetailsViewItemOld(
     modifier: Modifier = Modifier,
     subject: SubjectUi?,
     organization: OrganizationShortUi,

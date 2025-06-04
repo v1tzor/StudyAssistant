@@ -21,11 +21,13 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
@@ -37,6 +39,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.functional.Constants
 
 /**
@@ -98,4 +102,33 @@ fun TextStyle.BlackWeight() = copy(
 
 fun Int.pxToDp(density: Density) = with(density) {
     this@pxToDp.toDp()
+}
+
+suspend fun handleLazyListScroll(
+    lazyListState: LazyListState,
+    dropIndex: Int,
+): Unit = coroutineScope {
+    val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
+    val firstVisibleItemScrollOffset = lazyListState.firstVisibleItemScrollOffset
+
+    if (dropIndex == 0 || dropIndex == 1) {
+        launch {
+            lazyListState.scrollToItem(firstVisibleItemIndex, firstVisibleItemScrollOffset)
+        }
+    }
+
+    val lastVisibleItemIndex = lazyListState.firstVisibleItemIndex + lazyListState.layoutInfo.visibleItemsInfo.lastIndex
+
+    val firstVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull() ?: return@coroutineScope
+    val scrollAmount = firstVisibleItem.size * 2f
+
+    if (dropIndex <= firstVisibleItemIndex + 1) {
+        launch {
+            lazyListState.animateScrollBy(-scrollAmount)
+        }
+    } else if (dropIndex == lastVisibleItemIndex) {
+        launch {
+            lazyListState.animateScrollBy(scrollAmount)
+        }
+    }
 }

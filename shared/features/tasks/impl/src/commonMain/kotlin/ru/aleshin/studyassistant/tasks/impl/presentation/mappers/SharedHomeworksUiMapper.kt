@@ -30,7 +30,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTasksUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTasksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.MediatedHomeworkUi
 
 /**
@@ -81,15 +81,15 @@ internal fun SentMediatedHomeworks.mapToUi() = SentMediatedHomeworksUi(
 internal fun MediatedHomework.mapToUi() = MediatedHomeworkUi(
     uid = uid,
     subjectName = subjectName,
-    theoreticalTasks = HomeworkTasksUi(
+    theoreticalTasks = HomeworkTasksDetailsUi(
         origin = theoreticalTasks,
         components = theoreticalTasks.toHomeworkComponents().map { it.mapToUi() }
     ),
-    practicalTasks = HomeworkTasksUi(
+    practicalTasks = HomeworkTasksDetailsUi(
         origin = practicalTasks,
         components = practicalTasks.toHomeworkComponents().map { it.mapToUi() }
     ),
-    presentationTasks = HomeworkTasksUi(
+    presentationTasks = HomeworkTasksDetailsUi(
         origin = presentationTasks,
         components = presentationTasks.toHomeworkComponents().map { it.mapToUi() }
     ),

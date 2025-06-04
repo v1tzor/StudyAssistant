@@ -32,9 +32,9 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.Org
 internal data class MediatedHomeworkUi(
     val uid: UID,
     val subjectName: String,
-    val theoreticalTasks: HomeworkTasksUi,
-    val practicalTasks: HomeworkTasksUi,
-    val presentationTasks: HomeworkTasksUi,
+    val theoreticalTasks: HomeworkTasksDetailsUi,
+    val practicalTasks: HomeworkTasksDetailsUi,
+    val presentationTasks: HomeworkTasksDetailsUi,
     val test: String? = null,
     val priority: TaskPriority = TaskPriority.STANDARD,
 ) : Parcelable

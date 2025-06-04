@@ -24,6 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
@@ -34,19 +35,16 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowW
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
 import ru.aleshin.studyassistant.core.common.extensions.endOfWeek
-import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
-import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
+import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.extensions.shiftWeek
 import ru.aleshin.studyassistant.core.common.extensions.startOfWeek
-import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.Constants.Delay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.domain.entities.tasks.DailyHomeworksStatus
-import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
+import ru.aleshin.studyassistant.tasks.impl.domain.interactors.GoalsInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.HomeworksInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ScheduleInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ShareHomeworksInteractor
@@ -55,13 +53,9 @@ import ru.aleshin.studyassistant.tasks.impl.domain.interactors.UsersInteractor
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToBase
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToDetails
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.fetchAllTasks
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewAction
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEffect
 
@@ -75,6 +69,7 @@ internal interface OverviewWorkProcessor :
         private val homeworksInteractor: HomeworksInteractor,
         private val todoInteractor: TodoInteractor,
         private val scheduleInteractor: ScheduleInteractor,
+        private val goalsInteractor: GoalsInteractor,
         private val shareInteractor: ShareHomeworksInteractor,
         private val usersInteractor: UsersInteractor,
         private val dateManager: DateManager,
@@ -84,6 +79,7 @@ internal interface OverviewWorkProcessor :
             is OverviewWorkCommand.LoadHomeworks -> loadHomeworksWork(command.currentDate)
             is OverviewWorkCommand.LoadHomeworkErrors -> loadTaskErrorsWork(command.currentDate)
             is OverviewWorkCommand.LoadTodos -> loadTodosWork(command.currentDate)
+            is OverviewWorkCommand.LoadGoals -> loadGoals(command.selectedDate)
             is OverviewWorkCommand.LoadSharedHomeworks -> loadSharedHomeworksWork()
             is OverviewWorkCommand.LoadActiveSchedule -> loadActiveScheduleWork(command.currentDate)
             is OverviewWorkCommand.UpdateHomework -> updateHomeworkWork(command.homework)
@@ -91,55 +87,19 @@ internal interface OverviewWorkProcessor :
             is OverviewWorkCommand.ShareHomeworks -> shareHomeworksWork(command.sentMediatedHomeworks)
         }
 
-        private fun loadHomeworksWork(currentDate: Instant) = channelFlow<OverviewWorkResult> {
-            var cycleUpdateJob: Job? = null
+        private fun loadHomeworksWork(currentDate: Instant) = flow<OverviewWorkResult> {
             val targetTimeRange = TimeRange(
                 from = currentDate.startOfWeek().shiftWeek(-1),
                 to = currentDate.endOfWeek().shiftWeek(+1),
             )
-            homeworksInteractor.fetchHomeworksByTimeRange(targetTimeRange).collect { homeworksEither ->
-                cycleUpdateJob?.cancelAndJoin()
-                homeworksEither.handle(
-                    onLeftAction = { send(EffectResult(OverviewEffect.ShowError(it))) },
-                    onRightAction = { homeworkList ->
-                        val currentTime = dateManager.fetchCurrentInstant()
-                        val homeworks = homeworkList.map { homework ->
-                            val status = HomeworkStatus.calculate(
-                                isDone = homework.isDone,
-                                completeDate = homework.completeDate,
-                                deadline = homework.deadline,
-                                currentTime = currentDate.setHoursAndMinutes(currentTime),
-                            )
-                            return@map homework.mapToUi().convertToDetails(status)
-                        }
-                        val groupedHomeworks = homeworks.groupBy { homework ->
-                            homework.deadline.startThisDay()
-                        }
-                        val homeworksMap = buildMap {
-                            targetTimeRange.periodDates().forEach { date ->
-                                val homeworksByDate = groupedHomeworks[date] ?: emptyList<HomeworkDetailsUi>()
-                                val dailyHomeworks = DailyHomeworksUi(
-                                    dailyStatus = DailyHomeworksStatus.calculate(
-                                        targetDate = date,
-                                        currentDate = currentTime.startThisDay(),
-                                        homeworkStatuses = homeworksByDate.map { it.status }
-                                    ),
-                                    homeworks = homeworksByDate,
-                                )
-                                put(date, dailyHomeworks)
-                            }
-                        }
-                        val homeworksScope = calculateHomeworkScope(homeworksMap)
-
-                        send(ActionResult(OverviewAction.UpdateHomeworks(homeworksMap, homeworksScope)))
-
-                        cycleUpdateJob = cycleUpdateHomeworkStatus(homeworksMap)
-                            .onEach { send(it) }
-                            .launchIn(this)
-                            .apply { start() }
-                    },
-                )
-            }
+            homeworksInteractor.fetchHomeworksByTimeRange(targetTimeRange).collectAndHandle(
+                onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
+                onRightAction = { homeworks ->
+                    val homeworksMap = homeworks.mapValues { it.value.mapToUi() }
+                    val homeworksScope = homeworksInteractor.calculateHomeworkScope(homeworks).mapToUi()
+                    emit(ActionResult(OverviewAction.UpdateHomeworks(homeworksMap, homeworksScope)))
+                },
+            )
         }.onStart {
             emit(ActionResult(OverviewAction.UpdateHomeworksLoading(true)))
         }
@@ -216,6 +176,29 @@ internal interface OverviewWorkProcessor :
             emit(ActionResult(OverviewAction.UpdateShareLoading(true)))
         }
 
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private fun loadGoals(selectedDate: Instant) = flow {
+            val goalsFlow = goalsInteractor.fetchGoalsByDate(selectedDate).map { goalEither ->
+                goalEither.mapRight { goals -> goals.map { it.mapToUi() } }
+            }
+            val goalsProgressFlow = goalsInteractor.fetchGoalsProgressByTimeRange(
+                timeRange = TimeRange(selectedDate.shiftDay(1), selectedDate.shiftDay(3))
+            ).map { progressEither ->
+                progressEither.mapRight { progressMap -> progressMap.mapValues { it.value.mapToUi() } }
+            }
+            goalsFlow.flatMapLatestWithResult(
+                secondFlow = goalsProgressFlow,
+                onError = { OverviewEffect.ShowError(it) },
+                onData = { goals, goalsProgress ->
+                    OverviewAction.UpdateGoals(selectedDate, goals, goalsProgress)
+                },
+            ).collect { workResult ->
+                emit(workResult)
+            }
+        }.onStart {
+            emit(ActionResult(OverviewAction.UpdateShareLoading(true)))
+        }
+
         private fun loadActiveScheduleWork(currentDate: Instant) = flow<OverviewWorkResult> {
             scheduleInteractor.fetchScheduleByDate(currentDate).collectAndHandle(
                 onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
@@ -237,52 +220,6 @@ internal interface OverviewWorkProcessor :
             )
         }
 
-        private fun cycleUpdateHomeworkStatus(homeworksMap: Map<Instant, DailyHomeworksUi>) =
-            flow {
-                val updatedHomeworksMap = homeworksMap.toMutableMap()
-                while (currentCoroutineContext().isActive) {
-                    delay(Delay.UPDATE_TASK_STATUS)
-
-                    var isUpdated = false
-                    val currentInstant = dateManager.fetchCurrentInstant()
-                    val updatedDailyHomeworks = updatedHomeworksMap.values.toList()
-                    val updatedHomeworks = updatedDailyHomeworks.map { it.homeworks }.extractAllItem()
-
-                    updatedHomeworks.forEach { homework ->
-                        val status = homework.status
-                        if (status == HomeworkStatus.WAIT || status == HomeworkStatus.IN_FUTURE) {
-                            val newStatus = HomeworkStatus.calculate(
-                                isDone = homework.isDone,
-                                completeDate = homework.completeDate,
-                                deadline = homework.deadline,
-                                currentTime = currentInstant,
-                            )
-                            if (newStatus != status) {
-                                isUpdated = true
-                                val date = homework.deadline.startThisDay()
-                                val newHomework = homework.copy(status = newStatus)
-                                val newHomeworks = updatedHomeworksMap[date]!!.homeworks.toMutableList().apply {
-                                    remove(homework)
-                                    add(newHomework)
-                                }
-                                updatedHomeworksMap[date] = updatedHomeworksMap[date]!!.copy(
-                                    dailyStatus = DailyHomeworksStatus.calculate(
-                                        targetDate = date,
-                                        currentDate = currentInstant.startThisDay(),
-                                        homeworkStatuses = newHomeworks.map { it.status },
-                                    ),
-                                    homeworks = newHomeworks,
-                                )
-                            }
-                        }
-                    }
-                    if (isUpdated) {
-                        val homeworksScope = calculateHomeworkScope(updatedHomeworksMap)
-                        emit(ActionResult(OverviewAction.UpdateHomeworks(updatedHomeworksMap, homeworksScope)))
-                    }
-                }
-            }
-
         private fun cycleUpdateTodoStatus(todos: List<TodoDetailsUi>) = flow {
             while (currentCoroutineContext().isActive) {
                 delay(Delay.UPDATE_TASK_STATUS)
@@ -302,27 +239,6 @@ internal interface OverviewWorkProcessor :
             }
         }
 
-        private fun calculateHomeworkScope(
-            homeworksMap: Map<Instant, DailyHomeworksUi>
-        ): HomeworkScopeUi {
-            return HomeworkScopeUi(
-                theoreticalTasks = homeworksMap.mapValues { homeworkEntry ->
-                    homeworkEntry.value.homeworks.sumOf { homework ->
-                        return@sumOf homework.theoreticalTasks.components.fetchAllTasks().size
-                    }
-                },
-                practicalTasks = homeworksMap.mapValues { homeworkEntry ->
-                    homeworkEntry.value.homeworks.sumOf { homework ->
-                        return@sumOf homework.practicalTasks.components.fetchAllTasks().size
-                    }
-                },
-                presentationTasks = homeworksMap.mapValues { homeworkEntry ->
-                    homeworkEntry.value.homeworks.sumOf { homework ->
-                        return@sumOf homework.presentationTasks.components.fetchAllTasks().size
-                    }
-                },
-            )
-        }
 
         private fun shareHomeworksWork(sentMediatedHomeworks: SentMediatedHomeworksDetailsUi) = flow {
             shareInteractor.shareHomeworks(sentMediatedHomeworks.mapToDomain()).handle(
@@ -336,6 +252,7 @@ internal sealed class OverviewWorkCommand : WorkCommand {
     data class LoadHomeworks(val currentDate: Instant) : OverviewWorkCommand()
     data class LoadHomeworkErrors(val currentDate: Instant) : OverviewWorkCommand()
     data class LoadTodos(val currentDate: Instant) : OverviewWorkCommand()
+    data class LoadGoals(val selectedDate: Instant) : OverviewWorkCommand()
     data object LoadSharedHomeworks : OverviewWorkCommand()
     data class LoadActiveSchedule(val currentDate: Instant) : OverviewWorkCommand()
     data class UpdateHomework(val homework: HomeworkDetailsUi) : OverviewWorkCommand()

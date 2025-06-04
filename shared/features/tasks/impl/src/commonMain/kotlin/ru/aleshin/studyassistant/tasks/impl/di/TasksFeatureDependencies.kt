@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
@@ -41,6 +42,7 @@ public interface TasksFeatureDependencies : BaseFeatureDependencies {
     public val editorFeatureStarter: () -> EditorFeatureStarter
     public val usersFeatureStarter: () -> UsersFeatureStarter
     public val baseScheduleRepository: BaseScheduleRepository
+    public val goalsRepository: DailyGoalsRepository
     public val customScheduleRepository: CustomScheduleRepository
     public val organizationsRepository: OrganizationsRepository
     public val calendarSettingsRepository: CalendarSettingsRepository
