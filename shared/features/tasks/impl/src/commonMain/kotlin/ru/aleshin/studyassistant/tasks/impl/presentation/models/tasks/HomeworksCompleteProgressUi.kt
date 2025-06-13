@@ -23,7 +23,12 @@ import dev.icerock.moko.parcelize.Parcelize
  * @author Stanislav Aleshin on 27.06.2024.
  */
 @Parcelize
-internal data class HomeworkErrorsUi(
-    val overdueTasks: List<HomeworkDetailsUi>,
-    val detachedActiveTasks: List<HomeworkDetailsUi>,
+internal data class HomeworksCompleteProgressUi(
+    val comingHomeworksExecution: List<Boolean>,
+    val comingHomeworksProgress: Float,
+    val weekHomeworksExecution: List<Boolean>,
+    val weekHomeworksProgress: Float,
+    val overdueTasks: List<HomeworkUi>,
+    val detachedActiveTasks: List<HomeworkUi>,
+    val completedHomeworksCount: Int,
 ) : Parcelable

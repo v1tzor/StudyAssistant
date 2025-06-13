@@ -123,6 +123,8 @@ logger = { module = "co.touchlab:kermit", version.ref = "loggerKermit" }
 networkcheker = { module = "dev.tmapps:konnection", version.ref = "konnektion" }
 koalaplot-charts = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot-charts" }
 sketch-compose = { module = "io.github.panpf.sketch4:sketch-compose", version.ref = "sketch" }
+sketch-http = { module = "io.github.panpf.sketch4:sketch-http", version.ref = "sketch" }
+sketch-ktor = { module = "io.github.panpf.sketch4:sketch-http-ktor3", version.ref = "sketch" }
 sketch-compose-resources = { module = "io.github.panpf.sketch4:sketch-compose-resources", version.ref = "sketch" }
 sketch-compose-extnsions-resources = { module = "io.github.panpf.sketch4:sketch-extensions-compose-resources", version.ref = "sketch" }
 dragAndDrop = { module = "com.mohamedrejeb.dnd:compose-dnd", version.ref = "drag-and-drop" }
@@ -138,7 +140,7 @@ filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref =
 [bundles]
 firebase = ["firebase-auth", "firebase-firestore", "firebase-storage", "firebase-messaging"]
 voyager = ["voyager-navigator", "voyager-screenModel", "voyager-transitions", "voyager-kodein"]
-sketch = ["sketch-compose", "sketch-compose-resources", "sketch-compose-extnsions-resources"]
+sketch = ["sketch-compose", "sketch-compose-resources", "sketch-compose-extnsions-resources", "sketch-http", "sketch-ktor"]
 tracer = ["tracer-crashReport", "tracer-crashReportNative", "tracer-heapDumps", "tracer-diskUsage", "tracer-samplingProfiler", "tracer-systraceProfiler"]
 filekit = ["filekit-core", "filekit-compose"]
 

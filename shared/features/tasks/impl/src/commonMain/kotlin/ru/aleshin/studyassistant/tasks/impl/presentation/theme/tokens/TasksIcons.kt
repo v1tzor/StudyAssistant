@@ -22,8 +22,15 @@ import studyassistant.shared.features.tasks.impl.generated.resources.Res
 import studyassistant.shared.features.tasks.impl.generated.resources.ic_account_file_outline
 import studyassistant.shared.features.tasks.impl.generated.resources.ic_alert_triangular
 import studyassistant.shared.features.tasks.impl.generated.resources.ic_calendar_clock_outline
+import studyassistant.shared.features.tasks.impl.generated.resources.ic_calendar_goto
+import studyassistant.shared.features.tasks.impl.generated.resources.ic_deadline
+import studyassistant.shared.features.tasks.impl.generated.resources.ic_faster
+import studyassistant.shared.features.tasks.impl.generated.resources.ic_in_progress
+import studyassistant.shared.features.tasks.impl.generated.resources.ic_menu_open
+import studyassistant.shared.features.tasks.impl.generated.resources.ic_slower
 import studyassistant.shared.features.tasks.impl.generated.resources.ic_timeline_in_progress
 import studyassistant.shared.features.tasks.impl.generated.resources.ic_timer
+import studyassistant.shared.features.tasks.impl.generated.resources.ic_timer_play
 import studyassistant.shared.features.tasks.impl.generated.resources.ic_view_array_outline
 import studyassistant.shared.features.tasks.impl.generated.resources.ic_view_day_outline
 
@@ -38,6 +45,13 @@ internal data class TasksIcons(
     val viewAllTasks: DrawableResource,
     val viewShortTasks: DrawableResource,
     val timer: DrawableResource,
+    val calendarGoto: DrawableResource,
+    val timerPlay: DrawableResource,
+    val fasterThenDesired: DrawableResource,
+    val slowerThenDesired: DrawableResource,
+    val inProgress: DrawableResource,
+    val deadline: DrawableResource,
+    val openMenu: DrawableResource,
 ) {
 
     companion object {
@@ -49,6 +63,13 @@ internal data class TasksIcons(
             viewAllTasks = Res.drawable.ic_view_day_outline,
             viewShortTasks = Res.drawable.ic_view_array_outline,
             timer = Res.drawable.ic_timer,
+            calendarGoto = Res.drawable.ic_calendar_goto,
+            timerPlay = Res.drawable.ic_timer_play,
+            fasterThenDesired = Res.drawable.ic_faster,
+            slowerThenDesired = Res.drawable.ic_slower,
+            inProgress = Res.drawable.ic_in_progress,
+            deadline = Res.drawable.ic_deadline,
+            openMenu = Res.drawable.ic_menu_open,
         )
         val DARK = TasksIcons(
             tomorrowTime = Res.drawable.ic_timeline_in_progress,
@@ -58,6 +79,13 @@ internal data class TasksIcons(
             viewAllTasks = Res.drawable.ic_view_day_outline,
             viewShortTasks = Res.drawable.ic_view_array_outline,
             timer = Res.drawable.ic_timer,
+            calendarGoto = Res.drawable.ic_calendar_goto,
+            timerPlay = Res.drawable.ic_timer_play,
+            fasterThenDesired = Res.drawable.ic_faster,
+            slowerThenDesired = Res.drawable.ic_slower,
+            inProgress = Res.drawable.ic_in_progress,
+            deadline = Res.drawable.ic_deadline,
+            openMenu = Res.drawable.ic_menu_open,
         )
     }
 }

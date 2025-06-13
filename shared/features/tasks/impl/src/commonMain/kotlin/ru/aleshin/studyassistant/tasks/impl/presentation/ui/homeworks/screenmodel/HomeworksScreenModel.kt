@@ -45,7 +45,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.H
  * @author Stanislav Aleshin on 27.06.2024
  */
 internal class HomeworksScreenModel(
-    private val workProcessor: HomeworksWorkProcessor,
+    private val workProcessor: HomeworksDetailsWorkProcessor,
     private val screenProvider: TasksScreenProvider,
     private val dateManager: DateManager,
     stateCommunicator: HomeworksStateCommunicator,
@@ -76,11 +76,29 @@ internal class HomeworksScreenModel(
                 )
                 sendAction(HomeworksAction.UpdateDates(currentDate, targetTimeRange))
                 launchBackgroundWork(BackgroundKey.LOAD_HOMEWORKS) {
-                    val command = HomeworksWorkCommand.LoadHomeworks(targetTimeRange)
+                    val command = HomeworksDetailsWorkCommand.LoadHomeworks(targetTimeRange)
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_ACTIVE_SCHEDULE) {
-                    val command = HomeworksWorkCommand.LoadActiveSchedule(currentDate)
+                    val command = HomeworksDetailsWorkCommand.LoadActiveSchedule(currentDate)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is HomeworksEvent.ScheduleGoal -> with(event) {
+                launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
+                    val command = HomeworksDetailsWorkCommand.ScheduleGoal(goalCreateModel)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is HomeworksEvent.DeleteGoal -> with(event) {
+                launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
+                    val command = HomeworksDetailsWorkCommand.DeleteGoal(goal)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is HomeworksEvent.ShareHomeworks -> with(event) {
+                launchBackgroundWork(BackgroundKey.SHARE_HOMEWORK) {
+                    val command = HomeworksDetailsWorkCommand.ShareHomeworks(sentMediatedHomeworks)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -92,7 +110,7 @@ internal class HomeworksScreenModel(
                 )
                 sendAction(HomeworksAction.UpdateDates(currentDate, targetTimeRange))
                 launchBackgroundWork(BackgroundKey.LOAD_HOMEWORKS) {
-                    val command = HomeworksWorkCommand.LoadHomeworks(targetTimeRange)
+                    val command = HomeworksDetailsWorkCommand.LoadHomeworks(targetTimeRange)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -105,7 +123,7 @@ internal class HomeworksScreenModel(
                 )
                 sendAction(HomeworksAction.UpdateDates(currentDate, targetTimeRange))
                 launchBackgroundWork(BackgroundKey.LOAD_HOMEWORKS) {
-                    val command = HomeworksWorkCommand.LoadHomeworks(targetTimeRange)
+                    val command = HomeworksDetailsWorkCommand.LoadHomeworks(targetTimeRange)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -118,7 +136,7 @@ internal class HomeworksScreenModel(
                 )
                 sendAction(HomeworksAction.UpdateDates(currentDate, targetTimeRange))
                 launchBackgroundWork(BackgroundKey.LOAD_HOMEWORKS) {
-                    val command = HomeworksWorkCommand.LoadHomeworks(targetTimeRange)
+                    val command = HomeworksDetailsWorkCommand.LoadHomeworks(targetTimeRange)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -126,7 +144,7 @@ internal class HomeworksScreenModel(
                 val currentTime = dateManager.fetchCurrentInstant()
                 val updatedHomework = homework.copy(isDone = true, completeDate = currentTime)
                 launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
-                    val command = HomeworksWorkCommand.UpdateHomework(updatedHomework)
+                    val command = HomeworksDetailsWorkCommand.UpdateHomework(updatedHomework)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -134,14 +152,14 @@ internal class HomeworksScreenModel(
                 val currentTime = dateManager.fetchCurrentInstant()
                 val updatedHomework = homework.copy(isDone = false, completeDate = currentTime)
                 launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
-                    val command = HomeworksWorkCommand.UpdateHomework(updatedHomework)
+                    val command = HomeworksDetailsWorkCommand.UpdateHomework(updatedHomework)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
             is HomeworksEvent.RepeatHomework -> with(event) {
                 val updatedHomework = homework.copy(isDone = false, completeDate = null)
                 launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
-                    val command = HomeworksWorkCommand.UpdateHomework(updatedHomework)
+                    val command = HomeworksDetailsWorkCommand.UpdateHomework(updatedHomework)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -151,6 +169,16 @@ internal class HomeworksScreenModel(
                     date = homework.deadline.startThisDay().toEpochMilliseconds(),
                     subjectId = homework.subject?.uid,
                     organizationId = homework.organization.uid,
+                )
+                val screen = screenProvider.provideEditorScreen(featureScreen)
+                sendEffect(HomeworksEffect.NavigateToGlobal(screen))
+            }
+            is HomeworksEvent.NavigateToHomeworkCreator -> with(event) {
+                val featureScreen = EditorScreen.Homework(
+                    homeworkId = null,
+                    date = date.startThisDay().toEpochMilliseconds(),
+                    subjectId = null,
+                    organizationId = null,
                 )
                 val screen = screenProvider.provideEditorScreen(featureScreen)
                 sendEffect(HomeworksEffect.NavigateToGlobal(screen))
@@ -210,7 +238,7 @@ internal class HomeworksScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_HOMEWORKS, LOAD_ACTIVE_SCHEDULE, HOMEWORK_ACTION,
+        LOAD_HOMEWORKS, LOAD_FRIENDS, LOAD_ACTIVE_SCHEDULE, HOMEWORK_ACTION, GOAL_ACTION, SHARE_HOMEWORK
     }
 }
 

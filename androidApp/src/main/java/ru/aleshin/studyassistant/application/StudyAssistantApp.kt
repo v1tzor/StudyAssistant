@@ -7,6 +7,10 @@ import android.net.TrafficStats
 import android.os.Build
 import android.os.StrictMode
 import androidx.annotation.RequiresApi
+import com.github.panpf.sketch.PlatformContext
+import com.github.panpf.sketch.SingletonSketch
+import com.github.panpf.sketch.Sketch
+import com.github.panpf.sketch.fetch.supportKtorHttpUri
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationDefaults
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationImportance
@@ -14,7 +18,7 @@ import ru.aleshin.studyassistant.core.common.notifications.parameters.Notificati
 /**
  * @author Stanislav Aleshin on 13.04.2024.
  */
-class StudyAssistantApp : BaseFlavorApplication() {
+class StudyAssistantApp : BaseFlavorApplication(), SingletonSketch.Factory {
 
     private val notificationManager: NotificationManager
         get() = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -29,6 +33,14 @@ class StudyAssistantApp : BaseFlavorApplication() {
                 defaults = NotificationDefaults()
             )
         }
+    }
+
+    override fun createSketch(context: PlatformContext): Sketch {
+        return Sketch.Builder(context).apply {
+            addComponents {
+                supportKtorHttpUri()
+            }
+        }.build()
     }
 
     private fun setupStrictMode() {

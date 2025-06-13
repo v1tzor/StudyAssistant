@@ -33,8 +33,8 @@ data class Goal(
     val number: Int = 0,
     val targetDate: Instant,
     val desiredTime: Millis?,
-    val time: GoalTime,
-    val completeAfterTimeElapsed: Boolean = false,
+    val time: GoalTime = GoalTime.None,
+    val completeAfterTimeElapsed: Boolean = true,
     val isDone: Boolean = false,
-    val completeDate: Instant?,
+    val completeDate: Instant? = null,
 )

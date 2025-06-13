@@ -72,6 +72,7 @@ import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.domain.entities.tasks.DailyHomeworksStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
@@ -120,7 +121,7 @@ internal fun DailyHomeworksView(
         DailyHomeworksViewHeader(
             targetDate = date,
             currentDate = currentDate,
-            totalHomeworks = remember(homeworks) { homeworks.count() },
+            totalHomeworks = remember(homeworks) { homeworks.map { it.value }.extractAllItem().count() },
             completedHomeworks = remember(homeworks) {
                 homeworks[HomeworkStatus.COMPLETE]?.size ?: 0
             },
@@ -134,6 +135,7 @@ internal fun DailyHomeworksView(
                 if (completedHomeworks.isNotEmpty()) {
                     items(completedHomeworks, key = { it.uid }) { homework ->
                         ShortHomeworkViewItem(
+                            modifier = Modifier.animateItem(),
                             status = homework.status,
                             subject = homework.subject,
                             theoreticalTasks = homework.theoreticalTasks.components,
@@ -153,6 +155,7 @@ internal fun DailyHomeworksView(
                 if (runningHomeworks.isNotEmpty()) {
                     items(runningHomeworks, key = { it.uid }) { homework ->
                         ShortHomeworkViewItem(
+                            modifier = Modifier.animateItem(),
                             status = homework.status,
                             subject = homework.subject,
                             theoreticalTasks = homework.theoreticalTasks.components,
@@ -172,6 +175,7 @@ internal fun DailyHomeworksView(
                 if (errorHomeworks.isNotEmpty()) {
                     items(errorHomeworks, key = { it.uid }) { homework ->
                         ShortHomeworkViewItem(
+                            modifier = Modifier.animateItem(),
                             status = homework.status,
                             subject = homework.subject,
                             theoreticalTasks = homework.theoreticalTasks.components,
@@ -200,24 +204,27 @@ internal fun DailyHomeworksView(
                 }
             }
         }
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth().height(32.dp),
-            contentPadding = PaddingValues(start = 12.dp, end = 8.dp, top = 7.dp, bottom = 7.dp),
-            onClick = onShareHomeworks,
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
+        if (homeworks.isNotEmpty()) {
+            OutlinedButton(
+                onClick = onShareHomeworks,
+                modifier = Modifier.fillMaxWidth().height(32.dp),
+                contentPadding = PaddingValues(start = 12.dp, end = 8.dp, top = 7.dp, bottom = 7.dp),
+                shape = MaterialTheme.shapes.medium,
             ) {
-                Text(
-                    text = TasksThemeRes.strings.shareHomeworksButtonTitle,
-                    style = MaterialTheme.typography.labelMedium,
-                )
-                Icon(
-                    modifier = Modifier.size(18.dp),
-                    imageVector = Icons.Default.Share,
-                    contentDescription = null,
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = TasksThemeRes.strings.shareHomeworksButtonTitle,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                    Icon(
+                        modifier = Modifier.size(18.dp),
+                        imageVector = Icons.Default.Share,
+                        contentDescription = null,
+                    )
+                }
             }
         }
     }

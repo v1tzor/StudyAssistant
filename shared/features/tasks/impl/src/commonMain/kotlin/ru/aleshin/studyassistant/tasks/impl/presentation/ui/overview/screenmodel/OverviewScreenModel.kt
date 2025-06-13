@@ -30,20 +30,29 @@ import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen.Homework
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen.Todo
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen
+import ru.aleshin.studyassistant.tasks.api.navigation.TasksScreen.Homeworks
 import ru.aleshin.studyassistant.tasks.impl.di.holder.TasksFeatureDIHolder
 import ru.aleshin.studyassistant.tasks.impl.navigation.TasksScreenProvider
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewAction
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewAction.UpdateCurrentDate
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEffect
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEffect.NavigateToGlobal
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEffect.NavigateToLocal
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEvent
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewViewState
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.GoalWorkCommand.LoadGoals
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.TodoWorkCommand.LoadTodos
 
 /**
  * @author Stanislav Aleshin on 27.06.2024
  */
 internal class OverviewScreenModel(
-    private val workProcessor: OverviewWorkProcessor,
+    private val todoWorkProcessor: TodoWorkProcessor,
+    private val goalWorkProcessor: GoalWorkProcessor,
+    private val homeworksWorkProcessor: HomeworksWorkProcessor,
     private val screenProvider: TasksScreenProvider,
     private val dateManager: DateManager,
     stateCommunicator: OverviewStateCommunicator,
@@ -68,92 +77,136 @@ internal class OverviewScreenModel(
         when (event) {
             is OverviewEvent.Init -> {
                 val currentDate = dateManager.fetchBeginningCurrentInstant()
-                sendAction(OverviewAction.UpdateCurrentDate(currentDate))
+                sendAction(UpdateCurrentDate(currentDate))
                 launchBackgroundWork(BackgroundKey.LOAD_HOMEWORKS) {
-                    val command = OverviewWorkCommand.LoadHomeworks(currentDate)
-                    workProcessor.work(command).collectAndHandleWork()
+                    val command = HomeworksWorkCommand.LoadHomeworks(currentDate)
+                    homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
-                launchBackgroundWork(BackgroundKey.LOAD_ERRORS) {
-                    val command = OverviewWorkCommand.LoadHomeworkErrors(currentDate)
-                    workProcessor.work(command).collectAndHandleWork()
+                launchBackgroundWork(BackgroundKey.LOAD_PROGRESS) {
+                    val command = HomeworksWorkCommand.LoadHomeworksProgress(currentDate)
+                    homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_TASKS) {
-                    val command = OverviewWorkCommand.LoadTodos(currentDate)
-                    workProcessor.work(command).collectAndHandleWork()
+                    val command = LoadTodos(currentDate)
+                    todoWorkProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_GOALS) {
-                    val command = OverviewWorkCommand.LoadGoals(currentDate)
-                    workProcessor.work(command).collectAndHandleWork()
+                    val command = LoadGoals(currentDate)
+                    goalWorkProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_ACTIVE_SCHEDULE) {
-                    val command = OverviewWorkCommand.LoadActiveSchedule(currentDate)
-                    workProcessor.work(command).collectAndHandleWork()
+                    val command = HomeworksWorkCommand.LoadActiveSchedule(currentDate)
+                    homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_SHARE) {
-                    val command = OverviewWorkCommand.LoadSharedHomeworks
-                    workProcessor.work(command).collectAndHandleWork()
+                    val command = HomeworksWorkCommand.LoadSharedHomeworks
+                    homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
             is OverviewEvent.DoHomework -> with(event) {
-                val currentTime = dateManager.fetchCurrentInstant()
-                val updatedHomework = homework.copy(isDone = true, completeDate = currentTime)
                 launchBackgroundWork(BackgroundKey.TASK_ACTION) {
-                    val command = OverviewWorkCommand.UpdateHomework(updatedHomework)
-                    workProcessor.work(command).collectAndHandleWork()
+                    val command = HomeworksWorkCommand.DoHomework(homework)
+                    homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
             is OverviewEvent.SkipHomework -> with(event) {
-                val currentTime = dateManager.fetchCurrentInstant()
-                val updatedHomework = homework.copy(isDone = false, completeDate = currentTime)
                 launchBackgroundWork(BackgroundKey.TASK_ACTION) {
-                    val command = OverviewWorkCommand.UpdateHomework(updatedHomework)
-                    workProcessor.work(command).collectAndHandleWork()
+                    val command = HomeworksWorkCommand.SkipHomework(homework)
+                    homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
             is OverviewEvent.RepeatHomework -> with(event) {
-                val updatedHomework = homework.copy(isDone = false, completeDate = null)
                 launchBackgroundWork(BackgroundKey.TASK_ACTION) {
-                    val command = OverviewWorkCommand.UpdateHomework(updatedHomework)
-                    workProcessor.work(command).collectAndHandleWork()
+                    val command = HomeworksWorkCommand.RepeatHomework(homework)
+                    homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
             is OverviewEvent.SelectedGoalsDate -> with(event) {
                 launchBackgroundWork(BackgroundKey.LOAD_GOALS) {
-                    val command = OverviewWorkCommand.LoadGoals(date)
-                    workProcessor.work(command).collectAndHandleWork()
+                    val command = LoadGoals(date)
+                    goalWorkProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.SetNewGoalNumbers -> with(event) {
+                launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
+                    val command = GoalWorkCommand.SetNewGoalNumbers(goals)
+                    goalWorkProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.CompleteGoal -> with(event) {
+                launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
+                    val command = GoalWorkCommand.CompleteGoal(state().dailyGoals, goal)
+                    goalWorkProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.DeleteGoal -> with(event) {
+                launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
+                    val command = GoalWorkCommand.DeleteGoal(goal)
+                    goalWorkProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.ChangeGoalDesiredTime -> with(event) {
+                launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
+                    val command = GoalWorkCommand.ChangeGoalDesiredTime(goal, time)
+                    goalWorkProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.ChangeGoalTimeType -> with(event) {
+                launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
+                    val command = GoalWorkCommand.ChangeGoalTimeType(goal, type)
+                    goalWorkProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.PauseGoalTime -> with(event) {
+                launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
+                    val command = GoalWorkCommand.PauseGoalTime(goal)
+                    goalWorkProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.ResetGoalTime -> with(event) {
+                launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
+                    val command = GoalWorkCommand.ResetGoalTime(goal)
+                    goalWorkProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.StartGoalTime -> with(event) {
+                launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
+                    val command = GoalWorkCommand.StartGoalTime(goal)
+                    goalWorkProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is OverviewEvent.ScheduleGoal -> with(event) {
+                launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
+                    val command = GoalWorkCommand.ScheduleGoal(createModel)
+                    goalWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
             is OverviewEvent.UpdateTodoDone -> with(event) {
-                val currentTime = dateManager.fetchCurrentInstant()
-                val updatedTodo = todo.copy(
-                    isDone = isDone,
-                    completeDate = if (isDone) currentTime else null,
-                )
                 launchBackgroundWork(BackgroundKey.TASK_ACTION) {
-                    val command = OverviewWorkCommand.UpdateTodo(updatedTodo)
-                    workProcessor.work(command).collectAndHandleWork()
+                    val command = TodoWorkCommand.UpdateTodoDone(todo)
+                    todoWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
             is OverviewEvent.ShareHomeworks -> with(event) {
                 launchBackgroundWork(BackgroundKey.TASK_ACTION) {
-                    val command = OverviewWorkCommand.ShareHomeworks(sentMediatedHomeworks)
-                    workProcessor.work(command).collectAndHandleWork()
+                    val command = HomeworksWorkCommand.ShareHomeworks(sentMediatedHomeworks)
+                    homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
             is OverviewEvent.NavigateToHomeworkEditor -> with(event) {
-                val featureScreen = EditorScreen.Homework(
+                val featureScreen = Homework(
                     homeworkId = homework.uid,
                     date = homework.deadline.startThisDay().toEpochMilliseconds(),
                     subjectId = homework.subject?.uid,
                     organizationId = homework.organization.uid,
                 )
                 val screen = screenProvider.provideEditorScreen(featureScreen)
-                sendEffect(OverviewEffect.NavigateToGlobal(screen))
+                sendEffect(NavigateToGlobal(screen))
             }
             is OverviewEvent.NavigateToTodoEditor -> with(event) {
-                val featureScreen = EditorScreen.Todo(todoId = todo?.uid)
+                val featureScreen = Todo(todoId = todo?.uid)
                 val screen = screenProvider.provideEditorScreen(featureScreen)
-                sendEffect(OverviewEffect.NavigateToGlobal(screen))
+                sendEffect(NavigateToGlobal(screen))
             }
             is OverviewEvent.AddHomeworkInEditor -> with(state()) {
                 val currentTime = dateManager.fetchCurrentInstant()
@@ -174,30 +227,30 @@ internal class OverviewScreenModel(
                 } else {
                     null
                 }
-                val featureScreen = EditorScreen.Homework(
+                val featureScreen = Homework(
                     homeworkId = null,
                     date = null,
                     subjectId = activeClass?.subject?.uid,
                     organizationId = activeClass?.organization?.uid,
                 )
                 val screen = screenProvider.provideEditorScreen(featureScreen)
-                sendEffect(OverviewEffect.NavigateToGlobal(screen))
+                sendEffect(NavigateToGlobal(screen))
             }
             is OverviewEvent.NavigateToHomeworks -> with(event) {
-                val featureScreen = TasksScreen.Homeworks(
+                val featureScreen = Homeworks(
                     targetDate = homework?.deadline?.startThisDay()?.toEpochMilliseconds(),
                 )
                 val screen = screenProvider.provideFeatureScreen(featureScreen)
-                sendEffect(OverviewEffect.NavigateToLocal(screen))
+                sendEffect(NavigateToLocal(screen))
             }
             is OverviewEvent.NavigateToShare -> {
                 val featureScreen = TasksScreen.Share
                 val screen = screenProvider.provideFeatureScreen(featureScreen)
-                sendEffect(OverviewEffect.NavigateToLocal(screen))
+                sendEffect(NavigateToLocal(screen))
             }
             is OverviewEvent.NavigateToTodos -> {
                 val screen = screenProvider.provideFeatureScreen(TasksScreen.Todos)
-                sendEffect(OverviewEffect.NavigateToLocal(screen))
+                sendEffect(NavigateToLocal(screen))
             }
         }
     }
@@ -212,7 +265,7 @@ internal class OverviewScreenModel(
             isLoadingHomeworks = false,
         )
         is OverviewAction.UpdateTodos -> currentState.copy(
-            todos = action.todos,
+            groupedTodos = action.groupedTodos,
             isLoadingTasks = false,
         )
         is OverviewAction.UpdateGoals -> currentState.copy(
@@ -221,10 +274,9 @@ internal class OverviewScreenModel(
             goalsProgress = action.goalsProgress,
             isLoadingGoals = false,
         )
-        is OverviewAction.UpdateTaskErrors -> currentState.copy(
-            homeworkErrors = action.homeworkErrors,
-            todoErrors = action.todoErrors,
-            isLoadingErrors = false,
+        is OverviewAction.UpdateHomeworksProgress -> currentState.copy(
+            homeworksProgress = action.homeworkProgress,
+            isLoadingHomeworksProgress = false,
         )
         is OverviewAction.UpdateSharedHomeworks -> currentState.copy(
             sharedHomeworks = action.homeworks,
@@ -240,8 +292,8 @@ internal class OverviewScreenModel(
         is OverviewAction.UpdateHomeworksLoading -> currentState.copy(
             isLoadingHomeworks = action.isLoading,
         )
-        is OverviewAction.UpdateErrorsLoading -> currentState.copy(
-            isLoadingErrors = action.isLoading,
+        is OverviewAction.UpdateHomeworksProgressLoading -> currentState.copy(
+            isLoadingHomeworksProgress = action.isLoading,
         )
         is OverviewAction.UpdateTasksLoading -> currentState.copy(
             isLoadingTasks = action.isLoading,
@@ -255,7 +307,14 @@ internal class OverviewScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_HOMEWORKS, LOAD_ACTIVE_SCHEDULE, LOAD_GOALS, LOAD_ERRORS, LOAD_TASKS, LOAD_SHARE, TASK_ACTION,
+        LOAD_HOMEWORKS,
+        LOAD_ACTIVE_SCHEDULE,
+        LOAD_GOALS,
+        LOAD_SHARE,
+        LOAD_PROGRESS,
+        LOAD_TASKS,
+        GOAL_ACTION,
+        TASK_ACTION,
     }
 }
 

@@ -49,6 +49,21 @@ fun DateTimeComponents.Formats.shortDayMonthFormat() = DateTimeComponents.Format
 }
 
 /**
+ * Example output: 31.01 - 14:10
+ *
+ * @author Stanislav Aleshin on 20.07.2024.
+ */
+fun DateTimeComponents.Formats.shortDayMonthTimeFormat() = DateTimeComponents.Format {
+    dayOfMonth()
+    char('.')
+    monthNumber()
+    chars(" - ")
+    hour()
+    char(':')
+    minute()
+}
+
+/**
  * Example output: 31.01.2024
  *
  * @author Stanislav Aleshin on 20.07.2024.

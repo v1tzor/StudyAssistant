@@ -138,7 +138,10 @@ private fun HomeworksOverviewHeader(
             modifier = Modifier.height(32.dp),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            Text(text = TasksThemeRes.strings.showAllHomeworksTitle)
+            Text(
+                text = TasksThemeRes.strings.showAllTitle,
+                style = MaterialTheme.typography.labelMedium,
+            )
         }
     }
 }

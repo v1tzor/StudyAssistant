@@ -34,6 +34,7 @@ import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
 import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData.GOAL_CONTENT_ID
 import ru.aleshin.studyassistant.core.remote.mappers.goals.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.tasks.mapToDetails
@@ -53,7 +54,10 @@ interface DailyGoalsRemoteDataSource {
     suspend fun addOrUpdateGoal(goal: GoalPojo, targetUser: UID): UID
     suspend fun addDailyDailyGoals(dailyGoals: List<GoalPojo>, targetUser: UID)
     suspend fun fetchGoalById(uid: UID, targetUser: UID): Flow<GoalDetailsPojo?>
+    suspend fun fetchGoalByContentId(contentId: UID, targetUser: UID): Flow<GoalDetailsPojo?>
     suspend fun fetchDailyGoalsByTimeRange(from: Long, to: Long, targetUser: UID): Flow<List<GoalDetailsPojo>>
+    suspend fun fetchShortDailyGoalsByTimeRange(from: Long, to: Long, targetUser: UID): Flow<List<GoalPojo>>
+    suspend fun fetchShortActiveDailyGoals(targetUser: UID): Flow<List<GoalPojo>>
     suspend fun fetchOverdueDailyGoals(currentDate: Long, targetUser: UID): Flow<List<GoalDetailsPojo>>
     suspend fun fetchDailyGoalsByDate(date: Long, targetUser: UID): Flow<List<GoalDetailsPojo>>
     suspend fun deleteGoal(uid: UID, targetUser: UID)
@@ -100,6 +104,19 @@ interface DailyGoalsRemoteDataSource {
             return reference.snapshotFlowGet<GoalPojo>().flatMapToDetails(userDataRoot)
         }
 
+        override suspend fun fetchGoalByContentId(contentId: UID, targetUser: UID): Flow<GoalDetailsPojo?> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val goal = userDataRoot.collection(UserData.GOALS)
+                .where { GOAL_CONTENT_ID equalTo contentId }
+                .snapshotListFlowGet<GoalPojo>()
+                .flatMapListToDetails(userDataRoot)
+                .map { it.getOrNull(0) }
+
+            return goal
+        }
+
         override suspend fun fetchDailyGoalsByTimeRange(
             from: Long,
             to: Long,
@@ -117,6 +134,40 @@ interface DailyGoalsRemoteDataSource {
                 .orderBy(UserData.GOAL_TARGET_DATA, Direction.DESCENDING)
                 .snapshotListFlowGet<GoalPojo>()
                 .flatMapListToDetails(userDataRoot)
+
+            return goalsFlow
+        }
+
+        override suspend fun fetchShortDailyGoalsByTimeRange(
+            from: Long,
+            to: Long,
+            targetUser: UID
+        ): Flow<List<GoalPojo>> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val goalsFlow = userDataRoot.collection(UserData.GOALS)
+                .where {
+                    val fromDateFilter = UserData.GOAL_TARGET_DATA greaterThanOrEqualTo from
+                    val toDateFilter = UserData.GOAL_TARGET_DATA lessThanOrEqualTo to
+                    return@where fromDateFilter and toDateFilter
+                }
+                .orderBy(UserData.GOAL_TARGET_DATA, Direction.DESCENDING)
+                .snapshotListFlowGet<GoalPojo>()
+
+            return goalsFlow
+        }
+
+        override suspend fun fetchShortActiveDailyGoals(targetUser: UID): Flow<List<GoalPojo>> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val goalsFlow = userDataRoot.collection(UserData.GOALS)
+                .where {
+                    (UserData.GOAL_DONE equalTo false) and (UserData.GOAL_COMPLETE_DATE equalTo null)
+                }
+                .orderBy(UserData.GOAL_TARGET_DATA, Direction.DESCENDING)
+                .snapshotListFlowGet<GoalPojo>()
 
             return goalsFlow
         }
@@ -188,8 +239,10 @@ interface DailyGoalsRemoteDataSource {
                 val toDeadline = goals.maxOf { it.contentDeadline ?: Long.MAX_VALUE }
                 val todosMapFlow = userDataRoot.collection(UserData.TODOS)
                     .where {
-                        ((UserData.TODO_DEADLINE greaterThanOrEqualTo fromDeadline) and
-                                (UserData.TODO_DEADLINE lessThanOrEqualTo toDeadline)) or
+                        (
+                            (UserData.TODO_DEADLINE greaterThanOrEqualTo fromDeadline) and
+                                (UserData.TODO_DEADLINE lessThanOrEqualTo toDeadline)
+                            ) or
                             (UserData.TODO_DEADLINE equalTo null)
                     }
                     .orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)

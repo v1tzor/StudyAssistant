@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.goals.Goal
+import ru.aleshin.studyassistant.core.domain.entities.goals.GoalShort
 
 /**
  * @author Stanislav Aleshin on 18.04.2025.
@@ -30,7 +31,10 @@ interface DailyGoalsRepository {
     suspend fun addOrUpdateGoal(goal: Goal, targetUser: UID): UID
     suspend fun addDailyDailyGoals(dailyGoals: List<Goal>, targetUser: UID)
     suspend fun fetchGoalById(uid: UID, targetUser: UID): Flow<Goal?>
+    suspend fun fetchGoalByContentId(contentId: UID, targetUser: UID): Flow<Goal?>
     suspend fun fetchDailyGoalsByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Goal>>
+    suspend fun fetchShortDailyGoalsByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<GoalShort>>
+    suspend fun fetchShortActiveDailyGoals(targetUser: UID): Flow<List<GoalShort>>
     suspend fun fetchOverdueDailyGoals(currentDate: Instant, targetUser: UID): Flow<List<Goal>>
     suspend fun fetchDailyGoalsByDate(date: Instant, targetUser: UID): Flow<List<Goal>>
     suspend fun deleteGoal(uid: UID, targetUser: UID)

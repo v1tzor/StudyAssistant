@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.presentation.ui.main.screenmodel
 
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
@@ -87,7 +86,6 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                         is Either.Right -> checkEither.data
                     }
                 }
-                Logger.i("test") { "app user -> $appUser" }
                 val targetScreen = if (settings.isFirstStart) {
                     settingsInteractor.updateSettings(settings.copy(isFirstStart = false))
                     screenProvider.providePreviewScreen(PreviewScreen.Intro)

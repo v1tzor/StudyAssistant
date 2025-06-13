@@ -34,6 +34,7 @@ interface HomeworksRepository {
     suspend fun fetchOverdueHomeworks(currentDate: Instant, targetUser: UID): Flow<List<Homework>>
     suspend fun fetchActiveLinkedHomeworks(currentDate: Instant, targetUser: UID): Flow<List<Homework>>
     suspend fun fetchHomeworksByDate(date: Instant, targetUser: UID): Flow<List<Homework>>
+    suspend fun fetchCompletedHomeworksCount(targetUser: UID): Flow<Int>
     suspend fun deleteHomework(uid: UID, targetUser: UID)
     suspend fun deleteAllHomeworks(targetUser: UID)
     suspend fun transferData(direction: DataTransferDirection, targetUser: UID)

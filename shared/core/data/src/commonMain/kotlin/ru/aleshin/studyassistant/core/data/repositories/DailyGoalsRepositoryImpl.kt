@@ -31,6 +31,7 @@ import ru.aleshin.studyassistant.core.data.mappers.goals.mapToRemoteData
 import ru.aleshin.studyassistant.core.database.datasource.goals.DailyGoalsLocalDataSource
 import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.goals.Goal
+import ru.aleshin.studyassistant.core.domain.entities.goals.GoalShort
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.remote.datasources.goals.DailyGoalsRemoteDataSource
 
@@ -73,6 +74,16 @@ class DailyGoalsRepositoryImpl(
         }
     }
 
+    override suspend fun fetchGoalByContentId(contentId: UID, targetUser: UID): Flow<Goal?> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.fetchGoalByContentId(contentId, targetUser).map { goal -> goal?.mapToDomain() }
+        } else {
+            localDataSource.fetchGoalByContentId(contentId).map { goal -> goal?.mapToDomain() }
+        }
+    }
+
     override suspend fun fetchDailyGoalsByTimeRange(
         timeRange: TimeRange,
         targetUser: UID
@@ -87,6 +98,39 @@ class DailyGoalsRepositoryImpl(
             }
         } else {
             localDataSource.fetchDailyGoalsByTimeRange(from, to).map { goals ->
+                goals.map { it.mapToDomain() }
+            }
+        }
+    }
+
+    override suspend fun fetchShortDailyGoalsByTimeRange(
+        timeRange: TimeRange,
+        targetUser: UID
+    ): Flow<List<GoalShort>> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val from = timeRange.from.toEpochMilliseconds()
+        val to = timeRange.to.toEpochMilliseconds()
+
+        return if (isSubscriber) {
+            remoteDataSource.fetchShortDailyGoalsByTimeRange(from, to, targetUser).map { goals ->
+                goals.map { it.mapToDomain() }
+            }
+        } else {
+            localDataSource.fetchShortDailyGoalsByTimeRange(from, to).map { goals ->
+                goals.map { it.mapToDomain() }
+            }
+        }
+    }
+
+    override suspend fun fetchShortActiveDailyGoals(targetUser: UID): Flow<List<GoalShort>> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.fetchShortActiveDailyGoals(targetUser).map { goals ->
+                goals.map { it.mapToDomain() }
+            }
+        } else {
+            localDataSource.fetchShortActiveDailyGoals().map { goals ->
                 goals.map { it.mapToDomain() }
             }
         }

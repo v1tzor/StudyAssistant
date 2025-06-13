@@ -27,11 +27,15 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkR
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
-import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.tasks.impl.domain.interactors.GoalsInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.HomeworksInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ScheduleInteractor
+import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ShareHomeworksInteractor
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToBase
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksAction
@@ -40,19 +44,23 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.H
 /**
  * @author Stanislav Aleshin on 27.06.2024.
  */
-internal interface HomeworksWorkProcessor :
-    FlowWorkProcessor<HomeworksWorkCommand, HomeworksAction, HomeworksEffect> {
+internal interface HomeworksDetailsWorkProcessor :
+    FlowWorkProcessor<HomeworksDetailsWorkCommand, HomeworksAction, HomeworksEffect> {
 
     class Base(
         private val homeworksInteractor: HomeworksInteractor,
         private val scheduleInteractor: ScheduleInteractor,
-        private val dateManager: DateManager,
-    ) : HomeworksWorkProcessor {
+        private val shareInteractor: ShareHomeworksInteractor,
+        private val goalsInteractor: GoalsInteractor,
+    ) : HomeworksDetailsWorkProcessor {
 
-        override suspend fun work(command: HomeworksWorkCommand) = when (command) {
-            is HomeworksWorkCommand.LoadHomeworks -> loadHomeworksWork(command.timeRange)
-            is HomeworksWorkCommand.LoadActiveSchedule -> loadActiveScheduleWork(command.currentDate)
-            is HomeworksWorkCommand.UpdateHomework -> updateHomeworkWork(command.homework)
+        override suspend fun work(command: HomeworksDetailsWorkCommand) = when (command) {
+            is HomeworksDetailsWorkCommand.LoadHomeworks -> loadHomeworksWork(command.timeRange)
+            is HomeworksDetailsWorkCommand.LoadActiveSchedule -> loadActiveScheduleWork(command.currentDate)
+            is HomeworksDetailsWorkCommand.UpdateHomework -> updateHomeworkWork(command.homework)
+            is HomeworksDetailsWorkCommand.ShareHomeworks -> shareHomeworksWork(command.sentMediatedHomeworks)
+            is HomeworksDetailsWorkCommand.ScheduleGoal -> scheduleGoalWork(command.goalCreateModel)
+            is HomeworksDetailsWorkCommand.DeleteGoal -> deleteGoalWork(command.goal)
         }
 
         private fun loadHomeworksWork(timeRange: TimeRange) = flow<HomeworksWorkResult> {
@@ -81,13 +89,34 @@ internal interface HomeworksWorkProcessor :
                 onLeftAction = { emit(EffectResult(HomeworksEffect.ShowError(it))) },
             )
         }
+
+        private fun shareHomeworksWork(sentMediatedHomeworks: SentMediatedHomeworksDetailsUi) = flow {
+            shareInteractor.shareHomeworks(sentMediatedHomeworks.mapToDomain()).handle(
+                onLeftAction = { emit(EffectResult(HomeworksEffect.ShowError(it))) }
+            )
+        }
+
+        private fun scheduleGoalWork(goalCreateModel: GoalCreateModelUi) = flow {
+            goalsInteractor.addGoal(goalCreateModel.mapToDomain()).handle(
+                onLeftAction = { emit(EffectResult(HomeworksEffect.ShowError(it))) }
+            )
+        }
+
+        private fun deleteGoalWork(goal: GoalShortUi) = flow {
+            goalsInteractor.deleteGoal(goal.mapToDomain()).handle(
+                onLeftAction = { emit(EffectResult(HomeworksEffect.ShowError(it))) }
+            )
+        }
     }
 }
 
-internal sealed class HomeworksWorkCommand : WorkCommand {
-    data class LoadHomeworks(val timeRange: TimeRange) : HomeworksWorkCommand()
-    data class LoadActiveSchedule(val currentDate: Instant) : HomeworksWorkCommand()
-    data class UpdateHomework(val homework: HomeworkDetailsUi) : HomeworksWorkCommand()
+internal sealed class HomeworksDetailsWorkCommand : WorkCommand {
+    data class LoadHomeworks(val timeRange: TimeRange) : HomeworksDetailsWorkCommand()
+    data class LoadActiveSchedule(val currentDate: Instant) : HomeworksDetailsWorkCommand()
+    data class UpdateHomework(val homework: HomeworkDetailsUi) : HomeworksDetailsWorkCommand()
+    data class ShareHomeworks(val sentMediatedHomeworks: SentMediatedHomeworksDetailsUi) : HomeworksDetailsWorkCommand()
+    data class ScheduleGoal(val goalCreateModel: GoalCreateModelUi) : HomeworksDetailsWorkCommand()
+    data class DeleteGoal(val goal: GoalShortUi) : HomeworksDetailsWorkCommand()
 }
 
 internal typealias HomeworksWorkResult = WorkResult<HomeworksAction, HomeworksEffect>

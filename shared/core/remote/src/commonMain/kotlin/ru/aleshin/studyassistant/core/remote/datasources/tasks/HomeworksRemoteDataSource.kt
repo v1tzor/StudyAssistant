@@ -53,6 +53,7 @@ interface HomeworksRemoteDataSource {
     suspend fun fetchHomeworksByTimeRange(from: Long, to: Long, targetUser: UID): Flow<List<HomeworkDetailsPojo>>
     suspend fun fetchOverdueHomeworks(currentDate: Long, targetUser: UID): Flow<List<HomeworkDetailsPojo>>
     suspend fun fetchActiveLinkedHomeworks(currentDate: Long, targetUser: UID): Flow<List<HomeworkDetailsPojo>>
+    suspend fun fetchCompletedHomeworksCount(targetUser: UID): Flow<Int>
     suspend fun deleteHomework(uid: UID, targetUser: UID)
     suspend fun deleteAllHomework(targetUser: UID)
 
@@ -174,6 +175,23 @@ interface HomeworksRemoteDataSource {
             val reference = userDataRoot.collection(UserData.HOMEWORKS).document(uid)
 
             return reference.delete()
+        }
+
+        override suspend fun fetchCompletedHomeworksCount(targetUser: UID): Flow<Int> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val homeworksFlow = userDataRoot.collection(UserData.HOMEWORKS)
+                .where {
+                    val doneFilter = UserData.HOMEWORK_DONE equalTo true
+                    val completeDateFilter = UserData.HOMEWORK_COMPLETE_DATE notEqualTo null
+                    return@where doneFilter and completeDateFilter
+                }
+                .orderBy(UserData.HOMEWORK_DEADLINE, Direction.DESCENDING)
+                .snapshots
+                .map { snapshot -> snapshot.documents.size }
+
+            return homeworksFlow
         }
 
         override suspend fun deleteAllHomework(targetUser: UID) {

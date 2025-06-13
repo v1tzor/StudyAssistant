@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.tasks.impl.domain.entities
-
-import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
+package ru.aleshin.studyassistant.core.domain.entities.tasks
 
 /**
- * @author Stanislav Aleshin on 01.07.2024.
+ * @author Stanislav Aleshin on 12.06.2025.
  */
-internal data class TodoErrors(
-    val overdueTodos: List<Todo>,
+data class DetailsGroupedTodos(
+    val completedTodos: List<TodoDetails>,
+    val runningTodos: List<TodoDetails>,
+    val errorTodos: List<TodoDetails>,
 )

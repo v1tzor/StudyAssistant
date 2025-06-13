@@ -137,6 +137,16 @@ class HomeworksRepositoryImpl(
         }
     }
 
+    override suspend fun fetchCompletedHomeworksCount(targetUser: UID): Flow<Int> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+
+        return if (isSubscriber) {
+            remoteDataSource.fetchCompletedHomeworksCount(targetUser)
+        } else {
+            localDataSource.fetchCompletedHomeworksCount()
+        }
+    }
+
     override suspend fun deleteHomework(uid: UID, targetUser: UID) {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 

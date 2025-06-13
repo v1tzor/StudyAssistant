@@ -86,7 +86,7 @@ object Constants {
         const val LINK_EMPLOYEES = 5
         const val GOALS = 5
         const val EMPLOYEES_OR_SUBJECTS = 12
-        const val HOMEWORKS = 7
+        const val HOMEWORKS = 5
         const val USER_CONTACT_INFO = 4
         const val OVERVIEW_TODOS = 6
         const val TODOS = 15
@@ -94,6 +94,7 @@ object Constants {
         const val FULL_FRIEND_REQUESTS = 10
         const val FRIENDS = 10
         const val SOCIAL_NETWORKS = 4
+        const val SHARED_HOMEWORKS = 4
         const val SHARED_HOMEWORK_SUBJECTS = 4
     }
 

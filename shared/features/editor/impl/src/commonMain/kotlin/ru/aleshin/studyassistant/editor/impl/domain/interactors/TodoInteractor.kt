@@ -16,12 +16,14 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
+import kotlinx.coroutines.flow.first
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
 import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
@@ -39,6 +41,7 @@ internal interface TodoInteractor {
     class Base(
         private val todoRepository: TodoRepository,
         private val usersRepository: UsersRepository,
+        private val goalsRepository: DailyGoalsRepository,
         private val todoReminderManager: TodoReminderManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : TodoInteractor {
@@ -49,6 +52,10 @@ internal interface TodoInteractor {
         override suspend fun addOrUpdateTodo(todo: Todo) = eitherWrapper.wrap {
             todoRepository.addOrUpdateTodo(todo, targetUser).apply {
                 todoReminderManager.scheduleReminders(this, todo.name, todo.deadline, todo.notifications)
+                val linkedGoal = goalsRepository.fetchGoalByContentId(todo.uid, targetUser).first()
+                if (linkedGoal != null) {
+                    goalsRepository.addOrUpdateGoal(linkedGoal.copy(contentTodo = todo), targetUser)
+                }
             }
         }
 

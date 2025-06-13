@@ -23,8 +23,10 @@ import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.NullDurationParceler
 import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
 import kotlin.time.Duration
 
 /**
@@ -36,12 +38,26 @@ internal data class TodoDetailsUi(
     @TypeParceler<Instant?, NullInstantParceler>
     val deadline: Instant?,
     @TypeParceler<Duration?, NullDurationParceler>
-    val toDeadlineDuration: Duration?,
+    val deadlineTimeLeft: Millis?,
+    val progress: Float,
     val name: String,
+    val description: String?,
     val status: TodoStatus,
     val priority: TaskPriority,
     val notifications: TodoNotificationsUi = TodoNotificationsUi(),
+    val linkedGoal: GoalShortUi?,
     val isDone: Boolean = false,
     @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant? = null,
 ) : Parcelable
+
+internal fun TodoDetailsUi.convertToBase() = TodoUi(
+    uid = uid,
+    deadline = deadline,
+    name = name,
+    description = description,
+    priority = priority,
+    notifications = notifications,
+    isDone = isDone,
+    completeDate = completeDate,
+)

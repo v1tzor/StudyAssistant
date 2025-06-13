@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
 
@@ -45,6 +46,7 @@ internal data class HomeworkDetailsUi(
     val test: String? = null,
     val priority: TaskPriority = TaskPriority.STANDARD,
     val isDone: Boolean = false,
+    val linkedGoal: GoalShortUi?,
     val status: HomeworkStatus,
     @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant?,

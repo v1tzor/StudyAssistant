@@ -20,18 +20,16 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.DailyHomeworks
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkDetails
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkScope
-import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkTaskComponent
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkTasksDetails
-import ru.aleshin.studyassistant.tasks.impl.domain.entities.HomeworkErrors
+import ru.aleshin.studyassistant.tasks.impl.domain.entities.HomeworksCompleteProgress
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTaskComponentUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTasksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToDetails
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworksCompleteProgressUi
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
@@ -64,6 +62,7 @@ internal fun HomeworkDetails.mapToUi() = HomeworkDetailsUi(
     priority = priority,
     isDone = isDone,
     status = status,
+    linkedGoal = linkedGoal?.mapToUi(),
     completeDate = completeDate,
 )
 
@@ -87,11 +86,14 @@ internal fun DailyHomeworks.mapToUi() = DailyHomeworksUi(
     homeworks = homeworks.mapValues { entry -> entry.value.map { it.mapToUi() } },
 )
 
-internal fun HomeworkErrors.mapToUi() = HomeworkErrorsUi(
-    overdueTasks = overdueTasks.map { it.mapToUi().convertToDetails(HomeworkStatus.NOT_COMPLETE) },
-    detachedActiveTasks = detachedActiveTasks.map {
-        it.mapToUi().convertToDetails(HomeworkStatus.WAIT)
-    },
+internal fun HomeworksCompleteProgress.mapToUi() = HomeworksCompleteProgressUi(
+    comingHomeworksExecution = comingHomeworksExecution,
+    comingHomeworksProgress = comingHomeworksProgress,
+    weekHomeworksExecution = weekHomeworksExecution,
+    weekHomeworksProgress = weekHomeworksProgress,
+    overdueTasks = overdueTasks.map { it.mapToUi() },
+    detachedActiveTasks = detachedActiveTasks.map { it.mapToUi() },
+    completedHomeworksCount = completedHomeworksCount,
 )
 
 internal fun HomeworkTasksDetails.mapToUi() = HomeworkTasksDetailsUi(

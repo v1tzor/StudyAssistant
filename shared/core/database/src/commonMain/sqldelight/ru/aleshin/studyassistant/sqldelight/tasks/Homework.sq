@@ -35,6 +35,12 @@ FROM homeworkEntity
 WHERE deadline < ? AND is_done = 0 AND complete_date IS NULL
 ORDER BY deadline DESC;
 
+fetchCompletedHomeworksCount:
+SELECT COUNT(*)
+FROM homeworkEntity
+WHERE is_done = 1 AND complete_date IS NOT NULL
+ORDER BY deadline DESC;
+
 fetchHomeworkById:
 SELECT *
 FROM homeworkEntity

@@ -37,7 +37,6 @@ internal sealed class GoalTimeUi : Parcelable {
         val pastStopTime: Millis = 0,
         @TypeParceler<Instant, InstantParceler>
         val startTimePoint: Instant,
-        val leftTime: Millis,
         val isActive: Boolean = false,
     ) : GoalTimeUi() {
         override val type = GoalTime.Type.TIMER
@@ -47,7 +46,6 @@ internal sealed class GoalTimeUi : Parcelable {
         val pastStopTime: Millis = 0,
         @TypeParceler<Instant, InstantParceler>
         val startTimePoint: Instant,
-        val elapsedTime: Millis = 0,
         val isActive: Boolean = false,
     ) : GoalTimeUi() {
         override val type = GoalTime.Type.STOPWATCH

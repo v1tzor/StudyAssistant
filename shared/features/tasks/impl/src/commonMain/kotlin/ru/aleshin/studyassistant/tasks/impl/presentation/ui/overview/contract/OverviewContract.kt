@@ -27,18 +27,23 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.DailyGoalsProgressUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.ScheduleUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DetailsGroupedTodosUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworksCompleteProgressUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 
 /**
@@ -47,7 +52,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 @Parcelize
 internal data class OverviewViewState(
     val isLoadingHomeworks: Boolean = true,
-    val isLoadingErrors: Boolean = true,
+    val isLoadingHomeworksProgress: Boolean = true,
     val isLoadingTasks: Boolean = true,
     val isLoadingShare: Boolean = true,
     val isLoadingGoals: Boolean = true,
@@ -62,25 +67,33 @@ internal data class OverviewViewState(
     @TypeParceler<Instant, InstantParceler>
     val homeworks: Map<Instant, DailyHomeworksUi> = mapOf(),
     val friends: List<AppUserUi> = emptyList(),
-    val sharedHomeworks: SharedHomeworksUi? = null,
-    val todos: List<TodoDetailsUi> = emptyList(),
+    val sharedHomeworks: SharedHomeworksDetailsUi? = null,
+    val groupedTodos: DetailsGroupedTodosUi? = null,
     val homeworksScope: HomeworkScopeUi? = null,
-    val homeworkErrors: HomeworkErrorsUi? = null,
-    val todoErrors: TodoErrorsUi? = null,
+    val homeworksProgress: HomeworksCompleteProgressUi? = null,
 ) : BaseViewState
 
 internal sealed class OverviewEvent : BaseEvent {
     data object Init : OverviewEvent()
-    data class DoHomework(val homework: HomeworkDetailsUi) : OverviewEvent()
-    data class RepeatHomework(val homework: HomeworkDetailsUi) : OverviewEvent()
-    data class SkipHomework(val homework: HomeworkDetailsUi) : OverviewEvent()
+    data class DoHomework(val homework: HomeworkUi) : OverviewEvent()
+    data class RepeatHomework(val homework: HomeworkUi) : OverviewEvent()
+    data class SkipHomework(val homework: HomeworkUi) : OverviewEvent()
     data class UpdateTodoDone(val todo: TodoDetailsUi, val isDone: Boolean) : OverviewEvent()
     data class ShareHomeworks(val sentMediatedHomeworks: SentMediatedHomeworksDetailsUi) : OverviewEvent()
+    data class SetNewGoalNumbers(val goals: List<GoalDetailsUi>) : OverviewEvent()
     data class SelectedGoalsDate(val date: Instant) : OverviewEvent()
-    data class NavigateToHomeworkEditor(val homework: HomeworkDetailsUi) : OverviewEvent()
-    data class NavigateToTodoEditor(val todo: TodoDetailsUi?) : OverviewEvent()
+    data class CompleteGoal(val goal: GoalDetailsUi) : OverviewEvent()
+    data class DeleteGoal(val goal: GoalShortUi) : OverviewEvent()
+    data class StartGoalTime(val goal: GoalDetailsUi) : OverviewEvent()
+    data class PauseGoalTime(val goal: GoalDetailsUi) : OverviewEvent()
+    data class ResetGoalTime(val goal: GoalDetailsUi) : OverviewEvent()
+    data class ChangeGoalTimeType(val goal: GoalDetailsUi, val type: GoalTime.Type) : OverviewEvent()
+    data class ChangeGoalDesiredTime(val goal: GoalDetailsUi, val time: Millis?) : OverviewEvent()
+    data class ScheduleGoal(val createModel: GoalCreateModelUi) : OverviewEvent()
+    data class NavigateToHomeworkEditor(val homework: HomeworkUi) : OverviewEvent()
+    data class NavigateToTodoEditor(val todo: TodoUi?) : OverviewEvent()
     data object AddHomeworkInEditor : OverviewEvent()
-    data class NavigateToHomeworks(val homework: HomeworkDetailsUi?) : OverviewEvent()
+    data class NavigateToHomeworks(val homework: HomeworkUi?) : OverviewEvent()
     data object NavigateToShare : OverviewEvent()
     data object NavigateToTodos : OverviewEvent()
 }
@@ -97,26 +110,23 @@ internal sealed class OverviewAction : BaseAction {
         val homeworkScope: HomeworkScopeUi,
     ) : OverviewAction()
     data class UpdateTodos(
-        val todos: List<TodoDetailsUi>
+        val groupedTodos: DetailsGroupedTodosUi,
     ) : OverviewAction()
     data class UpdateGoals(
         val selectedGoalsDate: Instant,
         val dailyGoals: List<GoalDetailsUi>,
         val goalsProgress: Map<Instant, DailyGoalsProgressUi>,
     ) : OverviewAction()
-    data class UpdateTaskErrors(
-        val homeworkErrors: HomeworkErrorsUi?,
-        val todoErrors: TodoErrorsUi?,
-    ) : OverviewAction()
     data class UpdateSharedHomeworks(
-        val homeworks: SharedHomeworksUi,
+        val homeworks: SharedHomeworksDetailsUi,
         val friends: List<AppUserUi>,
     ) : OverviewAction()
 
+    data class UpdateHomeworksProgress(val homeworkProgress: HomeworksCompleteProgressUi?) : OverviewAction()
     data class UpdateActiveSchedule(val activeSchedule: ScheduleUi?) : OverviewAction()
     data class UpdateCurrentDate(val date: Instant) : OverviewAction()
     data class UpdateHomeworksLoading(val isLoading: Boolean) : OverviewAction()
-    data class UpdateErrorsLoading(val isLoading: Boolean) : OverviewAction()
+    data class UpdateHomeworksProgressLoading(val isLoading: Boolean) : OverviewAction()
     data class UpdateTasksLoading(val isLoading: Boolean) : OverviewAction()
     data class UpdateShareLoading(val isLoading: Boolean) : OverviewAction()
     data class UpdateGoalsLoading(val isLoading: Boolean) : OverviewAction()

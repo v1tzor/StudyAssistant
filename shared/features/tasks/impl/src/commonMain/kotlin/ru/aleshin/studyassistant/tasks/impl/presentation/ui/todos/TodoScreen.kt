@@ -21,9 +21,9 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -45,7 +45,6 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract.TodoE
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract.TodoViewState
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.rememberTodoScreenModel
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.views.TodoTopBar
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.views.TodoTopSheet
 
 /**
  * @author Stanislav Aleshin on 28.07.2024
@@ -76,15 +75,7 @@ internal class TodoScreen : Screen {
             topBar = {
                 Column {
                     TodoTopBar(
-                        onCurrentTimeRange = { dispatchEvent(TodoEvent.CurrentTimeRange) },
                         onBackClick = { dispatchEvent(TodoEvent.NavigateToBack) },
-                    )
-                    TodoTopSheet(
-                        isLoading = state.isLoading,
-                        selectedTimeRange = state.selectedTimeRange,
-                        progressList = state.todos.map { it.completeDate != null },
-                        onNextTimeRange = { dispatchEvent(TodoEvent.NextTimeRange) },
-                        onPreviousTimeRange = { dispatchEvent(TodoEvent.PreviousTimeRange) },
                     )
                 }
             },
@@ -92,7 +83,7 @@ internal class TodoScreen : Screen {
                 FloatingActionButton(
                     onClick = { dispatchEvent(TodoEvent.NavigateToTodoEditor(null)) },
                     shape = MaterialTheme.shapes.large,
-                    backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,

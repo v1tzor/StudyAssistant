@@ -114,6 +114,22 @@ class TodoRepositoryImpl(
         }
     }
 
+    override suspend fun fetchCompletedTodos(completeTimeRange: TimeRange?, targetUser: UID): Flow<List<Todo>> {
+        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val timeStart = completeTimeRange?.from?.toEpochMilliseconds()
+        val timeEnd = completeTimeRange?.to?.toEpochMilliseconds()
+
+        return if (isSubscriber) {
+            remoteDataSource.fetchCompletedTodos(timeStart, timeEnd, targetUser).map { todos ->
+                todos.map { todoPojo -> todoPojo.mapToDomain() }
+            }
+        } else {
+            localDataSource.fetchCompletedTodos(timeStart, timeEnd).map { todos ->
+                todos.map { todoEntity -> todoEntity.mapToDomain() }
+            }
+        }
+    }
+
     override suspend fun fetchOverdueTodos(
         currentDate: Instant,
         targetUser: UID

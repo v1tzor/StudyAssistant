@@ -219,8 +219,8 @@ interface OrganizationsRemoteDataSource {
                 ) { organizationsList, subjectsMap, employeesMap ->
                     organizationsList.map { organization ->
                         organization.mapToDetails(
-                            employee = checkNotNull(employeesMap[organization.uid]),
-                            subjects = checkNotNull(subjectsMap[organization.uid]).map { subject ->
+                            employee = employeesMap.getOrElse(organization.uid) { emptyList() },
+                            subjects = subjectsMap.getOrElse(organization.uid) { emptyList() }.map { subject ->
                                 val employee = employeesMap[organization.uid]?.find { it.uid == subject.teacherId }
                                 subject.mapToDetails(employee = employee)
                             },

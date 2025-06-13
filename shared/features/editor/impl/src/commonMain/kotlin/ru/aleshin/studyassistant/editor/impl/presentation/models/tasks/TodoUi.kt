@@ -33,6 +33,7 @@ internal data class TodoUi(
     @TypeParceler<Instant?, NullInstantParceler>
     val deadline: Instant?,
     val name: String,
+    val description: String?,
     val priority: TaskPriority,
     val notifications: TodoNotificationsUi = TodoNotificationsUi(),
     val isDone: Boolean = false,

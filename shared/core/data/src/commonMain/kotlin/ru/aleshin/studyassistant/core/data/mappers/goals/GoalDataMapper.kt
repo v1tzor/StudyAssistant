@@ -20,6 +20,7 @@ import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToDomain
 import ru.aleshin.studyassistant.core.database.models.goals.GoalEntityDetails
 import ru.aleshin.studyassistant.core.domain.entities.goals.Goal
+import ru.aleshin.studyassistant.core.domain.entities.goals.GoalShort
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalType
 import ru.aleshin.studyassistant.core.remote.models.goals.GoalDetailsPojo
@@ -56,6 +57,32 @@ fun GoalEntityDetails.mapToDomain() = Goal(
     completeDate = completeDate?.mapEpochTimeToInstant(),
 )
 
+fun GoalEntity.mapToDomain() = GoalShort(
+    uid = uid,
+    contentType = GoalType.valueOf(type),
+    contentId = content_id,
+    number = number.toInt(),
+    targetDate = target_date.mapEpochTimeToInstant(),
+    desiredTime = desired_time,
+    time = when (GoalTime.Type.valueOf(goal_time_type)) {
+        GoalTime.Type.TIMER -> GoalTime.Timer(
+            targetTime = checkNotNull(target_time),
+            pastStopTime = checkNotNull(past_stop_time),
+            startTimePoint = checkNotNull(start_time_point).mapEpochTimeToInstant(),
+            isActive = is_active == 1L,
+        )
+        GoalTime.Type.STOPWATCH -> GoalTime.Stopwatch(
+            pastStopTime = checkNotNull(past_stop_time),
+            startTimePoint = checkNotNull(start_time_point).mapEpochTimeToInstant(),
+            isActive = is_active == 1L,
+        )
+        GoalTime.Type.NONE -> GoalTime.None
+    },
+    completeAfterTimeElapsed = complete_after_time_elapsed == 1L,
+    isDone = is_done == 1L,
+    completeDate = complete_date?.mapEpochTimeToInstant(),
+)
+
 fun GoalDetailsPojo.mapToDomain() = Goal(
     uid = uid,
     contentType = GoalType.valueOf(contentType),
@@ -80,6 +107,32 @@ fun GoalDetailsPojo.mapToDomain() = Goal(
     },
     completeAfterTimeElapsed = completeAfterTimeElapsed,
     isDone = isDone,
+    completeDate = completeDate?.mapEpochTimeToInstant(),
+)
+
+fun GoalPojo.mapToDomain() = GoalShort(
+    uid = uid,
+    contentType = GoalType.valueOf(type),
+    contentId = contentId,
+    number = number,
+    targetDate = targetDate.mapEpochTimeToInstant(),
+    desiredTime = desiredTime,
+    time = when (GoalTime.Type.valueOf(goalTimeType)) {
+        GoalTime.Type.TIMER -> GoalTime.Timer(
+            targetTime = checkNotNull(targetTime),
+            pastStopTime = checkNotNull(pastStopTime),
+            startTimePoint = checkNotNull(startTimePoint).mapEpochTimeToInstant(),
+            isActive = active,
+        )
+        GoalTime.Type.STOPWATCH -> GoalTime.Stopwatch(
+            pastStopTime = checkNotNull(pastStopTime),
+            startTimePoint = checkNotNull(startTimePoint).mapEpochTimeToInstant(),
+            isActive = active,
+        )
+        GoalTime.Type.NONE -> GoalTime.None
+    },
+    completeAfterTimeElapsed = completeAfterTimeElapsed,
+    isDone = done,
     completeDate = completeDate?.mapEpochTimeToInstant(),
 )
 

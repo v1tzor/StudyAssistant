@@ -16,196 +16,169 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.daysUntil
-import kotlinx.datetime.format.DateTimeComponents
-import ru.aleshin.studyassistant.core.common.extensions.dateTime
-import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
-import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
-import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
+import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksViewState
-import kotlin.time.Duration.Companion.days
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.DailyHomeworksDetailsView
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.DailyHomeworksDetailsViewPlaceholder
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.ShareHomeworksBottomSheet
 
 /**
  * @author Stanislav Aleshin on 03.07.2024
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 internal fun HomeworksContent(
     state: HomeworksViewState,
     modifier: Modifier,
     targetDate: Instant,
     listState: LazyListState = rememberLazyListState(),
+    onAddHomework: (Instant) -> Unit,
     onEditHomework: (HomeworkDetailsUi) -> Unit,
     onDoHomework: (HomeworkDetailsUi) -> Unit,
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
     onRepeatHomework: (HomeworkDetailsUi) -> Unit,
+    onShareHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
+    onScheduleGoal: (GoalCreateModelUi) -> Unit,
+    onDeleteGoal: (GoalShortUi) -> Unit,
 ) = with(state) {
-//    var isShowTargetDay by rememberSaveable { mutableStateOf(true) }
-//    Crossfade(
-//        modifier = modifier,
-//        targetState = isLoading,
-//        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-//    ) { loading ->
-//        if (!loading) {
-//            LazyColumn(
-//                modifier = Modifier.fillMaxSize(),
-//                state = listState,
-//                verticalArrangement = Arrangement.spacedBy(12.dp),
-//            ) {
-//                homeworks.forEach { homeworksEntry ->
-//                    stickyHeader(key = homeworksEntry.key.toString()) {
-//                        HomeworkDateHeader(
-//                            modifier = Modifier.animateItem(),
-//                            currentDate = state.currentDate,
-//                            date = homeworksEntry.key,
-//                            progressList = homeworksEntry.value.map { it.completeDate != null },
-//                        )
-//                    }
-//                    if (homeworksEntry.value.isNotEmpty()) {
-//                        items(homeworksEntry.value, key = { it.uid }) { homework ->
-//                            HomeworksDetailsViewItem(
-//                                modifier = Modifier.padding(horizontal = 16.dp).animateItem(),
-//                                subject = homework.subject,
-//                                organization = homework.organization,
-//                                status = homework.status,
-//                                theoreticalTasks = homework.theoreticalTasks.components,
-//                                practicalTasks = homework.practicalTasks.components,
-//                                presentationTasks = homework.presentationTasks.components,
-//                                testTopic = homework.test,
-//                                priority = homework.priority,
-//                                completeDate = homework.completeDate,
-//                                onEdit = { onEditHomework(homework) },
-//                                onRepeat = { onRepeatHomework(homework) },
-//                                onSkip = { onSkipHomework(homework) },
-//                                onDone = { onDoHomework(homework) },
-//                            )
-//                        }
-//                    } else {
-//                        item {
-//                            HomeworksDetailsViewNoneItem(
-//                                modifier = Modifier.padding(horizontal = 16.dp).animateItem(),
-//                            )
-//                        }
-//                    }
-//                    if (homeworksEntry.key.endOfWeek().equalsDay(homeworksEntry.key)) {
-//                        item {
-//                            HorizontalDivider(modifier = Modifier.fillMaxWidth())
-//                        }
-//                    }
-//                }
-//            }
-//            LaunchedEffect(true) {
-//                if (isShowTargetDay && selectedTimeRange?.containsDate(targetDate) == true) {
-//                    val index = homeworks.toList().filter { it.first < targetDate }.sumOf {
-//                        val header = 1
-//                        val homeworks = it.second.size.takeIf { size -> size > 0 } ?: 1
-//                        val divider = if (it.first.endOfWeek().equalsDay(it.first)) 1 else 0
-//                        return@sumOf header + homeworks + divider
-//                    }
-//                    listState.animateScrollToItem(index)
-//                    isShowTargetDay = false
-//                }
-//            }
-//        } else {
-//            LazyColumn(
-//                modifier = Modifier.padding(top = 12.dp).fillMaxSize(),
-//                verticalArrangement = Arrangement.spacedBy(12.dp),
-//                userScrollEnabled = false,
-//            ) {
-//                item {
-//                    HomeworksDetailsViewPlaceholder(
-//                        modifier = Modifier.padding(horizontal = 16.dp),
-//                    )
-//                }
-//            }
-//        }
-//    }
+    var isShowedTargetDay by rememberSaveable { mutableStateOf(true) }
+    Crossfade(
+        modifier = modifier.padding(top = 12.dp),
+        targetState = isLoading,
+        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+    ) { loading ->
+        if (loading) {
+            LazyRow(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                userScrollEnabled = false,
+            ) {
+                items(Placeholder.HOMEWORKS) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        DailyHomeworksDetailsViewPlaceholder()
+                        DailyHomeworksDetailsVerticalDivider()
+                    }
+                }
+            }
+        } else {
+            val listState = rememberLazyListState()
+            val homeworksMapList = remember(homeworks) { homeworks.toList() }
+
+            LazyRow(
+                modifier = Modifier.fillMaxSize(),
+                state = listState,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                userScrollEnabled = true,
+            ) {
+                items(homeworksMapList, key = { it.first.toString() }) { homeworksEntry ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        var isShowSharedHomeworksSheet by remember { mutableStateOf(false) }
+                        DailyHomeworksDetailsView(
+                            date = homeworksEntry.first,
+                            currentDate = currentDate,
+                            isPassed = homeworksEntry.first < currentDate,
+                            dailyHomeworks = homeworksEntry.second,
+                            onAddHomework = onAddHomework,
+                            onDoHomework = onDoHomework,
+                            onOpenHomeworkTask = onEditHomework,
+                            onSkipHomework = onSkipHomework,
+                            onRepeatHomework = onRepeatHomework,
+                            onShareHomeworks = { isShowSharedHomeworksSheet = true },
+                            onScheduleGoal = onScheduleGoal,
+                            onDeleteGoal = onDeleteGoal,
+                        )
+
+                        DailyHomeworksDetailsVerticalDivider()
+
+                        if (isShowSharedHomeworksSheet) {
+                            ShareHomeworksBottomSheet(
+                                currentTime = Clock.System.now(),
+                                targetDate = homeworksEntry.first,
+                                homeworks = homeworksEntry.second.fetchAllHomeworks(),
+                                allFriends = friends,
+                                onDismissRequest = { isShowSharedHomeworksSheet = false },
+                                onConfirm = {
+                                    onShareHomeworks(it)
+                                    isShowSharedHomeworksSheet = false
+                                },
+                            )
+                        }
+                    }
+                }
+            }
+            LaunchedEffect(true) {
+                if (isShowedTargetDay) {
+                    val currentDateIndex = homeworksMapList.indexOfFirst {
+                        currentDate.equalsDay(it.first)
+                    }
+                    if (currentDateIndex != -1) {
+                        listState.animateScrollToItem(currentDateIndex)
+                        isShowedTargetDay = false
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
-private fun HomeworkDateHeader(
+private fun DailyHomeworksDetailsVerticalDivider(
     modifier: Modifier = Modifier,
-    currentDate: Instant,
-    date: Instant,
-    progressList: List<Boolean>,
+    headerHeight: Dp = 28.dp,
+    verticalArrangement: Dp = 12.dp,
+    thickness: Dp = 1.dp,
+    color: Color = MaterialTheme.colorScheme.outlineVariant,
 ) {
-    Row(
-        modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 16.dp)
-            .padding(top = 12.dp, bottom = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        val coreStrings = StudyAssistantRes.strings
-        val shortDateFormat = DateTimeComponents.Formats.dayMonthFormat(coreStrings)
-        val detailsDateFormat = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(coreStrings)
-        val daysDifference = currentDate.daysUntil(date, TimeZone.currentSystemDefault()).days.inWholeDays
-        Text(
-            text = when (daysDifference) {
-                0L -> coreStrings.todayTitle
-                1L -> coreStrings.tomorrowTitle
-                -1L -> coreStrings.yesterdayTitle
-                else -> date.dateTime().dayOfWeek.mapToSting(coreStrings)
-            },
-            color = MaterialTheme.colorScheme.primary,
-            maxLines = 1,
-            style = MaterialTheme.typography.titleMedium,
+    Canvas(modifier.fillMaxHeight().width(thickness)) {
+        drawLine(
+            color = color,
+            strokeWidth = thickness.toPx(),
+            start = Offset(thickness.toPx() / 2, 0f),
+            end = Offset(thickness.toPx() / 2, headerHeight.toPx()),
         )
-        Text(
-            text = if (daysDifference in -1..1) {
-                date.formatByTimeZone(detailsDateFormat)
-            } else {
-                date.formatByTimeZone(shortDateFormat)
-            },
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            style = MaterialTheme.typography.titleSmall,
+        drawLine(
+            color = color,
+            strokeWidth = thickness.toPx(),
+            start = Offset(thickness.toPx() / 2, headerHeight.toPx() + verticalArrangement.toPx()),
+            end = Offset(thickness.toPx() / 2, size.height),
+            pathEffect = PathEffect.dashPathEffect(floatArrayOf(8.dp.toPx(), 4.dp.toPx()))
         )
-        HorizontalDivider(
-            modifier = Modifier.weight(1f),
-            thickness = if (daysDifference == 0L) 2.dp else 1.dp,
-            color = if (daysDifference == 0L) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.outlineVariant
-            },
-        )
-        if (progressList.isNotEmpty()) {
-            val progress = progressList.count { it } / progressList.size.toFloat()
-            Text(
-                text = buildString {
-                    append(progressList.count { it }, "/", progressList.size)
-                },
-                color = if (progress == 1f) {
-                    StudyAssistantRes.colors.accents.green
-                } else if (date < currentDate) {
-                    StudyAssistantRes.colors.accents.red
-                } else {
-                    StudyAssistantRes.colors.accents.orange
-                },
-                maxLines = 1,
-                style = MaterialTheme.typography.titleSmall,
-            )
-        }
     }
 }

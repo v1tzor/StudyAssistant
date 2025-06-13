@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.tasks.impl.domain.entities
+package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
-import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 
 /**
- * @author Stanislav Aleshin on 27.06.2024.
+ * @author Stanislav Aleshin on 12.06.2025.
  */
-internal data class HomeworkErrors(
-    val overdueTasks: List<Homework>,
-    val detachedActiveTasks: List<Homework>,
-)
+@Parcelize
+internal data class DetailsGroupedTodosUi(
+    val completedTodos: List<TodoDetailsUi>,
+    val runningTodos: List<TodoDetailsUi>,
+    val errorTodos: List<TodoDetailsUi>,
+) : Parcelable

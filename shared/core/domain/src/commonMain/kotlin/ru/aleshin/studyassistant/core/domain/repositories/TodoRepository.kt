@@ -31,6 +31,7 @@ interface TodoRepository {
     suspend fun fetchTodoById(uid: UID, targetUser: UID): Flow<Todo?>
     suspend fun fetchTodosByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Todo>>
     suspend fun fetchActiveTodos(targetUser: UID): Flow<List<Todo>>
+    suspend fun fetchCompletedTodos(completeTimeRange: TimeRange? = null, targetUser: UID): Flow<List<Todo>>
     suspend fun fetchOverdueTodos(currentDate: Instant, targetUser: UID): Flow<List<Todo>>
     suspend fun fetchTodosByDate(date: Instant, targetUser: UID): Flow<List<Todo>>
     suspend fun deleteTodo(uid: UID, targetUser: UID)

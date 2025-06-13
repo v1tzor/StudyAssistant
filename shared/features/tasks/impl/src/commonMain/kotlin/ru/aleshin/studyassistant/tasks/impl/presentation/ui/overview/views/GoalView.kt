@@ -50,6 +50,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
@@ -71,9 +72,9 @@ import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
 import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalTimeUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalTimeDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 
 /**
@@ -89,7 +90,7 @@ internal fun GoalViewItem(
     onDelete: () -> Unit,
 ) {
     val density = LocalDensity.current
-    val dismissState = remember {
+    val dismissState = remember(goal) {
         SwipeToDismissBoxState(
             initialValue = Settled,
             density = density,
@@ -117,13 +118,13 @@ internal fun GoalViewItem(
             fontWeight = FontWeight.Bold,
         )
         Row(
-            modifier = modifier.weight(1f),
+            modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SwipeToDismissBox(
                 state = dismissState,
-                modifier = modifier.weight(1f).clipToBounds(),
+                modifier = Modifier.weight(1f).clipToBounds(),
                 backgroundContent = {
                     SwipeToDismissBackground(
                         dismissState = dismissState,
@@ -150,13 +151,13 @@ internal fun GoalViewItem(
                 when (goal.contentType) {
                     GoalType.HOMEWORK -> HomeworkGoalView(
                         onClick = onClick,
-                        homework = checkNotNull(goal.contentHomework),
+                        homework = goal.contentHomework,
                         time = goal.time,
                         isDone = goal.isDone,
                     )
                     GoalType.TODO -> TodoGoalView(
                         onClick = onClick,
-                        todo = checkNotNull(goal.contentTodo),
+                        todo = goal.contentTodo,
                         time = goal.time,
                         isDone = goal.isDone,
                     )
@@ -198,23 +199,22 @@ internal fun HomeworkGoalView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    homework: HomeworkUi,
-    time: GoalTimeUi,
+    homework: HomeworkUi?,
+    time: GoalTimeDetailsUi,
     isDone: Boolean,
 ) {
-    val subjectColor = homework.subject?.color?.let { Color(it) }
+    val subjectColor = homework?.subject?.color?.let { Color(it) }
     Surface(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow),
         enabled = enabled,
         shape = MaterialTheme.shapes.medium,
         color = subjectColor?.copy(alpha = 0.1f) ?: MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Row(
-            modifier = Modifier
-                .height(IntrinsicSize.Min)
-                .padding(end = 8.dp)
-                .background(MaterialTheme.colorScheme.surfaceContainerLow),
+            modifier = Modifier.height(IntrinsicSize.Min).padding(end = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Surface(
@@ -228,15 +228,15 @@ internal fun HomeworkGoalView(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
-                    text = homework.deadline.formatByTimeZone(
+                    text = homework?.deadline?.formatByTimeZone(
                         format = Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings)
-                    ),
+                    ) ?: StudyAssistantRes.strings.noneTitle,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     style = MaterialTheme.typography.labelSmall,
                 )
                 Text(
-                    text = homework.subject?.name ?: StudyAssistantRes.strings.noneTitle,
+                    text = homework?.subject?.name ?: StudyAssistantRes.strings.noneTitle,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -251,28 +251,26 @@ internal fun HomeworkGoalView(
     }
 }
 
-
 @Composable
 internal fun TodoGoalView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    todo: TodoDetailsUi,
-    time: GoalTimeUi,
+    todo: TodoUi?,
+    time: GoalTimeDetailsUi,
     isDone: Boolean,
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow),
         enabled = enabled,
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Row(
-            modifier = Modifier
-                .height(IntrinsicSize.Min)
-                .padding(end = 8.dp)
-                .background(MaterialTheme.colorScheme.surfaceContainerLow),
+            modifier = Modifier.height(IntrinsicSize.Min).padding(end = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
@@ -281,38 +279,43 @@ internal fun TodoGoalView(
             ) {
                 Column {
                     Text(
-                        text = todo.priority.mapToString(StudyAssistantRes.strings),
-                        color = when (todo.priority) {
+                        text = todo?.priority?.mapToString(StudyAssistantRes.strings) ?: StudyAssistantRes.strings.noneTitle,
+                        color = when (todo?.priority) {
                             STANDARD -> MaterialTheme.colorScheme.onSurfaceVariant
                             MEDIUM -> StudyAssistantRes.colors.accents.orange
                             HIGH -> StudyAssistantRes.colors.accents.red
+                            null -> MaterialTheme.colorScheme.onSurfaceVariant
                         },
                         maxLines = 1,
                         style = MaterialTheme.typography.labelMedium,
                     )
                     Text(
-                        text = todo.name,
+                        text = todo?.name ?: StudyAssistantRes.strings.noneTitle,
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.titleSmall,
                     )
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     val deadlineDateFormat = Formats.dayMonthFormat(StudyAssistantRes.strings)
                     Icon(
                         modifier = Modifier.size(18.dp),
-                        painter = painterResource(StudyAssistantRes.icons.tasksOutline),
+                        painter = painterResource(TasksThemeRes.icons.deadline),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
                         text = buildString {
                             append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
-                            append(todo.deadline?.formatByTimeZone(deadlineDateFormat))
+                            append(todo?.deadline?.formatByTimeZone(deadlineDateFormat) ?: TasksThemeRes.strings.noneDeadlineTitle)
                         },
                         maxLines = 1,
                         color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.labelSmall,
                     )
                 }
             }
@@ -327,11 +330,11 @@ internal fun TodoGoalView(
 @Composable
 private fun GoalTimeStatus(
     modifier: Modifier = Modifier,
-    time: GoalTimeUi,
+    time: GoalTimeDetailsUi,
     isDone: Boolean,
 ) {
     when (time) {
-        is GoalTimeUi.Stopwatch -> if (isDone) {
+        is GoalTimeDetailsUi.Stopwatch -> if (isDone) {
             Row(
                 modifier = modifier.padding(2.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -355,6 +358,7 @@ private fun GoalTimeStatus(
                 modifier = modifier,
                 shape = MaterialTheme.shapes.small,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                color = Color.Transparent,
             ) {
                 Row(
                     modifier = Modifier.padding(
@@ -382,7 +386,7 @@ private fun GoalTimeStatus(
             }
         }
 
-        is GoalTimeUi.Timer -> if (isDone) {
+        is GoalTimeDetailsUi.Timer -> if (isDone) {
             Row(
                 modifier = modifier.padding(2.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -406,6 +410,7 @@ private fun GoalTimeStatus(
                 modifier = modifier,
                 shape = MaterialTheme.shapes.small,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                color = Color.Transparent,
             ) {
                 Row(
                     modifier = Modifier.padding(
@@ -433,7 +438,7 @@ private fun GoalTimeStatus(
             }
         }
 
-        is GoalTimeUi.None -> if (isDone) {
+        is GoalTimeDetailsUi.None -> if (isDone) {
             Icon(
                 modifier = modifier.size(18.dp),
                 imageVector = Icons.Default.Check,

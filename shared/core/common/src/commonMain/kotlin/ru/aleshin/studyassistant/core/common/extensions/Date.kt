@@ -296,7 +296,7 @@ fun Duration.toString(
 fun Long.toShortTimeString(): String {
     val hours = this.toHorses()
     val minutes = this.toMinutesInHours()
-    val seconds = this.toSeconds() - this.toMinutes().toSeconds()
+    val seconds = this.toSeconds() - this.toMinutes() * Date.SECONDS_IN_MINUTE
 
     return buildString {
         append(hours.toString().padStart(2, '0'))

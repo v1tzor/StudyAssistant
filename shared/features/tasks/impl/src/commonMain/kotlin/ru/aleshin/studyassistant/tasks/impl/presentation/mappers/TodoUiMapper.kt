@@ -16,31 +16,48 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.mappers
 
+import ru.aleshin.studyassistant.core.domain.entities.tasks.DetailsGroupedTodos
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
+import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoDetails
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoNotifications
-import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
-import ru.aleshin.studyassistant.tasks.impl.domain.entities.TodoErrors
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DetailsGroupedTodosUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoNotificationsUi
-import kotlin.time.Duration
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.
  */
-internal fun Todo.mapToUi(
-    status: TodoStatus,
-    toDeadlineDuration: Duration?,
-) = TodoDetailsUi(
+internal fun Todo.mapToUi() = TodoUi(
     uid = uid,
     deadline = deadline,
-    toDeadlineDuration = toDeadlineDuration,
     name = name,
-    status = status,
+    description = description,
     priority = priority,
     notifications = notifications.mapToUi(),
     isDone = isDone,
     completeDate = completeDate,
+)
+
+internal fun TodoDetails.mapToUi() = TodoDetailsUi(
+    uid = uid,
+    deadline = deadline,
+    deadlineTimeLeft = deadlineTimeLeft,
+    progress = progress,
+    name = name,
+    description = description,
+    status = status,
+    priority = priority,
+    notifications = notifications.mapToUi(),
+    linkedGoal = linkedGoal?.mapToUi(),
+    isDone = isDone,
+    completeDate = completeDate,
+)
+
+internal fun DetailsGroupedTodos.mapToUi() = DetailsGroupedTodosUi(
+    completedTodos = completedTodos.map { it.mapToUi() },
+    runningTodos = runningTodos.map { it.mapToUi() },
+    errorTodos = errorTodos.map { it.mapToUi() },
 )
 
 internal fun TodoNotifications.mapToUi() = TodoNotificationsUi(
@@ -56,6 +73,18 @@ internal fun TodoDetailsUi.mapToDomain() = Todo(
     uid = uid,
     deadline = deadline,
     name = name,
+    description = description,
+    priority = priority,
+    notifications = notifications.mapToDomain(),
+    isDone = isDone,
+    completeDate = completeDate,
+)
+
+internal fun TodoUi.mapToDomain() = Todo(
+    uid = uid,
+    deadline = deadline,
+    name = name,
+    description = description,
     priority = priority,
     notifications = notifications.mapToDomain(),
     isDone = isDone,
@@ -69,8 +98,4 @@ internal fun TodoNotificationsUi.mapToDomain() = TodoNotifications(
     threeHourBefore = threeHourBefore,
     oneDayBefore = oneDayBefore,
     oneWeekBefore = oneWeekBefore,
-)
-
-internal fun TodoErrors.mapToUi() = TodoErrorsUi(
-    overdueTodos = overdueTodos.map { it.mapToUi(TodoStatus.NOT_COMPLETE, null) },
 )

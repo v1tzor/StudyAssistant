@@ -38,13 +38,13 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkTaskComponentUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkTasksUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 21.06.2024.

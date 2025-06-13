@@ -36,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -51,17 +50,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.core.common.extensions.calculateProgress
-import ru.aleshin.studyassistant.core.common.extensions.dateTime
-import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
-import ru.aleshin.studyassistant.core.common.extensions.shiftDay
-import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
-import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 
 /**
@@ -71,25 +62,15 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 internal fun ComingHomeworksExecutionAnalysisView(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    currentDate: Instant,
-    homeworks: Map<Instant, DailyHomeworksUi>,
+    comingHomeworksExecution: List<Boolean>,
+    comingHomeworksProgress: Float,
+    weekHomeworksExecution: List<Boolean>,
+    weekHomeworksProgress: Float,
 ) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        val tomorrowHomeworks = remember(homeworks, currentDate) {
-            homeworks.filter {
-                val timeRange = TimeRange(currentDate, currentDate.shiftDay(1))
-                return@filter timeRange.containsDate(it.key)
-            }
-        }
-        val weekHomeworks = remember(homeworks, currentDate) {
-            homeworks.filter {
-                val timeRange = currentDate.dateTime().weekTimeRange()
-                return@filter timeRange.containsDate(it.key)
-            }
-        }
         Text(
             text = TasksThemeRes.strings.comingHomeworksExecutionAnalysisTitle,
             color = MaterialTheme.colorScheme.onSurface,
@@ -99,11 +80,8 @@ internal fun ComingHomeworksExecutionAnalysisView(
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             InfoProgressView(
                 isLoading = isLoading,
-                items = remember(homeworks) {
-                    tomorrowHomeworks.values.map { it.fetchAllHomeworks() }.extractAllItem().map {
-                        it.completeDate != null
-                    }
-                },
+                items = comingHomeworksExecution,
+                progress = comingHomeworksProgress,
                 progressIcon = painterResource(TasksThemeRes.icons.tomorrowTime),
                 infoLabel = {
                     Text(
@@ -116,11 +94,8 @@ internal fun ComingHomeworksExecutionAnalysisView(
             )
             InfoProgressView(
                 isLoading = isLoading,
-                items = remember(homeworks) {
-                    weekHomeworks.values.map { it.fetchAllHomeworks() }.extractAllItem().map {
-                        it.completeDate != null
-                    }
-                },
+                items = weekHomeworksExecution,
+                progress = weekHomeworksProgress,
                 progressIcon = painterResource(TasksThemeRes.icons.weekTime),
                 infoLabel = {
                     Text(
@@ -140,6 +115,7 @@ private fun InfoProgressView(
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
     items: List<Boolean>,
+    progress: Float,
     progressIcon: Painter?,
     infoLabel: @Composable () -> Unit,
     accentColor: Color,
@@ -149,7 +125,6 @@ private fun InfoProgressView(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val progress = remember(items) { items.calculateProgress { it } }
         InfoProgressViewIndicator(
             progress = if (isLoading) 0f else progress,
             icon = progressIcon,

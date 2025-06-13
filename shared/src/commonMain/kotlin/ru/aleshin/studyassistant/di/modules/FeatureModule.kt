@@ -281,6 +281,7 @@ val featureModule = DI.Module("Feature") {
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
             override val employeeRepository = instance<EmployeeRepository>()
+            override val goalsRepository = instance<DailyGoalsRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val homeworksRepository = instance<HomeworksRepository>()
             override val todoRepository = instance<TodoRepository>()

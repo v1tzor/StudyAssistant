@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
@@ -62,6 +63,7 @@ public object EditorFeatureDIHolder : BaseFeatureDIHolder<EditorFeatureApi, Edit
                 bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
                 bindSingleton<EmployeeRepository> { dependencies.employeeRepository }
                 bindSingleton<SubjectsRepository> { dependencies.subjectsRepository }
+                bindSingleton<DailyGoalsRepository> { dependencies.goalsRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
                 bindSingleton<HomeworksRepository> { dependencies.homeworksRepository }
                 bindSingleton<TodoRepository> { dependencies.todoRepository }

@@ -20,9 +20,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,8 +38,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTaskComponentUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
@@ -88,6 +93,52 @@ internal fun HomeworkTaskTestView(
 
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
+internal fun CompactHomeworkTaskView(
+    modifier: Modifier = Modifier,
+    icon: Painter,
+    tasks: List<HomeworkTaskComponentUi>,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Icon(
+            modifier = Modifier.size(18.dp),
+            painter = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = buildAnnotatedString {
+                tasks.forEachIndexed { index, homeworkTask ->
+                    when (homeworkTask) {
+                        is HomeworkTaskComponentUi.Label -> withStyle(
+                            style = MaterialTheme.typography.bodySmall.toSpanStyle()
+                        ) {
+                            append(homeworkTask.text)
+                            append(' ')
+                        }
+                        is HomeworkTaskComponentUi.Tasks -> withStyle(
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Bold,
+                            ).toSpanStyle()
+                        ) {
+                            append(homeworkTask.taskList.joinToString())
+                            if (index != tasks.lastIndex) append("; ")
+                        }
+                    }
+                }
+            },
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 5,
+        )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalLayoutApi::class)
 internal fun HomeworkTaskView(
     modifier: Modifier = Modifier,
     icon: Painter,
@@ -95,7 +146,7 @@ internal fun HomeworkTaskView(
     tasks: List<HomeworkTaskComponentUi>,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(), //.height(IntrinsicSize.Min),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.Top,
     ) {

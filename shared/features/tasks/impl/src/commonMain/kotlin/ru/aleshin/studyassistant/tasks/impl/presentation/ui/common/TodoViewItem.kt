@@ -22,15 +22,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -39,13 +38,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
-import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.DateTimeComponents.Formats
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.HIGH
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.MEDIUM
@@ -54,11 +55,14 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.mappers.toLanguageString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.views.InfoBadge
+import ru.aleshin.studyassistant.core.ui.views.HorizontalProgressIndicator
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
+import ru.aleshin.studyassistant.core.ui.views.shortDayMonthTimeFormat
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
-import kotlin.time.Duration
+import kotlin.time.DurationUnit.MILLISECONDS
+import kotlin.time.toDuration
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.
@@ -70,32 +74,57 @@ internal fun TodoViewItem(
     modifier: Modifier = Modifier,
     isDone: Boolean,
     todoText: String,
+    description: String?,
+    linkedGoal: GoalShortUi?,
     status: TodoStatus,
     deadline: Instant?,
-    toDeadlineDuration: Duration?,
+    deadlineLeftTime: Millis?,
+    progress: Float,
     priority: TaskPriority,
+    completeTime: Instant?,
     onChangeDone: (Boolean) -> Unit,
+    onScheduleGoal: () -> Unit,
+    onDeleteGoal: () -> Unit,
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.width(IntrinsicSize.Max),
+        modifier = modifier.width(IntrinsicSize.Min),
         enabled = enabled,
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
-        Column {
+        Column(
+            modifier = Modifier.width(IntrinsicSize.Min).padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             TodoViewHeader(
+                modifier = Modifier.widthIn(min = 200.dp, max = 380.dp).fillMaxWidth(),
                 isDone = isDone,
                 enabled = enabled,
                 todoText = todoText,
                 priority = priority,
                 onChangeDone = onChangeDone,
             )
-            HorizontalDivider()
+            if (description != null) {
+                Text(
+                    modifier = Modifier.widthIn(min = 200.dp, max = 380.dp),
+                    text = description,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    minLines = 2,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
             TodoViewFooter(
-                deadline = deadline,
-                toDeadlineDuration = toDeadlineDuration,
                 status = status,
+                deadline = deadline,
+                linkedGoal = linkedGoal,
+                deadlineLeftTime = deadlineLeftTime,
+                completeTime = completeTime,
+                progress = progress,
+                onScheduleGoal = onScheduleGoal,
+                onDeleteGoal = onDeleteGoal,
             )
         }
     }
@@ -106,7 +135,7 @@ internal fun TodoViewItemPlaceholder(
     modifier: Modifier = Modifier,
 ) {
     PlaceholderBox(
-        modifier = modifier.fillMaxWidth().height(130.dp),
+        modifier = modifier.width(221.dp).height(164.dp),
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainer,
     )
@@ -121,28 +150,25 @@ private fun TodoViewHeader(
     priority: TaskPriority,
     onChangeDone: (Boolean) -> Unit,
 ) {
-    Column(
-        modifier = modifier.padding(start = 12.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = priority.mapToString(StudyAssistantRes.strings),
-            color = when (priority) {
-                STANDARD -> MaterialTheme.colorScheme.onSurfaceVariant
-                MEDIUM -> StudyAssistantRes.colors.accents.orange
-                HIGH -> StudyAssistantRes.colors.accents.red
-            },
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-            style = MaterialTheme.typography.labelMedium,
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
-                modifier = Modifier.widthIn(max = 400.dp).weight(1f),
+                text = priority.mapToString(StudyAssistantRes.strings),
+                color = when (priority) {
+                    STANDARD -> MaterialTheme.colorScheme.onSurfaceVariant
+                    MEDIUM -> StudyAssistantRes.colors.accents.orange
+                    HIGH -> StudyAssistantRes.colors.accents.red
+                },
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                style = MaterialTheme.typography.labelMedium,
+            )
+            Text(
+                modifier = Modifier.fillMaxWidth(),
                 text = todoText,
                 color = MaterialTheme.colorScheme.onSurface,
                 textDecoration = if (isDone) {
@@ -151,122 +177,191 @@ private fun TodoViewHeader(
                     TextDecoration.None
                 },
                 overflow = TextOverflow.Ellipsis,
-                maxLines = 4,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            RadioButton(
-                selected = isDone,
-                onClick = {
-                    onChangeDone(!isDone)
-                },
-                enabled = enabled,
-                modifier = Modifier.size(32.dp),
+                maxLines = 2,
+                style = MaterialTheme.typography.titleSmall,
             )
         }
+        RadioButton(
+            selected = isDone,
+            onClick = {
+                onChangeDone(!isDone)
+            },
+            enabled = enabled,
+            modifier = Modifier.size(32.dp),
+        )
     }
 }
 
 @Composable
 private fun TodoViewFooter(
     modifier: Modifier = Modifier,
-    deadline: Instant?,
-    toDeadlineDuration: Duration?,
     status: TodoStatus,
+    linkedGoal: GoalShortUi?,
+    deadline: Instant?,
+    deadlineLeftTime: Millis?,
+    completeTime: Instant?,
+    progress: Float,
+    onScheduleGoal: () -> Unit,
+    onDeleteGoal: () -> Unit,
 ) {
     Row(
-        modifier = modifier.padding(12.dp),
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (deadline != null) {
-            val deadlineDateFormat = DateTimeComponents.Formats.dayMonthFormat(StudyAssistantRes.strings)
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                when (status) {
+                    TodoStatus.IN_PROGRESS -> {
+                        val deadlineDateFormat = Formats.dayMonthFormat(StudyAssistantRes.strings)
+                        Icon(
+                            modifier = Modifier.size(18.dp),
+                            painter = painterResource(TasksThemeRes.icons.deadline),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                        Text(
+                            text = buildString {
+                                append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
+                                append(
+                                    deadline?.formatByTimeZone(deadlineDateFormat)
+                                        ?: TasksThemeRes.strings.noneDeadlineTitle
+                                )
+                            },
+                            color = MaterialTheme.colorScheme.error,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (deadlineLeftTime != null) {
+                            Text(
+                                text = deadlineLeftTime.toDuration(MILLISECONDS).toLanguageString(),
+                                color = MaterialTheme.colorScheme.primary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        }
+                    }
+
+                    TodoStatus.COMPLETE -> {
+                        val deadlineDateFormat = Formats.dayMonthFormat(StudyAssistantRes.strings)
+                        Icon(
+                            modifier = Modifier.size(18.dp),
+                            painter = painterResource(TasksThemeRes.icons.deadline),
+                            contentDescription = null,
+                            tint = StudyAssistantRes.colors.accents.green,
+                        )
+                        Text(
+                            text = buildString {
+                                append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
+                                append(
+                                    deadline?.formatByTimeZone(deadlineDateFormat) ?: TasksThemeRes.strings.noneDeadlineTitle
+                                )
+                            },
+                            color = StudyAssistantRes.colors.accents.green,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (completeTime != null) {
+                            Text(
+                                text = completeTime.formatByTimeZone(format = Formats.shortDayMonthTimeFormat()),
+                                color = MaterialTheme.colorScheme.primary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        }
+                    }
+
+                    TodoStatus.NOT_COMPLETE -> {
+                        val deadlineDateFormat = Formats.dayMonthFormat(StudyAssistantRes.strings)
+                        Icon(
+                            modifier = Modifier.size(18.dp),
+                            painter = painterResource(TasksThemeRes.icons.homeworkError),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                        Text(
+                            color = MaterialTheme.colorScheme.error,
+                            text = buildString {
+                                append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
+                                append(
+                                    deadline?.formatByTimeZone(deadlineDateFormat) ?: TasksThemeRes.strings.noneDeadlineTitle
+                                )
+                            },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = TasksThemeRes.strings.overdueDeadlineTitle,
+                            color = MaterialTheme.colorScheme.error,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
+                }
+            }
             when (status) {
-                TodoStatus.COMPLETE -> {
-                    InfoBadge(
-                        modifier = modifier,
-                        leadingIcon = {
-                            Icon(
-                                modifier = Modifier.size(18.dp),
-                                painter = painterResource(StudyAssistantRes.icons.tasksOutline),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurface,
-                            )
-                        },
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        content = {
-                            Text(
-                                text = buildString {
-                                    append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
-                                    append(deadline.formatByTimeZone(deadlineDateFormat))
-                                },
-                                maxLines = 1,
-                            )
-                        }
+                TodoStatus.IN_PROGRESS -> HorizontalProgressIndicator(
+                    modifier = Modifier.height(10.dp).fillMaxWidth(),
+                    progress = { progress },
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                )
+
+                TodoStatus.NOT_COMPLETE -> HorizontalProgressIndicator(
+                    modifier = Modifier.height(10.dp).fillMaxWidth(),
+                    progress = { 1f },
+                    color = MaterialTheme.colorScheme.error,
+                    trackColor = MaterialTheme.colorScheme.error,
+                )
+
+                TodoStatus.COMPLETE -> Unit
+            }
+        }
+        if (status != TodoStatus.COMPLETE) {
+            if (linkedGoal == null) {
+                Surface(
+                    onClick = onScheduleGoal,
+                    modifier = Modifier.size(36.dp),
+                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                ) {
+                    Icon(
+                        modifier = Modifier.wrapContentSize(Alignment.Center).size(24.dp),
+                        painter = painterResource(TasksThemeRes.icons.calendarGoto),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
                     )
                 }
-                TodoStatus.IN_PROGRESS -> {
-                    InfoBadge(
-                        modifier = modifier,
-                        leadingIcon = {
-                            Icon(
-                                modifier = Modifier.size(18.dp),
-                                painter = painterResource(StudyAssistantRes.icons.tasksOutline),
-                                contentDescription = null,
-                                tint = StudyAssistantRes.colors.accents.yellow,
-                            )
-                        },
-                        containerColor = StudyAssistantRes.colors.accents.yellowContainer,
-                        content = {
-                            Text(
-                                text = buildString {
-                                    append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
-                                    append(deadline.formatByTimeZone(deadlineDateFormat))
-                                },
-                                maxLines = 1,
-                            )
-                        }
+            } else {
+                Surface(
+                    onClick = onDeleteGoal,
+                    modifier = Modifier.size(36.dp),
+                    shape = MaterialTheme.shapes.small,
+                    color = Color.Transparent,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                ) {
+                    Icon(
+                        modifier = Modifier.wrapContentSize(Alignment.Center).size(24.dp),
+                        painter = painterResource(TasksThemeRes.icons.timerPlay),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
-                    if (toDeadlineDuration != null) {
-                        InfoBadge(
-                            modifier = modifier,
-                            containerColor = StudyAssistantRes.colors.accents.yellowContainer,
-                            content = {
-                                Text(text = toDeadlineDuration.toLanguageString(), maxLines = 1)
-                            }
-                        )
-                    }
-                }
-                TodoStatus.NOT_COMPLETE -> {
-                    InfoBadge(
-                        modifier = modifier,
-                        leadingIcon = {
-                            Icon(
-                                modifier = Modifier.size(18.dp),
-                                imageVector = Icons.Default.ErrorOutline,
-                                contentDescription = null,
-                                tint = StudyAssistantRes.colors.accents.red,
-                            )
-                        },
-                        containerColor = StudyAssistantRes.colors.accents.redContainer,
-                        content = {
-                            Text(
-                                text = buildString {
-                                    append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
-                                    append(deadline.formatByTimeZone(deadlineDateFormat))
-                                },
-                                maxLines = 1,
-                            )
-                        }
-                    )
-                    if (toDeadlineDuration != null) {
-                        InfoBadge(
-                            modifier = modifier,
-                            containerColor = StudyAssistantRes.colors.accents.redContainer,
-                            content = {
-                                Text(text = toDeadlineDuration.toLanguageString(), maxLines = 1)
-                            }
-                        )
-                    }
                 }
             }
         }

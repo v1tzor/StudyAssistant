@@ -613,6 +613,7 @@ fun ClickableTextField(
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
+    shape: Shape = MaterialTheme.shapes.large,
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     borderColor: Color = MaterialTheme.colorScheme.outline,
@@ -631,7 +632,7 @@ fun ClickableTextField(
                 .sizeIn(minHeight = 56.dp)
                 .animateContentSize(),
             enabled = enabled,
-            shape = MaterialTheme.shapes.large,
+            shape = shape,
             color = Color.Transparent,
             border = BorderStroke(
                 width = 1.dp,

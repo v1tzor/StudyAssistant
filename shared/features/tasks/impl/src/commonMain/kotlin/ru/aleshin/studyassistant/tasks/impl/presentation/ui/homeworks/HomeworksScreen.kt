@@ -74,10 +74,14 @@ internal data class HomeworksScreen(val targetDate: Long?) : Screen {
                     state = state,
                     modifier = Modifier.padding(paddingValues),
                     targetDate = targetDate?.mapEpochTimeToInstant() ?: state.currentDate,
+                    onAddHomework = { dispatchEvent(HomeworksEvent.NavigateToHomeworkCreator(it)) },
                     onEditHomework = { dispatchEvent(HomeworksEvent.NavigateToHomeworkEditor(it)) },
                     onDoHomework = { dispatchEvent(HomeworksEvent.DoHomework(it)) },
                     onRepeatHomework = { dispatchEvent(HomeworksEvent.RepeatHomework(it)) },
                     onSkipHomework = { dispatchEvent(HomeworksEvent.SkipHomework(it)) },
+                    onShareHomeworks = { dispatchEvent(HomeworksEvent.ShareHomeworks(it)) },
+                    onScheduleGoal = { dispatchEvent(HomeworksEvent.ScheduleGoal(it)) },
+                    onDeleteGoal = { dispatchEvent(HomeworksEvent.DeleteGoal(it)) },
                 )
             },
             topBar = {
@@ -89,9 +93,10 @@ internal data class HomeworksScreen(val targetDate: Long?) : Screen {
                     HomeworksTopSheet(
                         isLoading = state.isLoading,
                         selectedTimeRange = state.selectedTimeRange,
-                        progressList = state.homeworks.map { entry ->
-                            entry.value.fetchAllHomeworks().map { it.completeDate != null }
-                        }.extractAllItem(),
+                        progressList = remember(state.homeworks) {
+                            val allHomeworks = state.homeworks.map { it.value.fetchAllHomeworks() }.extractAllItem()
+                            allHomeworks.map { it.completeDate != null }
+                        },
                         onNextTimeRange = { dispatchEvent(HomeworksEvent.NextTimeRange) },
                         onPreviousTimeRange = { dispatchEvent(HomeworksEvent.PreviousTimeRange) },
                     )

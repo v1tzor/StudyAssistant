@@ -23,9 +23,8 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
-import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
 
 /**
  * @author Stanislav Aleshin on 28.07.2024
@@ -34,17 +33,13 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetail
 @Immutable
 internal data class TodoViewState(
     val isLoading: Boolean = true,
-    val selectedTimeRange: TimeRange? = null,
-    val todos: List<TodoDetailsUi> = emptyList(),
+    val completedTodos: List<TodoUi> = emptyList(),
 ) : BaseViewState
 
 internal sealed class TodoEvent : BaseEvent {
     data object Init : TodoEvent()
-    data object CurrentTimeRange : TodoEvent()
-    data object NextTimeRange : TodoEvent()
-    data object PreviousTimeRange : TodoEvent()
-    data class UpdateTodoDone(val todo: TodoDetailsUi, val isDone: Boolean) : TodoEvent()
-    data class NavigateToTodoEditor(val todo: TodoDetailsUi?) : TodoEvent()
+    data class UpdateTodoDone(val todo: TodoUi, val isDone: Boolean) : TodoEvent()
+    data class NavigateToTodoEditor(val todo: TodoUi?) : TodoEvent()
     data object NavigateToBack : TodoEvent()
 }
 
@@ -55,7 +50,6 @@ internal sealed class TodoEffect : BaseUiEffect {
 }
 
 internal sealed class TodoAction : BaseAction {
-    data class UpdateTodos(val todos: List<TodoDetailsUi>) : TodoAction()
-    data class UpdateTimeRange(val selectedTimeRange: TimeRange?) : TodoAction()
+    data class UpdateTodos(val todos: List<TodoUi>) : TodoAction()
     data class UpdateLoading(val isLoading: Boolean) : TodoAction()
 }

@@ -2,6 +2,7 @@ CREATE TABLE todoEntity (
     uid TEXT PRIMARY KEY NOT NULL,
     deadline INTEGER,
     name TEXT NOT NULL,
+    description TEXT,
     priority TEXT NOT NULL,
     notify_before_start INTEGER NOT NULL,
     notify_fifteen_minutes_before INTEGER NOT NULL,
@@ -14,7 +15,7 @@ CREATE TABLE todoEntity (
 );
 
 addOrUpdateTodo:
-INSERT OR REPLACE INTO todoEntity (uid, deadline, name, priority, notify_before_start, notify_fifteen_minutes_before, notify_one_hour_before, notify_three_hour_before, notify_one_day_before, notify_one_week_before, is_done, complete_date)
+INSERT OR REPLACE INTO todoEntity (uid, deadline, name, description, priority, notify_before_start, notify_fifteen_minutes_before, notify_one_hour_before, notify_three_hour_before, notify_one_day_before, notify_one_week_before, is_done, complete_date)
 VALUES ?;
 
 fetchTodosByTimeRange:
@@ -27,6 +28,18 @@ fetchActiveTodos:
 SELECT *
 FROM todoEntity
 WHERE is_done = 0 AND complete_date IS NULL
+ORDER BY deadline DESC;
+
+fetchCompletedTodos:
+SELECT *
+FROM todoEntity
+WHERE is_done = 1 AND complete_date IS NOT NULL
+ORDER BY deadline DESC;
+
+fetchCompletedTodosByTimeRange:
+SELECT *
+FROM todoEntity
+WHERE is_done = 1 AND complete_date IS NOT NULL AND complete_date BETWEEN ? AND ?
 ORDER BY deadline DESC;
 
 fetchOverdueTodos:

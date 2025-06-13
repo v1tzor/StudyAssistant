@@ -25,19 +25,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 
 /**
@@ -47,8 +52,9 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 internal fun AllHomeworksExecutionAnalysisView(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    totalCompleted: Int,
-    homeworkErrors: HomeworkErrorsUi?,
+    overdueTasks: List<HomeworkUi>,
+    detachedActiveTasks: List<HomeworkUi>,
+    completedHomeworksCount: Int,
     onShowErrors: () -> Unit,
 ) {
     Column(
@@ -62,9 +68,59 @@ internal fun AllHomeworksExecutionAnalysisView(
             style = MaterialTheme.typography.titleSmall,
         )
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Surface(
+                modifier = Modifier.height(44.dp).fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                color = StudyAssistantRes.colors.accents.greenContainer,
+            ) {
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.CheckCircle,
+                        contentDescription = null,
+                        tint = StudyAssistantRes.colors.accents.onGreenContainer,
+                    )
+                    Text(
+                        modifier = Modifier.animateContentSize().weight(1f),
+                        text = TasksThemeRes.strings.homeworksCompletedTitle,
+                        color = StudyAssistantRes.colors.accents.onGreenContainer,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                    Crossfade(
+                        modifier = Modifier.animateContentSize(),
+                        targetState = isLoading,
+                    ) { loading ->
+                        if (!loading) {
+                            Text(
+                                text = completedHomeworksCount.toString(),
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Bold,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                                style = MaterialTheme.typography.titleLarge,
+                            )
+                        } else {
+                            PlaceholderBox(
+                                modifier = Modifier.size(20.dp, 26.dp),
+                                shape = MaterialTheme.shapes.small,
+                                color = StudyAssistantRes.colors.accents.green,
+                            )
+                        }
+                    }
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Surface(
-                    modifier = Modifier.height(44.dp).fillMaxWidth(),
+                    modifier = Modifier.height(44.dp).weight(1f),
                     shape = MaterialTheme.shapes.large,
                     color = MaterialTheme.colorScheme.errorContainer,
                 ) {
@@ -90,14 +146,13 @@ internal fun AllHomeworksExecutionAnalysisView(
                             modifier = Modifier.animateContentSize(),
                             targetState = isLoading,
                         ) { loading ->
-                            if (!loading && homeworkErrors != null) {
-                                val errors = listOf(
-                                    homeworkErrors.overdueTasks.count(),
-                                    homeworkErrors.detachedActiveTasks.count(),
-                                )
+                            if (!loading) {
+                                val errors = remember(overdueTasks, detachedActiveTasks) {
+                                    listOf(overdueTasks.count(), detachedActiveTasks.count())
+                                }
                                 Text(
                                     text = errors.sum().toString(),
-                                    color = MaterialTheme.colorScheme.onErrorContainer,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     fontWeight = FontWeight.Bold,
                                     overflow = TextOverflow.Ellipsis,
                                     maxLines = 1,
@@ -113,21 +168,19 @@ internal fun AllHomeworksExecutionAnalysisView(
                         }
                     }
                 }
-//                Button(
-//                    onClick = onShowErrors,
-//                    modifier = Modifier.fillMaxWidth().height(32.dp),
-//                    enabled = !isLoading,
-//                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
-//                    colors = ButtonDefaults.buttonColors(
-//                        containerColor = MaterialTheme.colorScheme.error,
-//                        contentColor = MaterialTheme.colorScheme.onError,
-//                    ),
-//                ) {
-//                    Text(
-//                        text = TasksThemeRes.strings.showHomeworkErrorsTitle,
-//                        style = MaterialTheme.typography.labelMedium,
-//                    )
-//                }
+                Surface(
+                    onClick = onShowErrors,
+                    modifier = Modifier.size(32.dp, 44.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.errorContainer,
+                ) {
+                    Icon(
+                        modifier = Modifier.wrapContentSize(Alignment.Center).size(24.dp),
+                        painter = painterResource(TasksThemeRes.icons.openMenu),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                }
             }
         }
     }

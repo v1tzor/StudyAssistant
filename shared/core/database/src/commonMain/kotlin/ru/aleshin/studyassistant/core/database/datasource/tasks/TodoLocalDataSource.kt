@@ -20,9 +20,11 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.database.mappers.tasks.mapToBase
 import ru.aleshin.studyassistant.sqldelight.tasks.TodoEntity
 import ru.aleshin.studyassistant.sqldelight.tasks.TodoQueries
 import kotlin.coroutines.CoroutineContext
@@ -37,6 +39,7 @@ interface TodoLocalDataSource {
     suspend fun fetchTodoById(uid: UID): Flow<TodoEntity?>
     suspend fun fetchTodosByTimeRange(from: Long, to: Long): Flow<List<TodoEntity>>
     suspend fun fetchActiveTodos(): Flow<List<TodoEntity>>
+    suspend fun fetchCompletedTodos(from: Long?, to: Long?): Flow<List<TodoEntity>>
     suspend fun fetchOverdueTodos(currentDate: Long): Flow<List<TodoEntity>>
     suspend fun deleteTodo(uid: UID)
     suspend fun deleteAllTodos()
@@ -73,6 +76,16 @@ interface TodoLocalDataSource {
         override suspend fun fetchActiveTodos(): Flow<List<TodoEntity>> {
             val query = todoQueries.fetchActiveTodos()
             return query.asFlow().mapToList(coroutineContext)
+        }
+
+        override suspend fun fetchCompletedTodos(from: Long?, to: Long?): Flow<List<TodoEntity>> {
+            return if (from != null && to != null) {
+                val query = todoQueries.fetchCompletedTodosByTimeRange(from, to)
+                query.asFlow().mapToList(coroutineContext).map { it.map { todo -> todo.mapToBase() } }
+            } else {
+                val query = todoQueries.fetchCompletedTodos()
+                query.asFlow().mapToList(coroutineContext).map { it.map { todo -> todo.mapToBase() } }
+            }
         }
 
         override suspend fun fetchOverdueTodos(currentDate: Long): Flow<List<TodoEntity>> {

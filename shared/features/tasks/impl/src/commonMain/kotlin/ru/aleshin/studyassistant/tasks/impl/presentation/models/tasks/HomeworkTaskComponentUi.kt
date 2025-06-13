@@ -19,7 +19,9 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.core.domain.entities.tasks.fetchAllTasks
+import ru.aleshin.studyassistant.core.domain.entities.tasks.toHomeworkComponents
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
+import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.
@@ -38,6 +40,11 @@ internal data class HomeworkTasksDetailsUi(
     val origin: String,
     val components: List<HomeworkTaskComponentUi>,
 ) : Parcelable
+
+internal fun String.mapToHomeworkTasks() = HomeworkTasksDetailsUi(
+    origin = this,
+    components = this.toHomeworkComponents().map { it.mapToUi() }
+)
 
 internal fun List<HomeworkTaskComponentUi>.fetchAllTasks(): List<String> {
     return this.map { it.mapToDomain() }.fetchAllTasks()

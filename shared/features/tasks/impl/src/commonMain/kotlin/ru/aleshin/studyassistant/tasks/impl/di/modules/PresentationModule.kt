@@ -24,24 +24,26 @@ import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 import ru.aleshin.studyassistant.tasks.impl.navigation.TasksFeatureStarterImpl
 import ru.aleshin.studyassistant.tasks.impl.navigation.TasksScreenProvider
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksDetailsWorkProcessor
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksEffectCommunicator
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksScreenModel
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksStateCommunicator
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksWorkProcessor
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.navigation.NavigationScreen
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.navigation.NavigationScreenModel
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.GoalWorkProcessor
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.HomeworksWorkProcessor
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewEffectCommunicator
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewScreenModel
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewStateCommunicator
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewWorkProcessor
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.TodoWorkProcessor
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareEffectCommunicator
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareScreenModel
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareStateCommunicator
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareWorkProcessor
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoDetailsWorkProcessor
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoEffectCommunicator
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoScreenModel
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoStateCommunicator
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoWorkProcessor
 import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
@@ -56,12 +58,14 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<OverviewStateCommunicator> { OverviewStateCommunicator.Base() }
     bindProvider<OverviewEffectCommunicator> { OverviewEffectCommunicator.Base() }
-    bindProvider<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<OverviewScreenModel> { OverviewScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<HomeworksWorkProcessor> { HomeworksWorkProcessor.Base(instance(), instance(), instance(), instance()) }
+    bindProvider<TodoWorkProcessor> { TodoWorkProcessor.Base(instance()) }
+    bindProvider<GoalWorkProcessor> { GoalWorkProcessor.Base(instance(), instance()) }
+    bindProvider<OverviewScreenModel> { OverviewScreenModel(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<HomeworksStateCommunicator> { HomeworksStateCommunicator.Base() }
     bindProvider<HomeworksEffectCommunicator> { HomeworksEffectCommunicator.Base() }
-    bindProvider<HomeworksWorkProcessor> { HomeworksWorkProcessor.Base(instance(), instance(), instance()) }
+    bindProvider<HomeworksDetailsWorkProcessor> { HomeworksDetailsWorkProcessor.Base(instance(), instance(), instance(), instance()) }
     bindProvider<HomeworksScreenModel> { HomeworksScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<ShareStateCommunicator> { ShareStateCommunicator.Base() }
@@ -71,6 +75,6 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<TodoStateCommunicator> { TodoStateCommunicator.Base() }
     bindProvider<TodoEffectCommunicator> { TodoEffectCommunicator.Base() }
-    bindProvider<TodoWorkProcessor> { TodoWorkProcessor.Base(instance(), instance()) }
-    bindProvider<TodoScreenModel> { TodoScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<TodoDetailsWorkProcessor> { TodoDetailsWorkProcessor.Base(instance()) }
+    bindProvider<TodoScreenModel> { TodoScreenModel(instance(), instance(), instance(), instance(), instance()) }
 }

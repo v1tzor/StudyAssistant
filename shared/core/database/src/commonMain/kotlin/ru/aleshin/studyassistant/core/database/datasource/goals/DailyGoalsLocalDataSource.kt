@@ -54,7 +54,10 @@ interface DailyGoalsLocalDataSource {
     suspend fun addOrUpdateGoal(goal: GoalEntity): UID
     suspend fun addDailyDailyGoals(dailyGoals: List<GoalEntity>)
     suspend fun fetchGoalById(uid: UID): Flow<GoalEntityDetails?>
+    suspend fun fetchGoalByContentId(uid: UID): Flow<GoalEntityDetails?>
     suspend fun fetchDailyGoalsByTimeRange(from: Long, to: Long): Flow<List<GoalEntityDetails>>
+    suspend fun fetchShortDailyGoalsByTimeRange(from: Long, to: Long): Flow<List<GoalEntity>>
+    suspend fun fetchShortActiveDailyGoals(): Flow<List<GoalEntity>>
     suspend fun fetchOverdueDailyGoals(currentDate: Long): Flow<List<GoalEntityDetails>>
     suspend fun fetchDailyGoalsByDate(date: Long): Flow<List<GoalEntityDetails>>
     suspend fun deleteGoal(uid: UID)
@@ -89,9 +92,24 @@ interface DailyGoalsLocalDataSource {
             return query.asFlow().mapToOneOrNull(coroutineContext).flatMapToDetails()
         }
 
+        override suspend fun fetchGoalByContentId(uid: UID): Flow<GoalEntityDetails?> {
+            val query = goalQueries.fetchGoalByContentId(uid)
+            return query.asFlow().mapToOneOrNull(coroutineContext).flatMapToDetails()
+        }
+
         override suspend fun fetchDailyGoalsByTimeRange(from: Long, to: Long): Flow<List<GoalEntityDetails>> {
             val query = goalQueries.fetchDailyGoaslByTimeRange(from, to)
             return query.asFlow().mapToList(coroutineContext).flatMapListToDetails()
+        }
+
+        override suspend fun fetchShortDailyGoalsByTimeRange(from: Long, to: Long): Flow<List<GoalEntity>> {
+            val query = goalQueries.fetchDailyGoaslByTimeRange(from, to)
+            return query.asFlow().mapToList(coroutineContext)
+        }
+
+        override suspend fun fetchShortActiveDailyGoals(): Flow<List<GoalEntity>> {
+            val query = goalQueries.fetchActiveGoals()
+            return query.asFlow().mapToList(coroutineContext)
         }
 
         override suspend fun fetchOverdueDailyGoals(currentDate: Long): Flow<List<GoalEntityDetails>> {
@@ -138,7 +156,16 @@ interface DailyGoalsLocalDataSource {
                                    _, _, locationList, _, offices, _ ->
                             val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsEntity>(timeIntervalsModel)
                             val locations = locationList.map { Json.decodeFromString<ContactInfoEntity>(it) }
-                            OrganizationShortEntity(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
+                            OrganizationShortEntity(
+                                uid,
+                                isMain == 1L,
+                                name,
+                                type,
+                                avatar,
+                                locations,
+                                offices,
+                                timeIntervals
+                            )
                         },
                     )
                     .asFlow()

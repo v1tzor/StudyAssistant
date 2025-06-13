@@ -30,9 +30,13 @@ import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.ScheduleUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 
 /**
  * @author Stanislav Aleshin on 27.06.2024
@@ -47,6 +51,7 @@ internal data class HomeworksViewState(
     val activeSchedule: ScheduleUi? = null,
     @TypeParceler<Instant, InstantParceler>
     val homeworks: Map<Instant, DailyHomeworksUi> = mapOf(),
+    val friends: List<AppUserUi> = emptyList(),
 ) : BaseViewState
 
 internal sealed class HomeworksEvent : BaseEvent {
@@ -57,7 +62,11 @@ internal sealed class HomeworksEvent : BaseEvent {
     data class DoHomework(val homework: HomeworkDetailsUi) : HomeworksEvent()
     data class RepeatHomework(val homework: HomeworkDetailsUi) : HomeworksEvent()
     data class SkipHomework(val homework: HomeworkDetailsUi) : HomeworksEvent()
+    data class ShareHomeworks(val sentMediatedHomeworks: SentMediatedHomeworksDetailsUi) : HomeworksEvent()
+    data class ScheduleGoal(val goalCreateModel: GoalCreateModelUi) : HomeworksEvent()
+    data class DeleteGoal(val goal: GoalShortUi) : HomeworksEvent()
     data class NavigateToHomeworkEditor(val homework: HomeworkDetailsUi) : HomeworksEvent()
+    data class NavigateToHomeworkCreator(val date: Instant) : HomeworksEvent()
     data object AddHomeworkInEditor : HomeworksEvent()
     data object NavigateToBack : HomeworksEvent()
 }

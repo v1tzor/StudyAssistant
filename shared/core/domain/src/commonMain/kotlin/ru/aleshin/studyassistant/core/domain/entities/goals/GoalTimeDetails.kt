@@ -31,6 +31,7 @@ sealed class GoalTimeDetails {
         val pastStopTime: Millis = 0,
         val startTimePoint: Instant,
         val leftTime: Millis,
+        val progress: Float,
         val isActive: Boolean = false,
     ) : GoalTimeDetails() {
         override val type = GoalTime.Type.TIMER
@@ -40,6 +41,7 @@ sealed class GoalTimeDetails {
         val pastStopTime: Millis = 0,
         val startTimePoint: Instant,
         val elapsedTime: Millis = 0,
+        val progress: Float?,
         val isActive: Boolean = false,
     ) : GoalTimeDetails() {
         override val type = GoalTime.Type.STOPWATCH

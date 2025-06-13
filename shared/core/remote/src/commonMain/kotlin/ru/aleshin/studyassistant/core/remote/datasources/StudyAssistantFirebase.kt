@@ -58,6 +58,7 @@ object StudyAssistantFirebase {
         const val VERSION_FROM = "dateVersionFrom"
         const val VERSION_TO = "dateVersionTo"
         const val GOAL_TARGET_DATA = "targetDate"
+        const val GOAL_CONTENT_ID = "contentId"
         const val GOAL_DONE = "done"
         const val GOAL_COMPLETE_DATE = "completeDate"
         const val CLASS_SCHEDULE_ID = "scheduleId"

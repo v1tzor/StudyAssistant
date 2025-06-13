@@ -31,7 +31,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.TodoNotif
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.TaskPriorityInfoView
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.contract.TodoViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.views.TodoDeadlineInfoFields
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.views.TodoInfoField
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.views.TodoInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.views.TodoNotificationSelector
 
 /**
@@ -43,6 +43,7 @@ internal fun TodoContent(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     onTodoNameChange: (String) -> Unit,
+    onTodoDescriptionChange: (String) -> Unit,
     onChangeDeadline: (Instant?) -> Unit,
     onChangePriority: (TaskPriority) -> Unit,
     onChangeNotifications: (TodoNotificationsUi) -> Unit,
@@ -51,10 +52,12 @@ internal fun TodoContent(
         modifier = modifier.padding(top = 16.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        TodoInfoField(
+        TodoInfoFields(
             isLoading = isLoading,
             todoName = editableTodo?.name ?: "",
+            todoDescription = editableTodo?.description,
             onTodoNameChange = onTodoNameChange,
+            onTodoDescriptionChange = onTodoDescriptionChange,
         )
         TodoDeadlineInfoFields(
             isLoading = isLoading,

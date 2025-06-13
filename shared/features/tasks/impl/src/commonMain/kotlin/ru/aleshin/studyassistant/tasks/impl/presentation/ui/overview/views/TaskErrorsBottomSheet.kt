@@ -46,6 +46,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,12 +62,11 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.sheet.MediumDragHandle
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTaskComponentUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoErrorsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.fetchAllTasks
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.mapToHomeworkTasks
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 
 /**
@@ -77,13 +77,12 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 internal fun TaskErrorsBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
-    homeworkErrors: HomeworkErrorsUi?,
-    todoErrors: TodoErrorsUi?,
+    overdueTasks: List<HomeworkUi>,
+    detachedActiveTasks: List<HomeworkUi>,
     onDismissRequest: () -> Unit,
-    onEditHomework: (HomeworkDetailsUi) -> Unit,
-    onDoHomework: (HomeworkDetailsUi) -> Unit,
-    onSkipHomework: (HomeworkDetailsUi) -> Unit,
-    onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
+    onEditHomework: (HomeworkUi) -> Unit,
+    onDoHomework: (HomeworkUi) -> Unit,
+    onSkipHomework: (HomeworkUi) -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -96,17 +95,13 @@ internal fun TaskErrorsBottomSheet(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
-            OverdueTodosBottomSheetSection(
-                overdueTodos = todoErrors?.overdueTodos ?: emptyList(),
-                onChangeTodoDone = onChangeTodoDone,
-            )
             OverdueHomeworksBottomSheetSection(
-                overdueTasks = homeworkErrors?.overdueTasks ?: emptyList(),
+                overdueTasks = overdueTasks,
                 onDoHomework = onDoHomework,
                 onSkipHomework = onSkipHomework,
             )
             DetachedHomeworksBottomSheetSection(
-                detachedActiveTasks = homeworkErrors?.detachedActiveTasks ?: emptyList(),
+                detachedActiveTasks = detachedActiveTasks,
                 onEditHomework = onEditHomework,
             )
         }
@@ -116,8 +111,8 @@ internal fun TaskErrorsBottomSheet(
 @Composable
 private fun OverdueTodosBottomSheetSection(
     modifier: Modifier = Modifier,
-    overdueTodos: List<TodoDetailsUi>,
-    onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
+    overdueTodos: List<TodoUi>,
+    onChangeTodoDone: (TodoUi, Boolean) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -190,9 +185,9 @@ private fun OverdueTodosBottomSheetSection(
 @Composable
 private fun OverdueHomeworksBottomSheetSection(
     modifier: Modifier = Modifier,
-    overdueTasks: List<HomeworkDetailsUi>,
-    onDoHomework: (HomeworkDetailsUi) -> Unit,
-    onSkipHomework: (HomeworkDetailsUi) -> Unit,
+    overdueTasks: List<HomeworkUi>,
+    onDoHomework: (HomeworkUi) -> Unit,
+    onSkipHomework: (HomeworkUi) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -231,9 +226,15 @@ private fun OverdueHomeworksBottomSheetSection(
                     ErrorHomeworkView(
                         deadline = homework.deadline,
                         subject = homework.subject,
-                        theoreticalTasks = homework.theoreticalTasks.components,
-                        practicalTasks = homework.practicalTasks.components,
-                        presentationTasks = homework.presentationTasks.components,
+                        theoreticalTasks = remember(homework.theoreticalTasks) {
+                            homework.theoreticalTasks.mapToHomeworkTasks().components
+                        },
+                        practicalTasks = remember(homework.practicalTasks) {
+                            homework.practicalTasks.mapToHomeworkTasks().components
+                        },
+                        presentationTasks = remember(homework.presentationTasks) {
+                            homework.presentationTasks.mapToHomeworkTasks().components
+                        },
                         actions = {
                             DoAndSkipActions(
                                 onDo = { onDoHomework(homework) },
@@ -252,9 +253,15 @@ private fun OverdueHomeworksBottomSheetSection(
                     ErrorHomeworkView(
                         deadline = homework.deadline,
                         subject = homework.subject,
-                        theoreticalTasks = homework.theoreticalTasks.components,
-                        practicalTasks = homework.practicalTasks.components,
-                        presentationTasks = homework.presentationTasks.components,
+                        theoreticalTasks = remember(homework.theoreticalTasks) {
+                            homework.theoreticalTasks.mapToHomeworkTasks().components
+                        },
+                        practicalTasks = remember(homework.practicalTasks) {
+                            homework.practicalTasks.mapToHomeworkTasks().components
+                        },
+                        presentationTasks = remember(homework.presentationTasks) {
+                            homework.presentationTasks.mapToHomeworkTasks().components
+                        },
                         actions = {
                             DoAndSkipActions(
                                 onDo = { onDoHomework(homework) },
@@ -271,8 +278,8 @@ private fun OverdueHomeworksBottomSheetSection(
 @Composable
 private fun DetachedHomeworksBottomSheetSection(
     modifier: Modifier = Modifier,
-    detachedActiveTasks: List<HomeworkDetailsUi>,
-    onEditHomework: (HomeworkDetailsUi) -> Unit,
+    detachedActiveTasks: List<HomeworkUi>,
+    onEditHomework: (HomeworkUi) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -311,9 +318,15 @@ private fun DetachedHomeworksBottomSheetSection(
                     ErrorHomeworkView(
                         deadline = homework.deadline,
                         subject = homework.subject,
-                        theoreticalTasks = homework.theoreticalTasks.components,
-                        practicalTasks = homework.practicalTasks.components,
-                        presentationTasks = homework.presentationTasks.components,
+                        theoreticalTasks = remember(homework.theoreticalTasks) {
+                            homework.theoreticalTasks.mapToHomeworkTasks().components
+                        },
+                        practicalTasks = remember(homework.practicalTasks) {
+                            homework.practicalTasks.mapToHomeworkTasks().components
+                        },
+                        presentationTasks = remember(homework.presentationTasks) {
+                            homework.presentationTasks.mapToHomeworkTasks().components
+                        },
                         actions = { EditAction(onEdit = { onEditHomework(homework) }) },
                     )
                 }
@@ -327,9 +340,15 @@ private fun DetachedHomeworksBottomSheetSection(
                     ErrorHomeworkView(
                         deadline = homework.deadline,
                         subject = homework.subject,
-                        theoreticalTasks = homework.theoreticalTasks.components,
-                        practicalTasks = homework.practicalTasks.components,
-                        presentationTasks = homework.presentationTasks.components,
+                        theoreticalTasks = remember(homework.theoreticalTasks) {
+                            homework.theoreticalTasks.mapToHomeworkTasks().components
+                        },
+                        practicalTasks = remember(homework.practicalTasks) {
+                            homework.practicalTasks.mapToHomeworkTasks().components
+                        },
+                        presentationTasks = remember(homework.presentationTasks) {
+                            homework.presentationTasks.mapToHomeworkTasks().components
+                        },
                         actions = { EditAction(onEdit = { onEditHomework(homework) }) },
                     )
                 }

@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.domain.entities.tasks.toHomeworkComponents
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
 
@@ -51,7 +52,10 @@ internal data class HomeworkUi(
     val completeDate: Instant?,
 ) : Parcelable
 
-internal fun HomeworkUi.convertToDetails(status: HomeworkStatus) = HomeworkDetailsUi(
+internal fun HomeworkUi.convertToDetails(
+    status: HomeworkStatus,
+    linkedGoal: GoalShortUi? = null,
+) = HomeworkDetailsUi(
     uid = uid,
     classId = classId,
     deadline = deadline,
@@ -73,6 +77,7 @@ internal fun HomeworkUi.convertToDetails(status: HomeworkStatus) = HomeworkDetai
     priority = priority,
     isDone = isDone,
     status = status,
+    linkedGoal = linkedGoal,
     completeDate = completeDate,
 )
 

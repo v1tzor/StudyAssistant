@@ -63,6 +63,7 @@ internal data class TodoScreen(private val todoId: UID?) : Screen {
                     state = state,
                     modifier = Modifier.padding(paddingValues),
                     onTodoNameChange = { dispatchEvent(TodoEvent.UpdateTodoName(it)) },
+                    onTodoDescriptionChange = { dispatchEvent(TodoEvent.UpdateTodoDescription(it)) },
                     onChangeDeadline = { dispatchEvent(TodoEvent.UpdateDeadline(it)) },
                     onChangePriority = { dispatchEvent(TodoEvent.UpdatePriority(it)) },
                     onChangeNotifications = { dispatchEvent(TodoEvent.UpdateNotifications(it)) },

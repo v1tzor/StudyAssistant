@@ -39,6 +39,7 @@ interface TodoRemoteDataSource {
     suspend fun fetchTodoById(uid: UID, targetUser: UID): Flow<TodoPojo?>
     suspend fun fetchTodosByTimeRange(from: Long, to: Long, targetUser: UID): Flow<List<TodoPojo>>
     suspend fun fetchActiveTodos(targetUser: UID): Flow<List<TodoPojo>>
+    suspend fun fetchCompletedTodos(from: Long?, to: Long?, targetUser: UID): Flow<List<TodoPojo>>
     suspend fun fetchOverdueTodos(currentDate: Long, targetUser: UID): Flow<List<TodoPojo>>
     suspend fun deleteTodo(uid: UID, targetUser: UID)
     suspend fun deleteAllTodos(targetUser: UID)
@@ -112,6 +113,31 @@ interface TodoRemoteDataSource {
                 .where {
                     val doneFilter = UserData.TODO_DONE equalTo false
                     val completeDateFilter = UserData.TODO_COMPLETE_DATE equalTo null
+                    return@where doneFilter and completeDateFilter
+                }
+                .orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)
+                .snapshotListFlowGet<TodoPojo>()
+
+            return todosFlow
+        }
+
+        override suspend fun fetchCompletedTodos(
+            from: Long?,
+            to: Long?,
+            targetUser: UID
+        ): Flow<List<TodoPojo>> {
+            if (targetUser.isEmpty()) throw FirebaseUserException()
+            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+
+            val todosFlow = userDataRoot.collection(UserData.TODOS)
+                .where {
+                    val completeDateFilter = if (from != null && to != null) {
+                        (UserData.TODO_COMPLETE_DATE greaterThanOrEqualTo from) and
+                            (UserData.TODO_COMPLETE_DATE lessThanOrEqualTo to)
+                    } else {
+                        UserData.TODO_COMPLETE_DATE notEqualTo null
+                    }
+                    val doneFilter = UserData.TODO_DONE equalTo true
                     return@where doneFilter and completeDateFilter
                 }
                 .orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)

@@ -43,6 +43,7 @@ fun <T> ChooserDropdownMenu(
     offset: DpOffset = DpOffset(0.dp, 6.dp),
     scrollState: ScrollState = rememberScrollState(),
     properties: PopupProperties = PopupProperties(focusable = true),
+    showBackItem: Boolean = true,
     onChoose: (T) -> Unit,
 ) {
     DropdownMenu(
@@ -54,7 +55,7 @@ fun <T> ChooserDropdownMenu(
         properties = properties,
         offset = offset,
     ) {
-        BackMenuItem(onClick = onDismiss)
+        if (showBackItem) BackMenuItem(onClick = onDismiss)
         items.forEach { item ->
             DropdownMenuItem(
                 text = { text(item) },

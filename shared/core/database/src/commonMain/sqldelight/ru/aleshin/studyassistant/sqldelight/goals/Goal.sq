@@ -30,7 +30,13 @@ ORDER BY target_date DESC;
 fetchOverdueGoals:
 SELECT *
 FROM goalEntity
-WHERE target_date < ? AND is_done = 0 AND target_date IS NULL
+WHERE target_date < ? AND is_done = 0 AND complete_date IS NULL
+ORDER BY target_date DESC;
+
+fetchActiveGoals:
+SELECT *
+FROM goalEntity
+WHERE is_done = 0 AND complete_date IS NULL
 ORDER BY target_date DESC;
 
 fetchGoalById:
@@ -38,6 +44,10 @@ SELECT *
 FROM goalEntity
 WHERE uid = ?;
 
+fetchGoalByContentId:
+SELECT *
+FROM goalEntity
+WHERE content_id = ?;
 
 fetchGoalsByDate:
 SELECT *

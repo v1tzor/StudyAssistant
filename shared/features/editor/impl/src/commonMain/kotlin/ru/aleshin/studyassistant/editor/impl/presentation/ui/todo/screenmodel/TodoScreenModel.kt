@@ -66,6 +66,10 @@ internal class TodoScreenModel(
                 val updatedTodo = editableTodo?.copy(name = event.todo)
                 sendAction(TodoAction.UpdateEditModel(updatedTodo))
             }
+            is TodoEvent.UpdateTodoDescription -> with(state()) {
+                val updatedTodo = editableTodo?.copy(description = event.description)
+                sendAction(TodoAction.UpdateEditModel(updatedTodo))
+            }
             is TodoEvent.UpdateDeadline -> with(state()) {
                 val updatedTodo = editableTodo?.copy(deadline = event.deadline)
                 sendAction(TodoAction.UpdateEditModel(updatedTodo))

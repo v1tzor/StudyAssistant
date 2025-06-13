@@ -28,6 +28,7 @@ data class TodoPojo(
     val uid: UID,
     val deadline: Long? = null,
     val name: String = "",
+    val description: String? = null,
     val priority: String = TaskPriority.STANDARD.name,
     val notifications: TodoNotificationsPojo = TodoNotificationsPojo(),
     val done: Boolean = false,

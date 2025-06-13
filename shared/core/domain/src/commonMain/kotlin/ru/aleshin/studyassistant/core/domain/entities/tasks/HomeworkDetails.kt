@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.domain.entities.tasks
 
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.goals.GoalShort
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 
@@ -36,11 +37,15 @@ data class HomeworkDetails(
     val test: String? = null,
     val priority: TaskPriority = TaskPriority.STANDARD,
     val isDone: Boolean = false,
+    val linkedGoal: GoalShort? = null,
     val status: HomeworkStatus,
     val completeDate: Instant?,
 )
 
-fun Homework.convertToDetails(status: HomeworkStatus) = HomeworkDetails(
+fun Homework.convertToDetails(
+    status: HomeworkStatus,
+    linkedGoal: GoalShort?,
+) = HomeworkDetails(
     uid = uid,
     classId = classId,
     deadline = deadline,
@@ -61,6 +66,7 @@ fun Homework.convertToDetails(status: HomeworkStatus) = HomeworkDetails(
     test = test,
     priority = priority,
     isDone = isDone,
+    linkedGoal = linkedGoal,
     status = status,
     completeDate = completeDate,
 )

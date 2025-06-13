@@ -43,6 +43,7 @@ internal data class TodoViewState(
 internal sealed class TodoEvent : BaseEvent {
     data class Init(val todoId: UID?) : TodoEvent()
     data class UpdateTodoName(val todo: String) : TodoEvent()
+    data class UpdateTodoDescription(val description: String) : TodoEvent()
     data class UpdateDeadline(val deadline: Instant?) : TodoEvent()
     data class UpdatePriority(val priority: TaskPriority) : TodoEvent()
     data class UpdateNotifications(val notifications: TodoNotificationsUi) : TodoEvent()

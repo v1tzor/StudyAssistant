@@ -35,10 +35,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkErrorsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworksCompleteProgressUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 
 /**
@@ -48,14 +46,11 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun HomeworksExecutionAnalysisView(
     modifier: Modifier = Modifier,
-    isLoadingHomeworks: Boolean,
-    isLoadingErrors: Boolean,
-    currentDate: Instant,
-    dailyHomeworks: Map<Instant, DailyHomeworksUi>,
-    homeworkErrors: HomeworkErrorsUi?,
-    onEditHomework: (HomeworkDetailsUi) -> Unit,
-    onDoHomework: (HomeworkDetailsUi) -> Unit,
-    onSkipHomework: (HomeworkDetailsUi) -> Unit,
+    isLoading: Boolean,
+    completeProgress: HomeworksCompleteProgressUi?,
+    onEditHomework: (HomeworkUi) -> Unit,
+    onDoHomework: (HomeworkUi) -> Unit,
+    onSkipHomework: (HomeworkUi) -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -86,29 +81,33 @@ internal fun HomeworksExecutionAnalysisView(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 ComingHomeworksExecutionAnalysisView(
-                    isLoading = isLoadingHomeworks,
-                    currentDate = currentDate,
-                    homeworks = dailyHomeworks,
+                    isLoading = isLoading,
+                    comingHomeworksExecution = completeProgress?.comingHomeworksExecution ?: emptyList(),
+                    comingHomeworksProgress = completeProgress?.comingHomeworksProgress ?: 0f,
+                    weekHomeworksExecution = completeProgress?.weekHomeworksExecution ?: emptyList(),
+                    weekHomeworksProgress = completeProgress?.weekHomeworksProgress ?: 0f,
                 )
                 AllHomeworksExecutionAnalysisView(
                     modifier = Modifier.weight(1f),
-                    isLoading = isLoadingErrors,
-                    totalCompleted = 120, // todo
-                    homeworkErrors = homeworkErrors,
+                    isLoading = isLoading,
+                    overdueTasks = completeProgress?.overdueTasks ?: emptyList(),
+                    detachedActiveTasks = completeProgress?.detachedActiveTasks ?: emptyList(),
+                    completedHomeworksCount = completeProgress?.completedHomeworksCount ?: 0,
                     onShowErrors = { taskErrorsSheetState = true },
                 )
             }
 
-//            if (taskErrorsSheetState) {
-//                TaskErrorsBottomSheet(
-//                    sheetState = sheetState,
-//                    homeworkErrors = homeworkErrors,
-//                    onDismissRequest = { taskErrorsSheetState = false },
-//                    onEditHomework = onEditHomework,
-//                    onDoHomework = onDoHomework,
-//                    onSkipHomework = onSkipHomework,
-//                )
-//            }
+            if (taskErrorsSheetState) {
+                TaskErrorsBottomSheet(
+                    sheetState = sheetState,
+                    overdueTasks = completeProgress?.overdueTasks ?: emptyList(),
+                    detachedActiveTasks = completeProgress?.detachedActiveTasks ?: emptyList(),
+                    onDismissRequest = { taskErrorsSheetState = false },
+                    onEditHomework = onEditHomework,
+                    onDoHomework = onDoHomework,
+                    onSkipHomework = onSkipHomework,
+                )
+            }
         }
     }
 }

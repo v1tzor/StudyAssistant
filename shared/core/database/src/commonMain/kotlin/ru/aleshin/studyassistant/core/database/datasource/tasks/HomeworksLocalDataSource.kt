@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.database.datasource.tasks
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOne
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -55,6 +56,7 @@ interface HomeworksLocalDataSource {
     suspend fun fetchHomeworksByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsEntity>>
     suspend fun fetchOverdueHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
     suspend fun fetchActiveLinkedHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
+    suspend fun fetchCompletedHomeworksCount(): Flow<Int>
     suspend fun deleteHomework(uid: UID)
     suspend fun deleteAllHomework()
 
@@ -95,6 +97,11 @@ interface HomeworksLocalDataSource {
             return query.asFlow().mapToList(coroutineContext).flatMapListToDetails()
         }
 
+        override suspend fun fetchCompletedHomeworksCount(): Flow<Int> {
+            val query = homeworkQueries.fetchCompletedHomeworksCount()
+            return query.asFlow().mapToOne(coroutineContext).map { it.toInt() }
+        }
+
         override suspend fun fetchActiveLinkedHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>> {
             val query = homeworkQueries.fetchActiveAndLinkedHomeworks(currentDate)
             val homeworksFlow = query.asFlow().mapToList(coroutineContext).map { homeworksList ->
@@ -125,7 +132,16 @@ interface HomeworksLocalDataSource {
                                    _, _, locationList, _, offices, _ ->
                             val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsEntity>(timeIntervalsModel)
                             val locations = locationList.map { Json.decodeFromString<ContactInfoEntity>(it) }
-                            OrganizationShortEntity(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals)
+                            OrganizationShortEntity(
+                                uid,
+                                isMain == 1L,
+                                name,
+                                type,
+                                avatar,
+                                locations,
+                                offices,
+                                timeIntervals
+                            )
                         },
                     )
                     .asFlow()

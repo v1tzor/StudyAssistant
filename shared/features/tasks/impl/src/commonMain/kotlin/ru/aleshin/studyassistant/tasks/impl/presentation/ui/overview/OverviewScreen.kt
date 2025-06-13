@@ -20,16 +20,20 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -57,6 +61,7 @@ internal class OverviewScreen : Screen {
     ) { state ->
         val strings = TasksThemeRes.strings
         val navigator = LocalNavigator.currentOrThrow
+        var overviewTasksTab by rememberSaveable { mutableStateOf(OverviewTasksTab.HOMEWORKS) }
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -65,17 +70,34 @@ internal class OverviewScreen : Screen {
                 OverviewContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
-                    onOpenHomeworkTasks = { dispatchEvent(OverviewEvent.NavigateToHomeworks(it)) },
+                    overviewTasksTab = overviewTasksTab,
+                    onChangeTab = { overviewTasksTab = it },
+                    onOpenHomeworkEditor = { dispatchEvent(OverviewEvent.NavigateToHomeworkEditor(it)) },
                     onOpenSharedHomeworks = { dispatchEvent(OverviewEvent.NavigateToShare) },
-                    onShowAllHomeworkTasks = { dispatchEvent(OverviewEvent.NavigateToHomeworks(null)) },
+                    onShowHomeworkTasks = { dispatchEvent(OverviewEvent.NavigateToHomeworks(it)) },
                     onDoHomework = { dispatchEvent(OverviewEvent.DoHomework(it)) },
                     onSkipHomework = { dispatchEvent(OverviewEvent.SkipHomework(it)) },
                     onRepeatHomework = { dispatchEvent(OverviewEvent.RepeatHomework(it)) },
                     onShareHomeworks = { dispatchEvent(OverviewEvent.ShareHomeworks(it)) },
-                    onSelectGoalsDate = {dispatchEvent(OverviewEvent.SelectedGoalsDate(it)) },
+                    onSelectGoalsDate = { dispatchEvent(OverviewEvent.SelectedGoalsDate(it)) },
+                    onChangeGoalNumbers = { dispatchEvent(OverviewEvent.SetNewGoalNumbers(it)) },
+                    onCompleteGoal = { dispatchEvent(OverviewEvent.CompleteGoal(it)) },
+                    onDeleteGoal = { dispatchEvent(OverviewEvent.DeleteGoal(it)) },
+                    onStartGoalTime = { dispatchEvent(OverviewEvent.StartGoalTime(it)) },
+                    onPauseGoalTime = { dispatchEvent(OverviewEvent.PauseGoalTime(it)) },
+                    onResetGoalTime = { dispatchEvent(OverviewEvent.ResetGoalTime(it)) },
+                    onChangeGoalTimeType = { type, goal ->
+                        dispatchEvent(OverviewEvent.ChangeGoalTimeType(goal, type))
+                    },
+                    onChangeGoalDesiredTime = { time, goal ->
+                        dispatchEvent(OverviewEvent.ChangeGoalDesiredTime(goal, time))
+                    },
+                    onScheduleGoal = { dispatchEvent(OverviewEvent.ScheduleGoal(it)) },
                     onShowAllTodoTasks = { dispatchEvent(OverviewEvent.NavigateToTodos) },
                     onOpenTodoTask = { dispatchEvent(OverviewEvent.NavigateToTodoEditor(it)) },
-                    onChangeTodoDone = { task, done -> dispatchEvent(OverviewEvent.UpdateTodoDone(task, done)) },
+                    onChangeTodoDone = { task, done ->
+                        dispatchEvent(OverviewEvent.UpdateTodoDone(task, done))
+                    },
                 )
             },
             topBar = {
@@ -83,9 +105,14 @@ internal class OverviewScreen : Screen {
             },
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = { dispatchEvent(OverviewEvent.AddHomeworkInEditor) },
+                    onClick = {
+                        when (overviewTasksTab) {
+                            OverviewTasksTab.HOMEWORKS -> dispatchEvent(OverviewEvent.AddHomeworkInEditor)
+                            OverviewTasksTab.TODO -> dispatchEvent(OverviewEvent.NavigateToTodoEditor(null))
+                        }
+                    },
                     shape = MaterialTheme.shapes.large,
-                    backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,

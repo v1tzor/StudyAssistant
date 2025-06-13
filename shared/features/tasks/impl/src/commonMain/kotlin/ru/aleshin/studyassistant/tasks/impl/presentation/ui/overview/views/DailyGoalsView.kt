@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -51,6 +52,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -77,14 +79,20 @@ import ru.aleshin.studyassistant.core.common.extensions.handleLazyListScroll
 import ru.aleshin.studyassistant.core.common.extensions.isNextDay
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
+import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.Constants
+import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
+import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.tokens.contentColorFor
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.DailyGoalsProgressUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.DeleteGoalWarningDialog
 
 /**
  * @author Stanislav Aleshin on 26.03.2025.
@@ -98,6 +106,16 @@ internal fun DailyGoalsView(
     dailyGoals: List<GoalDetailsUi>,
     goalsProgress: Map<Instant, DailyGoalsProgressUi>,
     onSelectDate: (Instant) -> Unit,
+    onChangeGoalNumbers: (List<GoalDetailsUi>) -> Unit,
+    onOpenHomeworkEditor: (HomeworkUi) -> Unit,
+    onOpenTodoEditor: (TodoUi) -> Unit,
+    onCompleteGoal: (GoalDetailsUi) -> Unit,
+    onDeleteGoal: (GoalDetailsUi) -> Unit,
+    onStartGoalTime: (GoalDetailsUi) -> Unit,
+    onPauseGoalTime: (GoalDetailsUi) -> Unit,
+    onResetGoalTime: (GoalDetailsUi) -> Unit,
+    onChangeGoalTimeType: (GoalTime.Type, GoalDetailsUi) -> Unit,
+    onChangeGoalDesiredTime: (Millis?, GoalDetailsUi) -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth().height(369.dp),
@@ -132,8 +150,16 @@ internal fun DailyGoalsView(
                     modifier = Modifier.weight(1f),
                     isLoading = isLoadingGoals,
                     dailyGoals = dailyGoals,
-                    onCompleteGoal = {},
-                    onDeleteGoal = {},
+                    onOpenHomeworkEditor = onOpenHomeworkEditor,
+                    onOpenTodoEditor = onOpenTodoEditor,
+                    onCompleteGoal = onCompleteGoal,
+                    onDeleteGoal = onDeleteGoal,
+                    onChangeGoalNumbers = onChangeGoalNumbers,
+                    onStartTime = onStartGoalTime,
+                    onPauseTime = onPauseGoalTime,
+                    onResetTime = onResetGoalTime,
+                    onChangeTimeType = onChangeGoalTimeType,
+                    onChangeDesiredTime = onChangeGoalDesiredTime,
                 )
             }
         }
@@ -339,6 +365,7 @@ private fun GoalsByTypeProgressView(
                 fontWeight = FontWeight.Bold,
             )
             Crossfade(
+                modifier = Modifier.animateContentSize(),
                 targetState = isLoading,
                 animationSpec = spring(stiffness = Spring.StiffnessLow),
             ) { loading ->
@@ -356,7 +383,7 @@ private fun GoalsByTypeProgressView(
                     )
                 } else {
                     PlaceholderBox(
-                        modifier = Modifier.size(26.dp, 24.dp),
+                        modifier = Modifier.size(26.dp, 19.dp),
                         shape = MaterialTheme.shapes.small,
                         color = MaterialTheme.colorScheme.secondary,
                     )
@@ -378,6 +405,7 @@ private fun DateGoalRateView(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val rateBackgroundColor = when (goalCount) {
+            null -> StudyAssistantRes.colors.accents.greenContainer
             in 0..2 -> StudyAssistantRes.colors.accents.greenContainer
             in 3..5 -> StudyAssistantRes.colors.accents.orangeContainer
             else -> StudyAssistantRes.colors.accents.redContainer
@@ -459,6 +487,7 @@ private fun GoalListDivider(
         )
         HorizontalDivider(modifier = Modifier.weight(1f))
         Crossfade(
+            modifier = Modifier.animateContentSize(),
             targetState = isLoading,
             animationSpec = spring(stiffness = Spring.StiffnessLow),
         ) { loading ->
@@ -471,7 +500,7 @@ private fun GoalListDivider(
                 )
             } else {
                 PlaceholderBox(
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(20.dp, 17.dp),
                     shape = RoundedCornerShape(6.dp),
                 )
             }
@@ -480,20 +509,31 @@ private fun GoalListDivider(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 internal fun DailyGoalsViewContent(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     dailyGoals: List<GoalDetailsUi>,
+    onOpenHomeworkEditor: (HomeworkUi) -> Unit,
+    onOpenTodoEditor: (TodoUi) -> Unit,
     onCompleteGoal: (GoalDetailsUi) -> Unit,
     onDeleteGoal: (GoalDetailsUi) -> Unit,
+    onStartTime: (GoalDetailsUi) -> Unit,
+    onPauseTime: (GoalDetailsUi) -> Unit,
+    onResetTime: (GoalDetailsUi) -> Unit,
+    onChangeTimeType: (GoalTime.Type, GoalDetailsUi) -> Unit,
+    onChangeDesiredTime: (Millis?, GoalDetailsUi) -> Unit,
+    onChangeGoalNumbers: (List<GoalDetailsUi>) -> Unit,
+
 ) {
     val scope = rememberCoroutineScope()
     val reorderState = rememberReorderState<GoalDetailsUi>()
-    var goalBottomSheetViewerStatus by remember { mutableStateOf(false) }
-    var items by remember {
-        mutableStateOf(dailyGoals)
-    }
+    var goalItems by remember { mutableStateOf(dailyGoals) }
     val lazyListState = rememberLazyListState()
+
+    LaunchedEffect(dailyGoals) {
+        if (reorderState.draggedItem == null) goalItems = dailyGoals
+    }
 
     Crossfade(
         targetState = isLoading,
@@ -509,15 +549,19 @@ internal fun DailyGoalsViewContent(
                     state = lazyListState,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    if (items.isNotEmpty()) {
-                        items(items, key = { it.uid }, contentType = { it.contentType }) { goal ->
+                    if (goalItems.isNotEmpty()) {
+                        items(goalItems, key = { it.uid }, contentType = { it.contentType }) { goal ->
+                            var goalBottomSheetViewerStatus by remember { mutableStateOf(false) }
+                            var deleteWarningDialogState by remember { mutableStateOf(false) }
+
                             ReorderableItem(
                                 state = reorderState,
                                 key = goal,
                                 data = goal,
-                                onDrop = {},
+                                requireFirstDownUnconsumed = true,
+                                onDrop = { onChangeGoalNumbers(goalItems) },
                                 onDragEnter = { state ->
-                                    items = items.toMutableList().apply {
+                                    goalItems = goalItems.toMutableList().apply {
                                         val index = indexOf(goal)
                                         if (index == -1) return@ReorderableItem
                                         remove(state.data)
@@ -536,8 +580,37 @@ internal fun DailyGoalsViewContent(
                                 GoalViewItem(
                                     goal = goal,
                                     onClick = { goalBottomSheetViewerStatus = true },
-                                    onDelete = { onDeleteGoal(goal) },
+                                    onDelete = { deleteWarningDialogState = true },
                                     onComplete = { onCompleteGoal(goal) },
+                                )
+                            }
+
+                            if (deleteWarningDialogState) {
+                                DeleteGoalWarningDialog(
+                                    onDismiss = { deleteWarningDialogState = false },
+                                    onDelete = {
+                                        onDeleteGoal(goal)
+                                        deleteWarningDialogState = false
+                                    },
+                                )
+                            }
+
+                            if (goalBottomSheetViewerStatus) {
+                                GoalBottomSheet(
+                                    goal = goal,
+                                    onOpenTodoEditor = onOpenTodoEditor,
+                                    onOpenHomeworkEditor = onOpenHomeworkEditor,
+                                    onStartTime = { onStartTime(goal) },
+                                    onPauseTime = { onPauseTime(goal) },
+                                    onResetTime = { onResetTime(goal) },
+                                    onChangeTimeType = { onChangeTimeType(it, goal) },
+                                    onChangeDesiredTime = { onChangeDesiredTime(it, goal) },
+                                    onComplete = { onCompleteGoal(goal) },
+                                    onDelete = {
+                                        goalBottomSheetViewerStatus = false
+                                        onDeleteGoal(goal)
+                                   },
+                                    onDismissRequest = { goalBottomSheetViewerStatus = false }
                                 )
                             }
                         }
@@ -566,10 +639,6 @@ internal fun DailyGoalsViewContent(
             }
         }
     }
-
-    if (goalBottomSheetViewerStatus) {
-        // TODO
-    }
 }
 
 @Composable
@@ -593,7 +662,7 @@ private fun GoalDatePicker(
                 enabled = confirmEnabled,
                 onClick = {
                     val selectedDate = datePickerState.selectedDateMillis ?: return@TextButton
-                    onSelectedDate.invoke(selectedDate.mapEpochTimeToInstant())
+                    onSelectedDate.invoke(selectedDate.mapEpochTimeToInstant().startThisDay())
                 },
                 content = { Text(text = StudyAssistantRes.strings.selectConfirmTitle) }
             )

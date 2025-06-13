@@ -16,11 +16,13 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
+import kotlinx.coroutines.flow.first
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
+import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
@@ -37,6 +39,7 @@ internal interface HomeworkInteractor {
 
     class Base(
         private val homeworksRepository: HomeworksRepository,
+        private val goalsRepository: DailyGoalsRepository,
         private val usersRepository: UsersRepository,
         private val eitherWrapper: EditorEitherWrapper,
     ) : HomeworkInteractor {
@@ -45,7 +48,12 @@ internal interface HomeworkInteractor {
             get() = usersRepository.fetchCurrentUserOrError().uid
 
         override suspend fun addOrUpdateHomework(homework: Homework) = eitherWrapper.wrap {
-            homeworksRepository.addOrUpdateHomework(homework, targetUser)
+            homeworksRepository.addOrUpdateHomework(homework, targetUser).apply {
+                val linkedGoal = goalsRepository.fetchGoalByContentId(homework.uid, targetUser).first()
+                if (linkedGoal != null) {
+                    goalsRepository.addOrUpdateGoal(linkedGoal.copy(contentHomework = homework), targetUser)
+                }
+            }
         }
 
         override suspend fun fetchHomeworkById(homeworkId: UID) = eitherWrapper.wrapFlow {
