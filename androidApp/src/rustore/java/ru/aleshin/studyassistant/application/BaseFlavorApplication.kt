@@ -25,8 +25,10 @@ import ru.aleshin.studyassistant.core.remote.datasources.message.MessagingServic
 import ru.aleshin.studyassistant.data.AnalyticsServiceImpl
 import ru.aleshin.studyassistant.data.AppServiceImpl
 import ru.aleshin.studyassistant.data.CrashlyticsServiceImpl
+import ru.aleshin.studyassistant.data.IapServiceImpl
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.ok.tracer.HasTracerConfiguration
+import ru.rustore.sdk.billingclient.RuStoreBillingClientFactory
 import ru.rustore.sdk.pushclient.common.logger.DefaultLogger
 import ru.rustore.sdk.universalpush.RuStoreUniversalPushClient
 import ru.rustore.sdk.universalpush.firebase.provides.FirebasePushProvider
@@ -69,6 +71,15 @@ abstract class BaseFlavorApplication : BaseApplication(), HasTracerConfiguration
                     context = applicationContext,
                 ),
                 crashlyticsService = CrashlyticsServiceImpl(),
+                iapService = IapServiceImpl(
+                    applicationContext = applicationContext,
+                    billingClient = RuStoreBillingClientFactory.create(
+                        context = applicationContext,
+                        consoleApplicationId = BuildConfig.RUSTORE_CONSOLE_APP_ID,
+                        deeplinkScheme = Constants.App.PAY_DEEPLINK_SCHEME,
+                        debugLogs = BuildConfig.DEBUG,
+                    ),
+                ),
                 applicationContext = applicationContext,
             )
         )

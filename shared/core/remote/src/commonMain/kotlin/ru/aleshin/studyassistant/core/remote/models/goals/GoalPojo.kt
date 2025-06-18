@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.remote.models.goals
 
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
@@ -23,6 +24,7 @@ import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 /**
  * @author Stanislav Aleshin on 18.04.2025.
  */
+@Serializable
 data class GoalPojo(
     val uid: UID = "",
     val type: String = "",

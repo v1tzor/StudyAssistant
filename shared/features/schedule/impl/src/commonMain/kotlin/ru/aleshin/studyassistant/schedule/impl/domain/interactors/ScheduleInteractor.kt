@@ -23,12 +23,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.dateTimeByWeek
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
+import ru.aleshin.studyassistant.core.common.extensions.shiftMinutes
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.entities.classes.ActiveClass
 import ru.aleshin.studyassistant.core.domain.entities.classes.convertToDetails
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
@@ -58,6 +62,7 @@ internal interface ScheduleInteractor {
     suspend fun addBaseSchedules(schedules: List<BaseSchedule>): UnitDomainResult<ScheduleFailures>
     suspend fun fetchDetailsWeekSchedule(week: TimeRange): FlowDomainResult<ScheduleFailures, WeekScheduleDetails>
     suspend fun fetchDetailsScheduleByDate(date: Instant): FlowDomainResult<ScheduleFailures, ScheduleDetails>
+    suspend fun updateActiveClass(schedule: ScheduleDetails, classesDate: Instant): FlowDomainResult<ScheduleFailures, ActiveClass?>
 
     class Base(
         private val homeworksRepository: HomeworksRepository,
@@ -203,6 +208,53 @@ internal interface ScheduleInteractor {
                         }
                     )
                 }
+            }
+        }
+
+        override suspend fun updateActiveClass(
+            schedule: ScheduleDetails,
+            classesDate: Instant
+        ) = eitherWrapper.wrapFlow {
+            val ticker = dateManager.secondTicker()
+            val scheduleClasses = schedule.mapToValue(
+                onBaseSchedule = { it?.classes },
+                onCustomSchedule = { it?.classes }
+            )
+            return@wrapFlow ticker.map {
+                var activeClassData: ActiveClass? = null
+                val currentInstant = dateManager.fetchCurrentInstant()
+
+                if (classesDate.equalsDay(currentInstant) && scheduleClasses != null) {
+                    val activeClass = scheduleClasses.find { classModel ->
+                        val endInstant = classesDate.setHoursAndMinutes(classModel.timeRange.to)
+                        return@find currentInstant <= endInstant
+                    }
+                    if (activeClass != null) {
+                        val lastClass = scheduleClasses.findLast { classModel ->
+                            val endInstant = classesDate.setHoursAndMinutes(classModel.timeRange.to)
+                            val activeStartInstant = classesDate.setHoursAndMinutes(activeClass.timeRange.from)
+                            return@findLast activeStartInstant > endInstant
+                        }
+                        val lastEndInstant = lastClass?.timeRange?.to?.let { classesDate.setHoursAndMinutes(it) }
+
+                        val startInstant = classesDate.setHoursAndMinutes(activeClass.timeRange.from)
+                        val endInstant = classesDate.setHoursAndMinutes(activeClass.timeRange.to)
+                        val isStarted = currentInstant > startInstant
+
+                        activeClassData = ActiveClass(
+                            uid = activeClass.uid,
+                            isStarted = isStarted,
+                            progress = dateManager.calculateProgress(
+                                startTime = if (isStarted) startInstant else lastEndInstant ?: startInstant.shiftMinutes(-10),
+                                endTime = if (isStarted) endInstant else startInstant,
+                            ),
+                            duration = dateManager.calculateLeftDateTime(
+                                endDateTime = if (isStarted) endInstant else startInstant,
+                            )
+                        )
+                    }
+                }
+                activeClassData
             }
         }
     }

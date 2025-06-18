@@ -59,6 +59,7 @@ internal fun ProfileTopSheet(
     onUpdateAvatar: (PlatformFile) -> Unit,
     onDeleteAvatar: () -> Unit,
     onExceedingLimit: (Int) -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) {
     FreeOrPaidContent(
         isPaidUser = isPaidUser,
@@ -78,6 +79,7 @@ internal fun ProfileTopSheet(
         freeContent = {
             ProfileTopSheetFree(
                 appUser = appUser,
+                onClick = onOpenBillingScreen,
             )
         },
     )
@@ -87,6 +89,7 @@ internal fun ProfileTopSheet(
 private fun ProfileTopSheetFree(
     modifier: Modifier = Modifier,
     appUser: AppUserUi?,
+    onClick: () -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -100,9 +103,8 @@ private fun ProfileTopSheetFree(
         ) {
             if (appUser != null) {
                 ClickableAvatarView(
-                    onClick = {},
+                    onClick = onClick,
                     modifier = Modifier.size(120.dp),
-                    enabled = false,
                     imageUrl = appUser.avatar,
                     sideIcon = {
                         Icon(

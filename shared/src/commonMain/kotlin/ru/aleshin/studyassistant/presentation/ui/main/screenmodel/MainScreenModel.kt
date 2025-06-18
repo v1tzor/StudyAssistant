@@ -70,6 +70,10 @@ class MainScreenModel(
                     val command = MainWorkCommand.UpdateReminderServices
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(MainWorkCommand.UpdateSubscriptionInfo) {
+                    val command = MainWorkCommand.UpdateSubscriptionInfo
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
         }
     }

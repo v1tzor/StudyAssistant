@@ -65,8 +65,8 @@ internal fun SubscribeInfo.mapToUi() = SubscribeInfoUi(
     purchaseId = purchaseId,
     productId = productId,
     subscriptionToken = subscriptionToken,
-    purchaseDate = purchaseDate,
-    subscriptionPeriod = subscriptionPeriod,
+    startTimeMillis = startTimeMillis,
+    expiryTimeMillis = expiryTimeMillis,
     store = store,
 )
 
@@ -74,9 +74,9 @@ internal fun SubscribeInfoUi.mapToDomain() = SubscribeInfo(
     deviceId = deviceId,
     purchaseId = purchaseId,
     productId = productId,
+    startTimeMillis = startTimeMillis,
+    expiryTimeMillis = expiryTimeMillis,
     subscriptionToken = subscriptionToken,
-    purchaseDate = purchaseDate,
-    subscriptionPeriod = subscriptionPeriod,
     store = store,
 )
 

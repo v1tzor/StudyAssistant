@@ -29,6 +29,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":shared:features:settings:api"))
+            implementation(project(":shared:features:billing:api"))
 
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:data"))

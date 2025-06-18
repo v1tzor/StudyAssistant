@@ -70,7 +70,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<NavigationScreen> { NavigationScreen() }
 
     bindProvider<EditorFeatureStarter> { EditorFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<EditorScreenProvider> { EditorScreenProvider.Base() }
+    bindProvider<EditorScreenProvider> { EditorScreenProvider.Base(instance()) }
 
     bindProvider<WeekScheduleStateCommunicator> { WeekScheduleStateCommunicator.Base() }
     bindProvider<WeekScheduleEffectCommunicator> { WeekScheduleEffectCommunicator.Base() }
@@ -115,5 +115,5 @@ internal val presentationModule = DI.Module("Presentation") {
     bindProvider<ProfileStateCommunicator> { ProfileStateCommunicator.Base() }
     bindProvider<ProfileEffectCommunicator> { ProfileEffectCommunicator.Base() }
     bindProvider<ProfileWorkProcessor> { ProfileWorkProcessor.Base(instance()) }
-    bindProvider<ProfileScreenModel> { ProfileScreenModel(instance(), instance(), instance(), instance()) }
+    bindProvider<ProfileScreenModel> { ProfileScreenModel(instance(), instance(), instance(), instance(), instance()) }
 }

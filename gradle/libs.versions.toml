@@ -4,11 +4,12 @@ minSdk = "24"
 targetSdk = "35"
 compileSdk = "35"
 jvmTarget = "17"
-version-name = "0.0.2"
-version-code = "2"
+version-name = "0.0.3"
+version-code = "3"
 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 agp = "8.6.0"
 kotlin = "2.1.0"
+atomic = "0.28.0"
 kotlin-coroutines = "1.9.0"
 kotlin-datetime = "0.6.1"
 kotlin-serialization = "1.7.1"
@@ -18,7 +19,7 @@ compose-compiler = "1.5.11"
 compose-material3 = "1.3.2"
 compose-adaptive = "1.1.1"
 compose-material = "1.12.0"
-compose-plugin = "1.8.1"
+compose-plugin = "1.8.2"
 androidx-activityCompose = "1.10.1"
 workmanager = "2.10.0"
 gms = "4.4.2"
@@ -26,7 +27,9 @@ hms = "1.9.1.304"
 oauth = "1.24.0"
 firebase-bom = "33.12.0"
 crashlytics = "3.0.3"
-rustore-bom = "6.0.0"
+rustore-push = "6.10.0"
+rustore-pay = "9.0.2"
+rustore-billing = "9.0.1"
 firebase-gitlive = "2.1.0"
 tracer = "1.0.10"
 mytracker = "3.4.1"
@@ -50,6 +53,7 @@ drag-and-drop = "0.3.0"
 filekit = "0.7.0"
 konfig = "0.17.1"
 guava = "33.4.8-android"
+openai = "4.0.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -81,6 +85,8 @@ google-auth = { module = "io.github.mirzemehdi:kmpauth-google", version.ref = "k
 hms-core = { module = "com.huawei.agconnect:agconnect-core", version.ref="hms" }
 hms-push = { module = "com.huawei.hms:push", version.ref="hms" }
 hms-agcp = { module = "com.huawei.agconnect:agcp", version.ref="hms" }
+hms-iap = { module = "com.huawei.hms:iap", version.ref="hms" }
+hms-coreinstaller = { module = "com.huawei.hms:hmscoreinstaller", version.ref="hms" }
 placeholder = { group = "com.eygraber", name = "compose-placeholder-material3", version.ref = "placeholder" }
 firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebase-gitlive" }
 firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebase-gitlive" }
@@ -91,11 +97,12 @@ firebase-crashlytics-android = { module = "com.google.firebase:firebase-crashlyt
 firebase-auth-android = { module = "com.google.firebase:firebase-auth-ktx" }
 firebase-messaging-android = { module = "com.google.firebase:firebase-messaging" }
 firebase-messaging-directboot-android = { module = "com.google.firebase:firebase-messaging-directboot" }
-rustore-bom = { module = "ru.rustore.sdk:bom", version.ref = "rustore-bom" }
-rustore-universalpush-core = { module = "ru.rustore.sdk:universalpush" }
-rustore-universalpush-rustore = { module = "ru.rustore.sdk:universalrustore" }
-rustore-universalpush-fcm = { module = "ru.rustore.sdk:universalfcm" }
-rustore-universalpush-hms = { module = "ru.rustore.sdk:universalhms" }
+rustore-universalpush-core = { module = "ru.rustore.sdk:universalpush", version.ref="rustore-push" }
+rustore-universalpush-rustore = { module = "ru.rustore.sdk:universalrustore", version.ref="rustore-push" }
+rustore-universalpush-fcm = { module = "ru.rustore.sdk:universalfcm", version.ref="rustore-push" }
+rustore-universalpush-hms = { module = "ru.rustore.sdk:universalhms", version.ref="rustore-push" }
+rustore-billing = { module = "ru.rustore.sdk:billingclient", version.ref="rustore-billing" }
+rustore-pay = { module = "ru.rustore.sdk:pay", version.ref="rustore-pay" }
 tracer-plugin = { module = "ru.ok.tracer:tracer-plugin", version.ref = "tracer" }
 tracer-bom = { module = "ru.ok.tracer:tracer-platform", version.ref = "tracer" }
 tracer-crashReport = { module = "ru.ok.tracer:tracer-crash-report" }
@@ -136,6 +143,7 @@ ktor-client-content-negotation = { module = "io.ktor:ktor-client-content-negotia
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
 filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekit" }
+openai = { module = "com.aallam.openai:openai-client", version.ref = "openai" }
 
 [bundles]
 firebase = ["firebase-auth", "firebase-firestore", "firebase-storage", "firebase-messaging"]
@@ -150,6 +158,7 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinAtomic = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "atomic" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

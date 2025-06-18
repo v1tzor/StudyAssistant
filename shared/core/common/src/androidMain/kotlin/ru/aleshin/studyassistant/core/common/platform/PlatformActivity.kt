@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.payments
+package ru.aleshin.studyassistant.core.common.platform
 
-/**
- * @author Stanislav Aleshin on 18.04.2025.
- */
-interface PaymentsService {
-    fun init()
-}
+import androidx.activity.ComponentActivity
+
+actual abstract class PlatformActivity : ComponentActivity()

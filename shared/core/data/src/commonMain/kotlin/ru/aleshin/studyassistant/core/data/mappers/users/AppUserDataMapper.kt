@@ -16,13 +16,12 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.users
 
-import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.messages.PushServiceType
+import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetwork
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
-import ru.aleshin.studyassistant.core.domain.entities.users.Store
 import ru.aleshin.studyassistant.core.domain.entities.users.SubscribeInfo
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
@@ -78,8 +77,9 @@ internal fun SubscribeInfo.mapToRemoteData() = SubscribeInfoPojo(
     purchaseId = purchaseId,
     productId = productId,
     subscriptionToken = subscriptionToken,
-    purchaseDate = purchaseDate.toEpochMilliseconds(),
-    subscriptionPeriod = subscriptionPeriod,
+    orderId = orderId ?: "",
+    startTimeMillis = startTimeMillis,
+    expiryTimeMillis = expiryTimeMillis,
     store = store.name,
 )
 
@@ -108,7 +108,8 @@ internal fun SubscribeInfoPojo.mapToDomain() = SubscribeInfo(
     purchaseId = purchaseId,
     productId = productId,
     subscriptionToken = subscriptionToken,
-    purchaseDate = purchaseDate.mapEpochTimeToInstant(),
-    subscriptionPeriod = subscriptionPeriod,
+    orderId = orderId,
+    startTimeMillis = startTimeMillis,
+    expiryTimeMillis = expiryTimeMillis,
     store = Store.valueOf(store),
 )

@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.auth.impl.domain.common
 
+import dev.gitlive.firebase.FirebaseTooManyRequestsException
 import dev.gitlive.firebase.auth.FirebaseAuthException
 import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
@@ -36,6 +37,7 @@ internal interface AuthErrorHandler : ErrorHandler<AuthFailures> {
             is FirebaseUserException -> AuthFailures.NotFoundUserInfoError
             is NullPointerException -> AuthFailures.NotFoundUserInfoError
             is FirebaseAuthInvalidCredentialsException -> AuthFailures.CredentialsError
+            is FirebaseTooManyRequestsException -> AuthFailures.TooManyRequestsError
             is IllegalArgumentException -> AuthFailures.CredentialsError
             else -> AuthFailures.OtherError(throwable)
         }

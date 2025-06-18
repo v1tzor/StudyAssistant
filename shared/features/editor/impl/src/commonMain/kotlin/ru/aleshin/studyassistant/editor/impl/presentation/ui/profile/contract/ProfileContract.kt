@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract
 
 import androidx.compose.runtime.Immutable
+import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import io.github.vinceglb.filekit.core.PlatformFile
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
@@ -50,11 +51,13 @@ internal sealed class ProfileEvent : BaseEvent {
     data class UpdateCity(val city: String?) : ProfileEvent()
     data class UpdateSocialNetworks(val socialNetworks: List<SocialNetworkUi>) : ProfileEvent()
     data class UpdatePassword(val oldPassword: String, val newPassword: String) : ProfileEvent()
+    data object NavigateToBillingScreen : ProfileEvent()
     data object NavigateToBack : ProfileEvent()
 }
 
 internal sealed class ProfileEffect : BaseUiEffect {
     data class ShowError(val failures: EditorFailures) : ProfileEffect()
+    data class NavigateToGlobal(val pushScreen: Screen) : ProfileEffect()
     data object NavigateToBack : ProfileEffect()
 }
 

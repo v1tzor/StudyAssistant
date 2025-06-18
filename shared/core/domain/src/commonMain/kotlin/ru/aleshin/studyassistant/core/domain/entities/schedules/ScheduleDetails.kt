@@ -29,6 +29,14 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.convertTo
 sealed class ScheduleDetails {
     data class Base(val data: BaseScheduleDetails?) : ScheduleDetails()
     data class Custom(val data: CustomScheduleDetails?) : ScheduleDetails()
+
+    inline fun <T> mapToValue(
+        onBaseSchedule: (BaseScheduleDetails?) -> T,
+        onCustomSchedule: (CustomScheduleDetails?) -> T,
+    ) = when (this) {
+        is Base -> onBaseSchedule(data)
+        is Custom -> onCustomSchedule(data)
+    }
 }
 
 fun Schedule.convertToDetails(

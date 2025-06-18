@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.payments
+package ru.aleshin.studyassistant.billing.impl.di.modules
+
+import org.kodein.di.DI
+import org.kodein.di.bindEagerSingleton
+import org.kodein.di.bindSingleton
+import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.impl.navigation.BillingNavigatorManager
+import ru.aleshin.studyassistant.core.common.navigation.CommandBuffer
 
 /**
- * @author Stanislav Aleshin on 30.04.2024.
+ * @author Stanislav Aleshin on 27.05.2024.
  */
-interface SubscriptionChecker {
-
-    fun checkSubscriptionActivity(): Boolean
-
-    object FreeApp : SubscriptionChecker {
-        override fun checkSubscriptionActivity() = false
-    }
+internal val navigationModule = DI.Module("Navigation") {
+    bindEagerSingleton<BillingNavigatorManager> { BillingNavigatorManager.Base(instance()) }
+    bindSingleton<CommandBuffer> { CommandBuffer.Base() }
 }

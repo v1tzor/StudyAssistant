@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.users
 
-import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
 
 /**
  * @author Stanislav Aleshin on 30.08.2024.
@@ -27,7 +27,8 @@ data class SubscribeInfo(
     val purchaseId: UID,
     val productId: UID,
     val subscriptionToken: UID? = null,
-    val purchaseDate: Instant,
-    val subscriptionPeriod: Long? = null,
+    val orderId: UID? = null,
+    val startTimeMillis: Long,
+    val expiryTimeMillis: Long,
     val store: Store,
 )

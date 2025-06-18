@@ -49,6 +49,7 @@ android {
         val firebaseApiKey = localProperties.getProperty("firebaseApiKey")
         val myTrackerKey = localProperties.getProperty("myTrackerKey")
         val hmsAppId = localProperties.getProperty("hmsAppId")
+        val rustoreConsoleAppId = localProperties.getProperty("rustoreConsoleAppId")
 
         buildConfigField("String", "HMS_APP_ID", "\"$hmsAppId\"")
         buildConfigField("String", "MY_TRACKER_KEY", "\"$myTrackerKey\"")
@@ -56,6 +57,7 @@ android {
         buildConfigField("String", "APPLICATION_ID", "\"$firebaseApplicationId\"")
         buildConfigField("String", "STORAGE_BUCKET", "\"$firebaseStorageBucket\"")
         buildConfigField("String", "FIREBASE_API_KEY", "\"$firebaseApiKey\"")
+        buildConfigField("String", "RUSTORE_CONSOLE_APP_ID", "\"$rustoreConsoleAppId\"")
     }
 
     signingConfigs {
@@ -86,7 +88,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
         getByName("debug") {
-            applicationIdSuffix = ".debug"
+            // applicationIdSuffix = ".debug"
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
         }
@@ -168,15 +170,17 @@ dependencies {
     githubImplementation(libs.hms.push)
     huaweiImplementation(libs.hms.push)
 
-    implementation(platform(libs.rustore.bom))
+//    huaweiImplementation(libs.hms.iap)
+    rustoreImplementation(libs.rustore.billing)
+
     implementation(libs.rustore.universalpush.core)
     huaweiImplementation(libs.rustore.universalpush.hms)
     rustoreImplementation(libs.rustore.universalpush.fcm)
     rustoreImplementation(libs.rustore.universalpush.hms)
     rustoreImplementation(libs.rustore.universalpush.rustore)
+    githubImplementation(libs.rustore.universalpush.rustore)
     githubImplementation(libs.rustore.universalpush.fcm)
     githubImplementation(libs.rustore.universalpush.hms)
-    githubImplementation(libs.rustore.universalpush.rustore)
 }
 
 tracer {

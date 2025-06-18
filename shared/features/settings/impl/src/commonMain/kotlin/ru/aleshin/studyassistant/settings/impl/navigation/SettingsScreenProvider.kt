@@ -16,6 +16,9 @@
 
 package ru.aleshin.studyassistant.settings.impl.navigation
 
+import cafe.adriel.voyager.core.screen.Screen
+import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
+import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.settings.api.navigation.SettingsScreen
 import ru.aleshin.studyassistant.settings.api.presentation.SettingsRootScreen
@@ -29,13 +32,21 @@ import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.Subs
  */
 internal interface SettingsScreenProvider : FeatureScreenProvider<SettingsScreen, SettingsRootScreen> {
 
-    class Base : SettingsScreenProvider {
+    fun provideBillingScreen(screen: BillingScreen): Screen
+
+    class Base(
+        private val billingFeatureStarter: () -> BillingFeatureStarter,
+    ) : SettingsScreenProvider {
 
         override fun provideFeatureScreen(screen: SettingsScreen) = when (screen) {
             is SettingsScreen.General -> GeneralScreen()
             is SettingsScreen.Notification -> NotificationScreen()
             is SettingsScreen.Calendar -> CalendarScreen()
             is SettingsScreen.Subscription -> SubscriptionScreen()
+        }
+
+        override fun provideBillingScreen(screen: BillingScreen): Screen {
+            return billingFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }

@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.di.modules
 
+import dev.gitlive.firebase.firestore.FirebaseFirestore
 import org.kodein.di.DI
 import org.kodein.di.bindEagerSingleton
 import org.kodein.di.bindProvider
@@ -24,12 +25,17 @@ import org.kodein.di.provider
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
+import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
+import ru.aleshin.studyassistant.billing.impl.di.BillingFeatureDependencies
+import ru.aleshin.studyassistant.billing.impl.di.holder.BillingFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
+import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
@@ -277,6 +283,7 @@ val featureModule = DI.Module("Feature") {
 
     bindEagerSingleton<EditorFeatureDependencies> {
         object : EditorFeatureDependencies {
+            override val billingFeatureStarter = provider<BillingFeatureStarter>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
@@ -307,6 +314,7 @@ val featureModule = DI.Module("Feature") {
 
     bindEagerSingleton<SettingsFeatureDependencies> {
         object : SettingsFeatureDependencies {
+            override val billingFeatureStarter = provider<BillingFeatureStarter>()
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
@@ -327,8 +335,30 @@ val featureModule = DI.Module("Feature") {
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
+
     bindProvider<SettingsFeatureStarter> {
         with(SettingsFeatureDIHolder) {
+            init(instance())
+            fetchApi().fetchStarter()
+        }
+    }
+
+    bindEagerSingleton<BillingFeatureDependencies> {
+        object : BillingFeatureDependencies {
+            override val usersRepository = instance<UsersRepository>()
+            override val manageUserRepository = instance<ManageUserRepository>()
+            override val dateManager = instance<DateManager>()
+            override val deviceInfoProvider = instance<DeviceInfoProvider>()
+            override val coroutineManager = instance<CoroutineManager>()
+            override val firestore = instance<FirebaseFirestore>()
+            override val iapService = instance<IapService>()
+            override val crashlyticsService = instance<CrashlyticsService>()
+            override val analyticsService = instance<AnalyticsService>()
+        }
+    }
+
+    bindProvider<BillingFeatureStarter> {
+        with(BillingFeatureDIHolder) {
             init(instance())
             fetchApi().fetchStarter()
         }

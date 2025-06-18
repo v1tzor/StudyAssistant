@@ -26,4 +26,10 @@ object StudyAssistantKtor {
         const val SEND_TOKENS = "send"
         const val SEND_TOPIC = "send/topic"
     }
+
+    object ChatGpt {
+        const val RESPONSES_API = "https://api.openai.com/v1/responses"
+        const val BEARER = "Bearer "
+        const val MODEL = "gpt-4o-mini"
+    }
 }

@@ -16,6 +16,9 @@
 
 package ru.aleshin.studyassistant.editor.impl.navigation
 
+import cafe.adriel.voyager.core.screen.Screen
+import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
+import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
 import ru.aleshin.studyassistant.editor.api.presentation.EditorRootScreen
@@ -34,7 +37,11 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.TodoScreen
  */
 internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen, EditorRootScreen> {
 
-    class Base : EditorScreenProvider {
+    fun provideBillingScreen(screen: BillingScreen): Screen
+
+    class Base(
+        private val billingFeatureStarter: () -> BillingFeatureStarter,
+    ) : EditorScreenProvider {
 
         override fun provideFeatureScreen(screen: EditorScreen) = when (screen) {
             is EditorScreen.WeekSchedule -> WeekScheduleScreen(
@@ -73,6 +80,10 @@ internal interface EditorScreenProvider : FeatureScreenProvider<EditorScreen, Ed
             is EditorScreen.Todo -> TodoScreen(
                 todoId = screen.todoId,
             )
+        }
+
+        override fun provideBillingScreen(screen: BillingScreen): Screen {
+            return billingFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }

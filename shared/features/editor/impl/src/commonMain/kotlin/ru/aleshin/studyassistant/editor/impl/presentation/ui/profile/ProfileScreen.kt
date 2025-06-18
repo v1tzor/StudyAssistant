@@ -32,6 +32,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
+import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
@@ -85,6 +86,7 @@ internal class ProfileScreen : Screen {
                         appUser = state.appUser,
                         onUpdateAvatar = { file -> dispatchEvent(ProfileEvent.UpdateAvatar(file)) },
                         onDeleteAvatar = { dispatchEvent(ProfileEvent.DeleteAvatar) },
+                        onOpenBillingScreen = { dispatchEvent(ProfileEvent.NavigateToBillingScreen) },
                         onExceedingLimit = {
                             coroutineScope.launch {
                                 snackbarState.showSnackbar(
@@ -107,6 +109,7 @@ internal class ProfileScreen : Screen {
         handleEffect { effect ->
             when (effect) {
                 is ProfileEffect.NavigateToBack -> navigator.nestedPop()
+                is ProfileEffect.NavigateToGlobal -> navigator.root().push(effect.pushScreen)
                 is ProfileEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

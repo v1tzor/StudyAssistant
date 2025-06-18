@@ -28,7 +28,6 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
 
-            implementation(project.dependencies.platform(libs.rustore.bom))
             implementation(libs.rustore.universalpush.core)
 
             implementation(project.dependencies.platform(libs.google.oauth.bom.android))
@@ -47,6 +46,7 @@ kotlin {
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
             implementation(libs.networkcheker)
+            implementation(libs.openai)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -84,6 +84,7 @@ buildkonfig {
     val hmsAppId = gradleLocalProperties(rootDir, providers).getProperty("hmsAppId")
     val hmsClientId = gradleLocalProperties(rootDir, providers).getProperty("hmsClientId")
     val hmsClientSecret = gradleLocalProperties(rootDir, providers).getProperty("hmsClientSecret")
+    val chatGptKey = gradleLocalProperties(rootDir, providers).getProperty("chatGptKey")
 
     defaultConfigs {
         buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", isDebug.toString())
@@ -91,7 +92,8 @@ buildkonfig {
         buildConfigField(FieldSpec.Type.STRING, "RUSTORE_PROJECT_ID", rustoreProjectId)
         buildConfigField(FieldSpec.Type.STRING, "RUSTORE_SERVICE_AUTH_TOKEN", rustoreAuthToken)
         buildConfigField(FieldSpec.Type.STRING, "HMS_PROJECT_ID", hmsAppId)
-        buildConfigField(FieldSpec.Type.STRING, "HMS_CLIENT_ID", hmsAppId)
-        buildConfigField(FieldSpec.Type.STRING, "HMS_CLIENT_SECRET", hmsAppId)
+        buildConfigField(FieldSpec.Type.STRING, "HMS_CLIENT_ID", hmsClientId)
+        buildConfigField(FieldSpec.Type.STRING, "HMS_CLIENT_SECRET", hmsClientSecret)
+        buildConfigField(FieldSpec.Type.STRING, "CHAT_GPT_KEY", chatGptKey)
     }
 }

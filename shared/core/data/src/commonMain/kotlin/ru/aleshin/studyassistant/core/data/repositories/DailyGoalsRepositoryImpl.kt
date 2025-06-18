@@ -24,7 +24,6 @@ import kotlinx.datetime.Instant.Companion.DISTANT_FUTURE
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.payments.SubscriptionChecker
 import ru.aleshin.studyassistant.core.data.mappers.goals.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.goals.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.goals.mapToRemoteData
@@ -33,6 +32,7 @@ import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.goals.Goal
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalShort
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
+import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.goals.DailyGoalsRemoteDataSource
 
 /**

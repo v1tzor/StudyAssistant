@@ -5,6 +5,7 @@ pluginManagement {
         mavenCentral()
         maven("https://developer.huawei.com/repo/")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://artifactory-external.vkpartner.ru/artifactory/maven")
     }
 }
 
@@ -51,3 +52,5 @@ include(":shared:features:users:api")
 include(":shared:features:users:impl")
 include(":shared:features:editor:api")
 include(":shared:features:editor:impl")
+include(":shared:features:billing:api")
+include(":shared:features:billing:impl")

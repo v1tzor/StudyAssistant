@@ -27,7 +27,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
@@ -47,6 +50,7 @@ internal class SubscriptionScreen : Screen {
         initialState = SubscriptionViewState(),
     ) { state ->
         val strings = SettingsThemeRes.strings
+        val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -57,6 +61,7 @@ internal class SubscriptionScreen : Screen {
                     modifier = Modifier.padding(paddingValues),
                     onTransferRemoteData = { dispatchEvent(SubscriptionEvent.TransferRemoteData) },
                     onTransferLocalData = { dispatchEvent(SubscriptionEvent.TransferLocalData) },
+                    onOpenBilling = { dispatchEvent(SubscriptionEvent.NavigateToBilling) }
                 )
             },
             snackbarHost = {
@@ -70,6 +75,7 @@ internal class SubscriptionScreen : Screen {
 
         handleEffect { effect ->
             when (effect) {
+                is SubscriptionEffect.NavigateToGlobal -> navigator.root().push(effect.pushScreen)
                 is SubscriptionEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

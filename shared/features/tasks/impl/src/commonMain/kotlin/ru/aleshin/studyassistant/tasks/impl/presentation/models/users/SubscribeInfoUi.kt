@@ -18,11 +18,8 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.models.users
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
-import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
-import ru.aleshin.studyassistant.core.domain.entities.users.Store
+import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
 
 /**
  * @author Stanislav Aleshin on 30.08.2024.
@@ -33,8 +30,7 @@ internal data class SubscribeInfoUi(
     val purchaseId: UID,
     val productId: UID,
     val subscriptionToken: UID? = null,
-    @TypeParceler<Instant, InstantParceler>
-    val purchaseDate: Instant,
-    val subscriptionPeriod: Long? = null,
+    val startTimeMillis: Long,
+    val expiryTimeMillis: Long,
     val store: Store,
 ) : Parcelable

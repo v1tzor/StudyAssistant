@@ -60,6 +60,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
             is MainWorkCommand.InitialNavigation -> initialNavigationWork()
             is MainWorkCommand.UpdatePushToken -> updatePushTokenWork()
             is MainWorkCommand.UpdateReminderServices -> updateReminderServicesWork()
+            is MainWorkCommand.UpdateSubscriptionInfo -> updateUserSubscriptionInfoWork()
         }
 
         private fun loadThemeWork() = flow {
@@ -145,6 +146,12 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                 },
             )
         }
+
+        private fun updateUserSubscriptionInfoWork() = flow {
+            userInteractor.updateUserSubscriptionInfo().handle(
+                onLeftAction = { emit(EffectResult(MainEffect.ShowError(it))) },
+            )
+        }
     }
 }
 
@@ -153,4 +160,5 @@ sealed class MainWorkCommand : WorkCommand {
     data object InitialNavigation : MainWorkCommand()
     data object UpdatePushToken : MainWorkCommand()
     data object UpdateReminderServices : MainWorkCommand()
+    data object UpdateSubscriptionInfo : MainWorkCommand()
 }

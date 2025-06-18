@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.domain.entities.users
+package ru.aleshin.studyassistant.billing.api.navigation
+
+import ru.aleshin.studyassistant.billing.api.presentation.BillingRootScreen
+import ru.aleshin.studyassistant.core.common.inject.FeatureStarter
 
 /**
- * @author Stanislav Aleshin on 30.08.2024.
+ * @author Stanislav Aleshin on 27.05.2024.
  */
-enum class Store {
-    RU_STORE, GOOGLE_PLAY, APP_GALLERY, APP_STORE
-}
+interface BillingFeatureStarter : FeatureStarter.WithNestedNavigation<BillingScreen, BillingRootScreen>

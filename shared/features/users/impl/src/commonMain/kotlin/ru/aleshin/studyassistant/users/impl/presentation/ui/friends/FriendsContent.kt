@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -319,7 +320,7 @@ private fun FriendsViewItem(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.width(15.dp).padding(top = 16.dp),
             text = char.toString(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -371,7 +372,7 @@ private fun MyFriendsSectionSectionHeader(
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = UsersThemeRes.strings.friendRequestsSectionHeader,
+            text = UsersThemeRes.strings.myFriendsSectionHeader,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
             style = MaterialTheme.typography.titleMedium,

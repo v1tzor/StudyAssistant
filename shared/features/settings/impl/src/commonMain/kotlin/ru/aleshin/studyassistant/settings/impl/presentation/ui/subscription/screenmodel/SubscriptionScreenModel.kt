@@ -20,12 +20,14 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.settings.impl.di.holder.SettingsFeatureDIHolder
+import ru.aleshin.studyassistant.settings.impl.navigation.SettingsScreenProvider
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionAction
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionEffect
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionEvent
@@ -36,6 +38,7 @@ import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.cont
  */
 internal class SubscriptionScreenModel(
     private val workProcessor: SubscriptionWorkProcessor,
+    private val screenProvider: SettingsScreenProvider,
     stateCommunicator: SubscriptionStateCommunicator,
     effectCommunicator: SubscriptionEffectCommunicator,
     coroutineManager: CoroutineManager,
@@ -77,6 +80,10 @@ internal class SubscriptionScreenModel(
                     val command = SubscriptionWorkCommand.TransferLocalData
                     workProcessor.work(command).collectAndHandleWork()
                 }
+            }
+            is SubscriptionEvent.NavigateToBilling -> {
+                val screen = screenProvider.provideBillingScreen(BillingScreen.Subscription)
+                sendEffect(SubscriptionEffect.NavigateToGlobal(screen))
             }
         }
     }

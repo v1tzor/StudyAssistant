@@ -31,6 +31,7 @@ object Constants {
         const val GITHUB_URI = "https://github.com/v1tzor/StudyAssistant"
         const val ISSUES_URI = "https://github.com/v1tzor/StudyAssistant/issues"
         const val PERMISSION_TAG = "Notificatio_Permission"
+        const val PAY_DEEPLINK_SCHEME = "ru.aleshin.studyassistant.pay"
     }
 
     object Database {
@@ -43,7 +44,7 @@ object Constants {
 
     object Regex {
         const val TEXT_AND_NUMBERS = "^[a-zA-Z0-9]+$"
-        const val ONLY_TEXT = "^[a-zA-Z ]+$"
+        const val ONLY_TEXT = "^[\\p{L}\\p{M}\\p{Pd}.'’\\s]{1,50}$"
         const val NUMBERS = "\\d+"
         const val PASSWORD = "^[A-Za-z0-9\\!\\\"\\#\\$\\%\\&\\'\\(\\)\\*\\+\\,\\-\\.\\/\\:\\;\\<\\>\\=\\?\\@\\[\\]\\{\\}\\\\\\^\\_\\`\\~]+$"
     }
@@ -96,6 +97,7 @@ object Constants {
         const val SOCIAL_NETWORKS = 4
         const val SHARED_HOMEWORKS = 4
         const val SHARED_HOMEWORK_SUBJECTS = 4
+        const val PRODUCT = 2
     }
 
     object Delay {

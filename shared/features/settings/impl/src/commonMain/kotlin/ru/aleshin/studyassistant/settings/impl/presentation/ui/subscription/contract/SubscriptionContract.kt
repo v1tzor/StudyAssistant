@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract
 
+import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
@@ -37,9 +38,11 @@ internal sealed class SubscriptionEvent : BaseEvent {
     data object Init : SubscriptionEvent()
     data object TransferRemoteData : SubscriptionEvent()
     data object TransferLocalData : SubscriptionEvent()
+    data object NavigateToBilling : SubscriptionEvent()
 }
 
 internal sealed class SubscriptionEffect : BaseUiEffect {
+    data class NavigateToGlobal(val pushScreen: Screen) : SubscriptionEffect()
     data class ShowError(val failures: SettingsFailures) : SubscriptionEffect()
 }
 

@@ -20,6 +20,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
@@ -29,4 +30,5 @@ expect class PlatformConfiguration {
     val analyticsService: AnalyticsService
     val crashlyticsService: CrashlyticsService
     val messagingService: MessagingService
+    val iapService: IapService
 }

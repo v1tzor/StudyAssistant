@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
@@ -30,6 +31,7 @@ actual data class PlatformConfiguration(
     actual val analyticsService: AnalyticsService,
     actual val crashlyticsService: CrashlyticsService,
     actual val messagingService: MessagingService,
+    actual val iapService: IapService,
     val serviceTokenProvider: PlatformGoogleAuthTokenProvider,
     val uuidProvider: IosUUIDProvider,
 )

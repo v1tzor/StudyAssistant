@@ -25,7 +25,6 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
-            implementation(project.dependencies.platform(libs.rustore.bom))
             implementation(libs.rustore.universalpush.core)
         }
         androidMain.dependencies {
@@ -35,7 +34,6 @@ kotlin {
             api(libs.androidx.guava)
             api(libs.kodein.android)
 
-            implementation(project.dependencies.platform(libs.rustore.bom))
             implementation(libs.rustore.universalpush.core)
         }
         commonMain.dependencies {

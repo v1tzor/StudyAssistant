@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.core.remote.models.users
 
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.entities.users.Store
+import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
 
 /**
  * @author Stanislav Aleshin on 30.08.2024.
@@ -29,7 +29,8 @@ data class SubscribeInfoPojo(
     val purchaseId: UID = "",
     val productId: UID = "",
     val subscriptionToken: UID? = null,
-    val purchaseDate: Long = 0L,
-    val subscriptionPeriod: Long? = null,
+    val orderId: UID = "",
+    val startTimeMillis: Long = 0L,
+    val expiryTimeMillis: Long = 0L,
     val store: String = Store.RU_STORE.name,
 )

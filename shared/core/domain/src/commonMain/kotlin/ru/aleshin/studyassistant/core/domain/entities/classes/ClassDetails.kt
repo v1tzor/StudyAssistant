@@ -43,17 +43,16 @@ data class ClassDetails(
     val homework: Homework? = null,
 )
 
-fun Class.convertToDetails(homework: Homework?) =
-    ClassDetails(
-        uid = uid,
-        scheduleId = scheduleId,
-        organization = organization,
-        eventType = eventType,
-        subject = subject,
-        customData = customData,
-        teacher = teacher,
-        office = office,
-        location = location,
-        timeRange = timeRange,
-        homework = homework,
-    )
+fun Class.convertToDetails(homework: Homework?) = ClassDetails(
+    uid = uid,
+    scheduleId = scheduleId,
+    organization = organization,
+    eventType = eventType,
+    subject = subject,
+    customData = customData,
+    teacher = teacher,
+    office = office,
+    location = location,
+    timeRange = timeRange,
+    homework = homework,
+)

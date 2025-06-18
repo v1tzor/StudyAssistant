@@ -16,6 +16,11 @@
 
 package ru.aleshin.studyassistant.core.remote.di
 
+import com.aallam.openai.api.http.Timeout
+import com.aallam.openai.client.LoggingConfig
+import com.aallam.openai.client.OpenAI
+import com.aallam.openai.client.OpenAIHost
+import com.aallam.openai.client.RetryStrategy
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
@@ -38,6 +43,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.remote.BuildKonfig
 import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.goals.DailyGoalsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.message.MessageRemoteDataSource
@@ -55,6 +61,7 @@ import ru.aleshin.studyassistant.core.remote.datasources.tasks.HomeworksRemoteDa
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.TodoRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.ktor.HttpEngineFactory
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * @author Stanislav Aleshin on 01.08.2024.
@@ -96,7 +103,20 @@ val coreRemoteModule = DI.Module("CoreRemote") {
             }
         }
     }
+    bindSingleton<OpenAI> {
+        OpenAI(
+            token = BuildKonfig.CHAT_GPT_KEY,
+            logging = LoggingConfig(),
+            timeout = Timeout(socket = 30.seconds),
+            organization = null,
+            headers = emptyMap(),
+            host = OpenAIHost.OpenAI,
+            proxy = null,
+            retry = RetryStrategy(),
+        )
+    }
 
+    bindSingleton<SubscriptionChecker> { SubscriptionChecker.Base(instance(), instance(), instance()) }
     bindSingleton<AuthRemoteDataSource> { AuthRemoteDataSource.Base(instance(), instance()) }
     bindSingleton<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance()) }

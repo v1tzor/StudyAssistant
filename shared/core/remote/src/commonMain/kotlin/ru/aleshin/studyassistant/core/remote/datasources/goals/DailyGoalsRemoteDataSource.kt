@@ -235,21 +235,26 @@ interface DailyGoalsRemoteDataSource {
                 flowOf(emptyList())
             } else {
                 val organizationsIds = goals.mapNotNull { it.contentOrganizationId }.toSet()
-                val fromDeadline = goals.minOf { it.contentDeadline ?: 0 }
-                val toDeadline = goals.maxOf { it.contentDeadline ?: Long.MAX_VALUE }
+                val fromDeadline = goals.minOfOrNull {
+                    it.contentDeadline ?: Long.MAX_VALUE
+                }?.takeIf {
+                    it != Long.MAX_VALUE
+                } ?: 0L
+                val toDeadline = goals.maxOfOrNull {
+                    it.contentDeadline ?: 0L
+                }?.takeIf {
+                    it != 0L
+                } ?: Long.MAX_VALUE
                 val todosMapFlow = userDataRoot.collection(UserData.TODOS)
                     .where {
-                        (
-                            (UserData.TODO_DEADLINE greaterThanOrEqualTo fromDeadline) and
-                                (UserData.TODO_DEADLINE lessThanOrEqualTo toDeadline)
-                            ) or
+                        ((UserData.TODO_DEADLINE greaterThanOrEqualTo fromDeadline) and (UserData.TODO_DEADLINE lessThanOrEqualTo toDeadline)) or
                             (UserData.TODO_DEADLINE equalTo null)
                     }
                     .orderBy(UserData.TODO_DEADLINE, Direction.DESCENDING)
                     .snapshotListFlowGet<TodoPojo>()
                     .map { todoPojos -> todoPojos.associateBy { it.uid } }
 
-                val homeworksMapFlow = userDataRoot.collection(UserData.TODOS)
+                val homeworksMapFlow = userDataRoot.collection(UserData.HOMEWORKS)
                     .where {
                         (UserData.HOMEWORK_DEADLINE greaterThanOrEqualTo fromDeadline) and
                             (UserData.HOMEWORK_DEADLINE lessThanOrEqualTo toDeadline)

@@ -18,9 +18,11 @@ package ru.aleshin.studyassistant.editor.impl.di.holder
 
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
+import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -59,6 +61,7 @@ public object EditorFeatureDIHolder : BaseFeatureDIHolder<EditorFeatureApi, Edit
         if (directDi == null) {
             val di = DI {
                 importAll(navigationModule, presentationModule, domainModule)
+                bindInstance<() -> BillingFeatureStarter> { dependencies.billingFeatureStarter }
                 bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
                 bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
                 bindSingleton<EmployeeRepository> { dependencies.employeeRepository }

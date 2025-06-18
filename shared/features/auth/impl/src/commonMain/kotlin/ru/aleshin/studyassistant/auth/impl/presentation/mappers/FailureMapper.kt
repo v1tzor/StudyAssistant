@@ -26,5 +26,6 @@ internal fun AuthFailures.mapToMessage(strings: AuthStrings) = when (this) {
     is AuthFailures.AuthorizationError -> strings.authErrorMessage
     is AuthFailures.CredentialsError -> strings.credentialsErrorMessage
     is AuthFailures.NotFoundUserInfoError -> strings.userNotFoundErrorMessage
+    is AuthFailures.TooManyRequestsError -> strings.tooManyRequestsErrorMessage
     is AuthFailures.OtherError -> strings.otherErrorMessage
 }

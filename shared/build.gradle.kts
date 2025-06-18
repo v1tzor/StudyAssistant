@@ -52,6 +52,8 @@ kotlin {
             implementation(project(":shared:features:users:impl"))
             implementation(project(":shared:features:editor:api"))
             implementation(project(":shared:features:editor:impl"))
+            implementation(project(":shared:features:billing:api"))
+            implementation(project(":shared:features:billing:impl"))
 
             api(project(":shared:core:common"))
             api(project(":shared:core:ui"))

@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.remote.datasources.message.GoogleAuthTokenProvider
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 
@@ -35,6 +36,7 @@ actual val platformModule = DI.Module("PlatformModule") {
     bindSingleton<AnalyticsService> { instance<PlatformConfiguration>().analyticsService }
     bindSingleton<MessagingService> { instance<PlatformConfiguration>().messagingService }
     bindSingleton<CrashlyticsService> { instance<PlatformConfiguration>().crashlyticsService }
+    bindSingleton<IapService> { instance<PlatformConfiguration>().iapService }
     bindSingleton<GoogleAuthTokenProvider> { instance<PlatformConfiguration>().serviceTokenProvider }
     bindSingleton<IosUUIDProvider> { instance<PlatformConfiguration>().uuidProvider }
 }

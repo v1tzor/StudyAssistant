@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
 import ru.aleshin.studyassistant.core.common.extensions.exists
+import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Storage
@@ -102,9 +103,7 @@ interface UsersRemoteDataSource {
 
             val reference = database.collection(Users.ROOT).document(uid)
 
-            return reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<AppUserPojo?>())
-            }
+            return reference.snapshotFlowGet<AppUserPojo?>()
         }
 
         override suspend fun fetchRealtimeUserById(uid: UID): AppUserPojo? {

@@ -20,12 +20,14 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
+import ru.aleshin.studyassistant.editor.impl.navigation.EditorScreenProvider
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEvent
@@ -36,6 +38,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.Pr
  */
 internal class ProfileScreenModel(
     private val workProcessor: ProfileWorkProcessor,
+    private val screenProvider: EditorScreenProvider,
     stateCommunicator: ProfileStateCommunicator,
     effectCommunicator: ProfileEffectCommunicator,
     coroutineManager: CoroutineManager,
@@ -130,6 +133,10 @@ internal class ProfileScreenModel(
             }
             is ProfileEvent.NavigateToBack -> {
                 sendEffect(ProfileEffect.NavigateToBack)
+            }
+            is ProfileEvent.NavigateToBillingScreen -> {
+                val screen = screenProvider.provideBillingScreen(BillingScreen.Subscription)
+                sendEffect(ProfileEffect.NavigateToGlobal(screen))
             }
         }
     }
