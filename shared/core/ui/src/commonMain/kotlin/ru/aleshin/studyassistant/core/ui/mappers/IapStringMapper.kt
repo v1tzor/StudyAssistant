@@ -17,6 +17,8 @@
 package ru.aleshin.studyassistant.core.ui.mappers
 
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapFailure
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPurchaseStatus
+import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 
 /**
@@ -72,4 +74,27 @@ fun IapFailure.mapToString(strings: StudyAssistantStrings) = when (this) {
     IapFailure.AppGalleryHighRiskOperation -> strings.appGalleryHighRisk
     IapFailure.AppGalleryPendingPurchase -> strings.appGalleryPending
     IapFailure.UnknownError -> strings.otherErrorMessage
+}
+
+fun IapPurchaseStatus.mapToString(strings: StudyAssistantStrings) = when (this) {
+    IapPurchaseStatus.CREATED -> strings.purchaseStatusCreated
+    IapPurchaseStatus.INVOICE_CREATED -> strings.purchaseStatusCreated
+    IapPurchaseStatus.PROCESSING -> strings.purchaseStatusProcessing
+    IapPurchaseStatus.PAID -> strings.purchaseStatusPaid
+    IapPurchaseStatus.CONFIRMED -> strings.purchaseStatusConfirmed
+    IapPurchaseStatus.CONSUMED -> strings.purchaseStatusConfirmed
+    IapPurchaseStatus.CANCELLED -> strings.purchaseStatusCancelled
+    IapPurchaseStatus.REJECTED -> strings.purchaseStatusRejected
+    IapPurchaseStatus.EXPIRED -> strings.purchaseStatusExpired
+    IapPurchaseStatus.CLOSED -> strings.purchaseStatusTerminated
+    IapPurchaseStatus.PAUSED -> strings.purchaseStatusPaused
+    IapPurchaseStatus.TERMINATED -> strings.purchaseStatusTerminated
+    IapPurchaseStatus.REFUNDED -> strings.purchaseStatusRefunded
+}
+
+fun Store.mapToString() = when (this) {
+    Store.RU_STORE -> "RuStore"
+    Store.GOOGLE_PLAY -> "Google Play"
+    Store.APP_GALLERY -> "App Gallery"
+    Store.APP_STORE -> "App Store"
 }

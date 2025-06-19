@@ -21,17 +21,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.root
-import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionEffect
@@ -50,7 +52,9 @@ internal class SubscriptionScreen : Screen {
         initialState = SubscriptionViewState(),
     ) { state ->
         val strings = SettingsThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
         val navigator = LocalNavigator.currentOrThrow
+        val uriHandler = LocalUriHandler.current
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -61,13 +65,15 @@ internal class SubscriptionScreen : Screen {
                     modifier = Modifier.padding(paddingValues),
                     onTransferRemoteData = { dispatchEvent(SubscriptionEvent.TransferRemoteData) },
                     onTransferLocalData = { dispatchEvent(SubscriptionEvent.TransferLocalData) },
-                    onOpenBilling = { dispatchEvent(SubscriptionEvent.NavigateToBilling) }
+                    onOpenBilling = { dispatchEvent(SubscriptionEvent.NavigateToBilling) },
+                    onControlSubscription = { dispatchEvent(SubscriptionEvent.ControlSubscription) },
+                    onRestoreSubscription = { dispatchEvent(SubscriptionEvent.RestoreSubscription) },
                 )
             },
             snackbarHost = {
                 SnackbarHost(
                     hostState = snackbarState,
-                    snackbar = { ErrorSnackbar(it) },
+                    snackbar = { Snackbar(it) },
                 )
             },
             contentWindowInsets = WindowInsets.navigationBars,
@@ -76,9 +82,16 @@ internal class SubscriptionScreen : Screen {
         handleEffect { effect ->
             when (effect) {
                 is SubscriptionEffect.NavigateToGlobal -> navigator.root().push(effect.pushScreen)
+                is SubscriptionEffect.OpenUri -> uriHandler.openUri(effect.uri)
                 is SubscriptionEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
+                        withDismissAction = true,
+                    )
+                }
+                is SubscriptionEffect.SuccessRestoreMessage -> {
+                    snackbarState.showSnackbar(
+                        message = strings.successRestoreSubscriptionTitle,
                         withDismissAction = true,
                     )
                 }

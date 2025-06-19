@@ -219,7 +219,19 @@ data class StudyAssistantStrings(
     val appGalleryProductConsumed: String,
     val appGalleryAccountAreaUnsupported: String,
     val appGalleryHighRisk: String,
-    val appGalleryPending: String
+    val appGalleryPending: String,
+    val purchaseStatusCreated: String,
+    val purchaseStatusCancelled: String,
+    val purchaseStatusProcessing: String,
+    val purchaseStatusRejected: String,
+    val purchaseStatusExpired: String,
+    val purchaseStatusPaid: String,
+    val purchaseStatusConfirmed: String,
+    val purchaseStatusRefunded: String,
+    val purchaseStatusReversed: String,
+    val purchaseStatusPaused: String,
+    val purchaseStatusTerminated: String,
+    val storeTitle: String,
 )
 
 internal val russianStudyAssistantString = StudyAssistantStrings(
@@ -419,7 +431,19 @@ internal val russianStudyAssistantString = StudyAssistantStrings(
     appGalleryProductConsumed = "Продукт уже потреблён.",
     appGalleryAccountAreaUnsupported = "Регион вашей учетной записи не поддерживается.",
     appGalleryHighRisk = "Транзакция отклонена системой безопасности.",
-    appGalleryPending = "Покупка находится в ожидании подтверждения."
+    appGalleryPending = "Покупка находится в ожидании подтверждения.",
+    purchaseStatusCreated = "Создана",
+    purchaseStatusCancelled = "Отменена",
+    purchaseStatusProcessing = "В процессе",
+    purchaseStatusRejected = "Отклонена",
+    purchaseStatusExpired = "Истекла",
+    purchaseStatusPaid = "Оплачено",
+    purchaseStatusConfirmed = "Активна",
+    purchaseStatusRefunded = "Возврат",
+    purchaseStatusReversed = "Отмена холда",
+    purchaseStatusPaused = "Приостановлена",
+    purchaseStatusTerminated = "Завершена",
+    storeTitle = "Store",
 )
 
 internal val englishStudyAssistantString = StudyAssistantStrings(
@@ -619,7 +643,19 @@ internal val englishStudyAssistantString = StudyAssistantStrings(
     appGalleryProductConsumed = "This product has already been consumed.",
     appGalleryAccountAreaUnsupported = "Your account region is not supported.",
     appGalleryHighRisk = "Transaction blocked due to security risk.",
-    appGalleryPending = "Purchase is pending confirmation."
+    appGalleryPending = "Purchase is pending confirmation.",
+    purchaseStatusCreated = "Created",
+    purchaseStatusCancelled = "Cancelled",
+    purchaseStatusProcessing = "Processing",
+    purchaseStatusRejected = "Rejected",
+    purchaseStatusExpired = "Expired",
+    purchaseStatusPaid = "Paid",
+    purchaseStatusConfirmed = "Active",
+    purchaseStatusRefunded = "Refunded",
+    purchaseStatusReversed = "Reversed",
+    purchaseStatusPaused = "Paused",
+    purchaseStatusTerminated = "Terminated",
+    storeTitle = "Store",
 )
 
 fun StudyAssistantStrings.monthNames() = MonthNames(

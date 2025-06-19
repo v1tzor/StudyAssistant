@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.scre
 
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
+import ru.aleshin.studyassistant.billing.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.billing.impl.domain.interactors.PurchaseInteractor
 import ru.aleshin.studyassistant.billing.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.contract.SubscriptionAction
@@ -27,6 +28,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.Effec
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
+import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 
 /**
@@ -37,11 +39,13 @@ internal interface SubscriptionWorkProcessor :
 
     class Base(
         private val purchaseInteractor: PurchaseInteractor,
+        private val appUserInteractor: AppUserInteractor,
     ) : SubscriptionWorkProcessor {
 
         override suspend fun work(command: SubscriptionWorkCommand) = when (command) {
             is SubscriptionWorkCommand.LoadProducts -> loadProductsWork()
             is SubscriptionWorkCommand.PurchaseProduct -> purchaseProductWork(command.productId)
+            is SubscriptionWorkCommand.LoadUserPaidStatus -> loadUserPaidStatusWork()
         }
 
         private fun loadProductsWork() = flow<SubscriptionWorkResult> {
@@ -67,11 +71,19 @@ internal interface SubscriptionWorkProcessor :
                 }
             )
         }
+
+        private fun loadUserPaidStatusWork() = flow {
+            appUserInteractor.fetchAppUserPaidStatus().collectAndHandle(
+                onLeftAction = { emit(EffectResult(SubscriptionEffect.ShowError(it))) },
+                onRightAction = { emit(ActionResult(SubscriptionAction.UpdateUserPaidStatus(it))) },
+            )
+        }
     }
 }
 
 internal sealed class SubscriptionWorkCommand : WorkCommand {
     data object LoadProducts : SubscriptionWorkCommand()
+    data object LoadUserPaidStatus : SubscriptionWorkCommand()
     data class PurchaseProduct(val productId: String) : SubscriptionWorkCommand()
 }
 

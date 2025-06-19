@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.billing.impl.di.modules
+package ru.aleshin.studyassistant.core.data.repositories
 
-import org.kodein.di.DI
-import org.kodein.di.bindProvider
-import org.kodein.di.instance
-import ru.aleshin.studyassistant.billing.impl.data.datasources.ProductsRemoteDataSource
-import ru.aleshin.studyassistant.billing.impl.data.repositories.ProductsRepositoryImpl
-import ru.aleshin.studyassistant.billing.impl.domain.repositories.ProductsRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
+import ru.aleshin.studyassistant.core.remote.datasources.billing.ProductsRemoteDataSource
 
 /**
  * @author Stanislav Aleshin on 18.06.2025.
  */
-internal val dataModule = DI.Module("Data") {
-    bindProvider<ProductsRepository> { ProductsRepositoryImpl(instance()) }
-    bindProvider<ProductsRemoteDataSource> { ProductsRemoteDataSource.Base(instance()) }
+class ProductsRepositoryImpl(
+    private val productsRemoteDataSource: ProductsRemoteDataSource,
+) : ProductsRepository {
+
+    override suspend fun fetchProducts(): Flow<List<String>> {
+        return productsRemoteDataSource.fetchProducts().map { productsList ->
+            productsList.map { product -> product.id }
+        }
+    }
 }

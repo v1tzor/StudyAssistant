@@ -16,12 +16,19 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.mappers
 
+import ru.aleshin.studyassistant.core.ui.mappers.mapToString
+import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.tokens.SettingsStrings
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-internal fun SettingsFailures.mapToMessage(strings: SettingsStrings) = when (this) {
+internal fun SettingsFailures.mapToMessage(
+    strings: SettingsStrings,
+    coreStrings: StudyAssistantStrings
+) = when (this) {
+    is SettingsFailures.IapError -> type.mapToString(coreStrings)
+    is SettingsFailures.RestoreError -> strings.failureRestoreSubscriptionTitle
     is SettingsFailures.OtherError -> strings.otherErrorMessage
 }

@@ -34,6 +34,7 @@ import ru.aleshin.studyassistant.core.data.repositories.ManageUserRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.MessageRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.NotificationSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.OrganizationsRepositoryImpl
+import ru.aleshin.studyassistant.core.data.repositories.ProductsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ShareHomeworksRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ShareSchedulesRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.SubjectsRepositoryImpl
@@ -54,6 +55,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
@@ -68,6 +70,7 @@ val coreDataModule = DI.Module("CoreData") {
     importAll(coreDataPlatformModule, coreDatabaseModule, coreRemoteModule)
 
     bindSingleton<AuthRepository> { AuthRepositoryImpl(instance()) }
+    bindSingleton<ProductsRepository> { ProductsRepositoryImpl(instance()) }
     bindSingleton<ManageUserRepository> { ManageUserRepositoryImpl(instance()) }
     bindSingleton<UsersRepository> { UsersRepositoryImpl(instance(), instance()) }
     bindSingleton<FriendRequestsRepository> { FriendRequestsRepositoryImpl(instance()) }

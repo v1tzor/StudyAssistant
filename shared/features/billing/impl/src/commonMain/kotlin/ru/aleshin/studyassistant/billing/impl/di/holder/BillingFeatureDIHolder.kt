@@ -25,7 +25,6 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.billing.api.di.BillingFeatureApi
 import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.billing.impl.di.BillingFeatureDependencies
-import ru.aleshin.studyassistant.billing.impl.di.modules.dataModule
 import ru.aleshin.studyassistant.billing.impl.di.modules.domainModule
 import ru.aleshin.studyassistant.billing.impl.di.modules.navigationModule
 import ru.aleshin.studyassistant.billing.impl.di.modules.presentationModule
@@ -37,6 +36,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
@@ -49,8 +49,9 @@ public object BillingFeatureDIHolder : BaseFeatureDIHolder<BillingFeatureApi, Bi
     override fun init(dependencies: BillingFeatureDependencies) {
         if (directDi == null) {
             val di = DI {
-                importAll(navigationModule, presentationModule, domainModule, dataModule)
+                importAll(navigationModule, presentationModule, domainModule)
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
+                bindSingleton<ProductsRepository> { dependencies.productsRepository }
                 bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.billing.impl.data.models
+package ru.aleshin.studyassistant.core.remote.models.billing
 
 import kotlinx.serialization.Serializable
 
@@ -22,6 +22,6 @@ import kotlinx.serialization.Serializable
  * @author Stanislav Aleshin on 18.06.2025.
  */
 @Serializable
-internal data class ProductPojo(
+data class ProductPojo(
     val id: String,
 )

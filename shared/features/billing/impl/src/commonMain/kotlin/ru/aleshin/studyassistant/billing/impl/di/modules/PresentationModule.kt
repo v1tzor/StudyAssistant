@@ -42,6 +42,6 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<SubscriptionStateCommunicator> { SubscriptionStateCommunicator.Base() }
     bindProvider<SubscriptionEffectCommunicator> { SubscriptionEffectCommunicator.Base() }
-    bindProvider<SubscriptionWorkProcessor> { SubscriptionWorkProcessor.Base(instance()) }
+    bindProvider<SubscriptionWorkProcessor> { SubscriptionWorkProcessor.Base(instance(), instance()) }
     bindProvider<SubscriptionScreenModel> { SubscriptionScreenModel(instance(), instance(), instance(), instance()) }
 }

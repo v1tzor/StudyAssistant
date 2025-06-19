@@ -23,10 +23,12 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
@@ -39,6 +41,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsReposit
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -63,6 +66,7 @@ public object SettingsFeatureDIHolder :
                 importAll(navigationModule, presentationModule, domainModule)
                 bindInstance<() -> BillingFeatureStarter> { dependencies.billingFeatureStarter }
                 bindSingleton<GeneralSettingsRepository> { dependencies.generalSettingsRepository }
+                bindSingleton<ProductsRepository> { dependencies.productsRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
                 bindSingleton<NotificationSettingsRepository> { dependencies.notificationSettingsRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
@@ -79,7 +83,9 @@ public object SettingsFeatureDIHolder :
                 bindSingleton<HomeworksReminderManager> { dependencies.homeworksReminderManager }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
+                bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
+                bindSingleton<IapService> { dependencies.iapService }
                 bindSingleton<SettingsFeatureApi> {
                     object : SettingsFeatureApi {
                         override fun fetchStarter() = instance<SettingsFeatureStarter>()

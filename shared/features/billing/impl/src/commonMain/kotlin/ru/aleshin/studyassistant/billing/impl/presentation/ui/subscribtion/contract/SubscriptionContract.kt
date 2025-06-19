@@ -33,6 +33,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 internal data class SubscriptionViewState(
     val isLoadingProducts: Boolean = true,
     val isLoadingPurchase: Boolean = false,
+    val isPaidUser: Boolean = false,
     val selectedProduct: SubscriptionProductUi? = null,
     val products: List<SubscriptionProductUi> = emptyList(),
 ) : BaseViewState
@@ -51,7 +52,8 @@ internal sealed class SubscriptionEffect : BaseUiEffect {
 }
 
 internal sealed class SubscriptionAction : BaseAction {
-    data class UpdateLoadingProduct(val isLoading: Boolean) : SubscriptionAction()
-    data class UpdateSelectedProduct(val product: SubscriptionProductUi?) : SubscriptionAction()
     data class UpdateProducts(val products: List<SubscriptionProductUi>) : SubscriptionAction()
+    data class UpdateSelectedProduct(val product: SubscriptionProductUi?) : SubscriptionAction()
+    data class UpdateUserPaidStatus(val isPaidUser: Boolean) : SubscriptionAction()
+    data class UpdateLoadingProduct(val isLoading: Boolean) : SubscriptionAction()
 }

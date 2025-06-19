@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.settings.impl.domain.interactors.CalendarSettin
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.GeneralSettingsInteractor
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.NotificationSettingsInteractor
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.OrganizationInteractor
+import ru.aleshin.studyassistant.settings.impl.domain.interactors.SubscriptionInteractor
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.SyncInteractor
 
 /**
@@ -36,6 +37,7 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<SettingsEitherWrapper> { SettingsEitherWrapper.Base(instance(), instance()) }
 
     bindSingleton<GeneralSettingsInteractor> { GeneralSettingsInteractor.Base(instance(), instance()) }
+    bindSingleton<SubscriptionInteractor> { SubscriptionInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<NotificationSettingsInteractor> { NotificationSettingsInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance(), instance()) }

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.billing.impl.domain.repositories
+package ru.aleshin.studyassistant.core.domain.repositories
 
 import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Stanislav Aleshin on 18.06.2025.
  */
-internal interface ProductsRepository {
+interface ProductsRepository {
     suspend fun fetchProducts(): Flow<List<String>>
 }

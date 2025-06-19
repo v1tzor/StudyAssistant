@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import ru.aleshin.studyassistant.billing.impl.domain.common.BillingEitherWrapper
 import ru.aleshin.studyassistant.billing.impl.domain.entities.BillingFailures
-import ru.aleshin.studyassistant.billing.impl.domain.repositories.ProductsRepository
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
@@ -33,6 +32,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.iap.IapProductTyp
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapServiceError
 import ru.aleshin.studyassistant.core.domain.entities.users.SubscribeInfo
+import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**

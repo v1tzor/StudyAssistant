@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.settings.impl.di.holder.SettingsFeatureDIHolder
 import ru.aleshin.studyassistant.settings.impl.navigation.SettingsScreenProvider
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionAction
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionEffect
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionEffect.NavigateToGlobal
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionEvent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionViewState
 
@@ -60,6 +61,11 @@ internal class SubscriptionScreenModel(
     ) {
         when (event) {
             is SubscriptionEvent.Init -> {
+                workProcessor.work(SubscriptionWorkCommand.LoadCurrentStore).collectAndHandleWork()
+                launchBackgroundWork(BackgroundKey.LOAD_SUBSCRIPTIONS) {
+                    val command = SubscriptionWorkCommand.LoadSubscriptions
+                    workProcessor.work(command).collectAndHandleWork()
+                }
                 launchBackgroundWork(BackgroundKey.LOAD_PAID_STATUS) {
                     val command = SubscriptionWorkCommand.LoadUserPaidStatus
                     workProcessor.work(command).collectAndHandleWork()
@@ -81,9 +87,20 @@ internal class SubscriptionScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+            is SubscriptionEvent.ControlSubscription -> {
+                state().currentStore?.getSubscriptionsUri()?.let {
+                    sendEffect(SubscriptionEffect.OpenUri(it))
+                }
+            }
+            is SubscriptionEvent.RestoreSubscription -> {
+                launchBackgroundWork(BackgroundKey.SUBSCRIPTION_ACTION) {
+                    val command = SubscriptionWorkCommand.RestoreSubscription
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
             is SubscriptionEvent.NavigateToBilling -> {
                 val screen = screenProvider.provideBillingScreen(BillingScreen.Subscription)
-                sendEffect(SubscriptionEffect.NavigateToGlobal(screen))
+                sendEffect(NavigateToGlobal(screen))
             }
         }
     }
@@ -101,10 +118,20 @@ internal class SubscriptionScreenModel(
         is SubscriptionAction.UpdateLoadingSync -> currentState.copy(
             isLoadingSync = action.isLoading,
         )
+        is SubscriptionAction.UpdateCurrentStore -> currentState.copy(
+            currentStore = action.store,
+        )
+        is SubscriptionAction.UpdateSubscriptions -> currentState.copy(
+            subscriptions = action.subscriptions,
+            isLoadingSubscriptions = false,
+        )
+        is SubscriptionAction.UpdateLoadingSubscriptions -> currentState.copy(
+            isLoadingSubscriptions = action.isLoading,
+        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_PAID_STATUS, LOAD_REMOTE_STATUS, TRANSFER_DATA
+        LOAD_PAID_STATUS, LOAD_REMOTE_STATUS, LOAD_SUBSCRIPTIONS, SUBSCRIPTION_ACTION, TRANSFER_DATA
     }
 }
 

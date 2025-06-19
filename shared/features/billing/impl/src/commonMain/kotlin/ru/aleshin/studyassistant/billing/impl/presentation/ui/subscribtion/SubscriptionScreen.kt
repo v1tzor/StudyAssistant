@@ -78,7 +78,7 @@ internal class SubscriptionScreen : Screen {
             },
             bottomBar = {
                 SubscriptionBottomBar(
-                    enabled = !state.isLoadingProducts && state.selectedProduct != null,
+                    enabled = !state.isLoadingProducts && state.selectedProduct != null && !state.isPaidUser,
                     isLoadingPurchase = state.isLoadingPurchase,
                     onSubscribe = {
                         if (state.selectedProduct != null) {

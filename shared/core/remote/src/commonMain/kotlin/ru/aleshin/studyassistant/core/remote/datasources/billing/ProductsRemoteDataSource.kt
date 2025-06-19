@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.billing.impl.data.datasources
+package ru.aleshin.studyassistant.core.remote.datasources.billing
 
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
-import ru.aleshin.studyassistant.billing.impl.data.models.ProductPojo
 import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase
+import ru.aleshin.studyassistant.core.remote.models.billing.ProductPojo
 
 /**
  * @author Stanislav Aleshin on 18.06.2025.
  */
-internal interface ProductsRemoteDataSource {
+interface ProductsRemoteDataSource {
 
     suspend fun fetchProducts(): Flow<List<ProductPojo>>
 

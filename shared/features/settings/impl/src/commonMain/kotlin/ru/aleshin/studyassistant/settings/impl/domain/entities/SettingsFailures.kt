@@ -17,10 +17,13 @@
 package ru.aleshin.studyassistant.settings.impl.domain.entities
 
 import ru.aleshin.studyassistant.core.common.functional.DomainFailures
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapFailure
 
 /**
  * @author Stanislav Aleshin on 08.07.2024.
  */
 internal sealed class SettingsFailures : DomainFailures {
+    data class IapError(val type: IapFailure) : SettingsFailures()
+    data object RestoreError : SettingsFailures()
     data class OtherError(val throwable: Throwable) : SettingsFailures()
 }

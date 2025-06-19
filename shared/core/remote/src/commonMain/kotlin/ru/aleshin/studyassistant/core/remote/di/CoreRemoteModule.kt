@@ -43,6 +43,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.remote.BuildKonfig
 import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.billing.ProductsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.goals.DailyGoalsRemoteDataSource
@@ -131,6 +132,7 @@ val coreRemoteModule = DI.Module("CoreRemote") {
     bindSingleton<DailyGoalsRemoteDataSource> { DailyGoalsRemoteDataSource.Base(instance()) }
     bindSingleton<TodoRemoteDataSource> { TodoRemoteDataSource.Base(instance()) }
     bindSingleton<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance(), instance()) }
+    bindSingleton<ProductsRemoteDataSource> { ProductsRemoteDataSource.Base(instance()) }
     bindSingleton<MessageRemoteDataSource> { MessageRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
 
     bindProvider<PushServiceAuthTokenFactory> { PushServiceAuthTokenFactory.Base(instance(), instance(), instance()) }

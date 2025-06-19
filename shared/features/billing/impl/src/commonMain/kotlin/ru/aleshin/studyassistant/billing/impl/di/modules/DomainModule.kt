@@ -21,6 +21,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.billing.impl.domain.common.BillingEitherWrapper
 import ru.aleshin.studyassistant.billing.impl.domain.common.BillingErrorHandler
+import ru.aleshin.studyassistant.billing.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.billing.impl.domain.interactors.PurchaseInteractor
 
 /**
@@ -29,5 +30,7 @@ import ru.aleshin.studyassistant.billing.impl.domain.interactors.PurchaseInterac
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<BillingErrorHandler> { BillingErrorHandler.Base() }
     bindSingleton<BillingEitherWrapper> { BillingEitherWrapper.Base(instance(), instance()) }
+
     bindSingleton<PurchaseInteractor> { PurchaseInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance()) }
 }

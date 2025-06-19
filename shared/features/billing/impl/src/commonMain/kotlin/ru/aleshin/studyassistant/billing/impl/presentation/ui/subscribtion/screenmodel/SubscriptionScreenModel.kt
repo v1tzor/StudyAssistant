@@ -62,6 +62,10 @@ internal class SubscriptionScreenModel(
                     val command = SubscriptionWorkCommand.LoadProducts
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_PAID_USER_STATUS) {
+                    val command = SubscriptionWorkCommand.LoadUserPaidStatus
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is SubscriptionEvent.PurchaseProduct -> {
                 launchBackgroundWork(BackgroundKey.PRODUCT_ACTION) {
@@ -90,13 +94,16 @@ internal class SubscriptionScreenModel(
         is SubscriptionAction.UpdateSelectedProduct -> currentState.copy(
             selectedProduct = action.product,
         )
+        is SubscriptionAction.UpdateUserPaidStatus -> currentState.copy(
+            isPaidUser = action.isPaidUser,
+        )
         is SubscriptionAction.UpdateLoadingProduct -> currentState.copy(
             isLoadingProducts = action.isLoading,
         )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_PRODUCTS, PRODUCT_ACTION,
+        LOAD_PRODUCTS, LOAD_PAID_USER_STATUS, PRODUCT_ACTION,
     }
 }
 

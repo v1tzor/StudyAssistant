@@ -62,6 +62,15 @@ internal data class SettingsStrings(
     val holidaysOrganizationsLabel: String,
     val holidaysDatePickerHeadline: String,
     val holidaysOrganizationsSelectorHeader: String,
+    val activeSubscriptionsTitle: String,
+    val showSubscriptionPlansTitle: String,
+    val noneSubscriptionsTitle: String,
+    val subscriptionStatusSuffix: String,
+    val subscriptionPurchaseTimeSuffix: String,
+    val controlSubscriptionInStoreSuffix: String,
+    val restoreSubscriptionInStoreSuffix: String,
+    val successRestoreSubscriptionTitle: String,
+    val failureRestoreSubscriptionTitle: String,
     val otherErrorMessage: String,
 ) {
     companion object {
@@ -105,7 +114,16 @@ internal data class SettingsStrings(
             holidaysOrganizationsLabel = "Организации",
             holidaysDatePickerHeadline = "Дата",
             holidaysOrganizationsSelectorHeader = "Организации",
+            activeSubscriptionsTitle = "Активные подписки",
+            showSubscriptionPlansTitle = "Смотреть план",
+            noneSubscriptionsTitle = "Подписки отсутствуют",
+            subscriptionStatusSuffix = "Статус: ",
+            subscriptionPurchaseTimeSuffix = "Дата покупки: ",
+            controlSubscriptionInStoreSuffix = "Управлять в ",
+            restoreSubscriptionInStoreSuffix = "Восстановить покупку в ",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
+            successRestoreSubscriptionTitle = "Подписка успешно восстановлена!",
+            failureRestoreSubscriptionTitle = "Подписка не найдена. Обратитесь в поддержку!",
         )
         val ENGLISH = SettingsStrings(
             settingsHeader = "Settings",
@@ -147,6 +165,15 @@ internal data class SettingsStrings(
             holidaysOrganizationsPlaceholder = "Specify the organizations",
             holidaysDatePickerHeadline = "Date",
             holidaysOrganizationsSelectorHeader = "Organizations",
+            activeSubscriptionsTitle = "Active Subscriptions",
+            showSubscriptionPlansTitle = "View Plans",
+            noneSubscriptionsTitle = "No Subscriptions Available",
+            subscriptionStatusSuffix = "Status: ",
+            subscriptionPurchaseTimeSuffix = "Purchase Date: ",
+            controlSubscriptionInStoreSuffix = "Manage in ",
+            restoreSubscriptionInStoreSuffix = "Restore Purchase in ",
+            successRestoreSubscriptionTitle = "Subscription Restored Successfully!",
+            failureRestoreSubscriptionTitle = "Subscription not found. Please contact support!",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

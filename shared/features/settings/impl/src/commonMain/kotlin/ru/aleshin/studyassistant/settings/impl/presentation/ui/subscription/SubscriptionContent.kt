@@ -19,16 +19,14 @@ package ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract.SubscriptionViewState
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.views.ActiveSubscriptionView
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.views.SyncRemoteDataView
 
 /**
@@ -42,11 +40,22 @@ internal fun SubscriptionContent(
     onTransferRemoteData: () -> Unit,
     onTransferLocalData: () -> Unit,
     onOpenBilling: () -> Unit,
+    onControlSubscription: () -> Unit,
+    onRestoreSubscription: () -> Unit,
 ) = with(state) {
     Column(
         modifier = modifier.padding(vertical = 24.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        ActiveSubscriptionView(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            isLoading = isLoadingSubscriptions,
+            currentStore = currentStore,
+            subscriptions = subscriptions,
+            onOpenBillingScreen = onOpenBilling,
+            onControlSubscription = onControlSubscription,
+            onRestoreSubscription = onRestoreSubscription,
+        )
         SyncRemoteDataView(
             modifier = Modifier.padding(horizontal = 16.dp),
             isLoadingSync = isLoadingSync,
@@ -55,12 +64,5 @@ internal fun SubscriptionContent(
             onTransferRemoteData = onTransferRemoteData,
             onTransferLocalData = onTransferLocalData,
         )
-        // TODO
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onOpenBilling,
-        ) {
-            Text("Подписки")
-        }
     }
 }

@@ -17,10 +17,12 @@
 package ru.aleshin.studyassistant.settings.impl.di
 
 import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
@@ -33,6 +35,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsReposit
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -42,6 +45,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
  */
 public interface SettingsFeatureDependencies : BaseFeatureDependencies {
     public val billingFeatureStarter: () -> BillingFeatureStarter
+    public val productsRepository: ProductsRepository
     public val generalSettingsRepository: GeneralSettingsRepository
     public val calendarSettingsRepository: CalendarSettingsRepository
     public val notificationSettingsRepository: NotificationSettingsRepository
@@ -59,5 +63,7 @@ public interface SettingsFeatureDependencies : BaseFeatureDependencies {
     public val workloadWarningManager: WorkloadWarningManager
     public val dateManager: DateManager
     public val coroutineManager: CoroutineManager
+    public val deviceInfoProvider: DeviceInfoProvider
     public val crashlyticsService: CrashlyticsService
+    public val iapService: IapService
 }

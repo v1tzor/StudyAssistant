@@ -54,6 +54,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
@@ -315,6 +316,7 @@ val featureModule = DI.Module("Feature") {
     bindEagerSingleton<SettingsFeatureDependencies> {
         object : SettingsFeatureDependencies {
             override val billingFeatureStarter = provider<BillingFeatureStarter>()
+            override val productsRepository = instance<ProductsRepository>()
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
@@ -332,7 +334,9 @@ val featureModule = DI.Module("Feature") {
             override val workloadWarningManager = instance<WorkloadWarningManager>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val crashlyticsService = instance<CrashlyticsService>()
+            override val iapService = instance<IapService>()
         }
     }
 
@@ -346,6 +350,7 @@ val featureModule = DI.Module("Feature") {
     bindEagerSingleton<BillingFeatureDependencies> {
         object : BillingFeatureDependencies {
             override val usersRepository = instance<UsersRepository>()
+            override val productsRepository = instance<ProductsRepository>()
             override val manageUserRepository = instance<ManageUserRepository>()
             override val dateManager = instance<DateManager>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()

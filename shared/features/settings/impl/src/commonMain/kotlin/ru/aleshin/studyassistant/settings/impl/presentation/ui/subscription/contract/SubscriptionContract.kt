@@ -22,7 +22,9 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
+import ru.aleshin.studyassistant.settings.impl.presentation.models.billing.SubscriptionUi
 
 /**
  * @author Stanislav Aleshin on 28.08.2024
@@ -30,24 +32,34 @@ import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
 @Parcelize
 internal data class SubscriptionViewState(
     val isLoadingSync: Boolean = false,
+    val isLoadingSubscriptions: Boolean = false,
     val isPaidUser: Boolean? = null,
     val haveRemoteData: Boolean? = null,
+    val currentStore: Store? = null,
+    val subscriptions: List<SubscriptionUi> = emptyList(),
 ) : BaseViewState
 
 internal sealed class SubscriptionEvent : BaseEvent {
     data object Init : SubscriptionEvent()
     data object TransferRemoteData : SubscriptionEvent()
     data object TransferLocalData : SubscriptionEvent()
+    data object RestoreSubscription : SubscriptionEvent()
+    data object ControlSubscription : SubscriptionEvent()
     data object NavigateToBilling : SubscriptionEvent()
 }
 
 internal sealed class SubscriptionEffect : BaseUiEffect {
     data class NavigateToGlobal(val pushScreen: Screen) : SubscriptionEffect()
+    data class OpenUri(val uri: String) : SubscriptionEffect()
     data class ShowError(val failures: SettingsFailures) : SubscriptionEffect()
+    data object SuccessRestoreMessage : SubscriptionEffect()
 }
 
 internal sealed class SubscriptionAction : BaseAction {
     data class UpdateUserPaidStatus(val isPaidUser: Boolean) : SubscriptionAction()
     data class UpdateRemoteDataStatus(val haveRemoteData: Boolean) : SubscriptionAction()
+    data class UpdateSubscriptions(val subscriptions: List<SubscriptionUi>) : SubscriptionAction()
+    data class UpdateCurrentStore(val store: Store?) : SubscriptionAction()
+    data class UpdateLoadingSubscriptions(val isLoading: Boolean) : SubscriptionAction()
     data class UpdateLoadingSync(val isLoading: Boolean) : SubscriptionAction()
 }

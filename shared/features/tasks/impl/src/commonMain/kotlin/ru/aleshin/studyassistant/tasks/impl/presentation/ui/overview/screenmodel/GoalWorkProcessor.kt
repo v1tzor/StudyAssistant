@@ -85,7 +85,7 @@ internal interface GoalWorkProcessor : FlowWorkProcessor<GoalWorkCommand, Overvi
                 emit(workResult)
             }
         }.onStart {
-            emit(ActionResult(OverviewAction.UpdateShareLoading(true)))
+            emit(ActionResult(OverviewAction.UpdateGoalsLoading(true)))
         }
 
         private fun scheduleGoalWork(createModel: GoalCreateModelUi) = flow {

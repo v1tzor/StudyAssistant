@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.settings.impl.domain.common
 
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapServiceError
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
 
 /**
@@ -25,6 +26,7 @@ import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
 internal interface SettingsErrorHandler : ErrorHandler<SettingsFailures> {
     class Base : SettingsErrorHandler {
         override fun handle(throwable: Throwable) = when (throwable) {
+            is IapServiceError -> SettingsFailures.IapError(throwable.type)
             else -> SettingsFailures.OtherError(throwable)
         }
     }

@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
@@ -47,6 +48,7 @@ internal class NotificationScreen : Screen {
         initialState = NotificationViewState(),
     ) { state ->
         val strings = SettingsThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -88,7 +90,7 @@ internal class NotificationScreen : Screen {
             when (effect) {
                 is NotificationEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
                         withDismissAction = true,
                     )
                 }
