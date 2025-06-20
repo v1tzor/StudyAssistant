@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.info.impl.di
 
+import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -35,6 +36,7 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 public interface InfoFeatureDependencies : BaseFeatureDependencies {
     public val editorFeatureStarter: () -> EditorFeatureStarter
     public val usersFeatureStarter: () -> UsersFeatureStarter
+    public val billingFeatureStarter: () -> BillingFeatureStarter
     public val baseScheduleRepository: BaseScheduleRepository
     public val organizationsRepository: OrganizationsRepository
     public val calendarSettingsRepository: CalendarSettingsRepository

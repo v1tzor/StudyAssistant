@@ -38,7 +38,6 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
@@ -99,6 +98,7 @@ internal class OverviewScreen : Screen {
                     onChangeTodoDone = { task, done ->
                         dispatchEvent(OverviewEvent.UpdateTodoDone(task, done))
                     },
+                    onOpenBillingScreen = { dispatchEvent(OverviewEvent.NavigateToBilling) },
                 )
             },
             topBar = {
@@ -137,7 +137,7 @@ internal class OverviewScreen : Screen {
                 is OverviewEffect.NavigateToGlobal -> navigator.root().push(effect.pushScreen)
                 is OverviewEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.apply { Logger.e("test") { this.toString() } }.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

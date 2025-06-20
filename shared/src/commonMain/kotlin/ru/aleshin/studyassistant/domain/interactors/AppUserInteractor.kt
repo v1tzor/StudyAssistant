@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.domain.interactors
 
-import co.touchlab.kermit.Logger
 import dev.gitlive.firebase.auth.FirebaseUser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -84,17 +83,19 @@ interface AppUserInteractor {
             val currentUser = usersRepository.fetchCurrentAppUser()
             val isAvailability = iapService.fetchServiceAvailability()
             val isAuth = iapService.isAuthorizedUser()
+
             val allPurchases = if (isAuth && isAvailability is IapServiceAvailability.Available) {
                 iapService.fetchPurchases()
             } else {
                 emptyList()
             }
             if (currentUser != null) {
-                val activePurchase = allPurchases.find { product -> product.status == CONFIRMED }
+                val activePurchase = allPurchases.find { product ->
+                    product.status == CONFIRMED && product.developerPayload == currentUser.uid
+                }
 
                 val appUserInfo = usersRepository.fetchUserById(currentUser.uid).first() ?: return@wrap
                 val currentSubscriptionInfo = appUserInfo.subscriptionInfo
-                Logger.i("test") { "currentSubscriptionInfo -> $currentSubscriptionInfo | allPurchases -> $allPurchases | activePurchase -> $activePurchase" }
 
                 if (activePurchase != null) {
                     val productInfo = iapService.fetchProducts(ids = listOf(activePurchase.productId)).firstOrNull()
@@ -118,7 +119,6 @@ interface AppUserInteractor {
                                     startTimeMillis = startTime,
                                     expiryTimeMillis = endTime.toEpochMilliseconds(),
                                 )
-                                Logger.e("test") { "updatedSubscriptionInfo -> $updatedSubscriptionInfo" }
                                 val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
                                 usersRepository.addOrUpdateAppUser(updatedAppUser)
                             }
@@ -133,7 +133,6 @@ interface AppUserInteractor {
                                 expiryTimeMillis = endTime.toEpochMilliseconds(),
                                 store = iapService.fetchStore(),
                             )
-                            Logger.e("test") { "updatedSubscriptionInfo -> $updatedSubscriptionInfo" }
                             val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
                             usersRepository.addOrUpdateAppUser(updatedAppUser)
                         }

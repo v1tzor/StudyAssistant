@@ -20,12 +20,13 @@ package ru.aleshin.studyassistant.core.common.platform.services.iap
  * @author Stanislav Aleshin on 30.08.2024.
  */
 enum class Store {
-    RU_STORE, GOOGLE_PLAY, APP_GALLERY, APP_STORE;
+    RU_STORE, GOOGLE_PLAY, APP_GALLERY, APP_STORE, NONE;
 
     fun getSubscriptionsUri() = when (this) {
         RU_STORE -> "rustore://profile/subscriptions"
         APP_GALLERY -> "https://consumer.huawei.com/minisite/cloudservice/hiapmanage"
         GOOGLE_PLAY -> "https://play.google.com/store/account/subscriptions"
         APP_STORE -> "https://apps.apple.com/account/subscriptions"
+        Store.NONE -> null
     }
 }

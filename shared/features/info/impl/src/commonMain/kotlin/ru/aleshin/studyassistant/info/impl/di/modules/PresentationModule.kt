@@ -20,6 +20,7 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.info.impl.navigation.InfoFeatureStarterImpl
@@ -45,14 +46,14 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
  */
 internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<InfoFeatureStarter> { InfoFeatureStarterImpl(instance(), instance(), instance()) }
-    bindSingleton<InfoScreenProvider> { InfoScreenProvider.Base(instance<() -> EditorFeatureStarter>(), instance<() -> UsersFeatureStarter>()) }
+    bindSingleton<InfoScreenProvider> { InfoScreenProvider.Base(instance<() -> EditorFeatureStarter>(), instance<() -> UsersFeatureStarter>(), instance<() -> BillingFeatureStarter>()) }
 
     bindSingleton<NavigationScreenModel> { NavigationScreenModel() }
     bindSingleton<NavigationScreen> { NavigationScreen() }
 
     bindProvider<OrganizationsStateCommunicator> { OrganizationsStateCommunicator.Base() }
     bindProvider<OrganizationsEffectCommunicator> { OrganizationsEffectCommunicator.Base() }
-    bindProvider<OrganizationsWorkProcessor> { OrganizationsWorkProcessor.Base(instance(), instance()) }
+    bindProvider<OrganizationsWorkProcessor> { OrganizationsWorkProcessor.Base(instance(), instance(), instance()) }
     bindProvider<OrganizationsScreenModel> { OrganizationsScreenModel(instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<SubjectsStateCommunicator> { SubjectsStateCommunicator.Base() }

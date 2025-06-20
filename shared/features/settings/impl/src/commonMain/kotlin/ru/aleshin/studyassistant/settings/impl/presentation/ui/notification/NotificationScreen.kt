@@ -27,7 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
@@ -49,6 +51,7 @@ internal class NotificationScreen : Screen {
     ) { state ->
         val strings = SettingsThemeRes.strings
         val coreStrings = StudyAssistantRes.strings
+        val navigator = LocalNavigator.current
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -75,6 +78,9 @@ internal class NotificationScreen : Screen {
                     onUpdateWorkloadWarningNotify = {
                         dispatchEvent(NotificationEvent.UpdateHighWorkloadWarningNotify(it))
                     },
+                    onOpenBillingScreen = {
+                        dispatchEvent(NotificationEvent.NavigateToBilling)
+                    }
                 )
             },
             snackbarHost = {
@@ -88,6 +94,7 @@ internal class NotificationScreen : Screen {
 
         handleEffect { effect ->
             when (effect) {
+                is NotificationEffect.NavigateToGlobal -> navigator?.root()?.push(effect.pushScreen)
                 is NotificationEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings, coreStrings),

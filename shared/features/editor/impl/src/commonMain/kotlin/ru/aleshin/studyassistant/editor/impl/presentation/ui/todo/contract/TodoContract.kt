@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.contract
 
 import androidx.compose.runtime.Immutable
+import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
@@ -37,6 +38,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.TodoNotif
 internal data class TodoViewState(
     val isLoading: Boolean = true,
     val isLoadingSave: Boolean = false,
+    val isPaidUser: Boolean = false,
     val editableTodo: EditTodoUi? = null,
 ) : BaseViewState
 
@@ -49,16 +51,18 @@ internal sealed class TodoEvent : BaseEvent {
     data class UpdateNotifications(val notifications: TodoNotificationsUi) : TodoEvent()
     data object DeleteTodo : TodoEvent()
     data object SaveTodo : TodoEvent()
+    data object NavigateToBilling : TodoEvent()
     data object NavigateToBack : TodoEvent()
 }
 
 internal sealed class TodoEffect : BaseUiEffect {
     data class ShowError(val failures: EditorFailures) : TodoEffect()
     data object NavigateToBack : TodoEffect()
+    data class NavigateToGlobal(val pushScreen: Screen) : TodoEffect()
 }
 
 internal sealed class TodoAction : BaseAction {
-    data class SetupEditModel(val editModel: EditTodoUi) : TodoAction()
+    data class SetupEditModel(val editModel: EditTodoUi, val isPaidUser: Boolean) : TodoAction()
     data class UpdateEditModel(val editModel: EditTodoUi?) : TodoAction()
     data class UpdateLoading(val isLoading: Boolean) : TodoAction()
     data class UpdateLoadingSave(val isLoading: Boolean) : TodoAction()

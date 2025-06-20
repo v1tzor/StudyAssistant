@@ -60,12 +60,21 @@ internal interface SubscriptionInteractor {
             val appUserInfo = usersRepository.fetchUserById(currentUser).first()
             val userSubscriptionInfo = appUserInfo?.subscriptionInfo
 
-            val allPurchases = try { iapService.fetchPurchases() } catch (e: Throwable) { emptyList() }
+            val allPurchases = try {
+                iapService.fetchPurchases().filter { it.developerPayload == currentUser }
+            } catch (e: Throwable) {
+                emptyList()
+            }
             val allProducts = productsRepository.fetchProducts().first()
             val allProductsInfo = iapService.fetchProducts(allProducts)
 
             return@wrap buildList {
-                val linkedPurchase = allPurchases.find { it.developerPayload == currentUser }
+                val linkedPurchase = allPurchases.find {
+                    val productFilter = it.productId == userSubscriptionInfo?.productId
+                    val purchaseIdFilter = it.purchaseId == userSubscriptionInfo?.purchaseId
+                    val subscriptionTokenFilter = it.subscriptionToken == userSubscriptionInfo?.subscriptionToken
+                    return@find productFilter && (purchaseIdFilter || subscriptionTokenFilter)
+                }
                 if (userSubscriptionInfo != null) {
                     val linkedProduct = allProductsInfo.find { it.productId == userSubscriptionInfo.productId }
                     val userSubscription = userSubscriptionInfo.convertToDetails(

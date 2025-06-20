@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.contract
 
+import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
@@ -32,6 +33,7 @@ import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.Noti
 @Parcelize
 internal data class NotificationViewState(
     val settings: NotificationSettingsUi? = null,
+    val isPaidUser: Boolean = false,
     val allOrganizations: List<OrganizationShortUi> = emptyList(),
 ) : BaseViewState
 
@@ -43,13 +45,16 @@ internal sealed class NotificationEvent : BaseEvent {
     data class UpdateEndOfClassesExceptions(val organizations: List<UID>) : NotificationEvent()
     data class UpdateUnfinishedHomeworksNotify(val time: Long?) : NotificationEvent()
     data class UpdateHighWorkloadWarningNotify(val maxRate: Int?) : NotificationEvent()
+    data object NavigateToBilling : NotificationEvent()
 }
 
 internal sealed class NotificationEffect : BaseUiEffect {
+    data class NavigateToGlobal(val pushScreen: Screen) : NotificationEffect()
     data class ShowError(val failures: SettingsFailures) : NotificationEffect()
 }
 
 internal sealed class NotificationAction : BaseAction {
     data class UpdateSettings(val settings: NotificationSettingsUi) : NotificationAction()
+    data class UpdatePaidUserStatus(val isPaidUser: Boolean) : NotificationAction()
     data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : NotificationAction()
 }

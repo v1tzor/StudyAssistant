@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.remote.datasources.message.MessagingServic
 import ru.aleshin.studyassistant.data.AnalyticsServiceImpl
 import ru.aleshin.studyassistant.data.AppServiceImpl
 import ru.aleshin.studyassistant.data.CrashlyticsServiceImpl
+import ru.aleshin.studyassistant.data.IapServiceImpl
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.ok.tracer.HasTracerConfiguration
 import ru.rustore.sdk.pushclient.common.logger.DefaultLogger
@@ -70,6 +71,7 @@ abstract class BaseFlavorApplication : BaseApplication(), HasTracerConfiguration
                 messagingService = MessagingServiceImpl(
                     context = applicationContext,
                 ),
+                iapService = IapServiceImpl(),
                 crashlyticsService = CrashlyticsServiceImpl(),
                 applicationContext = applicationContext,
             )

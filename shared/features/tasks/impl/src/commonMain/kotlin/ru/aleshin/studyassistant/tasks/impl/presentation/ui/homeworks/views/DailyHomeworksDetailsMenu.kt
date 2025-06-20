@@ -63,7 +63,7 @@ internal fun DailyHomeworksDetailsMenu(
         onDismiss = onDismiss,
         onChoose = { action ->
             when (action) {
-                DailyHomeworksMenuActions.SHARE -> onShare
+                DailyHomeworksMenuActions.SHARE -> onShare()
             }
             onDismiss()
         }

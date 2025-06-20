@@ -20,22 +20,26 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.settings.impl.di.holder.SettingsFeatureDIHolder
+import ru.aleshin.studyassistant.settings.impl.navigation.SettingsScreenProvider
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.contract.NotificationAction
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.contract.NotificationEffect
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.contract.NotificationEvent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.contract.NotificationViewState
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.screenmodel.NotificationWorkCommand.UpdateSettings
 
 /**
  * @author Stanislav Aleshin on 25.08.2024
  */
 internal class NotificationScreenModel(
     private val workProcessor: NotificationWorkProcessor,
+    private val screenProvider: SettingsScreenProvider,
     stateCommunicator: NotificationStateCommunicator,
     effectCommunicator: NotificationEffectCommunicator,
     coroutineManager: CoroutineManager,
@@ -65,13 +69,17 @@ internal class NotificationScreenModel(
                     val command = NotificationWorkCommand.LoadOrganizations
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_PAID_USER_STATUS) {
+                    val command = NotificationWorkCommand.LoadPaidUserStatus
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is NotificationEvent.UpdateBeggingOfClassesNotify -> with(state()) {
                 val settings = checkNotNull(settings)
                 val updatedSettings = settings.copy(beginningOfClasses = event.beforeDelay)
 
                 launchBackgroundWork(BackgroundKey.SETTINGS_ACTION) {
-                    val command = NotificationWorkCommand.UpdateSettings(updatedSettings)
+                    val command = UpdateSettings(updatedSettings)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -80,7 +88,7 @@ internal class NotificationScreenModel(
                 val updatedSettings = settings.copy(exceptionsForBeginningOfClasses = event.organizations)
 
                 launchBackgroundWork(BackgroundKey.SETTINGS_ACTION) {
-                    val command = NotificationWorkCommand.UpdateSettings(updatedSettings)
+                    val command = UpdateSettings(updatedSettings)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -89,7 +97,7 @@ internal class NotificationScreenModel(
                 val updatedSettings = settings.copy(endOfClasses = event.isNotify)
 
                 launchBackgroundWork(BackgroundKey.SETTINGS_ACTION) {
-                    val command = NotificationWorkCommand.UpdateSettings(updatedSettings)
+                    val command = UpdateSettings(updatedSettings)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -98,7 +106,7 @@ internal class NotificationScreenModel(
                 val updatedSettings = settings.copy(exceptionsForEndOfClasses = event.organizations)
 
                 launchBackgroundWork(BackgroundKey.SETTINGS_ACTION) {
-                    val command = NotificationWorkCommand.UpdateSettings(updatedSettings)
+                    val command = UpdateSettings(updatedSettings)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -107,7 +115,7 @@ internal class NotificationScreenModel(
                 val updatedSettings = settings.copy(unfinishedHomeworks = event.time)
 
                 launchBackgroundWork(BackgroundKey.SETTINGS_ACTION) {
-                    val command = NotificationWorkCommand.UpdateSettings(updatedSettings)
+                    val command = UpdateSettings(updatedSettings)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -116,9 +124,13 @@ internal class NotificationScreenModel(
                 val updatedSettings = settings.copy(highWorkload = event.maxRate)
 
                 launchBackgroundWork(BackgroundKey.SETTINGS_ACTION) {
-                    val command = NotificationWorkCommand.UpdateSettings(updatedSettings)
+                    val command = UpdateSettings(updatedSettings)
                     workProcessor.work(command).collectAndHandleWork()
                 }
+            }
+            is NotificationEvent.NavigateToBilling -> {
+                val screen = screenProvider.provideBillingScreen(BillingScreen.Subscription)
+                sendEffect(NotificationEffect.NavigateToGlobal(screen))
             }
         }
     }
@@ -133,10 +145,13 @@ internal class NotificationScreenModel(
         is NotificationAction.UpdateOrganizations -> currentState.copy(
             allOrganizations = action.organizations,
         )
+        is NotificationAction.UpdatePaidUserStatus -> currentState.copy(
+            isPaidUser = action.isPaidUser,
+        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_SETTINGS, LOAD_ORGANIZATIONS, SETTINGS_ACTION
+        LOAD_SETTINGS, LOAD_PAID_USER_STATUS, LOAD_ORGANIZATIONS, SETTINGS_ACTION
     }
 }
 

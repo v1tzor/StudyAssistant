@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
@@ -51,8 +52,10 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 @Composable
 internal fun TodoNotificationSelector(
     modifier: Modifier = Modifier,
+    isPaidUser: Boolean,
     notifications: TodoNotificationsUi?,
     onChangeNotifications: (TodoNotificationsUi) -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) {
     Row(
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
@@ -81,14 +84,19 @@ internal fun TodoNotificationSelector(
 
             IconButton(
                 modifier = Modifier.size(32.dp),
-                onClick = { openNotificationsMenu = true },
+                onClick = {
+                    if (isPaidUser) openNotificationsMenu = true else onOpenBillingScreen()
+                },
                 enabled = notifications != null,
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 ),
             ) {
-                Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+                Icon(
+                    imageVector = if (isPaidUser) Icons.Default.Settings else Icons.Default.Star,
+                    contentDescription = null
+                )
             }
 
             if (notifications != null) {

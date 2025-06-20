@@ -44,7 +44,15 @@ internal data class EditTodoUi(
     fun isValid() = name.isNotBlank()
 
     companion object {
-        fun createEditModel(uid: UID?) = EditTodoUi(uid = uid ?: "")
+        fun createEditModel(
+            uid: UID?,
+            enableNotifications: Boolean = true,
+        ) = EditTodoUi(
+            uid = uid ?: "",
+            notifications = TodoNotificationsUi(
+                beforeStart = enableNotifications,
+            )
+        )
     }
 }
 

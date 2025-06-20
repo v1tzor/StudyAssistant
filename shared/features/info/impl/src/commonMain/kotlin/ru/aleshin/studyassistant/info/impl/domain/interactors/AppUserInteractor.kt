@@ -14,35 +14,24 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.tasks.impl.domain.interactors
+package ru.aleshin.studyassistant.info.impl.domain.interactors
 
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
-import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
-import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
+import ru.aleshin.studyassistant.info.impl.domain.common.InfoEitherWrapper
+import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
 
 /**
- * @author Stanislav Aleshin on 24.07.2024.
+ * @author Stanislav Aleshin on 19.06.2025.
  */
-internal interface UsersInteractor {
+internal interface AppUserInteractor {
 
-    suspend fun fetchAllFriends(): FlowDomainResult<TasksFailures, List<AppUser>>
-
-    suspend fun fetchAppUserPaidStatus(): FlowDomainResult<TasksFailures, Boolean>
+    suspend fun fetchAppUserPaidStatus(): FlowDomainResult<InfoFailures, Boolean>
 
     class Base(
         private val usersRepository: UsersRepository,
-        private val eitherWrapper: TasksEitherWrapper,
-    ) : UsersInteractor {
-
-        private val currentUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
-        override suspend fun fetchAllFriends() = eitherWrapper.wrapFlow {
-            usersRepository.fetchUserFriends(currentUser)
-        }
+        private val eitherWrapper: InfoEitherWrapper,
+    ) : AppUserInteractor {
 
         override suspend fun fetchAppUserPaidStatus() = eitherWrapper.wrapFlow {
             usersRepository.fetchCurrentUserPaidStatus()

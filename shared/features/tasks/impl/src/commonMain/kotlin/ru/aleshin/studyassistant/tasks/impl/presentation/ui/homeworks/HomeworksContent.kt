@@ -77,6 +77,7 @@ internal fun HomeworksContent(
     onShareHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
     onScheduleGoal: (GoalCreateModelUi) -> Unit,
     onDeleteGoal: (GoalShortUi) -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) = with(state) {
     var isShowedTargetDay by rememberSaveable { mutableStateOf(true) }
     Crossfade(
@@ -111,6 +112,7 @@ internal fun HomeworksContent(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         var isShowSharedHomeworksSheet by remember { mutableStateOf(false) }
                         DailyHomeworksDetailsView(
+                            isPaidUser = isPaidUser,
                             date = homeworksEntry.first,
                             currentDate = currentDate,
                             isPassed = homeworksEntry.first < currentDate,
@@ -123,6 +125,7 @@ internal fun HomeworksContent(
                             onShareHomeworks = { isShowSharedHomeworksSheet = true },
                             onScheduleGoal = onScheduleGoal,
                             onDeleteGoal = onDeleteGoal,
+                            onOpenBillingScreen = onOpenBillingScreen,
                         )
 
                         DailyHomeworksDetailsVerticalDivider()

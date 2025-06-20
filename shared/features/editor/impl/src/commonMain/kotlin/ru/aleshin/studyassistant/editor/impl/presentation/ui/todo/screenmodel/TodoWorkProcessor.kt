@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkR
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.firstRightOrNull
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.TodoInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
@@ -42,6 +43,7 @@ internal interface TodoWorkProcessor : FlowWorkProcessor<TodoWorkCommand, TodoAc
 
     class Base(
         private val todoInteractor: TodoInteractor,
+        private val usersInteractor: AppUserInteractor,
     ) : TodoWorkProcessor {
 
         override suspend fun work(command: TodoWorkCommand) = when (command) {
@@ -51,13 +53,19 @@ internal interface TodoWorkProcessor : FlowWorkProcessor<TodoWorkCommand, TodoAc
         }
 
         private fun loadEditModelWork(todoId: UID?) = flow {
+            val isPaidUser = usersInteractor.fetchAppUserPaidStatus().firstRightOrNull {
+                emit(EffectResult(TodoEffect.ShowError(it)))
+            } ?: false
             val todoModel = todoInteractor.fetchTodoById(todoId ?: "").firstRightOrNull {
                 emit(EffectResult(TodoEffect.ShowError(it)))
             }
 
-            val editModel = todoModel?.mapToUi()?.convertToEdit() ?: EditTodoUi.createEditModel(todoId)
+            val editModel = todoModel?.mapToUi()?.convertToEdit() ?: EditTodoUi.createEditModel(
+                uid = todoId,
+                enableNotifications = isPaidUser,
+            )
 
-            emit(ActionResult(TodoAction.SetupEditModel(editModel)))
+            emit(ActionResult(TodoAction.SetupEditModel(editModel, isPaidUser)))
         }
 
         private fun saveTodoWork(todo: EditTodoUi) = flow<TodoWorkResult> {

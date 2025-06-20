@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -45,13 +46,15 @@ import androidx.compose.ui.unit.dp
  * @author Stanislav Aleshin on 25.08.2024.
  */
 @Composable
-fun SettingsSwitchView(
+internal fun SettingsSwitchView(
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
+    isPaidUser: Boolean = false,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     title: String,
     description: String,
+    onBuyContent: () -> Unit = {},
     actions: @Composable (ColumnScope.() -> Unit)? = null,
 ) {
     Column(
@@ -66,18 +69,28 @@ fun SettingsSwitchView(
             Switch(
                 enabled = enabled,
                 checked = checked,
-                onCheckedChange = onCheckedChange,
+                onCheckedChange = { isChecked ->
+                    if (isPaidUser || !isChecked) onCheckedChange(isChecked) else onBuyContent()
+                },
                 thumbContent = {
-                    AnimatedVisibility(
-                        visible = checked,
-                        enter = fadeIn(spring()),
-                        exit = fadeOut(spring()),
-                    ) {
+                    if (!isPaidUser) {
                         Icon(
-                            imageVector = Icons.Filled.Check,
+                            imageVector = Icons.Filled.Star,
                             contentDescription = null,
                             modifier = Modifier.size(SwitchDefaults.IconSize),
                         )
+                    } else {
+                        AnimatedVisibility(
+                            visible = checked,
+                            enter = fadeIn(spring()),
+                            exit = fadeOut(spring()),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                            )
+                        }
                     }
                 }
             )

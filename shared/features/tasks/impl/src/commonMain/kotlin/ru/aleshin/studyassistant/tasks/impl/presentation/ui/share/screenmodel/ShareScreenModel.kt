@@ -20,19 +20,24 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen.Subject
 import ru.aleshin.studyassistant.tasks.impl.di.holder.TasksFeatureDIHolder
 import ru.aleshin.studyassistant.tasks.impl.navigation.TasksScreenProvider
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareAction
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareAction.SetupLinkData
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareAction.UpdateLinkData
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareEffect
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareEffect.NavigateToGlobal
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareEvent
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareViewState
-import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareWorkCommand.LoadSubjects
+import ru.aleshin.studyassistant.users.api.navigation.UsersScreen.UserProfile
 
 /**
  * @author Stanislav Aleshin on 18.07.2024
@@ -69,6 +74,10 @@ internal class ShareScreenModel(
                     val command = ShareWorkCommand.LoadOrganizations
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_PAID_STATE) {
+                    val command = ShareWorkCommand.LoadPaidUserState
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is ShareEvent.LoadLinkData -> with(event) {
                 launchBackgroundWork(BackgroundKey.LOAD_MATCHING_DATA) {
@@ -76,7 +85,7 @@ internal class ShareScreenModel(
                         val command = ShareWorkCommand.LoadLinkData(receivedHomeworks)
                         workProcessor.work(command).collectAndHandleWork()
                     } else {
-                        sendAction(ShareAction.SetupLinkData(emptyList(), null))
+                        sendAction(SetupLinkData(emptyList(), null))
                     }
                 }
             }
@@ -85,11 +94,11 @@ internal class ShareScreenModel(
                     val targetIndex = linkDataList.indexOfFirst { it.homework.uid == event.linkData.homework.uid }
                     if (targetIndex != -1) set(targetIndex, event.linkData)
                 }
-                sendAction(ShareAction.UpdateLinkData(updateLinkDataList))
+                sendAction(UpdateLinkData(updateLinkDataList))
             }
             is ShareEvent.LoadLinkSubjects -> with(event) {
                 launchBackgroundWork(BackgroundKey.LOAD_SUBJECTS) {
-                    val command = ShareWorkCommand.LoadSubjects(organization)
+                    val command = LoadSubjects(organization)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -113,14 +122,18 @@ internal class ShareScreenModel(
                 }
             }
             is ShareEvent.NavigateToSubjectEditor -> with(event) {
-                val featureScreen = EditorScreen.Subject(subjectId, organization)
+                val featureScreen = Subject(subjectId, organization)
                 val screen = screenProvider.provideEditorScreen(featureScreen)
-                sendEffect(ShareEffect.NavigateToGlobal(screen))
+                sendEffect(NavigateToGlobal(screen))
             }
             is ShareEvent.NavigateToUserProfile -> with(event) {
-                val featureScreen = UsersScreen.UserProfile(userId)
+                val featureScreen = UserProfile(userId)
                 val screen = screenProvider.provideUsersScreen(featureScreen)
-                sendEffect(ShareEffect.NavigateToGlobal(screen))
+                sendEffect(NavigateToGlobal(screen))
+            }
+            is ShareEvent.NavigateToBilling -> {
+                val screen = screenProvider.provideBillingScreen(BillingScreen.Subscription)
+                sendEffect(NavigateToGlobal(screen))
             }
             is ShareEvent.NavigateToBack -> {
                 sendEffect(ShareEffect.NavigateToBack)
@@ -150,6 +163,9 @@ internal class ShareScreenModel(
         is ShareAction.UpdateOrganizations -> currentState.copy(
             organizations = action.organizations,
         )
+        is ShareAction.UpdateUserPaidStatus -> currentState.copy(
+            isPaidUser = action.isPaidUser,
+        )
         is ShareAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )
@@ -159,7 +175,7 @@ internal class ShareScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_SHARED_HOMEWORKS, LOAD_ORGANIZATION, LOAD_SUBJECTS, LOAD_MATCHING_DATA, HOMEWORK_ACTION
+        LOAD_SHARED_HOMEWORKS, LOAD_PAID_STATE, LOAD_ORGANIZATION, LOAD_SUBJECTS, LOAD_MATCHING_DATA, HOMEWORK_ACTION
     }
 }
 

@@ -17,6 +17,7 @@ package ru.aleshin.studyassistant.core.common.architecture.screenmodel.work
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -51,6 +52,27 @@ interface FlowWorkProcessor<C : WorkCommand, A : BaseAction, E : BaseUiEffect> {
                             },
                         )
                     }
+                }
+            )
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    fun <L : DomainFailures, D1, D2> Flow<Either<L, D1>>.combineWithResult(
+        secondFlow: Flow<Either<L, D2>>,
+        onError: suspend (L) -> E,
+        onData: suspend (D1, D2) -> A,
+    ): FlowWorkResult<A, E> {
+        return combine(secondFlow) { eitherFirst, eitherSecond ->
+            eitherFirst.handleAndGet(
+                onLeftAction = { EffectResult(onError(it)) },
+                onRightAction = { dataFirst ->
+                    eitherSecond.handleAndGet(
+                        onLeftAction = { EffectResult(onError(it)) },
+                        onRightAction = { dataSecond ->
+                            ActionResult(onData(dataFirst, dataSecond))
+                        },
+                    )
                 }
             )
         }

@@ -31,6 +31,7 @@ import ru.aleshin.studyassistant.tasks.impl.domain.interactors.GoalsInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.HomeworksInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ScheduleInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ShareHomeworksInteractor
+import ru.aleshin.studyassistant.tasks.impl.domain.interactors.UsersInteractor
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
@@ -51,12 +52,15 @@ internal interface HomeworksDetailsWorkProcessor :
         private val homeworksInteractor: HomeworksInteractor,
         private val scheduleInteractor: ScheduleInteractor,
         private val shareInteractor: ShareHomeworksInteractor,
+        private val usersInteractor: UsersInteractor,
         private val goalsInteractor: GoalsInteractor,
     ) : HomeworksDetailsWorkProcessor {
 
         override suspend fun work(command: HomeworksDetailsWorkCommand) = when (command) {
             is HomeworksDetailsWorkCommand.LoadHomeworks -> loadHomeworksWork(command.timeRange)
             is HomeworksDetailsWorkCommand.LoadActiveSchedule -> loadActiveScheduleWork(command.currentDate)
+            is HomeworksDetailsWorkCommand.LoadPaidUserStatus -> loadUserPaidStatusWork()
+            is HomeworksDetailsWorkCommand.LoadFriends -> loadFriendsWork()
             is HomeworksDetailsWorkCommand.UpdateHomework -> updateHomeworkWork(command.homework)
             is HomeworksDetailsWorkCommand.ShareHomeworks -> shareHomeworksWork(command.sentMediatedHomeworks)
             is HomeworksDetailsWorkCommand.ScheduleGoal -> scheduleGoalWork(command.goalCreateModel)
@@ -80,6 +84,22 @@ internal interface HomeworksDetailsWorkProcessor :
                 onLeftAction = { emit(EffectResult(HomeworksEffect.ShowError(it))) },
                 onRightAction = { schedule ->
                     emit(ActionResult(HomeworksAction.UpdateActiveSchedule(schedule.mapToUi())))
+                },
+            )
+        }
+
+        private fun loadUserPaidStatusWork() = flow {
+            usersInteractor.fetchAppUserPaidStatus().collectAndHandle(
+                onLeftAction = { emit(EffectResult(HomeworksEffect.ShowError(it))) },
+                onRightAction = { emit(ActionResult(HomeworksAction.UpdateUserPaidStatus(it))) },
+            )
+        }
+
+        private fun loadFriendsWork() = flow {
+            usersInteractor.fetchAllFriends().collectAndHandle(
+                onLeftAction = { emit(EffectResult(HomeworksEffect.ShowError(it))) },
+                onRightAction = { friends ->
+                    emit(ActionResult(HomeworksAction.UpdateFriends(friends.map { it.mapToUi() })))
                 },
             )
         }
@@ -113,6 +133,8 @@ internal interface HomeworksDetailsWorkProcessor :
 internal sealed class HomeworksDetailsWorkCommand : WorkCommand {
     data class LoadHomeworks(val timeRange: TimeRange) : HomeworksDetailsWorkCommand()
     data class LoadActiveSchedule(val currentDate: Instant) : HomeworksDetailsWorkCommand()
+    data object LoadPaidUserStatus : HomeworksDetailsWorkCommand()
+    data object LoadFriends : HomeworksDetailsWorkCommand()
     data class UpdateHomework(val homework: HomeworkDetailsUi) : HomeworksDetailsWorkCommand()
     data class ShareHomeworks(val sentMediatedHomeworks: SentMediatedHomeworksDetailsUi) : HomeworksDetailsWorkCommand()
     data class ScheduleGoal(val goalCreateModel: GoalCreateModelUi) : HomeworksDetailsWorkCommand()

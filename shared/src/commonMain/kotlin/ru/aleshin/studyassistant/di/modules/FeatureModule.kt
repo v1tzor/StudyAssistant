@@ -183,6 +183,7 @@ val featureModule = DI.Module("Feature") {
         object : TasksFeatureDependencies {
             override val editorFeatureStarter = provider<EditorFeatureStarter>()
             override val usersFeatureStarter = provider<UsersFeatureStarter>()
+            override val billingFeatureStarter = provider<BillingFeatureStarter>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
@@ -211,6 +212,7 @@ val featureModule = DI.Module("Feature") {
         object : InfoFeatureDependencies {
             override val editorFeatureStarter = provider<EditorFeatureStarter>()
             override val usersFeatureStarter = provider<UsersFeatureStarter>()
+            override val billingFeatureStarter = provider<BillingFeatureStarter>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()

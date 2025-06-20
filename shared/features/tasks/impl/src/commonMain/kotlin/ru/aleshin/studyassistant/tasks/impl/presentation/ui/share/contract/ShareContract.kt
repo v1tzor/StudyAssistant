@@ -43,6 +43,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.MediatedHo
 internal data class ShareViewState(
     val isLoading: Boolean = true,
     val isLoadingLink: Boolean = true,
+    val isPaidUser: Boolean = false,
     @TypeParceler<Instant, InstantParceler>
     val currentTime: Instant = Clock.System.now(),
     val sharedHomeworks: SharedHomeworksDetailsUi? = null,
@@ -65,6 +66,7 @@ internal sealed class ShareEvent : BaseEvent {
     data class CancelSendHomework(val sentHomeworks: SentMediatedHomeworksDetailsUi) : ShareEvent()
     data class NavigateToSubjectEditor(val subjectId: UID?, val organization: UID) : ShareEvent()
     data class NavigateToUserProfile(val userId: UID) : ShareEvent()
+    data object NavigateToBilling : ShareEvent()
     data object NavigateToBack : ShareEvent()
 }
 
@@ -84,5 +86,6 @@ internal sealed class ShareAction : BaseAction {
     data class UpdateSubjects(val subjects: List<SubjectUi>) : ShareAction()
     data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : ShareAction()
     data class UpdateLoading(val isLoading: Boolean) : ShareAction()
+    data class UpdateUserPaidStatus(val isPaidUser: Boolean) : ShareAction()
     data class UpdateLinkLoading(val isLoading: Boolean) : ShareAction()
 }

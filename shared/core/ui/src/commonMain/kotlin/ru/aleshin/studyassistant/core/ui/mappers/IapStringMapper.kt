@@ -97,4 +97,5 @@ fun Store.mapToString() = when (this) {
     Store.GOOGLE_PLAY -> "Google Play"
     Store.APP_GALLERY -> "App Gallery"
     Store.APP_STORE -> "App Store"
+    Store.NONE -> "Store"
 }

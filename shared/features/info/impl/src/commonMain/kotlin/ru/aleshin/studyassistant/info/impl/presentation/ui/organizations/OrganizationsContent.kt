@@ -45,6 +45,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -72,6 +73,7 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationClassesInfoUi
+import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsViewState
@@ -102,6 +104,7 @@ internal fun OrganizationsContent(
     onShowEmployeeProfile: (UID) -> Unit,
     onShowAllSubjects: () -> Unit,
     onShowSubjectEditor: (UID) -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) = with(state) {
     PullToRefreshBox(
         modifier = modifier,
@@ -115,10 +118,13 @@ internal fun OrganizationsContent(
         ) {
             OrganizationsInfoSection(
                 isLoading = isLoading,
+                isPaidUser = isPaidUser,
                 organizationData = organizationData,
+                organizations = shortOrganizations,
                 classesInfo = classesInfo,
                 onAddOrganization = onAddOrganization,
                 onEditOrganization = onEditOrganization,
+                onOpenBillingScreen = onOpenBillingScreen,
             )
             OrganizationsContactSection(
                 isLoading = isLoading,
@@ -146,10 +152,13 @@ internal fun OrganizationsContent(
 private fun OrganizationsInfoSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    isPaidUser: Boolean,
     organizationData: OrganizationUi?,
+    organizations: List<OrganizationShortUi>?,
     classesInfo: OrganizationClassesInfoUi?,
     onAddOrganization: () -> Unit,
     onEditOrganization: () -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) {
     Crossfade(
         targetState = isLoading,
@@ -174,11 +183,27 @@ private fun OrganizationsInfoSection(
                     }
                 } else {
                     NoneOrganizationView()
+                    val functionalAvailable = (organizations != null && organizations.size < 2) || isPaidUser
                     FilledTonalButton(
                         modifier = Modifier.fillMaxWidth().height(40.dp),
-                        onClick = onAddOrganization,
+                        onClick = {
+                            if (functionalAvailable) onAddOrganization() else onOpenBillingScreen()
+                        },
                     ) {
-                        Text(text = InfoThemeRes.strings.addOrganizationTitle)
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(text = InfoThemeRes.strings.addOrganizationTitle)
+                            if (!functionalAvailable) {
+                                Icon(
+                                    modifier = Modifier.size(18.dp),
+                                    imageVector = Icons.Default.Stars,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+                        }
                     }
                 }
             } else {

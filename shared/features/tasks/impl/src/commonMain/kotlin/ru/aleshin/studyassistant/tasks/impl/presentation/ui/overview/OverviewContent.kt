@@ -103,6 +103,7 @@ internal fun OverviewContent(
     onShowAllTodoTasks: () -> Unit,
     onOpenTodoTask: (TodoUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) = with(state) {
     Column(
         modifier = modifier.fillMaxSize().padding(top = 8.dp).verticalScroll(scrollState),
@@ -158,8 +159,10 @@ internal fun OverviewContent(
                     )
                     OverviewTasksTab.TODO -> TodosSection(
                         isLoadingTasks = isLoadingTasks,
+                        isPaidUser = isPaidUser,
                         groupedTodos = groupedTodos,
                         currentDate = currentDate,
+                        onOpenBillingScreen = onOpenBillingScreen,
                         onShowAllTodoTasks = onShowAllTodoTasks,
                         onOpenTodoTask = { onOpenTodoTask(it.convertToBase()) },
                         onChangeTodoDone = onChangeTodoDone,
@@ -346,8 +349,10 @@ private fun HomeworksSection(
 private fun TodosSection(
     modifier: Modifier = Modifier,
     isLoadingTasks: Boolean,
+    isPaidUser: Boolean,
     currentDate: Instant,
     groupedTodos: DetailsGroupedTodosUi?,
+    onOpenBillingScreen: () -> Unit,
     onShowAllTodoTasks: () -> Unit,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
@@ -360,8 +365,10 @@ private fun TodosSection(
     ) {
         OverviewTodosInProgressSection(
             isLoading = isLoadingTasks,
+            isPaidUser = isPaidUser,
             currentDate = currentDate,
             todos = groupedTodos?.runningTodos ?: emptyList(),
+            onOpenBillingScreen = onOpenBillingScreen,
             onOpenTodoTask = onOpenTodoTask,
             onChangeTodoDone = onChangeTodoDone,
             onScheduleGoal = onScheduleGoal,
@@ -369,8 +376,10 @@ private fun TodosSection(
         )
         OverviewTodosErrorSection(
             isLoading = isLoadingTasks,
+            isPaidUser = isPaidUser,
             currentDate = currentDate,
             todos = groupedTodos?.errorTodos ?: emptyList(),
+            onOpenBillingScreen = onOpenBillingScreen,
             onOpenTodoTask = onOpenTodoTask,
             onChangeTodoDone = onChangeTodoDone,
             onScheduleGoal = onScheduleGoal,

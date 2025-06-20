@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.presentation.mappers
 
+import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.domain.entities.MainFailures
 
@@ -23,6 +24,7 @@ import ru.aleshin.studyassistant.domain.entities.MainFailures
  * @author Stanislav Aleshin on 13.09.2024.
  */
 fun MainFailures.mapToMessage(strings: StudyAssistantStrings) = when (this) {
+    is MainFailures.IapError -> type.mapToString(strings)
     is MainFailures.FirebaseNetworkError -> strings.networkErrorMessage
     is MainFailures.OtherError -> strings.otherErrorMessage
 }

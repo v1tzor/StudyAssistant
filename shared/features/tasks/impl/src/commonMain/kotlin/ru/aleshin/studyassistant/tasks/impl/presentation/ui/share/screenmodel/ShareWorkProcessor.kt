@@ -35,6 +35,7 @@ import ru.aleshin.studyassistant.tasks.impl.domain.interactors.OrganizationInter
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ScheduleInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ShareHomeworksInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.SubjectsInteractor
+import ru.aleshin.studyassistant.tasks.impl.domain.interactors.UsersInteractor
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
@@ -59,6 +60,7 @@ internal interface ShareWorkProcessor :
         private val homeworksInteractor: HomeworksInteractor,
         private val organizationInteractor: OrganizationInteractor,
         private val scheduleInteractor: ScheduleInteractor,
+        private val usersInteractor: UsersInteractor,
     ) : ShareWorkProcessor {
 
         override suspend fun work(command: ShareWorkCommand) = when (command) {
@@ -66,6 +68,7 @@ internal interface ShareWorkProcessor :
             is ShareWorkCommand.LoadOrganizations -> loadOrganizationsWork()
             is ShareWorkCommand.LoadLinkData -> loadLinkData(command.receivedHomeworks)
             is ShareWorkCommand.LoadSubjects -> loadSubjectsWork(command.organizationId)
+            is ShareWorkCommand.LoadPaidUserState -> loadUserPaidStatusWork()
             is ShareWorkCommand.AcceptHomework -> acceptHomeworkWork(
                 mediatedHomeworks = command.receivedHomeworks,
                 linkData = command.linkDataList,
@@ -135,6 +138,13 @@ internal interface ShareWorkProcessor :
             )
         }
 
+        private fun loadUserPaidStatusWork() = flow {
+            usersInteractor.fetchAppUserPaidStatus().collectAndHandle(
+                onLeftAction = { emit(EffectResult(ShareEffect.ShowError(it))) },
+                onRightAction = { emit(ActionResult(ShareAction.UpdateUserPaidStatus(it))) },
+            )
+        }
+
         private fun acceptHomeworkWork(
             mediatedHomeworks: ReceivedMediatedHomeworksDetailsUi,
             linkData: List<MediatedHomeworkLinkData>,
@@ -174,13 +184,10 @@ internal interface ShareWorkProcessor :
 internal sealed class ShareWorkCommand : WorkCommand {
 
     data object LoadSharedHomeworks : ShareWorkCommand()
-
     data class LoadLinkData(val receivedHomeworks: ReceivedMediatedHomeworksDetailsUi) : ShareWorkCommand()
-
     data object LoadOrganizations : ShareWorkCommand()
-
+    data object LoadPaidUserState : ShareWorkCommand()
     data class LoadSubjects(val organizationId: UID) : ShareWorkCommand()
-
     data class AcceptHomework(
         val receivedHomeworks: ReceivedMediatedHomeworksDetailsUi,
         val linkDataList: List<MediatedHomeworkLinkData>,

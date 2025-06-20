@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkR
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handleAndGet
+import ru.aleshin.studyassistant.info.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.info.impl.domain.interactors.ClassesInfoInteractor
 import ru.aleshin.studyassistant.info.impl.domain.interactors.OrganizationsInteractor
 import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToUi
@@ -40,11 +41,22 @@ internal interface OrganizationsWorkProcessor :
     class Base(
         private val organizationsInteractor: OrganizationsInteractor,
         private val classesInfoInteractor: ClassesInfoInteractor,
+        private val appUserInteractor: AppUserInteractor,
     ) : OrganizationsWorkProcessor {
 
         override suspend fun work(command: OrganizationsWorkCommand) = when (command) {
             is OrganizationsWorkCommand.LoadShortOrganizations -> loadShortOrganizationsWork()
+            is OrganizationsWorkCommand.LoadPaidUserStatus -> loadPaidUserStatusWork()
             is OrganizationsWorkCommand.LoadOrganizationData -> loadOrganizationDataWork(command.organizationId)
+        }
+
+        private fun loadPaidUserStatusWork() = flow {
+            appUserInteractor.fetchAppUserPaidStatus().collectAndHandle(
+                onLeftAction = { emit(EffectResult(OrganizationsEffect.ShowError(it))) },
+                onRightAction = {
+                    emit(ActionResult(OrganizationsAction.UpdatePaidUserStatus(it)))
+                }
+            )
         }
 
         private fun loadShortOrganizationsWork() = flow {
@@ -84,6 +96,7 @@ internal interface OrganizationsWorkProcessor :
 
 internal sealed class OrganizationsWorkCommand : WorkCommand {
     data object LoadShortOrganizations : OrganizationsWorkCommand()
+    data object LoadPaidUserStatus : OrganizationsWorkCommand()
     data class LoadOrganizationData(val organizationId: UID?) : OrganizationsWorkCommand()
 }
 

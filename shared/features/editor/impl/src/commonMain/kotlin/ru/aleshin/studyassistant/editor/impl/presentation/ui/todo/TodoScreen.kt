@@ -30,6 +30,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
+import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
@@ -67,6 +68,7 @@ internal data class TodoScreen(private val todoId: UID?) : Screen {
                     onChangeDeadline = { dispatchEvent(TodoEvent.UpdateDeadline(it)) },
                     onChangePriority = { dispatchEvent(TodoEvent.UpdatePriority(it)) },
                     onChangeNotifications = { dispatchEvent(TodoEvent.UpdateNotifications(it)) },
+                    onOpenBillingScreen = { dispatchEvent(TodoEvent.NavigateToBilling) },
                 )
             },
             topBar = {
@@ -95,6 +97,7 @@ internal data class TodoScreen(private val todoId: UID?) : Screen {
         handleEffect { effect ->
             when (effect) {
                 is TodoEffect.NavigateToBack -> navigator.nestedPop()
+                is TodoEffect.NavigateToGlobal -> navigator.root().push(effect.pushScreen)
                 is TodoEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

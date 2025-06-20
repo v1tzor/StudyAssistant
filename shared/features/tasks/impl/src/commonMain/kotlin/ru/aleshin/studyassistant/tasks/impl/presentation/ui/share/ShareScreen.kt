@@ -73,7 +73,8 @@ internal class ShareScreen : Screen {
                     },
                     onCancelSend = { sentHomeworks ->
                         dispatchEvent(ShareEvent.CancelSendHomework(sentHomeworks))
-                    }
+                    },
+                    onOpenBillingScreen = { dispatchEvent(ShareEvent.NavigateToBilling) },
                 )
             },
             topBar = {

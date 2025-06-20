@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Stanislav Aleshin
+ * Copyright 2024 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.domain.entities
+package ru.aleshin.studyassistant.presentation.ui
 
-import ru.aleshin.studyassistant.core.common.functional.DomainFailures
-import ru.aleshin.studyassistant.core.common.platform.services.iap.IapFailure
+import android.os.Bundle
+import io.github.vinceglb.filekit.core.FileKit
+import ru.aleshin.studyassistant.android.R
+import ru.aleshin.studyassistant.core.common.platform.PlatformActivity
 
 /**
- * @author Stanislav Aleshin on 27.01.2024.
+ * @author Stanislav Aleshin on 16.06.2025.
  */
-sealed class MainFailures : DomainFailures {
-    data object FirebaseNetworkError : MainFailures()
-    data class IapError(val type: IapFailure) : MainFailures()
-    data class OtherError(val throwable: Throwable) : MainFailures()
+abstract class FlavorMainActivity : PlatformActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.Theme_StudyAssistant)
+        super.onCreate(savedInstanceState)
+        FileKit.init(this)
+    }
 }

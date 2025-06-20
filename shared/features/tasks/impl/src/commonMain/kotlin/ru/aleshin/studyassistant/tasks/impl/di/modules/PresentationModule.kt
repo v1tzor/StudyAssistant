@@ -20,6 +20,7 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 import ru.aleshin.studyassistant.tasks.impl.navigation.TasksFeatureStarterImpl
@@ -54,7 +55,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<NavigationScreen> { NavigationScreen() }
 
     bindProvider<TasksFeatureStarter> { TasksFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<TasksScreenProvider> { TasksScreenProvider.Base(instance<() -> EditorFeatureStarter>(), instance<() -> UsersFeatureStarter>()) }
+    bindProvider<TasksScreenProvider> { TasksScreenProvider.Base(instance<() -> EditorFeatureStarter>(), instance<() -> UsersFeatureStarter>(), instance<() -> BillingFeatureStarter>()) }
 
     bindProvider<OverviewStateCommunicator> { OverviewStateCommunicator.Base() }
     bindProvider<OverviewEffectCommunicator> { OverviewEffectCommunicator.Base() }
@@ -65,12 +66,12 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<HomeworksStateCommunicator> { HomeworksStateCommunicator.Base() }
     bindProvider<HomeworksEffectCommunicator> { HomeworksEffectCommunicator.Base() }
-    bindProvider<HomeworksDetailsWorkProcessor> { HomeworksDetailsWorkProcessor.Base(instance(), instance(), instance(), instance()) }
+    bindProvider<HomeworksDetailsWorkProcessor> { HomeworksDetailsWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindProvider<HomeworksScreenModel> { HomeworksScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<ShareStateCommunicator> { ShareStateCommunicator.Base() }
     bindProvider<ShareEffectCommunicator> { ShareEffectCommunicator.Base() }
-    bindProvider<ShareWorkProcessor> { ShareWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<ShareWorkProcessor> { ShareWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindProvider<ShareScreenModel> { ShareScreenModel(instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<TodoStateCommunicator> { TodoStateCommunicator.Base() }

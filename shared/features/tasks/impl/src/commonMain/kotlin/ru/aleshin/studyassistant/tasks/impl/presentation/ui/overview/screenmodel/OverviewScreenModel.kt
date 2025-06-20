@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
@@ -100,6 +101,10 @@ internal class OverviewScreenModel(
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_SHARE) {
                     val command = HomeworksWorkCommand.LoadSharedHomeworks
+                    homeworksWorkProcessor.work(command).collectAndHandleWork()
+                }
+                launchBackgroundWork(BackgroundKey.LOAD_PAID_USER_STATUS) {
+                    val command = HomeworksWorkCommand.LoadPaidUserStatus
                     homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -252,6 +257,10 @@ internal class OverviewScreenModel(
                 val screen = screenProvider.provideFeatureScreen(TasksScreen.Todos)
                 sendEffect(NavigateToLocal(screen))
             }
+            is OverviewEvent.NavigateToBilling -> {
+                val screen = screenProvider.provideBillingScreen(BillingScreen.Subscription)
+                sendEffect(NavigateToGlobal(screen))
+            }
         }
     }
 
@@ -289,6 +298,9 @@ internal class OverviewScreenModel(
         is OverviewAction.UpdateCurrentDate -> currentState.copy(
             currentDate = action.date,
         )
+        is OverviewAction.UpdateUserPaidStatus -> currentState.copy(
+            isPaidUser = action.isPaidUser,
+        )
         is OverviewAction.UpdateHomeworksLoading -> currentState.copy(
             isLoadingHomeworks = action.isLoading,
         )
@@ -313,6 +325,7 @@ internal class OverviewScreenModel(
         LOAD_SHARE,
         LOAD_PROGRESS,
         LOAD_TASKS,
+        LOAD_PAID_USER_STATUS,
         GOAL_ACTION,
         TASK_ACTION,
     }

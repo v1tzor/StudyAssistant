@@ -36,6 +36,7 @@ import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.Orga
 @Parcelize
 internal data class OrganizationsViewState(
     val isLoading: Boolean = true,
+    val isPaidUser: Boolean = false,
     val shortOrganizations: List<OrganizationShortUi>? = null,
     val organizationData: OrganizationUi? = null,
     val classesInfo: OrganizationClassesInfoUi? = null,
@@ -50,6 +51,7 @@ internal sealed class OrganizationsEvent : BaseEvent {
     data class NavigateToSubjects(val organizationId: UID) : OrganizationsEvent()
     data class NavigateToOrganizationEditor(val organizationId: UID?) : OrganizationsEvent()
     data class NavigateToSubjectEditor(val subjectId: UID, val organizationId: UID) : OrganizationsEvent()
+    data object NavigateToBilling : OrganizationsEvent()
 }
 
 internal sealed class OrganizationsEffect : BaseUiEffect {
@@ -60,6 +62,7 @@ internal sealed class OrganizationsEffect : BaseUiEffect {
 
 internal sealed class OrganizationsAction : BaseAction {
     data class UpdateShortOrganizations(val organizations: List<OrganizationShortUi>) : OrganizationsAction()
+    data class UpdatePaidUserStatus(val isPaidUser: Boolean) : OrganizationsAction()
     data class UpdateOrganizationData(
         val data: OrganizationUi?,
         val classesInfo: OrganizationClassesInfoUi?,

@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
@@ -79,8 +80,16 @@ internal class HomeworksScreenModel(
                     val command = HomeworksDetailsWorkCommand.LoadHomeworks(targetTimeRange)
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_FRIENDS) {
+                    val command = HomeworksDetailsWorkCommand.LoadFriends
+                    workProcessor.work(command).collectAndHandleWork()
+                }
                 launchBackgroundWork(BackgroundKey.LOAD_ACTIVE_SCHEDULE) {
                     val command = HomeworksDetailsWorkCommand.LoadActiveSchedule(currentDate)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+                launchBackgroundWork(BackgroundKey.LOAD_PAID_USER_STATUS) {
+                    val command = HomeworksDetailsWorkCommand.LoadPaidUserStatus
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -214,6 +223,10 @@ internal class HomeworksScreenModel(
             is HomeworksEvent.NavigateToBack -> {
                 sendEffect(HomeworksEffect.NavigateToBack)
             }
+            is HomeworksEvent.NavigateToBilling -> {
+                val screen = screenProvider.provideBillingScreen(BillingScreen.Subscription)
+                sendEffect(HomeworksEffect.NavigateToGlobal(screen))
+            }
         }
     }
 
@@ -232,13 +245,25 @@ internal class HomeworksScreenModel(
             currentDate = action.currentDate,
             selectedTimeRange = action.selectedTimeRange,
         )
+        is HomeworksAction.UpdateUserPaidStatus -> currentState.copy(
+            isPaidUser = action.isPaidUser,
+        )
+        is HomeworksAction.UpdateFriends -> currentState.copy(
+            friends = action.friends,
+        )
         is HomeworksAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_HOMEWORKS, LOAD_FRIENDS, LOAD_ACTIVE_SCHEDULE, HOMEWORK_ACTION, GOAL_ACTION, SHARE_HOMEWORK
+        LOAD_HOMEWORKS,
+        LOAD_FRIENDS,
+        LOAD_ACTIVE_SCHEDULE,
+        LOAD_PAID_USER_STATUS,
+        HOMEWORK_ACTION,
+        GOAL_ACTION,
+        SHARE_HOMEWORK
     }
 }
 

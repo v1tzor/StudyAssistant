@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.application
 
+import IapServiceImpl
 import com.huawei.hms.api.HuaweiApiAvailability
 import ru.aleshin.studyassistant.PlatformSDK
 import ru.aleshin.studyassistant.android.BuildConfig
@@ -56,6 +57,7 @@ abstract class BaseFlavorApplication : BaseApplication(), HasTracerConfiguration
                 messagingService = MessagingServiceImpl(
                     context = applicationContext,
                 ),
+                iapService = IapServiceImpl(),
                 crashlyticsService = CrashlyticsServiceImpl(),
                 applicationContext = applicationContext,
             )

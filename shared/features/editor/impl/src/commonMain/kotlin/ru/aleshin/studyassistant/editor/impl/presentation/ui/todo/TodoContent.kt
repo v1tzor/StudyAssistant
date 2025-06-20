@@ -47,6 +47,7 @@ internal fun TodoContent(
     onChangeDeadline: (Instant?) -> Unit,
     onChangePriority: (TaskPriority) -> Unit,
     onChangeNotifications: (TodoNotificationsUi) -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) = with(state) {
     Column(
         modifier = modifier.padding(top = 16.dp).verticalScroll(scrollState),
@@ -70,8 +71,10 @@ internal fun TodoContent(
             onChangePriority = onChangePriority,
         )
         TodoNotificationSelector(
+            isPaidUser = isPaidUser,
             notifications = editableTodo?.notifications,
             onChangeNotifications = onChangeNotifications,
+            onOpenBillingScreen = onOpenBillingScreen,
         )
     }
 }

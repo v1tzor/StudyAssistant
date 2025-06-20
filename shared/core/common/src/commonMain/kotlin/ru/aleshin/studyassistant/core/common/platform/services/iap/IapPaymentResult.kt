@@ -25,25 +25,25 @@ sealed interface IapPaymentResult {
         val orderId: String?,
         val purchaseId: String,
         val productId: String,
-        val invoiceId: String,
+        val invoiceId: String?,
         val sandbox: Boolean,
         val subscriptionToken: String? = null,
     ) : IapPaymentResult
 
     data class Cancelled(
-        val purchaseId: String,
+        val purchaseId: String?,
         val sandbox: Boolean,
     ) : IapPaymentResult
 
     data class Failure(
-        val purchaseId: String?,
-        val invoiceId: String?,
-        val orderId: String?,
-        val quantity: Int?,
-        val productId: String?,
-        val sandbox: Boolean,
-        val errorCode: Int?,
-        val failure: IapFailure,
+        val purchaseId: String? = null,
+        val invoiceId: String? = null,
+        val orderId: String? = null,
+        val quantity: Int? = null,
+        val productId: String? = null,
+        val sandbox: Boolean = false,
+        val errorCode: Int? = null,
+        val failure: IapFailure = IapFailure.UnknownError,
     ) : IapPaymentResult
 
     object InvalidPaymentState : IapPaymentResult

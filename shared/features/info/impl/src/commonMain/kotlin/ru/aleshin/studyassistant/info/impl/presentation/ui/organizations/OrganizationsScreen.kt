@@ -97,6 +97,9 @@ internal class OrganizationsScreen : Screen {
                     onShowSubjectEditor = {
                         dispatchEvent(OrganizationsEvent.NavigateToSubjectEditor(it, checkNotNull(organizationId)))
                     },
+                    onOpenBillingScreen = {
+                        dispatchEvent(OrganizationsEvent.NavigateToBilling)
+                    }
                 )
             },
             topBar = {

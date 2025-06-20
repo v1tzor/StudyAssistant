@@ -84,6 +84,7 @@ internal fun ShareContent(
     onAcceptHomework: (ReceivedMediatedHomeworksDetailsUi, List<MediatedHomeworkLinkData>) -> Unit,
     onRejectHomework: (ReceivedMediatedHomeworksDetailsUi) -> Unit,
     onCancelSend: (SentMediatedHomeworksDetailsUi) -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) = with(state) {
     Column(
         modifier = modifier.padding(top = 8.dp).verticalScroll(scrollState),
@@ -92,6 +93,7 @@ internal fun ShareContent(
         ReceivedTasksSection(
             isLoading = isLoading,
             isLoadingLink = isLoadingLink,
+            isPaidUser = isPaidUser,
             currentTime = currentTime,
             organizations = organizations,
             receivedMediatedHomeworks = sharedHomeworks?.received?.values?.toList() ?: emptyList(),
@@ -105,6 +107,7 @@ internal fun ShareContent(
             onAcceptHomework = onAcceptHomework,
             onUpdateLinkData = onUpdateLinkData,
             onRejectHomework = onRejectHomework,
+            onOpenBillingScreen = onOpenBillingScreen,
         )
         HorizontalDivider()
         SentTasksSection(
@@ -122,6 +125,7 @@ private fun ReceivedTasksSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     isLoadingLink: Boolean,
+    isPaidUser: Boolean,
     currentTime: Instant,
     organizations: List<OrganizationShortUi>,
     receivedMediatedHomeworks: List<ReceivedMediatedHomeworksDetailsUi>,
@@ -135,6 +139,7 @@ private fun ReceivedTasksSection(
     onUpdateLinkData: (MediatedHomeworkLinkData) -> Unit,
     onAcceptHomework: (ReceivedMediatedHomeworksDetailsUi, List<MediatedHomeworkLinkData>) -> Unit,
     onRejectHomework: (ReceivedMediatedHomeworksDetailsUi) -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -189,7 +194,9 @@ private fun ReceivedTasksSection(
                             currentTime = currentTime,
                             sender = sender,
                             onOpenProfile = { onOpenUserProfile(sender) },
-                            onAccept = { isOpenMediatedHomeworksLinker = true },
+                            onAccept = {
+                                if (isPaidUser) isOpenMediatedHomeworksLinker = true else onOpenBillingScreen()
+                            },
                             onReject = { onRejectHomework(this) },
                         )
 

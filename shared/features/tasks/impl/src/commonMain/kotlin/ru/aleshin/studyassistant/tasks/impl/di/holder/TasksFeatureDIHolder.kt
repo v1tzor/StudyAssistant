@@ -22,6 +22,7 @@ import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -60,6 +61,7 @@ public object TasksFeatureDIHolder : BaseFeatureDIHolder<TasksFeatureApi, TasksF
                 importAll(navigationModule, presentationModule, domainModule)
                 bindInstance<() -> EditorFeatureStarter> { dependencies.editorFeatureStarter }
                 bindInstance<() -> UsersFeatureStarter> { dependencies.usersFeatureStarter }
+                bindInstance<() -> BillingFeatureStarter> { dependencies.billingFeatureStarter }
                 bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
                 bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }

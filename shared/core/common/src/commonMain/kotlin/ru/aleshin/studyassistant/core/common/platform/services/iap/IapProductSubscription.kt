@@ -38,4 +38,34 @@ data class IapSubscriptionPeriod(
     fun inMillis(): Long {
         return years * 365 * MILLIS_IN_DAY + months * 31 * MILLIS_IN_DAY + days * MILLIS_IN_DAY
     }
+
+    companion object {
+        fun fromIso8601(value: String) = with(value) {
+            if (!startsWith("P")) return@with IapSubscriptionPeriod(0, 0, 0)
+
+            var years = 0
+            var months = 0
+            var days = 0
+            var weeks = 0
+
+            val regex = Regex("""(\d+)([YMWD])""")
+            val matches = regex.findAll(this.drop(1))
+
+            for (match in matches) {
+                val value = match.groupValues[1].toInt()
+                when (match.groupValues[2]) {
+                    "Y" -> years += value
+                    "M" -> months += value
+                    "W" -> days += value * 7
+                    "D" -> days += value
+                }
+            }
+
+            return@with IapSubscriptionPeriod(
+                years = years,
+                months = months,
+                days = days
+            )
+        }
+    }
 }

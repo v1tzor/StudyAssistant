@@ -17,6 +17,8 @@
 package ru.aleshin.studyassistant.tasks.impl.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
+import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
+import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
@@ -35,12 +37,13 @@ import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
 internal interface TasksScreenProvider : FeatureScreenProvider<TasksScreen, TasksRootScreen> {
 
     fun provideEditorScreen(screen: EditorScreen): Screen
-
     fun provideUsersScreen(screen: UsersScreen): Screen
+    fun provideBillingScreen(screen: BillingScreen): Screen
 
     class Base(
         private val editorFeatureStarter: () -> EditorFeatureStarter,
         private val usersFeatureStarter: () -> UsersFeatureStarter,
+        private val billingFeatureStarter: () -> BillingFeatureStarter,
     ) : TasksScreenProvider {
 
         override fun provideFeatureScreen(screen: TasksScreen) = when (screen) {
@@ -56,6 +59,10 @@ internal interface TasksScreenProvider : FeatureScreenProvider<TasksScreen, Task
 
         override fun provideUsersScreen(screen: UsersScreen): Screen {
             return usersFeatureStarter().fetchRootScreenAndNavigate(screen)
+        }
+
+        override fun provideBillingScreen(screen: BillingScreen): Screen {
+            return billingFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
     }
 }

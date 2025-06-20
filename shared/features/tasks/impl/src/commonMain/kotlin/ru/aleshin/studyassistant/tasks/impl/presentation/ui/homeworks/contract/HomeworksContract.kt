@@ -45,6 +45,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 @Parcelize
 internal data class HomeworksViewState(
     val isLoading: Boolean = true,
+    val isPaidUser: Boolean = false,
     @TypeParceler<Instant, InstantParceler>
     val currentDate: Instant = Clock.System.now().startThisDay(),
     val selectedTimeRange: TimeRange? = null,
@@ -68,6 +69,7 @@ internal sealed class HomeworksEvent : BaseEvent {
     data class NavigateToHomeworkEditor(val homework: HomeworkDetailsUi) : HomeworksEvent()
     data class NavigateToHomeworkCreator(val date: Instant) : HomeworksEvent()
     data object AddHomeworkInEditor : HomeworksEvent()
+    data object NavigateToBilling : HomeworksEvent()
     data object NavigateToBack : HomeworksEvent()
 }
 
@@ -82,5 +84,7 @@ internal sealed class HomeworksAction : BaseAction {
     data class UpdateHomeworks(val homeworks: Map<Instant, DailyHomeworksUi>) : HomeworksAction()
     data class UpdateActiveSchedule(val activeSchedule: ScheduleUi?) : HomeworksAction()
     data class UpdateDates(val currentDate: Instant, val selectedTimeRange: TimeRange?) : HomeworksAction()
+    data class UpdateUserPaidStatus(val isPaidUser: Boolean) : HomeworksAction()
+    data class UpdateFriends(val friends: List<AppUserUi>) : HomeworksAction()
     data class UpdateLoading(val isLoading: Boolean) : HomeworksAction()
 }

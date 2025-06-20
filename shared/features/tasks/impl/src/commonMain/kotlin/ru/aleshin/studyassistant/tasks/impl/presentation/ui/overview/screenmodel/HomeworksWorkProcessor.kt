@@ -59,6 +59,7 @@ internal interface HomeworksWorkProcessor : FlowWorkProcessor<HomeworksWorkComma
             is HomeworksWorkCommand.LoadHomeworksProgress -> loadHomeworksProgressWork(command.currentDate)
             is HomeworksWorkCommand.LoadSharedHomeworks -> loadSharedHomeworksWork()
             is HomeworksWorkCommand.LoadActiveSchedule -> loadActiveScheduleWork(command.currentDate)
+            is HomeworksWorkCommand.LoadPaidUserStatus -> loadUserPaidStatusWork()
             is HomeworksWorkCommand.DoHomework -> doHomeworkWork(command.homework)
             is HomeworksWorkCommand.RepeatHomework -> repeatHomeworkWork(command.homework)
             is HomeworksWorkCommand.SkipHomework -> skipHomeworkWork(command.homework)
@@ -121,6 +122,13 @@ internal interface HomeworksWorkProcessor : FlowWorkProcessor<HomeworksWorkComma
             )
         }
 
+        private fun loadUserPaidStatusWork() = flow {
+            usersInteractor.fetchAppUserPaidStatus().collectAndHandle(
+                onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
+                onRightAction = { emit(ActionResult(OverviewAction.UpdateUserPaidStatus(it))) },
+            )
+        }
+
         private fun doHomeworkWork(homework: HomeworkUi) = flow {
             homeworksInteractor.doHomework(homework.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
@@ -153,6 +161,7 @@ internal sealed class HomeworksWorkCommand : WorkCommand {
     data object LoadSharedHomeworks : HomeworksWorkCommand()
     data class LoadActiveSchedule(val currentDate: Instant) : HomeworksWorkCommand()
     data class LoadHomeworksProgress(val currentDate: Instant) : HomeworksWorkCommand()
+    data object LoadPaidUserStatus : HomeworksWorkCommand()
     data class DoHomework(val homework: HomeworkUi) : HomeworksWorkCommand()
     data class SkipHomework(val homework: HomeworkUi) : HomeworksWorkCommand()
     data class RepeatHomework(val homework: HomeworkUi) : HomeworksWorkCommand()

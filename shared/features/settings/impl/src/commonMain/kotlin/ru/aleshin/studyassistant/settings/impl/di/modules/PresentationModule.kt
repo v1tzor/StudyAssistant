@@ -70,8 +70,8 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindSingleton<NotificationStateCommunicator> { NotificationStateCommunicator.Base() }
     bindSingleton<NotificationEffectCommunicator> { NotificationEffectCommunicator.Base() }
-    bindSingleton<NotificationWorkProcessor> { NotificationWorkProcessor.Base(instance(), instance()) }
-    bindSingleton<NotificationScreenModel> { NotificationScreenModel(instance(), instance(), instance(), instance()) }
+    bindSingleton<NotificationWorkProcessor> { NotificationWorkProcessor.Base(instance(), instance(), instance()) }
+    bindSingleton<NotificationScreenModel> { NotificationScreenModel(instance(), instance(), instance(), instance(), instance()) }
 
     bindSingleton<SubscriptionStateCommunicator> { SubscriptionStateCommunicator.Base() }
     bindSingleton<SubscriptionEffectCommunicator> { SubscriptionEffectCommunicator.Base() }

@@ -64,8 +64,10 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewNoneI
 internal fun OverviewTodosInProgressSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    isPaidUser: Boolean,
     currentDate: Instant,
     todos: List<TodoDetailsUi>,
+    onOpenBillingScreen: () -> Unit,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
     onScheduleGoal: (GoalCreateModelUi) -> Unit,
@@ -131,7 +133,9 @@ internal fun OverviewTodosInProgressSection(
                                 priority = todo.priority,
                                 completeTime = todo.completeDate,
                                 onChangeDone = { onChangeTodoDone(todo, it) },
-                                onScheduleGoal = { goalCreatorState = true },
+                                onScheduleGoal = {
+                                    if (isPaidUser) goalCreatorState = true else onOpenBillingScreen()
+                                },
                                 onDeleteGoal = { deleteWarningDialogState = true }
                             )
 
@@ -183,8 +187,10 @@ internal fun OverviewTodosInProgressSection(
 internal fun OverviewTodosErrorSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    isPaidUser: Boolean,
     currentDate: Instant,
     todos: List<TodoDetailsUi>,
+    onOpenBillingScreen: () -> Unit,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
     onScheduleGoal: (GoalCreateModelUi) -> Unit,
@@ -250,7 +256,9 @@ internal fun OverviewTodosErrorSection(
                                 priority = todo.priority,
                                 completeTime = todo.completeDate,
                                 onChangeDone = { onChangeTodoDone(todo, it) },
-                                onScheduleGoal = { goalCreatorState = true },
+                                onScheduleGoal = {
+                                    if (isPaidUser) goalCreatorState = true else onOpenBillingScreen()
+                                },
                                 onDeleteGoal = { deleteWarningDialogState = true },
                             )
 

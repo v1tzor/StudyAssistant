@@ -75,7 +75,7 @@ internal interface GoalWorkProcessor : FlowWorkProcessor<GoalWorkCommand, Overvi
             ).map { progressEither ->
                 progressEither.mapRight { progressMap -> progressMap.mapValues { it.value.mapToUi() } }
             }
-            goalsFlow.flatMapLatestWithResult(
+            goalsFlow.combineWithResult(
                 secondFlow = goalsProgressFlow,
                 onError = { OverviewEffect.ShowError(it) },
                 onData = { goals, goalsProgress ->

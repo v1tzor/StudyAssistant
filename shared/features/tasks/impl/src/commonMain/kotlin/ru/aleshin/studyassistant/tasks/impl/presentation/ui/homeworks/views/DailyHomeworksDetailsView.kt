@@ -108,6 +108,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.GoalCreatorDi
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun DailyHomeworksDetailsView(
     modifier: Modifier = Modifier,
+    isPaidUser: Boolean,
     date: Instant,
     currentDate: Instant,
     isPassed: Boolean,
@@ -120,6 +121,7 @@ internal fun DailyHomeworksDetailsView(
     onScheduleGoal: (GoalCreateModelUi) -> Unit,
     onDeleteGoal: (GoalShortUi) -> Unit,
     onShareHomeworks: () -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxHeight().width(182.dp),
@@ -186,7 +188,9 @@ internal fun DailyHomeworksDetailsView(
                         onSkip = { onSkipHomework(homework) },
                         onRepeat = { onRepeatHomework(homework) },
                         onDeleteGoal = { deleteWarningDialogState = true },
-                        onScheduleGoal = { goalCreatorState = true },
+                        onScheduleGoal = {
+                            if (isPaidUser) goalCreatorState = true else onOpenBillingScreen()
+                        },
                     )
 
                     if (deleteWarningDialogState) {
@@ -235,7 +239,9 @@ internal fun DailyHomeworksDetailsView(
                         onSkip = { onSkipHomework(homework) },
                         onRepeat = { onRepeatHomework(homework) },
                         onDeleteGoal = { deleteWarningDialogState = true },
-                        onScheduleGoal = { goalCreatorState = true },
+                        onScheduleGoal = {
+                            if (isPaidUser) goalCreatorState = true else onOpenBillingScreen()
+                        },
                     )
 
                     if (deleteWarningDialogState) {

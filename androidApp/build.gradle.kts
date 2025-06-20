@@ -170,7 +170,7 @@ dependencies {
     githubImplementation(libs.hms.push)
     huaweiImplementation(libs.hms.push)
 
-//    huaweiImplementation(libs.hms.iap)
+    huaweiImplementation(libs.hms.iap)
     rustoreImplementation(libs.rustore.billing)
 
     implementation(libs.rustore.universalpush.core)

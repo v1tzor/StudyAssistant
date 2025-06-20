@@ -24,6 +24,7 @@ androidx-activityCompose = "1.10.1"
 workmanager = "2.10.0"
 gms = "4.4.2"
 hms = "1.9.1.304"
+hms-iap = "6.13.0.300"
 oauth = "1.24.0"
 firebase-bom = "33.12.0"
 crashlytics = "3.0.3"
@@ -85,7 +86,7 @@ google-auth = { module = "io.github.mirzemehdi:kmpauth-google", version.ref = "k
 hms-core = { module = "com.huawei.agconnect:agconnect-core", version.ref="hms" }
 hms-push = { module = "com.huawei.hms:push", version.ref="hms" }
 hms-agcp = { module = "com.huawei.agconnect:agcp", version.ref="hms" }
-hms-iap = { module = "com.huawei.hms:iap", version.ref="hms" }
+hms-iap = { module = "com.huawei.hms:iap", version.ref="hms-iap" }
 hms-coreinstaller = { module = "com.huawei.hms:hmscoreinstaller", version.ref="hms" }
 placeholder = { group = "com.eygraber", name = "compose-placeholder-material3", version.ref = "placeholder" }
 firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebase-gitlive" }

@@ -12,7 +12,7 @@ CREATE TABLE notificationSettingsEntity (
 );
 
 INSERT INTO notificationSettingsEntity (id, beginning_of_classes, exceptions_for_beginning_of_classes, end_of_classes, exceptions_for_end_of_classes, unfinished_homeworks, high_workload)
-VALUES (1, 600000, '', 1, '', 72000000, 7);
+VALUES (1, NULL, '', 0, '', NULL, NULL);
 
 fetchSettings:
 SELECT *

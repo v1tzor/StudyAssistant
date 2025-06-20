@@ -82,6 +82,7 @@ internal data class HomeworksScreen(val targetDate: Long?) : Screen {
                     onShareHomeworks = { dispatchEvent(HomeworksEvent.ShareHomeworks(it)) },
                     onScheduleGoal = { dispatchEvent(HomeworksEvent.ScheduleGoal(it)) },
                     onDeleteGoal = { dispatchEvent(HomeworksEvent.DeleteGoal(it)) },
+                    onOpenBillingScreen = { dispatchEvent(HomeworksEvent.NavigateToBilling) },
                 )
             },
             topBar = {

@@ -104,8 +104,8 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<TodoStateCommunicator> { TodoStateCommunicator.Base() }
     bindProvider<TodoEffectCommunicator> { TodoEffectCommunicator.Base() }
-    bindProvider<TodoWorkProcessor> { TodoWorkProcessor.Base(instance()) }
-    bindProvider<TodoScreenModel> { TodoScreenModel(instance(), instance(), instance(), instance()) }
+    bindProvider<TodoWorkProcessor> { TodoWorkProcessor.Base(instance(), instance()) }
+    bindProvider<TodoScreenModel> { TodoScreenModel(instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<OrganizationStateCommunicator> { OrganizationStateCommunicator.Base() }
     bindProvider<OrganizationEffectCommunicator> { OrganizationEffectCommunicator.Base() }

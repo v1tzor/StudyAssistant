@@ -20,20 +20,26 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen.Organization
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen.Subject
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
+import ru.aleshin.studyassistant.info.api.navigation.InfoScreen.Subjects
 import ru.aleshin.studyassistant.info.impl.di.holder.InfoFeatureDIHolder
 import ru.aleshin.studyassistant.info.impl.navigation.InfoScreenProvider
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsAction
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEffect
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEffect.NavigateToGlobal
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEffect.NavigateToLocal
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEvent
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsViewState
-import ru.aleshin.studyassistant.users.api.navigation.UsersScreen
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenmodel.OrganizationsWorkCommand.LoadOrganizationData
+import ru.aleshin.studyassistant.users.api.navigation.UsersScreen.EmployeeProfile
 
 /**
  * @author Stanislav Aleshin on 16.06.2024
@@ -66,43 +72,51 @@ internal class OrganizationsScreenModel(
                     val command = OrganizationsWorkCommand.LoadShortOrganizations
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_PAID_USER_STATE) {
+                    val command = OrganizationsWorkCommand.LoadPaidUserStatus
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is OrganizationsEvent.Refresh -> {
                 launchBackgroundWork(BackgroundKey.LOAD_ORGANIZATION_DATA) {
-                    val command = OrganizationsWorkCommand.LoadOrganizationData(event.organizationId)
+                    val command = LoadOrganizationData(event.organizationId)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
             is OrganizationsEvent.ChangeOrganization -> {
                 launchBackgroundWork(BackgroundKey.LOAD_ORGANIZATION_DATA) {
-                    val command = OrganizationsWorkCommand.LoadOrganizationData(event.organizationId)
+                    val command = LoadOrganizationData(event.organizationId)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
             is OrganizationsEvent.OpenEmployeeProfile -> {
-                val featureScreen = UsersScreen.EmployeeProfile(event.employeeId)
+                val featureScreen = EmployeeProfile(event.employeeId)
                 val screen = screenProvider.provideUsersScreen(featureScreen)
-                sendEffect(OrganizationsEffect.NavigateToGlobal(screen))
+                sendEffect(NavigateToGlobal(screen))
             }
             is OrganizationsEvent.NavigateToEmployees -> {
                 val featureScreen = InfoScreen.Employee(event.organizationId)
                 val screen = screenProvider.provideFeatureScreen(featureScreen)
-                sendEffect(OrganizationsEffect.NavigateToLocal(screen))
+                sendEffect(NavigateToLocal(screen))
             }
             is OrganizationsEvent.NavigateToSubjects -> {
-                val featureScreen = InfoScreen.Subjects(event.organizationId)
+                val featureScreen = Subjects(event.organizationId)
                 val screen = screenProvider.provideFeatureScreen(featureScreen)
-                sendEffect(OrganizationsEffect.NavigateToLocal(screen))
+                sendEffect(NavigateToLocal(screen))
             }
             is OrganizationsEvent.NavigateToOrganizationEditor -> {
-                val featureScreen = EditorScreen.Organization(event.organizationId)
+                val featureScreen = Organization(event.organizationId)
                 val screen = screenProvider.provideEditorScreen(featureScreen)
-                sendEffect(OrganizationsEffect.NavigateToGlobal(screen))
+                sendEffect(NavigateToGlobal(screen))
             }
             is OrganizationsEvent.NavigateToSubjectEditor -> {
-                val featureScreen = EditorScreen.Subject(event.subjectId, event.organizationId)
+                val featureScreen = Subject(event.subjectId, event.organizationId)
                 val screen = screenProvider.provideEditorScreen(featureScreen)
-                sendEffect(OrganizationsEffect.NavigateToGlobal(screen))
+                sendEffect(NavigateToGlobal(screen))
+            }
+            is OrganizationsEvent.NavigateToBilling -> {
+                val screen = screenProvider.provideBillingScreen(BillingScreen.Subscription)
+                sendEffect(NavigateToGlobal(screen))
             }
         }
     }
@@ -119,13 +133,16 @@ internal class OrganizationsScreenModel(
             classesInfo = action.classesInfo,
             isLoading = false,
         )
+        is OrganizationsAction.UpdatePaidUserStatus -> currentState.copy(
+            isPaidUser = action.isPaidUser,
+        )
         is OrganizationsAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_SHORT_ORGANIZATIONS, LOAD_ORGANIZATION_DATA
+        LOAD_SHORT_ORGANIZATIONS, LOAD_ORGANIZATION_DATA, LOAD_PAID_USER_STATE
     }
 }
 

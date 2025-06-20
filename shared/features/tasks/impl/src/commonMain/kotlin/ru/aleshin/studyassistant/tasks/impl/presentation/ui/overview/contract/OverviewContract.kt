@@ -56,6 +56,7 @@ internal data class OverviewViewState(
     val isLoadingTasks: Boolean = true,
     val isLoadingShare: Boolean = true,
     val isLoadingGoals: Boolean = true,
+    val isPaidUser: Boolean = false,
     @TypeParceler<Instant, InstantParceler>
     val currentDate: Instant = Clock.System.now().startThisDay(),
     val activeSchedule: ScheduleUi? = null,
@@ -96,6 +97,7 @@ internal sealed class OverviewEvent : BaseEvent {
     data class NavigateToHomeworks(val homework: HomeworkUi?) : OverviewEvent()
     data object NavigateToShare : OverviewEvent()
     data object NavigateToTodos : OverviewEvent()
+    data object NavigateToBilling : OverviewEvent()
 }
 
 internal sealed class OverviewEffect : BaseUiEffect {
@@ -125,6 +127,7 @@ internal sealed class OverviewAction : BaseAction {
     data class UpdateHomeworksProgress(val homeworkProgress: HomeworksCompleteProgressUi?) : OverviewAction()
     data class UpdateActiveSchedule(val activeSchedule: ScheduleUi?) : OverviewAction()
     data class UpdateCurrentDate(val date: Instant) : OverviewAction()
+    data class UpdateUserPaidStatus(val isPaidUser: Boolean) : OverviewAction()
     data class UpdateHomeworksLoading(val isLoading: Boolean) : OverviewAction()
     data class UpdateHomeworksProgressLoading(val isLoading: Boolean) : OverviewAction()
     data class UpdateTasksLoading(val isLoading: Boolean) : OverviewAction()

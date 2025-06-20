@@ -50,6 +50,7 @@ internal fun NotificationContent(
     onUpdateEndOfClassesExceptions: (List<UID>) -> Unit,
     onUpdateUnfinishedHomeworksNotify: (Long?) -> Unit,
     onUpdateWorkloadWarningNotify: (Int?) -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) = with(state) {
     Column(
         modifier = modifier.padding(vertical = 24.dp).verticalScroll(scrollState),
@@ -59,6 +60,8 @@ internal fun NotificationContent(
             enabled = settings != null,
             modifier = Modifier.padding(horizontal = 16.dp),
             checked = settings?.beginningOfClasses != null,
+            isPaidUser = isPaidUser,
+            onBuyContent = onOpenBillingScreen,
             onCheckedChange = { isChecked ->
                 val result = if (isChecked) NotificationSettings.BEFORE_BEGINNING_CLASSES_NOTIFY_TIME else null
                 onUpdateBeggingOfClassesNotify(result)
@@ -82,6 +85,8 @@ internal fun NotificationContent(
             enabled = settings != null,
             modifier = Modifier.padding(horizontal = 16.dp),
             checked = settings?.endOfClasses == true,
+            isPaidUser = isPaidUser,
+            onBuyContent = onOpenBillingScreen,
             onCheckedChange = { isChecked -> onUpdateEndOfClassesNotify(isChecked) },
             title = SettingsThemeRes.strings.endOfClassesNotifyTitle,
             description = SettingsThemeRes.strings.endOfClassesNotifyDescription,
@@ -99,6 +104,8 @@ internal fun NotificationContent(
             enabled = settings != null,
             modifier = Modifier.padding(horizontal = 16.dp),
             checked = settings?.unfinishedHomeworks != null,
+            isPaidUser = isPaidUser,
+            onBuyContent = onOpenBillingScreen,
             onCheckedChange = { isChecked ->
                 val result = if (isChecked) NotificationSettings.UNFINISHED_HOMEWORKS_NOTIFY_TIME else null
                 onUpdateUnfinishedHomeworksNotify(result)
@@ -117,6 +124,8 @@ internal fun NotificationContent(
             enabled = settings != null,
             modifier = Modifier.padding(horizontal = 16.dp),
             checked = settings?.highWorkload != null,
+            isPaidUser = isPaidUser,
+            onBuyContent = onOpenBillingScreen,
             onCheckedChange = { isChecked ->
                 val result = if (isChecked) NotificationSettings.WORKLOAD_HIGH_VALUE else null
                 onUpdateWorkloadWarningNotify(result)

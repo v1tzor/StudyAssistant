@@ -89,7 +89,7 @@ internal interface PurchaseInteractor {
                 }
 
                 is IapPaymentResult.Cancelled -> {
-                    iapService.deletePurchase(purchaseResult.purchaseId)
+                    purchaseResult.purchaseId?.let { iapService.deletePurchase(it) }
                     throw IapServiceError(IapFailure.UserCancelled)
                 }
 
