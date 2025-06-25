@@ -21,6 +21,7 @@ import org.kodein.di.DirectDI
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.chat.api.navigation.ChatFeatureStarter
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
@@ -48,6 +49,7 @@ public object NavigationFeatureDIHolder :
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<() -> ScheduleFeatureStarter> { dependencies.scheduleFeatureStarter }
                 bindSingleton<() -> TasksFeatureStarter> { dependencies.tasksFeatureStarter }
+                bindSingleton<() -> ChatFeatureStarter> { dependencies.chatFeatureStarter }
                 bindSingleton<() -> InfoFeatureStarter> { dependencies.infoFeatureStarter }
                 bindSingleton<() -> ProfileFeatureStarter> { dependencies.profileFeatureStarter }
                 bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }

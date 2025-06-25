@@ -38,7 +38,7 @@ data class Homework(
     val test: String? = null,
     val priority: TaskPriority = TaskPriority.STANDARD,
     val isDone: Boolean = false,
-    val completeDate: Instant?,
+    val completeDate: Instant? = null,
 )
 
 fun String.toHomeworkComponents() = buildList<HomeworkTaskComponent> {

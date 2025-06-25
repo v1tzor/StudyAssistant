@@ -24,6 +24,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.data.Database
 import ru.aleshin.studyassistant.core.database.datasource.DriverFactory
+import ru.aleshin.studyassistant.core.database.datasource.ai.AiLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.employee.EmployeeLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.goals.DailyGoalsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.listOfIntAdapter
@@ -37,6 +38,9 @@ import ru.aleshin.studyassistant.core.database.datasource.settings.NotificationS
 import ru.aleshin.studyassistant.core.database.datasource.subjects.SubjectsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.tasks.HomeworksLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.tasks.TodoLocalDataSource
+import ru.aleshin.studyassistant.sqldelight.ai.AiChatHistoryQueries
+import ru.aleshin.studyassistant.sqldelight.ai.AiChatMessageEntity
+import ru.aleshin.studyassistant.sqldelight.ai.AiChatMessageQueries
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.goals.GoalQueries
@@ -67,14 +71,11 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
     bindEagerSingleton<NotificationSettingsEntity.Adapter> { NotificationSettingsEntity.Adapter(instance(), instance()) }
     bindEagerSingleton<CustomScheduleEntity.Adapter> { CustomScheduleEntity.Adapter(instance()) }
     bindEagerSingleton<BaseScheduleEntity.Adapter> { BaseScheduleEntity.Adapter(instance()) }
-    bindEagerSingleton<OrganizationEntity.Adapter> {
-        OrganizationEntity.Adapter(instance(), instance(), instance(), instance(), instance())
-    }
-    bindEagerSingleton<EmployeeEntity.Adapter> {
-        EmployeeEntity.Adapter(instance(), instance(), instance(), instance())
-    }
+    bindEagerSingleton<OrganizationEntity.Adapter> { OrganizationEntity.Adapter(instance(), instance(), instance(), instance(), instance()) }
+    bindEagerSingleton<EmployeeEntity.Adapter> { EmployeeEntity.Adapter(instance(), instance(), instance(), instance()) }
+    bindEagerSingleton<AiChatMessageEntity.Adapter> { AiChatMessageEntity.Adapter(instance()) }
 
-    bindEagerSingleton<Database> { Database(instance<SqlDriver>(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindEagerSingleton<Database> { Database(instance<SqlDriver>(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 
     bindSingleton<GeneralQueries> { instance<Database>().generalQueries }
     bindSingleton<CalendarQueries> { instance<Database>().calendarQueries }
@@ -87,7 +88,10 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
     bindSingleton<OrganizationQueries> { instance<Database>().organizationQueries }
     bindSingleton<SubjectQueries> { instance<Database>().subjectQueries }
     bindSingleton<EmployeeQueries> { instance<Database>().employeeQueries }
+    bindSingleton<AiChatHistoryQueries> { instance<Database>().aiChatHistoryQueries }
+    bindSingleton<AiChatMessageQueries> { instance<Database>().aiChatMessageQueries }
 
+    bindSingleton<AiLocalDataSource> { AiLocalDataSource.Base(instance(), instance(), instance()) }
     bindSingleton<GeneralSettingsLocalDataSource> { GeneralSettingsLocalDataSource.Base(instance(), instance()) }
     bindSingleton<NotificationSettingsLocalDataSource> { NotificationSettingsLocalDataSource.Base(instance(), instance()) }
     bindSingleton<CalendarSettingsLocalDataSource> { CalendarSettingsLocalDataSource.Base(instance(), instance()) }

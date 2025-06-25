@@ -27,9 +27,13 @@ object StudyAssistantKtor {
         const val SEND_TOPIC = "send/topic"
     }
 
+    object DeepSeek {
+        const val HOST = "https://api.deepseek.com"
+        const val CHAT_COMPLETIONS = "chat/completions"
+    }
+
     object ChatGpt {
         const val RESPONSES_API = "https://api.openai.com/v1/responses"
-        const val BEARER = "Bearer "
         const val MODEL = "gpt-4o-mini"
     }
 }

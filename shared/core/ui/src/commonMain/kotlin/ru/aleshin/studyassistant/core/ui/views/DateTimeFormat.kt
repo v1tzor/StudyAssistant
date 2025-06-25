@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.ui.views
 
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.alternativeParsing
 import kotlinx.datetime.format.char
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.core.ui.theme.tokens.dayOfWeekNames
@@ -127,3 +128,29 @@ fun DateTimeComponents.Formats.shortTimeFormat() = DateTimeComponents.Format {
     char(':')
     minute()
 }
+
+/**
+ * Example output: 2025-06-23T20:00:00
+ * ISO 8601
+ *
+ * @author Stanislav Aleshin on 23.06.2025.
+ */
+fun DateTimeComponents.Formats.iso8601() = DateTimeComponents.Format {
+    year()
+    char('-')
+    monthNumber()
+    char('-')
+    dayOfMonth()
+    alternativeParsing(
+        { char('t') }
+    ) {
+        char('T')
+    }
+    hour()
+    char(':')
+    minute()
+    char(':')
+    second()
+}
+
+const val TIME_SUFFIX = "T00:00:00"

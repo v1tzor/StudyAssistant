@@ -1,0 +1,20 @@
+CREATE TABLE aiChatHistoryEntity (
+   uid TEXT PRIMARY KEY NOT NULL
+);
+
+addOrUpdateChatHistory:
+INSERT OR REPLACE INTO aiChatHistoryEntity (uid)
+VALUES ?;
+
+fetchChatById:
+SELECT *
+FROM aiChatHistoryEntity
+WHERE uid = ?;
+
+fetchAllChats:
+SELECT *
+FROM aiChatHistoryEntity;
+
+deleteChatById:
+DELETE FROM aiChatHistoryEntity
+WHERE uid >= ?;

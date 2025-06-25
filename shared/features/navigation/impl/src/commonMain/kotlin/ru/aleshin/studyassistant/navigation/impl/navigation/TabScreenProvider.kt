@@ -16,6 +16,9 @@
 
 package ru.aleshin.studyassistant.navigation.impl.navigation
 
+import ru.aleshin.studyassistant.chat.api.navigation.ChatFeatureStarter
+import ru.aleshin.studyassistant.chat.api.navigation.ChatScreen
+import ru.aleshin.studyassistant.chat.api.presentation.ChatRootScreen
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.info.api.navigation.InfoScreen
 import ru.aleshin.studyassistant.info.api.presentation.InfoRootScreen
@@ -34,16 +37,15 @@ import ru.aleshin.studyassistant.tasks.api.presentation.TasksRootScreen
 internal interface TabScreenProvider {
 
     fun provideScheduleScreen(screen: ScheduleScreen): ScheduleRootScreen
-
     fun provideTasksScreen(screen: TasksScreen): TasksRootScreen
-
+    fun provideChatScreen(screen: ChatScreen): ChatRootScreen
     fun provideInfoScreen(screen: InfoScreen): InfoRootScreen
-
     fun provideProfileScreen(): ProfileRootScreen
 
     class Base(
         private val scheduleFeatureStarter: () -> ScheduleFeatureStarter,
         private val tasksFeatureStarter: () -> TasksFeatureStarter,
+        private val chatFeatureStarter: () -> ChatFeatureStarter,
         private val infoFeatureStarter: () -> InfoFeatureStarter,
         private val profileFeatureStarter: () -> ProfileFeatureStarter,
     ) : TabScreenProvider {
@@ -54,6 +56,10 @@ internal interface TabScreenProvider {
 
         override fun provideTasksScreen(screen: TasksScreen): TasksRootScreen {
             return tasksFeatureStarter().fetchRootScreenAndNavigate(screen, isNavigate = false)
+        }
+
+        override fun provideChatScreen(screen: ChatScreen): ChatRootScreen {
+            return chatFeatureStarter().fetchRootScreenAndNavigate(screen, isNavigate = false)
         }
 
         override fun provideInfoScreen(screen: InfoScreen): InfoRootScreen {

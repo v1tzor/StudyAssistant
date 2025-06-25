@@ -33,6 +33,7 @@ kotlin {
             implementation(project(":shared:features:tasks:api"))
             implementation(project(":shared:features:info:api"))
             implementation(project(":shared:features:profile:api"))
+            implementation(project(":shared:features:chat:api"))
 
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:ui"))

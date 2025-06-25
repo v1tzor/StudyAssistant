@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.core.screen.Screen
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.chat.api.presentation.ChatRootScreen
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.BottomBarItem
 import ru.aleshin.studyassistant.core.ui.views.BottomNavigationBar
@@ -83,6 +84,12 @@ internal enum class TabsBottomBarItems : BottomBarItem {
         override val enabledIcon: DrawableResource @Composable get() = StudyAssistantRes.icons.tasks
         override val disabledIcon: DrawableResource @Composable get() = StudyAssistantRes.icons.tasksDisabled
     },
+    CHAT {
+        override val label: String @Composable get() = StudyAssistantRes.strings.chatBottomItem
+        override val enabledIcon: DrawableResource @Composable get() = StudyAssistantRes.icons.chatAssistant
+        override val disabledIcon: DrawableResource @Composable get() = StudyAssistantRes.icons.chatAssistantOutline
+        override val containerColor: Color @Composable get() = MaterialTheme.colorScheme.surfaceContainerLow
+    },
     INFO {
         override val label: String @Composable get() = StudyAssistantRes.strings.infoBottomItem
         override val enabledIcon: DrawableResource @Composable get() = StudyAssistantRes.icons.information
@@ -99,6 +106,7 @@ internal enum class TabsBottomBarItems : BottomBarItem {
 internal fun Screen.mapToItem() = when (this) {
     is ScheduleRootScreen -> TabsBottomBarItems.SCHEDULE
     is TasksRootScreen -> TabsBottomBarItems.TASKS
+    is ChatRootScreen -> TabsBottomBarItems.CHAT
     is InfoRootScreen -> TabsBottomBarItems.INFO
     is ProfileRootScreen -> TabsBottomBarItems.PROFILE
     else -> null

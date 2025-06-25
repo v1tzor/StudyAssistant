@@ -28,6 +28,9 @@ import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
 import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.billing.impl.di.BillingFeatureDependencies
 import ru.aleshin.studyassistant.billing.impl.di.holder.BillingFeatureDIHolder
+import ru.aleshin.studyassistant.chat.api.navigation.ChatFeatureStarter
+import ru.aleshin.studyassistant.chat.impl.di.ChatFeatureDependencies
+import ru.aleshin.studyassistant.chat.impl.di.holder.ChatFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -41,6 +44,7 @@ import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
@@ -96,6 +100,7 @@ val featureModule = DI.Module("Feature") {
         object : NavigationFeatureDependencies {
             override val scheduleFeatureStarter = provider<ScheduleFeatureStarter>()
             override val tasksFeatureStarter = provider<TasksFeatureStarter>()
+            override val chatFeatureStarter = provider<ChatFeatureStarter>()
             override val infoFeatureStarter = provider<InfoFeatureStarter>()
             override val profileFeatureStarter = provider<ProfileFeatureStarter>()
             override val coroutineManager = instance<CoroutineManager>()
@@ -366,6 +371,38 @@ val featureModule = DI.Module("Feature") {
 
     bindProvider<BillingFeatureStarter> {
         with(BillingFeatureDIHolder) {
+            init(instance())
+            fetchApi().fetchStarter()
+        }
+    }
+
+    bindEagerSingleton<ChatFeatureDependencies> {
+        object : ChatFeatureDependencies {
+            override val billingFeatureStarter = provider<BillingFeatureStarter>()
+            override val aiAssistantRepository = instance<AiAssistantRepository>()
+            override val baseScheduleRepository = instance<BaseScheduleRepository>()
+            override val customScheduleRepository = instance<CustomScheduleRepository>()
+            override val subjectsRepository = instance<SubjectsRepository>()
+            override val employeeRepository = instance<EmployeeRepository>()
+            override val goalsRepository = instance<DailyGoalsRepository>()
+            override val organizationsRepository = instance<OrganizationsRepository>()
+            override val homeworksRepository = instance<HomeworksRepository>()
+            override val todoRepository = instance<TodoRepository>()
+            override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
+            override val startClassesReminderManager = instance<StartClassesReminderManager>()
+            override val endClassesReminderManager = instance<EndClassesReminderManager>()
+            override val todoReminderManager = instance<TodoReminderManager>()
+            override val usersRepository = instance<UsersRepository>()
+            override val manageUserRepository = instance<ManageUserRepository>()
+            override val dateManager = instance<DateManager>()
+            override val overlayManager = instance<TimeOverlayManager>()
+            override val coroutineManager = instance<CoroutineManager>()
+            override val crashlyticsService = instance<CrashlyticsService>()
+        }
+    }
+    bindProvider<ChatFeatureStarter> {
+        with(ChatFeatureDIHolder) {
             init(instance())
             fetchApi().fetchStarter()
         }

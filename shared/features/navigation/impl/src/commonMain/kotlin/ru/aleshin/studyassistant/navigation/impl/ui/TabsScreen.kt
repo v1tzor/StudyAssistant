@@ -26,6 +26,7 @@ import cafe.adriel.voyager.core.stack.StackEvent
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
+import ru.aleshin.studyassistant.chat.api.presentation.ChatRootScreen
 import ru.aleshin.studyassistant.core.common.architecture.screen.EmptyScreen
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.disposeByKeys
@@ -65,6 +66,7 @@ internal class TabsScreen : TabsRootScreen() {
                         selectedItem = when (navigator.lastItem) {
                             is ScheduleRootScreen -> TabsBottomBarItems.SCHEDULE
                             is TasksRootScreen -> TabsBottomBarItems.TASKS
+                            is ChatRootScreen -> TabsBottomBarItems.CHAT
                             is InfoRootScreen -> TabsBottomBarItems.INFO
                             is ProfileRootScreen -> TabsBottomBarItems.PROFILE
                             else -> null
@@ -73,6 +75,7 @@ internal class TabsScreen : TabsRootScreen() {
                             val event = when (tab) {
                                 TabsBottomBarItems.SCHEDULE -> TabsEvent.SelectedScheduleBottomItem
                                 TabsBottomBarItems.TASKS -> TabsEvent.SelectedTasksBottomItem
+                                TabsBottomBarItems.CHAT -> TabsEvent.SelectedChatBottomItem
                                 TabsBottomBarItems.INFO -> TabsEvent.SelectedInfoBottomItem
                                 TabsBottomBarItems.PROFILE -> TabsEvent.SelectedProfileBottomItem
                             }
@@ -84,6 +87,7 @@ internal class TabsScreen : TabsRootScreen() {
                     navigationBarContainerColor = when (navigator.lastItem) {
                         is ScheduleRootScreen -> TabsBottomBarItems.SCHEDULE.containerColor
                         is TasksRootScreen -> TabsBottomBarItems.TASKS.containerColor
+                        is ChatRootScreen -> TabsBottomBarItems.CHAT.containerColor
                         is InfoRootScreen -> TabsBottomBarItems.INFO.containerColor
                         is ProfileRootScreen -> TabsBottomBarItems.PROFILE.containerColor
                         else -> MaterialTheme.colorScheme.background

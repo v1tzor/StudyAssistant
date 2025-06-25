@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.navigation.impl.di
 
+import ru.aleshin.studyassistant.chat.api.navigation.ChatFeatureStarter
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
@@ -30,6 +31,7 @@ import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
 public interface NavigationFeatureDependencies : BaseFeatureDependencies {
     public val scheduleFeatureStarter: () -> ScheduleFeatureStarter
     public val tasksFeatureStarter: () -> TasksFeatureStarter
+    public val chatFeatureStarter: () -> ChatFeatureStarter
     public val infoFeatureStarter: () -> InfoFeatureStarter
     public val profileFeatureStarter: () -> ProfileFeatureStarter
     public val coroutineManager: CoroutineManager

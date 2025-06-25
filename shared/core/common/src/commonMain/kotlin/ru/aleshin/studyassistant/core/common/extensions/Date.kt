@@ -52,6 +52,13 @@ fun Instant.formatByTimeZone(
     return format(format = format, offset = offset)
 }
 
+fun Instant.Companion.parseUsingOffset(
+    input: CharSequence,
+    format: DateTimeFormat<DateTimeComponents> = DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET
+): Instant {
+    return format.parse(input).toInstantUsingOffset()
+}
+
 fun Instant.shiftWeek(amount: Int, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant {
     return if (amount < 0) {
         this.minus(value = -amount, unit = DateTimeUnit.WEEK, timeZone = timeZone)

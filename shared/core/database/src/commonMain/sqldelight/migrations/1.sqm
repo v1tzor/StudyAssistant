@@ -1,3 +1,7 @@
+import kotlin.String;
+import kotlin.collections.List;
+
+ALTER TABLE `todoEntity` ADD COLUMN description TEXT;
 CREATE TABLE IF NOT EXISTS `goalEntity` (
     uid TEXT PRIMARY KEY NOT NULL,
     type TEXT NOT NULL,
@@ -15,4 +19,20 @@ CREATE TABLE IF NOT EXISTS `goalEntity` (
     complete_after_time_elapsed INTEGER NOT NULL,
     is_done INTEGER NOT NULL,
     complete_date INTEGER
+);
+CREATE TABLE IF NOT EXISTS `aiChatHistoryEntity` (
+   uid TEXT PRIMARY KEY NOT NULL
+);
+CREATE TABLE IF NOT EXISTS `aiChatMessageEntity` (
+   uid TEXT PRIMARY KEY NOT NULL,
+   chat_id TEXT NOT NULL,
+   type TEXT NOT NULL,
+   name TEXT,
+   content TEXT,
+   prefix INTEGER,
+   reasoning_content TEXT,
+   tool_calls TEXT AS List<String>,
+   tool_call_id TEXT,
+   time INTEGER NOT NULL,
+   CONSTRAINT message_to_chat FOREIGN KEY (chat_id) REFERENCES aiChatHistoryEntity (uid) ON DELETE CASCADE
 );

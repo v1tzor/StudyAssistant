@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.navigation.impl.di.modules
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.chat.api.navigation.ChatFeatureStarter
 import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.navigation.impl.navigation.NavigationFeatureStarterImpl
@@ -38,7 +39,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<TabsScreen> { TabsScreen() }
 
     bindSingleton<NavigationFeatureStarter> { NavigationFeatureStarterImpl(instance()) }
-    bindSingleton<TabScreenProvider> { TabScreenProvider.Base(instance<() -> ScheduleFeatureStarter>(), instance<() -> TasksFeatureStarter>(), instance<() -> InfoFeatureStarter>(), instance<() -> ProfileFeatureStarter>()) }
+    bindSingleton<TabScreenProvider> { TabScreenProvider.Base(instance<() -> ScheduleFeatureStarter>(), instance<() -> TasksFeatureStarter>(), instance<() -> ChatFeatureStarter>(),instance<() -> InfoFeatureStarter>(), instance<() -> ProfileFeatureStarter>()) }
 
     bindSingleton<TabsEffectCommunicator> { TabsEffectCommunicator.Base() }
     bindSingleton<TabsStateCommunicator> { TabsStateCommunicator.Base() }

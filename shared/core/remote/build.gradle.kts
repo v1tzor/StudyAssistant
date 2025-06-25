@@ -43,10 +43,10 @@ kotlin {
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.content.negotation)
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.auth)
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
             implementation(libs.networkcheker)
-            implementation(libs.openai)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -84,7 +84,7 @@ buildkonfig {
     val hmsAppId = gradleLocalProperties(rootDir, providers).getProperty("hmsAppId")
     val hmsClientId = gradleLocalProperties(rootDir, providers).getProperty("hmsClientId")
     val hmsClientSecret = gradleLocalProperties(rootDir, providers).getProperty("hmsClientSecret")
-    val chatGptKey = gradleLocalProperties(rootDir, providers).getProperty("chatGptKey")
+    val deepSeekKey = gradleLocalProperties(rootDir, providers).getProperty("deepSeekKey")
 
     defaultConfigs {
         buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", isDebug.toString())
@@ -94,6 +94,6 @@ buildkonfig {
         buildConfigField(FieldSpec.Type.STRING, "HMS_PROJECT_ID", hmsAppId)
         buildConfigField(FieldSpec.Type.STRING, "HMS_CLIENT_ID", hmsClientId)
         buildConfigField(FieldSpec.Type.STRING, "HMS_CLIENT_SECRET", hmsClientSecret)
-        buildConfigField(FieldSpec.Type.STRING, "CHAT_GPT_KEY", chatGptKey)
+        buildConfigField(FieldSpec.Type.STRING, "DEEP_SEEK_KEY", deepSeekKey)
     }
 }

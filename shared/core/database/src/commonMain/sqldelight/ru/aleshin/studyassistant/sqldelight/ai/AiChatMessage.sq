@@ -1,0 +1,51 @@
+import kotlin.String;
+import kotlin.collections.List;
+
+CREATE TABLE aiChatMessageEntity (
+   uid TEXT PRIMARY KEY NOT NULL,
+   chat_id TEXT NOT NULL,
+   type TEXT NOT NULL,
+   name TEXT,
+   content TEXT,
+   prefix INTEGER,
+   reasoning_content TEXT,
+   tool_calls TEXT AS List<String>,
+   tool_call_id TEXT,
+   time INTEGER NOT NULL,
+   CONSTRAINT message_to_chat FOREIGN KEY (chat_id) REFERENCES aiChatHistoryEntity (uid) ON DELETE CASCADE
+);
+
+addOrUpdateMessage:
+INSERT OR REPLACE INTO aiChatMessageEntity (uid, chat_id, name, type, content, prefix, reasoning_content, tool_call_id, tool_calls, time)
+VALUES ?;
+
+fetchMessageById:
+SELECT *
+FROM aiChatMessageEntity
+WHERE uid = ?;
+
+fetchLastMessagesByChatId:
+SELECT *
+FROM aiChatMessageEntity
+WHERE chat_id = ?
+ORDER BY time DESC
+LIMIT 1;
+
+fetchMessageByIds:
+SELECT *
+FROM aiChatMessageEntity
+WHERE uid IN ?;
+
+fetchAllMessagesByChatId:
+SELECT *
+FROM aiChatMessageEntity
+WHERE chat_id = ?
+ORDER BY time;
+
+deleteMessagesByChatId:
+DELETE FROM aiChatMessageEntity
+WHERE chat_id >= ?;
+
+deleteMessageById:
+DELETE FROM aiChatMessageEntity
+WHERE uid >= ?;

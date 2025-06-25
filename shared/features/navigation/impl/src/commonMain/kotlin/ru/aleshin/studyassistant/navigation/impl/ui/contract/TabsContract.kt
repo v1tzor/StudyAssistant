@@ -37,6 +37,7 @@ internal sealed class TabsEvent : BaseEvent {
     data object Init : TabsEvent()
     data object SelectedScheduleBottomItem : TabsEvent()
     data object SelectedTasksBottomItem : TabsEvent()
+    data object SelectedChatBottomItem : TabsEvent()
     data object SelectedInfoBottomItem : TabsEvent()
     data object SelectedProfileBottomItem : TabsEvent()
 }

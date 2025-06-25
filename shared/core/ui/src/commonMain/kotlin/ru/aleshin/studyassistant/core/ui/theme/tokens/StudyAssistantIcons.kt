@@ -24,6 +24,8 @@ import studyassistant.shared.core.ui.generated.resources.ic_alert_circle_outline
 import studyassistant.shared.core.ui.generated.resources.ic_birthday
 import studyassistant.shared.core.ui.generated.resources.ic_book_study
 import studyassistant.shared.core.ui.generated.resources.ic_calendar_today
+import studyassistant.shared.core.ui.generated.resources.ic_chat_helper
+import studyassistant.shared.core.ui.generated.resources.ic_chat_helper_outline
 import studyassistant.shared.core.ui.generated.resources.ic_church
 import studyassistant.shared.core.ui.generated.resources.ic_class
 import studyassistant.shared.core.ui.generated.resources.ic_classes_column
@@ -133,6 +135,8 @@ data class StudyAssistantIcons(
     val otherSocialNetwork: DrawableResource,
     val userDescription: DrawableResource,
     val gender: DrawableResource,
+    val chatAssistant: DrawableResource,
+    val chatAssistantOutline: DrawableResource,
 ) {
     companion object {
         val BASE = StudyAssistantIcons(
@@ -193,6 +197,8 @@ data class StudyAssistantIcons(
             otherSocialNetwork = Res.drawable.ic_soc_network,
             userDescription = Res.drawable.ic_description,
             gender = Res.drawable.ic_gender,
+            chatAssistant = Res.drawable.ic_chat_helper,
+            chatAssistantOutline = Res.drawable.ic_chat_helper_outline,
         )
     }
 }

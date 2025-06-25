@@ -43,6 +43,8 @@ kotlin {
             api(compose.material3AdaptiveNavigationSuite)
             api(compose.materialIconsExtended)
             api(compose.components.resources)
+            api(libs.compose.richtext)
+            api(libs.compose.richtext.material3)
 
             api(libs.google.accompanist)
             api(libs.placeholder)

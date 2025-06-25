@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.chat.api.navigation.ChatScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
@@ -62,6 +63,9 @@ internal class TabsScreenModel(
         }
         is TabsEvent.SelectedScheduleBottomItem -> changeTabItem {
             provideScheduleScreen(ScheduleScreen.Overview)
+        }
+        is TabsEvent.SelectedChatBottomItem -> changeTabItem {
+            provideChatScreen(ChatScreen.Assistant)
         }
         is TabsEvent.SelectedTasksBottomItem -> changeTabItem {
             provideTasksScreen(TasksScreen.Overview)

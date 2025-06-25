@@ -40,12 +40,14 @@ interface SubscriptionChecker {
     ) : SubscriptionChecker {
 
         private var cacheResponse: Int = -1
+        private var cacheResponseUser: String? = null
 
         override suspend fun checkSubscriptionActivity(): Boolean {
-            if (cacheResponse != -1) {
+            val userId = auth.currentUser?.uid
+            if (cacheResponse != -1 && cacheResponseUser == userId) {
                 return cacheResponse == 1
             } else {
-                val userId = auth.currentUser?.uid
+                cacheResponseUser = userId
                 val isActive = if (userId == null) {
                     false
                 } else {

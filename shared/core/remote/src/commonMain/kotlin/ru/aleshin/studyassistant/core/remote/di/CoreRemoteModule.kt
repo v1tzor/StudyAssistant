@@ -16,11 +16,6 @@
 
 package ru.aleshin.studyassistant.core.remote.di
 
-import com.aallam.openai.api.http.Timeout
-import com.aallam.openai.client.LoggingConfig
-import com.aallam.openai.client.OpenAI
-import com.aallam.openai.client.OpenAIHost
-import com.aallam.openai.client.RetryStrategy
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
@@ -29,19 +24,30 @@ import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.storage.FirebaseStorage
 import dev.gitlive.firebase.storage.storage
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNamingStrategy
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.remote.BuildKonfig
+import ru.aleshin.studyassistant.core.remote.datasources.ai.AiRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.billing.ProductsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
@@ -62,11 +68,14 @@ import ru.aleshin.studyassistant.core.remote.datasources.tasks.HomeworksRemoteDa
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.TodoRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.ktor.HttpEngineFactory
-import kotlin.time.Duration.Companion.seconds
+import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.DeepSeek
+import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.UniversalMessaging
+import kotlin.random.Random
 
 /**
  * @author Stanislav Aleshin on 01.08.2024.
  */
+@OptIn(ExperimentalSerializationApi::class)
 val coreRemoteModule = DI.Module("CoreRemote") {
     import(coreRemotePlatformModule)
 
@@ -76,14 +85,40 @@ val coreRemoteModule = DI.Module("CoreRemote") {
 
     bindSingleton<Json> {
         Json {
+            prettyPrint = true
             isLenient = true
             ignoreUnknownKeys = true
             useAlternativeNames = false
+            namingStrategy = JsonNamingStrategy.SnakeCase
         }
     }
     bindSingleton<HttpEngineFactory> { HttpEngineFactory() }
-    bindSingleton<HttpClient> {
+    bindSingleton<HttpClient>(tag = "DeepSeek") {
         HttpClient(instance<HttpEngineFactory>().createEngine()) {
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        BearerTokens(BuildKonfig.DEEP_SEEK_KEY, "")
+                    }
+                }
+            }
+
+            install(ContentNegotiation) { json(instance<Json>()) }
+
+            defaultRequest {
+                url(DeepSeek.HOST)
+                contentType(ContentType.Application.Json)
+            }
+
+            install(HttpRequestRetry) {
+                maxRetries = 3
+                retryIf { _, response -> !response.status.isSuccess() }
+                delayMillis { retry ->
+                    val delay = (retry * 0.2).toLong().coerceAtLeast(1L)
+                    retry + Random.nextLong(delay)
+                }
+            }
+
             install(Logging) {
                 level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
                 logger = object : Logger {
@@ -94,9 +129,32 @@ val coreRemoteModule = DI.Module("CoreRemote") {
             }
 
             install(HttpTimeout) {
-                requestTimeoutMillis = 3000
-                socketTimeoutMillis = 3000
-                connectTimeoutMillis = 3000
+                requestTimeoutMillis = 300_000
+                socketTimeoutMillis = 300_000
+            }
+        }
+    }
+
+    bindSingleton<HttpClient>(tag = "Messages") {
+        HttpClient(instance<HttpEngineFactory>().createEngine()) {
+            defaultRequest {
+                url(UniversalMessaging.HOST + UniversalMessaging.SEND_TOKENS)
+                contentType(ContentType.Application.Json)
+            }
+
+            install(Logging) {
+                level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }
+                    }
+                }
+            }
+
+            install(HttpTimeout) {
+                requestTimeoutMillis = 5000
+                socketTimeoutMillis = 5000
+                connectTimeoutMillis = 5000
             }
 
             install(ContentNegotiation) {
@@ -104,19 +162,8 @@ val coreRemoteModule = DI.Module("CoreRemote") {
             }
         }
     }
-    bindSingleton<OpenAI> {
-        OpenAI(
-            token = BuildKonfig.CHAT_GPT_KEY,
-            logging = LoggingConfig(),
-            timeout = Timeout(socket = 30.seconds),
-            organization = null,
-            headers = emptyMap(),
-            host = OpenAIHost.OpenAI,
-            proxy = null,
-            retry = RetryStrategy(),
-        )
-    }
 
+    bindSingleton<AiRemoteDataSource> { AiRemoteDataSource.Base(instance(tag = "DeepSeek")) }
     bindSingleton<SubscriptionChecker> { SubscriptionChecker.Base(instance(), instance(), instance()) }
     bindSingleton<AuthRemoteDataSource> { AuthRemoteDataSource.Base(instance(), instance()) }
     bindSingleton<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
@@ -133,8 +180,9 @@ val coreRemoteModule = DI.Module("CoreRemote") {
     bindSingleton<TodoRemoteDataSource> { TodoRemoteDataSource.Base(instance()) }
     bindSingleton<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance(), instance()) }
     bindSingleton<ProductsRemoteDataSource> { ProductsRemoteDataSource.Base(instance()) }
-    bindSingleton<MessageRemoteDataSource> { MessageRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
-
+    bindSingleton<MessageRemoteDataSource> {
+        MessageRemoteDataSource.Base(instance(tag = "Messages"), instance(), instance(), instance())
+    }
     bindProvider<PushServiceAuthTokenFactory> { PushServiceAuthTokenFactory.Base(instance(), instance(), instance()) }
     bindProvider<PushServiceAuthTokenProvider.Firebase> { PushServiceAuthTokenProvider.Firebase(instance()) }
     bindProvider<PushServiceAuthTokenProvider.RuStore> { PushServiceAuthTokenProvider.RuStore() }

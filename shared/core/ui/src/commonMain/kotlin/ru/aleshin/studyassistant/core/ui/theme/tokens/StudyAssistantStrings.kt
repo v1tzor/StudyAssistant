@@ -57,6 +57,7 @@ data class StudyAssistantStrings(
     val yearTitle: String,
     val scheduleBottomItem: String,
     val tasksBottomItem: String,
+    val chatBottomItem: String,
     val infoBottomItem: String,
     val profileBottomItem: String,
     val userCodeLabel: String,
@@ -231,6 +232,7 @@ data class StudyAssistantStrings(
     val purchaseStatusReversed: String,
     val purchaseStatusPaused: String,
     val purchaseStatusTerminated: String,
+    val voiceInputPromt: String,
     val storeTitle: String,
 )
 
@@ -269,6 +271,7 @@ internal val russianStudyAssistantString = StudyAssistantStrings(
     yearTitle = "Год",
     scheduleBottomItem = "Расписание",
     tasksBottomItem = "Задания",
+    chatBottomItem = "Ассистент",
     infoBottomItem = "Информация",
     profileBottomItem = "Профиль",
     userCodeLabel = "Код: ",
@@ -443,6 +446,7 @@ internal val russianStudyAssistantString = StudyAssistantStrings(
     purchaseStatusReversed = "Отмена холда",
     purchaseStatusPaused = "Приостановлена",
     purchaseStatusTerminated = "Завершена",
+    voiceInputPromt = "Говорите...",
     storeTitle = "Store",
 )
 
@@ -481,6 +485,7 @@ internal val englishStudyAssistantString = StudyAssistantStrings(
     yearTitle = "Year",
     scheduleBottomItem = "Schedule",
     tasksBottomItem = "Tasks",
+    chatBottomItem = "Assistant",
     infoBottomItem = "Info",
     profileBottomItem = "Profile",
     userCodeLabel = "Code: ",
@@ -655,6 +660,7 @@ internal val englishStudyAssistantString = StudyAssistantStrings(
     purchaseStatusReversed = "Reversed",
     purchaseStatusPaused = "Paused",
     purchaseStatusTerminated = "Terminated",
+    voiceInputPromt = "Speak...",
     storeTitle = "Store",
 )
 

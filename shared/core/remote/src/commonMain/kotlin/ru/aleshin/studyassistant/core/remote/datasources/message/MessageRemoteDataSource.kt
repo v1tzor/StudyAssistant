@@ -20,8 +20,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.exceptions.RemoteException
@@ -29,8 +27,6 @@ import ru.aleshin.studyassistant.core.common.messages.UniversalPushToken
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
 import ru.aleshin.studyassistant.core.common.wrappers.EitherWrapper.Abstract.Companion.ERROR_TAG
-import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.UniversalMessaging.HOST
-import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.UniversalMessaging.SEND_TOKENS
 import ru.aleshin.studyassistant.core.remote.mappers.message.mapToRemote
 import ru.aleshin.studyassistant.core.remote.models.message.PushProviderPojo
 import ru.aleshin.studyassistant.core.remote.models.message.UniversalMessageData
@@ -64,8 +60,7 @@ interface MessageRemoteDataSource {
                 )
             }
             if (universalMessage.isAvailable()) {
-                val httpResponse = httpClient.post(HOST + SEND_TOKENS) {
-                    contentType(ContentType.Application.Json)
+                val httpResponse = httpClient.post {
                     setBody(universalMessage)
                 }
                 if (!httpResponse.status.isSuccess()) {
