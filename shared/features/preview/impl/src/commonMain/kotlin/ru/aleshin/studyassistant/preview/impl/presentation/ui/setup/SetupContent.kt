@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.vinceglb.filekit.core.PlatformFile
+import ru.aleshin.studyassistant.core.common.extensions.uri
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
 import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
@@ -151,7 +152,7 @@ private fun SetupPageInfoSection(
                                 profile = profile,
                                 avatar = when (actionWithProfileAvatar) {
                                     is ActionWithAvatar.None -> actionWithProfileAvatar.uri
-                                    is ActionWithAvatar.Set -> actionWithProfileAvatar.uri
+                                    is ActionWithAvatar.Set -> actionWithProfileAvatar.file.uri()
                                     is ActionWithAvatar.Delete -> null
                                 },
                                 onUpdateProfile = onUpdateProfile,
@@ -165,7 +166,7 @@ private fun SetupPageInfoSection(
                                 organization = organization,
                                 avatar = when (actionWithOrganizationAvatar) {
                                     is ActionWithAvatar.None -> actionWithOrganizationAvatar.uri
-                                    is ActionWithAvatar.Set -> actionWithOrganizationAvatar.uri
+                                    is ActionWithAvatar.Set -> actionWithOrganizationAvatar.file.uri()
                                     is ActionWithAvatar.Delete -> null
                                 },
                                 onUpdateOrganization = onUpdateOrganization,

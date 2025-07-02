@@ -17,7 +17,10 @@
 package ru.aleshin.studyassistant.data.mappers
 
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapFailure
-import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResult
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResultCancelled
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResultFailure
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResultInvalidPaymentState
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResultSuccess
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapProduct
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapProductSubscription
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapProductType
@@ -100,7 +103,7 @@ fun SubscriptionPeriod.convertToCommon() = IapSubscriptionPeriod(
 )
 
 fun PaymentResult.convertToCommon() = when (this) {
-    is PaymentResult.Success -> IapPaymentResult.Success(
+    is PaymentResult.Success -> IapPaymentResultSuccess(
         orderId = orderId,
         purchaseId = purchaseId,
         productId = productId,
@@ -108,7 +111,7 @@ fun PaymentResult.convertToCommon() = when (this) {
         sandbox = sandbox,
         subscriptionToken = subscriptionToken
     )
-    is PaymentResult.Failure -> IapPaymentResult.Failure(
+    is PaymentResult.Failure -> IapPaymentResultFailure(
         purchaseId = purchaseId,
         invoiceId = invoiceId,
         orderId = orderId,
@@ -146,9 +149,9 @@ fun PaymentResult.convertToCommon() = when (this) {
             else -> IapFailure.UnknownError
         }
     )
-    is PaymentResult.Cancelled -> IapPaymentResult.Cancelled(
+    is PaymentResult.Cancelled -> IapPaymentResultCancelled(
         purchaseId = purchaseId,
         sandbox = sandbox
     )
-    is PaymentResult.InvalidPaymentState -> IapPaymentResult.InvalidPaymentState
+    is PaymentResult.InvalidPaymentState -> IapPaymentResultInvalidPaymentState
 }

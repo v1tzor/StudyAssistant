@@ -20,8 +20,8 @@ import dev.gitlive.firebase.FirebaseTooManyRequestsException
 import dev.gitlive.firebase.auth.FirebaseAuthException
 import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseDataAuthException
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteDataAuthException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 
 /**
@@ -32,9 +32,9 @@ internal interface AuthErrorHandler : ErrorHandler<AuthFailures> {
     class Base : AuthErrorHandler {
 
         override fun handle(throwable: Throwable) = when (throwable) {
-            is FirebaseDataAuthException -> AuthFailures.AuthorizationError
+            is AppwriteDataAuthException -> AuthFailures.AuthorizationError
             is FirebaseAuthException -> AuthFailures.AuthorizationError
-            is FirebaseUserException -> AuthFailures.NotFoundUserInfoError
+            is AppwriteUserException -> AuthFailures.NotFoundUserInfoError
             is NullPointerException -> AuthFailures.NotFoundUserInfoError
             is FirebaseAuthInvalidCredentialsException -> AuthFailures.CredentialsError
             is FirebaseTooManyRequestsException -> AuthFailures.TooManyRequestsError

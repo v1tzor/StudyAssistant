@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalObjCName::class)
+
 package ru.aleshin.studyassistant.core.common.platform.services.iap
+
+import kotlin.experimental.ExperimentalObjCName
+import kotlin.native.ObjCName
 
 /**
  * @author Stanislav Aleshin on 16.06.2025.
  */
+@ObjCName("IapServiceAvailability", exact = true)
 sealed class IapServiceAvailability {
+    @ObjCName("IapServiceAvailabilityAvailable", exact = true)
     data object Available : IapServiceAvailability()
+
+    @ObjCName("IapServiceAvailabilityUnavailable", exact = true)
     data class Unavailable(val throwable: Throwable?) : IapServiceAvailability()
 }

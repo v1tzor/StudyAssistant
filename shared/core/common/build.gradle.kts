@@ -40,6 +40,7 @@ kotlin {
             api(libs.kotlin.coroutines)
             api(libs.kotlin.datetime)
             api(libs.kotlin.serialization)
+            api(libs.kotlin.serialization.json)
             api(libs.moko.parcelize)
             api(libs.bignumn)
             api(libs.logger)
@@ -48,6 +49,8 @@ kotlin {
             implementation(libs.kodein.compose)
 
             implementation(libs.bundles.firebase)
+
+            implementation(libs.filekit.core)
 
             implementation(libs.bundles.voyager)
             implementation(compose.ui)

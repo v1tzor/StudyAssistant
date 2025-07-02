@@ -47,9 +47,9 @@ internal interface AppUserInteractor {
 
         override suspend fun checkEmailVerification() = eitherWrapper.wrap {
             val currentUser = usersRepository.fetchCurrentUserOrError().let { user ->
-                usersRepository.reloadUser(user) ?: user
+                usersRepository.reloadUser() ?: user
             }
-            return@wrap currentUser.isEmailVerified
+            return@wrap currentUser.emailVerification
         }
     }
 }

@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
  */
 fun OrganizationDetailsPojo.mapToBase() = OrganizationPojo(
     uid = uid,
+    userId = userId,
     main = isMain,
     shortName = shortName,
     fullName = fullName,
@@ -45,6 +46,7 @@ fun OrganizationPojo.mapToDetails(
     employee: List<EmployeePojo>,
 ) = OrganizationDetailsPojo(
     uid = uid,
+    userId = userId,
     isMain = main,
     shortName = shortName,
     fullName = fullName,

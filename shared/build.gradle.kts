@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.parcelize)
     alias(libs.plugins.konfig)
+    alias(libs.plugins.skie)
 }
 
 kotlin {

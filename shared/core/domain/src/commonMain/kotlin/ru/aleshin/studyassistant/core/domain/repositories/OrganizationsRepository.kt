@@ -16,10 +16,10 @@
 
 package ru.aleshin.studyassistant.core.domain.repositories
 
-import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
+import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 
@@ -29,7 +29,7 @@ import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 interface OrganizationsRepository {
     suspend fun addOrUpdateOrganization(organization: Organization, targetUser: UID): UID
     suspend fun addOrUpdateOrganizationsGroup(organizations: List<Organization>, targetUser: UID)
-    suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String
+    suspend fun uploadAvatar(uid: UID, file: InputFile, targetUser: UID): String
     suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<Organization?>
     suspend fun fetchOrganizationsById(uid: List<UID>, targetUser: UID): Flow<List<Organization>>
     suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShort?>

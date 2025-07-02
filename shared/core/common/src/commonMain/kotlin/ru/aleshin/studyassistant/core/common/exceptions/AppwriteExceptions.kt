@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.functional
-
-import android.net.Uri
-import dev.gitlive.firebase.storage.File
+package ru.aleshin.studyassistant.core.common.exceptions
 
 /**
- * @author Stanislav Aleshin on 03.08.2024.
+ * @author Stanislav Aleshin on 22.04.2024.
  */
-actual fun File(uri: String): File {
-    return File(Uri.parse(uri))
-}
+class AppwriteDataAuthException : Exception()
 
-actual fun File.uriString(): String {
-    return uri.toString()
-}
+class AppwriteUserException : Exception()

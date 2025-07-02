@@ -16,78 +16,67 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.auth
 
-import dev.gitlive.firebase.auth.EmailAuthProvider
-import dev.gitlive.firebase.auth.FirebaseAuth
-import dev.gitlive.firebase.auth.FirebaseUser
-import dev.gitlive.firebase.auth.GoogleAuthProvider
-import dev.gitlive.firebase.firestore.FirebaseFirestore
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AppwriteAuth
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AuthUserPojo
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
  */
 interface AuthRemoteDataSource {
 
-    suspend fun createUserWithEmail(email: String, password: String): FirebaseUser?
-
-    suspend fun fetchCurrentUser(): FirebaseUser?
-
-    suspend fun signInWithEmail(email: String, password: String): FirebaseUser?
-
-    suspend fun signInViaGoogle(idToken: String?): FirebaseUser?
-
-    suspend fun sendPasswordResetEmail(email: String)
-
+    suspend fun fetchCurrentUser(): AuthUserPojo?
+    suspend fun createUserWithEmail(email: String, password: String): AuthUserPojo?
+    suspend fun signInWithEmail(email: String, password: String): AuthUserPojo?
+    suspend fun signInViaGoogle(idToken: String?): AuthUserPojo?
     suspend fun sendVerifyEmail()
-
-    suspend fun updatePassword(oldPassword: String, newPassword: String)
-
+    suspend fun sendPasswordRecoveryEmail(email: String)
+    suspend fun recoveryPassword(password: String, secret: String)
+    suspend fun updatePassword(oldPassword: String?, newPassword: String)
     suspend fun signOut()
 
     class Base(
-        private val firebaseAuth: FirebaseAuth,
-        private val firestore: FirebaseFirestore,
+        private val appwriteAuth: AppwriteAuth,
     ) : AuthRemoteDataSource {
 
-        override suspend fun createUserWithEmail(email: String, password: String): FirebaseUser? {
-            val authResult = firebaseAuth.createUserWithEmailAndPassword(email, password)
-            return authResult.user
+        override suspend fun fetchCurrentUser(): AuthUserPojo? {
+            return appwriteAuth.fetchCurrentUser()
         }
 
-        override suspend fun fetchCurrentUser(): FirebaseUser? {
-            return firebaseAuth.currentUser
+        override suspend fun createUserWithEmail(email: String, password: String): AuthUserPojo? {
+            val authResult = appwriteAuth.createUserWithEmail(email, password)
+            return authResult
         }
 
-        override suspend fun signInWithEmail(email: String, password: String): FirebaseUser? {
-            val authResult = firebaseAuth.signInWithEmailAndPassword(email, password)
-            return authResult.user
+        override suspend fun signInWithEmail(email: String, password: String): AuthUserPojo? {
+            val authResult = appwriteAuth.signInWithEmail(email, password)
+            return authResult
         }
 
-        override suspend fun signInViaGoogle(idToken: String?): FirebaseUser? {
-            val credential = GoogleAuthProvider.credential(idToken, null)
-            val authResult = firebaseAuth.signInWithCredential(credential)
-            return authResult.user
+        override suspend fun signInViaGoogle(idToken: String?): AuthUserPojo? {
+//            val credential = GoogleAuthProvider.credential(idToken, null)
+//            val authResult = appwriteAuth.signInWithCredential(credential)
+//            return authResult.user
+            return null
         }
 
-        override suspend fun sendPasswordResetEmail(email: String) {
-            firebaseAuth.sendPasswordResetEmail(email)
+        override suspend fun sendPasswordRecoveryEmail(email: String) {
+            appwriteAuth.sendPasswordRecoveryEmail(email)
+        }
+
+        override suspend fun recoveryPassword(password: String, secret: String) {
+            appwriteAuth.updateRecoveredPassword(password = password, secret = secret)
         }
 
         override suspend fun sendVerifyEmail() {
-            val currentUser = firebaseAuth.currentUser ?: throw FirebaseUserException()
-            currentUser.sendEmailVerification()
+            appwriteAuth.sendVerifyEmail()
         }
 
-        override suspend fun updatePassword(oldPassword: String, newPassword: String) {
-            val currentUser = firebaseAuth.currentUser ?: throw FirebaseUserException()
-            val userEmail = checkNotNull(currentUser.email)
-            val authCredential = EmailAuthProvider.credential(userEmail, oldPassword)
-            currentUser.reauthenticate(authCredential)
-            currentUser.updatePassword(newPassword)
+        override suspend fun updatePassword(oldPassword: String?, newPassword: String) {
+            appwriteAuth.updatePassword(oldPassword, newPassword)
         }
 
         override suspend fun signOut() {
-            firebaseAuth.signOut()
+            appwriteAuth.signOut()
         }
     }
 }

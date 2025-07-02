@@ -20,14 +20,16 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
-import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import androidx.core.graphics.toColorInt
+import androidx.core.net.toUri
 import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
 import ru.aleshin.studyassistant.core.common.extensions.generateDigitCode
 import ru.aleshin.studyassistant.core.common.functional.Constants
+import ru.aleshin.studyassistant.core.common.functional.Constants.App.OPEN_APP_URL
 import ru.aleshin.studyassistant.core.common.messages.RemoteMessageHandler
 import ru.aleshin.studyassistant.core.common.notifications.NotificationCreator
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationPriority
@@ -126,7 +128,7 @@ class RemoteMessageHandlerImpl(private val context: Context) : RemoteMessageHand
         clickAction: String? = null,
         tag: String? = null,
     ) {
-        val mainActivityUri = Uri.parse("app://studyassistant.com/openMain")
+        val mainActivityUri = OPEN_APP_URL.toUri()
         val contentIntent = clickAction?.let { Intent(it) } ?: Intent(ACTION_VIEW, mainActivityUri)
         val requestCode = generateDigitCode().toInt()
         val pContentIntent = PendingIntent.getActivity(
@@ -147,11 +149,7 @@ class RemoteMessageHandlerImpl(private val context: Context) : RemoteMessageHand
             channelId = channelId ?: Constants.Notification.CHANNEL_ID,
             title = title,
             text = body,
-            color = if (color != null) {
-                Color.parseColor(color)
-            } else {
-                null
-            },
+            color = color?.toColorInt(),
             smallIcon = icon,
             largeIcon = largeIcon,
             priority = NotificationPriority.MAX,

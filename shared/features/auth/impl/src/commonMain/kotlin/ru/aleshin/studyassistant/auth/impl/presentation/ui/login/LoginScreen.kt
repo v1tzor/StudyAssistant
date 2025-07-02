@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.LoginCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
@@ -85,7 +86,9 @@ internal class LoginScreen : Screen {
                 is LoginEffect.ReplaceGlobalScreen -> navigator.root().replaceAll(effect.screen)
                 is LoginEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failure.mapToMessage(strings),
+                        message = effect.failure.apply {
+                            Logger.i("test") { this.toString() }
+                        }.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

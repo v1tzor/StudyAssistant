@@ -20,9 +20,9 @@ import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
 import ru.aleshin.studyassistant.core.remote.models.settings.CalendarSettingsPojo
 
 /**
@@ -38,7 +38,7 @@ interface CalendarSettingsRemoteDataSource {
         private val database: FirebaseFirestore
     ) : CalendarSettingsRemoteDataSource {
         override suspend fun addOrUpdateSettings(settings: CalendarSettingsPojo, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
@@ -47,7 +47,7 @@ interface CalendarSettingsRemoteDataSource {
         }
 
         override suspend fun fetchSettings(targetUser: UID): Flow<CalendarSettingsPojo> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
@@ -59,7 +59,7 @@ interface CalendarSettingsRemoteDataSource {
         }
 
         override suspend fun deleteSettings(targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)

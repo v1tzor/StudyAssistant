@@ -16,17 +16,16 @@
 
 package ru.aleshin.studyassistant.core.data.repositories
 
-import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.functional.uriString
 import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToRemoteData
 import ru.aleshin.studyassistant.core.database.datasource.organizations.OrganizationsLocalDataSource
 import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
+import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
@@ -46,7 +45,7 @@ class OrganizationsRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.addOrUpdateOrganization(organization.mapToRemoteData(), targetUser)
+            remoteDataSource.addOrUpdateOrganization(organization.mapToRemoteData(targetUser), targetUser)
         } else {
             localDataSource.addOrUpdateOrganization(organization.mapToLocalData())
         }
@@ -56,19 +55,19 @@ class OrganizationsRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.addOrUpdateOrganizationsGroup(organizations.map { it.mapToRemoteData() }, targetUser)
+            remoteDataSource.addOrUpdateOrganizationsGroup(organizations.map { it.mapToRemoteData(targetUser) }, targetUser)
         } else {
             localDataSource.addOrUpdateOrganizationsGroup(organizations.map { it.mapToLocalData() })
         }
     }
 
-    override suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String {
+    override suspend fun uploadAvatar(uid: UID, file: InputFile, targetUser: UID): String {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
             remoteDataSource.uploadAvatar(uid, file, targetUser)
         } else {
-            file.uriString()
+            checkNotNull(file.uri)
         }
     }
 
@@ -177,7 +176,7 @@ class OrganizationsRepositoryImpl(
                 val allOrganizations = localDataSource.fetchAllOrganization(
                     showHide = true,
                 ).let { organizationFlow ->
-                    return@let organizationFlow.first().map { it.mapToDomain().mapToRemoteData() }
+                    return@let organizationFlow.first().map { it.mapToDomain().mapToRemoteData(targetUser) }
                 }
                 remoteDataSource.deleteAllOrganizations(targetUser)
                 remoteDataSource.addOrUpdateOrganizationsGroup(allOrganizations, targetUser)

@@ -64,7 +64,7 @@ internal class OrganizationScreenModel(
                 }
             }
             is OrganizationEvent.UpdateAvatar -> with(event) {
-                sendAction(OrganizationAction.UpdateActionWithAvatar(ActionWithAvatar.Set(imageUri)))
+                sendAction(OrganizationAction.UpdateActionWithAvatar(ActionWithAvatar.Set(image)))
             }
             is OrganizationEvent.DeleteAvatar -> with(state()) {
                 val action = if (editableOrganization?.avatar != null) {

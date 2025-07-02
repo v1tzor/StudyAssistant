@@ -26,14 +26,14 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.deleteAll
 import ru.aleshin.studyassistant.core.common.extensions.observeCollectionMapByField
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
 import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectPojo
@@ -58,7 +58,7 @@ interface SubjectsRemoteDataSource {
     ) : SubjectsRemoteDataSource {
 
         override suspend fun addOrUpdateSubject(subject: SubjectPojo, targetUser: UID): UID {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.SUBJECTS)
@@ -71,7 +71,7 @@ interface SubjectsRemoteDataSource {
         }
 
         override suspend fun addOrUpdateSubjectsGroup(subjects: List<SubjectPojo>, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.SUBJECTS)
@@ -86,7 +86,7 @@ interface SubjectsRemoteDataSource {
         }
 
         override suspend fun fetchSubjectById(uid: UID, targetUser: UID): Flow<SubjectDetailsPojo?> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             if (uid.isEmpty()) return flowOf(null)
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
@@ -99,7 +99,7 @@ interface SubjectsRemoteDataSource {
             organizationId: UID?,
             targetUser: UID
         ): Flow<List<SubjectDetailsPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val subjectsReference = if (organizationId != null) {
@@ -121,7 +121,7 @@ interface SubjectsRemoteDataSource {
             names: List<String>,
             targetUser: UID
         ): List<SubjectDetailsPojo> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val subjectsFlow = userDataRoot.collection(UserData.SUBJECTS)
@@ -136,7 +136,7 @@ interface SubjectsRemoteDataSource {
             employeeId: UID,
             targetUser: UID
         ): Flow<List<SubjectDetailsPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val subjectsFlow = userDataRoot.collection(UserData.SUBJECTS)
@@ -149,7 +149,7 @@ interface SubjectsRemoteDataSource {
         }
 
         override suspend fun deleteSubject(targetId: UID, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.SUBJECTS).document(targetId)
@@ -158,7 +158,7 @@ interface SubjectsRemoteDataSource {
         }
 
         override suspend fun deleteAllSubjects(targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.SUBJECTS)

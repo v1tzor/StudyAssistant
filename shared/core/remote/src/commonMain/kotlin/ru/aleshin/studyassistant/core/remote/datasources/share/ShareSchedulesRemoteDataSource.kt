@@ -24,11 +24,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.SharedSchedules
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Users
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.SharedSchedules
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
 import ru.aleshin.studyassistant.core.remote.mappers.share.convertToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.share.convertToShortDetails
 import ru.aleshin.studyassistant.core.remote.models.shared.schedules.SharedSchedulesDetailsPojo
@@ -52,7 +52,7 @@ interface ShareSchedulesRemoteDataSource {
     ) : ShareSchedulesRemoteDataSource {
 
         override suspend fun addOrUpdateSharedSchedules(schedules: SharedSchedulesPojo, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
 
             val reference = database.collection(SharedSchedules.ROOT).document(targetUser)
 

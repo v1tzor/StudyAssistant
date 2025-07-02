@@ -38,3 +38,20 @@ data class AppUserPojo(
     val subscriptionInfo: SubscribeInfoPojo? = null,
     val socialNetworks: List<SocialNetworkPojo> = emptyList(),
 )
+
+@Serializable
+data class NewAppUserPojo(
+    val uid: UID = "",
+    val devices: List<UserDevicePojo> = emptyList(),
+    val username: String = "",
+    val email: String = "",
+    val code: String = "",
+    val avatar: String? = null,
+    val description: String? = null,
+    val city: String? = null,
+    val birthday: String? = null,
+    val gender: String? = null,
+    val friends: List<UID> = emptyList(),
+    val subscriptionInfo: SubscribeInfoPojo? = null,
+    val socialNetworks: List<SocialNetworkPojo> = emptyList(),
+)

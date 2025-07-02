@@ -85,7 +85,7 @@ internal class SetupScreenModel(
                 sendAction(SetupAction.UpdatePage(SetupPage.ORGANIZATION))
             }
             is SetupEvent.UpdateProfileAvatar -> with(event) {
-                sendAction(SetupAction.UpdateActionWithProfileAvatar(ActionWithAvatar.Set(imageUri)))
+                sendAction(SetupAction.UpdateActionWithProfileAvatar(ActionWithAvatar.Set(image)))
             }
             is SetupEvent.DeleteProfileAvatar -> with(state()) {
                 val action = if (profile?.avatar != null) {
@@ -104,7 +104,7 @@ internal class SetupScreenModel(
                 sendAction(SetupAction.UpdatePage(SetupPage.CALENDAR))
             }
             is SetupEvent.UpdateOrganizationAvatar -> with(event) {
-                sendAction(SetupAction.UpdateActionWithOrganizationAvatar(ActionWithAvatar.Set(imageUri)))
+                sendAction(SetupAction.UpdateActionWithOrganizationAvatar(ActionWithAvatar.Set(image)))
             }
             is SetupEvent.DeleteOrganizationAvatar -> with(state()) {
                 val action = if (organization?.avatar != null) {

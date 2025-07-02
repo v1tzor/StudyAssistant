@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItemToSet
 import ru.aleshin.studyassistant.core.common.extensions.observeCollectionMapByField
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
@@ -35,7 +35,7 @@ import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
 import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
 import ru.aleshin.studyassistant.core.remote.mappers.schedules.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.models.classes.ClassDetailsPojo
@@ -67,7 +67,7 @@ interface CustomScheduleRemoteDataSource {
             schedule: CustomSchedulePojo,
             targetUser: UID
         ): UID {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES)
@@ -83,7 +83,7 @@ interface CustomScheduleRemoteDataSource {
             schedules: List<CustomSchedulePojo>,
             targetUser: UID
         ) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES)
@@ -98,7 +98,7 @@ interface CustomScheduleRemoteDataSource {
         }
 
         override suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<CustomScheduleDetailsPojo?> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES).document(uid)
@@ -107,7 +107,7 @@ interface CustomScheduleRemoteDataSource {
         }
 
         override suspend fun fetchScheduleByDate(date: Instant, targetUser: UID): Flow<CustomScheduleDetailsPojo?> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val dateMillis = date.toEpochMilliseconds()
@@ -129,7 +129,7 @@ interface CustomScheduleRemoteDataSource {
             to: Instant,
             targetUser: UID
         ): Flow<List<CustomScheduleDetailsPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val fromMillis = from.toEpochMilliseconds()
@@ -159,7 +159,7 @@ interface CustomScheduleRemoteDataSource {
         }
 
         override suspend fun deleteScheduleById(scheduleId: UID, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.CUSTOM_SCHEDULES).document(scheduleId)
@@ -172,7 +172,7 @@ interface CustomScheduleRemoteDataSource {
             to: Instant,
             targetUser: UID
         ) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val fromMillis = from.toEpochMilliseconds()

@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.data
 
 import ru.aleshin.studyassistant.core.common.platform.PlatformActivity
-import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResult
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResultInvalidPaymentState
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapProduct
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapProductPurchaseParams
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPurchase
@@ -35,7 +35,7 @@ class IapServiceImpl : IapService {
     override fun proceedIntent(intent: PlatformIntent?, requestCode: Int?) = Unit
     override suspend fun isAuthorizedUser() = false
     override suspend fun fetchServiceAvailability() = IapServiceAvailability.Unavailable(null)
-    override suspend fun purchaseProduct(params: IapProductPurchaseParams) = IapPaymentResult.InvalidPaymentState
+    override suspend fun purchaseProduct(params: IapProductPurchaseParams) = IapPaymentResultInvalidPaymentState
     override suspend fun fetchProducts(ids: List<String>) = emptyList<IapProduct>()
     override suspend fun fetchPurchases() = emptyList<IapPurchase>()
     override suspend fun fetchPurchaseInfo(purchaseId: String) = null

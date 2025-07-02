@@ -25,7 +25,10 @@ import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapFailure
-import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResult
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResultCancelled
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResultFailure
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResultInvalidPaymentState
+import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResultSuccess
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapProduct
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapProductPurchaseParams
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapProductType
@@ -71,7 +74,7 @@ internal interface PurchaseInteractor {
             )
             val purchaseResult = iapService.purchaseProduct(params)
             when (purchaseResult) {
-                is IapPaymentResult.Success -> with(purchaseResult) {
+                is IapPaymentResultSuccess -> with(purchaseResult) {
                     val currentTime = dataManager.fetchCurrentInstant().toEpochMilliseconds()
                     val periodTime = productInfo.subscription?.subscriptionPeriod?.inMillis() ?: 0L
                     val subscriptionInfo = SubscribeInfo(
@@ -88,17 +91,17 @@ internal interface PurchaseInteractor {
                     usersRepository.addOrUpdateAppUser(updateAppUser)
                 }
 
-                is IapPaymentResult.Cancelled -> {
+                is IapPaymentResultCancelled -> {
                     purchaseResult.purchaseId?.let { iapService.deletePurchase(it) }
                     throw IapServiceError(IapFailure.UserCancelled)
                 }
 
-                is IapPaymentResult.Failure -> {
+                is IapPaymentResultFailure -> {
                     purchaseResult.purchaseId?.let { iapService.deletePurchase(it) }
                     throw IapServiceError(purchaseResult.failure)
                 }
 
-                is IapPaymentResult.InvalidPaymentState -> {
+                is IapPaymentResultInvalidPaymentState -> {
                     throw IapServiceError(IapFailure.UnknownError)
                 }
             }

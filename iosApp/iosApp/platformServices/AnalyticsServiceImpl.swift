@@ -10,6 +10,9 @@ import Foundation
 import shared
 
 public class AnalyticsServiceImpl : CommonAnalyticsService {
+    public func initializeService() {
+    }
     
-   
+    public func trackEvent(name: String, eventParams: [String : String]) {
+    }
 }

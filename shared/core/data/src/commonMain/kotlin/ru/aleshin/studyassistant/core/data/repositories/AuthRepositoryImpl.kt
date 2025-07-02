@@ -17,16 +17,16 @@
 package ru.aleshin.studyassistant.core.data.repositories
 
 import dev.gitlive.firebase.auth.FirebaseUser
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseDataAuthException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteDataAuthException
 import ru.aleshin.studyassistant.core.domain.entities.auth.AuthCredentials
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
-import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSourceOld
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
  */
 class AuthRepositoryImpl(
-    private val remoteDataSource: AuthRemoteDataSource,
+    private val remoteDataSource: AuthRemoteDataSourceOld,
 ) : AuthRepository {
 
     override suspend fun registerByEmail(credentials: AuthCredentials): FirebaseUser {
@@ -34,7 +34,7 @@ class AuthRepositoryImpl(
             email = credentials.email,
             password = credentials.password
         )
-        return user ?: throw FirebaseDataAuthException()
+        return user ?: throw AppwriteDataAuthException()
     }
 
     override suspend fun signInWithEmail(credentials: AuthCredentials): FirebaseUser {
@@ -42,12 +42,12 @@ class AuthRepositoryImpl(
             email = credentials.email,
             password = credentials.password
         )
-        return user ?: throw FirebaseDataAuthException()
+        return user ?: throw AppwriteDataAuthException()
     }
 
     override suspend fun signInViaGoogle(idToken: String?): FirebaseUser {
         val user = remoteDataSource.signInViaGoogle(idToken)
-        return user ?: throw FirebaseDataAuthException()
+        return user ?: throw AppwriteDataAuthException()
     }
 
     override suspend fun signOut() {

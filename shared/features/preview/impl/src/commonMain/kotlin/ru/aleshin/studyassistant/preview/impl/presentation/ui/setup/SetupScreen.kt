@@ -30,7 +30,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
-import ru.aleshin.studyassistant.core.common.functional.uriString
 import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
@@ -42,7 +41,6 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.Set
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupViewState
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.rememberSetupScreenModel
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupTopBar
-import toStorageFile
 
 /**
  * @author Stanislav Aleshin on 17.04.2024
@@ -72,14 +70,10 @@ internal class SetupScreen : Screen {
                         onUpdateOrganization = { dispatchEvent(SetupEvent.UpdateOrganization(it)) },
                         onUpdateCalendarSettings = { dispatchEvent(SetupEvent.UpdateCalendarSettings(it)) },
                         onSaveProfile = { dispatchEvent(SetupEvent.SaveProfileInfo) },
-                        onUpdateProfileAvatar = {
-                            dispatchEvent(SetupEvent.UpdateProfileAvatar(it.toStorageFile().uriString()))
-                        },
+                        onUpdateProfileAvatar = { dispatchEvent(SetupEvent.UpdateProfileAvatar(it)) },
                         onDeleteProfileAvatar = { dispatchEvent(SetupEvent.DeleteProfileAvatar) },
                         onSaveOrganization = { dispatchEvent(SetupEvent.SaveOrganizationInfo) },
-                        onUpdateOrganizationAvatar = {
-                            dispatchEvent(SetupEvent.UpdateOrganizationAvatar(it.toStorageFile().uriString()))
-                        },
+                        onUpdateOrganizationAvatar = { dispatchEvent(SetupEvent.UpdateOrganizationAvatar(it)) },
                         onDeleteOrganizationAvatar = { dispatchEvent(SetupEvent.DeleteOrganizationAvatar) },
                         onSaveCalendar = { dispatchEvent(SetupEvent.SaveCalendarInfo) },
                         onFillOutSchedule = { dispatchEvent(SetupEvent.NavigateToWeekScheduleEditor) },

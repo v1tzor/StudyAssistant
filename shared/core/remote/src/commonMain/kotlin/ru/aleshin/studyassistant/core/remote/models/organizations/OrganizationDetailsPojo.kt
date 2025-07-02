@@ -28,6 +28,7 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 @Serializable
 data class OrganizationDetailsPojo(
     val uid: UID,
+    val userId: UID,
     val isMain: Boolean,
     val shortName: String,
     val fullName: String? = null,

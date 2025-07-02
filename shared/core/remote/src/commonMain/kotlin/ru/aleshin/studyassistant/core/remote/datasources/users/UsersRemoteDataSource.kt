@@ -16,24 +16,31 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.users
 
-import dev.gitlive.firebase.auth.FirebaseAuth
-import dev.gitlive.firebase.auth.FirebaseUser
-import dev.gitlive.firebase.firestore.FirebaseFirestore
-import dev.gitlive.firebase.firestore.Source
-import dev.gitlive.firebase.storage.File
-import dev.gitlive.firebase.storage.FirebaseStorage
 import dev.tmapps.konnection.Konnection
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.serialization.serializer
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
-import ru.aleshin.studyassistant.core.common.extensions.exists
-import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
-import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.launch
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Storage
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Users
+import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AppwriteAuth
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AuthUserPojo
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.AppwriteDatabase
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.AppwriteRealtime
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.getDocumentFlow
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.getDocumentOrNull
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.listDocumentsFlow
+import ru.aleshin.studyassistant.core.remote.appwrite.storage.AppwriteStorage
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Channels
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Role
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Organizations
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Storage.BUCKET
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 
 /**
@@ -45,111 +52,149 @@ interface UsersRemoteDataSource {
      * @return [Boolean] if the user is created for the first time, it returns true
      */
     suspend fun addOrUpdateUser(user: AppUserPojo): Boolean
-    suspend fun uploadAvatar(uid: UID, avatar: File): String
-    fun fetchCurrentAppUser(): FirebaseUser?
-    suspend fun fetchAuthStateChanged(): Flow<FirebaseUser?>
+    suspend fun uploadAvatar(uid: UID, avatar: InputFile): String
+    fun fetchCurrentAppUser(): AuthUserPojo?
+    suspend fun fetchAuthStateChanged(): Flow<AuthUserPojo?>
     suspend fun isExistRemoteData(uid: UID): Boolean
     suspend fun fetchUserById(uid: UID): Flow<AppUserPojo?>
     suspend fun fetchRealtimeUserById(uid: UID): AppUserPojo?
     suspend fun fetchUserFriends(uid: UID): Flow<List<AppUserPojo>>
     suspend fun findUsersByCode(code: String): Flow<List<AppUserPojo>>
-    suspend fun reloadUser(firebaseUser: FirebaseUser): FirebaseUser?
+    suspend fun reloadUser(): AuthUserPojo?
     suspend fun deleteAvatar(uid: UID)
 
     class Base(
-        private val auth: FirebaseAuth,
-        private val database: FirebaseFirestore,
-        private val storage: FirebaseStorage,
+        private val auth: AppwriteAuth,
+        private val database: AppwriteDatabase,
+        private val realtime: AppwriteRealtime,
+        private val storage: AppwriteStorage,
         private val connectivityChecker: Konnection,
     ) : UsersRemoteDataSource {
 
         override suspend fun addOrUpdateUser(user: AppUserPojo): Boolean {
-            if (user.uid.isEmpty()) throw FirebaseUserException()
+            if (user.uid.isEmpty()) throw AppwriteUserException()
 
-            val reference = database.collection(Users.ROOT).document(user.uid)
+            val existDocument = database.getDocumentOrNull(
+                databaseId = Users.DATABASE_ID,
+                collectionId = Users.COLLECTION_ID,
+                documentId = user.uid,
+            )
 
-            return database.runTransaction {
-                val isNewUser = !reference.exists()
-                reference.set(user)
-                return@runTransaction isNewUser
+            database.upsertDocument(
+                databaseId = Users.DATABASE_ID,
+                collectionId = Users.COLLECTION_ID,
+                documentId = user.uid,
+                data = user,
+                permissions = listOf(
+                    Permission.read(Role.users()),
+                    Permission.update(Role.users()),
+                    Permission.delete(Role.user(user.uid)),
+                ),
+                nestedType = AppUserPojo::class,
+            )
+
+            return existDocument == null
+        }
+
+        override suspend fun uploadAvatar(uid: UID, avatar: InputFile): String {
+            require(uid.isNotEmpty())
+
+            val file = storage.createFile(
+                bucketId = BUCKET,
+                fileId = randomUUID(),
+                fileBytes = avatar.fileBytes,
+                filename = avatar.filename,
+                mimeType = avatar.mimeType,
+                permissions = Permission.onlyUsersVisibleData(uid),
+            )
+
+            return file.getDownloadUrl()
+        }
+
+        override fun fetchCurrentAppUser(): AuthUserPojo? {
+            return auth.fetchCurrentUser()
+        }
+
+        override suspend fun fetchAuthStateChanged(): Flow<AuthUserPojo?> = channelFlow {
+            send(auth.fetchCurrentUser())
+
+            var job: Job? = null
+            val subscribe = realtime.subscribe(channels = Channels.account()) { event ->
+                job?.cancel()
+                job = launch { send(auth.fetchCurrentUser()) }
             }
-        }
 
-        override suspend fun uploadAvatar(uid: UID, avatar: File): String {
-            if (uid.isEmpty()) throw FirebaseUserException()
-            val storageRoot = storage.reference.child(uid)
-
-            val avatarReference = storageRoot.child(Storage.USER_AVATAR).child(Storage.USER_AVATAR_FILE)
-            avatarReference.putFile(avatar)
-
-            return avatarReference.getDownloadUrl()
-        }
-
-        override fun fetchCurrentAppUser(): FirebaseUser? {
-            return auth.currentUser
-        }
-
-        override suspend fun fetchAuthStateChanged(): Flow<FirebaseUser?> {
-            return auth.authStateChanged
+            awaitClose { subscribe.close() }
         }
 
         override suspend fun isExistRemoteData(uid: UID): Boolean {
-            val root = database.collection(UserData.ROOT).document(uid)
-            return root.collection(UserData.ORGANIZATIONS).snapshotGet().isNotEmpty()
+            require(uid.isNotEmpty())
+
+            val documentList = database.listDocuments(
+                databaseId = Organizations.DATABASE_ID,
+                collectionId = Organizations.COLLECTION_ID,
+                queries = listOf(Query.contains(Organizations.USER_ID, uid))
+            )
+            return documentList.documents.isNotEmpty()
         }
 
         override suspend fun fetchUserById(uid: UID): Flow<AppUserPojo?> {
-            if (uid.isEmpty()) throw FirebaseUserException()
+            if (uid.isEmpty()) throw AppwriteUserException()
 
-            val reference = database.collection(Users.ROOT).document(uid)
-
-            return reference.snapshotFlowGet<AppUserPojo?>()
+            return database.getDocumentFlow(
+                databaseId = Users.DATABASE_ID,
+                collectionId = Users.COLLECTION_ID,
+                documentId = uid,
+                realtime = realtime,
+            )
         }
 
         override suspend fun fetchRealtimeUserById(uid: UID): AppUserPojo? {
-            if (uid.isEmpty()) throw FirebaseUserException()
+            require(uid.isNotEmpty())
 
-            val reference = database.collection(Users.ROOT).document(uid)
+            val document = database.getDocumentOrNull(
+                databaseId = Users.DATABASE_ID,
+                collectionId = Users.COLLECTION_ID,
+                documentId = uid,
+                nestedType = AppUserPojo::class,
+            )
 
-            return reference.get(Source.SERVER).data(serializer<AppUserPojo?>())
+            return document?.data
         }
 
         override suspend fun fetchUserFriends(uid: UID): Flow<List<AppUserPojo>> {
             require(uid.isNotEmpty())
 
-            val queryReference = database.collection(Users.ROOT).where {
-                Users.FRIENDS containsAny listOf(uid)
-            }
+            val usersFlow = database.listDocumentsFlow<AppUserPojo>(
+                databaseId = Users.DATABASE_ID,
+                collectionId = Users.COLLECTION_ID,
+                queries = listOf(Query.contains(Users.FRIENDS, uid)),
+                realtime = realtime,
+            )
 
-            return queryReference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data<AppUserPojo>() }
-            }
+            return usersFlow
         }
 
         override suspend fun findUsersByCode(code: String): Flow<List<AppUserPojo>> {
-            val queryReference = database.collection(Users.ROOT).where {
-                Users.CODE equalTo code
-            }
+            require(code.isNotEmpty())
 
-            return queryReference.snapshots.map { snapshot ->
-                snapshot.documents.map { it.data<AppUserPojo>() }
-            }
+            val usersFlow = database.listDocumentsFlow<AppUserPojo>(
+                databaseId = Users.DATABASE_ID,
+                collectionId = Users.COLLECTION_ID,
+                queries = listOf(Query.equal(Users.CODE, code)),
+                realtime = realtime,
+            )
+
+            return usersFlow
         }
 
-        override suspend fun reloadUser(firebaseUser: FirebaseUser): FirebaseUser? {
-            return if (connectivityChecker.isConnected()) {
-                firebaseUser.apply { reload() }
-            } else {
-                null
-            }
+        override suspend fun reloadUser(): AuthUserPojo? {
+            return if (connectivityChecker.isConnected()) auth.reloadUser() else null
         }
 
         override suspend fun deleteAvatar(uid: UID) {
-            if (uid.isEmpty()) throw FirebaseUserException()
-            val storageRoot = storage.reference.child(uid)
-
-            val avatarReference = storageRoot.child(Storage.USER_AVATAR).child(Storage.USER_AVATAR_FILE)
-            avatarReference.delete()
+            if (uid.isEmpty()) throw AppwriteUserException()
+            storage.deleteFile(BUCKET, uid)
         }
     }
 }

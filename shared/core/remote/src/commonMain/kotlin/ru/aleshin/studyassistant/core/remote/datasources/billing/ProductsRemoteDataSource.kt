@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.core.remote.datasources.billing
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite
 import ru.aleshin.studyassistant.core.remote.models.billing.ProductPojo
 
 /**
@@ -34,7 +34,7 @@ interface ProductsRemoteDataSource {
     ) : ProductsRemoteDataSource {
 
         override suspend fun fetchProducts(): Flow<List<ProductPojo>> {
-            val reference = database.collection(StudyAssistantFirebase.Products.ROOT)
+            val reference = database.collection(StudyAssistantAppwrite.Products.ROOT)
             return reference.snapshotListFlowGet<ProductPojo>()
         }
     }

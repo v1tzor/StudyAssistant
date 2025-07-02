@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItemToSet
 import ru.aleshin.studyassistant.core.common.extensions.observeCollectionMapByField
@@ -37,7 +37,7 @@ import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
 import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
 import ru.aleshin.studyassistant.core.remote.mappers.schedules.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.models.classes.ClassDetailsPojo
@@ -77,7 +77,7 @@ interface BaseScheduleRemoteDataSource {
             schedule: BaseSchedulePojo,
             targetUser: UID
         ): UID {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.BASE_SCHEDULES)
@@ -90,7 +90,7 @@ interface BaseScheduleRemoteDataSource {
         }
 
         override suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseSchedulePojo>, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.BASE_SCHEDULES)
@@ -106,7 +106,7 @@ interface BaseScheduleRemoteDataSource {
 
         override suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<BaseScheduleDetailsPojo?> {
             if (uid.isEmpty()) return flowOf(null)
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.BASE_SCHEDULES).document(uid)
@@ -119,7 +119,7 @@ interface BaseScheduleRemoteDataSource {
             numberOfWeek: NumberOfRepeatWeek,
             targetUser: UID
         ): Flow<BaseScheduleDetailsPojo?> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val dateMillis = date.toEpochMilliseconds()
@@ -148,7 +148,7 @@ interface BaseScheduleRemoteDataSource {
             numberOfWeek: NumberOfRepeatWeek?,
             targetUser: UID
         ): Flow<List<BaseScheduleDetailsPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val fromMillis = from.toEpochMilliseconds()
@@ -185,7 +185,7 @@ interface BaseScheduleRemoteDataSource {
             to: Instant,
             targetUser: UID
         ) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val fromMillis = from.toEpochMilliseconds()

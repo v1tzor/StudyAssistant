@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract
 
 import androidx.compose.runtime.Immutable
 import dev.icerock.moko.parcelize.Parcelize
+import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
@@ -45,7 +46,7 @@ internal data class EmployeeViewState(
 
 internal sealed class EmployeeEvent : BaseEvent {
     data class Init(val employeeId: UID?, val organizationId: UID) : EmployeeEvent()
-    data class UpdateAvatar(val imageUrl: String) : EmployeeEvent()
+    data class UpdateAvatar(val image: PlatformFile) : EmployeeEvent()
     data object DeleteAvatar : EmployeeEvent()
     data class UpdateName(val first: String?, val second: String?, val patronymic: String?) : EmployeeEvent()
     data class UpdatePost(val post: EmployeePost?) : EmployeeEvent()

@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>ru.aleshin.studyassistant.homeworksreminder</string>
+	</array>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -21,21 +27,41 @@
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
-	<key>GIDServerClientID</key>
-	<string>190379302885-gnrh3tua2lftfs7ke2uhnfj1vinbc8vm.apps.googleusercontent.com</string>
-	<key>GIDClientID</key>
-	<string>190379302885-h97pj3sjqi5ll8djsbt99kc122mde9so.apps.googleusercontent.com</string>
 	<key>CFBundleURLTypes</key>
 	<array>
+        <dict>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.190379302885-h97pj3sjqi5ll8djsbt99kc122mde9so</string>
+            </array>
+        </dict>
 		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>ru.aleshin.studyassistant.deeplink</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.190379302885-h97pj3sjqi5ll8djsbt99kc122mde9so</string>
+				<string>deeplink</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>io.appwrite</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>appwrite-callback-685aefd7003bf3aab9fc</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>GIDClientID</key>
+	<string>190379302885-h97pj3sjqi5ll8djsbt99kc122mde9so.apps.googleusercontent.com</string>
+	<key>GIDServerClientID</key>
+	<string>190379302885-gnrh3tua2lftfs7ke2uhnfj1vinbc8vm.apps.googleusercontent.com</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
@@ -62,11 +88,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>ru.aleshin.studyassistant.homeworksreminder</string>
-	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
 </dict>
 </plist>

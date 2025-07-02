@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.vectorResource
@@ -73,7 +74,13 @@ internal fun UsernameTextField(
             readOnly = readOnly,
             value = username,
             onValueChange = onUsernameChanged,
-            placeholder = { Text(text = AuthThemeRes.strings.usernamePlaceholder) },
+            placeholder = {
+                Text(
+                    text = AuthThemeRes.strings.usernamePlaceholder,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            },
             leadingIcon = {
                 Icon(
                     imageVector = vectorResource(AuthThemeRes.icons.username),
@@ -131,7 +138,13 @@ internal fun EmailTextField(
             readOnly = readOnly,
             value = email,
             onValueChange = onEmailChanged,
-            placeholder = { Text(text = AuthThemeRes.strings.emailPlaceholder) },
+            placeholder = {
+                Text(
+                    text = AuthThemeRes.strings.emailPlaceholder,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            },
             leadingIcon = {
                 Icon(
                     modifier = Modifier.size(24.dp),
@@ -192,7 +205,13 @@ internal fun PasswordTextField(
             readOnly = readOnly,
             value = password,
             onValueChange = onPasswordChanged,
-            placeholder = { Text(text = AuthThemeRes.strings.passwordPlaceholder) },
+            placeholder = {
+                Text(
+                    text = AuthThemeRes.strings.passwordPlaceholder,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            },
             leadingIcon = {
                 Icon(
                     modifier = Modifier.size(24.dp),

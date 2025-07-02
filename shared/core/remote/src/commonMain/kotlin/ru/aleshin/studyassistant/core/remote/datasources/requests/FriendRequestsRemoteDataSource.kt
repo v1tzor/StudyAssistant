@@ -24,11 +24,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Requests
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Users
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Requests
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
 import ru.aleshin.studyassistant.core.remote.models.requests.FriendRequestsDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.requests.FriendRequestsPojo
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
@@ -48,7 +48,7 @@ interface FriendRequestsRemoteDataSource {
     ) : FriendRequestsRemoteDataSource {
 
         override suspend fun addOrUpdateRequests(requests: FriendRequestsPojo, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
 
             val reference = database.collection(Requests.ROOT).document(targetUser)
 

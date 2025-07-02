@@ -12,6 +12,23 @@ import shared
 
 public class GoogleAuthTokenProvider : PlatformGoogleAuthTokenProvider {
     
+    @nonobjc
+    public func __fetchAccessToken(scope: String, completionHandler: @escaping (String?, (any Error)?) -> Void) {
+        Task {
+            do {
+                let result = try await __fetchAccessToken(scope: scope)
+                completionHandler(result, nil)
+            } catch {
+                completionHandler(nil, error)
+            }
+        }
+    }
+    
+    public func __fetchAccessToken(scope: String) async throws -> String? {
+        return try await fetchAccessToken(scope: scope)
+    }
+    
+    
     public func fetchAccessToken(scope: String) async throws -> String? {
         // Locate the credentials URL
         guard let credentialsURL = Bundle.main.url(forResource: "service-account-file", withExtension: "json") else {

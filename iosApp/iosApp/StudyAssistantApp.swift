@@ -1,4 +1,5 @@
 import SwiftUI
+import Appwrite
 import Firebase
 import FirebaseCore
 import FirebaseAuth
@@ -9,6 +10,15 @@ import OAuth2
 import BackgroundTasks
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
+    
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url,
+            url.absoluteString.contains("appwrite-callback") else {
+            return
+        }
+
+        WebAuthComponent.handleIncomingCookie(from: url)
+    }
     
     func requestNotificationPermission() {
         let center = UNUserNotificationCenter.current()
@@ -44,17 +54,25 @@ struct iOSApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     init() {
+        let appwriteManager = AppwriteManager()
+        let appwrite = RemoteAppwriteApple.init(
+            auth: AppwriteAuthApple(account: appwriteManager.account),
+            databases: AppwriteDatabaseApple(database: appwriteManager.databases),
+            realtime: AppwriteRealtimeApple(realtime: appwriteManager.realtime),
+            storage: AppwriteStorageApple(storage: appwriteManager.storage)
+        )
         let appService = AppServiceImpl()
         let crashlyticsService = CrashlyticsServiceImpl()
         let analyticsService = AnalyticsServiceImpl()
-        let messagingService = MessagingServiceImpl()
         let tokenProvider = GoogleAuthTokenProvider()
+        let iapService = IapServiceImpl()
         let uuidProvider = UUIDProvider()
         let configuration = PlatformConfiguration(
             appService: appService,
             analyticsService: analyticsService,
             crashlyticsService: crashlyticsService,
-            messagingService: messagingService,
+            iapService: iapService,
+            appwrite: appwrite,
             serviceTokenProvider: tokenProvider,
             uuidProvider: uuidProvider
         )

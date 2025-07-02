@@ -27,4 +27,5 @@ plugins {
     alias(libs.plugins.gms) apply false
     alias(libs.plugins.konfig) apply false
     alias(libs.plugins.tracer) apply false
+    alias(libs.plugins.skie) apply false
 }

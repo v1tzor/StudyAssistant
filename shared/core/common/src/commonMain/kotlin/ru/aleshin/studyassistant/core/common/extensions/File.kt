@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.functional
+package ru.aleshin.studyassistant.core.common.extensions
 
-import dev.gitlive.firebase.storage.File
-import platform.Foundation.NSURL
+import io.github.vinceglb.filekit.core.PlatformFile
 
 /**
- * @author Stanislav Aleshin on 03.08.2024.
+ * @author Stanislav Aleshin on 01.07.2025.
  */
-actual fun File(uri: String): File {
-    return File(checkNotNull(NSURL.URLWithString(uri)))
-}
-
-actual fun File.uriString(): String {
-    return checkNotNull(url.absoluteString)
-}
+expect fun PlatformFile.uri(): String

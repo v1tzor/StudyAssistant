@@ -24,13 +24,13 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowW
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.ui.mappers.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEffect
-import toStorageFile
 
 /**
  * @author Stanislav Aleshin on 28.07.2024.
@@ -82,7 +82,7 @@ internal interface ProfileWorkProcessor :
         }
 
         private fun updateAvatarWork(user: AppUserUi, file: PlatformFile) = flow {
-            appUserInteractor.uploadAvatar(user.uid, file.toStorageFile()).handle(
+            appUserInteractor.uploadAvatar(user.uid, file.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
                 onRightAction = { imageUrl ->
                     val updatedUser = user.copy(avatar = imageUrl)

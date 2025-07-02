@@ -91,7 +91,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                     settingsInteractor.updateSettings(settings.copy(isFirstStart = false))
                     screenProvider.providePreviewScreen(PreviewScreen.Intro)
                 } else {
-                    if (appUser != null && appUser.isEmailVerified) {
+                    if (appUser != null) { // && appUser.isEmailVerified) {
                         screenProvider.provideTabNavigationScreen()
                     } else if (appUser != null) {
                         screenProvider.provideAuthScreen(AuthScreen.Verification)

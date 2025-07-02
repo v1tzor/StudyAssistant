@@ -16,13 +16,13 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.entities.organizations.convertToBase
@@ -41,7 +41,7 @@ internal interface OrganizationInteractor {
     suspend fun fetchShortOrganizationById(uid: UID): FlowDomainResult<EditorFailures, OrganizationShort>
     suspend fun fetchAllShortOrganizations(): FlowDomainResult<EditorFailures, List<OrganizationShort>>
     suspend fun updateShortOrganization(organization: OrganizationShort): UnitDomainResult<EditorFailures>
-    suspend fun uploadAvatar(uid: UID, file: File): DomainResult<EditorFailures, String>
+    suspend fun uploadAvatar(uid: UID, file: InputFile): DomainResult<EditorFailures, String>
     suspend fun deleteAvatar(uid: UID): UnitDomainResult<EditorFailures>
 
     class Base(
@@ -83,7 +83,7 @@ internal interface OrganizationInteractor {
             organizationsRepository.addOrUpdateOrganization(updatedModel, targetUser)
         }
 
-        override suspend fun uploadAvatar(uid: UID, file: File) = eitherWrapper.wrap {
+        override suspend fun uploadAvatar(uid: UID, file: InputFile) = eitherWrapper.wrap {
             organizationsRepository.uploadAvatar(uid, file, targetUser)
         }
         override suspend fun deleteAvatar(uid: UID) = eitherWrapper.wrap {

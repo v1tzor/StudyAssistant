@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.message
 
-import dev.gitlive.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import ru.aleshin.studyassistant.core.common.messages.PushServiceType
@@ -27,7 +26,6 @@ import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
  * @author Stanislav Aleshin on 07.08.2024.
  */
 actual class MessagingServiceImpl(
-    private val firebaseMessaging: FirebaseMessaging,
 ) : MessagingService {
 
     override fun fetchAvailablePushServices(): List<PushServiceType> {

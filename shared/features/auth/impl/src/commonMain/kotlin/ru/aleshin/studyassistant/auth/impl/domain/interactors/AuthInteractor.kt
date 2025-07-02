@@ -21,8 +21,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import ru.aleshin.studyassistant.auth.impl.domain.common.AuthEitherWrapper
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthResult
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseDataAuthException
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteDataAuthException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
@@ -57,7 +57,7 @@ internal interface AuthInteractor {
 
         override suspend fun loginWithEmail(credentials: AuthCredentials, device: UserDevice) = eitherWrapper.wrap {
             val firebaseUser = authRepository.signInWithEmail(credentials)
-            val userInfo = usersRepository.fetchUserById(firebaseUser.uid).first() ?: throw FirebaseUserException()
+            val userInfo = usersRepository.fetchUserById(firebaseUser.uid).first() ?: throw AppwriteUserException()
 
             if (userInfo.devices.find { it.deviceId == device.deviceId } == null) {
                 val updatedDevices = buildList {
@@ -91,7 +91,7 @@ internal interface AuthInteractor {
                     manageUserRepository.sendVerifyEmail()
                     AuthResult(firebaseUser = firebaseUser, isNewUser = true)
                 } else {
-                    throw FirebaseDataAuthException()
+                    throw AppwriteDataAuthException()
                 }
             }
         }
@@ -110,7 +110,7 @@ internal interface AuthInteractor {
                 manageUserRepository.sendVerifyEmail()
                 return@wrap newUserInfo
             } else {
-                throw FirebaseDataAuthException()
+                throw AppwriteDataAuthException()
             }
         }
 
@@ -124,7 +124,7 @@ internal interface AuthInteractor {
 
         override suspend fun signOut(deviceId: UID) = eitherWrapper.wrap {
             val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val userInfo = usersRepository.fetchUserById(targetUser).first() ?: throw FirebaseUserException()
+            val userInfo = usersRepository.fetchUserById(targetUser).first() ?: throw AppwriteUserException()
             val deviceInfo = userInfo.devices.find { it.deviceId == deviceId }
             if (deviceInfo != null) {
                 val updatedDevices = buildList {

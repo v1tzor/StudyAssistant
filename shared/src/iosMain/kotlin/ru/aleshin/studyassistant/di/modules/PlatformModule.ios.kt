@@ -25,6 +25,11 @@ import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
+import ru.aleshin.studyassistant.core.remote.appwrite.Appwrite
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AppwriteAuth
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.AppwriteDatabase
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.AppwriteRealtime
+import ru.aleshin.studyassistant.core.remote.appwrite.storage.AppwriteStorage
 import ru.aleshin.studyassistant.core.remote.datasources.message.GoogleAuthTokenProvider
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 
@@ -36,6 +41,11 @@ actual val platformModule = DI.Module("PlatformModule") {
     bindSingleton<AnalyticsService> { instance<PlatformConfiguration>().analyticsService }
     bindSingleton<MessagingService> { instance<PlatformConfiguration>().messagingService }
     bindSingleton<CrashlyticsService> { instance<PlatformConfiguration>().crashlyticsService }
+    bindSingleton<AppwriteStorage> { instance<PlatformConfiguration>().appwrite.storage }
+    bindSingleton<AppwriteRealtime> { instance<PlatformConfiguration>().appwrite.realtime }
+    bindSingleton<AppwriteDatabase> { instance<PlatformConfiguration>().appwrite.databases }
+    bindSingleton<AppwriteAuth> { instance<PlatformConfiguration>().appwrite.auth }
+    bindSingleton<Appwrite> { instance<PlatformConfiguration>().appwrite }
     bindSingleton<IapService> { instance<PlatformConfiguration>().iapService }
     bindSingleton<GoogleAuthTokenProvider> { instance<PlatformConfiguration>().serviceTokenProvider }
     bindSingleton<IosUUIDProvider> { instance<PlatformConfiguration>().uuidProvider }

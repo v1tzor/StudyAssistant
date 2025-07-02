@@ -14,40 +14,49 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalObjCName::class)
+
 package ru.aleshin.studyassistant.core.common.platform.services.iap
+
+import kotlin.experimental.ExperimentalObjCName
+import kotlin.native.ObjCName
 
 /**
  * @author Stanislav Aleshin on 16.06.2025.
  */
-sealed interface IapPaymentResult {
+@ObjCName("IapPaymentResult", exact = true)
+sealed interface IapPaymentResult
 
-    data class Success(
-        val orderId: String?,
-        val purchaseId: String,
-        val productId: String,
-        val invoiceId: String?,
-        val sandbox: Boolean,
-        val subscriptionToken: String? = null,
-    ) : IapPaymentResult
+@ObjCName("IapPaymentResultSuccess", exact = true)
+data class IapPaymentResultSuccess(
+    val orderId: String?,
+    val purchaseId: String,
+    val productId: String,
+    val invoiceId: String?,
+    val sandbox: Boolean,
+    val subscriptionToken: String? = null,
+) : IapPaymentResult
 
-    data class Cancelled(
-        val purchaseId: String?,
-        val sandbox: Boolean,
-    ) : IapPaymentResult
+@ObjCName("IapPaymentResultCancelled", exact = true)
+data class IapPaymentResultCancelled(
+    val purchaseId: String?,
+    val sandbox: Boolean,
+) : IapPaymentResult
 
-    data class Failure(
-        val purchaseId: String? = null,
-        val invoiceId: String? = null,
-        val orderId: String? = null,
-        val quantity: Int? = null,
-        val productId: String? = null,
-        val sandbox: Boolean = false,
-        val errorCode: Int? = null,
-        val failure: IapFailure = IapFailure.UnknownError,
-    ) : IapPaymentResult
+@ObjCName("IapPaymentResultFailure", exact = true)
+data class IapPaymentResultFailure(
+    val purchaseId: String? = null,
+    val invoiceId: String? = null,
+    val orderId: String? = null,
+    val quantity: Int? = null,
+    val productId: String? = null,
+    val sandbox: Boolean = false,
+    val errorCode: Int? = null,
+    val failure: IapFailure = IapFailure.UnknownError,
+) : IapPaymentResult
 
-    object InvalidPaymentState : IapPaymentResult
-}
+@ObjCName("IapPaymentResultInvalidPaymentState", exact = true)
+object IapPaymentResultInvalidPaymentState : IapPaymentResult
 
 enum class IapFailure {
     // ==== RuStore Errors ====

@@ -22,11 +22,11 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.Effec
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.functional.File
 import ru.aleshin.studyassistant.core.common.functional.firstHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.firstOrNullHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.functional.handleAndGet
+import ru.aleshin.studyassistant.core.ui.mappers.mapToDomain
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.CalendarSettingsInteractor
@@ -99,7 +99,7 @@ internal interface SetupWorkProcessor :
         ) = flow {
             val avatar = when (actionWithAvatar) {
                 is ActionWithAvatar.Set -> {
-                    appUserInteractor.uploadAvatar(File(actionWithAvatar.uri)).handleAndGet(
+                    appUserInteractor.uploadAvatar(actionWithAvatar.file.mapToDomain()).handleAndGet(
                         onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
                         onRightAction = { it },
                     )
@@ -133,7 +133,7 @@ internal interface SetupWorkProcessor :
 
             val avatar = when (actionWithAvatar) {
                 is ActionWithAvatar.Set -> {
-                    organizationsInteractor.uploadAvatar(uid, File(actionWithAvatar.uri)).handleAndGet(
+                    organizationsInteractor.uploadAvatar(uid, actionWithAvatar.file.mapToDomain()).handleAndGet(
                         onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
                         onRightAction = { it },
                     )

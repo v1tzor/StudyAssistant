@@ -22,12 +22,12 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.Effec
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.functional.File
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.firstHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.firstOrNullHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.functional.handleAndGet
+import ru.aleshin.studyassistant.core.ui.mappers.mapToDomain
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.EmployeeInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
@@ -85,7 +85,7 @@ internal interface EmployeeWorkProcessor :
 
             val avatar = when (actionWithAvatar) {
                 is ActionWithAvatar.Set -> {
-                    employeeInteractor.uploadAvatar(uid, File(actionWithAvatar.uri)).handleAndGet(
+                    employeeInteractor.uploadAvatar(uid, actionWithAvatar.file.mapToDomain()).handleAndGet(
                         onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))).let { null } },
                         onRightAction = { it },
                     )

@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.profile.impl.domain.interactors
 
 import kotlinx.coroutines.flow.first
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
@@ -44,7 +44,7 @@ internal interface AuthInteractor {
             get() = usersRepository.fetchCurrentUserOrError().uid
 
         override suspend fun signOut(deviceId: UID) = eitherWrapper.wrap {
-            val userInfo = usersRepository.fetchUserById(targetUser).first() ?: throw FirebaseUserException()
+            val userInfo = usersRepository.fetchUserById(targetUser).first() ?: throw AppwriteUserException()
             val deviceInfo = userInfo.devices.find { it.deviceId == deviceId }
             if (deviceInfo != null) {
                 val updatedDevices = buildList {

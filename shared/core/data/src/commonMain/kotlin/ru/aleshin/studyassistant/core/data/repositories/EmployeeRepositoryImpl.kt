@@ -16,18 +16,17 @@
 
 package ru.aleshin.studyassistant.core.data.repositories
 
-import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.functional.uriString
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToRemoteData
 import ru.aleshin.studyassistant.core.database.datasource.employee.EmployeeLocalDataSource
 import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
+import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
@@ -61,13 +60,13 @@ class EmployeeRepositoryImpl(
         }
     }
 
-    override suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String {
+    override suspend fun uploadAvatar(uid: UID, file: InputFile, targetUser: UID): String {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
             remoteDataSource.uploadAvatar(uid, file, targetUser)
         } else {
-            file.uriString()
+            checkNotNull(file.uri)
         }
     }
 

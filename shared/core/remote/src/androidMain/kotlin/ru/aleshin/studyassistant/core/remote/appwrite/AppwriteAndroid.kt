@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-import dev.gitlive.firebase.storage.File
-import io.github.vinceglb.filekit.core.PlatformFile
+package ru.aleshin.studyassistant.core.remote.appwrite
 
 /**
- * @author Stanislav Aleshin on 03.08.2024.
+ * @author Stanislav Aleshin on 29.06.2025.
  */
-actual fun PlatformFile.toStorageFile(): File {
-    return File(url = nsUrl)
-}
+class AppwriteAndroid(
+    override val auth: AppwriteAuthAndroid,
+    override val databases: AppwriteDatabaseAndroid,
+    override val realtime: AppwriteRealtimeAndroid,
+    override val storage: AppwriteStorageAndroid,
+) : Appwrite()

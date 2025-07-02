@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.parcelize.Parcelize
+import io.github.vinceglb.filekit.core.PlatformFile
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
@@ -48,10 +49,10 @@ internal sealed class SetupEvent : BaseEvent {
     data object Init : SetupEvent()
     data object NavigateToBackPage : SetupEvent()
     data class UpdateProfile(val userProfile: AppUserUi) : SetupEvent()
-    data class UpdateProfileAvatar(val imageUri: String) : SetupEvent()
+    data class UpdateProfileAvatar(val image: PlatformFile) : SetupEvent()
     data object DeleteProfileAvatar : SetupEvent()
     data class UpdateOrganization(val organization: OrganizationUi) : SetupEvent()
-    data class UpdateOrganizationAvatar(val imageUri: String) : SetupEvent()
+    data class UpdateOrganizationAvatar(val image: PlatformFile) : SetupEvent()
     data object DeleteOrganizationAvatar : SetupEvent()
     data class UpdateCalendarSettings(val calendarSettings: CalendarSettingsUi) : SetupEvent()
     data object SaveProfileInfo : SetupEvent()

@@ -147,6 +147,7 @@ dependencies {
 
     implementation(libs.sqldelight.core)
     implementation(libs.sqldelight.android)
+    implementation(libs.appwrite.sdk)
 
     implementation(libs.kodein.android)
 

@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.preview.impl.domain.interactors
 
-import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -35,7 +35,7 @@ internal interface OrganizationsInteractor {
 
     suspend fun addOrUpdateOrganization(organization: Organization): DomainResult<PreviewFailures, UID>
     suspend fun fetchAllOrganization(): FlowDomainResult<PreviewFailures, List<Organization>>
-    suspend fun uploadAvatar(uid: UID, file: File): DomainResult<PreviewFailures, String>
+    suspend fun uploadAvatar(uid: UID, file: InputFile): DomainResult<PreviewFailures, String>
     suspend fun deleteAvatar(uid: UID): UnitDomainResult<PreviewFailures>
 
     class Base(
@@ -57,7 +57,7 @@ internal interface OrganizationsInteractor {
             }
         }
 
-        override suspend fun uploadAvatar(uid: UID, file: File) = eitherWrapper.wrap {
+        override suspend fun uploadAvatar(uid: UID, file: InputFile) = eitherWrapper.wrap {
             organizationsRepository.uploadAvatar(uid, file, targetUser)
         }
 

@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contr
 
 import androidx.compose.runtime.Immutable
 import dev.icerock.moko.parcelize.Parcelize
+import io.github.vinceglb.filekit.core.PlatformFile
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
@@ -42,7 +43,7 @@ internal data class OrganizationViewState(
 
 internal sealed class OrganizationEvent : BaseEvent {
     data class Init(val organizationId: UID?) : OrganizationEvent()
-    data class UpdateAvatar(val imageUri: String) : OrganizationEvent()
+    data class UpdateAvatar(val image: PlatformFile) : OrganizationEvent()
     data object DeleteAvatar : OrganizationEvent()
     data class UpdateType(val organizationType: OrganizationType?) : OrganizationEvent()
     data class UpdateName(val shortName: String?, val fullName: String?) : OrganizationEvent()

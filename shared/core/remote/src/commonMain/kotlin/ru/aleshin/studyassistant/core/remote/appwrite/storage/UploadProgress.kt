@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-import dev.gitlive.firebase.storage.File
-import io.github.vinceglb.filekit.core.PlatformFile
+package ru.aleshin.studyassistant.core.remote.appwrite.storage
 
 /**
- * @author Stanislav Aleshin on 03.08.2024.
+ * @author Stanislav Aleshin on 30.06.2025.
  */
-actual fun PlatformFile.toStorageFile(): File {
-    return File(uri = uri)
-}
+data class UploadProgress(
+    val id: String,
+    val progress: Double,
+    val sizeUploaded: Long,
+    val chunksTotal: Int,
+    val chunksUploaded: Int
+)

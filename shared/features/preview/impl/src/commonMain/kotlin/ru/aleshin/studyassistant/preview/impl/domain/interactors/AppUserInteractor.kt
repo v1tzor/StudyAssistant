@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.preview.impl.domain.interactors
 
-import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.preview.impl.domain.common.PreviewEitherWrapper
@@ -34,7 +34,7 @@ internal interface AppUserInteractor {
 
     suspend fun fetchAppUser(): FlowDomainResult<PreviewFailures, AppUser>
     suspend fun updateUser(user: AppUser): UnitDomainResult<PreviewFailures>
-    suspend fun uploadAvatar(file: File): DomainResult<PreviewFailures, String>
+    suspend fun uploadAvatar(file: InputFile): DomainResult<PreviewFailures, String>
     suspend fun deleteAvatar(): UnitDomainResult<PreviewFailures>
 
     class Base(
@@ -55,7 +55,7 @@ internal interface AppUserInteractor {
             usersRepository.addOrUpdateAppUser(user)
         }
 
-        override suspend fun uploadAvatar(file: File) = eitherWrapper.wrap {
+        override suspend fun uploadAvatar(file: InputFile) = eitherWrapper.wrap {
             usersRepository.uploadUserAvatar(targetUser, file)
         }
         override suspend fun deleteAvatar() = eitherWrapper.wrap {

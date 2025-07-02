@@ -31,7 +31,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.functional.uriString
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
@@ -43,7 +42,6 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract.E
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract.EmployeeViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.rememberEmployeeScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeeTopBar
-import toStorageFile
 
 /**
  * @author Stanislav Aleshin on 06.06.2024
@@ -74,9 +72,7 @@ internal data class EmployeeScreen(
                 EmployeeContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
-                    onUpdateAvatar = {
-                        dispatchEvent(EmployeeEvent.UpdateAvatar(it.toStorageFile().uriString()))
-                    },
+                    onUpdateAvatar = { dispatchEvent(EmployeeEvent.UpdateAvatar(it)) },
                     onDeleteAvatar = { dispatchEvent(EmployeeEvent.DeleteAvatar) },
                     onEmployeePostSelected = { dispatchEvent(EmployeeEvent.UpdatePost(it)) },
                     omBirthdaySelected = { dispatchEvent(EmployeeEvent.UpdateBirthday(it)) },

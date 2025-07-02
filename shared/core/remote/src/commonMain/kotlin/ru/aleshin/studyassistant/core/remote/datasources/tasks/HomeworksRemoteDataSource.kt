@@ -26,14 +26,14 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.deleteAll
 import ru.aleshin.studyassistant.core.common.extensions.observeCollectionMapByField
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
 import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.tasks.mapToDetails
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationShortPojo
@@ -62,7 +62,7 @@ interface HomeworksRemoteDataSource {
     ) : HomeworksRemoteDataSource {
 
         override suspend fun addOrUpdateHomework(homework: HomeworkPojo, targetUser: UID): UID {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.HOMEWORKS)
@@ -78,7 +78,7 @@ interface HomeworksRemoteDataSource {
             homeworks: List<HomeworkPojo>,
             targetUser: UID
         ) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.HOMEWORKS)
@@ -97,7 +97,7 @@ interface HomeworksRemoteDataSource {
             targetUser: UID
         ): Flow<HomeworkDetailsPojo?> {
             if (uid.isEmpty()) return flowOf(null)
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.HOMEWORKS).document(uid)
@@ -110,7 +110,7 @@ interface HomeworksRemoteDataSource {
             to: Long,
             targetUser: UID
         ): Flow<List<HomeworkDetailsPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val homeworksFlow = userDataRoot.collection(UserData.HOMEWORKS)
@@ -130,7 +130,7 @@ interface HomeworksRemoteDataSource {
             currentDate: Long,
             targetUser: UID,
         ): Flow<List<HomeworkDetailsPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val homeworksFlow = userDataRoot.collection(UserData.HOMEWORKS)
@@ -151,7 +151,7 @@ interface HomeworksRemoteDataSource {
             currentDate: Long,
             targetUser: UID,
         ): Flow<List<HomeworkDetailsPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val homeworksFlow = userDataRoot.collection(UserData.HOMEWORKS)
@@ -169,7 +169,7 @@ interface HomeworksRemoteDataSource {
         }
 
         override suspend fun deleteHomework(uid: UID, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.HOMEWORKS).document(uid)
@@ -178,7 +178,7 @@ interface HomeworksRemoteDataSource {
         }
 
         override suspend fun fetchCompletedHomeworksCount(targetUser: UID): Flow<Int> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val homeworksFlow = userDataRoot.collection(UserData.HOMEWORKS)
@@ -195,7 +195,7 @@ interface HomeworksRemoteDataSource {
         }
 
         override suspend fun deleteAllHomework(targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.HOMEWORKS)

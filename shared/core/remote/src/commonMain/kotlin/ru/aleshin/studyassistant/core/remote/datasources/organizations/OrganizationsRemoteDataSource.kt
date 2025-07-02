@@ -18,22 +18,23 @@ package ru.aleshin.studyassistant.core.remote.datasources.organizations
 
 import dev.gitlive.firebase.firestore.DocumentReference
 import dev.gitlive.firebase.firestore.FirebaseFirestore
-import dev.gitlive.firebase.storage.File
-import dev.gitlive.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.deleteAll
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
 import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Storage
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
+import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
+import ru.aleshin.studyassistant.core.remote.appwrite.storage.AppwriteStorage
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Storage.BUCKET
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
 import ru.aleshin.studyassistant.core.remote.mappers.organizations.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationDetailsPojo
@@ -49,7 +50,7 @@ interface OrganizationsRemoteDataSource {
 
     suspend fun addOrUpdateOrganization(organization: OrganizationPojo, targetUser: UID): UID
     suspend fun addOrUpdateOrganizationsGroup(organizations: List<OrganizationPojo>, targetUser: UID)
-    suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String
+    suspend fun uploadAvatar(uid: UID, file: InputFile, targetUser: UID): String
     suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsPojo?>
     suspend fun fetchOrganizationsById(uid: List<UID>, targetUser: UID): Flow<List<OrganizationDetailsPojo>>
     suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShortPojo?>
@@ -60,14 +61,14 @@ interface OrganizationsRemoteDataSource {
 
     class Base(
         private val database: FirebaseFirestore,
-        private val storage: FirebaseStorage
+        private val storage: AppwriteStorage,
     ) : OrganizationsRemoteDataSource {
 
         override suspend fun addOrUpdateOrganization(
             organization: OrganizationPojo,
             targetUser: UID
         ): UID {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
@@ -83,7 +84,7 @@ interface OrganizationsRemoteDataSource {
             organizations: List<OrganizationPojo>,
             targetUser: UID
         ) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
@@ -97,14 +98,19 @@ interface OrganizationsRemoteDataSource {
             }
         }
 
-        override suspend fun uploadAvatar(uid: UID, file: File, targetUser: UID): String {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
-            val storageRoot = storage.reference.child(targetUser).child(Storage.ORGANIZATIONS).child(uid)
+        override suspend fun uploadAvatar(uid: UID, file: InputFile, targetUser: UID): String {
+            if (targetUser.isEmpty()) throw AppwriteUserException()
 
-            val avatarReference = storageRoot.child(Storage.ORGANIZATION_AVATAR).child(Storage.ORGANIZATION_AVATAR_FILE)
-            avatarReference.putFile(file)
+            val file = storage.createFile(
+                bucketId = BUCKET,
+                fileId = randomUUID(),
+                fileBytes = file.fileBytes,
+                filename = file.filename,
+                mimeType = file.mimeType,
+                permissions = Permission.onlyUsersVisibleData(targetUser),
+            )
 
-            return avatarReference.getDownloadUrl()
+            return file.getDownloadUrl()
         }
 
         override suspend fun fetchOrganizationById(
@@ -112,7 +118,7 @@ interface OrganizationsRemoteDataSource {
             targetUser: UID
         ): Flow<OrganizationDetailsPojo?> {
             if (uid.isEmpty()) return flowOf(null)
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val organizationFlow = userDataRoot.collection(UserData.ORGANIZATIONS).document(uid)
@@ -126,7 +132,7 @@ interface OrganizationsRemoteDataSource {
             uid: List<UID>,
             targetUser: UID,
         ): Flow<List<OrganizationDetailsPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.ORGANIZATIONS).where {
@@ -140,7 +146,7 @@ interface OrganizationsRemoteDataSource {
             uid: UID,
             targetUser: UID
         ): Flow<OrganizationShortPojo?> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             return userDataRoot.collection(UserData.ORGANIZATIONS).document(uid).snapshotFlowGet()
@@ -150,7 +156,7 @@ interface OrganizationsRemoteDataSource {
             targetUser: UID,
             showHide: Boolean,
         ): Flow<List<OrganizationDetailsPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = if (showHide) {
@@ -165,7 +171,7 @@ interface OrganizationsRemoteDataSource {
         }
 
         override suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShortPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             return userDataRoot
@@ -175,7 +181,7 @@ interface OrganizationsRemoteDataSource {
         }
 
         override suspend fun deleteAllOrganizations(targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
@@ -184,11 +190,8 @@ interface OrganizationsRemoteDataSource {
         }
 
         override suspend fun deleteAvatar(uid: UID, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
-            val storageRoot = storage.reference.child(targetUser).child(Storage.ORGANIZATIONS).child(uid)
-
-            val avatarReference = storageRoot.child(Storage.ORGANIZATION_AVATAR).child(Storage.ORGANIZATION_AVATAR_FILE)
-            avatarReference.delete()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
+            storage.deleteFile(BUCKET, uid)
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)

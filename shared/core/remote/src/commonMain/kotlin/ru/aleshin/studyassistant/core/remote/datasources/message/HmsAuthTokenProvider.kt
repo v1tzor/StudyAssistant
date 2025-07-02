@@ -20,5 +20,10 @@ package ru.aleshin.studyassistant.core.remote.datasources.message
  * @author Stanislav Aleshin on 05.08.2024.
  */
 interface HmsAuthTokenProvider {
+
     suspend fun fetchAccessToken(): String?
+
+    class Empty : HmsAuthTokenProvider {
+        override suspend fun fetchAccessToken() = null
+    }
 }

@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.remote.models.users.ContactInfoPojo
 @Serializable
 data class OrganizationPojo(
     val uid: UID = "",
+    val userId: UID = "",
     val main: Boolean = false,
     val shortName: String = "",
     val fullName: String? = null,

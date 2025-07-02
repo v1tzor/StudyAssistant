@@ -26,15 +26,15 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.deleteAll
 import ru.aleshin.studyassistant.core.common.extensions.observeCollectionMapByField
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
 import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData.GOAL_CONTENT_ID
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData.GOAL_CONTENT_ID
 import ru.aleshin.studyassistant.core.remote.mappers.goals.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.tasks.mapToDetails
@@ -68,7 +68,7 @@ interface DailyGoalsRemoteDataSource {
     ) : DailyGoalsRemoteDataSource {
 
         override suspend fun addOrUpdateGoal(goal: GoalPojo, targetUser: UID): UID {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.GOALS)
@@ -81,7 +81,7 @@ interface DailyGoalsRemoteDataSource {
         }
 
         override suspend fun addDailyDailyGoals(dailyGoals: List<GoalPojo>, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.GOALS)
@@ -96,7 +96,7 @@ interface DailyGoalsRemoteDataSource {
         }
 
         override suspend fun fetchGoalById(uid: UID, targetUser: UID): Flow<GoalDetailsPojo?> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.GOALS).document(uid)
@@ -105,7 +105,7 @@ interface DailyGoalsRemoteDataSource {
         }
 
         override suspend fun fetchGoalByContentId(contentId: UID, targetUser: UID): Flow<GoalDetailsPojo?> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val goal = userDataRoot.collection(UserData.GOALS)
@@ -122,7 +122,7 @@ interface DailyGoalsRemoteDataSource {
             to: Long,
             targetUser: UID
         ): Flow<List<GoalDetailsPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val goalsFlow = userDataRoot.collection(UserData.GOALS)
@@ -143,7 +143,7 @@ interface DailyGoalsRemoteDataSource {
             to: Long,
             targetUser: UID
         ): Flow<List<GoalPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val goalsFlow = userDataRoot.collection(UserData.GOALS)
@@ -159,7 +159,7 @@ interface DailyGoalsRemoteDataSource {
         }
 
         override suspend fun fetchShortActiveDailyGoals(targetUser: UID): Flow<List<GoalPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val goalsFlow = userDataRoot.collection(UserData.GOALS)
@@ -176,7 +176,7 @@ interface DailyGoalsRemoteDataSource {
             currentDate: Long,
             targetUser: UID
         ): Flow<List<GoalDetailsPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val goalsFlow = userDataRoot.collection(UserData.GOALS)
@@ -197,7 +197,7 @@ interface DailyGoalsRemoteDataSource {
             date: Long,
             targetUser: UID
         ): Flow<List<GoalDetailsPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val goalsFlow = userDataRoot.collection(UserData.GOALS)
@@ -210,7 +210,7 @@ interface DailyGoalsRemoteDataSource {
         }
 
         override suspend fun deleteGoal(uid: UID, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.GOALS).document(uid)
@@ -219,7 +219,7 @@ interface DailyGoalsRemoteDataSource {
         }
 
         override suspend fun deleteAllDailyGoals(targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.GOALS)

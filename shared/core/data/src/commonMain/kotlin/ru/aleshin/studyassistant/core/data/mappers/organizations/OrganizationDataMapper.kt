@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.organizations
 
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToRemoteData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
@@ -87,8 +87,9 @@ fun OrganizationDetailsEntity.mapToDomain() = Organization(
     isHide = isHide,
 )
 
-fun Organization.mapToRemoteData() = OrganizationPojo(
+fun Organization.mapToRemoteData(userId: UID) = OrganizationPojo(
     uid = uid,
+    userId = userId,
     main = isMain,
     shortName = shortName,
     fullName = fullName,

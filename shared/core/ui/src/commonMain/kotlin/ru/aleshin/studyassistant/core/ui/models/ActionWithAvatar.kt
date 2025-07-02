@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.ui.models
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import io.github.vinceglb.filekit.core.PlatformFile
 
 /**
  * @author Stanislav Aleshin on 03.08.2024.
@@ -28,7 +29,7 @@ sealed interface ActionWithAvatar : Parcelable {
     data object Delete : ActionWithAvatar
 
     @Parcelize
-    data class Set(val uri: String) : ActionWithAvatar
+    data class Set(val file: PlatformFile) : ActionWithAvatar
 
     @Parcelize
     data class None(val uri: String?) : ActionWithAvatar

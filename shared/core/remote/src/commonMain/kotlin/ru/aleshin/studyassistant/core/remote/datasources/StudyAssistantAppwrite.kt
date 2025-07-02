@@ -19,14 +19,32 @@ package ru.aleshin.studyassistant.core.remote.datasources
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
-object StudyAssistantFirebase {
+object StudyAssistantAppwrite {
+
+    object Client {
+        const val ENDPOINT = "https://fra.cloud.appwrite.io/v1"
+        const val ENDPOINT_REALTIME = "wss://fra.cloud.appwrite.io/v1/realtime"
+        const val PROJECT_ID = "685aefd7003bf3aab9fc"
+    }
 
     object Users {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "xxAGxrwB36eIWMKkUdElDAvWQzS2"
+
+        const val FRIENDS = "friends"
+        const val CODE = "code"
+
         const val ROOT = "users"
         const val UID = "uid"
-        const val CODE = "code"
-        const val FRIENDS = "friends"
     }
+
+    object Organizations {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "68644e7f001f9d9f8bd2"
+        const val USER_ID = "userId"
+    }
+
+    // NOT UPDATED
 
     object UserData {
         const val ROOT = "data"
@@ -88,15 +106,7 @@ object StudyAssistantFirebase {
     }
 
     object Storage {
-        const val USER_AVATAR = "avatar"
-        const val ORGANIZATIONS = "organizations"
-        const val ORGANIZATION_AVATAR = "avatar"
-        const val EMPLOYEE = "employee"
-        const val EMPLOYEE_AVATAR = "avatar"
-
-        const val USER_AVATAR_FILE = "userAvatar"
-        const val ORGANIZATION_AVATAR_FILE = "organizationAvatar"
-        const val EMPLOYEE_AVATAR_FILE = "employeeAvatar"
+        const val BUCKET = "68640fd3001e968f42d1"
     }
 
     object LIMITS {

@@ -16,14 +16,12 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.billing
 
-import dev.gitlive.firebase.auth.FirebaseAuth
-import dev.gitlive.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.firstOrNull
-import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date.DAYS_IN_WEEK
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date.MILLIS_IN_DAY
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Users
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AppwriteAuth
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.AppwriteDatabase
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 
 /**
@@ -34,8 +32,8 @@ interface SubscriptionChecker {
     suspend fun checkSubscriptionActivity(): Boolean
 
     class Base(
-        private val auth: FirebaseAuth,
-        private val database: FirebaseFirestore,
+        private val auth: AppwriteAuth,
+        private val database: AppwriteDatabase,
         private val dateManager: DateManager,
     ) : SubscriptionChecker {
 
@@ -43,7 +41,7 @@ interface SubscriptionChecker {
         private var cacheResponseUser: String? = null
 
         override suspend fun checkSubscriptionActivity(): Boolean {
-            val userId = auth.currentUser?.uid
+            val userId = auth.fetchCurrentUser()?.id
             if (cacheResponse != -1 && cacheResponseUser == userId) {
                 return cacheResponse == 1
             } else {
@@ -51,8 +49,13 @@ interface SubscriptionChecker {
                 val isActive = if (userId == null) {
                     false
                 } else {
-                    val reference = database.collection(Users.ROOT).document(userId)
-                    val subscriptionInfo = reference.snapshotFlowGet<AppUserPojo>().firstOrNull()?.subscriptionInfo
+                    val appUser = database.getDocument(
+                        databaseId = Users.DATABASE_ID,
+                        collectionId = Users.COLLECTION_ID,
+                        documentId = userId,
+                        nestedType = AppUserPojo::class
+                    )
+                    val subscriptionInfo = appUser.data.subscriptionInfo
                     return if (subscriptionInfo != null) {
                         val gracePeriod = MILLIS_IN_DAY * DAYS_IN_WEEK
                         val endTime = subscriptionInfo.expiryTimeMillis + gracePeriod

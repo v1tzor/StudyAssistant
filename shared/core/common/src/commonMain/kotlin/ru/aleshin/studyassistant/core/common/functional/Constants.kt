@@ -32,6 +32,7 @@ object Constants {
         const val ISSUES_URI = "https://github.com/v1tzor/StudyAssistant/issues"
         const val PERMISSION_TAG = "Notificatio_Permission"
         const val PAY_DEEPLINK_SCHEME = "ru.aleshin.studyassistant.pay"
+        const val OPEN_APP_URL = "app://studyassistant.com/openMain"
     }
 
     object Database {

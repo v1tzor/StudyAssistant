@@ -24,11 +24,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.serializer
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.SharedHomeworks
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.Users
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.SharedHomeworks
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
 import ru.aleshin.studyassistant.core.remote.mappers.share.convertToDetails
 import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomeworksDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomeworksPojo
@@ -49,7 +49,7 @@ interface ShareHomeworksRemoteDataSource {
     ) : ShareHomeworksRemoteDataSource {
 
         override suspend fun addOrUpdateSharedHomework(homeworks: SharedHomeworksPojo, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
 
             val reference = database.collection(SharedHomeworks.ROOT).document(targetUser)
 

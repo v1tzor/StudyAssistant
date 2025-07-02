@@ -51,6 +51,15 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="io.appwrite.views.CallbackActivity" android:exported="true">
+            <intent-filter android:label="android_web_auth">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="appwrite-callback-685aefd7003bf3aab9fc" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:directBootAware="true"

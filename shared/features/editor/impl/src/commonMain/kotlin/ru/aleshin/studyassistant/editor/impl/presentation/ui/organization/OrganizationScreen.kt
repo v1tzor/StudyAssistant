@@ -31,7 +31,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.functional.uriString
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
@@ -43,7 +42,6 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contra
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contract.OrganizationViewState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.rememberOrganizationScreenModel
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.views.OrganizationTopBar
-import toStorageFile
 
 /**
  * @author Stanislav Aleshin on 08.07.2024
@@ -69,7 +67,7 @@ internal data class OrganizationScreen(val organizationId: UID?) : Screen {
                     state = state,
                     modifier = Modifier.padding(paddingValues),
                     onUpdateAvatar = {
-                        dispatchEvent(OrganizationEvent.UpdateAvatar(it.toStorageFile().uriString()))
+                        dispatchEvent(OrganizationEvent.UpdateAvatar(it))
                     },
                     onDeleteAvatar = { dispatchEvent(OrganizationEvent.DeleteAvatar) },
                     onSelectedType = { dispatchEvent(OrganizationEvent.UpdateType(it)) },

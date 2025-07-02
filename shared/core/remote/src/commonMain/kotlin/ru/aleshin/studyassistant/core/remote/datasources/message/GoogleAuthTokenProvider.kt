@@ -20,5 +20,10 @@ package ru.aleshin.studyassistant.core.remote.datasources.message
  * @author Stanislav Aleshin on 05.08.2024.
  */
 interface GoogleAuthTokenProvider {
+
     suspend fun fetchAccessToken(scope: String): String?
+
+    class Empty : GoogleAuthTokenProvider {
+        override suspend fun fetchAccessToken(scope: String) = null
+    }
 }

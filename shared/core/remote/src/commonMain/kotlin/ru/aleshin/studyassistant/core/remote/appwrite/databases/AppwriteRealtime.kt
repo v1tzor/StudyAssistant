@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.exceptions
+package ru.aleshin.studyassistant.core.remote.appwrite.databases
+
+import kotlin.reflect.KClass
 
 /**
- * @author Stanislav Aleshin on 22.04.2024.
+ * @author Stanislav Aleshin on 30.06.2025.
  */
-class FirebaseDataAuthException : Exception()
+interface AppwriteRealtime {
+    suspend fun subscribe(
+        channels: List<String>,
+        callback: (RealtimeResponseEvent<Any>) -> Unit,
+    ): RealtimeSubscription
 
-class FirebaseUserException : Exception()
+    suspend fun <T : Any> subscribe(
+        channels: List<String>,
+        payloadType: KClass<T>,
+        callback: (RealtimeResponseEvent<T>) -> Unit,
+    ): RealtimeSubscription
+}

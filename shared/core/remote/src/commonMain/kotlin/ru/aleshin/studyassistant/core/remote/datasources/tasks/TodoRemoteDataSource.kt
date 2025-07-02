@@ -20,13 +20,13 @@ import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import ru.aleshin.studyassistant.core.common.exceptions.FirebaseUserException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.deleteAll
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
 import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantFirebase.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
 import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojo
 
 /**
@@ -49,7 +49,7 @@ interface TodoRemoteDataSource {
     ) : TodoRemoteDataSource {
 
         override suspend fun addOrUpdateTodo(todo: TodoPojo, targetUser: UID): UID {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.TODOS)
@@ -62,7 +62,7 @@ interface TodoRemoteDataSource {
         }
 
         override suspend fun addOrUpdateTodosGroup(todos: List<TodoPojo>, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.TODOS)
@@ -78,7 +78,7 @@ interface TodoRemoteDataSource {
 
         override suspend fun fetchTodoById(uid: UID, targetUser: UID): Flow<TodoPojo?> {
             if (uid.isEmpty()) return flowOf(null)
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             return userDataRoot.collection(UserData.TODOS).document(uid).snapshotFlowGet<TodoPojo>()
@@ -89,7 +89,7 @@ interface TodoRemoteDataSource {
             to: Long,
             targetUser: UID
         ): Flow<List<TodoPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val todosFlow = userDataRoot.collection(UserData.TODOS)
@@ -106,7 +106,7 @@ interface TodoRemoteDataSource {
         }
 
         override suspend fun fetchActiveTodos(targetUser: UID): Flow<List<TodoPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val todosFlow = userDataRoot.collection(UserData.TODOS)
@@ -126,7 +126,7 @@ interface TodoRemoteDataSource {
             to: Long?,
             targetUser: UID
         ): Flow<List<TodoPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val todosFlow = userDataRoot.collection(UserData.TODOS)
@@ -150,7 +150,7 @@ interface TodoRemoteDataSource {
             currentDate: Long,
             targetUser: UID
         ): Flow<List<TodoPojo>> {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val todosFlow = userDataRoot.collection(UserData.TODOS)
@@ -167,7 +167,7 @@ interface TodoRemoteDataSource {
         }
 
         override suspend fun deleteTodo(uid: UID, targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.TODOS).document(uid)
@@ -176,7 +176,7 @@ interface TodoRemoteDataSource {
         }
 
         override suspend fun deleteAllTodos(targetUser: UID) {
-            if (targetUser.isEmpty()) throw FirebaseUserException()
+            if (targetUser.isEmpty()) throw AppwriteUserException()
             val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
             val reference = userDataRoot.collection(UserData.TODOS)

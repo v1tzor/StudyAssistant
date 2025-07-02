@@ -29,6 +29,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
 
             implementation(libs.rustore.universalpush.core)
+            implementation(libs.appwrite.sdk)
 
             implementation(project.dependencies.platform(libs.google.oauth.bom.android))
             implementation(libs.google.oauth.android)

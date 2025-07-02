@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.functional
+package ru.aleshin.studyassistant.core.remote.appwrite
 
-import dev.gitlive.firebase.storage.File
+import ru.aleshin.studyassistant.core.remote.appwrite.storage.AppwriteStorage
 
 /**
- * @author Stanislav Aleshin on 03.08.2024.
+ * @author Stanislav Aleshin on 30.06.2025.
  */
-expect fun File(uri: String): File
-
-expect fun File.uriString(): String
+abstract class AppwriteStorageApple : AppwriteStorage

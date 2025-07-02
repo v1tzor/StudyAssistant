@@ -1,6 +1,3 @@
-import dev.gitlive.firebase.storage.File
-import io.github.vinceglb.filekit.core.PlatformFile
-
 /*
  * Copyright 2024 Stanislav Aleshin
  *
@@ -17,7 +14,18 @@ import io.github.vinceglb.filekit.core.PlatformFile
  * limitations under the License.
  */
 
+package ru.aleshin.studyassistant.core.ui.mappers
+
+import io.github.vinceglb.filekit.core.PlatformFile
+import ru.aleshin.studyassistant.core.common.functional.getMimeTypeFromFileName
+import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
+
 /**
- * @author Stanislav Aleshin on 03.08.2024.
+ * @author Stanislav Aleshin on 01.07.2025.
  */
-expect fun PlatformFile.toStorageFile(): File
+suspend fun PlatformFile.mapToDomain() = InputFile(
+    uri = path,
+    filename = name,
+    mimeType = getMimeTypeFromFileName(name),
+    fileBytes = readBytes(),
+)

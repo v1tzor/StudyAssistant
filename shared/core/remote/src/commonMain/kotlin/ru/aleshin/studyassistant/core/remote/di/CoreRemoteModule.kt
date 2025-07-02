@@ -48,7 +48,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.remote.BuildKonfig
 import ru.aleshin.studyassistant.core.remote.datasources.ai.AiRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSourceOld
 import ru.aleshin.studyassistant.core.remote.datasources.billing.ProductsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
@@ -66,7 +66,7 @@ import ru.aleshin.studyassistant.core.remote.datasources.share.ShareSchedulesRem
 import ru.aleshin.studyassistant.core.remote.datasources.subjects.SubjectsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.HomeworksRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.TodoRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSourceOld
 import ru.aleshin.studyassistant.core.remote.ktor.HttpEngineFactory
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.DeepSeek
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.UniversalMessaging
@@ -165,8 +165,8 @@ val coreRemoteModule = DI.Module("CoreRemote") {
 
     bindSingleton<AiRemoteDataSource> { AiRemoteDataSource.Base(instance(tag = "DeepSeek")) }
     bindSingleton<SubscriptionChecker> { SubscriptionChecker.Base(instance(), instance(), instance()) }
-    bindSingleton<AuthRemoteDataSource> { AuthRemoteDataSource.Base(instance(), instance()) }
-    bindSingleton<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<AuthRemoteDataSourceOld> { AuthRemoteDataSourceOld.Base(instance(), instance(), instance()) }
+    bindSingleton<UsersRemoteDataSourceOld> { UsersRemoteDataSourceOld.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance()) }
     bindSingleton<FriendRequestsRemoteDataSource> { FriendRequestsRemoteDataSource.Base(instance()) }
     bindSingleton<ShareHomeworksRemoteDataSource> { ShareHomeworksRemoteDataSource.Base(instance()) }

@@ -68,7 +68,7 @@ internal class EmployeeScreenModel(
                 }
             }
             is EmployeeEvent.UpdateAvatar -> with(event) {
-                sendAction(EmployeeAction.UpdateActionWithAvatar(ActionWithAvatar.Set(imageUrl)))
+                sendAction(EmployeeAction.UpdateActionWithAvatar(ActionWithAvatar.Set(image)))
             }
             is EmployeeEvent.DeleteAvatar -> with(state()) {
                 val action = if (editableEmployee?.avatar != null) {

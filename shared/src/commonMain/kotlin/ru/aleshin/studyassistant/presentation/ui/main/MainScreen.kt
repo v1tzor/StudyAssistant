@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import cafe.adriel.voyager.transitions.CrossfadeTransition
+import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantTheme
@@ -79,7 +80,7 @@ fun MainScreen() = ScreenContent(
                     when (effect) {
                         is MainEffect.ReplaceGlobalScreen -> navigator.replaceAll(effect.screen)
                         is MainEffect.ShowError -> snackbarState.showSnackbar(
-                            message = effect.failures.mapToMessage(coreStrings),
+                            message = effect.failures.apply { Logger.i("test") { this@apply.toString() } }.mapToMessage(coreStrings),
                             duration = SnackbarDuration.Indefinite,
                         )
                     }
