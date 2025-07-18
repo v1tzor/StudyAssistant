@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.core.remote.models.goals
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.remote.models.tasks.HomeworkDetailsPojo
-import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojo
+import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojoDetails
 
 /**
  * @author Stanislav Aleshin on 18.04.2025.
@@ -28,7 +28,7 @@ data class GoalDetailsPojo(
     val uid: UID,
     val contentType: String,
     val contentHomework: HomeworkDetailsPojo? = null,
-    val contentTodo: TodoPojo? = null,
+    val contentTodo: TodoPojoDetails? = null,
     val number: Int = 0,
     val targetDate: Long,
     val desiredTime: Millis?,

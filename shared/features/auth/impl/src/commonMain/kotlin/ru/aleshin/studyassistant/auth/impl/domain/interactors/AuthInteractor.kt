@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import ru.aleshin.studyassistant.auth.impl.domain.common.AuthEitherWrapper
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthResult
-import ru.aleshin.studyassistant.core.common.exceptions.AppwriteDataAuthException
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -29,8 +28,11 @@ import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.auth.AuthCredentials
 import ru.aleshin.studyassistant.core.domain.entities.auth.ForgotCredentials
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
+import ru.aleshin.studyassistant.core.domain.entities.users.AuthUser
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
+import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
+import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -40,10 +42,13 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
  */
 internal interface AuthInteractor {
 
-    suspend fun loginWithEmail(credentials: AuthCredentials, device: UserDevice): DomainResult<AuthFailures, AppUser>
-    suspend fun loginViaGoogle(idToken: String?, device: UserDevice): DomainResult<AuthFailures, AuthResult>
-    suspend fun registerNewAccount(credentials: AuthCredentials, device: UserDevice): DomainResult<AuthFailures, AppUser>
+    suspend fun loginWithEmail(credentials: AuthCredentials, device: UserDevice): DomainResult<AuthFailures, AuthUser>
+    suspend fun registerNewAccount(
+        credentials: AuthCredentials,
+        device: UserDevice
+    ): DomainResult<AuthFailures, AppUser>
     suspend fun resetPassword(credentials: ForgotCredentials): UnitDomainResult<AuthFailures>
+    suspend fun confirmOAuthLogin(session: UserSession, device: UserDevice): DomainResult<AuthFailures, AuthResult>
     suspend fun sendEmailVerification(): UnitDomainResult<AuthFailures>
     suspend fun signOut(deviceId: UID): UnitDomainResult<AuthFailures>
 
@@ -52,66 +57,62 @@ internal interface AuthInteractor {
         private val usersRepository: UsersRepository,
         private val messageRepository: MessageRepository,
         private val manageUserRepository: ManageUserRepository,
+        private val generalSettingsRepository: GeneralSettingsRepository,
         private val eitherWrapper: AuthEitherWrapper,
     ) : AuthInteractor {
 
         override suspend fun loginWithEmail(credentials: AuthCredentials, device: UserDevice) = eitherWrapper.wrap {
-            val firebaseUser = authRepository.signInWithEmail(credentials)
-            val userInfo = usersRepository.fetchUserById(firebaseUser.uid).first() ?: throw AppwriteUserException()
+            val userSession = authRepository.signInWithEmail(credentials)
+            val authUser = usersRepository.fetchCurrentAuthUser() ?: throw AppwriteUserException()
+            val userInfo = usersRepository.fetchUserById(userSession.userId).first() ?: throw AppwriteUserException()
 
             if (userInfo.devices.find { it.deviceId == device.deviceId } == null) {
                 val updatedDevices = buildList {
                     addAll(userInfo.devices)
                     add(device)
                 }
-                val updatedUserInfo = userInfo.copy(devices = updatedDevices).apply {
-                    usersRepository.addOrUpdateAppUser(this)
-                }
-                return@wrap updatedUserInfo
-            } else {
-                return@wrap userInfo
+                usersRepository.updateAppUser(userInfo.copy(devices = updatedDevices))
             }
+
+            return@wrap authUser
         }
 
-        override suspend fun loginViaGoogle(idToken: String?, device: UserDevice) = eitherWrapper.wrap {
-            val firebaseUser = authRepository.signInViaGoogle(idToken)
-            val userInfo = usersRepository.fetchUserById(firebaseUser.uid).firstOrNull()
+        override suspend fun confirmOAuthLogin(session: UserSession, device: UserDevice) = eitherWrapper.wrap {
+            val authUser = usersRepository.fetchCurrentAuthUser() ?: throw AppwriteUserException()
+            val userInfo = usersRepository.fetchUserById(session.userId).firstOrNull()
 
             return@wrap if (userInfo != null) {
-                AuthResult(firebaseUser = firebaseUser, isNewUser = false)
+                AuthResult(authUser = authUser, isNewUser = false)
             } else {
                 val newUserInfo = AppUser.createNewUser(
-                    uid = firebaseUser.uid,
+                    uid = session.userId,
                     device = device,
-                    username = checkNotNull(firebaseUser.displayName ?: firebaseUser.email),
-                    email = checkNotNull(firebaseUser.email),
+                    username = checkNotNull(authUser.name.takeIf { it.isNotEmpty() } ?: authUser.email),
+                    email = checkNotNull(authUser.email),
                 )
-                val createdResult = usersRepository.addOrUpdateAppUser(newUserInfo)
-                if (createdResult) {
-                    manageUserRepository.sendVerifyEmail()
-                    AuthResult(firebaseUser = firebaseUser, isNewUser = true)
-                } else {
-                    throw AppwriteDataAuthException()
-                }
+                usersRepository.addAppUser(newUserInfo)
+                manageUserRepository.sendVerifyEmail()
+
+                AuthResult(authUser = authUser, isNewUser = true)
             }
         }
 
         override suspend fun registerNewAccount(credentials: AuthCredentials, device: UserDevice) = eitherWrapper.wrap {
-            val firebaseUser = authRepository.registerByEmail(credentials)
+            val authUser = authRepository.registerByEmail(credentials)
             val newUserInfo = AppUser.createNewUser(
-                uid = firebaseUser.uid,
+                uid = authUser.uid,
                 device = device,
                 username = credentials.username ?: credentials.email,
                 email = credentials.email,
             )
-            val createdResult = usersRepository.addOrUpdateAppUser(newUserInfo)
+            usersRepository.addAppUser(newUserInfo)
+            manageUserRepository.sendVerifyEmail()
 
-            if (createdResult) {
-                manageUserRepository.sendVerifyEmail()
-                return@wrap newUserInfo
-            } else {
-                throw AppwriteDataAuthException()
-            }
+            val settings = generalSettingsRepository.fetchSettings().first()
+            val updatedSettings = settings.copy(isUnfinishedSetup = authUser.uid)
+            generalSettingsRepository.updateSettings(updatedSettings)
+
+            return@wrap newUserInfo
         }
 
         override suspend fun resetPassword(credentials: ForgotCredentials) = eitherWrapper.wrap {
@@ -132,7 +133,7 @@ internal interface AuthInteractor {
                     remove(deviceInfo)
                 }
                 val updatedUserInfo = userInfo.copy(devices = updatedDevices)
-                usersRepository.addOrUpdateAppUser(updatedUserInfo)
+                usersRepository.updateAppUser(updatedUserInfo)
             }
             authRepository.signOut()
             messageRepository.deleteToken()

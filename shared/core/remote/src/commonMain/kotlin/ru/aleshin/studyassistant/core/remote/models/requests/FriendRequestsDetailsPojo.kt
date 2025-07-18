@@ -17,14 +17,14 @@
 package ru.aleshin.studyassistant.core.remote.models.requests
 
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
+import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojoDetails
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
 @Serializable
 data class FriendRequestsDetailsPojo(
-    val received: Map<AppUserPojo, Long> = emptyMap(),
-    val send: Map<AppUserPojo, Long> = emptyMap(),
-    val lastActions: Map<AppUserPojo, Boolean> = emptyMap(),
+    val received: Map<AppUserPojoDetails, Long> = emptyMap(),
+    val send: Map<AppUserPojoDetails, Long> = emptyMap(),
+    val lastActions: Map<AppUserPojoDetails, Boolean> = emptyMap(),
 )

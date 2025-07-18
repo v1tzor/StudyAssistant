@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.billing.impl.di.holder
 
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
 import org.kodein.di.bindSingleton
@@ -55,7 +54,6 @@ public object BillingFeatureDIHolder : BaseFeatureDIHolder<BillingFeatureApi, Bi
                 bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
-                bindSingleton<FirebaseFirestore> { dependencies.firestore }
                 bindSingleton<IapService> { dependencies.iapService }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }

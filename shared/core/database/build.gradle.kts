@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.serialization)
     alias(libs.plugins.sqlitedelight)
+    alias(libs.plugins.kotlinAtomic)
 }
 
 kotlin {
@@ -33,12 +34,15 @@ kotlin {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:domain"))
 
+            implementation(libs.ktor.client.core)
             implementation(libs.sqldelight.core)
             implementation(libs.sqldelight.prmimitiveAdapters)
             implementation(libs.sqldelight.coroutines)
-            implementation(libs.firebase.storage)
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
+            implementation(libs.kotlin.atomicfu)
+            implementation(libs.settings.core)
+            implementation(libs.settings.noargs)
             implementation(libs.logger)
         }
         iosMain.dependencies {

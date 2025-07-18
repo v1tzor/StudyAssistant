@@ -19,9 +19,10 @@ package ru.aleshin.studyassistant.core.remote.datasources.billing
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date.DAYS_IN_WEEK
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date.MILLIS_IN_DAY
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.remote.appwrite.auth.AppwriteAuth
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.AppwriteDatabase
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
+import ru.aleshin.studyassistant.core.remote.mappers.users.convertToDetails
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 
 /**
@@ -32,8 +33,8 @@ interface SubscriptionChecker {
     suspend fun checkSubscriptionActivity(): Boolean
 
     class Base(
-        private val auth: AppwriteAuth,
-        private val database: AppwriteDatabase,
+        private val account: AccountService,
+        private val database: DatabaseService,
         private val dateManager: DateManager,
     ) : SubscriptionChecker {
 
@@ -41,7 +42,7 @@ interface SubscriptionChecker {
         private var cacheResponseUser: String? = null
 
         override suspend fun checkSubscriptionActivity(): Boolean {
-            val userId = auth.fetchCurrentUser()?.id
+            val userId = account.getCurrentUser()?.id
             if (cacheResponse != -1 && cacheResponseUser == userId) {
                 return cacheResponse == 1
             } else {
@@ -49,13 +50,13 @@ interface SubscriptionChecker {
                 val isActive = if (userId == null) {
                     false
                 } else {
-                    val appUser = database.getDocument(
+                    val appUser = database.getDocumentOrNull(
                         databaseId = Users.DATABASE_ID,
                         collectionId = Users.COLLECTION_ID,
                         documentId = userId,
-                        nestedType = AppUserPojo::class
-                    )
-                    val subscriptionInfo = appUser.data.subscriptionInfo
+                        nestedType = AppUserPojo.serializer()
+                    )?.data?.convertToDetails()
+                    val subscriptionInfo = appUser?.subscriptionInfo
                     return if (subscriptionInfo != null) {
                         val gracePeriod = MILLIS_IN_DAY * DAYS_IN_WEEK
                         val endTime = subscriptionInfo.expiryTimeMillis + gracePeriod

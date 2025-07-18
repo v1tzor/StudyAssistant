@@ -44,6 +44,7 @@ internal data class BillingStrings(
     val premiumFeatureMultipleOrganizations: String,
     val successPaymentTitle: String,
     val successPaymentBody: String,
+    val restartAppTitle: String,
     val premiumFeatureSupportDevelopment: String,
 ) {
     companion object Companion {
@@ -76,6 +77,7 @@ internal data class BillingStrings(
             premiumFeatureMultipleOrganizations = "Создание более 2 учебных организаций",
             successPaymentTitle = "Подписка оформлена!",
             successPaymentBody = "Поздравляем! Теперь у вас есть доступ ко всем премиум-функциям. Наслаждайтесь новыми возможностями!",
+            restartAppTitle = "Перезапустить",
             premiumFeatureSupportDevelopment = "Поддержка разработки и улучшений приложения",
         )
         val ENGLISH = BillingStrings(
@@ -106,6 +108,7 @@ internal data class BillingStrings(
             premiumFeatureMultipleOrganizations = "Create more than 2 study organizations",
             successPaymentTitle = "Subscription Successful!",
             successPaymentBody = "Congratulations! You now have access to all premium features. Enjoy the new possibilities!",
+            restartAppTitle = "Restart",
             premiumFeatureSupportDevelopment = "Support app development and improvements",
         )
     }

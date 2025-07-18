@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.preview.impl.domain.interactors
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
@@ -34,32 +33,38 @@ internal interface AppUserInteractor {
 
     suspend fun fetchAppUser(): FlowDomainResult<PreviewFailures, AppUser>
     suspend fun updateUser(user: AppUser): UnitDomainResult<PreviewFailures>
-    suspend fun uploadAvatar(file: InputFile): DomainResult<PreviewFailures, String>
-    suspend fun deleteAvatar(): UnitDomainResult<PreviewFailures>
+    suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile): DomainResult<PreviewFailures, String>
+    suspend fun deleteAvatar(avatarUrl: String): UnitDomainResult<PreviewFailures>
+    suspend fun fetchAppUserPaidStatus(): FlowDomainResult<PreviewFailures, Boolean>
 
     class Base(
         private val usersRepository: UsersRepository,
         private val eitherWrapper: PreviewEitherWrapper,
     ) : AppUserInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchAppUser() = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             usersRepository.fetchUserById(targetUser).map { appUser ->
                 checkNotNull(appUser)
             }
         }
 
         override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {
-            usersRepository.addOrUpdateAppUser(user)
+            usersRepository.updateAppUser(user)
         }
 
-        override suspend fun uploadAvatar(file: InputFile) = eitherWrapper.wrap {
-            usersRepository.uploadUserAvatar(targetUser, file)
+        override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            usersRepository.uploadUserAvatar(oldAvatarUrl, file, targetUser)
         }
-        override suspend fun deleteAvatar() = eitherWrapper.wrap {
-            usersRepository.deleteUserAvatar(targetUser)
+
+        override suspend fun deleteAvatar(avatarUrl: String) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            usersRepository.deleteUserAvatar(avatarUrl, targetUser)
+        }
+
+        override suspend fun fetchAppUserPaidStatus() = eitherWrapper.wrapFlow {
+            usersRepository.fetchCurrentUserPaidStatus()
         }
     }
 }

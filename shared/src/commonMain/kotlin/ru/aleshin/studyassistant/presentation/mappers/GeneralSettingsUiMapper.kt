@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.presentation.models.GeneralSettingsUi
  */
 fun GeneralSettings.mapToUi() = GeneralSettingsUi(
     isFirstStart = isFirstStart,
+    isUnfinishedSetup = isUnfinishedSetup,
     themeType = themeType.mapToUi(),
     languageType = languageType.mapToUi(),
 )

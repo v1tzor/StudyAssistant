@@ -18,18 +18,17 @@ package ru.aleshin.studyassistant.core.remote.models.users
 
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.messages.PushServiceType
-import ru.aleshin.studyassistant.core.common.platform.Platform
 
 /**
  * @author Stanislav Aleshin on 11.08.2024.
  */
 @Serializable
 data class UserDevicePojo(
-    val userId: UID = "",
-    val platform: Platform = Platform.Android,
-    val deviceId: String = "",
-    val deviceName: String = "",
-    val pushToken: String? = null,
-    val pushServiceType: String = PushServiceType.NONE.toString(),
+    val uid: UID,
+    val userId: UID,
+    val platform: String,
+    val deviceId: String,
+    val deviceName: String,
+    val pushToken: String?,
+    val pushServiceType: String,
 )

@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.interactors
 
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
@@ -37,10 +36,8 @@ internal interface HomeworkInteractor {
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : HomeworkInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun updateHomework(homework: Homework) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             homeworksRepository.addOrUpdateHomework(homework, targetUser)
         }
     }

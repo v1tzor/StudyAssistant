@@ -16,16 +16,12 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.verification
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +33,6 @@ import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.AuthHeaderSection
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.EmailTextField
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.contract.VerificationViewState
-import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.ui.mappers.toLanguageString
 import kotlin.time.DurationUnit.MILLISECONDS
 import kotlin.time.toDuration
@@ -82,20 +77,7 @@ internal fun VerificationContent(
                     enabled = retryAvailableTime == null,
                     shape = MaterialTheme.shapes.large,
                 ) {
-                    Crossfade(
-                        targetState = isLoadingSend,
-                        animationSpec = floatSpring(),
-                    ) { loading ->
-                        if (!loading) {
-                            Text(text = AuthThemeRes.strings.verificationButtonLabel)
-                        } else {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(18.dp),
-                                strokeWidth = 2.dp,
-                                color = LocalContentColor.current,
-                            )
-                        }
-                    }
+                    Text(text = AuthThemeRes.strings.verificationButtonLabel)
                 }
                 if (retryAvailableTime != null) {
                     Text(

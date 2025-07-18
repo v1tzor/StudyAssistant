@@ -34,7 +34,8 @@ data class MainViewState(
 ) : BaseViewState
 
 sealed class MainEvent : BaseEvent {
-    data object Init : MainEvent()
+    data object InitSettings : MainEvent()
+    data object InitNavigation : MainEvent()
 }
 
 sealed class MainEffect : BaseUiEffect {

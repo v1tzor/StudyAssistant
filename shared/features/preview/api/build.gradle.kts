@@ -30,8 +30,6 @@ kotlin {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:ui"))
             implementation(project(":shared:core:domain"))
-
-            implementation(libs.bundles.firebase)
         }
     }
 

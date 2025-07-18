@@ -44,7 +44,7 @@ class EmployeeRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.addOrUpdateEmployee(employee.mapToRemoteData(), targetUser)
+            remoteDataSource.addOrUpdateEmployee(employee.mapToRemoteData(targetUser), targetUser)
         } else {
             localDataSource.addOrUpdateEmployee(employee.mapToLocalData())
         }
@@ -54,17 +54,17 @@ class EmployeeRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.addOrUpdateEmployeeGroup(employees.map { it.mapToRemoteData() }, targetUser)
+            remoteDataSource.addOrUpdateEmployeeGroup(employees.map { it.mapToRemoteData(targetUser) }, targetUser)
         } else {
             localDataSource.addOrUpdateEmployeeGroup(employees.map { it.mapToLocalData() })
         }
     }
 
-    override suspend fun uploadAvatar(uid: UID, file: InputFile, targetUser: UID): String {
+    override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile, targetUser: UID): String {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.uploadAvatar(uid, file, targetUser)
+            remoteDataSource.uploadAvatar(oldAvatarUrl, file, targetUser)
         } else {
             checkNotNull(file.uri)
         }
@@ -103,11 +103,11 @@ class EmployeeRepositoryImpl(
         }
     }
 
-    override suspend fun deleteAvatar(uid: UID, targetUser: UID) {
+    override suspend fun deleteAvatar(avatarUrl: String, targetUser: UID) {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         if (isSubscriber) {
-            remoteDataSource.deleteAvatar(uid, targetUser)
+            remoteDataSource.deleteAvatar(avatarUrl, targetUser)
         }
     }
 
@@ -137,7 +137,7 @@ class EmployeeRepositoryImpl(
                 val allSchedules = localDataSource.fetchAllEmployeeByOrganization(
                     organizationId = null,
                 ).let { employeesFlow ->
-                    return@let employeesFlow.first().map { it.mapToDomain().mapToRemoteData() }
+                    return@let employeesFlow.first().map { it.mapToDomain().mapToRemoteData(targetUser) }
                 }
                 remoteDataSource.deleteAllEmployee(targetUser)
                 remoteDataSource.addOrUpdateEmployeeGroup(allSchedules, targetUser)

@@ -11,7 +11,7 @@ import Appwrite
 import AppwriteModels
 import JSONCodable
 
-class AppwriteManager {
+class AppwriteManager: ObservableObject {
     var client: Client
     var account: Account
     var realtime: Realtime

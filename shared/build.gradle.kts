@@ -66,11 +66,6 @@ kotlin {
             api(project(":shared:core:remote"))
 
             implementation(compose.components.resources)
-            implementation(libs.firebase.firestore)
-            implementation(libs.google.auth)
-        }
-        iosMain.dependencies {
-            implementation(libs.bundles.firebase)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

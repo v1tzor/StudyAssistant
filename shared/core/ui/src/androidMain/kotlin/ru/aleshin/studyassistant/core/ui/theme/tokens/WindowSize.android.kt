@@ -30,6 +30,7 @@ actual fun rememberScreenSizeInfo(): WindowSize {
     val density = LocalDensity.current
     val config = LocalConfiguration.current
 
+
     return remember {
         WindowSize.specifySize(
             height = config.screenHeightDp.dp,

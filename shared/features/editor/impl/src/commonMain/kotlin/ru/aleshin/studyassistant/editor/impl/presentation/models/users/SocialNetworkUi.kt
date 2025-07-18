@@ -18,6 +18,8 @@ package ru.aleshin.studyassistant.editor.impl.presentation.models.users
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
 
 /**
@@ -25,6 +27,7 @@ import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
  */
 @Parcelize
 internal data class SocialNetworkUi(
+    val uid: UID = randomUUID(),
     val type: SocialNetworkType,
     val otherType: String?,
     val data: String,

@@ -36,20 +36,28 @@ class UsersRepositoryImpl(
     private val subscriptionChecker: SubscriptionChecker,
 ) : UsersRepository {
 
-    override suspend fun addOrUpdateAppUser(user: AppUser): Boolean {
-        return remoteDataSource.addOrUpdateUser(user.mapToRemoteData())
+    override suspend fun addAppUser(user: AppUser): UID {
+        return remoteDataSource.addUser(user.mapToRemoteData())
     }
 
-    override fun fetchCurrentAppUser(): AuthUser? {
+    override suspend fun updateAppUser(user: AppUser) {
+        return remoteDataSource.updateUser(user.mapToRemoteData())
+    }
+
+    override suspend fun fetchCurrentAuthUser(): AuthUser? {
         return remoteDataSource.fetchCurrentAppUser()?.mapToDomain()
     }
 
-    override suspend fun fetchAuthStateChanged(): Flow<AuthUser?> {
-        return remoteDataSource.fetchAuthStateChanged().map { it?.mapToDomain() }
+    override suspend fun fetchCurrentUserOrError(): AuthUser {
+        return checkNotNull(fetchCurrentAuthUser()) { "Current user is not found" }
+    }
+
+    override suspend fun fetchStateChanged(): Flow<AuthUser?> {
+        return remoteDataSource.fetchStateChanged().map { it?.mapToDomain() }
     }
 
     override suspend fun fetchCurrentUserPaidStatus(): Flow<Boolean> {
-        return remoteDataSource.fetchAuthStateChanged().map {
+        return remoteDataSource.fetchStateChanged().map {
             subscriptionChecker.checkSubscriptionActivity()
         }
     }
@@ -80,15 +88,15 @@ class UsersRepositoryImpl(
         }
     }
 
-    override suspend fun uploadUserAvatar(uid: UID, avatar: InputFile): String {
-        return remoteDataSource.uploadAvatar(uid, avatar)
+    override suspend fun uploadUserAvatar(oldAvatarUrl: String?, avatar: InputFile, targetUser: UID): String {
+        return remoteDataSource.uploadAvatar(oldAvatarUrl, avatar, targetUser)
     }
 
     override suspend fun reloadUser(): AuthUser? {
         return remoteDataSource.reloadUser()?.mapToDomain()
     }
 
-    override suspend fun deleteUserAvatar(uid: UID) {
-        return remoteDataSource.deleteAvatar(uid)
+    override suspend fun deleteUserAvatar(avatarUrl: String, targetUser: UID) {
+        return remoteDataSource.deleteAvatar(avatarUrl, targetUser)
     }
 }

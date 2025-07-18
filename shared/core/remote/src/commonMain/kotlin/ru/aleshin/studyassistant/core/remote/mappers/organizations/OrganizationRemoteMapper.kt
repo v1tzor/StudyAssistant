@@ -16,8 +16,12 @@
 
 package ru.aleshin.studyassistant.core.remote.mappers.organizations
 
+import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.extensions.fromJson
+import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationPojo
+import ru.aleshin.studyassistant.core.remote.models.organizations.ScheduleTimeIntervalsPojo
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 
@@ -31,12 +35,12 @@ fun OrganizationDetailsPojo.mapToBase() = OrganizationPojo(
     shortName = shortName,
     fullName = fullName,
     type = type,
-    scheduleTimeIntervals = scheduleTimeIntervals,
+    scheduleTimeIntervals = Json.encodeToString<ScheduleTimeIntervalsPojo>(scheduleTimeIntervals),
     avatar = avatar,
-    emails = emails,
-    phones = phones,
-    locations = locations,
-    webs = webs,
+    emails = emails.map { it.toJson() },
+    phones = phones.map { it.toJson() },
+    locations = locations.map { it.toJson() },
+    webs = webs.map { it.toJson() },
     offices = offices,
     hide = isHide,
 )
@@ -52,13 +56,13 @@ fun OrganizationPojo.mapToDetails(
     fullName = fullName,
     type = type,
     avatar = avatar,
-    scheduleTimeIntervals = scheduleTimeIntervals,
+    scheduleTimeIntervals = Json.decodeFromString<ScheduleTimeIntervalsPojo>(scheduleTimeIntervals),
     subjects = subjects,
     employee = employee,
-    emails = emails,
-    phones = phones,
-    locations = locations,
-    webs = webs,
+    emails = emails.map { it.fromJson() },
+    phones = phones.map { it.fromJson() },
+    locations = locations.map { it.fromJson() },
+    webs = webs.map { it.fromJson() },
     offices = offices,
     isHide = hide,
 )

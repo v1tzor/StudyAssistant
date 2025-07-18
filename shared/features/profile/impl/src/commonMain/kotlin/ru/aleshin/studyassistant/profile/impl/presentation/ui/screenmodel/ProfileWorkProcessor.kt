@@ -74,7 +74,7 @@ internal interface ProfileWorkProcessor :
             val userInfoFlow = userInteractor.fetchAppUser()
             val friendsRequestsFlow = friendRequestsInteractor.fetchAllFriendRequests()
 
-            userInfoFlow.flatMapLatestWithResult(
+            userInfoFlow.combineWithResult(
                 secondFlow = friendsRequestsFlow,
                 onError = { ProfileEffect.ShowError(it) },
                 onData = { userInfo, friendRequest ->
@@ -94,7 +94,7 @@ internal interface ProfileWorkProcessor :
             val sharedSchedulesFlow = shareSchedulesInteractor.fetchShortSharedSchedules()
             val organizationsFlow = organizationsInteractor.fetchAllShortOrganizations()
 
-            sharedSchedulesFlow.flatMapLatestWithResult(
+            sharedSchedulesFlow.combineWithResult(
                 secondFlow = organizationsFlow,
                 onError = { ProfileEffect.ShowError(it) },
                 onData = { schedules, shortOrganizations ->

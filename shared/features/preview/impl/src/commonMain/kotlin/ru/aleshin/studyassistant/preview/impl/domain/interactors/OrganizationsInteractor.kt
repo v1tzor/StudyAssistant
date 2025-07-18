@@ -35,8 +35,8 @@ internal interface OrganizationsInteractor {
 
     suspend fun addOrUpdateOrganization(organization: Organization): DomainResult<PreviewFailures, UID>
     suspend fun fetchAllOrganization(): FlowDomainResult<PreviewFailures, List<Organization>>
-    suspend fun uploadAvatar(uid: UID, file: InputFile): DomainResult<PreviewFailures, String>
-    suspend fun deleteAvatar(uid: UID): UnitDomainResult<PreviewFailures>
+    suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile): DomainResult<PreviewFailures, String>
+    suspend fun deleteAvatar(avatarUrl: String): UnitDomainResult<PreviewFailures>
 
     class Base(
         private val organizationsRepository: OrganizationsRepository,
@@ -44,25 +44,26 @@ internal interface OrganizationsInteractor {
         private val eitherWrapper: PreviewEitherWrapper,
     ) : OrganizationsInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun addOrUpdateOrganization(organization: Organization) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             organizationsRepository.addOrUpdateOrganization(organization, targetUser)
         }
 
         override suspend fun fetchAllOrganization() = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             organizationsRepository.fetchAllOrganization(targetUser).map { organizations ->
                 organizations.sortedByDescending { it.isMain }
             }
         }
 
-        override suspend fun uploadAvatar(uid: UID, file: InputFile) = eitherWrapper.wrap {
-            organizationsRepository.uploadAvatar(uid, file, targetUser)
+        override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            organizationsRepository.uploadAvatar(oldAvatarUrl, file, targetUser)
         }
 
-        override suspend fun deleteAvatar(uid: UID) = eitherWrapper.wrap {
-            organizationsRepository.deleteAvatar(uid, targetUser)
+        override suspend fun deleteAvatar(avatarUrl: String) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            organizationsRepository.deleteAvatar(avatarUrl, targetUser)
         }
     }
 }

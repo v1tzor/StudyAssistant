@@ -17,9 +17,11 @@
 package ru.aleshin.studyassistant.core.ui.views.dialog
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,11 +33,14 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +54,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.hoursToMillis
 import ru.aleshin.studyassistant.core.common.extensions.minutesToMillis
 import ru.aleshin.studyassistant.core.common.extensions.toHorses
@@ -85,7 +91,7 @@ fun DurationPickerDialog(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.End,
             ) {
-                TimePickerHeader(title = headerTitle)
+                DurationPickerHeader(title = headerTitle)
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     DurationPickerHourMinuteSelector(
                         hours = hour?.toString() ?: "",
@@ -129,7 +135,7 @@ fun DurationPickerDialog(
                         }
                     }
                 }
-                TimePickerActions(
+                DurationPickerActions(
                     enabled = hour != null && minute != null && hour!! < 24,
                     onDismiss = onDismiss,
                     onConfirm = {
@@ -206,4 +212,55 @@ internal fun DurationPickerHourMinuteSelector(
             unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
     )
+}
+
+@Composable
+internal fun DurationPickerHeader(
+    modifier: Modifier = Modifier,
+    title: String,
+) = Box(
+    modifier = modifier.padding(start = 24.dp, end = 24.dp, top = 24.dp).fillMaxWidth(),
+) {
+    Text(
+        text = title,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = MaterialTheme.typography.labelMedium,
+    )
+}
+
+@Composable
+internal fun DurationPickerActions(
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    showCurrentTimeSelector: Boolean = false,
+    onCurrentTimeChoose: (() -> Unit)? = null,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) = Row(
+    modifier = modifier.fillMaxWidth().padding(bottom = 20.dp, start = 16.dp, end = 24.dp),
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+    verticalAlignment = Alignment.CenterVertically,
+) {
+    if (showCurrentTimeSelector && onCurrentTimeChoose != null) {
+        IconButton(onClick = onCurrentTimeChoose) {
+            Icon(
+                painter = painterResource(StudyAssistantRes.icons.timeOutline),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+    }
+    Spacer(modifier = Modifier.weight(1f))
+    TextButton(onClick = onDismiss) {
+        Text(
+            text = StudyAssistantRes.strings.cancelTitle,
+            maxLines = 1,
+        )
+    }
+    TextButton(enabled = enabled, onClick = onConfirm) {
+        Text(
+            text = StudyAssistantRes.strings.selectConfirmTitle,
+            maxLines = 1,
+        )
+    }
 }

@@ -16,38 +16,36 @@
 
 package ru.aleshin.studyassistant.core.data.repositories
 
-import dev.gitlive.firebase.auth.FirebaseUser
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteDataAuthException
+import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.domain.entities.auth.AuthCredentials
+import ru.aleshin.studyassistant.core.domain.entities.users.AuthUser
+import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
-import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSourceOld
+import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
  */
 class AuthRepositoryImpl(
-    private val remoteDataSource: AuthRemoteDataSourceOld,
+    private val remoteDataSource: AuthRemoteDataSource,
 ) : AuthRepository {
 
-    override suspend fun registerByEmail(credentials: AuthCredentials): FirebaseUser {
+    override suspend fun registerByEmail(credentials: AuthCredentials): AuthUser {
         val user = remoteDataSource.createUserWithEmail(
             email = credentials.email,
-            password = credentials.password
+            password = credentials.password,
+            name = credentials.username,
         )
-        return user ?: throw AppwriteDataAuthException()
+        return user?.mapToDomain() ?: throw AppwriteDataAuthException()
     }
 
-    override suspend fun signInWithEmail(credentials: AuthCredentials): FirebaseUser {
+    override suspend fun signInWithEmail(credentials: AuthCredentials): UserSession {
         val user = remoteDataSource.signInWithEmail(
             email = credentials.email,
             password = credentials.password
         )
-        return user ?: throw AppwriteDataAuthException()
-    }
-
-    override suspend fun signInViaGoogle(idToken: String?): FirebaseUser {
-        val user = remoteDataSource.signInViaGoogle(idToken)
-        return user ?: throw AppwriteDataAuthException()
+        return user.mapToDomain()
     }
 
     override suspend fun signOut() {

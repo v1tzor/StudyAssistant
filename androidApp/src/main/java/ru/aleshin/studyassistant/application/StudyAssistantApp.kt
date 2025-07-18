@@ -57,11 +57,13 @@ class StudyAssistantApp : BaseFlavorApplication(), SingletonSketch.Factory {
             in Build.VERSION_CODES.O..Build.VERSION_CODES.Q ->
                 vmPolicyBuilder
                     .detectContentUriWithoutPermission()
+
             in Build.VERSION_CODES.Q..Build.VERSION_CODES.S ->
                 vmPolicyBuilder
                     .detectContentUriWithoutPermission()
                     .detectCredentialProtectedWhileLocked()
                     .detectImplicitDirectBoot()
+
             in Build.VERSION_CODES.S..Int.MAX_VALUE ->
                 vmPolicyBuilder
                     .detectContentUriWithoutPermission()
@@ -69,6 +71,7 @@ class StudyAssistantApp : BaseFlavorApplication(), SingletonSketch.Factory {
                     .detectImplicitDirectBoot()
                     .detectIncorrectContextUse()
                     .detectUnsafeIntentLaunch()
+
             else -> vmPolicyBuilder
         }.build()
 

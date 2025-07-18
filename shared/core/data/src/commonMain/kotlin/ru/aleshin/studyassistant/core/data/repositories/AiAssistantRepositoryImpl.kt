@@ -79,12 +79,6 @@ class AiAssistantRepositoryImpl(
         }
         val chatHistory = localDataSource.fetchChatHistoryById(chatId).first()
         val messages = chatHistory?.messages?.map { it.mapToDomain().mapToRemote() }?.optimisedMessagesForSend()
-        if (messages != null && messages.size >= 15) {
-            Logger.i("test1") { "optimisedMessagesForSend:" }
-            messages.forEach {
-                Logger.i("test1") { it.toString() }
-            }
-        }
         if (messages.isNullOrEmpty()) throw NoSuchElementException()
         val request = ChatCompletionRequest(
             model = ChatModel.DEEPSEEK_CHAT.model,

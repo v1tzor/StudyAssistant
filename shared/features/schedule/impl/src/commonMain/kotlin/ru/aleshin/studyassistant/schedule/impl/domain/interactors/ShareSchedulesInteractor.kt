@@ -40,17 +40,16 @@ internal interface ShareSchedulesInteractor {
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : ShareSchedulesInteractor {
 
-        private val currentUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchReceivedSharedSchedules(shareId: UID) = eitherWrapper.wrapFlow {
-            shareRepository.fetchShareSchedulesByUser(currentUser).map { sharedSchedules ->
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            shareRepository.fetchShareSchedulesByUser(targetUser).map { sharedSchedules ->
                 checkNotNull(sharedSchedules.received[shareId])
             }
         }
 
         override suspend fun acceptOrRejectSchedules(schedules: ReceivedMediatedSchedules) = eitherWrapper.wrapUnit {
-            val currentSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(currentUser)
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            val currentSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(targetUser)
             val senderSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(schedules.sender.uid)
 
             val updatedCurrentSharedSchedules = currentSharedSchedules.copy(
@@ -68,7 +67,7 @@ internal interface ShareSchedulesInteractor {
 
             shareRepository.addOrUpdateSharedSchedules(
                 schedules = updatedCurrentSharedSchedules,
-                targetUser = currentUser,
+                targetUser = targetUser,
             )
             shareRepository.addOrUpdateSharedSchedules(
                 schedules = updatedSenderSharedSchedules,

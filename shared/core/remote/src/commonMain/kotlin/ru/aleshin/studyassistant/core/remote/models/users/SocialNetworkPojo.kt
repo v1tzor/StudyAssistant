@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.remote.models.users
 
 import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
 
 /**
@@ -24,6 +25,7 @@ import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
  */
 @Serializable
 data class SocialNetworkPojo(
+    val uid: UID,
     val type: String = SocialNetworkType.OTHER.name,
     val otherType: String? = null,
     val data: String = "",

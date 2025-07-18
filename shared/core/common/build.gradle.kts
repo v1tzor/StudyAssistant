@@ -48,8 +48,6 @@ kotlin {
             api(libs.kodein.core)
             implementation(libs.kodein.compose)
 
-            implementation(libs.bundles.firebase)
-
             implementation(libs.filekit.core)
 
             implementation(libs.bundles.voyager)

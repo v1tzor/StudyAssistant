@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.core.remote.models.shared.homeworks
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.models.tasks.MediatedHomeworkPojo
-import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
+import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojoDetails
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
@@ -29,6 +29,6 @@ data class ReceivedMediatedHomeworksDetailsPojo(
     val uid: UID,
     val date: Long,
     val sendDate: Long,
-    val sender: AppUserPojo,
+    val sender: AppUserPojoDetails,
     val homeworks: List<MediatedHomeworkPojo>,
 )

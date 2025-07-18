@@ -22,9 +22,11 @@ import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
+import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 
@@ -37,8 +39,10 @@ public interface AuthFeatureDependencies : BaseFeatureDependencies {
     public val authRepository: AuthRepository
     public val messageRepository: MessageRepository
     public val usersRepository: UsersRepository
+    public val generalSettingsRepository: GeneralSettingsRepository
     public val manageUserRepository: ManageUserRepository
     public val deviceInfoProvider: DeviceInfoProvider
+    public val accountService: AccountService
     public val coroutineManager: CoroutineManager
     public val appService: AppService
     public val crashlyticsService: CrashlyticsService

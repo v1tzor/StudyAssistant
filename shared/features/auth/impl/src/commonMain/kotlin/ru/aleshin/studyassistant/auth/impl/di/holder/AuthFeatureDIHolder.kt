@@ -34,9 +34,11 @@ import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
+import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 
@@ -57,8 +59,10 @@ public object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeat
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
                 bindSingleton<MessageRepository> { dependencies.messageRepository }
+                bindSingleton<GeneralSettingsRepository> { dependencies.generalSettingsRepository }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
+                bindSingleton<AccountService> { dependencies.accountService }
                 bindSingleton<AppService> { dependencies.appService }
                 bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
                 bindSingleton<AuthFeatureApi> {

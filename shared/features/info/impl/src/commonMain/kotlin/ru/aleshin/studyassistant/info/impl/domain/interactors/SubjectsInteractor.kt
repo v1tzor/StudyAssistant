@@ -40,14 +40,13 @@ internal interface SubjectsInteractor {
         private val eitherWrapper: InfoEitherWrapper,
     ) : SubjectsInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchSubjectsByOrganization(organizationId: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             subjectsRepository.fetchAllSubjectsByOrganization(organizationId, targetUser)
         }
 
         override suspend fun deleteSubjectById(targetId: UID) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             subjectsRepository.deleteSubject(targetId, targetUser)
         }
     }

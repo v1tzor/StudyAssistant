@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.organizations
 
-import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToRemoteData
@@ -95,11 +95,11 @@ fun Organization.mapToRemoteData(userId: UID) = OrganizationPojo(
     fullName = fullName,
     type = type.name,
     avatar = avatar,
-    scheduleTimeIntervals = scheduleTimeIntervals.mapToRemoteDate(),
-    emails = emails.map { it.mapToRemoteData() },
-    phones = phones.map { it.mapToRemoteData() },
-    locations = locations.map { it.mapToRemoteData() },
-    webs = webs.map { it.mapToRemoteData() },
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToRemoteDate().toJson(),
+    emails = emails.map { it.mapToRemoteData().toJson() },
+    phones = phones.map { it.mapToRemoteData().toJson() },
+    locations = locations.map { it.mapToRemoteData().toJson() },
+    webs = webs.map { it.mapToRemoteData().toJson() },
     offices = offices,
     hide = isHide,
 )
@@ -127,11 +127,11 @@ fun Organization.mapToLocalData() = OrganizationEntity(
     full_name = fullName,
     type = type.toString(),
     avatar = avatar,
-    schedule_time_intervals = Json.encodeToString(scheduleTimeIntervals.mapToLocalDate()),
-    emails = emails.map { Json.encodeToString(it.mapToLocalData()) },
-    phones = phones.map { Json.encodeToString(it.mapToLocalData()) },
-    locations = locations.map { Json.encodeToString(it.mapToLocalData()) },
-    webs = webs.map { Json.encodeToString(it.mapToLocalData()) },
+    schedule_time_intervals = scheduleTimeIntervals.mapToLocalDate().toJson(),
+    emails = emails.map { it.mapToLocalData().toJson() },
+    phones = phones.map { it.mapToLocalData().toJson() },
+    locations = locations.map { it.mapToLocalData().toJson() },
+    webs = webs.map { it.mapToLocalData().toJson() },
     offices = offices,
     is_hide = if (isHide) 1L else 0L,
 )

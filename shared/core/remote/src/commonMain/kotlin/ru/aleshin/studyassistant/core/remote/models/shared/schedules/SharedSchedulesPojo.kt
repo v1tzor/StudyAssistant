@@ -17,15 +17,14 @@
 package ru.aleshin.studyassistant.core.remote.models.shared.schedules
 
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.common.functional.UID
 
 /**
  * @author Stanislav Aleshin on 14.08.2024.
  */
 @Serializable
 data class SharedSchedulesPojo(
-    val sent: Map<UID, SentMediatedSchedulesPojo> = emptyMap(),
-    val received: Map<UID, ReceivedMediatedSchedulesPojo> = emptyMap(),
+    val sent: List<String> = emptyList(),
+    val received: List<String> = emptyList(),
 ) {
     companion object {
         fun default() = SharedSchedulesPojo()

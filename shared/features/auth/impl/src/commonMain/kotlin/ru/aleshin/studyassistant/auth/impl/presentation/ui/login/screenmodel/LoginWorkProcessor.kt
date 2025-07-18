@@ -35,6 +35,7 @@ import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
+import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 
 /**
@@ -52,7 +53,7 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
         override suspend fun work(command: LoginWorkCommand) = when (command) {
             is LoginWorkCommand.CheckGoogleAvailable -> checkGoogleAvailableWork()
             is LoginWorkCommand.LoginWithEmail -> loginWithEmailWork(command.credentials)
-            is LoginWorkCommand.LoginWithGoogle -> loginWithGoogleWork(command.idToken)
+            is LoginWorkCommand.SuccessOAuthLogin -> successOAuthLoginWork(command.session)
         }
 
         private fun checkGoogleAvailableWork() = flow {
@@ -68,8 +69,12 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
             )
             authInteractor.loginWithEmail(credentials.mapToDomain(), device).handle(
                 onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
-                onRightAction = {
-                    val targetScreen = screenProvider.provideTabNavigationScreen()
+                onRightAction = { authUser ->
+                    val targetScreen = if (authUser.emailVerification) {
+                        screenProvider.provideTabNavigationScreen()
+                    } else {
+                        screenProvider.provideFeatureScreen(AuthScreen.Verification)
+                    }
                     emit(EffectResult(LoginEffect.ReplaceGlobalScreen(targetScreen)))
                 }
             )
@@ -79,18 +84,18 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
             emit(ActionResult(LoginAction.UpdateLoading(false)))
         }
 
-        private fun loginWithGoogleWork(idToken: String?) = flow<LoginWorkResult> {
+        private fun successOAuthLoginWork(session: UserSession) = flow<LoginWorkResult> {
             val device = UserDevice.specifyDevice(
                 platform = deviceInfoProvider.fetchDevicePlatform(),
                 deviceId = deviceInfoProvider.fetchDeviceId(),
                 deviceName = deviceInfoProvider.fetchDeviceName(),
             )
-            authInteractor.loginViaGoogle(idToken, device).handle(
+            authInteractor.confirmOAuthLogin(session, device).handle(
                 onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
                 onRightAction = { result ->
                     val targetScreen = if (result.isNewUser) {
                         screenProvider.providePreviewScreen(PreviewScreen.Setup)
-                    } else if (!result.firebaseUser.isEmailVerified) {
+                    } else if (!result.authUser.emailVerification) {
                         screenProvider.provideFeatureScreen(AuthScreen.Verification)
                     } else {
                         screenProvider.provideTabNavigationScreen()
@@ -109,7 +114,7 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
 internal sealed class LoginWorkCommand : WorkCommand {
     data object CheckGoogleAvailable : LoginWorkCommand()
     data class LoginWithEmail(val credentials: LoginCredentialsUi) : LoginWorkCommand()
-    data class LoginWithGoogle(val idToken: String?) : LoginWorkCommand()
+    data class SuccessOAuthLogin(val session: UserSession) : LoginWorkCommand()
 }
 
 internal typealias LoginWorkResult = WorkResult<LoginAction, LoginEffect>

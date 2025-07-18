@@ -16,20 +16,25 @@
 
 package ru.aleshin.studyassistant.core.common.platform.services
 
+import ru.aleshin.studyassistant.core.common.functional.UID
+
 /**
  * @author Stanislav Aleshin on 11.09.2024.
  */
 interface CrashlyticsService {
 
     fun sendLog(message: String)
-    
+
     fun recordException(tag: String, message: String, exception: Throwable)
 
     fun initializeService()
+
+    fun setupUser(id: UID?)
 
     class Empty : CrashlyticsService {
         override fun sendLog(message: String) = Unit
         override fun recordException(tag: String, message: String, exception: Throwable) = Unit
         override fun initializeService() = Unit
+        override fun setupUser(id: UID?) = Unit
     }
 }

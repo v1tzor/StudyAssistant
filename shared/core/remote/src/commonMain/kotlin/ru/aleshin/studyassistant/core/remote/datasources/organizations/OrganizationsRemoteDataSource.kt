@@ -16,27 +16,29 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.organizations
 
-import dev.gitlive.firebase.firestore.DocumentReference
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
-import ru.aleshin.studyassistant.core.common.extensions.deleteAll
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
-import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
-import ru.aleshin.studyassistant.core.remote.appwrite.storage.AppwriteStorage
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
+import ru.aleshin.studyassistant.core.remote.appwrite.storage.StorageService
 import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Employee
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Organizations
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Storage.BUCKET
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Subjects
 import ru.aleshin.studyassistant.core.remote.mappers.organizations.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
+import ru.aleshin.studyassistant.core.remote.models.appwrite.extractBucketIdFromFileUrl
+import ru.aleshin.studyassistant.core.remote.models.appwrite.extractIdFromFileUrl
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationPojo
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationShortPojo
@@ -50,18 +52,26 @@ interface OrganizationsRemoteDataSource {
 
     suspend fun addOrUpdateOrganization(organization: OrganizationPojo, targetUser: UID): UID
     suspend fun addOrUpdateOrganizationsGroup(organizations: List<OrganizationPojo>, targetUser: UID)
-    suspend fun uploadAvatar(uid: UID, file: InputFile, targetUser: UID): String
+    suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile, targetUser: UID): String
     suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationDetailsPojo?>
-    suspend fun fetchOrganizationsById(uid: List<UID>, targetUser: UID): Flow<List<OrganizationDetailsPojo>>
+    suspend fun fetchOrganizationsById(
+        uid: List<UID>,
+        targetUser: UID
+    ): Flow<List<OrganizationDetailsPojo>>
+
     suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShortPojo?>
-    suspend fun fetchAllOrganization(targetUser: UID, showHide: Boolean = false): Flow<List<OrganizationDetailsPojo>>
+    suspend fun fetchAllOrganization(
+        targetUser: UID,
+        showHide: Boolean = false
+    ): Flow<List<OrganizationDetailsPojo>>
+
     suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShortPojo>>
     suspend fun deleteAllOrganizations(targetUser: UID)
-    suspend fun deleteAvatar(uid: UID, targetUser: UID)
+    suspend fun deleteAvatar(avatarUrl: String, targetUser: UID)
 
     class Base(
-        private val database: FirebaseFirestore,
-        private val storage: AppwriteStorage,
+        private val database: DatabaseService,
+        private val storage: StorageService,
     ) : OrganizationsRemoteDataSource {
 
         override suspend fun addOrUpdateOrganization(
@@ -69,15 +79,19 @@ interface OrganizationsRemoteDataSource {
             targetUser: UID
         ): UID {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
 
             val organizationId = organization.uid.takeIf { it.isNotBlank() } ?: randomUUID()
 
-            return reference.document(organizationId).set(organization.copy(uid = organizationId)).let {
-                return@let organizationId
-            }
+            database.upsertDocument(
+                databaseId = Organizations.DATABASE_ID,
+                collectionId = Organizations.COLLECTION_ID,
+                documentId = organizationId,
+                data = organization.copy(uid = organizationId),
+                permissions = Permission.onlyUserData(targetUser),
+                nestedType = OrganizationPojo.serializer(),
+            )
+
+            return organizationId
         }
 
         override suspend fun addOrUpdateOrganizationsGroup(
@@ -85,29 +99,21 @@ interface OrganizationsRemoteDataSource {
             targetUser: UID
         ) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
-
-            database.batch().apply {
-                organizations.forEach { organization ->
-                    val uid = organization.uid.takeIf { it.isNotBlank() } ?: randomUUID()
-                    set(reference.document(uid), organization.copy(uid = uid))
-                }
-                return@apply commit()
-            }
+            organizations.forEach { organization -> addOrUpdateOrganization(organization, targetUser) }
         }
 
-        override suspend fun uploadAvatar(uid: UID, file: InputFile, targetUser: UID): String {
+        override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile, targetUser: UID): String {
             if (targetUser.isEmpty()) throw AppwriteUserException()
+
+            if (!oldAvatarUrl.isNullOrBlank()) {
+                deleteAvatar(oldAvatarUrl, targetUser)
+            }
 
             val file = storage.createFile(
                 bucketId = BUCKET,
                 fileId = randomUUID(),
-                fileBytes = file.fileBytes,
-                filename = file.filename,
-                mimeType = file.mimeType,
-                permissions = Permission.onlyUsersVisibleData(targetUser),
+                file = file,
+                permissions = Permission.avatarData(targetUser),
             )
 
             return file.getDownloadUrl()
@@ -119,13 +125,15 @@ interface OrganizationsRemoteDataSource {
         ): Flow<OrganizationDetailsPojo?> {
             if (uid.isEmpty()) return flowOf(null)
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val organizationFlow = userDataRoot.collection(UserData.ORGANIZATIONS).document(uid)
-                .snapshotFlowGet<OrganizationPojo>()
-                .flatMapToDetails(userDataRoot)
+            val organizationFlow = database.getDocumentFlow(
+                databaseId = Organizations.DATABASE_ID,
+                collectionId = Organizations.COLLECTION_ID,
+                documentId = uid,
+                nestedType = OrganizationPojo.serializer(),
+            )
 
-            return organizationFlow
+            return organizationFlow.flatMapToDetails()
         }
 
         override suspend fun fetchOrganizationsById(
@@ -133,13 +141,15 @@ interface OrganizationsRemoteDataSource {
             targetUser: UID,
         ): Flow<List<OrganizationDetailsPojo>> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.ORGANIZATIONS).where {
-                UserData.UID inArray uid
-            }
+            val organizationFlow = database.listDocumentsFlow(
+                databaseId = Organizations.DATABASE_ID,
+                collectionId = Organizations.COLLECTION_ID,
+                queries = listOf(Query.equal(Organizations.UID, uid)),
+                nestedType = OrganizationPojo.serializer(),
+            )
 
-            return reference.snapshotListFlowGet<OrganizationPojo>().flatMapListToDetails(userDataRoot)
+            return organizationFlow.flatMapListToDetails()
         }
 
         override suspend fun fetchShortOrganizationById(
@@ -147,9 +157,15 @@ interface OrganizationsRemoteDataSource {
             targetUser: UID
         ): Flow<OrganizationShortPojo?> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            return userDataRoot.collection(UserData.ORGANIZATIONS).document(uid).snapshotFlowGet()
+            val organizationFlow = database.getDocumentFlow(
+                databaseId = Organizations.DATABASE_ID,
+                collectionId = Organizations.COLLECTION_ID,
+                documentId = uid,
+                nestedType = OrganizationShortPojo.serializer(),
+            )
+
+            return organizationFlow
         }
 
         override suspend fun fetchAllOrganization(
@@ -157,63 +173,90 @@ interface OrganizationsRemoteDataSource {
             showHide: Boolean,
         ): Flow<List<OrganizationDetailsPojo>> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = if (showHide) {
-                userDataRoot.collection(UserData.ORGANIZATIONS)
-            } else {
-                userDataRoot.collection(UserData.ORGANIZATIONS).where {
-                    UserData.ORGANIZATION_HIDE equalTo false
-                }
-            }
+            val organizationFlow = database.listDocumentsFlow(
+                databaseId = Organizations.DATABASE_ID,
+                collectionId = Organizations.COLLECTION_ID,
+                queries = if (showHide) {
+                    listOf(Query.equal(Organizations.USER_ID, targetUser))
+                } else {
+                    listOf(
+                        Query.equal(Organizations.USER_ID, targetUser),
+                        Query.equal(Organizations.HIDE, false)
+                    )
+                },
+                nestedType = OrganizationPojo.serializer(),
+            )
 
-            return reference.snapshotListFlowGet<OrganizationPojo>().flatMapListToDetails(userDataRoot)
+            return organizationFlow.flatMapListToDetails()
         }
 
         override suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShortPojo>> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            return userDataRoot
-                .collection(UserData.ORGANIZATIONS)
-                .where { UserData.ORGANIZATION_HIDE equalTo false }
-                .snapshotListFlowGet<OrganizationShortPojo>()
+            val organizationFlow = database.listDocumentsFlow(
+                databaseId = Organizations.DATABASE_ID,
+                collectionId = Organizations.COLLECTION_ID,
+                queries = listOf(
+                    Query.equal(Organizations.USER_ID, targetUser),
+                    Query.equal(Organizations.HIDE, false)
+                ),
+                nestedType = OrganizationShortPojo.serializer(),
+            )
+
+            return organizationFlow
         }
 
         override suspend fun deleteAllOrganizations(targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+            val organizationsFlow = fetchAllOrganization(targetUser, true)
 
-            val reference = userDataRoot.collection(UserData.ORGANIZATIONS)
+            organizationsFlow.first().forEach { organization ->
 
-            database.deleteAll(reference)
+                // Premium avatars are not deleted
+
+                database.deleteDocument(
+                    databaseId = Organizations.DATABASE_ID,
+                    collectionId = Organizations.COLLECTION_ID,
+                    documentId = organization.uid
+                )
+            }
         }
 
-        override suspend fun deleteAvatar(uid: UID, targetUser: UID) {
+        override suspend fun deleteAvatar(avatarUrl: String, targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            storage.deleteFile(BUCKET, uid)
+            require(avatarUrl.isNotBlank()) { "Organization avatar url is empty" }
+
+            storage.deleteFile(
+                bucketId = avatarUrl.extractBucketIdFromFileUrl(),
+                fileId = avatarUrl.extractIdFromFileUrl(),
+            )
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
-        private fun Flow<List<OrganizationPojo>>.flatMapListToDetails(
-            userDataRoot: DocumentReference
-        ): Flow<List<OrganizationDetailsPojo>> = flatMapLatest { organizations ->
+        private fun Flow<List<OrganizationPojo>>.flatMapListToDetails() = flatMapLatest { organizations ->
             if (organizations.isEmpty()) {
                 flowOf(emptyList())
             } else {
-                val organizationsIds = organizations.map { it.uid }.toSet()
+                val organizationsIds = organizations.map { it.uid }.toSet().toList()
 
-                val employeesMapFlow = userDataRoot
-                    .collection(UserData.EMPLOYEE)
-                    .where { UserData.ORGANIZATION_ID inArray organizationsIds.toList() }
-                    .snapshotListFlowGet<EmployeePojo>()
-                    .map { items -> items.groupBy { it.organizationId } }
+                val subjectsMapFlow = database.listDocumentsFlow(
+                    databaseId = Subjects.DATABASE_ID,
+                    collectionId = Subjects.COLLECTION_ID,
+                    queries = listOf(Query.equal(Subjects.ORGANIZATION_ID, organizationsIds)),
+                    nestedType = SubjectPojo.serializer(),
+                ).map { items ->
+                    items.groupBy { it.organizationId }
+                }
 
-                val subjectsMapFlow = userDataRoot
-                    .collection(UserData.SUBJECTS)
-                    .where { UserData.ORGANIZATION_ID inArray organizationsIds.toList() }
-                    .snapshotListFlowGet<SubjectPojo>()
-                    .map { items -> items.groupBy { it.organizationId } }
+                val employeesMapFlow = database.listDocumentsFlow(
+                    databaseId = Employee.DATABASE_ID,
+                    collectionId = Employee.COLLECTION_ID,
+                    queries = listOf(Query.equal(Employee.ORGANIZATION_ID, organizationsIds)),
+                    nestedType = EmployeePojo.serializer(),
+                ).map { items ->
+                    items.groupBy { it.organizationId }
+                }
 
                 combine(
                     flowOf(organizations),
@@ -233,11 +276,9 @@ interface OrganizationsRemoteDataSource {
             }
         }
 
-        private fun Flow<OrganizationPojo?>.flatMapToDetails(
-            userDataRoot: DocumentReference
-        ): Flow<OrganizationDetailsPojo?> {
+        private fun Flow<OrganizationPojo?>.flatMapToDetails(): Flow<OrganizationDetailsPojo?> {
             return map { it?.let { listOf(it) } ?: emptyList() }
-                .flatMapListToDetails(userDataRoot)
+                .flatMapListToDetails()
                 .map { it.getOrNull(0) }
         }
     }

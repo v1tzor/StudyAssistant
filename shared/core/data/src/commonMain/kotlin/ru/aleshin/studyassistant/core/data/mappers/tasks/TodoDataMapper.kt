@@ -17,17 +17,18 @@
 package ru.aleshin.studyassistant.core.data.mappers.tasks
 
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoNotifications
 import ru.aleshin.studyassistant.core.remote.models.tasks.TodoNotificationsPojo
-import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojo
+import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojoDetails
 import ru.aleshin.studyassistant.sqldelight.tasks.TodoEntity
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.
  */
-fun TodoPojo.mapToDomain() = Todo(
+fun TodoPojoDetails.mapToDomain() = Todo(
     uid = uid,
     deadline = deadline?.mapEpochTimeToInstant(),
     name = name,
@@ -65,8 +66,9 @@ fun TodoEntity.mapToDomain() = Todo(
     completeDate = complete_date?.mapEpochTimeToInstant(),
 )
 
-fun Todo.mapToRemoteData() = TodoPojo(
+fun Todo.mapToRemoteData(userId: UID) = TodoPojoDetails(
     uid = uid,
+    userId = userId,
     deadline = deadline?.toEpochMilliseconds(),
     name = name,
     description = description,

@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.data
 import ru.aleshin.studyassistant.android.BuildConfig
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.ok.tracer.CoreTracerConfiguration
+import ru.ok.tracer.Tracer
 import ru.ok.tracer.TracerConfiguration
 import ru.ok.tracer.crash.report.CrashFreeConfiguration
 import ru.ok.tracer.crash.report.CrashReportConfiguration
@@ -36,6 +37,10 @@ class CrashlyticsServiceImpl : CrashlyticsService {
 
     override fun recordException(tag: String, message: String, exception: Throwable) {
         TracerCrashReport.report(exception, tag)
+    }
+
+    override fun setupUser(id: UID?) {
+        Tracer.setUserId(id)
     }
 
     override fun initializeService() = Unit

@@ -38,6 +38,7 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupP
 @Immutable
 internal data class SetupViewState(
     val profile: AppUserUi? = null,
+    val isPaidUser: Boolean = false,
     val currentPage: SetupPage = SetupPage.PROFILE,
     val actionWithProfileAvatar: ActionWithAvatar = ActionWithAvatar.None(null),
     val organization: OrganizationUi? = null,
@@ -59,13 +60,16 @@ internal sealed class SetupEvent : BaseEvent {
     data object SaveOrganizationInfo : SetupEvent()
     data object SaveCalendarInfo : SetupEvent()
     data object NavigateToWeekScheduleEditor : SetupEvent()
+    data object NavigateToBilling : SetupEvent()
     data object NavigateToSchedule : SetupEvent()
+    data object NavigateToBack : SetupEvent()
 }
 
 internal sealed class SetupEffect : BaseUiEffect {
     data class ShowError(val failures: PreviewFailures) : SetupEffect()
     data class NavigateToGlobalScreen(val pushScreen: Screen) : SetupEffect()
     data class ReplaceGlobalScreen(val screen: Screen) : SetupEffect()
+    data object NavigateToBack : SetupEffect()
 }
 
 internal sealed class SetupAction : BaseAction {
@@ -76,6 +80,7 @@ internal sealed class SetupAction : BaseAction {
         val calendarSettings: CalendarSettingsUi
     ) : SetupAction()
     data class UpdateUserProfile(val profile: AppUserUi) : SetupAction()
+    data class UpdateUserPaidStatus(val isPaid: Boolean) : SetupAction()
     data class UpdateActionWithProfileAvatar(val action: ActionWithAvatar) : SetupAction()
     data class UpdateOrganization(val organization: OrganizationUi) : SetupAction()
     data class UpdateActionWithOrganizationAvatar(val action: ActionWithAvatar) : SetupAction()

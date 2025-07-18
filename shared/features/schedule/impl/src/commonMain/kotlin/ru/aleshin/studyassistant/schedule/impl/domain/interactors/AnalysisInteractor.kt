@@ -17,16 +17,14 @@
 package ru.aleshin.studyassistant.schedule.impl.domain.interactors
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis
 import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.CLASS_MINUTE_DURATION_RATE
 import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.MAX_RATE
@@ -74,11 +72,9 @@ internal interface AnalysisInteractor {
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : AnalysisInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchWeekAnalysis(weekTimeRange: TimeRange) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val calendarSettings = calendarSettingsRepository.fetchSettings(targetUser).first()
             val week = weekTimeRange.from.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
             val holidays = calendarSettings.holidays
@@ -88,38 +84,37 @@ internal interface AnalysisInteractor {
             val todosFlow = todoRepository.fetchActiveTodos(targetUser)
             val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(weekTimeRange, targetUser)
 
-            return@wrapFlow baseSchedulesFlow.flatMapLatest { baseSchedules ->
-                customSchedulesFlow.flatMapLatest { customSchedules ->
-                    homeworksFlow.flatMapLatest { homeworks ->
-                        todosFlow.map { todos ->
-                            val groupedHomeworks = homeworks.groupBy { it.deadline.startThisDay() }
-                            val weekAnalysis = mutableListOf<DailyAnalysis>()
+            combine(
+                baseSchedulesFlow,
+                customSchedulesFlow,
+                todosFlow,
+                homeworksFlow,
+            ) { baseSchedules, customSchedules, todos, homeworks ->
+                val groupedHomeworks = homeworks.groupBy { it.deadline.startThisDay() }
+                val weekAnalysis = mutableListOf<DailyAnalysis>()
 
-                            weekTimeRange.periodDates().forEach { instant ->
-                                val customSchedule = customSchedules.find { it.date.equalsDay(instant) }
-                                val baseSchedule = baseSchedules.find { it.dayOfWeek == instant.dateTime().dayOfWeek }
-                                val analysis = fetchDailyAnalysis(
-                                    date = instant,
-                                    baseSchedule = baseSchedule?.copy(
-                                        classes = baseSchedule.classes.filter { classModel ->
-                                            holidays.none {
-                                                val dateFilter = TimeRange(it.start, it.end).containsDate(instant)
-                                                val orgFilter = it.organizations.contains(classModel.organization.uid)
-                                                return@none dateFilter && orgFilter
-                                            }
-                                        }
-                                    ),
-                                    customSchedule = customSchedule,
-                                    groupedHomeworks = groupedHomeworks,
-                                    todos = todos,
-                                )
-                                weekAnalysis.add(analysis)
+                weekTimeRange.periodDates().forEach { instant ->
+                    val customSchedule = customSchedules.find { it.date.equalsDay(instant) }
+                    val baseSchedule = baseSchedules.find { it.dayOfWeek == instant.dateTime().dayOfWeek }
+                    val analysis = fetchDailyAnalysis(
+                        date = instant,
+                        baseSchedule = baseSchedule?.copy(
+                            classes = baseSchedule.classes.filter { classModel ->
+                                holidays.none {
+                                    val dateFilter = TimeRange(it.start, it.end).containsDate(instant)
+                                    val orgFilter = it.organizations.contains(classModel.organization.uid)
+                                    return@none dateFilter && orgFilter
+                                }
                             }
-
-                            return@map weekAnalysis
-                        }
-                    }
+                        ),
+                        customSchedule = customSchedule,
+                        groupedHomeworks = groupedHomeworks,
+                        todos = todos,
+                    )
+                    weekAnalysis.add(analysis)
                 }
+
+                return@combine weekAnalysis
             }
         }
 

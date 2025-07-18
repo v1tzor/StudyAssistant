@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.core.remote.models.schedule
 
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.models.classes.ClassPojo
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
@@ -26,9 +25,10 @@ import ru.aleshin.studyassistant.core.remote.models.classes.ClassPojo
 @Serializable
 data class BaseSchedulePojo(
     val uid: UID,
+    val userId: UID,
     val dateVersionFrom: Long,
     val dateVersionTo: Long,
     val weekDayOfWeek: String,
     val week: String,
-    val classes: Map<UID, ClassPojo>,
+    val classes: List<String>,
 )

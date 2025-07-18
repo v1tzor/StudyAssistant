@@ -25,6 +25,6 @@ import ru.aleshin.studyassistant.domain.entities.MainFailures
  */
 fun MainFailures.mapToMessage(strings: StudyAssistantStrings) = when (this) {
     is MainFailures.IapError -> type.mapToString(strings)
-    is MainFailures.FirebaseNetworkError -> strings.networkErrorMessage
+    is MainFailures.NetworkError -> strings.networkErrorMessage
     is MainFailures.OtherError -> strings.otherErrorMessage
 }

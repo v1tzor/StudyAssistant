@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
  */
 @Parcelize
 internal data class SubscribeInfoUi(
+    val uid: UID,
     val deviceId: UID,
     val purchaseId: UID,
     val productId: UID,

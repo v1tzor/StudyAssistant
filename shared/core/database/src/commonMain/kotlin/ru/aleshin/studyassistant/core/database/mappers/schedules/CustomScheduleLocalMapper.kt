@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.core.database.mappers.schedules
 
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.extensions.fromJson
+import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.database.models.classes.ClassDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.classes.ClassEntity
 import ru.aleshin.studyassistant.core.database.models.schedule.CustomScheduleDetailsEntity
@@ -29,7 +29,7 @@ import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleEntity
 fun CustomScheduleDetailsEntity.mapToBase() = CustomScheduleEntity(
     uid = uid,
     date = date,
-    classes = classes.map { Json.encodeToString(it.mapToBase()) },
+    classes = classes.map { it.mapToBase().toJson<ClassEntity>() },
 )
 
 suspend fun CustomScheduleEntity.mapToDetails(
@@ -37,5 +37,5 @@ suspend fun CustomScheduleEntity.mapToDetails(
 ) = CustomScheduleDetailsEntity(
     uid = uid,
     date = date,
-    classes = classes.map { classMapper(Json.decodeFromString<ClassEntity>(it)) },
+    classes = classes.map { classMapper(it.fromJson<ClassEntity>()) },
 )

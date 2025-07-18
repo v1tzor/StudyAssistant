@@ -44,10 +44,8 @@ internal interface HomeworkInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : HomeworkInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun addOrUpdateHomework(homework: Homework) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             homeworksRepository.addOrUpdateHomework(homework, targetUser).apply {
                 val linkedGoal = goalsRepository.fetchGoalByContentId(homework.uid, targetUser).first()
                 if (linkedGoal != null) {
@@ -57,10 +55,12 @@ internal interface HomeworkInteractor {
         }
 
         override suspend fun fetchHomeworkById(homeworkId: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             homeworksRepository.fetchHomeworkById(homeworkId, targetUser)
         }
 
         override suspend fun deleteHomework(targetId: UID) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             homeworksRepository.deleteHomework(targetId, targetUser)
         }
     }

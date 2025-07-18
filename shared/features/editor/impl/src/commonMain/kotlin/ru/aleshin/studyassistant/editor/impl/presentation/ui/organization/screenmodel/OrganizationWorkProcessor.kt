@@ -74,13 +74,13 @@ internal interface OrganizationWorkProcessor :
 
             val avatar = when (actionWithAvatar) {
                 is ActionWithAvatar.Set -> {
-                    organizationInteractor.uploadAvatar(uid, actionWithAvatar.file.mapToDomain()).handleAndGet(
+                    organizationInteractor.uploadAvatar(editModel.avatar, actionWithAvatar.file.mapToDomain()).handleAndGet(
                         onLeftAction = { emit(EffectResult(OrganizationEffect.ShowError(it))).let { null } },
                         onRightAction = { it },
                     )
                 }
                 is ActionWithAvatar.Delete -> {
-                    organizationInteractor.deleteAvatar(uid).handleAndGet(
+                    organizationInteractor.deleteAvatar(editModel.avatar ?: "").handleAndGet(
                         onLeftAction = { emit(EffectResult(OrganizationEffect.ShowError(it))).let { null } },
                         onRightAction = { null },
                     )

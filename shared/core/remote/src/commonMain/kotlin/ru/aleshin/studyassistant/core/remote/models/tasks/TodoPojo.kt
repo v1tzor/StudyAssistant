@@ -21,16 +21,17 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 
 /**
- * @author Stanislav Aleshin on 01.07.2024.
+ * @author Stanislav Aleshin on 06.07.2025.
  */
 @Serializable
 data class TodoPojo(
     val uid: UID,
+    val userId: UID,
     val deadline: Long? = null,
     val name: String = "",
     val description: String? = null,
     val priority: String = TaskPriority.STANDARD.name,
-    val notifications: TodoNotificationsPojo = TodoNotificationsPojo(),
+    val notifications: String = "",
     val done: Boolean = false,
     val completeDate: Long? = null,
 )

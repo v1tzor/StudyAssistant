@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
+import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 
 /**
@@ -31,6 +32,7 @@ actual data class PlatformConfiguration constructor(
     actual val appService: AppService,
     actual val analyticsService: AnalyticsService,
     actual val crashlyticsService: CrashlyticsService,
+    actual val reviewService: ReviewService,
     actual val messagingService: MessagingService,
     actual val iapService: IapService,
 )

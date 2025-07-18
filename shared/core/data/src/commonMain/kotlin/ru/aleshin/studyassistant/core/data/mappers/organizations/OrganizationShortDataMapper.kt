@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.organizations
 
+import ru.aleshin.studyassistant.core.common.extensions.fromJson
+import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToRemoteData
@@ -23,6 +25,8 @@ import ru.aleshin.studyassistant.core.database.models.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationShortPojo
+import ru.aleshin.studyassistant.core.remote.models.organizations.ScheduleTimeIntervalsPojo
+import ru.aleshin.studyassistant.core.remote.models.users.ContactInfoPojo
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
@@ -32,10 +36,10 @@ fun OrganizationShortPojo.mapToDomain() = OrganizationShort(
     isMain = main,
     shortName = shortName,
     type = OrganizationType.valueOf(type),
-    locations = locations.map { it.mapToDomain() },
+    locations = locations.map { it.fromJson<ContactInfoPojo>().mapToDomain() },
     offices = offices,
     avatar = avatar,
-    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
+    scheduleTimeIntervals = scheduleTimeIntervals.fromJson<ScheduleTimeIntervalsPojo>().mapToDomain(),
 )
 
 fun OrganizationShortEntity.mapToDomain() = OrganizationShort(
@@ -55,9 +59,9 @@ fun OrganizationShort.mapToRemoteData() = OrganizationShortPojo(
     shortName = shortName,
     type = type.name,
     avatar = avatar,
-    locations = locations.map { it.mapToRemoteData() },
+    locations = locations.map { it.mapToRemoteData().toJson() },
     offices = offices,
-    scheduleTimeIntervals = scheduleTimeIntervals.mapToRemoteDate(),
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToRemoteDate().toJson(),
 )
 
 fun OrganizationShort.mapToLocalData() = OrganizationShortEntity(

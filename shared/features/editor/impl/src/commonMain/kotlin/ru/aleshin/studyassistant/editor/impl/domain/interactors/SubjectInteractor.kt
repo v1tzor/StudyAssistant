@@ -41,20 +41,20 @@ internal interface SubjectInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : SubjectInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun addOrUpdateSubject(subject: Subject) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             subjectsRepository.addOrUpdateSubject(subject, targetUser)
         }
 
         override suspend fun fetchAllSubjectsByOrganization(organizationId: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             subjectsRepository.fetchAllSubjectsByOrganization(organizationId, targetUser).map { subjects ->
                 subjects.sortedBy { subject -> subject.name }
             }
         }
 
         override suspend fun fetchSubjectById(uid: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             subjectsRepository.fetchSubjectById(uid, targetUser)
         }
     }

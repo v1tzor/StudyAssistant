@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.tasks.impl.domain.interactors
 import kotlinx.coroutines.flow.first
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.message.NotifyPushContent
 import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.ReceivedMediatedHomeworks
@@ -52,34 +51,35 @@ internal interface ShareHomeworksInteractor {
         private val messageRepository: MessageRepository,
         private val eitherWrapper: TasksEitherWrapper,
     ) : ShareHomeworksInteractor {
-        private val currentUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
 
         override suspend fun fetchSharedHomeworks() = eitherWrapper.wrapFlow {
-            shareRepository.fetchShortSharedHomeworksByUser(currentUser)
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            shareRepository.fetchShortSharedHomeworksByUser(targetUser)
         }
 
         override suspend fun fetchSharedHomeworksDetails() = eitherWrapper.wrapFlow {
-            shareRepository.fetchSharedHomeworksByUser(currentUser)
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            shareRepository.fetchSharedHomeworksByUser(targetUser)
         }
 
         override suspend fun shareHomeworks(homeworks: SentMediatedHomeworksDetails) = eitherWrapper.wrapUnit {
-            val currentUserInfo = usersRepository.fetchUserById(currentUser).first()
-            val currentSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(currentUser)
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            val targetUserInfo = usersRepository.fetchUserById(targetUser).first()
+            val currentSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(targetUser)
             val updatedCurrentSharedHomeworks = currentSharedHomeworks.copy(
                 sent = buildMap {
                     putAll(currentSharedHomeworks.sent)
                     put(homeworks.uid, homeworks.convertToBase())
                 }
             )
-            shareRepository.addOrUpdateSharedHomework(updatedCurrentSharedHomeworks, currentUser)
+            shareRepository.addOrUpdateSharedHomework(updatedCurrentSharedHomeworks, targetUser)
 
             homeworks.recipients.forEach { recipient ->
                 val recipientSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(recipient.uid)
                 val updatedRecipientSharedHomeworks = recipientSharedHomeworks.copy(
                     received = buildMap {
                         putAll(recipientSharedHomeworks.received)
-                        put(homeworks.uid, homeworks.convertToBase().convertToReceived(currentUser))
+                        put(homeworks.uid, homeworks.convertToBase().convertToReceived(targetUser))
                     }
                 )
                 shareRepository.addOrUpdateSharedHomework(updatedRecipientSharedHomeworks, recipient.uid)
@@ -87,22 +87,23 @@ internal interface ShareHomeworksInteractor {
 
             val notifyContent = NotifyPushContent.ShareHomework(
                 devices = homeworks.recipients.map { it.devices }.extractAllItem(),
-                senderUsername = checkNotNull(currentUserInfo).username,
-                senderUserId = currentUser,
+                senderUsername = checkNotNull(targetUserInfo).username,
+                senderUserId = targetUser,
                 subjectNames = homeworks.homeworks.map { it.subjectName }
             )
             messageRepository.sendMessage(notifyContent.toMessageBody())
         }
 
         override suspend fun cancelSendHomeworks(homeworks: SentMediatedHomeworks) = eitherWrapper.wrapUnit {
-            val currentSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(currentUser)
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            val currentSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(targetUser)
             val updatedCurrentSharedHomeworks = currentSharedHomeworks.copy(
                 sent = buildMap {
                     putAll(currentSharedHomeworks.sent)
                     remove(homeworks.uid)
                 }
             )
-            shareRepository.addOrUpdateSharedHomework(updatedCurrentSharedHomeworks, currentUser)
+            shareRepository.addOrUpdateSharedHomework(updatedCurrentSharedHomeworks, targetUser)
 
             homeworks.recipients.forEach { recipient ->
                 val recipientSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(recipient)
@@ -117,7 +118,8 @@ internal interface ShareHomeworksInteractor {
         }
 
         override suspend fun acceptOrRejectHomeworks(homeworks: ReceivedMediatedHomeworks) = eitherWrapper.wrapUnit {
-            val currentSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(currentUser)
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            val currentSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(targetUser)
             val senderSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(homeworks.sender)
 
             val updatedCurrentSharedHomeworks = currentSharedHomeworks.copy(
@@ -133,7 +135,7 @@ internal interface ShareHomeworksInteractor {
                 }
             )
 
-            shareRepository.addOrUpdateSharedHomework(updatedCurrentSharedHomeworks, currentUser)
+            shareRepository.addOrUpdateSharedHomework(updatedCurrentSharedHomeworks, targetUser)
             shareRepository.addOrUpdateSharedHomework(updatedSenderSharedHomeworks, homeworks.sender)
         }
     }

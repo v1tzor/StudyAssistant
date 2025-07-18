@@ -16,8 +16,10 @@
 package ru.aleshin.studyassistant.data
 
 import ru.aleshin.studyassistant.android.BuildConfig
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.ok.tracer.CoreTracerConfiguration
+import ru.ok.tracer.Tracer
 import ru.ok.tracer.TracerConfiguration
 import ru.ok.tracer.crash.report.CrashFreeConfiguration
 import ru.ok.tracer.crash.report.CrashReportConfiguration
@@ -31,11 +33,23 @@ import ru.ok.tracer.heap.dumps.HeapDumpConfiguration
 class CrashlyticsServiceImpl : CrashlyticsService {
 
     override fun sendLog(message: String) {
-        TracerCrashReport.log(message)
+        try {
+            TracerCrashReport.log(message)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun recordException(tag: String, message: String, exception: Throwable) {
-        TracerCrashReport.report(exception, tag)
+        try {
+            TracerCrashReport.report(exception, tag)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun setupUser(id: UID?) {
+        Tracer.setUserId(id)
     }
 
     override fun initializeService() = Unit

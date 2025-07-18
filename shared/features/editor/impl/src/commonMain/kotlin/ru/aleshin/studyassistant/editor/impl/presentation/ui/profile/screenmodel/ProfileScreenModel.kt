@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.ui.mappers.convertToInputFile
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
 import ru.aleshin.studyassistant.editor.impl.navigation.EditorScreenProvider
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileAction
@@ -72,7 +73,8 @@ internal class ProfileScreenModel(
             is ProfileEvent.UpdateAvatar -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
                     val user = checkNotNull(appUser)
-                    val command = ProfileWorkCommand.UpdateAvatar(user, event.file)
+                    val inputFile = event.file.convertToInputFile()
+                    val command = ProfileWorkCommand.UpdateAvatar(user, inputFile)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }

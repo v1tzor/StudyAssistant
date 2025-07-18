@@ -33,6 +33,7 @@ kotlin {
             implementation(project(":shared:features:auth:api"))
 
             implementation(project(":shared:core:common"))
+            implementation(project(":shared:core:remote"))
             implementation(project(":shared:core:data"))
             implementation(project(":shared:core:domain"))
             implementation(project(":shared:core:ui"))

@@ -16,6 +16,9 @@
 
 package ru.aleshin.studyassistant.core.remote.mappers.subjects
 
+import ru.aleshin.studyassistant.core.common.extensions.fromJson
+import ru.aleshin.studyassistant.core.common.extensions.toJson
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectPojo
 import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
@@ -23,15 +26,16 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
-fun SubjectDetailsPojo.mapToBase() = SubjectPojo(
+fun SubjectDetailsPojo.mapToBase(userId: UID) = SubjectPojo(
     uid = uid,
+    userId = userId,
     organizationId = organizationId,
     eventType = eventType,
     name = name,
     teacherId = teacher?.uid,
     office = office,
     color = color,
-    location = location,
+    location = location?.toJson()
 )
 
 fun SubjectPojo.mapToDetails(
@@ -44,5 +48,5 @@ fun SubjectPojo.mapToDetails(
     teacher = employee,
     office = office,
     color = color,
-    location = location,
+    location = location?.fromJson()
 )

@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.core.data.mappers.schedules
 
 import kotlinx.datetime.DayOfWeek
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -26,7 +25,6 @@ import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.MediatedBaseSchedule
-import ru.aleshin.studyassistant.core.remote.models.classes.ClassPojo
 import ru.aleshin.studyassistant.core.remote.models.schedule.BaseScheduleDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.schedule.BaseSchedulePojo
 import ru.aleshin.studyassistant.core.remote.models.schedule.MediatedBaseSchedulePojo
@@ -59,15 +57,14 @@ fun BaseScheduleDetailsEntity.mapToDomain() = BaseSchedule(
     classes = classes.map { it.mapToDomain() },
 )
 
-fun BaseSchedule.mapToRemoteData() = BaseSchedulePojo(
+fun BaseSchedule.mapToRemoteData(userId: UID) = BaseSchedulePojo(
     uid = uid,
+    userId = userId,
     dateVersionFrom = dateVersion.from.toEpochMilliseconds(),
     dateVersionTo = dateVersion.to.toEpochMilliseconds(),
     weekDayOfWeek = dayOfWeek.name,
     week = week.name,
-    classes = mutableMapOf<UID, ClassPojo>().apply {
-        classes.forEach { put(it.uid, it.mapToRemoteData()) }
-    },
+    classes = classes.map { Json.encodeToString(it.mapToRemoteData()) }
 )
 
 fun MediatedBaseSchedule.mapToRemoteData() = MediatedBaseSchedulePojo(

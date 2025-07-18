@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
  */
 @Parcelize
 internal data class SocialNetworkUi(
+    val uid: String,
     val type: SocialNetworkType,
     val otherType: String?,
     val data: String,

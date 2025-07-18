@@ -16,8 +16,13 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.auth
 
-import ru.aleshin.studyassistant.core.remote.appwrite.auth.AppwriteAuth
-import ru.aleshin.studyassistant.core.remote.appwrite.auth.AuthUserPojo
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.functional.Constants.App.RECOVERY_PASSWORD_URL
+import ru.aleshin.studyassistant.core.common.functional.Constants.App.VERIFY_EMAIL_URL
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
+import ru.aleshin.studyassistant.core.remote.models.appwrite.AuthUserPojo
+import ru.aleshin.studyassistant.core.remote.models.appwrite.SessionPojo
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
@@ -25,9 +30,8 @@ import ru.aleshin.studyassistant.core.remote.appwrite.auth.AuthUserPojo
 interface AuthRemoteDataSource {
 
     suspend fun fetchCurrentUser(): AuthUserPojo?
-    suspend fun createUserWithEmail(email: String, password: String): AuthUserPojo?
-    suspend fun signInWithEmail(email: String, password: String): AuthUserPojo?
-    suspend fun signInViaGoogle(idToken: String?): AuthUserPojo?
+    suspend fun createUserWithEmail(email: String, password: String, name: String?): AuthUserPojo?
+    suspend fun signInWithEmail(email: String, password: String): SessionPojo
     suspend fun sendVerifyEmail()
     suspend fun sendPasswordRecoveryEmail(email: String)
     suspend fun recoveryPassword(password: String, secret: String)
@@ -35,48 +39,48 @@ interface AuthRemoteDataSource {
     suspend fun signOut()
 
     class Base(
-        private val appwriteAuth: AppwriteAuth,
+        private val account: AccountService,
     ) : AuthRemoteDataSource {
 
         override suspend fun fetchCurrentUser(): AuthUserPojo? {
-            return appwriteAuth.fetchCurrentUser()
+            return account.getCurrentUser()
         }
 
-        override suspend fun createUserWithEmail(email: String, password: String): AuthUserPojo? {
-            val authResult = appwriteAuth.createUserWithEmail(email, password)
-            return authResult
+        override suspend fun createUserWithEmail(email: String, password: String, name: String?): AuthUserPojo? {
+            val authUser = account.create(
+                userId = randomUUID(),
+                email = email,
+                password = password,
+                name = name,
+            )
+            account.createEmailPasswordSession(email, password)
+
+            return authUser
         }
 
-        override suspend fun signInWithEmail(email: String, password: String): AuthUserPojo? {
-            val authResult = appwriteAuth.signInWithEmail(email, password)
-            return authResult
-        }
-
-        override suspend fun signInViaGoogle(idToken: String?): AuthUserPojo? {
-//            val credential = GoogleAuthProvider.credential(idToken, null)
-//            val authResult = appwriteAuth.signInWithCredential(credential)
-//            return authResult.user
-            return null
+        override suspend fun signInWithEmail(email: String, password: String): SessionPojo {
+            return account.createEmailPasswordSession(email, password)
         }
 
         override suspend fun sendPasswordRecoveryEmail(email: String) {
-            appwriteAuth.sendPasswordRecoveryEmail(email)
+            account.createRecovery(email, RECOVERY_PASSWORD_URL)
         }
 
         override suspend fun recoveryPassword(password: String, secret: String) {
-            appwriteAuth.updateRecoveredPassword(password = password, secret = secret)
+            val userId = account.getCurrentUser()?.id ?: throw AppwriteUserException()
+            account.updateRecovery(userId = userId, password = password, secret = secret)
         }
 
         override suspend fun sendVerifyEmail() {
-            appwriteAuth.sendVerifyEmail()
+            account.createVerification(VERIFY_EMAIL_URL)
         }
 
         override suspend fun updatePassword(oldPassword: String?, newPassword: String) {
-            appwriteAuth.updatePassword(oldPassword, newPassword)
+            account.updatePassword(password = newPassword, oldPassword = oldPassword)
         }
 
         override suspend fun signOut() {
-            appwriteAuth.signOut()
+            account.deleteSession("current")
         }
     }
 }

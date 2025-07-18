@@ -36,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.extensions.uri
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
@@ -82,7 +81,7 @@ internal fun EmployeeContent(
             lastName = editableEmployee?.patronymic ?: editableEmployee?.secondName,
             avatar = when (actionWithAvatar) {
                 is ActionWithAvatar.None -> actionWithAvatar.uri
-                is ActionWithAvatar.Set -> actionWithAvatar.file.uri()
+                is ActionWithAvatar.Set -> actionWithAvatar.file.uri
                 is ActionWithAvatar.Delete -> null
             },
             onUpdateAvatar = onUpdateAvatar,

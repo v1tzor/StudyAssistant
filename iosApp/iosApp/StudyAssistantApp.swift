@@ -53,26 +53,21 @@ struct iOSApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
+    let appService = AppServiceImpl()
+    let crashlyticsService = CrashlyticsServiceImpl()
+    let reviewService = ReviewServiceImpl()
+    let analyticsService = AnalyticsServiceImpl()
+    let tokenProvider = GoogleAuthTokenProvider()
+    let iapService = IapServiceImpl()
+    let uuidProvider = UUIDProvider()
+    
     init() {
-        let appwriteManager = AppwriteManager()
-        let appwrite = RemoteAppwriteApple.init(
-            auth: AppwriteAuthApple(account: appwriteManager.account),
-            databases: AppwriteDatabaseApple(database: appwriteManager.databases),
-            realtime: AppwriteRealtimeApple(realtime: appwriteManager.realtime),
-            storage: AppwriteStorageApple(storage: appwriteManager.storage)
-        )
-        let appService = AppServiceImpl()
-        let crashlyticsService = CrashlyticsServiceImpl()
-        let analyticsService = AnalyticsServiceImpl()
-        let tokenProvider = GoogleAuthTokenProvider()
-        let iapService = IapServiceImpl()
-        let uuidProvider = UUIDProvider()
         let configuration = PlatformConfiguration(
             appService: appService,
             analyticsService: analyticsService,
             crashlyticsService: crashlyticsService,
+            reviewService: reviewService,
             iapService: iapService,
-            appwrite: appwrite,
             serviceTokenProvider: tokenProvider,
             uuidProvider: uuidProvider
         )
@@ -82,7 +77,11 @@ struct iOSApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView().onOpenURL(perform: { url in GIDSignIn.sharedInstance.handle(url)})
+            ContentView().onOpenURL(
+                perform: { url in
+                    GIDSignIn.sharedInstance.handle(url)
+                }
+            )
         }
     }
 }

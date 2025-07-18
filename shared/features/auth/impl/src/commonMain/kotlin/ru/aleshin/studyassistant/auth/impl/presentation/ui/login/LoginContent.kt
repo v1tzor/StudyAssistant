@@ -44,6 +44,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.views.LoginActi
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.views.LoginInputSection
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.views.NotAccountButton
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.PRIVACY_POLICY
+import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
@@ -54,7 +55,8 @@ internal fun LoginContent(
     modifier: Modifier,
     onForgotPassword: () -> Unit,
     onLoginClick: (email: String, password: String) -> Unit,
-    onLoginViaGoogleClick: (idToken: String?) -> Unit,
+    onSuccessOAuthLogin: (UserSession) -> Unit,
+    onFailureOAuthLogin: () -> Unit,
     onNotAccountClick: () -> Unit,
 ) {
     Column(
@@ -91,7 +93,8 @@ internal fun LoginContent(
                 enabledGoogle = state.isAvailableGoogle,
                 isLoading = state.isLoading,
                 onLoginClick = { onLoginClick(email, password) },
-                onLoginViaGoogleClick = { onLoginViaGoogleClick(it) },
+                onSuccessOAuthLogin = onSuccessOAuthLogin,
+                onFailureOAuthLogin = onFailureOAuthLogin,
             )
             Text(
                 modifier = Modifier.fillMaxWidth(),

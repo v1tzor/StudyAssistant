@@ -17,11 +17,20 @@
 package ru.aleshin.studyassistant.core.common.platform
 
 import android.app.Application
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import ru.aleshin.studyassistant.core.common.di.MainDirectDIAware
 
 /**
  * @author Stanislav Aleshin on 14.04.2025.
  */
-abstract class BaseApplication : Application() {
+abstract class BaseApplication : Application(), MainDirectDIAware {
+
+    protected val job = Job()
+
+    protected val applicationScope = CoroutineScope(job + Dispatchers.Main)
 
     abstract fun initPlatformServices()
 
@@ -31,5 +40,10 @@ abstract class BaseApplication : Application() {
         super.onCreate()
         initPlatformServices()
         initSettings()
+    }
+
+    override fun onTerminate() {
+        super.onTerminate()
+        applicationScope.cancel(null)
     }
 }

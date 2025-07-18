@@ -16,17 +16,11 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.screenmodel
 
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
 import ru.aleshin.studyassistant.auth.impl.domain.interactors.AppUserInteractor
@@ -41,8 +35,8 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowW
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date.MILLIS_IN_MINUTE
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date.MILLIS_IN_SECONDS
-import ru.aleshin.studyassistant.core.common.functional.Constants.Delay.UPDATE_EMAIL_VERIFICATION
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
+import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewScreen
 
@@ -61,37 +55,40 @@ internal interface VerificationWorkProcessor :
 
         override suspend fun work(command: VerificationWorkCommand) = when (command) {
             is VerificationWorkCommand.LoadAppUser -> loadAppUserWork()
+            is VerificationWorkCommand.LoadVerifyStatus -> checkEmailVerificationWork()
             is VerificationWorkCommand.SendEmailVerification -> sendEmailVerificationWork()
             is VerificationWorkCommand.SignOut -> signOutWork()
         }
 
-        private fun loadAppUserWork() = channelFlow {
-            var verificationJob: Job? = null
-            appUserInteractor.fetchAppUser().collect { userEither ->
-                verificationJob?.cancelAndJoin()
-                userEither.handle(
-                    onLeftAction = { send(EffectResult(VerificationEffect.ShowError(it))) },
-                    onRightAction = { user ->
-                        send(ActionResult(VerificationAction.UpdateAppUser(user.mapToUi())))
-                        verificationJob = cycleCheckEmailVerification()
-                            .onEach { send(it) }
-                            .launchIn(this)
-                            .apply { start() }
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private fun loadAppUserWork() = flow {
+            appUserInteractor.fetchAppUser().collectAndHandle(
+                onLeftAction = { emit(EffectResult(VerificationEffect.ShowError(it))) },
+                onRightAction = { user ->
+                    emit(ActionResult(VerificationAction.UpdateAppUser(user.mapToUi())))
+                }
+            )
+        }
+
+        private fun checkEmailVerificationWork() = flow {
+            appUserInteractor.checkEmailVerification().collectAndHandle(
+                onLeftAction = { emit(EffectResult(VerificationEffect.ShowError(it))) },
+                onRightAction = { isVerify ->
+                    if (isVerify) {
+                        val previewScreen = screenProvider.providePreviewScreen(PreviewScreen.Setup)
+                        emit(EffectResult(VerificationEffect.ReplaceGlobalScreen(previewScreen)))
                     }
-                )
-            }
+                },
+            )
         }
 
         private fun sendEmailVerificationWork() = flow {
             authInteractor.sendEmailVerification().handle(
                 onLeftAction = { emit(EffectResult(VerificationEffect.ShowError(it))) },
                 onRightAction = {
-                    emit(ActionResult(VerificationAction.UpdateLoadingSend(false)))
                     emitAll(cycleUpdateRetryTime())
                 },
             )
-        }.onStart {
-            emit(ActionResult(VerificationAction.UpdateLoadingSend(true)))
         }
 
         private fun signOutWork() = flow {
@@ -118,29 +115,12 @@ internal interface VerificationWorkProcessor :
                 delay(MILLIS_IN_SECONDS)
             }
         }
-
-        private fun cycleCheckEmailVerification() = flow {
-            while (currentCoroutineContext().isActive) {
-                appUserInteractor.checkEmailVerification().handle(
-                    onLeftAction = {
-                        emit(EffectResult(VerificationEffect.ShowError(it)))
-                        currentCoroutineContext().cancel()
-                    },
-                    onRightAction = { isVerify ->
-                        if (isVerify) {
-                            val previewScreen = screenProvider.providePreviewScreen(PreviewScreen.Setup)
-                            emit(EffectResult(VerificationEffect.ReplaceGlobalScreen(previewScreen)))
-                        }
-                    },
-                )
-                delay(UPDATE_EMAIL_VERIFICATION)
-            }
-        }
     }
 }
 
 internal sealed class VerificationWorkCommand : WorkCommand {
     data object LoadAppUser : VerificationWorkCommand()
+    data object LoadVerifyStatus : VerificationWorkCommand()
     data object SendEmailVerification : VerificationWorkCommand()
     data object SignOut : VerificationWorkCommand()
 }

@@ -17,6 +17,8 @@
 package ru.aleshin.studyassistant.presentation.ui
 
 import android.Manifest
+import android.app.ComponentCaller
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -68,5 +70,9 @@ class MainActivity : FlavorMainActivity() {
                 permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
+        super.onNewIntent(intent, caller)
     }
 }

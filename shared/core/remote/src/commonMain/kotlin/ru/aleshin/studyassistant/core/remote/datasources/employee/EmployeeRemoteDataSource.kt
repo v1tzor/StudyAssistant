@@ -16,20 +16,23 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.employee
 
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.serialization.json.JsonElement
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
-import ru.aleshin.studyassistant.core.common.extensions.deleteAll
+import ru.aleshin.studyassistant.core.common.extensions.getString
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
-import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
-import ru.aleshin.studyassistant.core.remote.appwrite.storage.AppwriteStorage
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
+import ru.aleshin.studyassistant.core.remote.appwrite.storage.StorageService
 import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Employee
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Storage.BUCKET
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
+import ru.aleshin.studyassistant.core.remote.models.appwrite.extractBucketIdFromFileUrl
+import ru.aleshin.studyassistant.core.remote.models.appwrite.extractIdFromFileUrl
 import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 
 /**
@@ -39,56 +42,52 @@ interface EmployeeRemoteDataSource {
 
     suspend fun addOrUpdateEmployee(employee: EmployeePojo, targetUser: UID): UID
     suspend fun addOrUpdateEmployeeGroup(employees: List<EmployeePojo>, targetUser: UID)
-    suspend fun uploadAvatar(uid: UID, file: InputFile, targetUser: UID): String
+    suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile, targetUser: UID): String
     suspend fun fetchEmployeeById(uid: UID, targetUser: UID): Flow<EmployeePojo?>
     suspend fun fetchAllEmployeeByOrganization(organizationId: UID?, targetUser: UID): Flow<List<EmployeePojo>>
     suspend fun deleteEmployee(targetId: UID, targetUser: UID)
     suspend fun deleteAllEmployee(targetUser: UID)
-    suspend fun deleteAvatar(uid: UID, targetUser: UID)
+    suspend fun deleteAvatar(avatarUrl: UID, targetUser: UID)
 
     class Base(
-        private val database: FirebaseFirestore,
-        private val storage: AppwriteStorage,
+        private val database: DatabaseService,
+        private val storage: StorageService,
     ) : EmployeeRemoteDataSource {
 
         override suspend fun addOrUpdateEmployee(employee: EmployeePojo, targetUser: UID): UID {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.EMPLOYEE)
 
             val employeeId = employee.uid.takeIf { it.isNotBlank() } ?: randomUUID()
 
-            return reference.document(employeeId).set(employee.copy(uid = employeeId)).let {
-                return@let employeeId
-            }
+            database.upsertDocument(
+                databaseId = Employee.DATABASE_ID,
+                collectionId = Employee.COLLECTION_ID,
+                documentId = employeeId,
+                data = employee.copy(uid = employeeId),
+                permissions = Permission.onlyUserData(targetUser),
+                nestedType = EmployeePojo.serializer(),
+            )
+
+            return employeeId
         }
 
         override suspend fun addOrUpdateEmployeeGroup(employees: List<EmployeePojo>, targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.EMPLOYEE)
-
-            database.batch().apply {
-                employees.forEach { employee ->
-                    val uid = employee.uid.takeIf { it.isNotBlank() } ?: randomUUID()
-                    set(reference.document(uid), employee.copy(uid = uid))
-                }
-                return@apply commit()
-            }
+            employees.forEach { employee -> addOrUpdateEmployee(employee, targetUser) }
         }
 
-        override suspend fun uploadAvatar(uid: UID, file: InputFile, targetUser: UID): String {
+        override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile, targetUser: UID): String {
             if (targetUser.isEmpty()) throw AppwriteUserException()
+
+            if (!oldAvatarUrl.isNullOrBlank()) {
+                deleteAvatar(oldAvatarUrl, targetUser)
+            }
 
             val file = storage.createFile(
                 bucketId = BUCKET,
                 fileId = randomUUID(),
-                fileBytes = file.fileBytes,
-                filename = file.filename,
-                mimeType = file.mimeType,
-                permissions = Permission.onlyUsersVisibleData(targetUser),
+                file = file,
+                permissions = Permission.avatarData(targetUser),
             )
 
             return file.getDownloadUrl()
@@ -97,11 +96,15 @@ interface EmployeeRemoteDataSource {
         override suspend fun fetchEmployeeById(uid: UID, targetUser: UID): Flow<EmployeePojo?> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
             if (uid.isEmpty()) return flowOf(null)
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.EMPLOYEE).document(uid)
+            val employeesFlow = database.getDocumentFlow(
+                databaseId = Employee.DATABASE_ID,
+                collectionId = Employee.COLLECTION_ID,
+                documentId = uid,
+                nestedType = EmployeePojo.serializer(),
+            )
 
-            return reference.snapshotFlowGet<EmployeePojo>()
+            return employeesFlow
         }
 
         override suspend fun fetchAllEmployeeByOrganization(
@@ -109,42 +112,69 @@ interface EmployeeRemoteDataSource {
             targetUser: UID
         ): Flow<List<EmployeePojo>> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = if (organizationId != null) {
-                userDataRoot.collection(UserData.EMPLOYEE).where {
-                    UserData.ORGANIZATION_ID equalTo organizationId
-                }
-            } else {
-                userDataRoot.collection(UserData.EMPLOYEE)
-            }
+            val employeesFlow = database.listDocumentsFlow(
+                databaseId = Employee.DATABASE_ID,
+                collectionId = Employee.COLLECTION_ID,
+                queries = if (organizationId != null) {
+                    listOf(
+                        Query.equal(Employee.USER_ID, targetUser),
+                        Query.equal(Employee.ORGANIZATION_ID, organizationId),
+                    )
+                } else {
+                    listOf(Query.equal(Employee.USER_ID, targetUser))
+                },
+                nestedType = EmployeePojo.serializer(),
+            )
 
-            val employeeFlow = reference.snapshotListFlowGet<EmployeePojo>()
-
-            return employeeFlow
+            return employeesFlow
         }
 
         override suspend fun deleteEmployee(targetId: UID, targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.EMPLOYEE).document(targetId)
+            val avatarUrl = database.getDocumentOrNull(
+                databaseId = Employee.DATABASE_ID,
+                collectionId = Employee.COLLECTION_ID,
+                documentId = targetId,
+                queries = listOf(Query.select(listOf(Employee.AVATAR_URL))),
+                nestedType = JsonElement.serializer(),
+            )?.data?.getString(Employee.AVATAR_URL)
 
-            return reference.delete()
+            if (!avatarUrl.isNullOrBlank()) {
+                deleteAvatar(avatarUrl, targetUser)
+            }
+
+            database.deleteDocument(
+                databaseId = Employee.DATABASE_ID,
+                collectionId = Employee.COLLECTION_ID,
+                documentId = targetId,
+            )
         }
 
         override suspend fun deleteAllEmployee(targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
+            val employees = fetchAllEmployeeByOrganization(null, targetUser)
+            employees.first().forEach {
 
-            val reference = userDataRoot.collection(UserData.EMPLOYEE)
+                // Premium avatars are not deleted
 
-            database.deleteAll(reference)
+                database.deleteDocument(
+                    databaseId = Employee.DATABASE_ID,
+                    collectionId = Employee.COLLECTION_ID,
+                    documentId = it.uid,
+                )
+            }
         }
 
-        override suspend fun deleteAvatar(uid: UID, targetUser: UID) {
+        override suspend fun deleteAvatar(avatarUrl: UID, targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            storage.deleteFile(BUCKET, uid)
+            require(avatarUrl.isNotBlank()) { "Employee avatar url is empty" }
+
+            storage.deleteFile(
+                bucketId = avatarUrl.extractBucketIdFromFileUrl(),
+                fileId = avatarUrl.extractIdFromFileUrl(),
+            )
         }
     }
 }

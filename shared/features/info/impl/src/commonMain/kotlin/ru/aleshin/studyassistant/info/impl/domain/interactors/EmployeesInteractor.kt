@@ -39,14 +39,13 @@ internal interface EmployeesInteractor {
         private val eitherWrapper: InfoEitherWrapper,
     ) : EmployeesInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchEmployeesByOrganization(organizationId: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             employeeRepository.fetchAllEmployeeByOrganization(organizationId, targetUser)
         }
 
         override suspend fun deleteEmployeeById(targetId: UID) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             employeeRepository.deleteEmployee(targetId, targetUser)
         }
     }

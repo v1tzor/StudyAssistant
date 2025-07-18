@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.subjects
 
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.extensions.toJson
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToRemoteData
@@ -67,15 +67,16 @@ fun SubjectDetailsEntity.mapToDomain() = Subject(
     location = location?.mapToDomain(),
 )
 
-fun Subject.mapToRemoteData() = SubjectPojo(
+fun Subject.mapToRemoteData(userId: UID) = SubjectPojo(
     uid = uid,
+    userId = userId,
     organizationId = organizationId,
     eventType = eventType.name,
     name = name,
     teacherId = teacher?.uid,
     office = office,
     color = color,
-    location = location?.mapToRemoteData(),
+    location = location?.mapToRemoteData()?.toJson(),
 )
 
 fun MediatedSubject.mapToRemoteData() = MediatedSubjectPojo(
@@ -97,5 +98,5 @@ fun Subject.mapToLocalData() = SubjectEntity(
     teacher_id = teacher?.uid,
     office = office,
     color = color.toLong(),
-    location = Json.encodeToString(location?.mapToLocalData()),
+    location = location?.mapToLocalData()?.toJson(),
 )

@@ -17,15 +17,14 @@
 package ru.aleshin.studyassistant.core.remote.models.shared.homeworks
 
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.common.functional.UID
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
 @Serializable
 data class SharedHomeworksPojo(
-    val received: Map<UID, ReceivedMediatedHomeworksPojo> = emptyMap(),
-    val sent: Map<UID, SentMediatedHomeworksPojo> = emptyMap(),
+    val received: List<String> = emptyList(),
+    val sent: List<String> = emptyList(),
 ) {
     companion object {
         fun default() = SharedHomeworksPojo()

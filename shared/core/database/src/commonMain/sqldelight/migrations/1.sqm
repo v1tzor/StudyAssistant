@@ -1,7 +1,8 @@
 import kotlin.String;
 import kotlin.collections.List;
 
-ALTER TABLE `todoEntity` ADD COLUMN description TEXT;
+ALTER TABLE `todoEntity` ADD COLUMN description TEXT DEFAULT '';
+ALTER TABLE `generalSettingsEntity` ADD COLUMN is_unfinished_setup TEXT DEFAULT NULL;
 CREATE TABLE IF NOT EXISTS `goalEntity` (
     uid TEXT PRIMARY KEY NOT NULL,
     type TEXT NOT NULL,
@@ -35,4 +36,15 @@ CREATE TABLE IF NOT EXISTS `aiChatMessageEntity` (
    tool_call_id TEXT,
    time INTEGER NOT NULL,
    CONSTRAINT message_to_chat FOREIGN KEY (chat_id) REFERENCES aiChatHistoryEntity (uid) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS `CachedResponseDataEntity` (
+    url TEXT PRIMARY KEY,
+    status_code INTEGER NOT NULL,
+    request_time INTEGER NOT NULL,
+    response_time INTEGER NOT NULL,
+    http_version TEXT NOT NULL,
+    expires_time INTEGER NOT NULL,
+    headers TEXT NOT NULL,
+    vary_keys TEXT NOT NULL,
+    body BLOB NOT NULL
 );

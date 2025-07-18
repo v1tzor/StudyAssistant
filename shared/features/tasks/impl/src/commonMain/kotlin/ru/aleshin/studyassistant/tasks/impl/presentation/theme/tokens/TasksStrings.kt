@@ -165,7 +165,7 @@ internal data class TasksStrings(
             goalSheetDeleteActionLabel = "Удалить",
             goalSheetCompleteActionLabel = "Выполнить",
             goalSheetCancelActionLabel = "Отменить",
-            homeworksTasksTab = "Домашние задгия",
+            homeworksTasksTab = "Домашние задания",
             todosTasksTab = "Задачи",
             shareHomeworksHeader = "Обмен заданиями",
             shareHomeworksPrefixTitle = "Активность: ",

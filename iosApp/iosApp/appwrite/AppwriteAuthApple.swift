@@ -83,7 +83,7 @@ public class AppwriteAuthApple : RemoteAppwriteAuthApple {
         let result = try await account.updateVerification(userId: user.id, secret: secret)
     }
     
-    public override func __reloadUser(secret: String) async throws -> RemoteUser<NSDictionary>? {
+    public override func __reloadUser() async throws -> RemoteUser<NSDictionary>? {
         let _ = try await account.updateSession(sessionId: "current")
         let user = try await account.get()
         return user.toRemoteUser()

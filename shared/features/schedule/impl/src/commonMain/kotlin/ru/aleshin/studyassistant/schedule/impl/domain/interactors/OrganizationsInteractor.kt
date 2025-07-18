@@ -47,24 +47,25 @@ internal interface OrganizationsInteractor {
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : OrganizationsInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun addOrUpdateOrganizationsData(organizations: List<Organization>) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val subjects = organizations.map { it.subjects }.extractAllItem()
             val employees = organizations.map { it.employee }.extractAllItem()
+
             organizationsRepository.addOrUpdateOrganizationsGroup(organizations, targetUser)
             subjectsRepository.addOrUpdateSubjectsGroup(subjects, targetUser)
             employeeRepository.addOrUpdateEmployeeGroup(employees, targetUser)
         }
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             organizationsRepository.fetchAllShortOrganization(targetUser).map { organizations ->
                 organizations.sortedByDescending { it.isMain }
             }
         }
 
         override suspend fun fetchOrganizationById(uid: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             organizationsRepository.fetchOrganizationById(uid, targetUser).map { organization ->
                 checkNotNull(organization)
             }

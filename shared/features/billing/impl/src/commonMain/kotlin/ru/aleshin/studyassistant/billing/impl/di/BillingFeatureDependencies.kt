@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.billing.impl.di
 
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
@@ -38,7 +37,6 @@ public interface BillingFeatureDependencies : BaseFeatureDependencies {
     public val dateManager: DateManager
     public val coroutineManager: CoroutineManager
     public val deviceInfoProvider: DeviceInfoProvider
-    public val firestore: FirebaseFirestore
     public val crashlyticsService: CrashlyticsService
     public val analyticsService: AnalyticsService
     public val iapService: IapService

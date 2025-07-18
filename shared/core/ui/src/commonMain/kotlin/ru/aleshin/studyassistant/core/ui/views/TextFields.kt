@@ -129,6 +129,7 @@ fun InfoTextField(
                 Text(
                     text = label,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
                 )
             },
             placeholder = placeholder,
@@ -208,6 +209,7 @@ fun InfoTextField(
                 Text(
                     text = label,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
                 )
             },
             placeholder = placeholder,
@@ -287,6 +289,7 @@ fun InfoTextField(
                 Text(
                     text = label,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
                 )
             },
             placeholder = placeholder,
@@ -365,6 +368,7 @@ fun VerticalInfoTextField(
                 Text(
                     text = placeholder,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = maxLines,
                 )
             },
             leadingIcon = {
@@ -450,6 +454,7 @@ fun VerticalInfoTextField(
                 Text(
                     text = placeholder,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = maxLines,
                 )
             },
             leadingIcon = {

@@ -23,7 +23,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.iap.IapFailure
  * @author Stanislav Aleshin on 27.01.2024.
  */
 sealed class MainFailures : DomainFailures {
-    data object FirebaseNetworkError : MainFailures()
+    data object NetworkError : MainFailures()
     data class IapError(val type: IapFailure) : MainFailures()
     data class OtherError(val throwable: Throwable) : MainFailures()
 }

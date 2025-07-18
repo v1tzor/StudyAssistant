@@ -16,21 +16,26 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.share
 
-import dev.gitlive.firebase.firestore.FirebaseFirestore
-import dev.gitlive.firebase.firestore.Source
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
-import ru.aleshin.studyassistant.core.common.extensions.snapshotGet
+import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Role
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.SharedSchedules
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
 import ru.aleshin.studyassistant.core.remote.mappers.share.convertToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.share.convertToShortDetails
+import ru.aleshin.studyassistant.core.remote.mappers.users.convertToDetails
+import ru.aleshin.studyassistant.core.remote.models.shared.schedules.ReceivedMediatedSchedulesPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.schedules.ReceivedMediatedSchedulesShortPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.schedules.SentMediatedSchedulesPojo
 import ru.aleshin.studyassistant.core.remote.models.shared.schedules.SharedSchedulesDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.shared.schedules.SharedSchedulesPojo
 import ru.aleshin.studyassistant.core.remote.models.shared.schedules.SharedSchedulesShortDetailsPojo
@@ -48,41 +53,62 @@ interface ShareSchedulesRemoteDataSource {
     suspend fun fetchRealtimeSharedSchedulesByUser(uid: UID): SharedSchedulesDetailsPojo
 
     class Base(
-        private val database: FirebaseFirestore,
+        private val database: DatabaseService,
     ) : ShareSchedulesRemoteDataSource {
 
-        override suspend fun addOrUpdateSharedSchedules(schedules: SharedSchedulesPojo, targetUser: UID) {
+        override suspend fun addOrUpdateSharedSchedules(
+            schedules: SharedSchedulesPojo,
+            targetUser: UID
+        ) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
 
-            val reference = database.collection(SharedSchedules.ROOT).document(targetUser)
-
-            return reference.set(schedules)
+            database.upsertDocument(
+                databaseId = SharedSchedules.DATABASE_ID,
+                collectionId = SharedSchedules.COLLECTION_ID,
+                documentId = targetUser,
+                data = schedules,
+                permissions = listOf(
+                    Permission.read(Role.users()),
+                    Permission.update(Role.users()),
+                ),
+                nestedType = SharedSchedulesPojo.serializer()
+            )
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchSharedSchedulesByUser(uid: UID): Flow<SharedSchedulesDetailsPojo> {
             require(uid.isNotBlank())
 
-            val userRoot = database.collection(Users.ROOT)
-
-            val reference = database.collection(SharedSchedules.ROOT).document(uid)
-
-            val sharedSchedulesPojoFlow = reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<SharedSchedulesPojo?>()) ?: SharedSchedulesPojo.default()
+            val sharedSchedulesPojoFlow = database.getDocumentFlow(
+                databaseId = SharedSchedules.DATABASE_ID,
+                collectionId = SharedSchedules.COLLECTION_ID,
+                documentId = uid,
+                nestedType = SharedSchedulesPojo.serializer(),
+            ).map { item ->
+                item ?: SharedSchedulesPojo.default()
             }
 
             return sharedSchedulesPojoFlow.flatMapLatest { sharedSchedules ->
+                val sentSchedules = sharedSchedules.sent.decodeFromString<SentMediatedSchedulesPojo>()
+                val receivedSchedules = sharedSchedules.received.decodeFromString<ReceivedMediatedSchedulesPojo>()
+
                 val users = buildList {
-                    addAll(sharedSchedules.sent.map { it.value.recipient })
-                    addAll(sharedSchedules.received.map { it.value.sender })
+                    addAll(sentSchedules.map { it.value.recipient })
+                    addAll(receivedSchedules.map { it.value.sender })
                 }
-                val senderAndRecipientsUsersReference = users.let {
-                    if (users.isEmpty()) return@let null
-                    userRoot.where { Users.UID inArray users }
+
+                val senderAndRecipientsUsersFlow = if (users.isNotEmpty()) {
+                    database.listDocumentsFlow(
+                        databaseId = Users.DATABASE_ID,
+                        collectionId = Users.COLLECTION_ID,
+                        queries = listOf(Query.equal(Users.UID, users)),
+                        nestedType = AppUserPojo.serializer(),
+                    ).map { usersList ->
+                        usersList.map { it.convertToDetails() }
+                    }
+                } else {
+                    flowOf(null)
                 }
-                val senderAndRecipientsUsersFlow = senderAndRecipientsUsersReference?.snapshots?.map { snapshot ->
-                    snapshot.documents.map { it.data(serializer<AppUserPojo>()) }
-                } ?: flowOf(null)
 
                 senderAndRecipientsUsersFlow.map { senderAndRecipientsUsers ->
                     sharedSchedules.convertToDetails(
@@ -101,26 +127,36 @@ interface ShareSchedulesRemoteDataSource {
         override suspend fun fetchShortSharedSchedulesByUser(uid: UID): Flow<SharedSchedulesShortDetailsPojo> {
             require(uid.isNotBlank())
 
-            val reference = database.collection(SharedSchedules.ROOT).document(uid)
-
-            val userRoot = database.collection(Users.ROOT)
-
-            val sharedSchedulesPojoFlow = reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<SharedSchedulesShortPojo?>()) ?: SharedSchedulesShortPojo.default()
+            val sharedSchedulesShortPojoFlow = database.getDocumentFlow(
+                databaseId = SharedSchedules.DATABASE_ID,
+                collectionId = SharedSchedules.COLLECTION_ID,
+                documentId = uid,
+                nestedType = SharedSchedulesShortPojo.serializer(),
+            ).map { item ->
+                item ?: SharedSchedulesShortPojo.default()
             }
 
-            return sharedSchedulesPojoFlow.flatMapLatest { sharedSchedules ->
+            return sharedSchedulesShortPojoFlow.flatMapLatest { sharedSchedules ->
+                val sentSchedules = sharedSchedules.sent.decodeFromString<SentMediatedSchedulesPojo>()
+                val receivedSchedules = sharedSchedules.received.decodeFromString<ReceivedMediatedSchedulesShortPojo>()
+
                 val users = buildList {
-                    addAll(sharedSchedules.sent.map { it.value.recipient })
-                    addAll(sharedSchedules.received.map { it.value.sender })
+                    addAll(sentSchedules.map { it.value.recipient })
+                    addAll(receivedSchedules.map { it.value.sender })
                 }
-                val senderAndRecipientsUsersReference = users.let {
-                    if (users.isEmpty()) return@let null
-                    userRoot.where { Users.UID inArray users }
+
+                val senderAndRecipientsUsersFlow = if (users.isNotEmpty()) {
+                    database.listDocumentsFlow(
+                        databaseId = Users.DATABASE_ID,
+                        collectionId = Users.COLLECTION_ID,
+                        queries = listOf(Query.equal(Users.UID, users)),
+                        nestedType = AppUserPojo.serializer(),
+                    ).map { usersList ->
+                        usersList.map { it.convertToDetails() }
+                    }
+                } else {
+                    flowOf(null)
                 }
-                val senderAndRecipientsUsersFlow = senderAndRecipientsUsersReference?.snapshots?.map { snapshot ->
-                    snapshot.documents.map { it.data(serializer<AppUserPojo>()) }
-                } ?: flowOf(null)
 
                 senderAndRecipientsUsersFlow.map { senderAndRecipientsUsers ->
                     sharedSchedules.convertToShortDetails(
@@ -138,24 +174,31 @@ interface ShareSchedulesRemoteDataSource {
         override suspend fun fetchRealtimeSharedSchedulesByUser(uid: UID): SharedSchedulesDetailsPojo {
             require(uid.isNotBlank())
 
-            val userRoot = database.collection(Users.ROOT)
+            val sharedSchedules = database.getDocumentOrNull(
+                databaseId = SharedSchedules.DATABASE_ID,
+                collectionId = SharedSchedules.COLLECTION_ID,
+                documentId = uid,
+                nestedType = SharedSchedulesPojo.serializer(),
+            )?.data ?: SharedSchedulesPojo.default()
 
-            val reference = database.collection(SharedSchedules.ROOT).document(uid)
-
-            val snapshot = reference.get(Source.SERVER)
-            val sharedSchedules = snapshot.data(serializer<SharedSchedulesPojo?>()) ?: SharedSchedulesPojo.default()
+            val sentSchedules = sharedSchedules.sent.decodeFromString<SentMediatedSchedulesPojo>()
+            val receivedSchedules = sharedSchedules.received.decodeFromString<ReceivedMediatedSchedulesPojo>()
 
             val users = buildList {
-                addAll(sharedSchedules.sent.map { it.value.recipient })
-                addAll(sharedSchedules.received.map { it.value.sender })
+                addAll(sentSchedules.map { it.value.recipient })
+                addAll(receivedSchedules.map { it.value.sender })
             }
-            val senderAndRecipientsUsersReference = users.let {
-                if (users.isEmpty()) return@let null
-                userRoot.where { Users.UID inArray users }
+
+            val senderAndRecipientsUsers = if (users.isNotEmpty()) {
+                database.listDocuments(
+                    databaseId = Users.DATABASE_ID,
+                    collectionId = Users.COLLECTION_ID,
+                    queries = listOf(Query.equal(Users.UID, users)),
+                    nestedType = AppUserPojo.serializer(),
+                ).documents.map { document -> document.data.convertToDetails() }
+            } else {
+                emptyList()
             }
-            val senderAndRecipientsUsers = senderAndRecipientsUsersReference?.snapshotGet()?.map { documentSnapshot ->
-                documentSnapshot.data(serializer<AppUserPojo>())
-            } ?: emptyList()
 
             return sharedSchedules.convertToDetails(
                 recipientMapper = { recipient ->

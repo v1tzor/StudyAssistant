@@ -53,15 +53,13 @@ internal interface UsersInteractor {
         private val eitherWrapper: UsersEitherWrapper,
     ) : UsersInteractor {
 
-        private val currentUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchUserById(userId: UID) = eitherWrapper.wrapFlow {
             usersRepository.fetchUserById(userId).map { user -> checkNotNull(user) }
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchUserFriendStatus(userId: UID) = eitherWrapper.wrapFlow {
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
             val currentUserInfo = usersRepository.fetchUserById(currentUser)
             val userFriendRequests = requestsRepository.fetchShortRequestsByUser(currentUser)
 
@@ -85,16 +83,19 @@ internal interface UsersInteractor {
         }
 
         override suspend fun fetchAllFriends() = eitherWrapper.wrapFlow {
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
             usersRepository.fetchUserFriends(currentUser)
         }
 
         override suspend fun findUsersByCode(code: String) = eitherWrapper.wrapFlow {
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
             usersRepository.findUsersByCode(code).filter { users ->
                 users.find { it.uid == currentUser } == null
             }
         }
 
         override suspend fun addUserToFriends(userId: UID) = eitherWrapper.wrapUnit {
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
             val currentUserInfo = usersRepository.fetchUserById(currentUser).first()
             val targetUserInfo = usersRepository.fetchUserById(userId).first()
 
@@ -110,11 +111,12 @@ internal interface UsersInteractor {
                     add(currentUser)
                 }
             )
-            usersRepository.addOrUpdateAppUser(updatedCurrentUser)
-            usersRepository.addOrUpdateAppUser(updatedTargetUser)
+            usersRepository.updateAppUser(updatedCurrentUser)
+            usersRepository.updateAppUser(updatedTargetUser)
         }
 
         override suspend fun removeUserFromFriends(userId: UID) = eitherWrapper.wrapUnit {
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
             shareSchedulesRepository.fetchRealtimeSharedSchedulesByUser(currentUser).apply {
                 val updatedCurrentSharedSchedules = copy(
                     received = received.filter { it.value.sender.uid != userId },
@@ -170,8 +172,8 @@ internal interface UsersInteractor {
                     remove(currentUser)
                 }
             )
-            usersRepository.addOrUpdateAppUser(updatedCurrentUser)
-            usersRepository.addOrUpdateAppUser(updatedTargetUser)
+            usersRepository.updateAppUser(updatedCurrentUser)
+            usersRepository.updateAppUser(updatedTargetUser)
         }
     }
 }

@@ -20,7 +20,7 @@ import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.models.organizations.MediatedOrganizationPojo
 import ru.aleshin.studyassistant.core.remote.models.schedule.MediatedBaseSchedulePojo
-import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
+import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojoDetails
 
 /**
  * @author Stanislav Aleshin on 14.08.2024.
@@ -29,7 +29,7 @@ import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 data class ReceivedMediatedSchedulesDetailsPojo(
     val uid: UID,
     val sendDate: Long,
-    val sender: AppUserPojo,
+    val sender: AppUserPojoDetails,
     val schedules: List<MediatedBaseSchedulePojo> = emptyList(),
     val organizationsData: List<MediatedOrganizationPojo> = emptyList(),
 )

@@ -28,6 +28,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,8 +40,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import io.github.vinceglb.filekit.core.PlatformFile
 import org.jetbrains.compose.resources.painterResource
@@ -48,11 +51,14 @@ import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.core.ui.views.FreeOrPaidContent
 import ru.aleshin.studyassistant.core.ui.views.GenderDropdownMenu
 import ru.aleshin.studyassistant.core.ui.views.InfoTextField
 import ru.aleshin.studyassistant.core.ui.views.dialog.BirthdayDatePicker
+import ru.aleshin.studyassistant.core.ui.views.menu.ClickableAvatarView
 import ru.aleshin.studyassistant.core.ui.views.menu.SelectableAvatarView
 import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
@@ -64,27 +70,54 @@ import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 internal fun ProfilePageInfo(
     modifier: Modifier = Modifier,
     profile: AppUserUi,
+    isPaidUser: Boolean,
     avatar: String?,
     scrollState: ScrollState = rememberScrollState(),
     onUpdateProfile: (AppUserUi) -> Unit,
     onUpdateAvatar: (PlatformFile) -> Unit,
     onDeleteAvatar: () -> Unit,
     onExceedingLimit: (Int) -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) = with(profile) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            SelectableAvatarView(
-                onSelect = onUpdateAvatar,
-                onDelete = onDeleteAvatar,
-                onExceedingLimit = onExceedingLimit,
-                modifier = Modifier.size(90.dp),
-                firstName = profile.username.split(' ').getOrNull(0) ?: "-",
-                secondName = profile.username.split(' ').getOrNull(1),
-                imageUrl = avatar,
-                style = MaterialTheme.typography.displaySmall,
+            FreeOrPaidContent(
+                isPaidUser = isPaidUser,
+                modifier = modifier,
+                paidContent = {
+                    SelectableAvatarView(
+                        onSelect = onUpdateAvatar,
+                        onDelete = onDeleteAvatar,
+                        onExceedingLimit = onExceedingLimit,
+                        modifier = Modifier.size(90.dp),
+                        firstName = profile.username.split(' ').getOrNull(0) ?: "-",
+                        secondName = profile.username.split(' ').getOrNull(1),
+                        imageUrl = avatar,
+                        style = MaterialTheme.typography.displaySmall,
+                    )
+                },
+                freeContent = {
+                    ClickableAvatarView(
+                        onClick = onOpenBillingScreen,
+                        modifier = Modifier.size(90.dp),
+                        imageUrl = avatar,
+                        sideIcon = {
+                            Icon(
+                                modifier = Modifier.clip(MaterialTheme.shapes.full),
+                                imageVector = Icons.Default.Stars,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        firstName = username.split(' ').getOrNull(0) ?: "-",
+                        secondName = username.split(' ').getOrNull(1),
+                        style = MaterialTheme.typography.displaySmall,
+                        iconOffset = DpOffset((-4).dp, (-4).dp),
+                    )
+                },
             )
         }
         Column(
@@ -107,16 +140,16 @@ internal fun ProfilePageInfo(
                 },
                 label = PreviewThemeRes.strings.usernameLabel,
                 leadingInfoIcon = painterResource(PreviewThemeRes.icons.name),
-                trailingIcon = {
-                    if (usernameInteraction.collectIsFocusedAsState().value) {
-                        IconButton(onClick = { focusManager.clearFocus() }) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null,
-                                tint = StudyAssistantRes.colors.accents.green,
-                            )
-                        }
+                trailingIcon = if (usernameInteraction.collectIsFocusedAsState().value) { {
+                    IconButton(onClick = { focusManager.clearFocus() }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = StudyAssistantRes.colors.accents.green,
+                        )
                     }
+                } } else {
+                    null
                 },
                 interactionSource = usernameInteraction,
             )
@@ -129,16 +162,16 @@ internal fun ProfilePageInfo(
                 maxLength = Constants.Text.MAX_PROFILE_DESC_LENGTH,
                 label = PreviewThemeRes.strings.profileDescriptionLabel,
                 leadingInfoIcon = painterResource(StudyAssistantRes.icons.userDescription),
-                trailingIcon = {
-                    if (descriptionInteraction.collectIsFocusedAsState().value) {
-                        IconButton(onClick = { focusManager.clearFocus() }) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null,
-                                tint = StudyAssistantRes.colors.accents.green,
-                            )
-                        }
+                trailingIcon = if (descriptionInteraction.collectIsFocusedAsState().value) {{
+                    IconButton(onClick = { focusManager.clearFocus() }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = StudyAssistantRes.colors.accents.green,
+                        )
                     }
+                } } else {
+                    null
                 },
                 singleLine = false,
                 maxLines = 4,

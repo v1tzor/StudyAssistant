@@ -16,15 +16,15 @@
 
 package ru.aleshin.studyassistant.core.domain.repositories
 
-import dev.gitlive.firebase.auth.FirebaseUser
 import ru.aleshin.studyassistant.core.domain.entities.auth.AuthCredentials
+import ru.aleshin.studyassistant.core.domain.entities.users.AuthUser
+import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
  */
 interface AuthRepository {
-    suspend fun registerByEmail(credentials: AuthCredentials): FirebaseUser
-    suspend fun signInWithEmail(credentials: AuthCredentials): FirebaseUser
-    suspend fun signInViaGoogle(idToken: String?): FirebaseUser
+    suspend fun registerByEmail(credentials: AuthCredentials): AuthUser
+    suspend fun signInWithEmail(credentials: AuthCredentials): UserSession
     suspend fun signOut()
 }

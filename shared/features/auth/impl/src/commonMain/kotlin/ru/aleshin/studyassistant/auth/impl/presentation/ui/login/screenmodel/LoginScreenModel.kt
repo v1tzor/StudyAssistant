@@ -89,8 +89,8 @@ internal class LoginScreenModel(
                     passwordValidResult.isValid,
                 )
             }
-            is LoginEvent.LoginViaGoogle -> launchBackgroundWork(BackgroundKey.LOGIN_VIA_GOOGLE) {
-                val command = LoginWorkCommand.LoginWithGoogle(event.idToken)
+            is LoginEvent.SuccessOAuthLogin -> launchBackgroundWork(BackgroundKey.LOGIN_VIA_OAUTH) {
+                val command = LoginWorkCommand.SuccessOAuthLogin(event.session)
                 workProcessor.work(command).collectAndHandleWork()
             }
             is LoginEvent.NavigateToForgot -> {
@@ -124,7 +124,7 @@ internal class LoginScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        CHECK_GOOGLE, LOGIN, LOGIN_VIA_GOOGLE
+        CHECK_GOOGLE, LOGIN, LOGIN_VIA_OAUTH
     }
 }
 

@@ -20,6 +20,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
+import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 
 /**
@@ -30,5 +31,6 @@ expect class PlatformConfiguration {
     val analyticsService: AnalyticsService
     val crashlyticsService: CrashlyticsService
     val messagingService: MessagingService
+    val reviewService: ReviewService
     val iapService: IapService
 }

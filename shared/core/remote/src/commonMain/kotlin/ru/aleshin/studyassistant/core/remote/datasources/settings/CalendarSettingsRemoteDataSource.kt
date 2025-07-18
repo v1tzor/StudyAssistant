@@ -16,13 +16,13 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.settings
 
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.CalendarSettings
 import ru.aleshin.studyassistant.core.remote.models.settings.CalendarSettingsPojo
 
 /**
@@ -35,36 +35,42 @@ interface CalendarSettingsRemoteDataSource {
     suspend fun deleteSettings(targetUser: UID)
 
     class Base(
-        private val database: FirebaseFirestore
+        private val database: DatabaseService,
     ) : CalendarSettingsRemoteDataSource {
         override suspend fun addOrUpdateSettings(settings: CalendarSettingsPojo, targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
-
-            return reference.set(settings)
+            database.upsertDocument(
+                databaseId = CalendarSettings.DATABASE_ID,
+                collectionId = CalendarSettings.COLLECTION_ID,
+                documentId = targetUser,
+                data = settings,
+                permissions = Permission.onlyUserData(targetUser),
+                nestedType = CalendarSettingsPojo.serializer(),
+            )
         }
 
         override suspend fun fetchSettings(targetUser: UID): Flow<CalendarSettingsPojo> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
+            val settingsFlow = database.getDocumentFlow(
+                databaseId = CalendarSettings.DATABASE_ID,
+                collectionId = CalendarSettings.COLLECTION_ID,
+                documentId = targetUser,
+                nestedType = CalendarSettingsPojo.serializer(),
+            )
 
-            return reference.snapshots.map { snapshot ->
-                val settings = snapshot.data(serializer<CalendarSettingsPojo?>()) ?: CalendarSettingsPojo.default()
-                return@map settings
-            }
+            return settingsFlow.map { it ?: CalendarSettingsPojo.default() }
         }
 
         override suspend fun deleteSettings(targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.SETTINGS).document(UserData.CALENDAR_SETTINGS)
-
-            reference.delete()
+            database.deleteDocument(
+                databaseId = CalendarSettings.DATABASE_ID,
+                collectionId = CalendarSettings.COLLECTION_ID,
+                documentId = targetUser
+            )
         }
     }
 }

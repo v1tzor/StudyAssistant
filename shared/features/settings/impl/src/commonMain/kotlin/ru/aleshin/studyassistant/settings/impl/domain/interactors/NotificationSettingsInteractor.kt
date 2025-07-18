@@ -23,7 +23,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkResult
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.settings.NotificationSettings
@@ -57,14 +56,13 @@ internal interface NotificationSettingsInteractor {
         private val eitherWrapper: SettingsEitherWrapper,
     ) : NotificationSettingsInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchSettings() = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             settingsRepository.fetchSettings(targetUser)
         }
 
         override suspend fun updateSettings(settings: NotificationSettings) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val allOrganizations = organizationsRepository.fetchAllShortOrganization(targetUser).first()
             val organizationIds = allOrganizations.map { it.uid }
 

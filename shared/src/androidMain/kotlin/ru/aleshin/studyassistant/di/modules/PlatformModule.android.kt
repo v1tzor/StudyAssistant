@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
+import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.aleshin.studyassistant.presentation.services.RemoteMessageHandlerImpl
@@ -38,6 +39,7 @@ actual val platformModule = DI.Module("PlatformModule") {
     bindSingleton<AnalyticsService> { instance<PlatformConfiguration>().analyticsService }
     bindSingleton<MessagingService> { instance<PlatformConfiguration>().messagingService }
     bindSingleton<CrashlyticsService> { instance<PlatformConfiguration>().crashlyticsService }
+    bindSingleton<ReviewService> { instance<PlatformConfiguration>().reviewService }
     bindSingleton<IapService> { instance<PlatformConfiguration>().iapService }
     bindSingleton<RemoteMessageHandler> { RemoteMessageHandlerImpl(instance()) }
 }

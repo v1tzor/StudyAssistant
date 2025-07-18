@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.auth.impl.domain.interactors
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.auth.impl.domain.common.AuthEitherWrapper
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
-import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -31,7 +30,7 @@ internal interface AppUserInteractor {
 
     suspend fun fetchAppUser(): FlowDomainResult<AuthFailures, AppUser>
 
-    suspend fun checkEmailVerification(): DomainResult<AuthFailures, Boolean>
+    suspend fun checkEmailVerification(): FlowDomainResult<AuthFailures, Boolean>
 
     class Base(
         private val usersRepository: UsersRepository,
@@ -39,17 +38,14 @@ internal interface AppUserInteractor {
     ) : AppUserInteractor {
 
         override suspend fun fetchAppUser() = eitherWrapper.wrapFlow {
-            val firebaseUser = checkNotNull(usersRepository.fetchCurrentAppUser())
+            val firebaseUser = checkNotNull(usersRepository.fetchCurrentAuthUser())
             usersRepository.fetchUserById(firebaseUser.uid).map { appUser ->
                 checkNotNull(appUser)
             }
         }
 
-        override suspend fun checkEmailVerification() = eitherWrapper.wrap {
-            val currentUser = usersRepository.fetchCurrentUserOrError().let { user ->
-                usersRepository.reloadUser() ?: user
-            }
-            return@wrap currentUser.emailVerification
+        override suspend fun checkEmailVerification() = eitherWrapper.wrapFlow {
+            usersRepository.fetchStateChanged().map { it?.emailVerification == true }
         }
     }
 }

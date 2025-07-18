@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.settings.impl.domain.interactors
 
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -38,10 +37,8 @@ internal interface OrganizationInteractor {
         private val eitherWrapper: SettingsEitherWrapper,
     ) : OrganizationInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             organizationsRepository.fetchAllShortOrganization(targetUser).map { organizations ->
                 organizations.sortedByDescending { it.isMain }
             }

@@ -28,6 +28,7 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 @Serializable
 data class HomeworkPojo(
     val uid: UID = "",
+    val userId: UID,
     val classId: UID? = null,
     val deadline: Long = Clock.System.now().startThisDay().toEpochMilliseconds(),
     val subjectId: UID? = null,

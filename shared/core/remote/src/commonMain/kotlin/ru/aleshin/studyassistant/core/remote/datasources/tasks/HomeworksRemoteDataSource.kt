@@ -16,24 +16,24 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.tasks
 
-import dev.gitlive.firebase.firestore.Direction
-import dev.gitlive.firebase.firestore.DocumentReference
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
-import ru.aleshin.studyassistant.core.common.extensions.deleteAll
-import ru.aleshin.studyassistant.core.common.extensions.observeCollectionMapByField
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
-import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Employee
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Homeworks
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Organizations
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Subjects
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.tasks.mapToDetails
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationShortPojo
@@ -58,38 +58,31 @@ interface HomeworksRemoteDataSource {
     suspend fun deleteAllHomework(targetUser: UID)
 
     class Base(
-        private val database: FirebaseFirestore,
+        private val database: DatabaseService,
     ) : HomeworksRemoteDataSource {
 
         override suspend fun addOrUpdateHomework(homework: HomeworkPojo, targetUser: UID): UID {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.HOMEWORKS)
 
             val homeworkId = homework.uid.takeIf { it.isNotBlank() } ?: randomUUID()
 
-            return reference.document(homeworkId).set(homework.copy(uid = homeworkId)).let {
-                return@let homeworkId
-            }
+            database.upsertDocument(
+                databaseId = Homeworks.DATABASE_ID,
+                collectionId = Homeworks.COLLECTION_ID,
+                documentId = homeworkId,
+                data = homework.copy(uid = homeworkId),
+                permissions = Permission.onlyUserData(targetUser),
+                nestedType = HomeworkPojo.serializer(),
+            )
+
+            return homeworkId
         }
 
         override suspend fun addOrUpdateHomeworksGroup(
             homeworks: List<HomeworkPojo>,
             targetUser: UID
         ) {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.HOMEWORKS)
-
-            database.batch().apply {
-                homeworks.forEach { homework ->
-                    val uid = homework.uid.takeIf { it.isNotBlank() } ?: randomUUID()
-                    set(reference.document(uid), homework)
-                }
-                return@apply commit()
-            }
+            homeworks.forEach { addOrUpdateHomework(it, targetUser) }
         }
 
         override suspend fun fetchHomeworkById(
@@ -98,11 +91,15 @@ interface HomeworksRemoteDataSource {
         ): Flow<HomeworkDetailsPojo?> {
             if (uid.isEmpty()) return flowOf(null)
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.HOMEWORKS).document(uid)
+            val homeworkFlow = database.getDocumentFlow(
+                databaseId = Homeworks.DATABASE_ID,
+                collectionId = Homeworks.COLLECTION_ID,
+                documentId = uid,
+                nestedType = HomeworkPojo.serializer(),
+            )
 
-            return reference.snapshotFlowGet<HomeworkPojo?>().flatMapToDetails(userDataRoot)
+            return homeworkFlow.flatMapToDetails()
         }
 
         override suspend fun fetchHomeworksByTimeRange(
@@ -111,19 +108,19 @@ interface HomeworksRemoteDataSource {
             targetUser: UID
         ): Flow<List<HomeworkDetailsPojo>> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val homeworksFlow = userDataRoot.collection(UserData.HOMEWORKS)
-                .where {
-                    val fromDeadlineFilter = UserData.HOMEWORK_DEADLINE greaterThanOrEqualTo from
-                    val toDeadlineFilter = UserData.HOMEWORK_DEADLINE lessThanOrEqualTo to
-                    return@where fromDeadlineFilter and toDeadlineFilter
-                }
-                .orderBy(UserData.HOMEWORK_DEADLINE, Direction.DESCENDING)
-                .snapshotListFlowGet<HomeworkPojo>()
-                .flatMapListToDetails(userDataRoot)
+            val homeworksFlow = database.listDocumentsFlow(
+                databaseId = Homeworks.DATABASE_ID,
+                collectionId = Homeworks.COLLECTION_ID,
+                queries = listOf(
+                    Query.equal(Homeworks.USER_ID, targetUser),
+                    Query.between(Homeworks.DEADLINE, from, to),
+                    Query.orderDesc(Homeworks.DEADLINE),
+                ),
+                nestedType = HomeworkPojo.serializer(),
+            )
 
-            return homeworksFlow
+            return homeworksFlow.flatMapListToDetails()
         }
 
         override suspend fun fetchOverdueHomeworks(
@@ -131,20 +128,21 @@ interface HomeworksRemoteDataSource {
             targetUser: UID,
         ): Flow<List<HomeworkDetailsPojo>> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val homeworksFlow = userDataRoot.collection(UserData.HOMEWORKS)
-                .where {
-                    val deadlineFilter = UserData.HOMEWORK_DEADLINE lessThan currentDate
-                    val doneFilter = UserData.HOMEWORK_DONE equalTo false
-                    val completeDateFilter = UserData.HOMEWORK_COMPLETE_DATE equalTo null
-                    return@where deadlineFilter and doneFilter and completeDateFilter
-                }
-                .orderBy(UserData.HOMEWORK_DEADLINE, Direction.DESCENDING)
-                .snapshotListFlowGet<HomeworkPojo>()
-                .flatMapListToDetails(userDataRoot)
+            val homeworksFlow = database.listDocumentsFlow(
+                databaseId = Homeworks.DATABASE_ID,
+                collectionId = Homeworks.COLLECTION_ID,
+                queries = listOf(
+                    Query.equal(Homeworks.USER_ID, targetUser),
+                    Query.lessThan(Homeworks.DEADLINE, currentDate),
+                    Query.equal(Homeworks.DONE, false),
+                    Query.isNull(Homeworks.COMPLETE_DATE),
+                    Query.orderDesc(Homeworks.DEADLINE),
+                ),
+                nestedType = HomeworkPojo.serializer(),
+            )
 
-            return homeworksFlow
+            return homeworksFlow.flatMapListToDetails()
         }
 
         override suspend fun fetchActiveLinkedHomeworks(
@@ -152,85 +150,89 @@ interface HomeworksRemoteDataSource {
             targetUser: UID,
         ): Flow<List<HomeworkDetailsPojo>> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val homeworksFlow = userDataRoot.collection(UserData.HOMEWORKS)
-                .where {
-                    val deadlineFilter = UserData.HOMEWORK_DEADLINE greaterThanOrEqualTo currentDate
-                    val classIdFilter = UserData.HOMEWORK_CLASS_ID notEqualTo null
-                    val doneFilter = UserData.HOMEWORK_DONE equalTo false
-                    return@where deadlineFilter and classIdFilter and doneFilter
-                }
-                .orderBy(UserData.HOMEWORK_DEADLINE, Direction.DESCENDING)
-                .snapshotListFlowGet<HomeworkPojo>()
-                .flatMapListToDetails(userDataRoot)
+            val homeworksFlow = database.listDocumentsFlow(
+                databaseId = Homeworks.DATABASE_ID,
+                collectionId = Homeworks.COLLECTION_ID,
+                queries = listOf(
+                    Query.equal(Homeworks.USER_ID, targetUser),
+                    Query.greaterThanEqual(Homeworks.DEADLINE, currentDate),
+                    Query.isNotNull(Homeworks.CLASS_ID),
+                    Query.equal(Homeworks.DONE, false),
+                    Query.orderDesc(Homeworks.DEADLINE),
+                ),
+                nestedType = HomeworkPojo.serializer(),
+            )
 
-            return homeworksFlow
+            return homeworksFlow.flatMapListToDetails()
         }
 
         override suspend fun deleteHomework(uid: UID, targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.HOMEWORKS).document(uid)
-
-            return reference.delete()
+            database.deleteDocument(
+                databaseId = Homeworks.DATABASE_ID,
+                collectionId = Homeworks.COLLECTION_ID,
+                documentId = uid,
+            )
         }
 
         override suspend fun fetchCompletedHomeworksCount(targetUser: UID): Flow<Int> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val homeworksFlow = userDataRoot.collection(UserData.HOMEWORKS)
-                .where {
-                    val doneFilter = UserData.HOMEWORK_DONE equalTo true
-                    val completeDateFilter = UserData.HOMEWORK_COMPLETE_DATE notEqualTo null
-                    return@where doneFilter and completeDateFilter
-                }
-                .orderBy(UserData.HOMEWORK_DEADLINE, Direction.DESCENDING)
-                .snapshots
-                .map { snapshot -> snapshot.documents.size }
+            val homeworksFlow = database.listDocumentsFlow(
+                databaseId = Homeworks.DATABASE_ID,
+                collectionId = Homeworks.COLLECTION_ID,
+                queries = listOf(
+                    Query.equal(Homeworks.USER_ID, targetUser),
+                    Query.equal(Homeworks.DONE, true),
+                    Query.isNotNull(Homeworks.COMPLETE_DATE),
+                ),
+                nestedType = HomeworkPojo.serializer(),
+            )
 
-            return homeworksFlow
+            return homeworksFlow.map { it.size }
         }
 
         override suspend fun deleteAllHomework(targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.HOMEWORKS)
-
-            database.deleteAll(reference)
+            val homeworks = fetchHomeworksByTimeRange(Long.MIN_VALUE, Long.MAX_VALUE, targetUser)
+            homeworks.first().forEach { deleteHomework(it.uid, targetUser) }
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
-        private fun Flow<List<HomeworkPojo>>.flatMapListToDetails(
-            userDataRoot: DocumentReference
-        ): Flow<List<HomeworkDetailsPojo>> = flatMapLatest { homeworks ->
+        private fun Flow<List<HomeworkPojo>>.flatMapListToDetails() = flatMapLatest { homeworks ->
             if (homeworks.isEmpty()) {
                 flowOf(emptyList())
             } else {
-                val organizationsIds = homeworks.map { it.organizationId }.toSet()
+                val organizationsIds = homeworks.map { it.organizationId }.toSet().toList()
 
-                val organizationsMapFlow = userDataRoot.collection(UserData.ORGANIZATIONS)
-                    .observeCollectionMapByField<OrganizationShortPojo>(
-                        ids = organizationsIds,
-                        associateKey = { it.uid }
-                    )
+                val organizationsMapFlow = database.listDocumentsFlow(
+                    databaseId = Organizations.DATABASE_ID,
+                    collectionId = Organizations.COLLECTION_ID,
+                    queries = listOf(Query.equal(Organizations.UID, organizationsIds)),
+                    nestedType = OrganizationShortPojo.serializer(),
+                ).map { items ->
+                    items.associateBy { it.uid }
+                }
 
-                val subjectsMapFlow = userDataRoot.collection(UserData.SUBJECTS)
-                    .observeCollectionMapByField<SubjectPojo>(
-                        ids = organizationsIds,
-                        fieldName = UserData.ORGANIZATION_ID,
-                        associateKey = { it.uid }
-                    )
+                val subjectsMapFlow = database.listDocumentsFlow(
+                    databaseId = Subjects.DATABASE_ID,
+                    collectionId = Subjects.COLLECTION_ID,
+                    queries = listOf(Query.equal(Subjects.ORGANIZATION_ID, organizationsIds)),
+                    nestedType = SubjectPojo.serializer(),
+                ).map { items ->
+                    items.associateBy { it.uid }
+                }
 
-                val employeesMapFlow = userDataRoot.collection(UserData.EMPLOYEE)
-                    .observeCollectionMapByField<EmployeePojo>(
-                        ids = organizationsIds,
-                        fieldName = UserData.ORGANIZATION_ID,
-                        associateKey = { it.uid }
-                    )
+                val employeesMapFlow = database.listDocumentsFlow(
+                    databaseId = Employee.DATABASE_ID,
+                    collectionId = Employee.COLLECTION_ID,
+                    queries = listOf(Query.equal(Employee.ORGANIZATION_ID, organizationsIds)),
+                    nestedType = EmployeePojo.serializer(),
+                ).map { items ->
+                    items.associateBy { it.uid }
+                }
 
                 combine(
                     flowOf(homeworks),
@@ -250,11 +252,9 @@ interface HomeworksRemoteDataSource {
             }
         }
 
-        private fun Flow<HomeworkPojo?>.flatMapToDetails(
-            userDataRoot: DocumentReference
-        ): Flow<HomeworkDetailsPojo?> {
+        private fun Flow<HomeworkPojo?>.flatMapToDetails(): Flow<HomeworkDetailsPojo?> {
             return mapNotNull { it?.let { listOf(it) } ?: emptyList() }
-                .flatMapListToDetails(userDataRoot)
+                .flatMapListToDetails()
                 .map { it.getOrNull(0) }
         }
     }

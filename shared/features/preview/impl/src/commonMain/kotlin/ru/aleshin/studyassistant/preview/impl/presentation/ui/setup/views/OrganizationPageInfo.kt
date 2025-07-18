@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,17 +40,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import io.github.vinceglb.filekit.core.PlatformFile
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
+import ru.aleshin.studyassistant.core.ui.views.FreeOrPaidContent
 import ru.aleshin.studyassistant.core.ui.views.VerticalInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.dialog.ContactInfoEditorDialog
+import ru.aleshin.studyassistant.core.ui.views.menu.ClickableAvatarView
 import ru.aleshin.studyassistant.core.ui.views.menu.OrganizationTypeDropdownMenu
 import ru.aleshin.studyassistant.core.ui.views.menu.SelectableAvatarView
 import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
@@ -64,11 +70,13 @@ internal fun OrganizationPageInfo(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     organization: OrganizationUi,
+    isPaidUser: Boolean,
     avatar: String?,
     onUpdateOrganization: (OrganizationUi) -> Unit,
     onUpdateAvatar: (PlatformFile) -> Unit,
     onDeleteAvatar: () -> Unit,
     onExceedingLimit: (Int) -> Unit,
+    onOpenBillingScreen: () -> Unit,
 ) = with(organization) {
     Column(
         modifier = modifier,
@@ -83,16 +91,42 @@ internal fun OrganizationPageInfo(
             var editableShortName by remember { mutableStateOf(TextFieldValue(shortName)) }
             val shortNameInteraction = remember { MutableInteractionSource() }
 
-            SelectableAvatarView(
-                onSelect = onUpdateAvatar,
-                onDelete = onDeleteAvatar,
-                onExceedingLimit = onExceedingLimit,
-                modifier = Modifier.size(90.dp),
-                firstName = organization.shortName.split(' ').getOrNull(0) ?: "*",
-                secondName = organization.shortName.split(' ').getOrNull(1),
-                imageUrl = avatar,
-                shape = RoundedCornerShape(32.dp),
-                style = MaterialTheme.typography.displaySmall,
+            FreeOrPaidContent(
+                isPaidUser = isPaidUser,
+                modifier = modifier,
+                paidContent = {
+                    SelectableAvatarView(
+                        onSelect = onUpdateAvatar,
+                        onDelete = onDeleteAvatar,
+                        onExceedingLimit = onExceedingLimit,
+                        modifier = Modifier.size(90.dp),
+                        firstName = organization.shortName.split(' ').getOrNull(0) ?: "*",
+                        secondName = organization.shortName.split(' ').getOrNull(1),
+                        imageUrl = avatar,
+                        shape = RoundedCornerShape(32.dp),
+                        style = MaterialTheme.typography.displaySmall,
+                    )
+                },
+                freeContent = {
+                    ClickableAvatarView(
+                        onClick = onOpenBillingScreen,
+                        modifier = Modifier.size(90.dp),
+                        imageUrl = avatar,
+                        sideIcon = {
+                            Icon(
+                                modifier = Modifier.clip(MaterialTheme.shapes.full),
+                                imageVector = Icons.Default.Stars,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        firstName = organization.shortName.split(' ').getOrNull(0) ?: "-",
+                        secondName = organization.shortName.split(' ').getOrNull(1),
+                        shape = RoundedCornerShape(32.dp),
+                        style = MaterialTheme.typography.displaySmall,
+                        iconOffset = DpOffset((-4).dp, (-4).dp),
+                    )
+                },
             )
             VerticalInfoTextField(
                 value = editableShortName,
@@ -103,16 +137,16 @@ internal fun OrganizationPageInfo(
                 labelText = PreviewThemeRes.strings.shortNameLabel,
                 placeholder = PreviewThemeRes.strings.shortNamePlaceholder,
                 infoIcon = painterResource(PreviewThemeRes.icons.name),
-                trailingIcon = {
-                    if (shortNameInteraction.collectIsFocusedAsState().value) {
-                        IconButton(onClick = { focusManager.clearFocus() }) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null,
-                                tint = StudyAssistantRes.colors.accents.green,
-                            )
-                        }
+                trailingIcon = if (shortNameInteraction.collectIsFocusedAsState().value) { {
+                    IconButton(onClick = { focusManager.clearFocus() }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = StudyAssistantRes.colors.accents.green,
+                        )
                     }
+                } } else {
+                    null
                 },
                 interactionSource = shortNameInteraction,
             )

@@ -49,7 +49,7 @@ class HomeworksRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.addOrUpdateHomework(homework.mapToRemoteData(), targetUser)
+            remoteDataSource.addOrUpdateHomework(homework.mapToRemoteData(targetUser), targetUser)
         } else {
             localDataSource.addOrUpdateHomework(homework.mapToLocalData())
         }
@@ -59,7 +59,7 @@ class HomeworksRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.addOrUpdateHomeworksGroup(homeworks.map { it.mapToRemoteData() }, targetUser)
+            remoteDataSource.addOrUpdateHomeworksGroup(homeworks.map { it.mapToRemoteData(targetUser) }, targetUser)
         } else {
             localDataSource.addOrUpdateHomeworksGroup(homeworks.map { it.mapToLocalData() })
         }
@@ -186,7 +186,7 @@ class HomeworksRepositoryImpl(
                     from = DISTANT_PAST.toEpochMilliseconds(),
                     to = DISTANT_FUTURE.toEpochMilliseconds(),
                 ).let { homeworksFlow ->
-                    return@let homeworksFlow.first().map { it.mapToDomain().mapToRemoteData() }
+                    return@let homeworksFlow.first().map { it.mapToDomain().mapToRemoteData(targetUser) }
                 }
                 remoteDataSource.deleteAllHomework(targetUser)
                 remoteDataSource.addOrUpdateHomeworksGroup(allHomeworks, targetUser)

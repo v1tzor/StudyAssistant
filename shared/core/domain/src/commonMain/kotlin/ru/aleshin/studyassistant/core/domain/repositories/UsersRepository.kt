@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.core.domain.repositories
 
 import kotlinx.coroutines.flow.Flow
-import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
@@ -27,17 +26,18 @@ import ru.aleshin.studyassistant.core.domain.entities.users.AuthUser
  * @author Stanislav Aleshin on 29.04.2024.
  */
 interface UsersRepository {
-    suspend fun addOrUpdateAppUser(user: AppUser): Boolean
-    fun fetchCurrentAppUser(): AuthUser?
-    fun fetchCurrentUserOrError() = fetchCurrentAppUser() ?: throw AppwriteUserException()
-    suspend fun fetchAuthStateChanged(): Flow<AuthUser?>
+    suspend fun addAppUser(user: AppUser): UID
+    suspend fun updateAppUser(user: AppUser)
+    suspend fun fetchCurrentAuthUser(): AuthUser?
+    suspend fun fetchCurrentUserOrError(): AuthUser
+    suspend fun fetchStateChanged(): Flow<AuthUser?>
     suspend fun fetchCurrentUserPaidStatus(): Flow<Boolean>
     suspend fun fetchExistRemoteDataStatus(uid: UID): Flow<Boolean>
     suspend fun fetchUserById(uid: UID): Flow<AppUser?>
     suspend fun fetchRealtimeUserById(uid: UID): AppUser?
     suspend fun fetchUserFriends(uid: UID): Flow<List<AppUser>>
     suspend fun findUsersByCode(code: String): Flow<List<AppUser>>
-    suspend fun uploadUserAvatar(uid: UID, avatar: InputFile): String
+    suspend fun uploadUserAvatar(oldAvatarUrl: String?, avatar: InputFile, targetUser: UID): String
     suspend fun reloadUser(): AuthUser?
-    suspend fun deleteUserAvatar(uid: UID)
+    suspend fun deleteUserAvatar(avatarUrl: String, targetUser: UID)
 }

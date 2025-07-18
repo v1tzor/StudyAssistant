@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.common
 
-import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
+import ru.aleshin.studyassistant.core.remote.appwrite.AppwriteException
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.domain.entities.ShiftTimeError
 
@@ -27,7 +27,11 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.ShiftTimeError
 internal interface EditorErrorHandler : ErrorHandler<EditorFailures> {
     class Base : EditorErrorHandler {
         override fun handle(throwable: Throwable) = when (throwable) {
-            is FirebaseAuthInvalidCredentialsException -> EditorFailures.CredentialsError
+            is AppwriteException -> if (throwable.type == "user_invalid_credentials") {
+                EditorFailures.CredentialsError
+            } else {
+                EditorFailures.OtherError(throwable)
+            }
             is ShiftTimeError -> EditorFailures.ShiftTimeError
             else -> EditorFailures.OtherError(throwable)
         }

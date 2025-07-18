@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.remote.models.tasks.HomeworkPojo
  */
 fun HomeworkDetailsPojo.mapToBase() = HomeworkPojo(
     uid = uid,
+    userId = userId,
     classId = classId,
     deadline = deadline,
     subjectId = subject?.uid,
@@ -44,6 +45,7 @@ fun HomeworkPojo.mapToDetails(
     subject: SubjectDetailsPojo?,
 ) = HomeworkDetailsPojo(
     uid = uid,
+    userId = userId,
     classId = classId,
     deadline = deadline,
     subject = subject,

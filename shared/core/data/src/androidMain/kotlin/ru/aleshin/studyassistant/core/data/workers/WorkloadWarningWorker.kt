@@ -93,7 +93,7 @@ class WorkloadWarningWorker(
 
     override suspend fun doWork(): Result {
         val coreStrings = fetchCoreStrings(fetchAppLanguage(applicationContext.fetchCurrentLanguage()))
-        val currentUser = usersRepository.fetchCurrentAppUser()?.uid ?: return Result.failure()
+        val currentUser = usersRepository.fetchCurrentAuthUser()?.uid ?: return Result.failure()
         val currentDate = dateManager.fetchBeginningCurrentInstant()
 
         val notificationSettings = notificationSettingsRepository.fetchSettings(currentUser).first()

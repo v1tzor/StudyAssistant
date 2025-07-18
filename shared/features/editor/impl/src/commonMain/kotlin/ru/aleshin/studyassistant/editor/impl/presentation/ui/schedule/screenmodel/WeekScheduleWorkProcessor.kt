@@ -83,7 +83,7 @@ internal interface WeekScheduleWorkProcessor :
             val organizationsFlow = organizationInteractor.fetchAllShortOrganizations()
             val settingsFlow = settingsInteractor.fetchSettings()
 
-            organizationsFlow.flatMapLatestWithResult(
+            organizationsFlow.combineWithResult(
                 secondFlow = settingsFlow,
                 onError = { WeekScheduleEffect.ShowError(it) },
                 onData = { shortOrganizations, calendarSettings ->

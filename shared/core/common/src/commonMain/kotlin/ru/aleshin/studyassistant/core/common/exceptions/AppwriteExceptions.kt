@@ -22,3 +22,5 @@ package ru.aleshin.studyassistant.core.common.exceptions
 class AppwriteDataAuthException : Exception()
 
 class AppwriteUserException : Exception()
+
+class InternetConnectionException : Exception()

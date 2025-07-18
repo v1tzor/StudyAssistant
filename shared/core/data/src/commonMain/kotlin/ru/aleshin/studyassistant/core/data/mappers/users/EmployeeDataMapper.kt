@@ -16,10 +16,11 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.users
 
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.extensions.fromJson
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.core.domain.entities.employee.MediatedEmployee
@@ -48,10 +49,10 @@ fun EmployeePojo.mapToDomain() = Employee(
     } else {
         null
     },
-    emails = emails.map { it.mapToDomain() },
-    phones = phones.map { it.mapToDomain() },
-    locations = locations.map { it.mapToDomain() },
-    webs = webs.map { it.mapToDomain() },
+    emails = emails.map { it.fromJson<ContactInfoPojo>().mapToDomain() },
+    phones = phones.map { it.fromJson<ContactInfoPojo>().mapToDomain() },
+    locations = locations.map { it.fromJson<ContactInfoPojo>().mapToDomain() },
+    webs = webs.map { it.fromJson<ContactInfoPojo>().mapToDomain() },
 )
 
 fun MediatedEmployeePojo.mapToDomain() = MediatedEmployee(
@@ -93,14 +94,15 @@ fun EmployeeEntity.mapToDomain() = Employee(
     } else {
         null
     },
-    emails = emails.map { Json.decodeFromString<ContactInfoPojo>(it).mapToDomain() },
-    phones = phones.map { Json.decodeFromString<ContactInfoPojo>(it).mapToDomain() },
-    locations = locations.map { Json.decodeFromString<ContactInfoPojo>(it).mapToDomain() },
-    webs = webs.map { Json.decodeFromString<ContactInfoPojo>(it).mapToDomain() },
+    emails = emails.map { it.fromJson<ContactInfoPojo>().mapToDomain() },
+    phones = phones.map { it.fromJson<ContactInfoPojo>().mapToDomain() },
+    locations = locations.map { it.fromJson<ContactInfoPojo>().mapToDomain() },
+    webs = webs.map { it.fromJson<ContactInfoPojo>().mapToDomain() },
 )
 
-fun Employee.mapToRemoteData() = EmployeePojo(
+fun Employee.mapToRemoteData(userId: UID) = EmployeePojo(
     uid = uid,
+    userId = userId,
     organizationId = organizationId,
     firstName = firstName,
     secondName = secondName,
@@ -110,10 +112,10 @@ fun Employee.mapToRemoteData() = EmployeePojo(
     birthday = birthday,
     workTimeStart = workTime?.from?.toEpochMilliseconds(),
     workTimeEnd = workTime?.to?.toEpochMilliseconds(),
-    emails = emails.map { it.mapToRemoteData() },
-    phones = phones.map { it.mapToRemoteData() },
-    locations = locations.map { it.mapToRemoteData() },
-    webs = webs.map { it.mapToRemoteData() },
+    emails = emails.map { it.mapToRemoteData().toJson() },
+    phones = phones.map { it.mapToRemoteData().toJson() },
+    locations = locations.map { it.mapToRemoteData().toJson() },
+    webs = webs.map { it.mapToRemoteData().toJson() },
 )
 
 fun MediatedEmployee.mapToRemoteData() = MediatedEmployeePojo(
@@ -143,8 +145,8 @@ fun Employee.mapToLocalData() = EmployeeEntity(
     birthday = birthday,
     workTimeStart = workTime?.from?.toEpochMilliseconds(),
     workTimeEnd = workTime?.to?.toEpochMilliseconds(),
-    emails = emails.map { Json.encodeToString(it.mapToLocalData()) },
-    phones = phones.map { Json.encodeToString(it.mapToLocalData()) },
-    locations = locations.map { Json.encodeToString(it.mapToLocalData()) },
-    webs = webs.map { Json.encodeToString(it.mapToLocalData()) },
+    emails = emails.map { it.mapToLocalData().toJson() },
+    phones = phones.map { it.mapToLocalData().toJson() },
+    locations = locations.map { it.mapToLocalData().toJson() },
+    webs = webs.map { it.mapToLocalData().toJson() },
 )

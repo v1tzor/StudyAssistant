@@ -20,13 +20,17 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
-import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
+import ru.aleshin.studyassistant.core.ui.mappers.convertToInputFile
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar.Delete
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar.None
+import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar.Set
+import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen.WeekSchedule
 import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
 import ru.aleshin.studyassistant.preview.impl.navigation.PreviewScreenProvider
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupAction
@@ -66,6 +70,10 @@ internal class SetupScreenModel(
                     val command = SetupWorkCommand.LoadAllData
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_PAID_USER_STATUS) {
+                    val command = SetupWorkCommand.LoadPaidUserStatus
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is SetupEvent.UpdateProfile -> {
                 sendAction(SetupAction.UpdateUserProfile(event.userProfile))
@@ -85,13 +93,14 @@ internal class SetupScreenModel(
                 sendAction(SetupAction.UpdatePage(SetupPage.ORGANIZATION))
             }
             is SetupEvent.UpdateProfileAvatar -> with(event) {
-                sendAction(SetupAction.UpdateActionWithProfileAvatar(ActionWithAvatar.Set(image)))
+                val inputFile = image.convertToInputFile()
+                sendAction(SetupAction.UpdateActionWithProfileAvatar(Set(inputFile)))
             }
             is SetupEvent.DeleteProfileAvatar -> with(state()) {
                 val action = if (profile?.avatar != null) {
-                    ActionWithAvatar.Delete
+                    Delete
                 } else {
-                    ActionWithAvatar.None(null)
+                    None(null)
                 }
                 sendAction(SetupAction.UpdateActionWithProfileAvatar(action))
             }
@@ -104,13 +113,14 @@ internal class SetupScreenModel(
                 sendAction(SetupAction.UpdatePage(SetupPage.CALENDAR))
             }
             is SetupEvent.UpdateOrganizationAvatar -> with(event) {
-                sendAction(SetupAction.UpdateActionWithOrganizationAvatar(ActionWithAvatar.Set(image)))
+                val inputFile = image.convertToInputFile()
+                sendAction(SetupAction.UpdateActionWithOrganizationAvatar(Set(inputFile)))
             }
             is SetupEvent.DeleteOrganizationAvatar -> with(state()) {
                 val action = if (organization?.avatar != null) {
-                    ActionWithAvatar.Delete
+                    Delete
                 } else {
-                    ActionWithAvatar.None(null)
+                    None(null)
                 }
                 sendAction(SetupAction.UpdateActionWithOrganizationAvatar(action))
             }
@@ -123,15 +133,26 @@ internal class SetupScreenModel(
                 sendAction(SetupAction.UpdatePage(SetupPage.SCHEDULE))
             }
             is SetupEvent.NavigateToWeekScheduleEditor -> {
-                val screen = screenProvider.provideEditorScreen(EditorScreen.WeekSchedule())
+                val screen = screenProvider.provideEditorScreen(WeekSchedule())
+
+                workProcessor.work(SetupWorkCommand.FinishSetup).collectAndHandleWork()
                 sendEffect(SetupEffect.NavigateToGlobalScreen(screen))
             }
             is SetupEvent.NavigateToSchedule -> {
                 val screen = screenProvider.provideTabNavigationScreen()
+
+                workProcessor.work(SetupWorkCommand.FinishSetup).collectAndHandleWork()
                 sendEffect(SetupEffect.ReplaceGlobalScreen(screen))
             }
             is SetupEvent.NavigateToBackPage -> with(state()) {
                 sendAction(SetupAction.UpdatePage(SetupPage.previousPage(currentPage)))
+            }
+            is SetupEvent.NavigateToBilling -> {
+                val screen = screenProvider.provideBillingScreen(BillingScreen.Subscription)
+                sendEffect(SetupEffect.NavigateToGlobalScreen(screen))
+            }
+            is SetupEvent.NavigateToBack -> {
+                sendEffect(SetupEffect.NavigateToBack)
             }
         }
     }
@@ -145,10 +166,13 @@ internal class SetupScreenModel(
         )
         is SetupAction.UpdateAll -> currentState.copy(
             profile = action.profile,
-            actionWithProfileAvatar = ActionWithAvatar.None(action.profile.avatar),
+            actionWithProfileAvatar = None(action.profile.avatar),
             organization = action.organization,
-            actionWithOrganizationAvatar = ActionWithAvatar.None(action.organization.avatar),
+            actionWithOrganizationAvatar = None(action.organization.avatar),
             calendarSettings = action.calendarSettings,
+        )
+        is SetupAction.UpdateUserPaidStatus -> currentState.copy(
+            isPaidUser = action.isPaid,
         )
         is SetupAction.UpdateUserProfile -> currentState.copy(
             profile = action.profile,
@@ -168,7 +192,7 @@ internal class SetupScreenModel(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_ALL_DATA, SAVE_PROFILE, SAVE_ORGANIZATION, SAVE_SETTINGS
+        LOAD_ALL_DATA, LOAD_PAID_USER_STATUS, SAVE_PROFILE, SAVE_ORGANIZATION, SAVE_SETTINGS
     }
 }
 

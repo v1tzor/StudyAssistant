@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.Effec
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.extensions.delayedAction
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.Constants.Delay.SPLASH_NAV
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.Either
@@ -81,7 +82,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                         is Either.Right -> settingsEither.data
                     }
                 }
-                val appUser = userInteractor.fetchAppUser().let { checkEither ->
+                val authUser = userInteractor.fetchAuthUser().let { checkEither ->
                     when (checkEither) {
                         is Either.Left -> return@delayedAction EffectResult(MainEffect.ShowError(checkEither.data))
                         is Either.Right -> checkEither.data
@@ -91,9 +92,11 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                     settingsInteractor.updateSettings(settings.copy(isFirstStart = false))
                     screenProvider.providePreviewScreen(PreviewScreen.Intro)
                 } else {
-                    if (appUser != null) { // && appUser.isEmailVerified) {
+                    if (authUser != null && authUser.emailVerification && settings.isUnfinishedSetup != authUser.uid) {
                         screenProvider.provideTabNavigationScreen()
-                    } else if (appUser != null) {
+                    } else if (authUser != null && authUser.emailVerification) {
+                        screenProvider.providePreviewScreen(PreviewScreen.Setup)
+                    } else if (authUser != null) {
                         screenProvider.provideAuthScreen(AuthScreen.Verification)
                     } else {
                         screenProvider.provideAuthScreen(AuthScreen.Login)
@@ -114,20 +117,19 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                     val deviceId = deviceInfoProvider.fetchDeviceId()
                     val currentDeviceInfo = appUser?.devices?.find { it.deviceId == deviceId }
                     val actualDeviceInfo = UserDevice(
+                        uid = randomUUID(),
                         platform = deviceInfoProvider.fetchDevicePlatform(),
                         deviceId = deviceId,
                         deviceName = deviceInfoProvider.fetchDeviceName(),
                         pushToken = token?.token,
                         pushServiceType = token?.service ?: PushServiceType.NONE,
                     )
-                    if (appUser != null && currentDeviceInfo != null && actualDeviceInfo != currentDeviceInfo) {
-                        val updatedUser = appUser.copy(
-                            devices = buildList {
-                                addAll(appUser.devices)
-                                remove(currentDeviceInfo)
-                                add(actualDeviceInfo)
-                            }
-                        )
+                    if (appUser != null && actualDeviceInfo.pushToken != currentDeviceInfo?.pushToken) {
+                        val devices = buildList {
+                            addAll(appUser.devices.filter { it.deviceId != deviceId })
+                            add(actualDeviceInfo)
+                        }
+                        val updatedUser = appUser.copy(devices = devices)
                         userInteractor.updateUser(updatedUser)
                     }
                 },

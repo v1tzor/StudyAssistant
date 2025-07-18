@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.first
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPurchaseStatus.CONFIRMED
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
@@ -49,19 +48,17 @@ internal interface SubscriptionInteractor {
         private val eitherWrapper: SettingsEitherWrapper,
     ) : SubscriptionInteractor {
 
-        private val currentUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchCurrentStore(): Store {
             return iapService.fetchStore()
         }
 
         override suspend fun fetchSubscriptions() = eitherWrapper.wrap {
-            val appUserInfo = usersRepository.fetchUserById(currentUser).first()
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            val appUserInfo = usersRepository.fetchUserById(targetUser).first()
             val userSubscriptionInfo = appUserInfo?.subscriptionInfo
 
             val allPurchases = try {
-                iapService.fetchPurchases().filter { it.developerPayload == currentUser }
+                iapService.fetchPurchases().filter { it.developerPayload == targetUser }
             } catch (e: Throwable) {
                 emptyList()
             }
@@ -91,12 +88,13 @@ internal interface SubscriptionInteractor {
         }
 
         override suspend fun restoreSubscription() = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val allPurchases = iapService.fetchPurchases()
             val activePurchase = allPurchases.find { product ->
-                product.status == CONFIRMED && product.developerPayload == currentUser
+                product.status == CONFIRMED && product.developerPayload == targetUser
             }
 
-            val appUserInfo = checkNotNull(usersRepository.fetchUserById(currentUser).first())
+            val appUserInfo = checkNotNull(usersRepository.fetchUserById(targetUser).first())
             val currentSubscriptionInfo = appUserInfo.subscriptionInfo
 
             return@wrap if (activePurchase != null) {
@@ -120,7 +118,7 @@ internal interface SubscriptionInteractor {
                             expiryTimeMillis = endTime.toEpochMilliseconds(),
                         )
                         val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
-                        usersRepository.addOrUpdateAppUser(updatedAppUser)
+                        usersRepository.updateAppUser(updatedAppUser)
                     } else {
                         val updatedSubscriptionInfo = SubscribeInfo(
                             deviceId = deviceInfoProvider.fetchDeviceId(),
@@ -133,7 +131,7 @@ internal interface SubscriptionInteractor {
                             store = iapService.fetchStore(),
                         )
                         val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
-                        usersRepository.addOrUpdateAppUser(updatedAppUser)
+                        usersRepository.updateAppUser(updatedAppUser)
                     }
                     true
                 } else {

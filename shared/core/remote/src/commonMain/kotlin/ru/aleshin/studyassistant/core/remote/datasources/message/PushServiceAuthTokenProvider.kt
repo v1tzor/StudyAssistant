@@ -64,6 +64,7 @@ interface PushServiceAuthTokenProvider {
     class Huawei(
         private val hmsAuthTokenProvider: HmsAuthTokenProvider,
     ) : PushServiceAuthTokenProvider {
+
         override suspend fun fetchAuthToken(): String {
             return checkNotNull(hmsAuthTokenProvider.fetchAccessToken()) {
                 "Hms auth token was null."

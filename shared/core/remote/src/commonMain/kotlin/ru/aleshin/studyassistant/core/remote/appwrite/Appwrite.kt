@@ -16,23 +16,25 @@
 
 package ru.aleshin.studyassistant.core.remote.appwrite
 
-import ru.aleshin.studyassistant.core.remote.appwrite.auth.AppwriteAuth
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.AppwriteDatabase
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.AppwriteRealtime
-import ru.aleshin.studyassistant.core.remote.appwrite.storage.AppwriteStorage
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
+import ru.aleshin.studyassistant.core.remote.appwrite.realtime.RealtimeService
+import ru.aleshin.studyassistant.core.remote.appwrite.storage.StorageService
 import kotlin.experimental.ExperimentalObjCName
 import kotlin.native.ObjCName
 
 /**
  * @author Stanislav Aleshin on 29.06.2025.
  */
-abstract class Appwrite {
-    abstract val auth: AppwriteAuth
-    abstract val databases: AppwriteDatabase
-    abstract val realtime: AppwriteRealtime
-    abstract val storage: AppwriteStorage
-}
+data class Appwrite(
+    val auth: AccountService,
+    val databases: DatabaseService,
+    val realtime: RealtimeService,
+    val storage: StorageService,
+)
 
+@Serializable
 @OptIn(ExperimentalObjCName::class)
 @ObjCName("RemoteAppwriteException", exact = true)
 data class AppwriteException(

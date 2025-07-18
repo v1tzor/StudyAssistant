@@ -41,8 +41,8 @@ internal interface OrganizationInteractor {
     suspend fun fetchShortOrganizationById(uid: UID): FlowDomainResult<EditorFailures, OrganizationShort>
     suspend fun fetchAllShortOrganizations(): FlowDomainResult<EditorFailures, List<OrganizationShort>>
     suspend fun updateShortOrganization(organization: OrganizationShort): UnitDomainResult<EditorFailures>
-    suspend fun uploadAvatar(uid: UID, file: InputFile): DomainResult<EditorFailures, String>
-    suspend fun deleteAvatar(uid: UID): UnitDomainResult<EditorFailures>
+    suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile): DomainResult<EditorFailures, String>
+    suspend fun deleteAvatar(avatarUrl: String): UnitDomainResult<EditorFailures>
 
     class Base(
         private val organizationsRepository: OrganizationsRepository,
@@ -50,26 +50,27 @@ internal interface OrganizationInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : OrganizationInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun addOrUpdateOrganization(organization: Organization) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             organizationsRepository.addOrUpdateOrganization(organization, targetUser)
         }
 
         override suspend fun fetchOrganizationById(uid: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             organizationsRepository.fetchOrganizationById(uid, targetUser).map { organization ->
                 checkNotNull(organization)
             }
         }
 
         override suspend fun fetchShortOrganizationById(uid: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             organizationsRepository.fetchShortOrganizationById(uid, targetUser).map { organization ->
                 checkNotNull(organization)
             }
         }
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             organizationsRepository.fetchAllShortOrganization(targetUser).map { organizations ->
                 organizations.sortedByDescending { it.isMain }
             }
@@ -77,17 +78,20 @@ internal interface OrganizationInteractor {
 
         override suspend fun updateShortOrganization(organization: OrganizationShort) = eitherWrapper.wrapUnit {
             val baseUid = organization.uid
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val baseModel = organizationsRepository.fetchOrganizationById(baseUid, targetUser).first()
             val updatedModel = organization.convertToBase(checkNotNull(baseModel))
 
             organizationsRepository.addOrUpdateOrganization(updatedModel, targetUser)
         }
 
-        override suspend fun uploadAvatar(uid: UID, file: InputFile) = eitherWrapper.wrap {
-            organizationsRepository.uploadAvatar(uid, file, targetUser)
+        override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            organizationsRepository.uploadAvatar(oldAvatarUrl, file, targetUser)
         }
-        override suspend fun deleteAvatar(uid: UID) = eitherWrapper.wrap {
-            organizationsRepository.deleteAvatar(uid, targetUser)
+        override suspend fun deleteAvatar(avatarUrl: String) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            organizationsRepository.deleteAvatar(avatarUrl, targetUser)
         }
     }
 }

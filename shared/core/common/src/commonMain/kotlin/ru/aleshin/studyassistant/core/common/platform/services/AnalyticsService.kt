@@ -15,6 +15,8 @@
  */
 package ru.aleshin.studyassistant.core.common.platform.services
 
+import ru.aleshin.studyassistant.core.common.functional.UID
+
 /**
  * @author Stanislav Aleshin on 13.04.2025.
  */
@@ -23,6 +25,8 @@ interface AnalyticsService {
     fun trackEvent(name: String, eventParams: Map<String, String>)
 
     fun initializeService()
+
+    fun setupUserId(id: UID) {}
 
     class Empty : AnalyticsService {
         override fun trackEvent(name: String, eventParams: Map<String, String>) = Unit

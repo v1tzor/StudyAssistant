@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.core.remote.models.shared.schedules
 
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
+import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojoDetails
 
 /**
  * @author Stanislav Aleshin on 14.08.2024.
@@ -27,6 +27,6 @@ import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 data class ReceivedMediatedSchedulesShortDetailsPojo(
     val uid: UID,
     val sendDate: Long,
-    val sender: AppUserPojo,
+    val sender: AppUserPojoDetails,
     val organizationNames: List<String>,
 )

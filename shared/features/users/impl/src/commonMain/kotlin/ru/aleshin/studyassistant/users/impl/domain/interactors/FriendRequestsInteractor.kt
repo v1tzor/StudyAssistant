@@ -48,16 +48,15 @@ internal interface FriendRequestsInteractor {
         private val eitherWrapper: UsersEitherWrapper,
     ) : FriendRequestsInteractor {
 
-        private val currentUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchUserFriendRequests() = eitherWrapper.wrapFlow {
-            requestsRepository.fetchRequestsByUser(currentUser)
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            requestsRepository.fetchRequestsByUser(targetUser)
         }
 
         override suspend fun sendRequest(userId: UID) = eitherWrapper.wrapUnit {
             val currentInstant = dateManager.fetchCurrentInstant()
 
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
             val currentUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(currentUser)
             val targetUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(userId)
             val currentUserInfo = usersRepository.fetchRealtimeUserById(currentUser)
@@ -88,6 +87,7 @@ internal interface FriendRequestsInteractor {
         }
 
         override suspend fun cancelSendRequest(userId: UID) = eitherWrapper.wrapUnit {
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
             val currentUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(currentUser)
             val targetUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(userId)
 
@@ -109,6 +109,7 @@ internal interface FriendRequestsInteractor {
         }
 
         override suspend fun acceptRequest(userId: UID) = eitherWrapper.wrapUnit {
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
             val currentUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(currentUser)
             val targetUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(userId)
             val currentUserInfo = usersRepository.fetchRealtimeUserById(currentUser)
@@ -148,6 +149,7 @@ internal interface FriendRequestsInteractor {
         }
 
         override suspend fun rejectRequest(userId: UID) = eitherWrapper.wrapUnit {
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
             val currentUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(currentUser)
             val targetUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(userId)
             val currentUserInfo = usersRepository.fetchRealtimeUserById(currentUser)
@@ -187,6 +189,7 @@ internal interface FriendRequestsInteractor {
         }
 
         override suspend fun deleteHistoryRequestByUser(userId: UID) = eitherWrapper.wrapUnit {
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
             val userRequests = requestsRepository.fetchRealtimeShortRequestsByUser(currentUser)
             val updatedUserRequests = userRequests.copy(
                 lastActions = buildMap {

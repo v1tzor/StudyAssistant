@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.preview.impl.domain.common.PreviewEitherWrapper
 import ru.aleshin.studyassistant.preview.impl.domain.common.PreviewErrorHandler
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.CalendarSettingsInteractor
+import ru.aleshin.studyassistant.preview.impl.domain.interactors.GeneralSettingsInteractor
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.OrganizationsInteractor
 
 /**
@@ -35,5 +36,6 @@ internal val domainModule = DI.Module("Domain") {
 
     bindProvider<AppUserInteractor> { AppUserInteractor.Base(instance(), instance()) }
     bindProvider<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance()) }
+    bindProvider<GeneralSettingsInteractor> { GeneralSettingsInteractor.Base(instance(), instance()) }
     bindProvider<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance(), instance()) }
 }

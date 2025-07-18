@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.info.impl.presentation.models.users
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.messages.PushServiceType
 import ru.aleshin.studyassistant.core.common.platform.Platform
 
@@ -26,6 +27,7 @@ import ru.aleshin.studyassistant.core.common.platform.Platform
  */
 @Parcelize
 internal data class UserDeviceUi(
+    val uid: UID,
     val platform: Platform,
     val deviceId: String,
     val deviceName: String,

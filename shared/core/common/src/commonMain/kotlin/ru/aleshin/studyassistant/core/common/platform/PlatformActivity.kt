@@ -16,7 +16,12 @@
 
 package ru.aleshin.studyassistant.core.common.platform
 
+import androidx.compose.runtime.Composable
+
 /**
  * @author Stanislav Aleshin on 16.06.2025.
  */
-expect abstract class PlatformActivity
+expect class PlatformActivity
+
+@Composable
+expect fun getPlatformActivity(): PlatformActivity

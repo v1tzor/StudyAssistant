@@ -45,10 +45,8 @@ internal interface BaseScheduleInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : BaseScheduleInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchScheduleById(uid: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             scheduleRepository.fetchScheduleById(uid, targetUser).map { schedule ->
                 schedule?.copy(classes = schedule.classes.sortedBy { it.timeRange.from.dateTime().time })
             }
@@ -59,6 +57,7 @@ internal interface BaseScheduleInteractor {
             week: NumberOfRepeatWeek,
         ) = eitherWrapper.wrapFlow {
             val weekDaySchedules = mutableMapOf<DayOfWeek, BaseSchedule>()
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val schedulesByVersion = scheduleRepository.fetchSchedulesByVersion(timeRange, week, targetUser)
 
             return@wrapFlow schedulesByVersion.map { rawSchedules ->

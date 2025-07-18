@@ -16,8 +16,6 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.subjects
 
-import dev.gitlive.firebase.firestore.DocumentReference
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -27,13 +25,13 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
-import ru.aleshin.studyassistant.core.common.extensions.deleteAll
-import ru.aleshin.studyassistant.core.common.extensions.observeCollectionMapByField
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.extensions.snapshotFlowGet
-import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.UserData
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Employee
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Subjects
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectPojo
@@ -54,45 +52,43 @@ interface SubjectsRemoteDataSource {
     suspend fun deleteAllSubjects(targetUser: UID)
 
     class Base(
-        private val database: FirebaseFirestore,
+        private val database: DatabaseService,
     ) : SubjectsRemoteDataSource {
 
         override suspend fun addOrUpdateSubject(subject: SubjectPojo, targetUser: UID): UID {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.SUBJECTS)
 
             val subjectId = subject.uid.takeIf { it.isNotBlank() } ?: randomUUID()
 
-            return reference.document(subjectId).set(subject.copy(uid = subjectId)).let {
-                return@let subjectId
-            }
+            database.upsertDocument(
+                databaseId = Subjects.DATABASE_ID,
+                collectionId = Subjects.COLLECTION_ID,
+                documentId = subjectId,
+                data = subject.copy(uid = subjectId),
+                permissions = Permission.onlyUserData(targetUser),
+                nestedType = SubjectPojo.serializer(),
+            )
+
+            return subjectId
         }
 
         override suspend fun addOrUpdateSubjectsGroup(subjects: List<SubjectPojo>, targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.SUBJECTS)
-
-            database.batch().apply {
-                subjects.forEach { subject ->
-                    val uid = subject.uid.takeIf { it.isNotBlank() } ?: randomUUID()
-                    set(reference.document(uid), subject.copy(uid = uid))
-                }
-                return@apply commit()
-            }
+            subjects.forEach { subject -> addOrUpdateSubject(subject, targetUser) }
         }
 
         override suspend fun fetchSubjectById(uid: UID, targetUser: UID): Flow<SubjectDetailsPojo?> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
             if (uid.isEmpty()) return flowOf(null)
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.SUBJECTS).document(uid)
+            val subjectsFlow = database.getDocumentFlow(
+                databaseId = Subjects.DATABASE_ID,
+                collectionId = Subjects.COLLECTION_ID,
+                documentId = uid,
+                nestedType = SubjectPojo.serializer(),
+            )
 
-            return reference.snapshotFlowGet<SubjectPojo>().flatMapToDetails(userDataRoot)
+            return subjectsFlow.flatMapToDetails()
         }
 
         override suspend fun fetchAllSubjectsByOrganization(
@@ -100,21 +96,22 @@ interface SubjectsRemoteDataSource {
             targetUser: UID
         ): Flow<List<SubjectDetailsPojo>> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val subjectsReference = if (organizationId != null) {
-                userDataRoot.collection(UserData.SUBJECTS).where {
-                    UserData.ORGANIZATION_ID equalTo organizationId
-                }
-            } else {
-                userDataRoot.collection(UserData.SUBJECTS)
-            }
+            val subjectsFlow = database.listDocumentsFlow(
+                databaseId = Subjects.DATABASE_ID,
+                collectionId = Subjects.COLLECTION_ID,
+                queries = if (organizationId != null) {
+                    listOf(
+                        Query.equal(Subjects.USER_ID, targetUser),
+                        Query.equal(Subjects.ORGANIZATION_ID, organizationId),
+                    )
+                } else {
+                    listOf(Query.equal(Subjects.USER_ID, targetUser))
+                },
+                nestedType = SubjectPojo.serializer(),
+            )
 
-            val subjectsFlow = subjectsReference
-                .snapshotListFlowGet<SubjectPojo>()
-                .flatMapListToDetails(userDataRoot)
-
-            return subjectsFlow
+            return subjectsFlow.flatMapListToDetails()
         }
 
         override suspend fun fetchAllSubjectsByNames(
@@ -122,14 +119,18 @@ interface SubjectsRemoteDataSource {
             targetUser: UID
         ): List<SubjectDetailsPojo> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val subjectsFlow = userDataRoot.collection(UserData.SUBJECTS)
-                .where { UserData.SUBJECT_NAME inArray names }
-                .snapshotListFlowGet<SubjectPojo>()
-                .flatMapListToDetails(userDataRoot)
+            val subjectsFlow = database.listDocumentsFlow(
+                databaseId = Subjects.DATABASE_ID,
+                collectionId = Subjects.COLLECTION_ID,
+                queries = listOf(
+                    Query.equal(Subjects.USER_ID, targetUser),
+                    Query.equal(Subjects.SUBJECT_NAME, names),
+                ),
+                nestedType = SubjectPojo.serializer(),
+            )
 
-            return subjectsFlow.first()
+            return subjectsFlow.flatMapListToDetails().first()
         }
 
         override suspend fun fetchSubjectsByEmployee(
@@ -137,48 +138,50 @@ interface SubjectsRemoteDataSource {
             targetUser: UID
         ): Flow<List<SubjectDetailsPojo>> {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val subjectsFlow = userDataRoot.collection(UserData.SUBJECTS)
-                .where { UserData.SUBJECT_TEACHER_ID equalTo employeeId }
-                .orderBy(UserData.SUBJECT_TEACHER_ID)
-                .snapshotListFlowGet<SubjectPojo>()
-                .flatMapListToDetails(userDataRoot)
+            val subjectsFlow = database.listDocumentsFlow(
+                databaseId = Subjects.DATABASE_ID,
+                collectionId = Subjects.COLLECTION_ID,
+                queries = listOf(
+                    Query.equal(Subjects.USER_ID, targetUser),
+                    Query.equal(Subjects.TEACHER_ID, employeeId),
+                ),
+                nestedType = SubjectPojo.serializer(),
+            )
 
-            return subjectsFlow
+            return subjectsFlow.flatMapListToDetails()
         }
 
         override suspend fun deleteSubject(targetId: UID, targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
 
-            val reference = userDataRoot.collection(UserData.SUBJECTS).document(targetId)
-
-            return reference.delete()
+            database.deleteDocument(
+                databaseId = Subjects.DATABASE_ID,
+                collectionId = Subjects.COLLECTION_ID,
+                documentId = targetId,
+            )
         }
 
         override suspend fun deleteAllSubjects(targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
-            val userDataRoot = database.collection(UserData.ROOT).document(targetUser)
-
-            val reference = userDataRoot.collection(UserData.SUBJECTS)
-
-            database.deleteAll(reference)
+            val subjectsFlow = fetchAllSubjectsByOrganization(null, targetUser)
+            subjectsFlow.first().forEach { subject -> deleteSubject(subject.uid, targetUser) }
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
-        private fun Flow<List<SubjectPojo>>.flatMapListToDetails(
-            userDataRoot: DocumentReference,
-        ): Flow<List<SubjectDetailsPojo>> = flatMapLatest { subjects ->
+        private fun Flow<List<SubjectPojo>>.flatMapListToDetails() = flatMapLatest { subjects ->
             if (subjects.isEmpty()) {
                 flowOf(emptyList())
             } else {
-                val employeesMapFlow = userDataRoot.collection(UserData.EMPLOYEE)
-                    .observeCollectionMapByField<EmployeePojo>(
-                        ids = subjects.map { it.organizationId }.toSet(),
-                        fieldName = UserData.ORGANIZATION_ID,
-                        associateKey = { it.uid }
-                    )
+                val organizationIds = subjects.map { it.organizationId }.toSet().toList()
+                val employeesMapFlow = database.listDocumentsFlow(
+                    databaseId = Employee.DATABASE_ID,
+                    collectionId = Employee.COLLECTION_ID,
+                    queries = listOf(Query.equal(Employee.ORGANIZATION_ID, organizationIds)),
+                    nestedType = EmployeePojo.serializer(),
+                ).map { items ->
+                    items.associateBy { it.uid }
+                }
 
                 combine(
                     flowOf(subjects),
@@ -191,11 +194,9 @@ interface SubjectsRemoteDataSource {
             }
         }
 
-        private fun Flow<SubjectPojo?>.flatMapToDetails(
-            userDataRoot: DocumentReference,
-        ): Flow<SubjectDetailsPojo?> {
+        private fun Flow<SubjectPojo?>.flatMapToDetails(): Flow<SubjectDetailsPojo?> {
             return mapNotNull { it?.let { listOf(it) } ?: emptyList() }
-                .flatMapListToDetails(userDataRoot)
+                .flatMapListToDetails()
                 .map { it.getOrNull(0) }
         }
     }

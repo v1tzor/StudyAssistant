@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.data.mappers.schedules
 
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToDomain
@@ -83,7 +84,7 @@ fun Class.mapToRemoteData() = ClassPojo(
     customData = customData,
     teacherId = teacher?.uid,
     office = office,
-    location = location?.mapToRemoteData(),
+    location = location?.mapToRemoteData()?.toJson(),
     startTime = timeRange.from.toEpochMilliseconds(),
     endTime = timeRange.to.toEpochMilliseconds(),
 )

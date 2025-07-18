@@ -70,15 +70,13 @@ internal interface BaseClassInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : BaseClassInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun addClassBySchedule(
             classModel: Class,
             schedule: BaseSchedule?,
             targetDay: DayOfNumberedWeek
         ) = eitherWrapper.wrap {
             val createClassModel = classModel.copy(uid = randomUUID())
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val currentDate = dateManager.fetchBeginningCurrentInstant()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
@@ -119,11 +117,13 @@ internal interface BaseClassInteractor {
         }
 
         override suspend fun fetchClass(classId: UID, scheduleId: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             scheduleRepository.fetchClassById(classId, scheduleId, targetUser)
         }
 
         override suspend fun updateClassBySchedule(classModel: Class, schedule: BaseSchedule) = eitherWrapper.wrap {
             val classId = classModel.uid
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val currentDate = dateManager.fetchBeginningCurrentInstant()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
@@ -166,6 +166,7 @@ internal interface BaseClassInteractor {
         }
 
         override suspend fun deleteClassBySchedule(uid: UID, schedule: BaseSchedule) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val currentDate = dateManager.fetchBeginningCurrentInstant()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
@@ -195,6 +196,7 @@ internal interface BaseClassInteractor {
         }
 
         private suspend fun updateReminderServices(currentDate: Instant, targetDay: DayOfNumberedWeek) {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val calendarSettings = calendarSettingsRepository.fetchSettings(targetUser).first()
             val notificationSettings = notificationSettingsRepository.fetchSettings(targetUser).first()
 

@@ -30,7 +30,6 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
  */
 @Parcelize
 internal data class VerificationViewState(
-    val isLoadingSend: Boolean = false,
     val appUser: AppUserUi? = null,
     val retryAvailableTime: Long? = null,
 ) : BaseViewState
@@ -50,5 +49,4 @@ internal sealed class VerificationEffect : BaseUiEffect {
 internal sealed class VerificationAction : BaseAction {
     data class UpdateAppUser(val appUser: AppUserUi) : VerificationAction()
     data class UpdateRetryAvailableTime(val retryAvailableTime: Long?) : VerificationAction()
-    data class UpdateLoadingSend(val isLoading: Boolean) : VerificationAction()
 }

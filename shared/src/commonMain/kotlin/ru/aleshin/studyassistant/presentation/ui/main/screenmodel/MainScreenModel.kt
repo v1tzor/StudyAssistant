@@ -45,7 +45,7 @@ class MainScreenModel(
     override fun init(deps: EmptyDeps) {
         if (!isInitialize) {
             super.init(deps)
-            dispatchEvent(MainEvent.Init)
+            dispatchEvent(MainEvent.InitSettings)
         }
     }
 
@@ -53,13 +53,9 @@ class MainScreenModel(
         event: MainEvent,
     ) {
         when (event) {
-            MainEvent.Init -> {
+            is MainEvent.InitSettings -> {
                 launchBackgroundWork(MainWorkCommand.LoadThemeSettings) {
                     val command = MainWorkCommand.LoadThemeSettings
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-                launchBackgroundWork(MainWorkCommand.InitialNavigation) {
-                    val command = MainWorkCommand.InitialNavigation
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(MainWorkCommand.UpdatePushToken) {
@@ -72,6 +68,12 @@ class MainScreenModel(
                 }
                 launchBackgroundWork(MainWorkCommand.UpdateSubscriptionInfo) {
                     val command = MainWorkCommand.UpdateSubscriptionInfo
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is MainEvent.InitNavigation -> {
+                launchBackgroundWork(MainWorkCommand.InitialNavigation) {
+                    val command = MainWorkCommand.InitialNavigation
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }

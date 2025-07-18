@@ -41,7 +41,7 @@ import ru.aleshin.studyassistant.core.common.inject.RootScreen
 fun <S : FeatureScreen<R>, R : RootScreen> R.NestedFeatureNavigator(
     screenProvider: FeatureScreenProvider<S, R>,
     navigatorManager: NavigatorManager<S, R>,
-    onBackPressed: OnBackPressed = { true },
+    onBackPressed: OnBackPressed? = { true },
     disposeBehavior: NavigatorDisposeBehavior = NavigatorDisposeBehavior(
         disposeNestedNavigators = true,
         disposeSteps = true,
@@ -84,7 +84,7 @@ fun <S : FeatureScreen<R>, R : RootScreen> R.NestedFeatureNavigator(
 @InternalVoyagerApi
 fun NestedNavigatorBackHandler(
     navigator: Navigator,
-    onBackPressed: OnBackPressed
+    onBackPressed: OnBackPressed?
 ) {
     if (onBackPressed != null) {
         BackHandler(

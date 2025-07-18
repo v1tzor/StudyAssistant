@@ -72,7 +72,7 @@ class HomeworksReminderWorker(
     private val homeworksRepository = instance<HomeworksRepository>()
 
     override suspend fun doWork(): Result {
-        val currentUser = usersRepository.fetchCurrentAppUser() ?: return Result.failure()
+        val currentUser = usersRepository.fetchCurrentAuthUser() ?: return Result.failure()
         val today = dateManager.fetchBeginningCurrentInstant()
         val tomorrow = today.shiftDay(1)
         val afterTomorrow = today.shiftDay(2)

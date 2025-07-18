@@ -40,20 +40,16 @@ internal interface AuthInteractor {
         private val eitherWrapper: ProfileEitherWrapper,
     ) : AuthInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun signOut(deviceId: UID) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val userInfo = usersRepository.fetchUserById(targetUser).first() ?: throw AppwriteUserException()
-            val deviceInfo = userInfo.devices.find { it.deviceId == deviceId }
-            if (deviceInfo != null) {
-                val updatedDevices = buildList {
-                    addAll(userInfo.devices)
-                    remove(deviceInfo)
-                }
-                val updatedUserInfo = userInfo.copy(devices = updatedDevices)
-                usersRepository.addOrUpdateAppUser(updatedUserInfo)
+
+            val updatedDevices = buildList {
+                addAll(userInfo.devices.filter { it.deviceId != deviceId })
             }
+            val updatedUserInfo = userInfo.copy(devices = updatedDevices)
+            usersRepository.updateAppUser(updatedUserInfo)
+
             authRepository.signOut()
             messageRepository.deleteToken()
         }

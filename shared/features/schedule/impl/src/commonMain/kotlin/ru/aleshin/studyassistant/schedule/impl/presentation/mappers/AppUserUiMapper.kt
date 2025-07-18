@@ -61,6 +61,7 @@ internal fun AppUserUi.mapToDomain() = AppUser(
 )
 
 internal fun SubscribeInfo.mapToUi() = SubscribeInfoUi(
+    uid = uid,
     deviceId = deviceId,
     purchaseId = purchaseId,
     productId = productId,
@@ -71,6 +72,7 @@ internal fun SubscribeInfo.mapToUi() = SubscribeInfoUi(
 )
 
 internal fun SubscribeInfoUi.mapToDomain() = SubscribeInfo(
+    uid = uid,
     deviceId = deviceId,
     purchaseId = purchaseId,
     productId = productId,
@@ -81,6 +83,7 @@ internal fun SubscribeInfoUi.mapToDomain() = SubscribeInfo(
 )
 
 internal fun UserDevice.mapToUi() = UserDeviceUi(
+    uid = uid,
     platform = platform,
     deviceId = deviceId,
     deviceName = deviceName,
@@ -89,6 +92,7 @@ internal fun UserDevice.mapToUi() = UserDeviceUi(
 )
 
 internal fun UserDeviceUi.mapToDomain() = UserDevice(
+    uid = uid,
     platform = platform,
     deviceId = deviceId,
     deviceName = deviceName,
@@ -97,12 +101,14 @@ internal fun UserDeviceUi.mapToDomain() = UserDevice(
 )
 
 internal fun SocialNetwork.mapToUi() = SocialNetworkUi(
+    uid = uid,
     type = type,
     otherType = otherType,
     data = data,
 )
 
 internal fun SocialNetworkUi.mapToDomain() = SocialNetwork(
+    uid = uid,
     type = type,
     otherType = otherType,
     data = data,

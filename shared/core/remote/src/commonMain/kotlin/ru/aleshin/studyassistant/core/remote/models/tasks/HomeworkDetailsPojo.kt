@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectDetailsPojo
 @Serializable
 data class HomeworkDetailsPojo(
     val uid: UID,
+    val userId: UID = "",
     val classId: UID? = null,
     val deadline: Long,
     val subject: SubjectDetailsPojo? = null,

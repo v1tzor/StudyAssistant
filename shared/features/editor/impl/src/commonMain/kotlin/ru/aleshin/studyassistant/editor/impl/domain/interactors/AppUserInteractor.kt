@@ -36,9 +36,9 @@ internal interface AppUserInteractor {
     suspend fun fetchAppUser(): FlowDomainResult<EditorFailures, AppUser>
     suspend fun fetchAppUserPaidStatus(): FlowDomainResult<EditorFailures, Boolean>
     suspend fun updateUser(user: AppUser): UnitDomainResult<EditorFailures>
-    suspend fun uploadAvatar(uid: UID, file: InputFile): DomainResult<EditorFailures, String>
+    suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile): DomainResult<EditorFailures, String>
     suspend fun updatePassword(oldPassword: String, newPassword: String): UnitDomainResult<EditorFailures>
-    suspend fun deleteAvatar(uid: UID): UnitDomainResult<EditorFailures>
+    suspend fun deleteAvatar(avatarUrl: String): UnitDomainResult<EditorFailures>
 
     class Base(
         private val usersRepository: UsersRepository,
@@ -46,11 +46,9 @@ internal interface AppUserInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : AppUserInteractor {
 
-        private val currentUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchAppUser() = eitherWrapper.wrapFlow {
-            usersRepository.fetchUserById(currentUser).map { appUser ->
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            usersRepository.fetchUserById(targetUser).map { appUser ->
                 checkNotNull(appUser)
             }
         }
@@ -60,19 +58,21 @@ internal interface AppUserInteractor {
         }
 
         override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {
-            usersRepository.addOrUpdateAppUser(user)
+            usersRepository.updateAppUser(user)
         }
 
-        override suspend fun uploadAvatar(uid: UID, file: InputFile) = eitherWrapper.wrap {
-            usersRepository.uploadUserAvatar(uid, file)
+        override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            usersRepository.uploadUserAvatar(oldAvatarUrl, file, targetUser)
         }
 
         override suspend fun updatePassword(oldPassword: String, newPassword: String) = eitherWrapper.wrap {
             manageUserRepository.updatePassword(oldPassword, newPassword)
         }
 
-        override suspend fun deleteAvatar(uid: UID) = eitherWrapper.wrap {
-            usersRepository.deleteUserAvatar(uid)
+        override suspend fun deleteAvatar(avatarUrl: UID) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            usersRepository.deleteUserAvatar(avatarUrl, targetUser)
         }
     }
 }

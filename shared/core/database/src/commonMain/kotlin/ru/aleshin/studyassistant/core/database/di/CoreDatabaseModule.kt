@@ -18,6 +18,8 @@ package ru.aleshin.studyassistant.core.database.di
 
 import app.cash.sqldelight.ColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
+import io.ktor.client.plugins.cache.storage.CacheStorage
+import io.ktor.client.plugins.cookies.CookiesStorage
 import org.kodein.di.DI
 import org.kodein.di.bindEagerSingleton
 import org.kodein.di.bindSingleton
@@ -38,6 +40,8 @@ import ru.aleshin.studyassistant.core.database.datasource.settings.NotificationS
 import ru.aleshin.studyassistant.core.database.datasource.subjects.SubjectsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.tasks.HomeworksLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.tasks.TodoLocalDataSource
+import ru.aleshin.studyassistant.core.database.storages.AppwriteCacheStorage
+import ru.aleshin.studyassistant.core.database.storages.AppwriteCookiesStorage
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatHistoryQueries
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatMessageEntity
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatMessageQueries
@@ -55,6 +59,7 @@ import ru.aleshin.studyassistant.sqldelight.settings.CalendarSettingsEntity
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
 import ru.aleshin.studyassistant.sqldelight.settings.NotificationQueries
 import ru.aleshin.studyassistant.sqldelight.settings.NotificationSettingsEntity
+import ru.aleshin.studyassistant.sqldelight.storage.AppwriteCacheQueries
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries
 import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkQueries
 import ru.aleshin.studyassistant.sqldelight.tasks.TodoQueries
@@ -77,6 +82,9 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
 
     bindEagerSingleton<Database> { Database(instance<SqlDriver>(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 
+    bindSingleton<CookiesStorage> { AppwriteCookiesStorage(instance()) }
+    bindSingleton<CacheStorage> { AppwriteCacheStorage(instance(), instance(), instance()) }
+
     bindSingleton<GeneralQueries> { instance<Database>().generalQueries }
     bindSingleton<CalendarQueries> { instance<Database>().calendarQueries }
     bindSingleton<NotificationQueries> { instance<Database>().notificationQueries }
@@ -90,6 +98,7 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
     bindSingleton<EmployeeQueries> { instance<Database>().employeeQueries }
     bindSingleton<AiChatHistoryQueries> { instance<Database>().aiChatHistoryQueries }
     bindSingleton<AiChatMessageQueries> { instance<Database>().aiChatMessageQueries }
+    bindSingleton<AppwriteCacheQueries> { instance<Database>().appwriteCacheQueries }
 
     bindSingleton<AiLocalDataSource> { AiLocalDataSource.Base(instance(), instance(), instance()) }
     bindSingleton<GeneralSettingsLocalDataSource> { GeneralSettingsLocalDataSource.Base(instance(), instance()) }

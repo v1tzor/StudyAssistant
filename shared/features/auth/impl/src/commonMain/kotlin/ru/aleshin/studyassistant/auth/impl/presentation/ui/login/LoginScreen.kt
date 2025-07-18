@@ -23,11 +23,13 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import co.touchlab.kermit.Logger
+import kotlinx.coroutines.launch
+import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.LoginCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
@@ -53,6 +55,7 @@ internal class LoginScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val windowSize = LocalWindowSize.current
         val strings = AuthThemeRes.strings
+        val coroutineScope = rememberCoroutineScope()
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -62,12 +65,20 @@ internal class LoginScreen : Screen {
                     else -> LoginContent(
                         state = state,
                         modifier = Modifier.padding(paddingValues),
-                        onLoginViaGoogleClick = { dispatchEvent(LoginEvent.LoginViaGoogle(it)) },
+                        onSuccessOAuthLogin = { dispatchEvent(LoginEvent.SuccessOAuthLogin(it)) },
                         onForgotPassword = { dispatchEvent(LoginEvent.NavigateToForgot) },
                         onNotAccountClick = { dispatchEvent(LoginEvent.NavigateToRegister) },
                         onLoginClick = { email, password ->
                             val credentials = LoginCredentialsUi(email, password)
                             dispatchEvent(LoginEvent.LoginWithEmail(credentials))
+                        },
+                        onFailureOAuthLogin = {
+                            coroutineScope.launch {
+                                snackbarState.showSnackbar(
+                                    message = AuthFailures.OAuthProviderError.mapToMessage(strings),
+                                    withDismissAction = true,
+                                )
+                            }
                         },
                     )
                 }
@@ -86,9 +97,7 @@ internal class LoginScreen : Screen {
                 is LoginEffect.ReplaceGlobalScreen -> navigator.root().replaceAll(effect.screen)
                 is LoginEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failure.apply {
-                            Logger.i("test") { this.toString() }
-                        }.mapToMessage(strings),
+                        message = effect.failure.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

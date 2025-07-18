@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.Passwo
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.UsernameValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.EmailTextField
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.PasswordTextField
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.SpacerToKeyboard
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.UsernameTextField
 
 /**
@@ -52,44 +53,44 @@ internal fun RegisterInputSection(
     onPasswordChange: (String) -> Unit,
     onCompleteEnter: () -> Unit,
 ) {
-    Column(
-        modifier = modifier.padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        val emailFocusRequester = remember { FocusRequester() }
-        val passwordFocusRequester = remember { FocusRequester() }
+    Column(modifier = modifier.padding(horizontal = 24.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            val emailFocusRequester = remember { FocusRequester() }
+            val passwordFocusRequester = remember { FocusRequester() }
 
-        UsernameTextField(
-            enabled = enabled,
-            username = username,
-            onUsernameChanged = onUsernameChange,
-            isError = usernameValidError != null,
-            errorText = usernameValidError?.mapToMessage(),
-            keyboardActions = KeyboardActions(
-                onDone = { emailFocusRequester.requestFocus() },
-            ),
-        )
-        EmailTextField(
-            modifier = Modifier.focusRequester(emailFocusRequester),
-            enabled = enabled,
-            email = email,
-            onEmailChanged = onEmailChange,
-            isError = emailValidError != null,
-            errorText = emailValidError?.mapToMessage(),
-            keyboardActions = KeyboardActions(
-                onDone = { passwordFocusRequester.requestFocus() },
-            ),
-        )
-        PasswordTextField(
-            modifier = Modifier.focusRequester(passwordFocusRequester),
-            enabled = enabled,
-            password = password,
-            onPasswordChanged = onPasswordChange,
-            isError = passwordValidError != null,
-            errorText = passwordValidError?.mapToMessage(),
-            keyboardActions = KeyboardActions(
-                onDone = { onCompleteEnter() },
+            UsernameTextField(
+                enabled = enabled,
+                username = username,
+                onUsernameChanged = onUsernameChange,
+                isError = usernameValidError != null,
+                errorText = usernameValidError?.mapToMessage(),
+                keyboardActions = KeyboardActions(
+                    onDone = { emailFocusRequester.requestFocus() },
+                ),
             )
-        )
+            EmailTextField(
+                modifier = Modifier.focusRequester(emailFocusRequester),
+                enabled = enabled,
+                email = email,
+                onEmailChanged = onEmailChange,
+                isError = emailValidError != null,
+                errorText = emailValidError?.mapToMessage(),
+                keyboardActions = KeyboardActions(
+                    onDone = { passwordFocusRequester.requestFocus() },
+                ),
+            )
+            PasswordTextField(
+                modifier = Modifier.focusRequester(passwordFocusRequester),
+                enabled = enabled,
+                password = password,
+                onPasswordChanged = onPasswordChange,
+                isError = passwordValidError != null,
+                errorText = passwordValidError?.mapToMessage(),
+                keyboardActions = KeyboardActions(
+                    onDone = { onCompleteEnter() },
+                )
+            )
+        }
     }
+    SpacerToKeyboard(additionOffset = 24.dp)
 }

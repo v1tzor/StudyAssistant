@@ -21,6 +21,7 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
@@ -44,7 +45,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<NavigationScreen> { NavigationScreen() }
 
     bindProvider<PreviewFeatureStarter> { PreviewFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<PreviewScreenProvider> { PreviewScreenProvider.Base(instance<() -> AuthFeatureStarter>(), instance<() -> EditorFeatureStarter>(), instance<() -> NavigationFeatureStarter>()) }
+    bindProvider<PreviewScreenProvider> { PreviewScreenProvider.Base(instance<() -> AuthFeatureStarter>(), instance<() -> EditorFeatureStarter>(), instance<() -> NavigationFeatureStarter>(), instance<() -> BillingFeatureStarter>()) }
 
     bindProvider<IntroStateCommunicator> { IntroStateCommunicator.Base() }
     bindProvider<IntroEffectCommunicator> { IntroEffectCommunicator.Base() }
@@ -52,6 +53,6 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindProvider<SetupStateCommunicator> { SetupStateCommunicator.Base() }
     bindProvider<SetupEffectCommunicator> { SetupEffectCommunicator.Base() }
-    bindProvider<SetupWorkProcessor> { SetupWorkProcessor.Base(instance(), instance(), instance()) }
+    bindProvider<SetupWorkProcessor> { SetupWorkProcessor.Base(instance(), instance(), instance(), instance()) }
     bindProvider<SetupScreenModel> { SetupScreenModel(instance(), instance(), instance(), instance(), instance()) }
 }

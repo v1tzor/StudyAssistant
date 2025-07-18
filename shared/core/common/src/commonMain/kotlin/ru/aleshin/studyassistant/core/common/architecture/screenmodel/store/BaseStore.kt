@@ -59,7 +59,10 @@ interface BaseStore<S : BaseViewState, E : BaseEvent, A : BaseAction, F : BaseUi
         private val eventChannel = Channel<E>(Channel.UNLIMITED, BufferOverflow.SUSPEND)
 
         fun start(scope: CoroutineScope) = coroutineManager.runOnBackground(scope) {
-            val workScope = WorkScope.Base(this@Abstract, this)
+            val workScope = WorkScope.Base(
+                store = this@Abstract,
+                coroutineScope = this
+            )
             while (isActive) {
                 actor.apply { workScope.handleEvent(eventChannel.receive()) }
             }

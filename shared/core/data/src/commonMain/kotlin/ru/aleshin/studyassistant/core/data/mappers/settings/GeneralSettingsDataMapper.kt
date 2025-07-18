@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.sqldelight.settings.GeneralSettingsEntity
  */
 fun GeneralSettingsEntity.mapToDomain() = GeneralSettings(
     isFirstStart = is_first_start == 1L,
+    isUnfinishedSetup = is_unfinished_setup,
     themeType = ThemeType.valueOf(theme),
     languageType = LanguageType.valueOf(language),
 )
@@ -33,6 +34,7 @@ fun GeneralSettingsEntity.mapToDomain() = GeneralSettings(
 fun GeneralSettings.mapToLocalData() = GeneralSettingsEntity(
     id = 1L,
     is_first_start = if (isFirstStart) 1L else 0L,
+    is_unfinished_setup = isUnfinishedSetup,
     theme = themeType.name,
     language = languageType.name,
 )

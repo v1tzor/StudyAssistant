@@ -1,17 +1,18 @@
 CREATE TABLE generalSettingsEntity (
   id INTEGER PRIMARY KEY NOT NULL,
   is_first_start INTEGER NOT NULL,
+  is_unfinished_setup TEXT,
   theme TEXT NOT NULL,
   language TEXT NOT NULL
 );
 
-INSERT INTO generalSettingsEntity (id, is_first_start, theme, language)
-VALUES (1, 1, 'DEFAULT', 'DEFAULT');
+INSERT INTO generalSettingsEntity (id, is_first_start, is_unfinished_setup, theme, language)
+VALUES (1, 1, NULL, 'DEFAULT', 'DEFAULT');
 
 fetchSettings:
 SELECT *
 FROM generalSettingsEntity;
 
 updateSettings:
-INSERT OR REPLACE INTO generalSettingsEntity (id, is_first_start, theme, language)
+INSERT OR REPLACE INTO generalSettingsEntity (id, is_first_start, is_unfinished_setup, theme, language)
 VALUES ?;

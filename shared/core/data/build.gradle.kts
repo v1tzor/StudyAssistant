@@ -32,8 +32,6 @@ kotlin {
             implementation(project(":shared:core:database"))
             implementation(project(":shared:core:remote"))
 
-            api(libs.bundles.firebase)
-
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
         }

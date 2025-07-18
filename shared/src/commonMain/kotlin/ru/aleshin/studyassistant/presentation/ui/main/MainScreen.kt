@@ -23,19 +23,20 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import cafe.adriel.voyager.transitions.CrossfadeTransition
-import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantTheme
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
+import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEvent
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainViewState
 import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.rememberMainScreenModel
 import ru.aleshin.studyassistant.presentation.ui.splash.SplashScreen
@@ -71,6 +72,12 @@ fun MainScreen() = ScreenContent(
                     disposeSteps = true,
                 ),
             ) { navigator ->
+                LaunchedEffect(navigator.lastItemOrNull) {
+                    if (navigator.lastItemOrNull is SplashScreen) {
+                        dispatchEvent(MainEvent.InitNavigation)
+                    }
+                }
+
                 CrossfadeTransition(
                     modifier = Modifier.padding(paddingValues),
                     navigator = navigator,
@@ -80,7 +87,7 @@ fun MainScreen() = ScreenContent(
                     when (effect) {
                         is MainEffect.ReplaceGlobalScreen -> navigator.replaceAll(effect.screen)
                         is MainEffect.ShowError -> snackbarState.showSnackbar(
-                            message = effect.failures.apply { Logger.i("test") { this@apply.toString() } }.mapToMessage(coreStrings),
+                            message = effect.failures.mapToMessage(coreStrings),
                             duration = SnackbarDuration.Indefinite,
                         )
                     }

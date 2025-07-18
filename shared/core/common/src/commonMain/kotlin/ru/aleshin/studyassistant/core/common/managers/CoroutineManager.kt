@@ -32,7 +32,7 @@ interface CoroutineManager : WorkDispatchersProvider {
 
     fun runOnUi(scope: CoroutineScope, block: CoroutineBlock): Job
 
-    suspend fun changeFlow(coroutineFlow: CoroutineFlow, block: CoroutineBlock)
+    suspend fun <T> changeFlow(coroutineFlow: CoroutineFlow, block: suspend CoroutineScope.() -> T): T
 
     abstract class Abstract(
         override val backgroundDispatcher: CoroutineDispatcher,
@@ -47,12 +47,15 @@ interface CoroutineManager : WorkDispatchersProvider {
             return scope.launch(context = uiDispatcher, block = block)
         }
 
-        override suspend fun changeFlow(coroutineFlow: CoroutineFlow, block: CoroutineBlock) {
+        override suspend fun <T> changeFlow(
+            coroutineFlow: CoroutineFlow,
+            block: suspend CoroutineScope.() -> T
+        ): T {
             val dispatcher = when (coroutineFlow) {
                 CoroutineFlow.BACKGROUND -> backgroundDispatcher
                 CoroutineFlow.UI -> uiDispatcher
             }
-            withContext(context = dispatcher, block = block)
+            return withContext(context = dispatcher, block = block)
         }
     }
 

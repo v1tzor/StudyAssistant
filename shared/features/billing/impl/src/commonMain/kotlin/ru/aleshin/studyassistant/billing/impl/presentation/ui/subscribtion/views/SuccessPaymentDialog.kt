@@ -87,7 +87,7 @@ internal fun SuccessPaymentDialog(
                     Spacer(modifier = Modifier.weight(1f))
                     TextButton(onClick = onDismiss) {
                         Text(
-                            text = StudyAssistantRes.strings.okConfirmTitle,
+                            text = BillingThemeRes.strings.restartAppTitle,
                             color = MaterialTheme.colorScheme.onSurface,
                             style = MaterialTheme.typography.labelLarge,
                         )

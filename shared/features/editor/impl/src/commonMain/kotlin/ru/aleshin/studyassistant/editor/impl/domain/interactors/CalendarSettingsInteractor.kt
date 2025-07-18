@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -37,10 +36,8 @@ internal interface CalendarSettingsInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : CalendarSettingsInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchSettings() = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             calendarSettingsRepository.fetchSettings(targetUser)
         }
     }

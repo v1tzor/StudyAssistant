@@ -19,6 +19,8 @@ package ru.aleshin.studyassistant.preview.impl.navigation
 import cafe.adriel.voyager.core.screen.Screen
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.api.navigation.AuthScreen
+import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
+import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.core.common.navigation.FeatureScreenProvider
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.api.navigation.EditorScreen
@@ -34,15 +36,15 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.SetupScreen
 internal interface PreviewScreenProvider : FeatureScreenProvider<PreviewScreen, PreviewRootScreen> {
 
     fun provideAuthScreen(screen: AuthScreen): Screen
-
     fun provideEditorScreen(screen: EditorScreen): Screen
-
+    fun provideBillingScreen(screen: BillingScreen): Screen
     fun provideTabNavigationScreen(): Screen
 
     class Base(
         private val authFeatureStarter: () -> AuthFeatureStarter,
         private val editorFeatureStarter: () -> EditorFeatureStarter,
         private val navigationFeatureStarter: () -> NavigationFeatureStarter,
+        private val billingFeatureStarter: () -> BillingFeatureStarter,
     ) : PreviewScreenProvider {
 
         override fun provideFeatureScreen(screen: PreviewScreen) = when (screen) {
@@ -56,6 +58,10 @@ internal interface PreviewScreenProvider : FeatureScreenProvider<PreviewScreen, 
 
         override fun provideEditorScreen(screen: EditorScreen): Screen {
             return editorFeatureStarter().fetchRootScreenAndNavigate(screen)
+        }
+
+        override fun provideBillingScreen(screen: BillingScreen): Screen {
+            return billingFeatureStarter().fetchRootScreenAndNavigate(screen)
         }
 
         override fun provideTabNavigationScreen(): Screen {

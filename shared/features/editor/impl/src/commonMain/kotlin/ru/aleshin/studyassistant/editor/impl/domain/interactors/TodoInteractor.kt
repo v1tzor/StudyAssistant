@@ -46,10 +46,8 @@ internal interface TodoInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : TodoInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun addOrUpdateTodo(todo: Todo) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             todoRepository.addOrUpdateTodo(todo, targetUser).apply {
                 todoReminderManager.scheduleReminders(this, todo.name, todo.deadline, todo.notifications)
                 val linkedGoal = goalsRepository.fetchGoalByContentId(todo.uid, targetUser).first()
@@ -60,10 +58,12 @@ internal interface TodoInteractor {
         }
 
         override suspend fun fetchTodoById(uid: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             todoRepository.fetchTodoById(uid, targetUser)
         }
 
         override suspend fun deleteTodo(targetId: UID) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             todoRepository.deleteTodo(targetId, targetUser)
             todoReminderManager.clearAllReminders(targetId)
         }

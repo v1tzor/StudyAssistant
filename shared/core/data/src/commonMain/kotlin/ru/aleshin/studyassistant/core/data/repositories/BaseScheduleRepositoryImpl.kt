@@ -57,7 +57,7 @@ class BaseScheduleRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.addOrUpdateSchedule(schedule.mapToRemoteData(), targetUser)
+            remoteDataSource.addOrUpdateSchedule(schedule.mapToRemoteData(targetUser), targetUser)
         } else {
             localDataSource.addOrUpdateSchedule(schedule.mapToLocalData())
         }
@@ -67,7 +67,7 @@ class BaseScheduleRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.addOrUpdateSchedulesGroup(schedules.map { it.mapToRemoteData() }, targetUser)
+            remoteDataSource.addOrUpdateSchedulesGroup(schedules.map { it.mapToRemoteData(targetUser) }, targetUser)
         } else {
             localDataSource.addOrUpdateSchedulesGroup(schedules.map { it.mapToLocalData() })
         }
@@ -193,7 +193,7 @@ class BaseScheduleRepositoryImpl(
                     to = DISTANT_FUTURE,
                     numberOfWeek = null,
                 ).let { schedulesFlow ->
-                    return@let schedulesFlow.first().map { it.mapToDomain().mapToRemoteData() }
+                    return@let schedulesFlow.first().map { it.mapToDomain().mapToRemoteData(targetUser) }
                 }
                 remoteDataSource.deleteSchedulesByTimeRange(DISTANT_PAST, DISTANT_FUTURE, targetUser)
                 remoteDataSource.addOrUpdateSchedulesGroup(allSchedules, targetUser)

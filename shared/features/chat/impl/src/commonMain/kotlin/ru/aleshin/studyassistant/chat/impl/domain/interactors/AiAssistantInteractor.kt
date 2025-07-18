@@ -96,10 +96,8 @@ internal interface AiAssistantInteractor {
         private val eitherWrapper: ChatEitherWrapper,
     ) : AiAssistantInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun addChat() = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val appUserInfo = checkNotNull(usersRepository.fetchUserById(targetUser).first())
             val chatId = randomUUID()
             val systemMessage = AiAssistantMessage.SystemMessage(
@@ -141,7 +139,9 @@ internal interface AiAssistantInteractor {
         }
 
         override suspend fun clearHistory(chatId: UID) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val chat = aiAssistantRepository.fetchChatHistoryById(chatId).first()
+
             if (chat != null) {
                 val appUserInfo = checkNotNull(usersRepository.fetchUserById(targetUser).first())
                 val systemMessage = AiAssistantMessage.SystemMessage(
@@ -162,7 +162,9 @@ internal interface AiAssistantInteractor {
 
         override suspend fun sendMessage(chatId: UID, message: String?) = eitherWrapper.wrapUnit {
             val currentTime = dateManager.fetchCurrentInstant()
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val lastMessage = aiAssistantRepository.fetchChatHistoryLastMessage(chatId).first()
+
             if (lastMessage?.time?.equalsDay(currentTime) != true) {
                 val systemMessage = AiAssistantMessage.SystemMessage(
                     id = chatId,
@@ -179,37 +181,43 @@ internal interface AiAssistantInteractor {
             val response = aiAssistantRepository.sendUserMessage(chatId, userMessage)
 
             val assistantMessage = response.choices.firstOrNull()?.message
-            handleMessage(chatId, assistantMessage)
+            handleMessage(chatId, assistantMessage, targetUser)
         }
 
-        private suspend fun handleMessage(chatId: UID, assistantMessage: AiAssistantMessage?) {
+        private suspend fun handleMessage(
+            chatId: UID,
+            assistantMessage: AiAssistantMessage?,
+            targetUser: UID,
+        ) {
             val toolCalls = (assistantMessage as AiAssistantMessage.AssistantMessage).toolCalls
             aiAssistantRepository.saveAssistantMessage(chatId, assistantMessage)
 
             if (toolCalls != null && toolCalls.isNotEmpty()) {
-                val handleResult = handleToolCalls(toolCalls)
+                val handleResult = handleToolCalls(toolCalls, targetUser)
+                Logger.i("test") { "handleResult -> $handleResult" }
                 val toolResponse = aiAssistantRepository.sendToolResponse(chatId, handleResult)
-                handleMessage(chatId, toolResponse.choices.firstOrNull()?.message)
+                handleMessage(chatId, toolResponse.choices.firstOrNull()?.message, targetUser)
             }
         }
 
         private suspend fun handleToolCalls(
-            toolCalls: List<ToolCall>
+            toolCalls: List<ToolCall>,
+            targetUser: UID,
         ): List<AiAssistantMessage.ToolMessage> {
             return toolCalls.map { call ->
                 val functionName = call.function.name
                 val functionArgs = call.function.arguments ?: emptyMap()
 
                 val resultContent = when (functionName) {
-                    "create_todo" -> createTodo(functionArgs)
-                    "create_homework" -> createHomeworks(functionArgs)
-                    "get_homeworks" -> getHomeworks(functionArgs)
-                    "get_overdue_homeworks" -> getOverdueHomeworks(functionArgs)
-                    "get_subjects" -> getSubjects(functionArgs)
-                    "get_employee" -> getEmployee(functionArgs)
-                    "get_organizations" -> getOrganizations(functionArgs)
-                    "get_classes_by_date" -> getClassesByDate(functionArgs)
-                    "get_near_class" -> getNearClass(functionArgs)
+                    "create_todo" -> createTodo(functionArgs, targetUser)
+                    "create_homework" -> createHomeworks(functionArgs, targetUser)
+                    "get_homeworks" -> getHomeworks(functionArgs, targetUser)
+                    "get_overdue_homeworks" -> getOverdueHomeworks(functionArgs, targetUser)
+                    "get_subjects" -> getSubjects(functionArgs, targetUser)
+                    "get_employee" -> getEmployee(functionArgs, targetUser)
+                    "get_organizations" -> getOrganizations(functionArgs, targetUser)
+                    "get_classes_by_date" -> getClassesByDate(functionArgs, targetUser)
+                    "get_near_class" -> getNearClass(functionArgs, targetUser)
                     else -> """{"error": "Функция $functionName не найдена"}"""
                 }
 
@@ -221,7 +229,7 @@ internal interface AiAssistantInteractor {
             }
         }
 
-        private suspend fun createTodo(args: Map<String, String>): String {
+        private suspend fun createTodo(args: Map<String, String>, targetUser: UID): String {
             val name = args["name"] ?: "Без названия"
             val description = args["description"] ?: ""
             val deadline = args["deadline"]?.let { Instant.parseUsingOffset(it, Formats.iso8601()) }
@@ -242,7 +250,7 @@ internal interface AiAssistantInteractor {
             }
         }
 
-        private suspend fun createHomeworks(args: Map<String, String>): String {
+        private suspend fun createHomeworks(args: Map<String, String>, targetUser: UID): String {
             val organization = args["organizationId"]?.let {
                 organizationsRepository.fetchShortOrganizationById(it, targetUser).first()
             }
@@ -278,7 +286,7 @@ internal interface AiAssistantInteractor {
             }
         }
 
-        private suspend fun getHomeworks(args: Map<String, String>): String {
+        private suspend fun getHomeworks(args: Map<String, String>, targetUser: UID): String {
             val from = args["from"] ?: return """{"error": "Дата периода не найдена"}"""
             val to = args["to"] ?: return """{"error": "Дата периода не найдена"}"""
             val timeRange = TimeRange(
@@ -313,7 +321,7 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
-        private suspend fun getOverdueHomeworks(args: Map<String, String>): String {
+        private suspend fun getOverdueHomeworks(args: Map<String, String>, targetUser: UID): String {
             val currentDate = dateManager.fetchBeginningCurrentInstant()
             val homeworks = homeworksRepository.fetchOverdueHomeworks(currentDate, targetUser).first()
             Logger.i("test") { "getOverdueHomeworks -> $homeworks" }
@@ -343,7 +351,7 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
-        private suspend fun getOrganizations(args: Map<String, String>): String {
+        private suspend fun getOrganizations(args: Map<String, String>, targetUser: UID): String {
             val organizations = organizationsRepository.fetchAllShortOrganization(targetUser).first()
             Logger.i("test") { "getOrganizations -> $organizations" }
             return buildJsonArray {
@@ -357,7 +365,7 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
-        private suspend fun getSubjects(args: Map<String, String>): String {
+        private suspend fun getSubjects(args: Map<String, String>, targetUser: UID): String {
             val organizationId = args["organizationId"] ?: return """{"error": "Организация не найдена"}"""
             val subjects = subjectsRepository.fetchAllSubjectsByOrganization(organizationId, targetUser).first()
             Logger.i("test") { "getSubjects(org: $organizationId) -> $subjects" }
@@ -374,7 +382,7 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
-        private suspend fun getEmployee(args: Map<String, String>): String {
+        private suspend fun getEmployee(args: Map<String, String>, targetUser: UID): String {
             val teacherId = args["teacherId"] ?: return """{"error": "Сотрудник не найден"}"""
             val teacher = employeeRepository.fetchEmployeeById(teacherId, targetUser).first()
             if (teacher == null) return """{"error": "Сотрудник не найден"}"""
@@ -386,7 +394,7 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
-        private suspend fun getClassesByDate(args: Map<String, String>): String {
+        private suspend fun getClassesByDate(args: Map<String, String>, targetUser: UID): String {
             val date = args["date"]?.let {
                 Instant.parseUsingOffset(it + TIME_SUFFIX, Formats.iso8601()).startThisDay()
             } ?: return """{"error": "Ошибка получения даты"}"""
@@ -428,7 +436,7 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
-        private suspend fun getNearClass(args: Map<String, String>): String {
+        private suspend fun getNearClass(args: Map<String, String>, targetUser: UID): String {
             val subjectId = args["subjectId"] ?: return """{"error": "Ошибка получения предмета"}"""
             val currentDate = dateManager.fetchBeginningCurrentInstant()
             val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
@@ -498,13 +506,13 @@ internal interface AiAssistantInteractor {
                 "Пользователь: $username ${birthday ?: ""} — адаптируйся под возраст. " +
                 "Сегодня: $currentDate, \"Завтра\" = текущая дата + 1 день. " +
                 "Отвечай только по делу и вежливо, без лирических отступлений. " +
-                "Предлагай функции, если данных мало не создавай функцию а проси больше данных от пользователя либо использую другие фукнкции для их получения. " +
+                "Предлагай и используй функции, если данных недостаточно проси уточнения" +
                 "Сообщения вне тем — мягко направь к учёбе. " +
                 "Отвечай ВСЕГДА на языке пользователя. Определяй язык по полследнему сообщению и переводи все на него " +
                 "Используй ТОЛЬКО простой markdown ВСЕГДА а именно: заголовки, списки, жирный, курсив. " +
                 "\"Не используй LaTeX (например: \\\\log_b, \\\\frac, ^, _), mathtext, //, backticks (``), HTML, код или таблицы. Формулы пиши простыми словами или обычными знаками: например 'log_b(a) = c', 'b^c = a', 'x^2', 'a/b'. " +
                 "Если нужно отобразить урок/занятие отобрази название предмета (его можно найти вызвав get_subjects). " +
-                "Никогда не отображай данные о ID а получай или находи по ним названия. Расписание на день это уроки, задания к ним и TODO " +
+                "НИКОГДА НЕ ОТОБРАЖАЙ ЛЮБЫЕ ID а получай или находи по ним названия. ПОЛЬЗОВАТЕЛЬ НЕ ЗНАЕТ НИКАКИХ id итд. Расписание это уроки, задания к ним и TODO " +
                 "Особые правила для некоторых функций: " +
                 "1) create_homework: " +
                 "1. Вызови get_organizations, найди organisationId по названию. " +

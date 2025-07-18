@@ -180,6 +180,12 @@ fun Instant.setHoursAndMinutes(
     return setHoursAndMinutes(hour, minute)
 }
 
+fun Instant.setHoursAndMinutes(time: LocalTime): Instant {
+    val hour = time.hour
+    val minute = time.minute
+    return setHoursAndMinutes(hour, minute)
+}
+
 fun Instant.setHoursAndMinutes(
     hour: Int,
     minute: Int,

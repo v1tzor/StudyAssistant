@@ -28,11 +28,11 @@ import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 interface EmployeeRepository {
     suspend fun addOrUpdateEmployee(employee: Employee, targetUser: UID): UID
     suspend fun addOrUpdateEmployeeGroup(employees: List<Employee>, targetUser: UID)
-    suspend fun uploadAvatar(uid: UID, file: InputFile, targetUser: UID): String
+    suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile, targetUser: UID): String
     suspend fun fetchAllEmployeeByOrganization(organizationId: UID, targetUser: UID): Flow<List<Employee>>
     suspend fun fetchEmployeeById(uid: UID, targetUser: UID): Flow<Employee?>
     suspend fun deleteEmployee(targetId: UID, targetUser: UID)
     suspend fun deleteAllEmployee(targetUser: UID)
-    suspend fun deleteAvatar(uid: UID, targetUser: UID)
+    suspend fun deleteAvatar(avatarUrl: String, targetUser: UID)
     suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
 }

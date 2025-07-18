@@ -17,17 +17,17 @@
 package ru.aleshin.studyassistant.core.data.repositories
 
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
-import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSourceOld
+import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
  */
 class ManageUserRepositoryImpl(
-    private val remoteDataSource: AuthRemoteDataSourceOld
+    private val remoteDataSource: AuthRemoteDataSource
 ) : ManageUserRepository {
 
     override suspend fun sendPasswordResetEmail(email: String) {
-        remoteDataSource.sendPasswordResetEmail(email)
+        remoteDataSource.sendPasswordRecoveryEmail(email)
     }
 
     override suspend fun sendVerifyEmail() {

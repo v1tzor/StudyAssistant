@@ -88,7 +88,7 @@ internal interface PurchaseInteractor {
                         store = iapService.fetchStore(),
                     )
                     val updateAppUser = appUserProfile.copy(subscriptionInfo = subscriptionInfo)
-                    usersRepository.addOrUpdateAppUser(updateAppUser)
+                    usersRepository.updateAppUser(updateAppUser)
                 }
 
                 is IapPaymentResultCancelled -> {

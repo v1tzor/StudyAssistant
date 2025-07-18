@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.chat.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.chat.impl.presentation.theme.ChatThemeRes
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEffect
@@ -90,7 +89,7 @@ internal class AssistantScreen : Screen {
                 is AssistantEffect.ShowError -> {
                     dispatchEvent(AssistantEvent.StopResponseLoading)
                     snackbarState.showSnackbar(
-                        message = effect.failures.apply { Logger.e("test") { effect.failures.toString() } }.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

@@ -19,11 +19,19 @@ package ru.aleshin.studyassistant.core.ui.mappers
 import io.github.vinceglb.filekit.core.PlatformFile
 import ru.aleshin.studyassistant.core.common.functional.getMimeTypeFromFileName
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
+import ru.aleshin.studyassistant.core.ui.models.InputFileUi
 
 /**
  * @author Stanislav Aleshin on 01.07.2025.
  */
-suspend fun PlatformFile.mapToDomain() = InputFile(
+fun InputFileUi.mapToDomain() = InputFile(
+    uri = uri,
+    filename = filename,
+    mimeType = mimeType,
+    fileBytes = fileBytes,
+)
+
+suspend fun PlatformFile.convertToInputFile() = InputFileUi(
     uri = path,
     filename = name,
     mimeType = getMimeTypeFromFileName(name),

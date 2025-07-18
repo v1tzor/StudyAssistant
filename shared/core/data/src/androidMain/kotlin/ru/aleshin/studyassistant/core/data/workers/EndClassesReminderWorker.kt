@@ -76,7 +76,7 @@ class EndClassesReminderWorker(
     private val organizationsRepository = instance<OrganizationsRepository>()
 
     override suspend fun doWork(): Result {
-        val currentUser = usersRepository.fetchCurrentAppUser()?.uid ?: return Result.failure()
+        val currentUser = usersRepository.fetchCurrentAuthUser()?.uid ?: return Result.failure()
         val holidays = calendarSettingsRepository.fetchSettings(currentUser).first().holidays
         val notificationSettings = notificationSettingRepository.fetchSettings(currentUser).first()
 

@@ -16,6 +16,11 @@
 
 package ru.aleshin.studyassistant.core.common.platform
 
-actual abstract class PlatformActivity {
-    class Base : PlatformActivity()
+import androidx.compose.runtime.Composable
+
+actual object PlatformActivity
+
+@Composable
+actual fun getPlatformActivity(): PlatformActivity {
+    return PlatformActivity
 }

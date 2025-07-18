@@ -26,4 +26,8 @@ interface HmsAuthTokenProvider {
     class Empty : HmsAuthTokenProvider {
         override suspend fun fetchAccessToken() = null
     }
+
+    companion object {
+        const val OAUTH_URL = "https://oauth-login.cloud.huawei.com/oauth2/v3/token"
+    }
 }

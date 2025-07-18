@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.share
 
+import ru.aleshin.studyassistant.core.common.extensions.encodeToString
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToRemoteData
@@ -80,8 +81,8 @@ fun SentMediatedSchedulesShortDetailsPojo.mapToDomain() = SentMediatedSchedules(
 )
 
 fun SharedSchedules.mapToRemoteData() = SharedSchedulesPojo(
-    sent = sent.mapValues { it.value.mapToRemoteData() },
-    received = received.mapValues { it.value.mapToRemoteData() },
+    sent = sent.mapValues { it.value.mapToRemoteData() }.encodeToString(),
+    received = received.mapValues { it.value.mapToRemoteData() }.encodeToString(),
 )
 
 fun ReceivedMediatedSchedules.mapToRemoteData() = ReceivedMediatedSchedulesPojo(

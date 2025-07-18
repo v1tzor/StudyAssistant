@@ -17,16 +17,15 @@
 package ru.aleshin.studyassistant.core.remote.models.requests
 
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.common.functional.UID
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
 @Serializable
 data class FriendRequestsPojo(
-    val received: Map<UID, Long> = emptyMap(),
-    val send: Map<UID, Long> = emptyMap(),
-    val lastActions: Map<UID, Boolean> = emptyMap(),
+    val received: List<String> = emptyList(),
+    val send: List<String> = emptyList(),
+    val lastActions: List<String> = emptyList(),
 ) {
     companion object {
         fun default() = FriendRequestsPojo()

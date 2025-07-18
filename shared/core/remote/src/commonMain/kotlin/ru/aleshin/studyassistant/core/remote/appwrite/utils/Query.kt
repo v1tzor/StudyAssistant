@@ -218,7 +218,7 @@ class Query(
          * @param queries The list of query strings to combine.
          * @returns The query string.
          */
-        fun or(queries: List<String>) = Query("or", null, queries.map { Json.decodeFromString<Query>(it) }).toString()
+        fun or(queries: List<String>) = Query("or", null, queries).toString()
 
         /**
          * Combine multiple queries using logical AND operator.
@@ -226,7 +226,7 @@ class Query(
          * @param queries The list of query strings to combine.
          * @returns The query string.
          */
-        fun and(queries: List<String>) = Query("and", null, queries.map { Json.decodeFromString<Query>(it) }).toString()
+        fun and(queries: List<String>) = Query("and", null, queries).toString()
 
         /**
          * Parse the value to a list of values.

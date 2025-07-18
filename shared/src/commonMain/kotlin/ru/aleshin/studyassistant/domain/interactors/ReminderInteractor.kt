@@ -22,7 +22,6 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
@@ -52,10 +51,8 @@ interface ReminderInteractor {
         private val eitherWrapper: MainEitherWrapper,
     ) : ReminderInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun startOrRetryAvailableReminders() = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             notificationSettingsRepository.fetchSettings(targetUser).first().apply {
                 if (beginningOfClasses != null) {
                     startClassesReminderManager.startOrRetryReminderService()

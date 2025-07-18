@@ -85,13 +85,13 @@ internal interface EmployeeWorkProcessor :
 
             val avatar = when (actionWithAvatar) {
                 is ActionWithAvatar.Set -> {
-                    employeeInteractor.uploadAvatar(uid, actionWithAvatar.file.mapToDomain()).handleAndGet(
+                    employeeInteractor.uploadAvatar(editModel.avatar, actionWithAvatar.file.mapToDomain()).handleAndGet(
                         onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))).let { null } },
                         onRightAction = { it },
                     )
                 }
                 is ActionWithAvatar.Delete -> {
-                    employeeInteractor.deleteAvatar(uid).handleAndGet(
+                    employeeInteractor.deleteAvatar(editModel.avatar ?: "").handleAndGet(
                         onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))).let { null } },
                         onRightAction = { null },
                     )

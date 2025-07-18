@@ -15,6 +15,7 @@
  */
 package ru.aleshin.studyassistant.data
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.provider.Settings.Secure
@@ -36,11 +37,12 @@ class AnalyticsServiceImpl(
     override fun initializeService() {
         MyTracker.getTrackerParams().apply {
             setCustomParam("android_id", getAndroidId(context))
-            setCustomParam("store", "appgallery")
+            setCustomParam("store", "rustore")
         }
         MyTracker.initTracker(BuildConfig.MY_TRACKER_KEY, (context.applicationContext as Application))
     }
 
+    @SuppressLint("HardwareIds")
     private fun getAndroidId(context: Context): String? {
         return Secure.getString(context.contentResolver, Secure.ANDROID_ID)
     }

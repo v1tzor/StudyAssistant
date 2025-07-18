@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.serialization)
     alias(libs.plugins.konfig)
+    alias(libs.plugins.kotlinAtomic)
 }
 
 kotlin {
@@ -29,7 +30,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
 
             implementation(libs.rustore.universalpush.core)
-            implementation(libs.appwrite.sdk)
+            implementation(libs.androidx.browser)
 
             implementation(project.dependencies.platform(libs.google.oauth.bom.android))
             implementation(libs.google.oauth.android)
@@ -39,15 +40,19 @@ kotlin {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:domain"))
 
-            api(libs.bundles.firebase)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.content.negotation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.auth)
+            implementation(libs.ktor.websockets)
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
+            implementation(libs.kotlin.atomicfu)
+            implementation(libs.kotlin.io)
             implementation(libs.networkcheker)
+            implementation(libs.settings.core)
+            implementation(libs.settings.noargs)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -83,7 +88,7 @@ buildkonfig {
     val rustoreProjectId = gradleLocalProperties(rootDir, providers).getProperty("rustoreProjectId")
     val rustoreAuthToken = gradleLocalProperties(rootDir, providers).getProperty("rustoreServiceAuthToken")
     val hmsAppId = gradleLocalProperties(rootDir, providers).getProperty("hmsAppId")
-    val hmsClientId = gradleLocalProperties(rootDir, providers).getProperty("hmsClientId")
+    val hmsProjectId = gradleLocalProperties(rootDir, providers).getProperty("hmsProjectId")
     val hmsClientSecret = gradleLocalProperties(rootDir, providers).getProperty("hmsClientSecret")
     val deepSeekKey = gradleLocalProperties(rootDir, providers).getProperty("deepSeekKey")
 
@@ -92,8 +97,8 @@ buildkonfig {
         buildConfigField(FieldSpec.Type.STRING, "FIREBASE_PROJECT_ID", firebaseProjectId)
         buildConfigField(FieldSpec.Type.STRING, "RUSTORE_PROJECT_ID", rustoreProjectId)
         buildConfigField(FieldSpec.Type.STRING, "RUSTORE_SERVICE_AUTH_TOKEN", rustoreAuthToken)
-        buildConfigField(FieldSpec.Type.STRING, "HMS_PROJECT_ID", hmsAppId)
-        buildConfigField(FieldSpec.Type.STRING, "HMS_CLIENT_ID", hmsClientId)
+        buildConfigField(FieldSpec.Type.STRING, "HMS_PROJECT_ID", hmsProjectId)
+        buildConfigField(FieldSpec.Type.STRING, "HMS_APP_ID", hmsAppId)
         buildConfigField(FieldSpec.Type.STRING, "HMS_CLIENT_SECRET", hmsClientSecret)
         buildConfigField(FieldSpec.Type.STRING, "DEEP_SEEK_KEY", deepSeekKey)
     }

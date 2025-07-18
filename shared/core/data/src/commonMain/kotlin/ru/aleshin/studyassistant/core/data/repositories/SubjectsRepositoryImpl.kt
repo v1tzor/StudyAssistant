@@ -43,7 +43,7 @@ class SubjectsRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.addOrUpdateSubject(subject.mapToRemoteData(), targetUser)
+            remoteDataSource.addOrUpdateSubject(subject.mapToRemoteData(targetUser), targetUser)
         } else {
             localDataSource.addOrUpdateSubject(subject.mapToLocalData())
         }
@@ -53,7 +53,7 @@ class SubjectsRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.addOrUpdateSubjectsGroup(subjects.map { it.mapToRemoteData() }, targetUser)
+            remoteDataSource.addOrUpdateSubjectsGroup(subjects.map { it.mapToRemoteData(targetUser) }, targetUser)
         } else {
             localDataSource.addOrUpdateSubjectsGroup(subjects.map { it.mapToLocalData() })
         }
@@ -149,7 +149,7 @@ class SubjectsRepositoryImpl(
                 val allSubjects = localDataSource.fetchAllSubjectsByOrganization(
                     organizationId = null,
                 ).let { subjectsFlow ->
-                    return@let subjectsFlow.first().map { it.mapToDomain().mapToRemoteData() }
+                    return@let subjectsFlow.first().map { it.mapToDomain().mapToRemoteData(targetUser) }
                 }
                 remoteDataSource.deleteAllSubjects(targetUser)
                 remoteDataSource.addOrUpdateSubjectsGroup(allSubjects, targetUser)

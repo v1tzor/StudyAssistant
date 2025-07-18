@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.core.remote.models.classes
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
-import ru.aleshin.studyassistant.core.remote.models.users.ContactInfoPojo
 
 /**
  * @author Stanislav Aleshin on 01.05.2024.
@@ -33,7 +32,7 @@ data class ClassPojo(
     val customData: String? = null,
     val teacherId: UID? = null,
     val office: String = "",
-    val location: ContactInfoPojo? = null,
+    val location: String? = null,
     val startTime: Long = 0L,
     val endTime: Long = 0L,
 )

@@ -30,6 +30,6 @@ import ru.aleshin.studyassistant.auth.impl.domain.interactors.AuthInteractor
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<AuthErrorHandler> { AuthErrorHandler.Base() }
     bindSingleton<AuthEitherWrapper> { AuthEitherWrapper.Base(instance(), instance()) }
-    bindSingleton<AuthInteractor> { AuthInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<AuthInteractor> { AuthInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance()) }
 }

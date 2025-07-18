@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.profile.impl.domain.interactors
 
 import kotlinx.coroutines.flow.first
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
@@ -45,10 +44,9 @@ internal interface ReminderInteractor {
         private val eitherWrapper: ProfileEitherWrapper,
     ) : ReminderInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun stopReminders() = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+
             val allOrganizations = organizationsRepository.fetchAllShortOrganization(targetUser).first()
             val organizationIds = allOrganizations.map { it.uid }
 

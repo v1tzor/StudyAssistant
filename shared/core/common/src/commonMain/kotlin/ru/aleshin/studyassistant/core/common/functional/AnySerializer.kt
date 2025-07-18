@@ -20,6 +20,8 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildSerialDescriptor
@@ -100,15 +102,99 @@ object AnySerializer : KSerializer<Any> {
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class, InternalSerializationApi::class)
+object AnyNullSerializer : KSerializer<Any?> {
+
+    override val descriptor: SerialDescriptor = buildSerialDescriptor(
+        serialName = "kotlin.Any",
+        kind = PolymorphicKind.OPEN,
+    )
+
+    override fun serialize(encoder: Encoder, value: Any?) {
+        if (value == null) {
+            encoder.encodeNull()
+            return
+        }
+        val jsonEncoder = encoder as? JsonEncoder
+            ?: error("This class can be saved only by Json")
+
+        val element = when (value) {
+            is Boolean -> JsonPrimitive(value)
+            is Number -> JsonPrimitive(value)
+            is String -> JsonPrimitive(value)
+            is List<*> -> JsonArray(value.map { serializeToElement(it) })
+            is Map<*, *> -> JsonObject(value.mapKeys { (k, _) ->
+                k.toString()
+            }.mapValues { (_, v) -> serializeToElement(v) })
+            else -> error("Not supported type: ${value::class.simpleName}")
+        }
+
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: Decoder): Any? {
+        if (decoder.decodeNotNullMark()) {
+            val jsonDecoder = decoder as? JsonDecoder
+            return jsonDecoder?.decodeJsonElement()?.let { decodeFromElement(it) }
+        } else {
+            return decoder.decodeNull()
+        }
+    }
+
+    private fun serializeToElement(value: Any?): JsonElement = when (value) {
+        null -> JsonNull
+        is Boolean -> JsonPrimitive(value)
+        is Number -> JsonPrimitive(value)
+        is String -> JsonPrimitive(value)
+        is List<*> -> JsonArray(value.map { serializeToElement(it) })
+        is Map<*, *> -> JsonObject(value.mapKeys { (k, _) ->
+            k.toString()
+        }.mapValues { (_, v) -> serializeToElement(v) })
+        else -> error("Not supported type: ${value::class.simpleName}")
+    }
+
+    private fun decodeFromElement(element: JsonElement): Any? = when (element) {
+        is JsonPrimitive -> when {
+            element.isString -> element.content
+            element.booleanOrNull != null -> element.boolean
+            element.longOrNull != null -> element.long
+            element.doubleOrNull != null -> element.double
+            else -> element.content
+        }
+        is JsonArray -> element.map { decodeFromElement(it) }
+        is JsonObject -> element.mapValues { decodeFromElement(it.value) }
+    }
+}
+
 @OptIn(ExperimentalSerializationApi::class)
-object ListAnySerializer : KSerializer<List<Any>> {
+object ListAnySerializer : KSerializer<List<Any>?> {
     override val descriptor: SerialDescriptor = ListSerializer(AnySerializer).descriptor
 
-    override fun serialize(encoder: Encoder, value: List<Any>) {
+    override fun serialize(encoder: Encoder, value: List<Any>?) {
+        if (value == null) return encoder.encodeNull()
         ListSerializer(AnySerializer).serialize(encoder, value)
     }
 
-    override fun deserialize(decoder: Decoder): List<Any> {
-        return ListSerializer(AnySerializer).deserialize(decoder)
+    override fun deserialize(decoder: Decoder): List<Any>? {
+        return if (decoder.decodeNotNullMark()) {
+            ListSerializer(AnySerializer).deserialize(decoder)
+        } else {
+            decoder.decodeNull()
+        }
+    }
+}
+
+object MapAnySerializer : KSerializer<Map<String, Any>> {
+
+    private val mapSerializer = MapSerializer(String.serializer(), AnySerializer)
+
+    override val descriptor: SerialDescriptor = mapSerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: Map<String, Any>) {
+        mapSerializer.serialize(encoder, value)
+    }
+
+    override fun deserialize(decoder: Decoder): Map<String, Any> {
+        return mapSerializer.deserialize(decoder)
     }
 }

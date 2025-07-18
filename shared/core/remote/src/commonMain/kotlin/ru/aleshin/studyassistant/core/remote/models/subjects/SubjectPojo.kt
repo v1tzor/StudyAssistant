@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.core.remote.models.subjects
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
-import ru.aleshin.studyassistant.core.remote.models.users.ContactInfoPojo
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
@@ -27,11 +26,12 @@ import ru.aleshin.studyassistant.core.remote.models.users.ContactInfoPojo
 @Serializable
 data class SubjectPojo(
     val uid: UID = "",
+    val userId: UID,
     val organizationId: UID = "",
     val eventType: String = EventType.LESSON.toString(),
     val name: String = "",
     val teacherId: UID? = null,
     val office: String = "",
     val color: Int = 0,
-    val location: ContactInfoPojo? = null,
+    val location: String? = null,
 )

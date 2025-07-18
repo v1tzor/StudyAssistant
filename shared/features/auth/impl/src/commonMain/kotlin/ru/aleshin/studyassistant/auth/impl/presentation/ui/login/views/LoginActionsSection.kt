@@ -42,14 +42,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.mmk.kmpauth.google.GoogleButtonUiContainer
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.OAuthSignInRowContainer
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
+import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.OAuthProvider
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
@@ -61,7 +65,8 @@ internal fun LoginActionsSection(
     enabledGoogle: Boolean,
     isLoading: Boolean,
     onLoginClick: () -> Unit,
-    onLoginViaGoogleClick: (idToken: String?) -> Unit,
+    onSuccessOAuthLogin: (UserSession) -> Unit,
+    onFailureOAuthLogin: () -> Unit,
 ) {
     Column(
         modifier = modifier.padding(horizontal = 24.dp),
@@ -105,32 +110,54 @@ internal fun LoginActionsSection(
                 color = MaterialTheme.colorScheme.outlineVariant
             )
         }
-        GoogleButtonUiContainer(
-            onGoogleSignInResult = { googleUser -> onLoginViaGoogleClick(googleUser?.idToken) },
-        ) {
+        OAuthSignInRowContainer(
+            onCreateSession = onSuccessOAuthLogin,
+            onError = { exception ->
+                exception?.printStackTrace()
+                onFailureOAuthLogin()
+            },
+        ) { callback ->
             OutlinedButton(
-                onClick = { this.onClick() },
-                modifier = Modifier.alphaByEnabled(enabledGoogle).fillMaxWidth().height(44.dp),
+                onClick = { callback(OAuthProvider.GOOGLE) },
+                modifier = Modifier.alphaByEnabled(enabledGoogle).size(48.dp),
                 enabled = !isLoading && enabledGoogle,
                 shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
+                contentPadding = PaddingValues(0.dp),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                     Image(
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(24.dp),
                         painter = painterResource(AuthThemeRes.icons.google),
                         contentDescription = AuthThemeRes.strings.loginViaGoogleLabel,
                     )
+                }
+            }
+            OutlinedButton(
+                onClick = { callback(OAuthProvider.YANDEX) },
+                modifier = Modifier.alphaByEnabled(enabledGoogle).size(48.dp),
+                enabled = !isLoading && enabledGoogle,
+                shape = MaterialTheme.shapes.large,
+                contentPadding = PaddingValues(0.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                ),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            ) {
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+//                    Image(
+//                        modifier = Modifier.size(24.dp),
+//                        painter = painterResource(AuthThemeRes.icons.google),
+//                        contentDescription = AuthThemeRes.strings.loginViaGoogleLabel,
+//                    )
                     Text(
-                        text = AuthThemeRes.strings.loginViaGoogleLabel,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        text = "Y",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.Red,
+                        fontWeight = FontWeight.Black
                     )
                 }
             }

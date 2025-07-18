@@ -26,10 +26,12 @@ import ru.aleshin.studyassistant.data.AnalyticsServiceImpl
 import ru.aleshin.studyassistant.data.AppServiceImpl
 import ru.aleshin.studyassistant.data.CrashlyticsServiceImpl
 import ru.aleshin.studyassistant.data.IapServiceImpl
+import ru.aleshin.studyassistant.data.ReviewServiceImpl
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.ok.tracer.HasTracerConfiguration
 import ru.rustore.sdk.billingclient.RuStoreBillingClientFactory
 import ru.rustore.sdk.pushclient.common.logger.DefaultLogger
+import ru.rustore.sdk.review.RuStoreReviewManagerFactory
 import ru.rustore.sdk.universalpush.RuStoreUniversalPushClient
 import ru.rustore.sdk.universalpush.firebase.provides.FirebasePushProvider
 import ru.rustore.sdk.universalpush.hms.providers.HmsPushProvider
@@ -71,6 +73,9 @@ abstract class BaseFlavorApplication : BaseApplication(), HasTracerConfiguration
                     context = applicationContext,
                 ),
                 crashlyticsService = CrashlyticsServiceImpl(),
+                reviewService = ReviewServiceImpl(
+                    reviewManager = RuStoreReviewManagerFactory.create(applicationContext)
+                ),
                 iapService = IapServiceImpl(
                     applicationContext = applicationContext,
                     billingClient = RuStoreBillingClientFactory.create(

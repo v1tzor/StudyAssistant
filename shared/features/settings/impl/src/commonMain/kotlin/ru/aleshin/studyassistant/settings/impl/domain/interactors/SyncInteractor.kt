@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.settings.impl.domain.interactors
 
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
@@ -47,14 +47,12 @@ internal interface SyncInteractor {
         private val homeworksRepository: HomeworksRepository,
         private val todosRepository: TodoRepository,
         private val baseScheduleRepository: BaseScheduleRepository,
+        private val goalsRepository: DailyGoalsRepository,
         private val customScheduleRepository: CustomScheduleRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
         private val usersRepository: UsersRepository,
         private val eitherWrapper: SettingsEitherWrapper,
     ) : SyncInteractor {
-
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
 
         override suspend fun transferRemoteData() = eitherWrapper.wrapUnit {
             transferData(DataTransferDirection.REMOTE_TO_LOCAL)
@@ -65,6 +63,7 @@ internal interface SyncInteractor {
         }
 
         private suspend fun transferData(direction: DataTransferDirection) {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             subjectsRepository.transferData(direction, targetUser)
             employeeRepository.transferData(direction, targetUser)
             homeworksRepository.transferData(direction, targetUser)
@@ -73,6 +72,7 @@ internal interface SyncInteractor {
             customScheduleRepository.transferData(direction, targetUser)
             calendarSettingsRepository.transferData(direction, targetUser)
             organizationsRepository.transferData(direction, targetUser)
+            goalsRepository.transferData(direction, targetUser)
         }
     }
 }

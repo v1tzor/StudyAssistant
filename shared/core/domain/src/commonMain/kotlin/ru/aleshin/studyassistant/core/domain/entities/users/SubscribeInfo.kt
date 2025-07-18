@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.users
 
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
 
@@ -23,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
  * @author Stanislav Aleshin on 30.08.2024.
  */
 data class SubscribeInfo(
+    val uid: UID = randomUUID(),
     val deviceId: UID,
     val purchaseId: UID,
     val productId: UID,

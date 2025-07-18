@@ -16,13 +16,11 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.schedules
 
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.database.models.schedule.CustomScheduleDetailsEntity
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
-import ru.aleshin.studyassistant.core.remote.models.classes.ClassPojo
 import ru.aleshin.studyassistant.core.remote.models.schedule.CustomScheduleDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.schedule.CustomSchedulePojo
 import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleEntity
@@ -42,16 +40,15 @@ fun CustomScheduleDetailsEntity.mapToDomain() = CustomSchedule(
     classes = classes.map { it.mapToDomain() },
 )
 
-fun CustomSchedule.mapToRemoteData() = CustomSchedulePojo(
+fun CustomSchedule.mapToRemoteData(userId: UID) = CustomSchedulePojo(
     uid = uid,
+    userId = userId,
     date = date.toEpochMilliseconds(),
-    classes = mutableMapOf<UID, ClassPojo>().apply {
-        classes.forEach { put(it.uid, it.mapToRemoteData()) }
-    },
+    classes = classes.map { it.mapToRemoteData().toJson() },
 )
 
 fun CustomSchedule.mapToLocalData() = CustomScheduleEntity(
     uid = uid,
     date = date.toEpochMilliseconds(),
-    classes = classes.map { Json.encodeToString(it.mapToLocalData()) },
+    classes = classes.map { it.mapToLocalData().toJson() },
 )

@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.domain.interactors
 
-import dev.gitlive.firebase.auth.FirebaseUser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -32,6 +31,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPurchaseSt
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapServiceAvailability
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
+import ru.aleshin.studyassistant.core.domain.entities.users.AuthUser
 import ru.aleshin.studyassistant.core.domain.entities.users.SubscribeInfo
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -43,9 +43,9 @@ import ru.aleshin.studyassistant.domain.entities.MainFailures
  */
 interface AppUserInteractor {
 
-    suspend fun fetchAppUser(): DomainResult<MainFailures, FirebaseUser?>
+    suspend fun fetchAuthUser(): DomainResult<MainFailures, AuthUser?>
     suspend fun fetchAppUserInfo(): FlowDomainResult<MainFailures, AppUser?>
-    suspend fun fetchAuthStateChanged(): FlowDomainResult<MainFailures, FirebaseUser?>
+    suspend fun fetchAuthStateChanged(): FlowDomainResult<MainFailures, AuthUser?>
     suspend fun fetchAppToken(): FlowDomainResult<MainFailures, UniversalPushToken>
     suspend fun updateUserSubscriptionInfo(): UnitDomainResult<MainFailures>
     suspend fun updateUser(user: AppUser): UnitDomainResult<MainFailures>
@@ -58,21 +58,21 @@ interface AppUserInteractor {
         private val eitherWrapper: MainEitherWrapper,
     ) : AppUserInteractor {
 
-        override suspend fun fetchAppUser() = eitherWrapper.wrap {
-            val currentUser = usersRepository.fetchCurrentAppUser()
-            return@wrap currentUser?.let { user -> usersRepository.reloadUser(user) ?: user }
+        override suspend fun fetchAuthUser() = eitherWrapper.wrap {
+            val currentUser = usersRepository.fetchCurrentAuthUser()
+            return@wrap currentUser
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchAppUserInfo() = eitherWrapper.wrapFlow {
-            usersRepository.fetchAuthStateChanged().flatMapLatest { authUser ->
+            usersRepository.fetchStateChanged().flatMapLatest { authUser ->
                 val appUserId = authUser?.uid ?: return@flatMapLatest flowOf(null)
                 usersRepository.fetchUserById(appUserId)
             }
         }
 
         override suspend fun fetchAuthStateChanged() = eitherWrapper.wrapFlow {
-            usersRepository.fetchAuthStateChanged()
+            usersRepository.fetchStateChanged()
         }
 
         override suspend fun fetchAppToken() = eitherWrapper.wrapFlow {
@@ -80,7 +80,7 @@ interface AppUserInteractor {
         }
 
         override suspend fun updateUserSubscriptionInfo() = eitherWrapper.wrap {
-            val currentUser = usersRepository.fetchCurrentAppUser()
+            val currentUser = usersRepository.fetchCurrentAuthUser()
             val isAvailability = iapService.fetchServiceAvailability()
             val isAuth = iapService.isAuthorizedUser()
 
@@ -120,7 +120,7 @@ interface AppUserInteractor {
                                     expiryTimeMillis = endTime.toEpochMilliseconds(),
                                 )
                                 val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
-                                usersRepository.addOrUpdateAppUser(updatedAppUser)
+                                usersRepository.updateAppUser(updatedAppUser)
                             }
                         } else {
                             val updatedSubscriptionInfo = SubscribeInfo(
@@ -134,7 +134,7 @@ interface AppUserInteractor {
                                 store = iapService.fetchStore(),
                             )
                             val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
-                            usersRepository.addOrUpdateAppUser(updatedAppUser)
+                            usersRepository.updateAppUser(updatedAppUser)
                         }
                     }
                 }
@@ -142,7 +142,7 @@ interface AppUserInteractor {
         }
 
         override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {
-            usersRepository.addOrUpdateAppUser(user)
+            usersRepository.updateAppUser(user)
         }
     }
 }

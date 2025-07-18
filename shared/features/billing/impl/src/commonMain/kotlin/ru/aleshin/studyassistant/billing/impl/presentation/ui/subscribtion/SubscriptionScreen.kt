@@ -43,6 +43,7 @@ import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.views
 import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.views.SuccessPaymentDialog
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
+import ru.aleshin.studyassistant.core.common.platform.closeApp
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
@@ -111,7 +112,7 @@ internal class SubscriptionScreen : Screen {
         }
 
         if (successDialogState) {
-            SuccessPaymentDialog(onDismiss = { dispatchEvent(SubscriptionEvent.NavigateToBack) })
+            SuccessPaymentDialog(onDismiss = { closeApp() })
         }
     }
 }

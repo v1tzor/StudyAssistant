@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.core.remote.models.organizations
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
-import ru.aleshin.studyassistant.core.remote.models.users.ContactInfoPojo
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
@@ -31,7 +30,7 @@ data class OrganizationShortPojo(
     val shortName: String = "",
     val type: String = OrganizationType.SCHOOL.toString(),
     val avatar: String? = null,
-    val locations: List<ContactInfoPojo> = emptyList(),
+    val locations: List<String> = emptyList(),
     val offices: List<String> = emptyList(),
-    val scheduleTimeIntervals: ScheduleTimeIntervalsPojo = ScheduleTimeIntervalsPojo(),
+    val scheduleTimeIntervals: String,
 )

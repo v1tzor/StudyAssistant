@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
@@ -49,6 +50,7 @@ public interface SettingsFeatureDependencies : BaseFeatureDependencies {
     public val generalSettingsRepository: GeneralSettingsRepository
     public val calendarSettingsRepository: CalendarSettingsRepository
     public val notificationSettingsRepository: NotificationSettingsRepository
+    public val goalsRepository: DailyGoalsRepository
     public val organizationsRepository: OrganizationsRepository
     public val subjectsRepository: SubjectsRepository
     public val employeeRepository: EmployeeRepository

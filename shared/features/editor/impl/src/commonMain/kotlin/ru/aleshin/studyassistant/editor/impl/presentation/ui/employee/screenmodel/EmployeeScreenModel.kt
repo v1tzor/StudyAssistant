@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreen
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.ui.mappers.convertToInputFile
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract.EmployeeAction
@@ -68,7 +69,8 @@ internal class EmployeeScreenModel(
                 }
             }
             is EmployeeEvent.UpdateAvatar -> with(event) {
-                sendAction(EmployeeAction.UpdateActionWithAvatar(ActionWithAvatar.Set(image)))
+                val inputFile = image.convertToInputFile()
+                sendAction(EmployeeAction.UpdateActionWithAvatar(ActionWithAvatar.Set(inputFile)))
             }
             is EmployeeEvent.DeleteAvatar -> with(state()) {
                 val action = if (editableEmployee?.avatar != null) {

@@ -17,8 +17,9 @@
 package ru.aleshin.studyassistant.core.data.mappers.users
 
 import ru.aleshin.studyassistant.core.domain.entities.users.AuthUser
-import ru.aleshin.studyassistant.core.remote.appwrite.auth.AuthUserPojo
-import ru.aleshin.studyassistant.core.remote.appwrite.auth.Preferences
+import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
+import ru.aleshin.studyassistant.core.remote.models.appwrite.AuthUserPojo
+import ru.aleshin.studyassistant.core.remote.models.appwrite.SessionPojo
 
 /**
  * @author Stanislav Aleshin on 01.07.2025.
@@ -31,16 +32,52 @@ fun AuthUserPojo.mapToDomain(): AuthUser {
         name = name,
         password = password,
         hash = hash,
+        hashOptions = hashOptions,
         registration = registration,
         status = status,
-        labels = labels,
+        labels = labels ?: emptyList(),
         passwordUpdate = passwordUpdate,
         email = email,
         phone = phone,
         emailVerification = emailVerification,
         phoneVerification = phoneVerification,
+        preferences = prefs ?: emptyMap(),
         mfa = mfa,
         accessedAt = accessedAt
+    )
+}
+
+fun SessionPojo.mapToDomain(): UserSession {
+    return UserSession(
+        id = id,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        userId = userId,
+        expire = expire,
+        provider = provider,
+        providerUid = providerUid,
+        providerAccessToken = providerAccessToken,
+        providerAccessTokenExpiry = providerAccessTokenExpiry,
+        providerRefreshToken = providerRefreshToken,
+        ip = ip,
+        osCode = osCode,
+        osName = osName,
+        osVersion = osVersion,
+        clientType = clientType,
+        clientCode = clientCode,
+        clientName = clientName,
+        clientVersion = clientVersion,
+        clientEngine = clientEngine,
+        clientEngineVersion = clientEngineVersion,
+        deviceName = deviceName,
+        deviceBrand = deviceBrand,
+        deviceModel = deviceModel,
+        countryCode = countryCode,
+        countryName = countryName,
+        current = current,
+        factors = factors,
+        secret = secret,
+        mfaUpdatedAt = mfaUpdatedAt
     )
 }
 
@@ -52,7 +89,7 @@ fun AuthUser.mapToData(): AuthUserPojo {
         name = name,
         password = password,
         hash = hash,
-        hashOptions = null,
+        hashOptions = hashOptions,
         registration = registration,
         status = status,
         labels = labels,
@@ -61,9 +98,9 @@ fun AuthUser.mapToData(): AuthUserPojo {
         phone = phone,
         emailVerification = emailVerification,
         phoneVerification = phoneVerification,
-        mfa = mfa,
-        prefs = Preferences(emptyMap()),
+        prefs = preferences,
         targets = emptyList(),
-        accessedAt = accessedAt,
+        mfa = mfa,
+        accessedAt = accessedAt
     )
 }

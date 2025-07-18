@@ -16,8 +16,9 @@
 
 package ru.aleshin.studyassistant.core.database.mappers.organizations
 
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.extensions.fromJson
+import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationShortEntity
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
@@ -35,10 +36,10 @@ fun OrganizationDetailsEntity.mapToBase() = OrganizationEntity(
     type = type,
     avatar = avatar,
     schedule_time_intervals = Json.encodeToString(scheduleTimeIntervals),
-    emails = emails.map { Json.encodeToString(it) },
-    phones = phones.map { Json.encodeToString(it) },
-    locations = locations.map { Json.encodeToString(it) },
-    webs = webs.map { Json.encodeToString(it) },
+    emails = emails.map { it.toJson() },
+    phones = phones.map { it.toJson() },
+    locations = locations.map { it.toJson() },
+    webs = webs.map { it.toJson() },
     offices = offices,
     is_hide = if (isHide) 1L else 0L,
 )
@@ -56,10 +57,10 @@ fun OrganizationEntity.mapToDetails(
     scheduleTimeIntervals = Json.decodeFromString(schedule_time_intervals),
     subjects = subjects,
     employee = employee,
-    emails = emails.map { Json.decodeFromString(it) },
-    phones = phones.map { Json.decodeFromString(it) },
-    locations = locations.map { Json.decodeFromString(it) },
-    webs = webs.map { Json.decodeFromString(it) },
+    emails = emails.map { it.fromJson() },
+    phones = phones.map { it.fromJson() },
+    locations = locations.map { it.fromJson() },
+    webs = webs.map { it.fromJson() },
     offices = offices,
     isHide = is_hide == 1L,
 )
@@ -70,7 +71,7 @@ fun OrganizationEntity.mapToShort() = OrganizationShortEntity(
     shortName = short_name,
     type = type,
     avatar = avatar,
-    locations = locations.map { Json.decodeFromString(it) },
+    locations = locations.map { it.fromJson() },
     offices = offices,
     scheduleTimeIntervals = Json.decodeFromString(schedule_time_intervals),
 )

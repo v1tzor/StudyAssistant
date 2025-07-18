@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.screenmodel
 
-import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
@@ -25,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkC
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.ui.mappers.mapToDomain
+import ru.aleshin.studyassistant.core.ui.models.InputFileUi
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
@@ -81,8 +81,8 @@ internal interface ProfileWorkProcessor :
             )
         }
 
-        private fun updateAvatarWork(user: AppUserUi, file: PlatformFile) = flow {
-            appUserInteractor.uploadAvatar(user.uid, file.mapToDomain()).handle(
+        private fun updateAvatarWork(user: AppUserUi, file: InputFileUi) = flow {
+            appUserInteractor.uploadAvatar(user.avatar, file.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
                 onRightAction = { imageUrl ->
                     val updatedUser = user.copy(avatar = imageUrl)
@@ -94,7 +94,7 @@ internal interface ProfileWorkProcessor :
         }
 
         private fun deleteAvatarWork(user: AppUserUi) = flow {
-            appUserInteractor.deleteAvatar(user.uid).handle(
+            appUserInteractor.deleteAvatar(user.avatar ?: "").handle(
                 onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
                 onRightAction = {
                     val updatedUser = user.copy(avatar = null)
@@ -111,7 +111,7 @@ internal sealed class ProfileWorkCommand : WorkCommand {
     data object LoadAppUser : ProfileWorkCommand()
     data object LoadPaidUserStatus : ProfileWorkCommand()
     data class UpdateAppUser(val user: AppUserUi) : ProfileWorkCommand()
-    data class UpdateAvatar(val user: AppUserUi, val file: PlatformFile) : ProfileWorkCommand()
+    data class UpdateAvatar(val user: AppUserUi, val file: InputFileUi) : ProfileWorkCommand()
     data class DeleteAvatar(val user: AppUserUi) : ProfileWorkCommand()
     data class UpdatePassword(val oldPassword: String, val newPassword: String) : ProfileWorkCommand()
 }

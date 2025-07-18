@@ -39,10 +39,10 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 internal interface EmployeeInteractor {
 
     suspend fun addOrUpdateEmployee(employee: Employee): DomainResult<EditorFailures, UID>
-    suspend fun uploadAvatar(uid: UID, file: InputFile): DomainResult<EditorFailures, String>
+    suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile): DomainResult<EditorFailures, String>
     suspend fun fetchAllDetailsEmployee(organizationId: UID): FlowDomainResult<EditorFailures, List<EmployeeDetails>>
     suspend fun fetchEmployeeById(uid: UID): FlowDomainResult<EditorFailures, Employee?>
-    suspend fun deleteAvatar(uid: UID): UnitDomainResult<EditorFailures>
+    suspend fun deleteAvatar(avatarUrl: String): UnitDomainResult<EditorFailures>
 
     class Base(
         private val employeeRepository: EmployeeRepository,
@@ -51,19 +51,19 @@ internal interface EmployeeInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : EmployeeInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun addOrUpdateEmployee(employee: Employee) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             employeeRepository.addOrUpdateEmployee(employee, targetUser)
         }
 
-        override suspend fun uploadAvatar(uid: UID, file: InputFile) = eitherWrapper.wrap {
-            employeeRepository.uploadAvatar(uid, file, targetUser)
+        override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            employeeRepository.uploadAvatar(oldAvatarUrl, file, targetUser)
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchAllDetailsEmployee(organizationId: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val subjectsFlow = subjectsRepository.fetchAllSubjectsByOrganization(organizationId, targetUser)
             val employeesFlow = employeeRepository.fetchAllEmployeeByOrganization(organizationId, targetUser)
 
@@ -79,11 +79,13 @@ internal interface EmployeeInteractor {
         }
 
         override suspend fun fetchEmployeeById(uid: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             employeeRepository.fetchEmployeeById(uid, targetUser)
         }
 
-        override suspend fun deleteAvatar(uid: UID) = eitherWrapper.wrap {
-            employeeRepository.deleteAvatar(uid, targetUser)
+        override suspend fun deleteAvatar(avatarUrl: UID) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            employeeRepository.deleteAvatar(avatarUrl, targetUser)
         }
     }
 }

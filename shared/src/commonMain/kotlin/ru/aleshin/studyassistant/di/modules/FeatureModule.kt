@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.di.modules
 
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import org.kodein.di.DI
 import org.kodein.di.bindEagerSingleton
 import org.kodein.di.bindProvider
@@ -64,6 +63,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesReposito
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.impl.di.EditorFeatureDependencies
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
@@ -119,8 +119,10 @@ val featureModule = DI.Module("Feature") {
             override val authFeatureStarter = provider<AuthFeatureStarter>()
             override val editorFeatureStarter = provider<EditorFeatureStarter>()
             override val navigationFeatureStarter = provider<NavigationFeatureStarter>()
+            override val billingFeatureStarter = provider<BillingFeatureStarter>()
             override val usersRepository = instance<UsersRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
+            override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
@@ -140,8 +142,10 @@ val featureModule = DI.Module("Feature") {
             override val previewFeatureStarter = provider<PreviewFeatureStarter>()
             override val authRepository = instance<AuthRepository>()
             override val usersRepository = instance<UsersRepository>()
+            override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val messageRepository = instance<MessageRepository>()
             override val manageUserRepository = instance<ManageUserRepository>()
+            override val accountService = instance<AccountService>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
             override val appService = instance<AppService>()
@@ -327,6 +331,7 @@ val featureModule = DI.Module("Feature") {
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
+            override val goalsRepository = instance<DailyGoalsRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val usersRepository = instance<UsersRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
@@ -362,7 +367,6 @@ val featureModule = DI.Module("Feature") {
             override val dateManager = instance<DateManager>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
-            override val firestore = instance<FirebaseFirestore>()
             override val iapService = instance<IapService>()
             override val crashlyticsService = instance<CrashlyticsService>()
             override val analyticsService = instance<AnalyticsService>()

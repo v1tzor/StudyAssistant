@@ -16,9 +16,11 @@
 package ru.aleshin.studyassistant.core.common.wrappers
 
 import cafe.adriel.voyager.core.platform.multiplatformName
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.common.functional.DomainFailures
 import ru.aleshin.studyassistant.core.common.functional.Either
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
@@ -47,6 +49,7 @@ interface EitherWrapper<F : DomainFailures> {
                 message = failure::class.multiplatformName.toString(),
                 exception = error,
             )
+            Logger.e(LOGGER_TAG, error) { "Domain error: $failure" }
             Either.Left(data = failure)
         }
 
@@ -64,12 +67,19 @@ interface FlowEitherWrapper<F : DomainFailures> : EitherWrapper<F> {
 
     abstract class Abstract<F : DomainFailures>(
         private val errorHandler: ErrorHandler<F>,
-        crashlyticsService: CrashlyticsService,
+        private val crashlyticsService: CrashlyticsService,
     ) : FlowEitherWrapper<F>, EitherWrapper.Abstract<F>(errorHandler, crashlyticsService) {
 
         override suspend fun <O> wrapFlow(block: suspend () -> Flow<O>) = flow {
             block.invoke().catch { error ->
-                this@flow.emit(Either.Left(data = errorHandler.handle(error)))
+                val failure = errorHandler.handle(error)
+                crashlyticsService.recordException(
+                    tag = ERROR_TAG,
+                    message = failure::class.multiplatformName.toString(),
+                    exception = error,
+                )
+                Logger.e(LOGGER_TAG, error) { "Domain error: $failure" }
+                this@flow.emit(Either.Left(data = failure))
             }.collect { data ->
                 emit(Either.Right(data = data))
             }

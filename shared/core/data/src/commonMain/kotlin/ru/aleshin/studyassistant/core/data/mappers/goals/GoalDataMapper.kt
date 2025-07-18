@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.data.mappers.goals
 
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToDomain
 import ru.aleshin.studyassistant.core.database.models.goals.GoalEntityDetails
 import ru.aleshin.studyassistant.core.domain.entities.goals.Goal
@@ -136,8 +137,9 @@ fun GoalPojo.mapToDomain() = GoalShort(
     completeDate = completeDate?.mapEpochTimeToInstant(),
 )
 
-fun Goal.mapToRemoteData() = GoalPojo(
+fun Goal.mapToRemoteData(userId: UID) = GoalPojo(
     uid = uid,
+    userId = userId,
     type = contentType.toString(),
     number = number,
     contentId = checkNotNull(contentHomework?.uid ?: contentTodo?.uid),

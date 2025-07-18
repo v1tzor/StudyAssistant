@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.presentation.models
 
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 
@@ -27,6 +28,7 @@ import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 @Parcelize
 data class GeneralSettingsUi(
     val isFirstStart: Boolean = true,
+    val isUnfinishedSetup: UID? = null,
     val themeType: ThemeUiType = ThemeUiType.DEFAULT,
     val languageType: LanguageUiType = LanguageUiType.DEFAULT,
 ) : Parcelable

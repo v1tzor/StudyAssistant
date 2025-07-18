@@ -82,6 +82,12 @@ object Permission {
         update(Role.user(userId)),
         delete(Role.user(userId))
     )
+
+    fun avatarData(userId: String) = listOf(
+        read(Role.any()),
+        update(Role.user(userId)),
+        delete(Role.user(userId))
+    )
 }
 
 object Role {

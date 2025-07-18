@@ -45,6 +45,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.Passwo
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.EmailTextField
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.PasswordTextField
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.SpacerToKeyboard
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
@@ -78,17 +79,20 @@ internal fun LoginInputSection(
                 onDone = { passwordFocusRequester.requestFocus() },
             ),
         )
-        PasswordTextField(
-            modifier = Modifier.focusRequester(passwordFocusRequester),
-            enabled = enabled,
-            password = password,
-            onPasswordChanged = onPasswordChange,
-            isError = passwordValidError != null,
-            errorText = passwordValidError?.mapToMessage(),
-            keyboardActions = KeyboardActions(
-                onDone = { onCompleteEnter() },
+        Column {
+            PasswordTextField(
+                modifier = Modifier.focusRequester(passwordFocusRequester),
+                enabled = enabled,
+                password = password,
+                onPasswordChanged = onPasswordChange,
+                isError = passwordValidError != null,
+                errorText = passwordValidError?.mapToMessage(),
+                keyboardActions = KeyboardActions(
+                    onDone = { onCompleteEnter() },
+                )
             )
-        )
+            SpacerToKeyboard()
+        }
         ForgotButton(
             enabled = enabled,
             onClick = onForgotPassword

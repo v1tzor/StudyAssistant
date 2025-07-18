@@ -7,13 +7,9 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvmToolchain(17)
+
+    androidTarget()
 
     listOf(
         iosX64(),
@@ -54,8 +50,6 @@ kotlin {
             api(libs.dragAndDrop)
 
             api(libs.bundles.sketch)
-
-            implementation(libs.firebase.storage)
         }
     }
 

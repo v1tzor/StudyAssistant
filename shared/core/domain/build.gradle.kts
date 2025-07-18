@@ -27,7 +27,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":shared:core:common"))
-            implementation(libs.bundles.firebase)
         }
     }
 

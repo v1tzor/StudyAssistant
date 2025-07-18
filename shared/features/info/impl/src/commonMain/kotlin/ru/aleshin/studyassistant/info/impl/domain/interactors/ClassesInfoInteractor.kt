@@ -42,10 +42,8 @@ internal interface ClassesInfoInteractor {
         private val eitherWrapper: InfoEitherWrapper,
     ) : ClassesInfoInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchClassesInfo(organizationId: UID) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val currentWeek = dateManager.fetchCurrentWeek()
             val schedules = scheduleRepository.fetchSchedulesByVersion(currentWeek, null, targetUser)
             val classes = schedules.first().groupBy { it.week }.mapValues { entry ->

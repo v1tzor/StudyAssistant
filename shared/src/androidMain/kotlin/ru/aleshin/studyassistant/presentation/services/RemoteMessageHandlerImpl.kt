@@ -29,7 +29,7 @@ import androidx.core.net.toUri
 import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
 import ru.aleshin.studyassistant.core.common.extensions.generateDigitCode
 import ru.aleshin.studyassistant.core.common.functional.Constants
-import ru.aleshin.studyassistant.core.common.functional.Constants.App.OPEN_APP_URL
+import ru.aleshin.studyassistant.core.common.functional.Constants.App.OPEN_APP_DEEPLINK
 import ru.aleshin.studyassistant.core.common.messages.RemoteMessageHandler
 import ru.aleshin.studyassistant.core.common.notifications.NotificationCreator
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationPriority
@@ -128,7 +128,7 @@ class RemoteMessageHandlerImpl(private val context: Context) : RemoteMessageHand
         clickAction: String? = null,
         tag: String? = null,
     ) {
-        val mainActivityUri = OPEN_APP_URL.toUri()
+        val mainActivityUri = OPEN_APP_DEEPLINK.toUri()
         val contentIntent = clickAction?.let { Intent(it) } ?: Intent(ACTION_VIEW, mainActivityUri)
         val requestCode = generateDigitCode().toInt()
         val pContentIntent = PendingIntent.getActivity(

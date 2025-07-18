@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.tasks.impl.domain.interactors
 
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
@@ -37,11 +36,9 @@ internal interface UsersInteractor {
         private val eitherWrapper: TasksEitherWrapper,
     ) : UsersInteractor {
 
-        private val currentUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchAllFriends() = eitherWrapper.wrapFlow {
-            usersRepository.fetchUserFriends(currentUser)
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            usersRepository.fetchUserFriends(targetUser)
         }
 
         override suspend fun fetchAppUserPaidStatus() = eitherWrapper.wrapFlow {

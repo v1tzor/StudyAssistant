@@ -16,20 +16,25 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.share
 
-import dev.gitlive.firebase.firestore.FirebaseFirestore
-import dev.gitlive.firebase.firestore.Source
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
+import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Role
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.SharedHomeworks
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
 import ru.aleshin.studyassistant.core.remote.mappers.share.convertToDetails
+import ru.aleshin.studyassistant.core.remote.mappers.users.convertToDetails
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.ReceivedMediatedHomeworksPojo
+import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SentMediatedHomeworksPojo
 import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomeworksDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomeworksPojo
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
@@ -45,41 +50,59 @@ interface ShareHomeworksRemoteDataSource {
     suspend fun fetchRealtimeSharedHomeworksByUser(uid: UID): SharedHomeworksPojo
 
     class Base(
-        private val database: FirebaseFirestore,
+        private val database: DatabaseService,
     ) : ShareHomeworksRemoteDataSource {
 
         override suspend fun addOrUpdateSharedHomework(homeworks: SharedHomeworksPojo, targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
 
-            val reference = database.collection(SharedHomeworks.ROOT).document(targetUser)
-
-            return reference.set(homeworks)
+            database.upsertDocument(
+                databaseId = SharedHomeworks.DATABASE_ID,
+                collectionId = SharedHomeworks.COLLECTION_ID,
+                documentId = targetUser,
+                data = homeworks,
+                permissions = listOf(
+                    Permission.read(Role.users()),
+                    Permission.update(Role.users()),
+                ),
+                nestedType = SharedHomeworksPojo.serializer()
+            )
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchSharedHomeworksByUser(uid: UID): Flow<SharedHomeworksDetailsPojo> {
             require(uid.isNotBlank())
 
-            val userRoot = database.collection(Users.ROOT)
-
-            val reference = database.collection(SharedHomeworks.ROOT).document(uid)
-
-            val sharedHomeworksPojoFlow = reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<SharedHomeworksPojo?>()) ?: SharedHomeworksPojo.default()
+            val sharedHomeworksPojoFlow = database.getDocumentFlow(
+                databaseId = SharedHomeworks.DATABASE_ID,
+                collectionId = SharedHomeworks.COLLECTION_ID,
+                documentId = uid,
+                nestedType = SharedHomeworksPojo.serializer(),
+            ).map { item ->
+                item ?: SharedHomeworksPojo.default()
             }
 
             return sharedHomeworksPojoFlow.flatMapLatest { sharedHomeworks ->
+                val sentHomeworks = sharedHomeworks.sent.decodeFromString<SentMediatedHomeworksPojo>()
+                val receivedHomeworks = sharedHomeworks.received.decodeFromString<ReceivedMediatedHomeworksPojo>()
+
                 val users = buildList {
-                    addAll(sharedHomeworks.sent.map { it.value.recipients }.extractAllItem())
-                    addAll(sharedHomeworks.received.map { it.value.sender })
+                    addAll(sentHomeworks.map { it.value.recipients }.extractAllItem())
+                    addAll(receivedHomeworks.map { it.value.sender })
                 }
-                val senderAndRecipientsUsersReference = users.let {
-                    if (users.isEmpty()) return@let null
-                    userRoot.where { Users.UID inArray users }
+
+                val senderAndRecipientsUsersFlow = if (users.isNotEmpty()) {
+                    database.listDocumentsFlow(
+                        databaseId = Users.DATABASE_ID,
+                        collectionId = Users.COLLECTION_ID,
+                        queries = listOf(Query.equal(Users.UID, users)),
+                        nestedType = AppUserPojo.serializer(),
+                    ).map { usersList ->
+                        usersList.map { it.convertToDetails() }
+                    }
+                } else {
+                    flowOf(null)
                 }
-                val senderAndRecipientsUsersFlow = senderAndRecipientsUsersReference?.snapshots?.map { snapshot ->
-                    snapshot.documents.map { it.data(serializer<AppUserPojo>()) }
-                } ?: flowOf(null)
 
                 senderAndRecipientsUsersFlow.map { senderAndRecipientsUsers ->
                     sharedHomeworks.convertToDetails(
@@ -97,21 +120,27 @@ interface ShareHomeworksRemoteDataSource {
         override suspend fun fetchShortSharedHomeworksByUser(uid: UID): Flow<SharedHomeworksPojo> {
             require(uid.isNotBlank())
 
-            val reference = database.collection(SharedHomeworks.ROOT).document(uid)
-
-            return reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<SharedHomeworksPojo?>()) ?: SharedHomeworksPojo.default()
+            return database.getDocumentFlow(
+                databaseId = SharedHomeworks.DATABASE_ID,
+                collectionId = SharedHomeworks.COLLECTION_ID,
+                documentId = uid,
+                nestedType = SharedHomeworksPojo.serializer(),
+            ).map { item ->
+                item ?: SharedHomeworksPojo.default()
             }
         }
 
         override suspend fun fetchRealtimeSharedHomeworksByUser(uid: UID): SharedHomeworksPojo {
             require(uid.isNotBlank())
 
-            val reference = database.collection(SharedHomeworks.ROOT).document(uid)
+            val sharedHomeworks = database.getDocumentOrNull(
+                databaseId = SharedHomeworks.DATABASE_ID,
+                collectionId = SharedHomeworks.COLLECTION_ID,
+                documentId = uid,
+                nestedType = SharedHomeworksPojo.serializer(),
+            )
 
-            val sharedHomeworks = reference.get(Source.SERVER).data(serializer<SharedHomeworksPojo?>())
-
-            return sharedHomeworks ?: SharedHomeworksPojo.default()
+            return sharedHomeworks?.data ?: SharedHomeworksPojo.default()
         }
     }
 }

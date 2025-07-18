@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
 
 /**
  * @author Stanislav Aleshin on 16.04.2024
@@ -43,7 +44,7 @@ internal data class LoginViewState(
 internal sealed class LoginEvent : BaseEvent {
     data object Init : LoginEvent()
     data class LoginWithEmail(val credentials: LoginCredentialsUi) : LoginEvent()
-    data class LoginViaGoogle(val idToken: String?) : LoginEvent()
+    data class SuccessOAuthLogin(val session: UserSession) : LoginEvent()
     data object NavigateToRegister : LoginEvent()
     data object NavigateToForgot : LoginEvent()
 }

@@ -16,19 +16,21 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.requests
 
-import dev.gitlive.firebase.firestore.FirebaseFirestore
-import dev.gitlive.firebase.firestore.Source
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.serializer
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
-import ru.aleshin.studyassistant.core.common.extensions.snapshotListFlowGet
+import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
+import ru.aleshin.studyassistant.core.remote.appwrite.utils.Role
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Requests
 import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
+import ru.aleshin.studyassistant.core.remote.mappers.users.convertToDetails
 import ru.aleshin.studyassistant.core.remote.models.requests.FriendRequestsDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.requests.FriendRequestsPojo
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
@@ -44,58 +46,75 @@ interface FriendRequestsRemoteDataSource {
     suspend fun fetchRealtimeShortRequestsByUser(uid: UID): FriendRequestsPojo
 
     class Base(
-        private val database: FirebaseFirestore,
+        private val database: DatabaseService,
     ) : FriendRequestsRemoteDataSource {
 
         override suspend fun addOrUpdateRequests(requests: FriendRequestsPojo, targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()
 
-            val reference = database.collection(Requests.ROOT).document(targetUser)
-
-            return reference.set(requests)
+            database.upsertDocument(
+                databaseId = Requests.DATABASE_ID,
+                collectionId = Requests.COLLECTION_ID,
+                documentId = targetUser,
+                data = requests,
+                permissions = listOf(
+                    Permission.read(Role.users()),
+                    Permission.update(Role.users()),
+                ),
+                nestedType = FriendRequestsPojo.serializer(),
+            )
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchRequestsByUser(uid: UID): Flow<FriendRequestsDetailsPojo> {
             require(uid.isNotBlank())
 
-            val userRoot = database.collection(Users.ROOT)
-
-            val reference = database.collection(Requests.ROOT).document(uid)
-
-            val requestsFlow = reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<FriendRequestsPojo?>()) ?: FriendRequestsPojo.default()
+            val requestsFlow = database.getDocumentFlow(
+                databaseId = Requests.DATABASE_ID,
+                collectionId = Requests.COLLECTION_ID,
+                documentId = uid,
+                nestedType = FriendRequestsPojo.serializer(),
+            ).map {
+                it ?: FriendRequestsPojo.default()
             }
 
-            return requestsFlow.flatMapLatest { request ->
+            return requestsFlow.flatMapLatest { rawRequest ->
+                val receivedMap = rawRequest.received.decodeFromString<Long>()
+                val sendMap = rawRequest.send.decodeFromString<Long>()
+                val lastActionsMap = rawRequest.lastActions.decodeFromString<Boolean>()
                 val users = buildSet {
-                    addAll(request.received.keys.toList())
-                    addAll(request.send.keys.toList())
-                    addAll(request.lastActions.keys.toList())
-                }
-                val targetUsersReference = users.let {
-                    if (users.isEmpty()) return@let null
-                    userRoot.where { Users.UID inArray users.toList() }
+                    addAll(receivedMap.keys.toList())
+                    addAll(sendMap.keys.toList())
+                    addAll(lastActionsMap.keys.toList())
                 }
 
-                val targetUsersFlow = targetUsersReference?.snapshotListFlowGet<AppUserPojo>() ?: flowOf(null)
+                val targetUsersFlow = users.toList().takeIf { it.isNotEmpty() }?.let { users ->
+                    database.listDocumentsFlow(
+                        databaseId = Users.DATABASE_ID,
+                        collectionId = Users.COLLECTION_ID,
+                        queries = listOf(Query.equal(Users.UID, users)),
+                        nestedType = AppUserPojo.serializer(),
+                    ).map { users ->
+                        users.map { it.convertToDetails() }
+                    }
+                } ?: flowOf(null)
 
                 targetUsersFlow.map { targetUsers ->
                     return@map FriendRequestsDetailsPojo(
                         received = targetUsers?.filter { user ->
-                            request.received.containsKey(user.uid)
+                            receivedMap.containsKey(user.uid)
                         }?.associate { user ->
-                            Pair(user, request.received[user.uid] ?: 0L)
+                            Pair(user, receivedMap[user.uid] ?: 0L)
                         } ?: emptyMap(),
                         send = targetUsers?.filter { user ->
-                            request.send.containsKey(user.uid)
+                            sendMap.containsKey(user.uid)
                         }?.associate { user ->
-                            Pair(user, request.send[user.uid] ?: 0L)
+                            Pair(user, sendMap[user.uid] ?: 0L)
                         } ?: emptyMap(),
                         lastActions = targetUsers?.filter { user ->
-                            request.lastActions.containsKey(user.uid)
+                            lastActionsMap.containsKey(user.uid)
                         }?.associate { user ->
-                            Pair(user, request.lastActions[user.uid] ?: false)
+                            Pair(user, lastActionsMap[user.uid] ?: false)
                         } ?: emptyMap(),
                     )
                 }
@@ -105,21 +124,29 @@ interface FriendRequestsRemoteDataSource {
         override suspend fun fetchShortRequestsByUser(uid: UID): Flow<FriendRequestsPojo> {
             require(uid.isNotBlank())
 
-            val reference = database.collection(Requests.ROOT).document(uid)
-
-            return reference.snapshots.map { snapshot ->
-                snapshot.data(serializer<FriendRequestsPojo?>()) ?: FriendRequestsPojo.default()
+            val requestsFlow = database.getDocumentFlow(
+                databaseId = Requests.DATABASE_ID,
+                collectionId = Requests.COLLECTION_ID,
+                documentId = uid,
+                nestedType = FriendRequestsPojo.serializer(),
+            ).map { requests ->
+                requests ?: FriendRequestsPojo.default()
             }
+
+            return requestsFlow
         }
 
         override suspend fun fetchRealtimeShortRequestsByUser(uid: UID): FriendRequestsPojo {
             require(uid.isNotBlank())
 
-            val reference = database.collection(Requests.ROOT).document(uid)
+            val requests = database.getDocumentOrNull(
+                databaseId = Requests.DATABASE_ID,
+                collectionId = Requests.COLLECTION_ID,
+                documentId = uid,
+                nestedType = FriendRequestsPojo.serializer(),
+            )
 
-            val friendRequests = reference.get(Source.SERVER).data(serializer<FriendRequestsPojo?>())
-
-            return friendRequests ?: FriendRequestsPojo.default()
+            return requests?.data ?: FriendRequestsPojo.default()
         }
     }
 }

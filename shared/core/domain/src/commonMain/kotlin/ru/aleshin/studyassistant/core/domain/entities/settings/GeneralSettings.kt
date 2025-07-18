@@ -16,11 +16,14 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.settings
 
+import ru.aleshin.studyassistant.core.common.functional.UID
+
 /**
  * @author Stanislav Aleshin on 24.04.2024.
  */
 data class GeneralSettings(
     val isFirstStart: Boolean = true,
+    val isUnfinishedSetup: UID? = null,
     val languageType: LanguageType = LanguageType.DEFAULT,
     val themeType: ThemeType = ThemeType.DEFAULT,
 )

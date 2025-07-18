@@ -16,10 +16,13 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.users
 
+import ru.aleshin.studyassistant.core.common.functional.UID
+
 /**
  * @author Stanislav Aleshin on 20.04.2024.
  */
 data class SocialNetwork(
+    val uid: UID,
     val type: SocialNetworkType,
     val otherType: String?,
     val data: String,

@@ -61,6 +61,10 @@ internal class VerificationScreenModel(
                     val command = VerificationWorkCommand.LoadAppUser
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_VERIFY_STATUS) {
+                    val command = VerificationWorkCommand.LoadVerifyStatus
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is VerificationEvent.SendEmailVerification -> {
                 launchBackgroundWork(BackgroundKey.SEND_EMAIL) {
@@ -87,13 +91,10 @@ internal class VerificationScreenModel(
         is VerificationAction.UpdateRetryAvailableTime -> currentState.copy(
             retryAvailableTime = action.retryAvailableTime,
         )
-        is VerificationAction.UpdateLoadingSend -> currentState.copy(
-            isLoadingSend = action.isLoading,
-        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_APP_USER, SEND_EMAIL, SIGN_OUT
+        LOAD_APP_USER, LOAD_VERIFY_STATUS, SEND_EMAIL, SIGN_OUT
     }
 }
 

@@ -25,11 +25,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import ru.aleshin.studyassistant.core.common.navigation.nestedPop
 import ru.aleshin.studyassistant.core.common.navigation.root
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
@@ -48,6 +50,7 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupT
 internal class SetupScreen : Screen {
 
     @Composable
+    @OptIn(InternalVoyagerApi::class)
     override fun Content() = ScreenContent(
         screenModel = rememberSetupScreenModel(),
         initialState = SetupViewState(),
@@ -55,7 +58,7 @@ internal class SetupScreen : Screen {
         val strings = PreviewThemeRes.strings
         val coreStrings = StudyAssistantRes.strings
         val windowSize = LocalWindowSize.current
-        val rootNavigator = LocalNavigator.currentOrThrow.root()
+        val navigator = LocalNavigator.currentOrThrow
         val coroutineScope = rememberCoroutineScope()
         val snackbarState = remember { SnackbarHostState() }
 
@@ -78,6 +81,7 @@ internal class SetupScreen : Screen {
                         onSaveCalendar = { dispatchEvent(SetupEvent.SaveCalendarInfo) },
                         onFillOutSchedule = { dispatchEvent(SetupEvent.NavigateToWeekScheduleEditor) },
                         onStartUsing = { dispatchEvent(SetupEvent.NavigateToSchedule) },
+                        onOpenBillingScreen = { dispatchEvent(SetupEvent.NavigateToBilling) },
                         onExceedingAvatarSizeLimit = {
                             coroutineScope.launch {
                                 snackbarState.showSnackbar(
@@ -106,8 +110,9 @@ internal class SetupScreen : Screen {
 
         handleEffect { effect ->
             when (effect) {
-                is SetupEffect.NavigateToGlobalScreen -> rootNavigator.push(effect.pushScreen)
-                is SetupEffect.ReplaceGlobalScreen -> rootNavigator.replaceAll(effect.screen)
+                is SetupEffect.NavigateToGlobalScreen -> navigator.root().push(effect.pushScreen)
+                is SetupEffect.ReplaceGlobalScreen -> navigator.root().replaceAll(effect.screen)
+                is SetupEffect.NavigateToBack -> navigator.nestedPop()
                 is SetupEffect.ShowError -> {
                     snackbarState.showSnackbar(
                         message = effect.failures.mapToMessage(strings),

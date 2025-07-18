@@ -44,11 +44,9 @@ internal interface EmployeeInteractor {
         private val eitherWrapper: UsersEitherWrapper,
     ) : EmployeeInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchEmployeeById(uid: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val employeeFlow = employeeRepository.fetchEmployeeById(uid, targetUser)
 
             return@wrapFlow employeeFlow.flatMapLatest { employee ->

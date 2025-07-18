@@ -41,20 +41,20 @@ internal interface OrganizationsInteractor {
         private val eitherWrapper: InfoEitherWrapper,
     ) : OrganizationsInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchOrganizationById(organizationId: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             organizationsRepository.fetchOrganizationById(organizationId, targetUser)
         }
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             organizationsRepository.fetchAllShortOrganization(targetUser).map { organizations ->
                 organizations.sortedByDescending { it.isMain }
             }
         }
 
         override suspend fun fetchMainOrFirstOrganization() = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             organizationsRepository.fetchAllShortOrganization(targetUser).map { organizations ->
                 organizations.find { it.isMain } ?: organizations.getOrNull(0)
             }

@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.core.database.mappers.subjects
 
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.extensions.fromJson
+import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.database.mappers.employee.mapToBase
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
@@ -34,7 +34,7 @@ fun SubjectDetailsEntity.mapToBase() = SubjectEntity(
     teacher_id = teacher?.uid,
     office = office,
     color = color.toLong(),
-    location = Json.encodeToString(location),
+    location = location?.toJson(),
 )
 
 fun SubjectEntity.mapToDetails(
@@ -47,5 +47,5 @@ fun SubjectEntity.mapToDetails(
     teacher = employee?.mapToBase(),
     office = office,
     color = color.toInt(),
-    location = location?.let { Json.decodeFromString(it) },
+    location = location?.fromJson(),
 )

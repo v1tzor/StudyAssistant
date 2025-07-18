@@ -34,6 +34,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.AuthHeaderSection
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.EmailTextField
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.SpacerToKeyboard
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotViewState
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.views.ForgotActionsSection
 
@@ -62,20 +63,24 @@ internal fun ForgotContent(
             val focusManager = LocalFocusManager.current
             var email by rememberSaveable { mutableStateOf("") }
 
-            EmailTextField(
-                modifier = Modifier.padding(horizontal = 24.dp),
-                enabled = !state.isLoading,
-                email = email,
-                onEmailChanged = { email = it },
-                isError = state.emailValidError != null,
-                errorText = state.emailValidError?.mapToMessage(),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        if (email.isNotEmpty()) onSendEmailClick(email)
-                        focusManager.clearFocus()
-                    },
+            Column {
+                EmailTextField(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    enabled = !state.isLoading,
+                    email = email,
+                    onEmailChanged = { email = it },
+                    isError = state.emailValidError != null,
+                    errorText = state.emailValidError?.mapToMessage(),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            if (email.isNotEmpty()) onSendEmailClick(email)
+                            focusManager.clearFocus()
+                        },
+                    )
                 )
-            )
+                SpacerToKeyboard()
+            }
+
             ForgotActionsSection(
                 enabled = !state.isLoading && email.isNotEmpty(),
                 isLoading = state.isLoading,

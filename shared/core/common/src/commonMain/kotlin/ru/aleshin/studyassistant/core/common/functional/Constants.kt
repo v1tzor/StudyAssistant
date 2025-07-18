@@ -30,9 +30,11 @@ object Constants {
         const val PRIVACY_POLICY = "https://www.termsfeed.com/live/32b56f45-28c2-4942-89b8-f900516d2129"
         const val GITHUB_URI = "https://github.com/v1tzor/StudyAssistant"
         const val ISSUES_URI = "https://github.com/v1tzor/StudyAssistant/issues"
-        const val PERMISSION_TAG = "Notificatio_Permission"
+        const val PERMISSION_TAG = "Notification_Permission"
         const val PAY_DEEPLINK_SCHEME = "ru.aleshin.studyassistant.pay"
-        const val OPEN_APP_URL = "app://studyassistant.com/openMain"
+        const val OPEN_APP_DEEPLINK = "https://studyassistant-app.ru/"
+        const val RECOVERY_PASSWORD_URL = "https://studyassistant-app.ru/recovery"
+        const val VERIFY_EMAIL_URL = "https://studyassistant-app.ru/verify"
     }
 
     object Database {
@@ -66,7 +68,7 @@ object Constants {
 
     object Image {
         const val BYTE_TO_MB = 1024 * 1024
-        const val AVATAR_MAX_SIZE_IN_BYTES = 1024 * 1024 * 2
+        const val AVATAR_MAX_SIZE_IN_BYTES = 1024 * 1024 * 5
     }
 
     object Notification {
@@ -103,7 +105,7 @@ object Constants {
     }
 
     object Delay {
-        const val SPLASH_NAV = 1800L
+        const val SPLASH_NAV = 1400L
         const val SPLASH_LOGO = 300L
         const val SPLASH_TEXT = 600L
         const val UPDATE_ACTIVE_CLASS = 5000L

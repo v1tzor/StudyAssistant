@@ -17,13 +17,11 @@
 package ru.aleshin.studyassistant.tasks.impl.domain.interactors
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkResult
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
@@ -48,30 +46,26 @@ internal interface ScheduleInteractor {
         private val eitherWrapper: TasksEitherWrapper,
     ) : ScheduleInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchScheduleByDate(date: Instant) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
             val currentNumberOfWeek = date.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
 
             val baseScheduleFlow = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek, targetUser)
             val customScheduleFlow = customScheduleRepository.fetchScheduleByDate(date, targetUser)
 
-            return@wrapFlow baseScheduleFlow.flatMapLatest { baseSchedule ->
-                customScheduleFlow.map { customSchedule ->
-                    if (customSchedule != null) {
-                        val schedule = customSchedule.copy(
-                            classes = customSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
-                        )
-                        Schedule.Custom(schedule)
-                    } else {
-                        val schedule = baseSchedule?.copy(
-                            classes = baseSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
-                        )
-                        Schedule.Base(schedule)
-                    }
+            combine(baseScheduleFlow, customScheduleFlow) { baseSchedule, customSchedule ->
+                return@combine if (customSchedule != null) {
+                    val schedule = customSchedule.copy(
+                        classes = customSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
+                    )
+                    Schedule.Custom(schedule)
+                } else {
+                    val schedule = baseSchedule?.copy(
+                        classes = baseSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
+                    )
+                    Schedule.Base(schedule)
                 }
             }
         }

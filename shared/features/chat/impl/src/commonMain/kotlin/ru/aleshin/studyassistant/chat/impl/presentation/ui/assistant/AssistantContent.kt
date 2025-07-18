@@ -147,7 +147,7 @@ private fun AssistantChat(
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(chatHistory.messages.size) {
-        chatListState.animateScrollToItem(chatHistory.messages.lastIndex)
+        chatListState.animateScrollToItem(chatHistory.messages.lastIndex.coerceIn(0, Int.MAX_VALUE))
     }
 
     LazyColumn(

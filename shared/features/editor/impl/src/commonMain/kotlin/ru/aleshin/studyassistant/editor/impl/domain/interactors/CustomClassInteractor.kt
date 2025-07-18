@@ -51,14 +51,12 @@ internal interface CustomClassInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : CustomClassInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun addClassBySchedule(
             classModel: Class,
             schedule: CustomSchedule,
         ) = eitherWrapper.wrap {
             val createClassModel = classModel.copy(uid = randomUUID())
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val updatedClasses = schedule.classes.toMutableList().apply { add(createClassModel) }
             val updatedSchedule = schedule.copy(classes = updatedClasses)
 
@@ -69,6 +67,7 @@ internal interface CustomClassInteractor {
         }
 
         override suspend fun fetchClass(classId: UID, scheduleId: UID) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             customScheduleRepository.fetchClassById(classId, scheduleId, targetUser)
         }
 
@@ -77,6 +76,7 @@ internal interface CustomClassInteractor {
             schedule: CustomSchedule,
         ) = eitherWrapper.wrap {
             val updatedClassId: UID
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val oldModel = schedule.classes.find { it.uid == classModel.uid }
             val updatedClasses = schedule.classes.toMutableList().apply {
                 if (classModel.subject?.uid != oldModel?.subject?.uid ||
@@ -102,6 +102,7 @@ internal interface CustomClassInteractor {
             uid: UID,
             schedule: CustomSchedule,
         ) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val updatedClasses = schedule.classes.toMutableList().apply { removeAll { it.uid == uid } }
             val updatedSchedule = schedule.copy(classes = updatedClasses)
 
@@ -111,6 +112,7 @@ internal interface CustomClassInteractor {
         }
 
         private suspend fun updateReminderServices() {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val notificationSettings = notificationSettingsRepository.fetchSettings(targetUser).first()
             if (notificationSettings.beginningOfClasses != null) {
                 startClassesReminderManager.startOrRetryReminderService()

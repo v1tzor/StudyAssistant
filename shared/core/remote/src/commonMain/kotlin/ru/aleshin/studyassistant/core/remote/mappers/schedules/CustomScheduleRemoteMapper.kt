@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.core.remote.mappers.schedules
 
+import ru.aleshin.studyassistant.core.common.extensions.fromJson
+import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.models.classes.ClassDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.classes.ClassPojo
@@ -25,12 +27,11 @@ import ru.aleshin.studyassistant.core.remote.models.schedule.CustomSchedulePojo
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
-fun CustomScheduleDetailsPojo.mapToRemoteData() = CustomSchedulePojo(
+fun CustomScheduleDetailsPojo.mapToRemoteData(userId: UID) = CustomSchedulePojo(
     uid = uid,
+    userId = userId,
     date = date,
-    classes = mutableMapOf<UID, ClassPojo>().apply {
-        classes.forEach { put(it.uid, it.mapToBase()) }
-    },
+    classes = classes.map { it.mapToBase().toJson<ClassPojo>() },
 )
 
 suspend fun CustomSchedulePojo.mapToDetails(
@@ -38,5 +39,5 @@ suspend fun CustomSchedulePojo.mapToDetails(
 ) = CustomScheduleDetailsPojo(
     uid = uid,
     date = date,
-    classes = classes.map { classMapper(it.value) },
+    classes = classes.map { classMapper(it.fromJson<ClassPojo>()) },
 )

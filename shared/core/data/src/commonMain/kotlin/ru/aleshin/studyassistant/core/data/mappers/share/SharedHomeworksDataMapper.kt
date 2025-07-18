@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.share
 
+import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
+import ru.aleshin.studyassistant.core.common.extensions.encodeToString
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToRemoteData
@@ -37,8 +39,8 @@ import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomew
  * @author Stanislav Aleshin on 18.07.2024.
  */
 fun SharedHomeworksPojo.mapToDomain() = SharedHomeworks(
-    received = received.mapValues { it.value.mapToDomain() },
-    sent = sent.mapValues { it.value.mapToDomain() },
+    received = received.decodeFromString<ReceivedMediatedHomeworksPojo>().mapValues { it.value.mapToDomain() },
+    sent = sent.decodeFromString<SentMediatedHomeworksPojo>().mapValues { it.value.mapToDomain() },
 )
 
 fun SharedHomeworksDetailsPojo.mapToDomain() = SharedHomeworksDetails(
@@ -79,8 +81,8 @@ fun SentMediatedHomeworksDetailsPojo.mapToDomain() = SentMediatedHomeworksDetail
 )
 
 fun SharedHomeworks.mapToRemoteData() = SharedHomeworksPojo(
-    received = received.mapValues { it.value.mapToRemoteData() },
-    sent = sent.mapValues { it.value.mapToRemoteData() },
+    received = received.mapValues { it.value.mapToRemoteData() }.encodeToString(),
+    sent = sent.mapValues { it.value.mapToRemoteData() }.encodeToString(),
 )
 
 fun ReceivedMediatedHomeworks.mapToRemoteData() = ReceivedMediatedHomeworksPojo(

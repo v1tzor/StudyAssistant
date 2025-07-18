@@ -147,7 +147,6 @@ dependencies {
 
     implementation(libs.sqldelight.core)
     implementation(libs.sqldelight.android)
-    implementation(libs.appwrite.sdk)
 
     implementation(libs.kodein.android)
 
@@ -160,28 +159,31 @@ dependencies {
     implementation(libs.firebase.messaging.android)
     implementation(libs.firebase.messaging.directboot.android)
     implementation(libs.firebase.messaging.android)
-    rustoreImplementation(libs.google.gms.services)
-    githubImplementation(libs.google.gms.services)
-    huaweiImplementation(libs.google.gms.services)
-
-    rustoreImplementation(libs.hms.core)
-    githubImplementation(libs.hms.core)
-    huaweiImplementation(libs.hms.core)
-    rustoreImplementation(libs.hms.push)
-    githubImplementation(libs.hms.push)
-    huaweiImplementation(libs.hms.push)
-
-    huaweiImplementation(libs.hms.iap)
-    rustoreImplementation(libs.rustore.billing)
 
     implementation(libs.rustore.universalpush.core)
-    huaweiImplementation(libs.rustore.universalpush.hms)
+
+    rustoreImplementation(libs.google.gms.services)
+    rustoreImplementation(libs.hms.core)
+    rustoreImplementation(libs.hms.push)
     rustoreImplementation(libs.rustore.universalpush.fcm)
     rustoreImplementation(libs.rustore.universalpush.hms)
     rustoreImplementation(libs.rustore.universalpush.rustore)
+    rustoreImplementation(libs.rustore.billing)
+    rustoreImplementation(libs.rustore.review)
+    rustoreImplementation(libs.rustore.updates)
+
+    githubImplementation(libs.google.gms.services)
+    githubImplementation(libs.hms.core)
+    githubImplementation(libs.hms.push)
     githubImplementation(libs.rustore.universalpush.rustore)
     githubImplementation(libs.rustore.universalpush.fcm)
     githubImplementation(libs.rustore.universalpush.hms)
+
+    huaweiImplementation(libs.google.gms.services)
+    huaweiImplementation(libs.hms.core)
+    huaweiImplementation(libs.hms.push)
+    huaweiImplementation(libs.hms.iap)
+    huaweiImplementation(libs.rustore.universalpush.hms)
 }
 
 tracer {

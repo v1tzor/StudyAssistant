@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.requsts
 
+import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
+import ru.aleshin.studyassistant.core.common.extensions.encodeToString
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.domain.entities.requests.FriendRequests
@@ -26,19 +28,19 @@ import ru.aleshin.studyassistant.core.remote.models.requests.FriendRequestsPojo
 /**
  * @author Stanislav Aleshin on 12.07.2024.
  */
-internal fun FriendRequests.mapToRemote() = FriendRequestsPojo(
-    received = received.mapValues { it.value.toEpochMilliseconds() },
-    send = send.mapValues { it.value.toEpochMilliseconds() },
-    lastActions = lastActions,
+fun FriendRequests.mapToRemote() = FriendRequestsPojo(
+    received = received.mapValues { it.value.toEpochMilliseconds() }.encodeToString<Long>(),
+    send = send.mapValues { it.value.toEpochMilliseconds() }.encodeToString<Long>(),
+    lastActions = lastActions.encodeToString(),
 )
 
-internal fun FriendRequestsPojo.mapToData() = FriendRequests(
-    received = received.mapValues { it.value.mapEpochTimeToInstant() },
-    send = send.mapValues { it.value.mapEpochTimeToInstant() },
-    lastActions = lastActions,
+fun FriendRequestsPojo.mapToData() = FriendRequests(
+    received = received.decodeFromString<Long>().mapValues { it.value.mapEpochTimeToInstant() },
+    send = send.decodeFromString<Long>().mapValues { it.value.mapEpochTimeToInstant() },
+    lastActions = lastActions.decodeFromString<Boolean>(),
 )
 
-internal fun FriendRequestsDetailsPojo.mapToData() = FriendRequestsDetails(
+fun FriendRequestsDetailsPojo.mapToData() = FriendRequestsDetails(
     received = received.mapKeys { it.key.mapToDomain() }.mapValues { it.value.mapEpochTimeToInstant() },
     send = send.mapKeys { it.key.mapToDomain() }.mapValues { it.value.mapEpochTimeToInstant() },
     lastActions = lastActions.mapKeys { it.key.mapToDomain() },

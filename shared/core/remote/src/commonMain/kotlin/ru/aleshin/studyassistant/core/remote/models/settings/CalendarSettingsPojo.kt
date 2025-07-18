@@ -27,7 +27,7 @@ import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewT
 data class CalendarSettingsPojo(
     val numberOfWeek: String = NumberOfRepeatWeek.ONE.name,
     val weekScheduleViewType: String = WeekScheduleViewType.COMMON.name,
-    val holidays: List<HolidaysPojo> = emptyList(),
+    val holidays: List<String> = emptyList(),
 ) {
     companion object {
         fun default() = CalendarSettingsPojo()

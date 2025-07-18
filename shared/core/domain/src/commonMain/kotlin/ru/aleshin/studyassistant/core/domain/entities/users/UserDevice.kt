@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.users
 
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.messages.PushServiceType
 import ru.aleshin.studyassistant.core.common.platform.Platform
 
@@ -23,6 +25,7 @@ import ru.aleshin.studyassistant.core.common.platform.Platform
  * @author Stanislav Aleshin on 07.08.2024.
  */
 data class UserDevice(
+    val uid: UID = randomUUID(),
     val platform: Platform,
     val deviceId: String,
     val deviceName: String,
@@ -31,10 +34,12 @@ data class UserDevice(
 ) {
     companion object {
         fun specifyDevice(
+            uid: UID = randomUUID(),
             platform: Platform,
             deviceId: String,
             deviceName: String,
         ) = UserDevice(
+            uid = uid,
             platform = platform,
             deviceId = deviceId,
             deviceName = deviceName,

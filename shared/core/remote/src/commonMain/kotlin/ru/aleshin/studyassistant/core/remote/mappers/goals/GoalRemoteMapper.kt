@@ -19,14 +19,14 @@ package ru.aleshin.studyassistant.core.remote.mappers.goals
 import ru.aleshin.studyassistant.core.remote.models.goals.GoalDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.goals.GoalPojo
 import ru.aleshin.studyassistant.core.remote.models.tasks.HomeworkDetailsPojo
-import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojo
+import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojoDetails
 
 /**
  * @author Stanislav Aleshin on 28.04.2025.
  */
 fun GoalPojo.mapToDetails(
     homeworksMapper: (() -> HomeworkDetailsPojo?)? = null,
-    todoMapper: (() -> TodoPojo?)? = null,
+    todoMapper: (() -> TodoPojoDetails?)? = null,
 ) = GoalDetailsPojo(
     uid = uid,
     contentType = type,

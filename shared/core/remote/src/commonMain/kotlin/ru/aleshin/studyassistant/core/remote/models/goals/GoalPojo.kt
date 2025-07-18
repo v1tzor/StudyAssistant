@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 @Serializable
 data class GoalPojo(
     val uid: UID = "",
+    val userId: UID,
     val type: String = "",
     val number: Int = 0,
     val contentId: UID = "",

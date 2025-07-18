@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
  */
 @Serializable
 data class SubscribeInfoPojo(
+    val uid: UID,
     val deviceId: UID = "",
     val purchaseId: UID = "",
     val productId: UID = "",

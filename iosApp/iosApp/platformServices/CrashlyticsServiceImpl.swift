@@ -15,4 +15,5 @@ public class CrashlyticsServiceImpl : CommonCrashlyticsService {
     public func sendLog(message: String) {}
     public func initializeService() {}
     public func recordException(tag: String, message: String, exception: KotlinThrowable) {}
+    public func setupUser(message: String?) {}
 }

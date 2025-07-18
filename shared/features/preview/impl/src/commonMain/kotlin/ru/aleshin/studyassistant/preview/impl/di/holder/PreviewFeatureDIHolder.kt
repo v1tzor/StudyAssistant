@@ -23,11 +23,13 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
@@ -53,8 +55,10 @@ public object PreviewFeatureDIHolder : BaseFeatureDIHolder<PreviewFeatureApi, Pr
                 bindInstance<() -> EditorFeatureStarter> { dependencies.editorFeatureStarter }
                 bindInstance<() -> AuthFeatureStarter> { dependencies.authFeatureStarter }
                 bindInstance<() -> NavigationFeatureStarter> { dependencies.navigationFeatureStarter }
+                bindInstance<() -> BillingFeatureStarter> { dependencies.billingFeatureStarter }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
+                bindSingleton<GeneralSettingsRepository> { dependencies.generalSettingsRepository }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }

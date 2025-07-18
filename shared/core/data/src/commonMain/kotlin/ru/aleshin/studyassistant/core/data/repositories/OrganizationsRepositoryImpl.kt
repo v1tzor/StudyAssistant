@@ -61,11 +61,11 @@ class OrganizationsRepositoryImpl(
         }
     }
 
-    override suspend fun uploadAvatar(uid: UID, file: InputFile, targetUser: UID): String {
+    override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile, targetUser: UID): String {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.uploadAvatar(uid, file, targetUser)
+            remoteDataSource.uploadAvatar(oldAvatarUrl, file, targetUser)
         } else {
             checkNotNull(file.uri)
         }
@@ -151,11 +151,11 @@ class OrganizationsRepositoryImpl(
         }
     }
 
-    override suspend fun deleteAvatar(uid: UID, targetUser: UID) {
+    override suspend fun deleteAvatar(avatarUrl: String, targetUser: UID) {
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         if (isSubscriber) {
-            remoteDataSource.deleteAvatar(uid, targetUser)
+            remoteDataSource.deleteAvatar(avatarUrl, targetUser)
         }
     }
 

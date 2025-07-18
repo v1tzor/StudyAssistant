@@ -48,7 +48,7 @@ class DailyGoalsRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.addOrUpdateGoal(goal.mapToRemoteData(), targetUser)
+            remoteDataSource.addOrUpdateGoal(goal.mapToRemoteData(targetUser), targetUser)
         } else {
             localDataSource.addOrUpdateGoal(goal.mapToLocalData())
         }
@@ -58,7 +58,7 @@ class DailyGoalsRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         if (isSubscriber) {
-            remoteDataSource.addDailyDailyGoals(dailyGoals.map { it.mapToRemoteData() }, targetUser)
+            remoteDataSource.addDailyDailyGoals(dailyGoals.map { it.mapToRemoteData(targetUser) }, targetUser)
         } else {
             localDataSource.addDailyDailyGoals(dailyGoals.map { it.mapToLocalData() })
         }
@@ -208,7 +208,7 @@ class DailyGoalsRepositoryImpl(
                     from = DISTANT_PAST.toEpochMilliseconds(),
                     to = DISTANT_FUTURE.toEpochMilliseconds(),
                 ).let { goalsFlow ->
-                    return@let goalsFlow.first().map { it.mapToDomain().mapToRemoteData() }
+                    return@let goalsFlow.first().map { it.mapToDomain().mapToRemoteData(targetUser) }
                 }
                 remoteDataSource.deleteAllDailyGoals(targetUser)
                 remoteDataSource.addDailyDailyGoals(allGoals, targetUser)

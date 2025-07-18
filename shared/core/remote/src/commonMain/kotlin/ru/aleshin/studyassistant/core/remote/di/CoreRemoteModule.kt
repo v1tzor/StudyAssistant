@@ -16,13 +16,7 @@
 
 package ru.aleshin.studyassistant.core.remote.di
 
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.auth.FirebaseAuth
-import dev.gitlive.firebase.auth.auth
-import dev.gitlive.firebase.firestore.FirebaseFirestore
-import dev.gitlive.firebase.firestore.firestore
-import dev.gitlive.firebase.storage.FirebaseStorage
-import dev.gitlive.firebase.storage.storage
+import com.russhwolf.settings.Settings
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
@@ -30,6 +24,7 @@ import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
@@ -47,12 +42,22 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.remote.BuildKonfig
+import ru.aleshin.studyassistant.core.remote.appwrite.Appwrite
+import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
+import ru.aleshin.studyassistant.core.remote.appwrite.client.AppwriteClient
+import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
+import ru.aleshin.studyassistant.core.remote.appwrite.realtime.RealtimeService
+import ru.aleshin.studyassistant.core.remote.appwrite.storage.StorageService
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Client.ENDPOINT
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Client.ENDPOINT_REALTIME
+import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Client.PROJECT_ID
 import ru.aleshin.studyassistant.core.remote.datasources.ai.AiRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSourceOld
+import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.billing.ProductsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.goals.DailyGoalsRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.message.HmsAuthTokenProvider
 import ru.aleshin.studyassistant.core.remote.datasources.message.MessageRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.message.PushServiceAuthTokenFactory
 import ru.aleshin.studyassistant.core.remote.datasources.message.PushServiceAuthTokenProvider
@@ -66,7 +71,7 @@ import ru.aleshin.studyassistant.core.remote.datasources.share.ShareSchedulesRem
 import ru.aleshin.studyassistant.core.remote.datasources.subjects.SubjectsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.HomeworksRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.TodoRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSourceOld
+import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.ktor.HttpEngineFactory
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.DeepSeek
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.UniversalMessaging
@@ -79,13 +84,28 @@ import kotlin.random.Random
 val coreRemoteModule = DI.Module("CoreRemote") {
     import(coreRemotePlatformModule)
 
-    bindProvider<FirebaseAuth> { Firebase.auth }
-    bindProvider<FirebaseFirestore> { Firebase.firestore }
-    bindProvider<FirebaseStorage> { Firebase.storage }
+    bindSingleton<AppwriteClient> {
+        AppwriteClient(
+            headersProvider = instance(),
+            coroutineManager = instance(),
+            engineFactory = instance(),
+            cookiesStorage = instance(),
+            cacheStorage = instance(),
+            connectionManager = instance(),
+        ).setEndpoint(ENDPOINT)
+            .setEndpointRealtime(ENDPOINT_REALTIME)
+            .setProject(PROJECT_ID)
+    }
+    bindSingleton<Appwrite> { Appwrite(instance(), instance(), instance(), instance()) }
+    bindSingleton<AccountService> { AccountService(instance(), instance(), instance()) }
+    bindSingleton<StorageService> { StorageService(instance()) }
+    bindSingleton<DatabaseService> { DatabaseService(instance(), instance()) }
+    bindSingleton<RealtimeService> { RealtimeService(instance(), instance()) }
+
+    bindSingleton<Settings> { Settings() }
 
     bindSingleton<Json> {
         Json {
-            prettyPrint = true
             isLenient = true
             ignoreUnknownKeys = true
             useAlternativeNames = false
@@ -93,8 +113,33 @@ val coreRemoteModule = DI.Module("CoreRemote") {
         }
     }
     bindSingleton<HttpEngineFactory> { HttpEngineFactory() }
+    bindSingleton<HttpClient>(tag = "HmsToken") {
+        HttpClient(instance<HttpEngineFactory>().createEngine()) {
+            defaultRequest {
+                url(HmsAuthTokenProvider.OAUTH_URL)
+                contentType(ContentType.Application.FormUrlEncoded)
+            }
+            install(Logging) {
+                level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }
+                    }
+                }
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 15_000
+                socketTimeoutMillis = 15_000
+            }
+            install(ContentNegotiation) { json(instance<Json>()) }
+        }
+    }
     bindSingleton<HttpClient>(tag = "DeepSeek") {
         HttpClient(instance<HttpEngineFactory>().createEngine()) {
+            defaultRequest {
+                url(DeepSeek.HOST)
+                contentType(ContentType.Application.Json)
+            }
             install(Auth) {
                 bearer {
                     loadTokens {
@@ -102,14 +147,6 @@ val coreRemoteModule = DI.Module("CoreRemote") {
                     }
                 }
             }
-
-            install(ContentNegotiation) { json(instance<Json>()) }
-
-            defaultRequest {
-                url(DeepSeek.HOST)
-                contentType(ContentType.Application.Json)
-            }
-
             install(HttpRequestRetry) {
                 maxRetries = 3
                 retryIf { _, response -> !response.status.isSuccess() }
@@ -118,7 +155,10 @@ val coreRemoteModule = DI.Module("CoreRemote") {
                     retry + Random.nextLong(delay)
                 }
             }
-
+            install(HttpTimeout) {
+                requestTimeoutMillis = 300_000
+                socketTimeoutMillis = 300_000
+            }
             install(Logging) {
                 level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
                 logger = object : Logger {
@@ -127,21 +167,16 @@ val coreRemoteModule = DI.Module("CoreRemote") {
                     }
                 }
             }
-
-            install(HttpTimeout) {
-                requestTimeoutMillis = 300_000
-                socketTimeoutMillis = 300_000
-            }
+            install(ContentNegotiation) { json(instance<Json>()) }
+            install(HttpCookies)
         }
     }
-
     bindSingleton<HttpClient>(tag = "Messages") {
         HttpClient(instance<HttpEngineFactory>().createEngine()) {
             defaultRequest {
                 url(UniversalMessaging.HOST + UniversalMessaging.SEND_TOKENS)
                 contentType(ContentType.Application.Json)
             }
-
             install(Logging) {
                 level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
                 logger = object : Logger {
@@ -150,13 +185,11 @@ val coreRemoteModule = DI.Module("CoreRemote") {
                     }
                 }
             }
-
             install(HttpTimeout) {
-                requestTimeoutMillis = 5000
-                socketTimeoutMillis = 5000
-                connectTimeoutMillis = 5000
+                requestTimeoutMillis = 15000
+                socketTimeoutMillis = 15000
+                connectTimeoutMillis = 15000
             }
-
             install(ContentNegotiation) {
                 json(instance<Json>())
             }
@@ -165,8 +198,16 @@ val coreRemoteModule = DI.Module("CoreRemote") {
 
     bindSingleton<AiRemoteDataSource> { AiRemoteDataSource.Base(instance(tag = "DeepSeek")) }
     bindSingleton<SubscriptionChecker> { SubscriptionChecker.Base(instance(), instance(), instance()) }
-    bindSingleton<AuthRemoteDataSourceOld> { AuthRemoteDataSourceOld.Base(instance(), instance(), instance()) }
-    bindSingleton<UsersRemoteDataSourceOld> { UsersRemoteDataSourceOld.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<AuthRemoteDataSource> { AuthRemoteDataSource.Base(instance()) }
+    bindProvider<UsersRemoteDataSource> {
+        UsersRemoteDataSource.Base(
+            instance(),
+            instance(),
+            instance(),
+            instance(),
+            instance()
+        )
+    }
     bindSingleton<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance()) }
     bindSingleton<FriendRequestsRemoteDataSource> { FriendRequestsRemoteDataSource.Base(instance()) }
     bindSingleton<ShareHomeworksRemoteDataSource> { ShareHomeworksRemoteDataSource.Base(instance()) }
@@ -181,7 +222,12 @@ val coreRemoteModule = DI.Module("CoreRemote") {
     bindSingleton<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance(), instance()) }
     bindSingleton<ProductsRemoteDataSource> { ProductsRemoteDataSource.Base(instance()) }
     bindSingleton<MessageRemoteDataSource> {
-        MessageRemoteDataSource.Base(instance(tag = "Messages"), instance(), instance(), instance())
+        MessageRemoteDataSource.Base(
+            instance(tag = "Messages"),
+            instance(),
+            instance(),
+            instance()
+        )
     }
     bindProvider<PushServiceAuthTokenFactory> { PushServiceAuthTokenFactory.Base(instance(), instance(), instance()) }
     bindProvider<PushServiceAuthTokenProvider.Firebase> { PushServiceAuthTokenProvider.Firebase(instance()) }

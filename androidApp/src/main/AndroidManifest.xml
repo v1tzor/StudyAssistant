@@ -25,7 +25,7 @@
         <activity
             android:name="ru.aleshin.studyassistant.presentation.ui.MainActivity"
             android:exported="true"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize">
 
             <intent-filter>
@@ -38,20 +38,23 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:scheme="app"
-                    android:host="studyassistant.com"
-                    android:pathPrefix="/openMain" />
+                    android:scheme="https"
+                    android:host="studyassistant-app.ru" />
             </intent-filter>
 
-            <intent-filter android:autoVerify="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="ru.aleshin.studyassistant.pay" />
             </intent-filter>
+
         </activity>
 
-        <activity android:name="io.appwrite.views.CallbackActivity" android:exported="true">
+        <activity
+            android:name="ru.aleshin.studyassistant.core.remote.appwrite.auth.CallbackActivity"
+            android:exported="true">
+
             <intent-filter android:label="android_web_auth">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

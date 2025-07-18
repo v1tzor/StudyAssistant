@@ -49,7 +49,7 @@ class TodoRepositoryImpl(
         val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
 
         return if (isSubscriber) {
-            remoteDataSource.addOrUpdateTodo(todo.mapToRemoteData(), targetUser)
+            remoteDataSource.addOrUpdateTodo(todo.mapToRemoteData(targetUser), targetUser)
         } else {
             localDataSource.addOrUpdateTodo(todo.mapToLocalData())
         }
@@ -187,7 +187,7 @@ class TodoRepositoryImpl(
                     from = DISTANT_PAST.toEpochMilliseconds(),
                     to = DISTANT_FUTURE.toEpochMilliseconds(),
                 ).let { todosFlow ->
-                    return@let todosFlow.first().map { it.mapToDomain().mapToRemoteData() }
+                    return@let todosFlow.first().map { it.mapToDomain().mapToRemoteData(targetUser) }
                 }
                 remoteDataSource.deleteAllTodos(targetUser)
                 remoteDataSource.addOrUpdateTodosGroup(allTodos, targetUser)

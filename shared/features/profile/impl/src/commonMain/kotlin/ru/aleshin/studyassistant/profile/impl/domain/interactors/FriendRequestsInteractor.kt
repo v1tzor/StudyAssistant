@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.profile.impl.domain.interactors
 
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.requests.FriendRequests
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -37,10 +36,8 @@ internal interface FriendRequestsInteractor {
         private val eitherWrapper: ProfileEitherWrapper,
     ) : FriendRequestsInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun fetchAllFriendRequests() = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             requestsRepository.fetchShortRequestsByUser(targetUser)
         }
     }

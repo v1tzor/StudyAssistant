@@ -29,80 +29,119 @@ object StudyAssistantAppwrite {
 
     object Users {
         const val DATABASE_ID = "686052b2001b25f5a09f"
-        const val COLLECTION_ID = "xxAGxrwB36eIWMKkUdElDAvWQzS2"
+        const val COLLECTION_ID = "687a169b0033e3bb56fd"
 
         const val FRIENDS = "friends"
         const val CODE = "code"
-
-        const val ROOT = "users"
         const val UID = "uid"
     }
 
     object Organizations {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "68644e7f001f9d9f8bd2"
+
         const val USER_ID = "userId"
-    }
-
-    // NOT UPDATED
-
-    object UserData {
-        const val ROOT = "data"
-
-        const val ORGANIZATIONS = "organizations"
-        const val HOMEWORKS = "homeworks"
-        const val GOALS = "goals"
-        const val TODOS = "todos"
-        const val BASE_SCHEDULES = "baseSchedules"
-        const val CUSTOM_SCHEDULES = "customSchedules"
-        const val SUBJECTS = "subjects"
-        const val EMPLOYEE = "employee"
-
-        const val SETTINGS = "settings"
-        const val CALENDAR_SETTINGS = "calendar"
-        const val NOTIFICATION_SETTINGS = "notification"
-
         const val UID = "uid"
-        const val SCHEDULE_CLASSES = "classes"
-        const val HOMEWORK_DEADLINE = "deadline"
-        const val HOMEWORK_CLASS_ID = "classId"
-        const val HOMEWORK_DONE = "done"
-        const val HOMEWORK_COMPLETE_DATE = "completeDate"
-        const val SUBJECT_TEACHER_ID = "teacherId"
-        const val SUBJECT_NAME = "name"
-        const val TODO_DEADLINE = "deadline"
-        const val TODO_DONE = "done"
-        const val TODO_COMPLETE_DATE = "completeDate"
-        const val VERSION_FROM = "dateVersionFrom"
-        const val VERSION_TO = "dateVersionTo"
-        const val GOAL_TARGET_DATA = "targetDate"
-        const val GOAL_CONTENT_ID = "contentId"
-        const val GOAL_DONE = "done"
-        const val GOAL_COMPLETE_DATE = "completeDate"
-        const val CLASS_SCHEDULE_ID = "scheduleId"
-        const val CUSTOM_SCHEDULE_DATE = "date"
-        const val WEEK = "week"
-        const val DAY_OF_WEEK = "weekDayOfWeek"
-        const val ORGANIZATION_ID = "organizationId"
-        const val ORGANIZATION_AVATAR = "avatar"
-        const val ORGANIZATION_HIDE = "hide"
-        const val USER_AVATAR = "avatar"
-    }
-
-    object Requests {
-        const val ROOT = "requests"
-    }
-
-    object SharedHomeworks {
-        const val ROOT = "sharedHomeworks"
-    }
-
-    object SharedSchedules {
-        const val ROOT = "sharedSchedules"
+        const val HIDE = "hide"
+        const val AVATAR_URL = "avatar"
     }
 
     object Products {
-        const val ROOT = "products"
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "6868f3600031044044e4"
+    }
+
+    object Requests {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "6868f6f6003c5a582e29"
+    }
+
+    object Todo {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "686a6c1200117f6ac3e4"
+
+        const val UID = "uid"
+        const val USER_ID = "userId"
+        const val DEADLINE = "deadline"
+        const val DONE = "done"
+        const val COMPLETE_DATE = "completeDate"
+    }
+
+    object Homeworks {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "686a6db40026eb4d93e1"
+
+        const val UID = "uid"
+        const val USER_ID = "userId"
+        const val CLASS_ID = "classId"
+        const val DEADLINE = "deadline"
+        const val DONE = "done"
+        const val COMPLETE_DATE = "completeDate"
+    }
+
+    object Subjects {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "686a77e3001569389b53"
+
+        const val ORGANIZATION_ID = "organizationId"
+        const val USER_ID = "userId"
+        const val TEACHER_ID = "teacherId"
+        const val SUBJECT_NAME = "name"
+    }
+
+    object Employee {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "686a76030033a69f0c63"
+
+        const val ORGANIZATION_ID = "organizationId"
+        const val USER_ID = "userId"
+        const val AVATAR_URL = "avatar"
+    }
+
+    object Goals {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "686a72270018a02b7f87"
+
+        const val ORGANIZATION_ID = "organizationId"
+        const val CONTENT_ID = "contentId"
+        const val USER_ID = "userId"
+        const val TARGET_DATE = "targetDate"
+        const val DONE = "done"
+        const val COMPLETE_DATE = "completeDate"
+    }
+
+    object CalendarSettings {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "686bba840027eb8155c1"
+    }
+
+    object BaseSchedules {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "686a7916003790edf45b"
+
+        const val USER_ID = "userId"
+        const val VERSION_FROM = "dateVersionFrom"
+        const val VERSION_TO = "dateVersionTo"
+        const val WEEK = "week"
+        const val DAY_OF_WEEK = "weekDayOfWeek"
+    }
+
+    object CustomSchedules {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "686a7a24002578efe97f"
+
+        const val USER_ID = "userId"
+        const val DATE = "date"
+    }
+
+    object SharedHomeworks {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "686a7b8c0027dd5f1cad"
+    }
+
+    object SharedSchedules {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "686a7c54002949d7a815"
     }
 
     object Storage {

@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.core.remote.mappers.schedules
 
+import ru.aleshin.studyassistant.core.common.extensions.fromJson
+import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.models.classes.ClassDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.classes.ClassPojo
@@ -34,7 +36,7 @@ fun ClassDetailsPojo.mapToBase() = ClassPojo(
     customData = customData,
     teacherId = teacher?.uid,
     office = office,
-    location = location,
+    location = location?.toJson(),
     startTime = startTime,
     endTime = endTime,
 )
@@ -53,7 +55,7 @@ fun ClassPojo.mapToDetails(
     customData = customData,
     teacher = employee,
     office = office,
-    location = location,
+    location = location?.fromJson(),
     startTime = startTime,
     endTime = endTime,
 )

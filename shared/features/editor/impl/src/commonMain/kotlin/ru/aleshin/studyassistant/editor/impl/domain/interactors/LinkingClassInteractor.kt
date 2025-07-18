@@ -55,14 +55,12 @@ internal interface LinkingClassInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : LinkingClassInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchFreeClassesForHomework(
             subject: UID,
             date: Instant,
         ) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val maxNumberOfWeek = calendarRepository.fetchSettings(targetUser).first().numberOfWeek
 
             val searchedTimeRange = TimeRange(

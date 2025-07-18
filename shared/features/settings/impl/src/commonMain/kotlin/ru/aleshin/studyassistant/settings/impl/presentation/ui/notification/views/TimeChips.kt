@@ -25,12 +25,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
+import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.ui.mappers.toLanguageString
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
-import ru.aleshin.studyassistant.core.ui.views.dialog.BaseTimePickerDialog
+import ru.aleshin.studyassistant.core.ui.views.dialog.TimePickerDialog
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -66,12 +70,15 @@ internal fun BeforeTimeChip(
     )
 
     if (timePickerState) {
-        BaseTimePickerDialog(
-            initTime = LocalTime.fromMillisecondOfDay(selectedTime.toInt()),
+        TimePickerDialog(
+            initTime = Clock.System.now().setHoursAndMinutes(
+                time = LocalTime.fromMillisecondOfDay(selectedTime.toInt())
+            ),
             timeRestriction = LocalTime(hour = 2, minute = 0),
             onDismiss = { timePickerState = false },
             onConfirmTime = { selectedStartTime ->
-                onTimeChange(selectedStartTime.toMillisecondOfDay().toLong())
+                val dateTime = selectedStartTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                onTimeChange(dateTime.time.toMillisecondOfDay().toLong())
                 timePickerState = false
             },
         )
@@ -112,11 +119,14 @@ internal fun ReminderTimeChip(
     )
 
     if (datePickerState) {
-        BaseTimePickerDialog(
-            initTime = LocalTime.fromMillisecondOfDay(selectedTime.toInt()),
+        TimePickerDialog(
+            initTime = Clock.System.now().setHoursAndMinutes(
+                time = LocalTime.fromMillisecondOfDay(selectedTime.toInt())
+            ),
             onDismiss = { datePickerState = false },
             onConfirmTime = { selectedStartTime ->
-                onTimeChange(selectedStartTime.toMillisecondOfDay().toLong())
+                val dateTime = selectedStartTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                onTimeChange(dateTime.time.toMillisecondOfDay().toLong())
                 datePickerState = false
             },
         )

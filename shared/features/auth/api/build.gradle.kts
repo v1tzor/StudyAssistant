@@ -29,8 +29,6 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:ui"))
-
-            implementation(libs.bundles.firebase)
         }
     }
 

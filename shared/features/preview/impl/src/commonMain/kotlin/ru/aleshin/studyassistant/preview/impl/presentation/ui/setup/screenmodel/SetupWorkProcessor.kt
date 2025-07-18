@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.Effec
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.firstHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.firstOrNullHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.handle
@@ -30,6 +31,7 @@ import ru.aleshin.studyassistant.core.ui.mappers.mapToDomain
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.CalendarSettingsInteractor
+import ru.aleshin.studyassistant.preview.impl.domain.interactors.GeneralSettingsInteractor
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.OrganizationsInteractor
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToUi
@@ -48,11 +50,13 @@ internal interface SetupWorkProcessor :
     class Base(
         private val appUserInteractor: AppUserInteractor,
         private val organizationsInteractor: OrganizationsInteractor,
+        private val generalSettingsInteractor: GeneralSettingsInteractor,
         private val calendarSettingsInteractor: CalendarSettingsInteractor,
     ) : SetupWorkProcessor {
 
         override suspend fun work(command: SetupWorkCommand) = when (command) {
             is SetupWorkCommand.LoadAllData -> fetchAllDataWork()
+            is SetupWorkCommand.LoadPaidUserStatus -> loadUserPaidStatusWork()
             is SetupWorkCommand.UpdateUserProfile -> updateProfileWork(
                 user = command.user,
                 actionWithAvatar = command.actionWithAvatar,
@@ -64,6 +68,7 @@ internal interface SetupWorkProcessor :
             is SetupWorkCommand.UpdateCalendarSettings -> updateCalendarSettingsWork(
                 settings = command.settings,
             )
+            is SetupWorkCommand.FinishSetup -> finishSetupWork()
         }
 
         private fun fetchAllDataWork() = flow {
@@ -93,19 +98,26 @@ internal interface SetupWorkProcessor :
             )
         }
 
+        private fun loadUserPaidStatusWork() = flow {
+            appUserInteractor.fetchAppUserPaidStatus().collectAndHandle(
+                onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))) },
+                onRightAction = { emit(ActionResult(SetupAction.UpdateUserPaidStatus(it))) },
+            )
+        }
+
         private fun updateProfileWork(
             user: AppUserUi,
             actionWithAvatar: ActionWithAvatar,
         ) = flow {
             val avatar = when (actionWithAvatar) {
                 is ActionWithAvatar.Set -> {
-                    appUserInteractor.uploadAvatar(actionWithAvatar.file.mapToDomain()).handleAndGet(
+                    appUserInteractor.uploadAvatar(user.avatar, actionWithAvatar.file.mapToDomain()).handleAndGet(
                         onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
                         onRightAction = { it },
                     )
                 }
                 is ActionWithAvatar.Delete -> {
-                    appUserInteractor.deleteAvatar().handleAndGet(
+                    appUserInteractor.deleteAvatar(user.avatar ?: "").handleAndGet(
                         onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
                         onRightAction = { null },
                     )
@@ -133,13 +145,16 @@ internal interface SetupWorkProcessor :
 
             val avatar = when (actionWithAvatar) {
                 is ActionWithAvatar.Set -> {
-                    organizationsInteractor.uploadAvatar(uid, actionWithAvatar.file.mapToDomain()).handleAndGet(
+                    organizationsInteractor.uploadAvatar(
+                        organization.avatar,
+                        actionWithAvatar.file.mapToDomain()
+                    ).handleAndGet(
                         onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
                         onRightAction = { it },
                     )
                 }
                 is ActionWithAvatar.Delete -> {
-                    organizationsInteractor.deleteAvatar(uid).handleAndGet(
+                    organizationsInteractor.deleteAvatar(organization.avatar ?: "").handleAndGet(
                         onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
                         onRightAction = { null },
                     )
@@ -165,15 +180,23 @@ internal interface SetupWorkProcessor :
                 onRightAction = { emit(ActionResult(SetupAction.UpdateCalendarSettings(settings))) },
             )
         }
+
+        private fun finishSetupWork() = flow {
+            generalSettingsInteractor.updateSetupStatus(null).handle(
+                onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))) },
+            )
+        }
     }
 }
 
 internal sealed class SetupWorkCommand : WorkCommand {
     data object LoadAllData : SetupWorkCommand()
+    data object LoadPaidUserStatus : SetupWorkCommand()
     data class UpdateUserProfile(val user: AppUserUi, val actionWithAvatar: ActionWithAvatar) : SetupWorkCommand()
     data class UpdateOrganization(
         val organization: OrganizationUi,
         val actionWithAvatar: ActionWithAvatar
     ) : SetupWorkCommand()
     data class UpdateCalendarSettings(val settings: CalendarSettingsUi) : SetupWorkCommand()
+    data object FinishSetup : SetupWorkCommand()
 }

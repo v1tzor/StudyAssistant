@@ -16,13 +16,6 @@
 
 package ru.aleshin.studyassistant
 
-import com.mmk.kmpauth.google.GoogleAuthCredentials
-import com.mmk.kmpauth.google.GoogleAuthProvider
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.firestore.LocalCacheSettings
-import dev.gitlive.firebase.firestore.firestore
-import dev.gitlive.firebase.firestore.firestoreSettings
-import dev.gitlive.firebase.firestore.persistentCacheSettings
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
@@ -44,13 +37,6 @@ object PlatformSDK {
         configuration.appService.initializeApp()
         configuration.analyticsService.initializeService()
         configuration.crashlyticsService.initializeService()
-
-        Firebase.firestore.settings = firestoreSettings {
-            persistentCacheSettings {
-                cacheSettings = LocalCacheSettings.Persistent.newBuilder().build()
-            }
-        }
-        GoogleAuthProvider.create(GoogleAuthCredentials(serverId = BuildKonfig.WEB_CLIENT_ID))
 
         MainDependenciesGraph.initialize(
             di = DI {

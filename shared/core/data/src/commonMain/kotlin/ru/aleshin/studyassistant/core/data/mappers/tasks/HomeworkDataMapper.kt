@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.data.mappers.tasks
 
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToDomain
 import ru.aleshin.studyassistant.core.database.models.tasks.HomeworkDetailsEntity
@@ -71,8 +72,9 @@ fun HomeworkDetailsEntity.mapToDomain() = Homework(
     completeDate = completeDate?.mapEpochTimeToInstant(),
 )
 
-fun Homework.mapToRemoteData() = HomeworkPojo(
+fun Homework.mapToRemoteData(userId: UID) = HomeworkPojo(
     uid = uid,
+    userId = userId,
     classId = classId,
     deadline = deadline.toEpochMilliseconds(),
     subjectId = subject?.uid,

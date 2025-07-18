@@ -30,7 +30,6 @@ import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
@@ -79,15 +78,14 @@ internal interface HomeworksInteractor {
         private val eitherWrapper: TasksEitherWrapper,
     ) : HomeworksInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun addHomeworksGroup(homeworks: List<Homework>) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             homeworksRepository.addHomeworksGroup(homeworks, targetUser)
         }
 
         override suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange) = eitherWrapper.wrapFlow {
             val ticker = dateManager.secondTicker()
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val goalsTimeRange = TimeRange(timeRange.from, timeRange.to.shiftDay(21))
             val shortGoalsFlow = goalsRepository.fetchShortDailyGoalsByTimeRange(goalsTimeRange, targetUser)
             val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(timeRange, targetUser)
@@ -129,6 +127,7 @@ internal interface HomeworksInteractor {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchHomeworksProgress(targetDate: Instant) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
 
             val targetTimeRange = TimeRange(targetDate.startOfWeek(), targetDate.endOfWeek().shiftDay(1))
@@ -190,10 +189,12 @@ internal interface HomeworksInteractor {
         }
 
         override suspend fun updateHomework(homework: Homework) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             homeworksRepository.addOrUpdateHomework(homework, targetUser)
         }
 
         override suspend fun doHomework(homework: Homework) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val currentTime = dateManager.fetchCurrentInstant()
             val linkedGoal = goalsRepository.fetchGoalByContentId(homework.uid, targetUser).first()
             val updatedHomework = homework.copy(isDone = true, completeDate = currentTime)
@@ -203,6 +204,7 @@ internal interface HomeworksInteractor {
         }
 
         override suspend fun skipHomework(homework: Homework) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val currentTime = dateManager.fetchCurrentInstant()
             val linkedGoal = goalsRepository.fetchGoalByContentId(homework.uid, targetUser).first()
             val updatedHomework = homework.copy(isDone = false, completeDate = currentTime)
@@ -232,6 +234,7 @@ internal interface HomeworksInteractor {
         }
 
         private suspend fun completeLinkedGoal(linkedGoal: Goal) {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val currentTime = dateManager.fetchCurrentInstant()
             val updatedGoal = linkedGoal.copy(
                 time = when (linkedGoal.time) {

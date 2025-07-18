@@ -25,7 +25,6 @@ import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.goals.DailyGoalsProgress
@@ -67,10 +66,8 @@ internal interface GoalsInteractor {
         private val eitherWrapper: TasksEitherWrapper,
     ) : GoalsInteractor {
 
-        private val targetUser: UID
-            get() = usersRepository.fetchCurrentUserOrError().uid
-
         override suspend fun addGoal(createModel: GoalCreateModel) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val dailyGoals = goalsRepository.fetchDailyGoalsByDate(createModel.date, targetUser).first()
             val maxNumber = dailyGoals.maxOfOrNull { it.number } ?: 0
             val createdGoal = Goal(
@@ -87,6 +84,7 @@ internal interface GoalsInteractor {
 
         override suspend fun fetchGoalsByDate(date: Instant) = eitherWrapper.wrapFlow {
             val ticker = dateManager.secondTicker()
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val goalsFlow = goalsRepository.fetchDailyGoalsByDate(date, targetUser)
 
             return@wrapFlow combine(goalsFlow, ticker) { goals, _ ->
@@ -163,6 +161,7 @@ internal interface GoalsInteractor {
         }
 
         override suspend fun fetchGoalsProgressByTimeRange(timeRange: TimeRange) = eitherWrapper.wrapFlow {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             return@wrapFlow goalsRepository.fetchDailyGoalsByTimeRange(timeRange, targetUser).map { goals ->
                 val goalsByDate = goals.groupBy { it.targetDate.startThisDay() }
                 val goalsProgress = goalsByDate.mapValues { entry ->
@@ -185,11 +184,13 @@ internal interface GoalsInteractor {
         }
 
         override suspend fun updateGoals(goals: List<Goal>) = eitherWrapper.wrapUnit {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             goalsRepository.addDailyDailyGoals(goals, targetUser)
         }
 
         override suspend fun completeOrCancelGoal(goal: Goal) = eitherWrapper.wrapUnit {
             val currentTime = dateManager.fetchCurrentInstant()
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             if (!goal.isDone) {
                 val completedGoal = goal.copy(
                     time = when (goal.time) {
@@ -282,6 +283,7 @@ internal interface GoalsInteractor {
         }
 
         override suspend fun deleteGoal(goal: GoalShort) = eitherWrapper.wrap {
+            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val dailyGoals = goalsRepository.fetchDailyGoalsByDate(goal.targetDate, targetUser).first()
             goalsRepository.deleteGoal(goal.uid, targetUser)
             if (dailyGoals.size > 1) {
