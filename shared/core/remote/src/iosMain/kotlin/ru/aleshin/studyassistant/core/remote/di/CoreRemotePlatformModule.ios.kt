@@ -19,15 +19,12 @@ package ru.aleshin.studyassistant.core.remote.di
 import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
-import ru.aleshin.studyassistant.core.remote.appwrite.client.AppwriteHeadersProvider
-import ru.aleshin.studyassistant.core.remote.appwrite.client.AppwriteHeadersProviderApple
 import ru.aleshin.studyassistant.core.remote.datasources.message.HmsAuthTokenProvider
 
 /**
  * @author Stanislav Aleshin on 08.08.2024.
  */
 actual val coreRemotePlatformModule = DI.Module("CoreRemotePlatform") {
-    bindSingleton<AppwriteHeadersProvider> { AppwriteHeadersProviderApple() }
     bindSingleton<HmsAuthTokenProvider> { HmsAuthTokenProvider.Empty() }
     bindSingleton<Konnection> { Konnection.createInstance() }
 }

@@ -31,6 +31,7 @@ include(":shared:core:domain")
 include(":shared:core:data")
 include(":shared:core:database")
 include(":shared:core:remote")
+include(":shared:core:client-api")
 
 include(":shared:features:preview:api")
 include(":shared:features:preview:impl")

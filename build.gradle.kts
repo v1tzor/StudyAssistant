@@ -12,21 +12,21 @@ buildscript {
 }
 
 plugins {
-    alias(libs.plugins.androidApplication) apply false
-    alias(libs.plugins.androidLibrary) apply false
-    alias(libs.plugins.kotlinJvm) apply false
-    alias(libs.plugins.kotlinAndroid) apply false
-    alias(libs.plugins.kotlinMultiplatform) apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.compose) apply false
     alias(libs.plugins.compose.compiler) apply false
-    alias(libs.plugins.serialization) apply false
-    alias(libs.plugins.parcelize) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.kotlin.parcelize) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.kapt) apply false
-    alias(libs.plugins.sqlitedelight) apply false
+    alias(libs.plugins.sqldelight) apply false
     alias(libs.plugins.gms) apply false
     alias(libs.plugins.konfig) apply false
     alias(libs.plugins.tracer) apply false
     alias(libs.plugins.skie) apply false
-    alias(libs.plugins.kotlinAtomic) apply false
+    alias(libs.plugins.kotlin.atomic) apply false
 }

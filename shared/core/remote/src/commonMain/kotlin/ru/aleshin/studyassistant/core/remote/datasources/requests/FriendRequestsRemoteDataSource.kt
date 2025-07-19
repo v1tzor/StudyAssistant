@@ -21,15 +21,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Requests
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Users
+import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
+import ru.aleshin.studyassistant.core.api.utils.Permission
+import ru.aleshin.studyassistant.core.api.utils.Query
+import ru.aleshin.studyassistant.core.api.utils.Role
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Role
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Requests
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
 import ru.aleshin.studyassistant.core.remote.mappers.users.convertToDetails
 import ru.aleshin.studyassistant.core.remote.models.requests.FriendRequestsDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.requests.FriendRequestsPojo
@@ -46,7 +46,7 @@ interface FriendRequestsRemoteDataSource {
     suspend fun fetchRealtimeShortRequestsByUser(uid: UID): FriendRequestsPojo
 
     class Base(
-        private val database: DatabaseService,
+        private val database: DatabaseApi,
     ) : FriendRequestsRemoteDataSource {
 
         override suspend fun addOrUpdateRequests(requests: FriendRequestsPojo, targetUser: UID) {

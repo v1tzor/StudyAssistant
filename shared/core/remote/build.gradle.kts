@@ -2,11 +2,11 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.codingfeline.buildkonfig.compiler.FieldSpec
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.konfig)
-    alias(libs.plugins.kotlinAtomic)
+    alias(libs.plugins.kotlin.atomic)
 }
 
 kotlin {
@@ -39,10 +39,11 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:domain"))
+            implementation(project(":shared:core:client-api"))
 
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.logging)
-            implementation(libs.ktor.client.content.negotation)
+            implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.auth)
             implementation(libs.ktor.websockets)

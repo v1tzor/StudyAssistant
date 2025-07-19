@@ -51,9 +51,9 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.OAuthSignInRowContainer
+import ru.aleshin.studyassistant.core.api.utils.OAuthProvider
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.OAuthProvider
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.

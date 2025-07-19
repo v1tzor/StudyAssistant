@@ -16,13 +16,13 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.auth
 
+import ru.aleshin.studyassistant.core.api.auth.AccountApi
+import ru.aleshin.studyassistant.core.api.models.AuthUserPojo
+import ru.aleshin.studyassistant.core.api.models.SessionPojo
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.RECOVERY_PASSWORD_URL
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.VERIFY_EMAIL_URL
-import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
-import ru.aleshin.studyassistant.core.remote.models.appwrite.AuthUserPojo
-import ru.aleshin.studyassistant.core.remote.models.appwrite.SessionPojo
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
@@ -39,7 +39,7 @@ interface AuthRemoteDataSource {
     suspend fun signOut()
 
     class Base(
-        private val account: AccountService,
+        private val account: AccountApi,
     ) : AuthRemoteDataSource {
 
         override suspend fun fetchCurrentUser(): AuthUserPojo? {

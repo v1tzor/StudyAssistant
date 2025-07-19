@@ -16,59 +16,60 @@
 
 package ru.aleshin.studyassistant.core.database.storages
 
-import io.ktor.client.plugins.cache.storage.CacheStorage
-import io.ktor.client.plugins.cache.storage.CachedResponseData
-import io.ktor.http.Url
-import ru.aleshin.studyassistant.core.common.managers.CoroutineFlow.BACKGROUND
-import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.database.mappers.storage.toCacheEntity
-import ru.aleshin.studyassistant.core.database.mappers.storage.toCachedResponseData
-import ru.aleshin.studyassistant.sqldelight.storage.AppwriteCacheQueries
-
 /**
  * @author Stanislav Aleshin on 11.07.2025.
  */
-class AppwriteCacheStorage(
-    private val database: AppwriteCacheQueries,
-    private val coroutineManager: CoroutineManager,
-    private val dateManager: DateManager,
-) : CacheStorage {
-
-    init {
-        cleanExpired()
-    }
-
-    override suspend fun store(url: Url, data: CachedResponseData) {
-        coroutineManager.changeFlow(BACKGROUND) {
-            database.insertOrReplace(data.toCacheEntity())
-        }
-    }
-
-    override suspend fun find(url: Url, varyKeys: Map<String, String>): CachedResponseData? {
-        return coroutineManager.changeFlow(BACKGROUND) {
-            val cacheEntity = database.selectByUrl(url.toString()).executeAsList().map {
-                it.toCachedResponseData()
-            }
-            cacheEntity.find { varyKeys.all { (key, value) -> it.varyKeys[key] == value } }
-        }
-    }
-
-    override suspend fun findAll(url: Url): Set<CachedResponseData> {
-        return coroutineManager.changeFlow(BACKGROUND) {
-            val cacheEntity = database.selectByUrl(url.toString()).executeAsList().map {
-                it.toCachedResponseData()
-            }
-            cacheEntity.toSet()
-        }
-    }
-
-    fun cleanExpired() {
-        val currentTime = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-        database.deleteExpired(currentTime)
-    }
-
-    fun clearAll() {
-        database.deleteAll()
-    }
-}
+//class AppwriteCacheStorage(
+//    private val database: AppwriteCacheQueries,
+//    private val coroutineManager: CoroutineManager,
+//    private val dateManager: DateManager,
+//) : CacheStorage {
+//
+//    init {
+//        cleanExpired()
+//    }
+//
+//    override suspend fun store(url: Url, data: CachedResponseData) {
+//        coroutineManager.changeFlow(BACKGROUND) {
+//            database.insertOrReplace(data.toCacheEntity())
+//        }
+//    }
+//
+//    override suspend fun find(url: Url, varyKeys: Map<String, String>): CachedResponseData? {
+//        return coroutineManager.changeFlow(BACKGROUND) {
+//            val cacheEntity = database.selectByUrl(url.toString()).executeAsList().map {
+//                it.toCachedResponseData()
+//            }
+//            cacheEntity.find { varyKeys.all { (key, value) -> it.varyKeys[key] == value } }
+//        }
+//    }
+//
+//    override suspend fun findAll(url: Url): Set<CachedResponseData> {
+//        return coroutineManager.changeFlow(BACKGROUND) {
+//            val cacheEntity = database.selectByUrl(url.toString()).executeAsList().map {
+//                it.toCachedResponseData()
+//            }
+//            cacheEntity.toSet()
+//        }
+//    }
+//
+//    override suspend fun remove(
+//        url: Url,
+//        varyKeys: Map<String, String>
+//    ) {
+//        TODO("Not yet implemented")
+//    }
+//
+//    override suspend fun removeAll(url: Url) {
+//        TODO("Not yet implemented")
+//    }
+//
+//    fun cleanExpired() {
+//        val currentTime = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+//        database.deleteExpired(currentTime)
+//    }
+//
+//    fun clearAll() {
+//        database.deleteAll()
+//    }
+//}

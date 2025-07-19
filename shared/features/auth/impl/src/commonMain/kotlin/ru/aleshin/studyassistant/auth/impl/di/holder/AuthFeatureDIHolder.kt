@@ -28,6 +28,7 @@ import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
 import ru.aleshin.studyassistant.auth.impl.di.modules.domainModule
 import ru.aleshin.studyassistant.auth.impl.di.modules.navigationModule
 import ru.aleshin.studyassistant.auth.impl.di.modules.presentationModule
+import ru.aleshin.studyassistant.core.api.auth.AccountApi
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
@@ -38,7 +39,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsReposit
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 
@@ -62,7 +62,7 @@ public object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeat
                 bindSingleton<GeneralSettingsRepository> { dependencies.generalSettingsRepository }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
-                bindSingleton<AccountService> { dependencies.accountService }
+                bindSingleton<AccountApi> { dependencies.accountService }
                 bindSingleton<AppService> { dependencies.appService }
                 bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
                 bindSingleton<AuthFeatureApi> {

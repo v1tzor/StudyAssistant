@@ -16,9 +16,19 @@
 
 package ru.aleshin.studyassistant.core.common.exceptions
 
+import kotlinx.serialization.Serializable
+
 /**
  * @author Stanislav Aleshin on 22.04.2024.
  */
+@Serializable
+data class AppwriteException(
+    override val message: String? = null,
+    val code: Int? = null,
+    val type: String? = null,
+    val response: String? = null
+) : Exception()
+
 class AppwriteDataAuthException : Exception()
 
 class AppwriteUserException : Exception()

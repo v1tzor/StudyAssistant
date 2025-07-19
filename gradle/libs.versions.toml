@@ -7,114 +7,160 @@ jvmTarget = "17"
 version-name = "0.0.3"
 version-code = "3"
 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+# Gradle
 agp = "8.6.0"
-skie = "0.10.4"
-kswift = "0.7.0"
-swiftklib = "0.6.4"
+ksp = "2.1.20-2.0.0"
+
+# Kotlin
 kotlin = "2.1.0"
-atomic = "0.29.0"
-kotlin-coroutines = "1.9.0"
+kotlin-coroutines = "1.10.2"
 kotlin-datetime = "0.6.1"
 kotlin-serialization = "1.9.0"
 kotlin-io = "0.8.0"
-mokoParcelize = "0.9.0"
-compose = "1.8.2"
+kotlin-atomic = "0.29.0"
+
+# Swift
+skie = "0.10.4"
+kswift = "0.7.0"
+swiftklib = "0.6.4"
+
+# Compose
+compose = "1.8.3"
 compose-compiler = "1.5.11"
-compose-richtext = "0.35.0"
-compose-material3 = "1.3.2"
-compose-adaptive = "1.1.1"
 compose-material = "1.12.0"
-compose-plugin = "1.8.2"
-androidx-activityCompose = "1.10.1"
+compose-material3 = "1.3.2"
+compose-adaptive = "1.1.2"
+compose-multiplatform = "1.8.2"
+
+# UI
+richtext = "0.35.0"
+placeholder = "1.0.7"
+drag-and-drop = "0.3.0"
+koalaplot-charts = "0.6.3"
+sketch = "4.2.0"
+guava = "33.4.8-android"
+
+# AndroidX
+androidx-activity-compose = "1.10.1"
 androidx-browser = "1.8.0"
-workmanager = "2.10.0"
-gms = "4.4.2"
+androidx-core-ktx = "1.13.1"
+androidx-workmanager = "2.10.0"
+
+# Google & Firebase
+google-gms = "4.4.3"
+google-gms-auth = "21.3.0"
+google-oauth = "1.37.1"
+google-accompanist = "0.36.0"
+firebase-bom = "33.16.0"
+
+# Huawei
 hms = "1.9.1.304"
 hms-iap = "6.13.0.300"
-oauth = "1.24.0"
-firebase-bom = "33.12.0"
-settings = "1.3.0"
-crashlytics = "3.0.3"
+
+# RuStore
 rustore-push = "6.10.0"
-rustore-pay = "9.1.0"
 rustore-billing = "9.0.1"
+rustore-pay = "9.1.0"
 rustore-review = "8.0.0"
 rustore-updates = "8.0.0"
+
+# Crashlytics & Analytics
 tracer = "1.1.1"
-mytracker = "3.4.1"
-ksp = "2.1.20-2.0.0"
-voyager = "1.1.0-beta02"
+mytracker = "3.5.0"
+
+# DI
 kodein = "7.26.1"
-ktor = "3.1.3"
-accompanist = "0.36.0"
-coreKtx = "1.13.1"
-bignum = "0.3.9"
-sqldelight = "2.0.2"
-mokoResources = "0.23.0"
-loggerKermit = "2.0.3"
-placeholder = "1.0.7"
-gms-auth = "21.2.0"
-konnektion = "1.4.3"
-kmpauth-google = "1.3.0"
-koalaplot-charts = "0.6.3"
-sketch = "4.1.0"
-drag-and-drop = "0.3.0"
-filekit = "0.7.0"
+
+# Voyager
+voyager = "1.1.0-beta02"
+
+# Ktor
+ktor = "3.2.2"
+
+# Databases
+sqldelight = "2.1.0"
+settings = "1.3.0"
+
+# Multiplatform Utils
+moko-parcelize = "0.9.0"
+bignum = "0.3.10"
+logger-kermit = "2.0.6"
+konnektion = "1.4.4"
+filekit = "0.8.8"
 konfig = "0.17.1"
-guava = "33.4.8-android"
-openai = "4.0.1"
 
 [libraries]
+
+# Kotlin
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime" }
 kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlin-serialization" }
-kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomic" }
-kotlin-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlin-io" }
-moko-parcelize = { module = "dev.icerock.moko:parcelize", version.ref = "mokoParcelize" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
-androidx-tools = { module = "com.android.tools.build:gradle", version.ref="agp" }
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
-androidx-workmanager = { module = "androidx.work:work-runtime", version.ref = "workmanager" }
-androidx-workmanager-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager" }
-androidx-guava = { module = "com.google.guava:guava", version.ref = "guava" }
-androidx-browser = { module = "androidx.browser:browser", version.ref = "androidx-browser" }
+kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlin-atomic" }
+kotlin-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlin-io" }
+
+# Compose
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-material = { group = "com.google.android.material", name = "material", version.ref = "compose-material" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
 compose-material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "compose-adaptive" }
 compose-material3-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "compose-adaptive" }
-compose-richtext = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "compose-richtext" }
-compose-richtext-material3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "compose-richtext" }
-google-accompanist = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
-google-gms-services = { module = "com.google.android.gms:play-services-auth", version.ref = "gms-auth" }
-google-oauth-bom-android = { module = "com.google.auth:google-auth-library-bom", version.ref = "oauth" }
+
+# Ui
+richtext = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "richtext" }
+richtext-material3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "richtext" }
+placeholder = { group = "com.eygraber", name = "compose-placeholder-material3", version.ref = "placeholder" }
+koalaplot-charts = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot-charts" }
+dragAndDrop = { module = "com.mohamedrejeb.dnd:compose-dnd", version.ref = "drag-and-drop" }
+sketch-compose = { module = "io.github.panpf.sketch4:sketch-compose", version.ref = "sketch" }
+sketch-http = { module = "io.github.panpf.sketch4:sketch-http", version.ref = "sketch" }
+sketch-ktor = { module = "io.github.panpf.sketch4:sketch-http-ktor3", version.ref = "sketch" }
+sketch-compose-resources = { module = "io.github.panpf.sketch4:sketch-compose-resources", version.ref = "sketch" }
+sketch-compose-extnsions-resources = { module = "io.github.panpf.sketch4:sketch-extensions-compose-resources", version.ref = "sketch" }
+
+# AndroidX
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+androidx-browser = { module = "androidx.browser:browser", version.ref = "androidx-browser" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
+androidx-workmanager = { module = "androidx.work:work-runtime", version.ref = "androidx-workmanager" }
+androidx-workmanager-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-workmanager" }
+androidx-guava = { module = "com.google.guava:guava", version.ref = "guava" }
+androidx-tools = { module = "com.android.tools.build:gradle", version.ref="agp" }
+
+# Google
+google-gms-services = { module = "com.google.android.gms:play-services-auth", version.ref = "google-gms-auth" }
+google-oauth-bom-android = { module = "com.google.auth:google-auth-library-bom", version.ref = "google-oauth" }
 google-oauth-android = { module = "com.google.auth:google-auth-library-oauth2-http" }
 google-oauth-credentials-android = { module = "com.google.auth:google-auth-library-credentials" }
-google-auth = { module = "io.github.mirzemehdi:kmpauth-google", version.ref = "kmpauth-google" }
-hms-core = { module = "com.huawei.agconnect:agconnect-core", version.ref="hms" }
-hms-push = { module = "com.huawei.hms:push", version.ref="hms" }
-hms-agcp = { module = "com.huawei.agconnect:agcp", version.ref="hms" }
-hms-iap = { module = "com.huawei.hms:iap", version.ref="hms-iap" }
-hms-coreinstaller = { module = "com.huawei.hms:hmscoreinstaller", version.ref="hms" }
-placeholder = { group = "com.eygraber", name = "compose-placeholder-material3", version.ref = "placeholder" }
+google-accompanist = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "google-accompanist" }
+
+# Firebase
 firebase-bom-android = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
-firebase-crashlytics-android = { module = "com.google.firebase:firebase-crashlytics" }
 firebase-auth-android = { module = "com.google.firebase:firebase-auth-ktx" }
 firebase-messaging-android = { module = "com.google.firebase:firebase-messaging" }
 firebase-messaging-directboot-android = { module = "com.google.firebase:firebase-messaging-directboot" }
+
+# Huawei
+hms-core = { module = "com.huawei.agconnect:agconnect-core", version.ref = "hms" }
+hms-push = { module = "com.huawei.hms:push", version.ref = "hms" }
+hms-agcp = { module = "com.huawei.agconnect:agcp", version.ref = "hms" }
+hms-iap = { module = "com.huawei.hms:iap", version.ref = "hms-iap" }
+hms-core-installer = { module = "com.huawei.hms:hmscoreinstaller", version.ref = "hms" }
+
+# RuStore
 rustore-universalpush-core = { module = "ru.rustore.sdk:universalpush", version.ref="rustore-push" }
 rustore-universalpush-rustore = { module = "ru.rustore.sdk:universalrustore", version.ref="rustore-push" }
 rustore-universalpush-fcm = { module = "ru.rustore.sdk:universalfcm", version.ref="rustore-push" }
 rustore-universalpush-hms = { module = "ru.rustore.sdk:universalhms", version.ref="rustore-push" }
-rustore-billing = { module = "ru.rustore.sdk:billingclient", version.ref="rustore-billing" }
-rustore-pay = { module = "ru.rustore.sdk:pay", version.ref="rustore-pay" }
+rustore-billing = { module = "ru.rustore.sdk:billingclient", version.ref = "rustore-billing" }
+rustore-pay = { module = "ru.rustore.sdk:pay", version.ref = "rustore-pay" }
 rustore-review = { module = "ru.rustore.sdk:review", version.ref = "rustore-review" }
 rustore-updates = { module = "ru.rustore.sdk:appupdate", version.ref = "rustore-updates" }
+
+# Crashlytics & Analytics
 tracer-bom = { module = "ru.ok.tracer:tracer-platform", version.ref = "tracer" }
 tracer-crashReport = { module = "ru.ok.tracer:tracer-crash-report" }
 tracer-crashReportNative = { module = "ru.ok.tracer:tracer-crash-report-native" }
@@ -123,63 +169,68 @@ tracer-diskUsage = { module = "ru.ok.tracer:tracer-disk-usage" }
 tracer-samplingProfiler = { module = "ru.ok.tracer:tracer-profiler-sampling" }
 tracer-systraceProfiler = { module = "ru.ok.tracer:tracer-profiler-systrace" }
 mytracker-core = { module = "com.my.tracker:mytracker-sdk", version.ref = "mytracker" }
-voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
-voyager-screenModel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
-voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
-voyager-kodein = { module = "cafe.adriel.voyager:voyager-kodein", version.ref = "voyager" }
+
+# DI
 kodein-core = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
 kodein-compose = { module = "org.kodein.di:kodein-di-framework-compose", version.ref = "kodein" }
 kodein-android = { module = "org.kodein.di:kodein-di-framework-android-core", version.ref = "kodein" }
-bignumn = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
+
+# Voyager
+voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
+voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
+voyager-kodein = { module = "cafe.adriel.voyager:voyager-kodein", version.ref = "voyager" }
+
+# Ktor
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
+ktor-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
+
+# Databases
 sqldelight-core = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqldelight-prmimitiveAdapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
 sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-desktop = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
-logger = { module = "co.touchlab:kermit", version.ref = "loggerKermit" }
-networkcheker = { module = "dev.tmapps:konnection", version.ref = "konnektion" }
-koalaplot-charts = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot-charts" }
-sketch-compose = { module = "io.github.panpf.sketch4:sketch-compose", version.ref = "sketch" }
-sketch-http = { module = "io.github.panpf.sketch4:sketch-http", version.ref = "sketch" }
-sketch-ktor = { module = "io.github.panpf.sketch4:sketch-http-ktor3", version.ref = "sketch" }
-sketch-compose-resources = { module = "io.github.panpf.sketch4:sketch-compose-resources", version.ref = "sketch" }
-sketch-compose-extnsions-resources = { module = "io.github.panpf.sketch4:sketch-extensions-compose-resources", version.ref = "sketch" }
-dragAndDrop = { module = "com.mohamedrejeb.dnd:compose-dnd", version.ref = "drag-and-drop" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
-ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
-ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
-ktor-client-content-negotation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-ktor-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
-ktor-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
-filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
-filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekit" }
 settings-core = { module = "com.russhwolf:multiplatform-settings", version.ref = "settings" }
 settings-noargs = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "settings" }
 
+# Multiplatform Utils
+moko-parcelize = { module = "dev.icerock.moko:parcelize", version.ref = "moko-parcelize" }
+bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
+logger = { module = "co.touchlab:kermit", version.ref = "logger-kermit" }
+networkcheker = { module = "dev.tmapps:konnection", version.ref = "konnektion" }
+filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
+filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekit" }
+
+
 [bundles]
-voyager = ["voyager-navigator", "voyager-screenModel", "voyager-transitions", "voyager-kodein"]
+voyager = ["voyager-navigator", "voyager-screenmodel", "voyager-transitions", "voyager-kodein"]
 sketch = ["sketch-compose", "sketch-compose-resources", "sketch-compose-extnsions-resources", "sketch-http", "sketch-ktor"]
 tracer = ["tracer-crashReport", "tracer-crashReportNative", "tracer-heapDumps", "tracer-diskUsage", "tracer-samplingProfiler", "tracer-systraceProfiler"]
 filekit = ["filekit-core", "filekit-compose"]
 
 [plugins]
-androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
-kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlinAtomic = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "atomic" }
-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-compose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-atomic = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "kotlin-atomic" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
-sqlitedelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
-gms = { id = "com.google.gms.google-services", version.ref = "gms" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+gms = { id = "com.google.gms.google-services", version.ref = "google-gms" }
 swiftklib = { id = "io.github.ttypic.swiftklib", version.ref = "swiftklib" }
 skie = { id = "co.touchlab.skie", version.ref = "skie" }
 hms = { id = "com.huawei.agconnect", version.ref = "hms" }

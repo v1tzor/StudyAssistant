@@ -20,6 +20,7 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.api.di.coreClintApiModule
 import ru.aleshin.studyassistant.core.data.managers.TodoReminderManagerImpl
 import ru.aleshin.studyassistant.core.data.repositories.AiAssistantRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.AuthRepositoryImpl
@@ -69,7 +70,7 @@ import ru.aleshin.studyassistant.core.remote.di.coreRemoteModule
  * @author Stanislav Aleshin on 22.04.2024.
  */
 val coreDataModule = DI.Module("CoreData") {
-    importAll(coreDataPlatformModule, coreDatabaseModule, coreRemoteModule)
+    importAll(coreDataPlatformModule, coreDatabaseModule, coreRemoteModule, coreClintApiModule)
 
     bindSingleton<AuthRepository> { AuthRepositoryImpl(instance()) }
     bindSingleton<ProductsRepository> { ProductsRepositoryImpl(instance()) }

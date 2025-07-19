@@ -1,10 +1,10 @@
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.serialization)
-    alias(libs.plugins.parcelize)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 kotlin {
@@ -42,7 +42,7 @@ kotlin {
             api(libs.kotlin.serialization)
             api(libs.kotlin.serialization.json)
             api(libs.moko.parcelize)
-            api(libs.bignumn)
+            api(libs.bignum)
             api(libs.logger)
 
             api(libs.kodein.core)

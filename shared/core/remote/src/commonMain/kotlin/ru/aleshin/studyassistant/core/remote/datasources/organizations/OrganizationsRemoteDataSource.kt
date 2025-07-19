@@ -23,22 +23,22 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Employee
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Organizations
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Storage.BUCKET
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Subjects
+import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
+import ru.aleshin.studyassistant.core.api.models.extractBucketIdFromFileUrl
+import ru.aleshin.studyassistant.core.api.models.extractIdFromFileUrl
+import ru.aleshin.studyassistant.core.api.storage.StorageApi
+import ru.aleshin.studyassistant.core.api.utils.Permission
+import ru.aleshin.studyassistant.core.api.utils.Query
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
-import ru.aleshin.studyassistant.core.remote.appwrite.storage.StorageService
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Employee
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Organizations
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Storage.BUCKET
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Subjects
 import ru.aleshin.studyassistant.core.remote.mappers.organizations.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
-import ru.aleshin.studyassistant.core.remote.models.appwrite.extractBucketIdFromFileUrl
-import ru.aleshin.studyassistant.core.remote.models.appwrite.extractIdFromFileUrl
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationPojo
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationShortPojo
@@ -70,8 +70,8 @@ interface OrganizationsRemoteDataSource {
     suspend fun deleteAvatar(avatarUrl: String, targetUser: UID)
 
     class Base(
-        private val database: DatabaseService,
-        private val storage: StorageService,
+        private val database: DatabaseApi,
+        private val storage: StorageApi,
     ) : OrganizationsRemoteDataSource {
 
         override suspend fun addOrUpdateOrganization(

@@ -2,11 +2,11 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.parcelize)
+    alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.konfig)
     alias(libs.plugins.skie)
 }
@@ -64,6 +64,7 @@ kotlin {
             api(project(":shared:core:data"))
             api(project(":shared:core:database"))
             api(project(":shared:core:remote"))
+            api(project(":shared:core:client-api"))
 
             implementation(compose.components.resources)
         }

@@ -20,19 +20,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.json.JsonElement
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Employee
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Storage.BUCKET
+import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
+import ru.aleshin.studyassistant.core.api.models.extractBucketIdFromFileUrl
+import ru.aleshin.studyassistant.core.api.models.extractIdFromFileUrl
+import ru.aleshin.studyassistant.core.api.storage.StorageApi
+import ru.aleshin.studyassistant.core.api.utils.Permission
+import ru.aleshin.studyassistant.core.api.utils.Query
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.getString
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
-import ru.aleshin.studyassistant.core.remote.appwrite.storage.StorageService
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Employee
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Storage.BUCKET
-import ru.aleshin.studyassistant.core.remote.models.appwrite.extractBucketIdFromFileUrl
-import ru.aleshin.studyassistant.core.remote.models.appwrite.extractIdFromFileUrl
 import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 
 /**
@@ -50,8 +50,8 @@ interface EmployeeRemoteDataSource {
     suspend fun deleteAvatar(avatarUrl: UID, targetUser: UID)
 
     class Base(
-        private val database: DatabaseService,
-        private val storage: StorageService,
+        private val database: DatabaseApi,
+        private val storage: StorageApi,
     ) : EmployeeRemoteDataSource {
 
         override suspend fun addOrUpdateEmployee(employee: EmployeePojo, targetUser: UID): UID {

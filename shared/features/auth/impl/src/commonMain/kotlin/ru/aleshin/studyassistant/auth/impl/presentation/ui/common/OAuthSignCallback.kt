@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.common
 
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.OAuthProvider
+import ru.aleshin.studyassistant.core.api.utils.OAuthProvider
 
 /**
  * @author Stanislav Aleshin on 17.07.2025.

@@ -16,10 +16,10 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.users
 
+import ru.aleshin.studyassistant.core.api.models.AuthUserPojo
+import ru.aleshin.studyassistant.core.api.models.SessionPojo
 import ru.aleshin.studyassistant.core.domain.entities.users.AuthUser
 import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
-import ru.aleshin.studyassistant.core.remote.models.appwrite.AuthUserPojo
-import ru.aleshin.studyassistant.core.remote.models.appwrite.SessionPojo
 
 /**
  * @author Stanislav Aleshin on 01.07.2025.

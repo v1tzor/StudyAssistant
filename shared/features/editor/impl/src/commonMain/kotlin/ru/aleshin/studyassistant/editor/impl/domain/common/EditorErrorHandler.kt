@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
-import ru.aleshin.studyassistant.core.remote.appwrite.AppwriteException
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.domain.entities.ShiftTimeError
 

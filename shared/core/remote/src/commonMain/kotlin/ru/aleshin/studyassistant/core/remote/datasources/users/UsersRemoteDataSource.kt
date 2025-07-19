@@ -20,27 +20,27 @@ import dev.tmapps.konnection.Konnection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Organizations
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Storage.BUCKET
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Users
+import ru.aleshin.studyassistant.core.api.auth.AccountApi
+import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
+import ru.aleshin.studyassistant.core.api.models.AuthUserPojo
+import ru.aleshin.studyassistant.core.api.models.extractBucketIdFromFileUrl
+import ru.aleshin.studyassistant.core.api.models.extractIdFromFileUrl
+import ru.aleshin.studyassistant.core.api.realtime.RealtimeApi
+import ru.aleshin.studyassistant.core.api.storage.StorageApi
+import ru.aleshin.studyassistant.core.api.utils.Channels
+import ru.aleshin.studyassistant.core.api.utils.Permission
+import ru.aleshin.studyassistant.core.api.utils.Query
+import ru.aleshin.studyassistant.core.api.utils.Role
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.tryFromJson
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
-import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
-import ru.aleshin.studyassistant.core.remote.appwrite.realtime.RealtimeService
-import ru.aleshin.studyassistant.core.remote.appwrite.storage.StorageService
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Channels
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Role
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Organizations
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Storage.BUCKET
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
 import ru.aleshin.studyassistant.core.remote.mappers.users.convertToBase
 import ru.aleshin.studyassistant.core.remote.mappers.users.convertToDetails
-import ru.aleshin.studyassistant.core.remote.models.appwrite.AuthUserPojo
-import ru.aleshin.studyassistant.core.remote.models.appwrite.extractBucketIdFromFileUrl
-import ru.aleshin.studyassistant.core.remote.models.appwrite.extractIdFromFileUrl
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojoDetails
 
@@ -63,10 +63,10 @@ interface UsersRemoteDataSource {
     suspend fun deleteAvatar(avatarUrl: String, targetUser: UID)
 
     class Base(
-        private val account: AccountService,
-        private val database: DatabaseService,
-        private val realtime: RealtimeService,
-        private val storage: StorageService,
+        private val account: AccountApi,
+        private val database: DatabaseApi,
+        private val realtime: RealtimeApi,
+        private val storage: StorageApi,
         private val connectivityChecker: Konnection,
     ) : UsersRemoteDataSource {
 

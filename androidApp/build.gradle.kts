@@ -3,8 +3,8 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.huawei.agconnect.agcp.AGCPExtension
 
 plugins {
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kapt)
     alias(libs.plugins.compose.compiler)

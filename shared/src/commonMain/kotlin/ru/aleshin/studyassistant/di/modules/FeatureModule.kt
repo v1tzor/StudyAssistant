@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.billing.impl.di.holder.BillingFeatureDIHolder
 import ru.aleshin.studyassistant.chat.api.navigation.ChatFeatureStarter
 import ru.aleshin.studyassistant.chat.impl.di.ChatFeatureDependencies
 import ru.aleshin.studyassistant.chat.impl.di.holder.ChatFeatureDIHolder
+import ru.aleshin.studyassistant.core.api.auth.AccountApi
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -63,7 +64,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesReposito
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.impl.di.EditorFeatureDependencies
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
@@ -145,7 +145,7 @@ val featureModule = DI.Module("Feature") {
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val messageRepository = instance<MessageRepository>()
             override val manageUserRepository = instance<ManageUserRepository>()
-            override val accountService = instance<AccountService>()
+            override val accountService = instance<AccountApi>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
             override val appService = instance<AppService>()

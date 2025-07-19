@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.core.database.di
 
 import app.cash.sqldelight.ColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
-import io.ktor.client.plugins.cache.storage.CacheStorage
 import io.ktor.client.plugins.cookies.CookiesStorage
 import org.kodein.di.DI
 import org.kodein.di.bindEagerSingleton
@@ -40,7 +39,6 @@ import ru.aleshin.studyassistant.core.database.datasource.settings.NotificationS
 import ru.aleshin.studyassistant.core.database.datasource.subjects.SubjectsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.tasks.HomeworksLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.tasks.TodoLocalDataSource
-import ru.aleshin.studyassistant.core.database.storages.AppwriteCacheStorage
 import ru.aleshin.studyassistant.core.database.storages.AppwriteCookiesStorage
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatHistoryQueries
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatMessageEntity
@@ -83,7 +81,6 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
     bindEagerSingleton<Database> { Database(instance<SqlDriver>(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 
     bindSingleton<CookiesStorage> { AppwriteCookiesStorage(instance()) }
-    bindSingleton<CacheStorage> { AppwriteCacheStorage(instance(), instance(), instance()) }
 
     bindSingleton<GeneralQueries> { instance<Database>().generalQueries }
     bindSingleton<CalendarQueries> { instance<Database>().calendarQueries }

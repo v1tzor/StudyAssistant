@@ -22,8 +22,6 @@ import io.ktor.client.HttpClient
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.remote.appwrite.client.AppwriteHeadersProvider
-import ru.aleshin.studyassistant.core.remote.appwrite.client.AppwriteHeadersProviderAndroid
 import ru.aleshin.studyassistant.core.remote.datasources.message.GoogleAuthTokenProvider
 import ru.aleshin.studyassistant.core.remote.datasources.message.GoogleAuthTokenProviderImpl
 import ru.aleshin.studyassistant.core.remote.datasources.message.HmsAuthTokenProvider
@@ -36,5 +34,4 @@ actual val coreRemotePlatformModule = DI.Module("CoreRemotePlatform") {
     bindSingleton<HmsAuthTokenProvider> { HmsAuthTokenProviderImpl(instance<HttpClient>(tag = "HmsToken")) }
     bindSingleton<GoogleAuthTokenProvider> { GoogleAuthTokenProviderImpl(instance()) }
     bindSingleton<Konnection> { Konnection.createInstance(instance<Context>()) }
-    bindSingleton<AppwriteHeadersProvider> { AppwriteHeadersProviderAndroid(instance<Context>()) }
 }

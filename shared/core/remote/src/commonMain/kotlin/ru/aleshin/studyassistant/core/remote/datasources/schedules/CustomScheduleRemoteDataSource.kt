@@ -26,17 +26,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.api.AppwriteApi.CustomSchedules
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Employee
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Organizations
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Subjects
+import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
+import ru.aleshin.studyassistant.core.api.utils.Permission
+import ru.aleshin.studyassistant.core.api.utils.Query
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItemToSet
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.CustomSchedules
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Employee
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Organizations
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Subjects
 import ru.aleshin.studyassistant.core.remote.mappers.schedules.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.models.classes.ClassDetailsPojo
@@ -62,7 +62,7 @@ interface CustomScheduleRemoteDataSource {
     suspend fun deleteSchedulesByTimeRange(from: Instant, to: Instant, targetUser: UID)
 
     class Base(
-        private val database: DatabaseService,
+        private val database: DatabaseApi,
     ) : CustomScheduleRemoteDataSource {
 
         override suspend fun addOrUpdateSchedule(

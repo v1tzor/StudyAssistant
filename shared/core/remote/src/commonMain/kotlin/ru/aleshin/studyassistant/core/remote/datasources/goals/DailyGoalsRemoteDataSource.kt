@@ -24,19 +24,19 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Employee
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Goals
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Homeworks
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Organizations
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Subjects
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Todo
+import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
+import ru.aleshin.studyassistant.core.api.utils.Permission
+import ru.aleshin.studyassistant.core.api.utils.Query
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalType
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Employee
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Goals
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Homeworks
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Organizations
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Subjects
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Todo
 import ru.aleshin.studyassistant.core.remote.mappers.goals.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.subjects.mapToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.tasks.convertToDetails
@@ -67,7 +67,7 @@ interface DailyGoalsRemoteDataSource {
     suspend fun deleteAllDailyGoals(targetUser: UID)
 
     class Base(
-        private val database: DatabaseService,
+        private val database: DatabaseApi,
     ) : DailyGoalsRemoteDataSource {
 
         override suspend fun addOrUpdateGoal(goal: GoalPojo, targetUser: UID): UID {

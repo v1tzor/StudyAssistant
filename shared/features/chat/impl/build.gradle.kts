@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.parcelize)
-    alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -37,8 +37,8 @@ kotlin {
             implementation(project(":shared:core:domain"))
             implementation(project(":shared:core:ui"))
 
-            implementation(libs.compose.richtext)
-            implementation(libs.compose.richtext.material3)
+            implementation(libs.richtext)
+            implementation(libs.richtext.material3)
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
             implementation(compose.components.resources)

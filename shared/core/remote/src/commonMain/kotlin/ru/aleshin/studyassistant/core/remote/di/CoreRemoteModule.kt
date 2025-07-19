@@ -18,6 +18,8 @@ package ru.aleshin.studyassistant.core.remote.di
 
 import com.russhwolf.settings.Settings
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.HttpClientEngineConfig
+import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.auth.Auth
@@ -42,15 +44,6 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.remote.BuildKonfig
-import ru.aleshin.studyassistant.core.remote.appwrite.Appwrite
-import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
-import ru.aleshin.studyassistant.core.remote.appwrite.client.AppwriteClient
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
-import ru.aleshin.studyassistant.core.remote.appwrite.realtime.RealtimeService
-import ru.aleshin.studyassistant.core.remote.appwrite.storage.StorageService
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Client.ENDPOINT
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Client.ENDPOINT_REALTIME
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Client.PROJECT_ID
 import ru.aleshin.studyassistant.core.remote.datasources.ai.AiRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.billing.ProductsRemoteDataSource
@@ -84,24 +77,6 @@ import kotlin.random.Random
 val coreRemoteModule = DI.Module("CoreRemote") {
     import(coreRemotePlatformModule)
 
-    bindSingleton<AppwriteClient> {
-        AppwriteClient(
-            headersProvider = instance(),
-            coroutineManager = instance(),
-            engineFactory = instance(),
-            cookiesStorage = instance(),
-            cacheStorage = instance(),
-            connectionManager = instance(),
-        ).setEndpoint(ENDPOINT)
-            .setEndpointRealtime(ENDPOINT_REALTIME)
-            .setProject(PROJECT_ID)
-    }
-    bindSingleton<Appwrite> { Appwrite(instance(), instance(), instance(), instance()) }
-    bindSingleton<AccountService> { AccountService(instance(), instance(), instance()) }
-    bindSingleton<StorageService> { StorageService(instance()) }
-    bindSingleton<DatabaseService> { DatabaseService(instance(), instance()) }
-    bindSingleton<RealtimeService> { RealtimeService(instance(), instance()) }
-
     bindSingleton<Settings> { Settings() }
 
     bindSingleton<Json> {
@@ -113,6 +88,7 @@ val coreRemoteModule = DI.Module("CoreRemote") {
         }
     }
     bindSingleton<HttpEngineFactory> { HttpEngineFactory() }
+    bindProvider<HttpClientEngineFactory<HttpClientEngineConfig>> { instance<HttpEngineFactory>().createEngine() }
     bindSingleton<HttpClient>(tag = "HmsToken") {
         HttpClient(instance<HttpEngineFactory>().createEngine()) {
             defaultRequest {
@@ -199,15 +175,7 @@ val coreRemoteModule = DI.Module("CoreRemote") {
     bindSingleton<AiRemoteDataSource> { AiRemoteDataSource.Base(instance(tag = "DeepSeek")) }
     bindSingleton<SubscriptionChecker> { SubscriptionChecker.Base(instance(), instance(), instance()) }
     bindSingleton<AuthRemoteDataSource> { AuthRemoteDataSource.Base(instance()) }
-    bindProvider<UsersRemoteDataSource> {
-        UsersRemoteDataSource.Base(
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance()
-        )
-    }
+    bindProvider<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance()) }
     bindSingleton<FriendRequestsRemoteDataSource> { FriendRequestsRemoteDataSource.Base(instance()) }
     bindSingleton<ShareHomeworksRemoteDataSource> { ShareHomeworksRemoteDataSource.Base(instance()) }
@@ -221,14 +189,7 @@ val coreRemoteModule = DI.Module("CoreRemote") {
     bindSingleton<TodoRemoteDataSource> { TodoRemoteDataSource.Base(instance()) }
     bindSingleton<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance(), instance()) }
     bindSingleton<ProductsRemoteDataSource> { ProductsRemoteDataSource.Base(instance()) }
-    bindSingleton<MessageRemoteDataSource> {
-        MessageRemoteDataSource.Base(
-            instance(tag = "Messages"),
-            instance(),
-            instance(),
-            instance()
-        )
-    }
+    bindSingleton<MessageRemoteDataSource> { MessageRemoteDataSource.Base(instance(tag = "Messages"), instance(), instance(), instance()) }
     bindProvider<PushServiceAuthTokenFactory> { PushServiceAuthTokenFactory.Base(instance(), instance(), instance()) }
     bindProvider<PushServiceAuthTokenProvider.Firebase> { PushServiceAuthTokenProvider.Firebase(instance()) }
     bindProvider<PushServiceAuthTokenProvider.RuStore> { PushServiceAuthTokenProvider.RuStore() }

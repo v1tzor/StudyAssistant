@@ -21,16 +21,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.api.AppwriteApi.SharedHomeworks
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Users
+import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
+import ru.aleshin.studyassistant.core.api.utils.Permission
+import ru.aleshin.studyassistant.core.api.utils.Query
+import ru.aleshin.studyassistant.core.api.utils.Role
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Role
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.SharedHomeworks
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
 import ru.aleshin.studyassistant.core.remote.mappers.share.convertToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.users.convertToDetails
 import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.ReceivedMediatedHomeworksPojo
@@ -50,7 +50,7 @@ interface ShareHomeworksRemoteDataSource {
     suspend fun fetchRealtimeSharedHomeworksByUser(uid: UID): SharedHomeworksPojo
 
     class Base(
-        private val database: DatabaseService,
+        private val database: DatabaseApi,
     ) : ShareHomeworksRemoteDataSource {
 
         override suspend fun addOrUpdateSharedHomework(homeworks: SharedHomeworksPojo, targetUser: UID) {

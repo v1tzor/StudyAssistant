@@ -21,13 +21,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Todo
+import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
+import ru.aleshin.studyassistant.core.api.utils.Permission
+import ru.aleshin.studyassistant.core.api.utils.Query
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Query
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Todo
 import ru.aleshin.studyassistant.core.remote.mappers.tasks.convertToBase
 import ru.aleshin.studyassistant.core.remote.mappers.tasks.convertToDetails
 import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojo
@@ -49,7 +49,7 @@ interface TodoRemoteDataSource {
     suspend fun deleteAllTodos(targetUser: UID)
 
     class Base(
-        private val database: DatabaseService,
+        private val database: DatabaseApi,
     ) : TodoRemoteDataSource {
 
         override suspend fun addOrUpdateTodo(todo: TodoPojoDetails, targetUser: UID): UID {

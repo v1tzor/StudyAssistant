@@ -18,9 +18,9 @@ package ru.aleshin.studyassistant.auth.impl.domain.common
 
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteDataAuthException
+import ru.aleshin.studyassistant.core.common.exceptions.AppwriteException
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
-import ru.aleshin.studyassistant.core.remote.appwrite.AppwriteException
 
 /**
  * @author Stanislav Aleshin on 16.04.2024

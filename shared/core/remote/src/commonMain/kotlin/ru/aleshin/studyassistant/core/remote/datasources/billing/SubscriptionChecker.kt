@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.billing
 
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Users
+import ru.aleshin.studyassistant.core.api.auth.AccountApi
+import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date.DAYS_IN_WEEK
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date.MILLIS_IN_DAY
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.remote.appwrite.auth.AccountService
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Users
 import ru.aleshin.studyassistant.core.remote.mappers.users.convertToDetails
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 
@@ -33,8 +33,8 @@ interface SubscriptionChecker {
     suspend fun checkSubscriptionActivity(): Boolean
 
     class Base(
-        private val account: AccountService,
-        private val database: DatabaseService,
+        private val account: AccountApi,
+        private val database: DatabaseApi,
         private val dateManager: DateManager,
     ) : SubscriptionChecker {
 

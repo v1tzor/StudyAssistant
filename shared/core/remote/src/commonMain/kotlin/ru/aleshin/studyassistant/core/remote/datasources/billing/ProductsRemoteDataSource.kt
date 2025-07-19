@@ -17,8 +17,8 @@
 package ru.aleshin.studyassistant.core.remote.datasources.billing
 
 import kotlinx.coroutines.flow.Flow
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.Products
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Products
+import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
 import ru.aleshin.studyassistant.core.remote.models.billing.ProductPojo
 
 /**
@@ -29,7 +29,7 @@ interface ProductsRemoteDataSource {
     suspend fun fetchProducts(): Flow<List<ProductPojo>>
 
     class Base(
-        private val database: DatabaseService,
+        private val database: DatabaseApi,
     ) : ProductsRemoteDataSource {
 
         override suspend fun fetchProducts(): Flow<List<ProductPojo>> {

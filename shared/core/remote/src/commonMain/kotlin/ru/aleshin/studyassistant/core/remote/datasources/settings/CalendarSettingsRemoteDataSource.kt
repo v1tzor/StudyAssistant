@@ -18,11 +18,11 @@ package ru.aleshin.studyassistant.core.remote.datasources.settings
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.api.AppwriteApi.CalendarSettings
+import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
+import ru.aleshin.studyassistant.core.api.utils.Permission
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.appwrite.databases.DatabaseService
-import ru.aleshin.studyassistant.core.remote.appwrite.utils.Permission
-import ru.aleshin.studyassistant.core.remote.datasources.StudyAssistantAppwrite.CalendarSettings
 import ru.aleshin.studyassistant.core.remote.models.settings.CalendarSettingsPojo
 
 /**
@@ -35,7 +35,7 @@ interface CalendarSettingsRemoteDataSource {
     suspend fun deleteSettings(targetUser: UID)
 
     class Base(
-        private val database: DatabaseService,
+        private val database: DatabaseApi,
     ) : CalendarSettingsRemoteDataSource {
         override suspend fun addOrUpdateSettings(settings: CalendarSettingsPojo, targetUser: UID) {
             if (targetUser.isEmpty()) throw AppwriteUserException()

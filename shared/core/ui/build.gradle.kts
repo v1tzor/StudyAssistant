@@ -1,9 +1,9 @@
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.parcelize)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 kotlin {
@@ -39,8 +39,10 @@ kotlin {
             api(compose.material3AdaptiveNavigationSuite)
             api(compose.materialIconsExtended)
             api(compose.components.resources)
-            api(libs.compose.richtext)
-            api(libs.compose.richtext.material3)
+            api(libs.compose.material3.adaptive)
+            api(libs.compose.material3.adaptive.layout)
+            api(libs.richtext)
+            api(libs.richtext.material3)
 
             api(libs.google.accompanist)
             api(libs.placeholder)
