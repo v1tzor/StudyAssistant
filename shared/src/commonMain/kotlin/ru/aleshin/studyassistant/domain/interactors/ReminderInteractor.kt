@@ -24,12 +24,11 @@ import kotlinx.datetime.toInstant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.domain.common.MainEitherWrapper
 import ru.aleshin.studyassistant.domain.entities.MainFailures
 
@@ -46,14 +45,12 @@ interface ReminderInteractor {
         private val endClassesReminderManager: EndClassesReminderManager,
         private val homeworksReminderManager: HomeworksReminderManager,
         private val workloadWarningManager: WorkloadWarningManager,
-        private val usersRepository: UsersRepository,
         private val dateManager: DateManager,
         private val eitherWrapper: MainEitherWrapper,
     ) : ReminderInteractor {
 
         override suspend fun startOrRetryAvailableReminders() = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            notificationSettingsRepository.fetchSettings(targetUser).first().apply {
+            notificationSettingsRepository.fetchSettings().first().apply {
                 if (beginningOfClasses != null) {
                     startClassesReminderManager.startOrRetryReminderService()
                 }

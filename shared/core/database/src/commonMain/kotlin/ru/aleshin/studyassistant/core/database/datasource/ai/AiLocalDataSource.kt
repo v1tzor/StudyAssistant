@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.core.database.mappers.ai.mapToDetails
 import ru.aleshin.studyassistant.core.database.mappers.ai.mapToShort
 import ru.aleshin.studyassistant.core.database.models.ai.AiChatEntity
 import ru.aleshin.studyassistant.core.database.models.ai.AiChatHistoryEntityDetails
+import ru.aleshin.studyassistant.core.database.utils.LocalDataSource
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatHistoryEntity
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatHistoryQueries
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatMessageEntity
@@ -41,7 +42,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * @author Stanislav Aleshin on 21.06.2025.
  */
-interface AiLocalDataSource {
+interface AiLocalDataSource : LocalDataSource.OnlyOffline {
 
     suspend fun fetchAllChats(): Flow<List<AiChatEntity>>
     suspend fun fetchChatHistoryById(uid: UID): Flow<AiChatHistoryEntityDetails?>
@@ -90,15 +91,15 @@ interface AiLocalDataSource {
         }
 
         override suspend fun addOrUpdateChat(chatHistory: AiChatHistoryEntityDetails) {
-            chatQueries.addOrUpdateChatHistory(chatHistory.mapToBase())
-            messagesQueries.deleteMessagesByChatId(chatHistory.uid)
+            chatQueries.addOrUpdateChatHistory(chatHistory.mapToBase()).await()
+            messagesQueries.deleteMessagesByChatId(chatHistory.uid).await()
             chatHistory.messages.forEach { message ->
-                messagesQueries.addOrUpdateMessage(message)
+                messagesQueries.addOrUpdateMessage(message).await()
             }
         }
 
         override suspend fun addChatMessage(message: AiChatMessageEntity) {
-            messagesQueries.addOrUpdateMessage(message)
+            messagesQueries.addOrUpdateMessage(message).await()
         }
 
         override suspend fun addChatMessages(messages: List<AiChatMessageEntity>) {
@@ -106,12 +107,12 @@ interface AiLocalDataSource {
         }
 
         override suspend fun deleteChat(chatId: UID) {
-            messagesQueries.deleteMessagesByChatId(chatId)
-            chatQueries.deleteChatById(chatId)
+            messagesQueries.deleteMessagesByChatId(chatId).await()
+            chatQueries.deleteChatById(chatId).await()
         }
 
         override suspend fun deleteChatMessage(messageId: UID) {
-            messagesQueries.deleteMessageById(messageId)
+            messagesQueries.deleteMessageById(messageId).await()
         }
     }
 }

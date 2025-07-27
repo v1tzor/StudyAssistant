@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.profile.impl.di.holder
 
+import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
 import org.kodein.di.bindSingleton
@@ -27,10 +28,11 @@ import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
-import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.SourceSyncFacade
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
@@ -71,6 +73,7 @@ public object ProfileFeatureDIHolder : BaseFeatureDIHolder<ProfileFeatureApi, Pr
                 bindSingleton<BaseScheduleRepository> { dependencies.baseSchedulesRepository }
                 bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
                 bindSingleton<MessageRepository> { dependencies.messageRepository }
+                bindSingleton<SourceSyncFacade> { dependencies.sourceSyncFacade }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<StartClassesReminderManager> { dependencies.startClassesReminderManager }
@@ -78,6 +81,7 @@ public object ProfileFeatureDIHolder : BaseFeatureDIHolder<ProfileFeatureApi, Pr
                 bindSingleton<WorkloadWarningManager> { dependencies.workloadWarningManager }
                 bindSingleton<HomeworksReminderManager> { dependencies.homeworksReminderManager }
                 bindSingleton<DateManager> { dependencies.dateManager }
+                bindSingleton<Konnection> { dependencies.connectionManager }
                 bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
                 bindSingleton<ProfileFeatureApi> {
                     object : ProfileFeatureApi {

@@ -16,10 +16,12 @@
 
 package ru.aleshin.studyassistant.billing.impl.domain.interactors
 
+import dev.tmapps.konnection.Konnection
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import ru.aleshin.studyassistant.billing.impl.domain.common.BillingEitherWrapper
 import ru.aleshin.studyassistant.billing.impl.domain.entities.BillingFailures
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
@@ -53,17 +55,22 @@ internal interface PurchaseInteractor {
         private val usersRepository: UsersRepository,
         private val dataManager: DateManager,
         private val deviceInfoProvider: DeviceInfoProvider,
+        private val connectionManager: Konnection,
         private val eitherWrapper: BillingEitherWrapper,
     ) : PurchaseInteractor {
 
         override suspend fun fetchProducts() = eitherWrapper.wrap {
+            if (!connectionManager.isConnected()) throw InternetConnectionException()
+
             val products = productsRepository.fetchProducts().first()
             iapService.fetchProducts(products)
         }
 
         override suspend fun purchaseSubscription(productId: String) = eitherWrapper.wrapUnit {
+            if (!connectionManager.isConnected()) throw InternetConnectionException()
+
             val currentUser = usersRepository.fetchCurrentUserOrError()
-            val appUserProfile = checkNotNull(usersRepository.fetchUserById(currentUser.uid).firstOrNull())
+            val appUserProfile = checkNotNull(usersRepository.fetchCurrentUserProfile().firstOrNull())
             val productInfo = checkNotNull(iapService.fetchProducts(listOf(productId)).firstOrNull())
             val params = IapProductPurchaseParams(
                 productId = productId,
@@ -88,7 +95,7 @@ internal interface PurchaseInteractor {
                         store = iapService.fetchStore(),
                     )
                     val updateAppUser = appUserProfile.copy(subscriptionInfo = subscriptionInfo)
-                    usersRepository.updateAppUser(updateAppUser)
+                    usersRepository.updateCurrentUserProfile(updateAppUser)
                 }
 
                 is IapPaymentResultCancelled -> {

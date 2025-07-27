@@ -42,14 +42,13 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedul
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.convertToDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.convertToDetails
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.convertToDetails
-import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 
@@ -72,7 +71,6 @@ internal interface ScheduleInteractor {
         private val customScheduleRepository: CustomScheduleRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
         private val notificationSettingsRepository: NotificationSettingsRepository,
-        private val usersRepository: UsersRepository,
         private val startClassesReminderManager: StartClassesReminderManager,
         private val endClassesReminderManager: EndClassesReminderManager,
         private val dateManager: DateManager,
@@ -83,23 +81,28 @@ internal interface ScheduleInteractor {
             val currentWeek = dateManager.fetchCurrentWeek()
             val currentInstant = dateManager.fetchCurrentInstant()
 
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-
-            val currentSchedules = baseScheduleRepository.fetchSchedulesByVersion(currentWeek, null, targetUser).first()
+            val currentSchedules = baseScheduleRepository.fetchSchedulesByVersion(currentWeek, null).first()
             val deprecatedSchedules = currentSchedules.map { schedule ->
                 val deprecatedVersion = schedule.dateVersion.makeDeprecated(currentInstant)
                 val updatedClasses = schedule.classes.map { it.copy(uid = randomUUID()) }
-                return@map schedule.copy(dateVersion = deprecatedVersion, classes = updatedClasses)
+                return@map schedule.copy(
+                    dateVersion = deprecatedVersion,
+                    classes = updatedClasses,
+                    updatedAt = currentInstant.toEpochMilliseconds(),
+                )
             }
-            baseScheduleRepository.addOrUpdateSchedulesGroup(deprecatedSchedules, targetUser)
+            baseScheduleRepository.addOrUpdateSchedulesGroup(deprecatedSchedules)
 
             val newActualSchedules = schedules.map { schedules ->
                 val actualVersion = DateVersion.createNewVersion(currentInstant)
-                return@map schedules.copy(dateVersion = actualVersion)
+                return@map schedules.copy(
+                    dateVersion = actualVersion,
+                    updatedAt = currentInstant.toEpochMilliseconds(),
+                )
             }
-            baseScheduleRepository.addOrUpdateSchedulesGroup(newActualSchedules, targetUser)
+            baseScheduleRepository.addOrUpdateSchedulesGroup(newActualSchedules)
 
-            val notificationSettings = notificationSettingsRepository.fetchSettings(targetUser).first()
+            val notificationSettings = notificationSettingsRepository.fetchSettings().first()
             if (notificationSettings.beginningOfClasses != null) {
                 startClassesReminderManager.startOrRetryReminderService()
             }
@@ -110,14 +113,13 @@ internal interface ScheduleInteractor {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchDetailsWeekSchedule(week: TimeRange) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val calendarSettings = calendarSettingsRepository.fetchSettings(targetUser).first()
+            val calendarSettings = calendarSettingsRepository.fetchSettings().first()
             val numberOfWeek = week.from.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
             val holidays = calendarSettings.holidays
 
-            val baseSchedulesFlow = baseScheduleRepository.fetchSchedulesByVersion(week, numberOfWeek, targetUser)
-            val customSchedulesFlow = customScheduleRepository.fetchSchedulesByTimeRange(week, targetUser)
-            val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(week, targetUser)
+            val baseSchedulesFlow = baseScheduleRepository.fetchSchedulesByVersion(week, numberOfWeek)
+            val customSchedulesFlow = customScheduleRepository.fetchSchedulesByTimeRange(week)
+            val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(week)
 
             combine(
                 baseSchedulesFlow,
@@ -174,14 +176,13 @@ internal interface ScheduleInteractor {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchDetailsScheduleByDate(date: Instant) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val calendarSettings = calendarSettingsRepository.fetchSettings(targetUser).first()
+            val calendarSettings = calendarSettingsRepository.fetchSettings().first()
             val currentNumberOfWeek = date.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
             val holidays = calendarSettings.holidays
 
-            val baseScheduleFlow = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek, targetUser)
-            val customScheduleFlow = customScheduleRepository.fetchScheduleByDate(date, targetUser)
-            val homeworksFlow = homeworksRepository.fetchHomeworksByDate(date, targetUser)
+            val baseScheduleFlow = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek)
+            val customScheduleFlow = customScheduleRepository.fetchScheduleByDate(date)
+            val homeworksFlow = homeworksRepository.fetchHomeworksByDate(date)
 
             combine(
                 baseScheduleFlow,

@@ -21,7 +21,6 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoEitherWrapper
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
 
@@ -36,18 +35,15 @@ internal interface SubjectsInteractor {
 
     class Base(
         private val subjectsRepository: SubjectsRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: InfoEitherWrapper,
     ) : SubjectsInteractor {
 
         override suspend fun fetchSubjectsByOrganization(organizationId: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            subjectsRepository.fetchAllSubjectsByOrganization(organizationId, targetUser)
+            subjectsRepository.fetchAllSubjectsByOrganization(organizationId)
         }
 
         override suspend fun deleteSubjectById(targetId: UID) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            subjectsRepository.deleteSubject(targetId, targetUser)
+            subjectsRepository.deleteSubject(targetId)
         }
     }
 }

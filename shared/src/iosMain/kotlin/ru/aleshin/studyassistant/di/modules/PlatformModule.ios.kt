@@ -26,7 +26,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsServic
 import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
 import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
-import ru.aleshin.studyassistant.core.remote.datasources.message.GoogleAuthTokenProvider
+import ru.aleshin.studyassistant.core.remote.api.message.GoogleAuthTokenProvider
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 
 /**

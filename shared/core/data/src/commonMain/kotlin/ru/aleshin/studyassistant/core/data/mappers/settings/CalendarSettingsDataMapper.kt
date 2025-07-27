@@ -19,6 +19,8 @@ package ru.aleshin.studyassistant.core.data.mappers.settings
 import ru.aleshin.studyassistant.core.common.extensions.fromJson
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.extensions.toJson
+import ru.aleshin.studyassistant.core.data.utils.sync.SingleSyncMapper
+import ru.aleshin.studyassistant.core.database.models.settings.BaseCalendarSettingsEntity
 import ru.aleshin.studyassistant.core.database.models.settings.HolidaysEntity
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
@@ -26,39 +28,18 @@ import ru.aleshin.studyassistant.core.domain.entities.settings.Holidays
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 import ru.aleshin.studyassistant.core.remote.models.settings.CalendarSettingsPojo
 import ru.aleshin.studyassistant.core.remote.models.settings.HolidaysPojo
-import ru.aleshin.studyassistant.sqldelight.settings.CalendarSettingsEntity
 
 /**
  * @author Stanislav Aleshin on 01.05.2024.
  */
-fun CalendarSettingsPojo.mapToDomain() = CalendarSettings(
-    numberOfWeek = NumberOfRepeatWeek.valueOf(numberOfWeek),
-    weekScheduleViewType = WeekScheduleViewType.valueOf(weekScheduleViewType),
-    holidays = holidays.map { it.fromJson<HolidaysPojo>().mapToDomain() },
-)
 
-fun HolidaysPojo.mapToDomain() = Holidays(
-    organizations = organizations,
-    start = start.mapEpochTimeToInstant(),
-    end = end.mapEpochTimeToInstant(),
-)
-
-fun CalendarSettingsEntity.mapToDomain() = CalendarSettings(
-    numberOfWeek = NumberOfRepeatWeek.valueOf(number_of_week),
-    weekScheduleViewType = WeekScheduleViewType.valueOf(week_schedule_view_type),
-    holidays = holidays?.map { it.fromJson<HolidaysEntity>().mapToDomain() } ?: emptyList(),
-)
-
-fun HolidaysEntity.mapToDomain() = Holidays(
-    organizations = organizations,
-    start = start.mapEpochTimeToInstant(),
-    end = end.mapEpochTimeToInstant(),
-)
+// Remote
 
 fun CalendarSettings.mapToRemoteData() = CalendarSettingsPojo(
     numberOfWeek = numberOfWeek.name,
     weekScheduleViewType = weekScheduleViewType.name,
     holidays = holidays.map { it.mapToRemoteData().toJson() },
+    updatedAt = updatedAt,
 )
 
 fun Holidays.mapToRemoteData() = HolidaysPojo(
@@ -67,15 +48,80 @@ fun Holidays.mapToRemoteData() = HolidaysPojo(
     end = end.toEpochMilliseconds(),
 )
 
-fun CalendarSettings.mapToLocalData() = CalendarSettingsEntity(
-    id = 1L,
-    number_of_week = numberOfWeek.name,
-    week_schedule_view_type = weekScheduleViewType.name,
+fun CalendarSettingsPojo.mapToDomain() = CalendarSettings(
+    numberOfWeek = NumberOfRepeatWeek.valueOf(numberOfWeek),
+    weekScheduleViewType = WeekScheduleViewType.valueOf(weekScheduleViewType),
+    holidays = holidays.map { it.fromJson<HolidaysPojo>().mapToDomain() },
+    updatedAt = updatedAt,
+)
+
+fun HolidaysPojo.mapToDomain() = Holidays(
+    organizations = organizations,
+    start = start.mapEpochTimeToInstant(),
+    end = end.mapEpochTimeToInstant(),
+)
+
+// Local
+
+fun CalendarSettings.mapToLocalData() = BaseCalendarSettingsEntity(
+    numberOfWeek = numberOfWeek.name,
+    weekScheduleViewType = weekScheduleViewType.name,
     holidays = holidays.map { it.mapToLocalData().toJson() },
+    updatedAt = updatedAt,
+    isCacheData = 0L,
 )
 
 fun Holidays.mapToLocalData() = HolidaysEntity(
     organizations = organizations,
     start = start.toEpochMilliseconds(),
     end = end.toEpochMilliseconds(),
+)
+
+fun BaseCalendarSettingsEntity.mapToDomain() = CalendarSettings(
+    numberOfWeek = NumberOfRepeatWeek.valueOf(numberOfWeek),
+    weekScheduleViewType = WeekScheduleViewType.valueOf(weekScheduleViewType),
+    holidays = holidays?.map { it.fromJson<HolidaysEntity>().mapToDomain() } ?: emptyList(),
+    updatedAt = updatedAt,
+)
+
+fun HolidaysEntity.mapToDomain() = Holidays(
+    organizations = organizations,
+    start = start.mapEpochTimeToInstant(),
+    end = end.mapEpochTimeToInstant(),
+)
+
+// Combined
+
+fun BaseCalendarSettingsEntity.convertToRemote() = CalendarSettingsPojo(
+    id = uid,
+    numberOfWeek = numberOfWeek,
+    weekScheduleViewType = weekScheduleViewType,
+    holidays = holidays?.map { it.fromJson<HolidaysEntity>().mapToRemote().toJson() } ?: emptyList(),
+    updatedAt = updatedAt,
+)
+
+fun CalendarSettingsPojo.convertToLocal() = BaseCalendarSettingsEntity(
+    uid = id,
+    numberOfWeek = numberOfWeek,
+    weekScheduleViewType = weekScheduleViewType,
+    holidays = holidays.map { it.fromJson<HolidaysPojo>().mapToLocal().toJson() },
+    updatedAt = updatedAt,
+    isCacheData = 1L,
+)
+
+fun HolidaysPojo.mapToLocal() = HolidaysEntity(
+    organizations = organizations,
+    start = start,
+    end = end,
+)
+
+fun HolidaysEntity.mapToRemote() = HolidaysPojo(
+    organizations = organizations,
+    start = start,
+    end = end,
+)
+
+class CalendarSettingsSyncMapper : SingleSyncMapper<BaseCalendarSettingsEntity, CalendarSettingsPojo>(
+    localToRemote = { convertToRemote() },
+    remoteToLocal = { convertToLocal() },
 )

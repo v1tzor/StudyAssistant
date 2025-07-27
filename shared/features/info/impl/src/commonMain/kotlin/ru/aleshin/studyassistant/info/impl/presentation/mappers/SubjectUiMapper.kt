@@ -33,6 +33,7 @@ internal fun Subject.mapToUi() = SubjectUi(
     office = office,
     color = color,
     location = location?.mapToUi(),
+    updatedAt = updatedAt,
 )
 
 internal fun SubjectUi.mapToDomain() = Subject(
@@ -44,6 +45,7 @@ internal fun SubjectUi.mapToDomain() = Subject(
     office = office,
     color = color,
     location = location?.mapToDomain(),
+    updatedAt = updatedAt,
 )
 
 internal fun SubjectSortedType.mapToString(strings: InfoStrings) = when (this) {

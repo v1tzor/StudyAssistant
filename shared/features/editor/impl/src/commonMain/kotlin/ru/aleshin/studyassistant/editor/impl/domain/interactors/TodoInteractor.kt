@@ -21,11 +21,11 @@ import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
-import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 
@@ -40,31 +40,36 @@ internal interface TodoInteractor {
 
     class Base(
         private val todoRepository: TodoRepository,
-        private val usersRepository: UsersRepository,
         private val goalsRepository: DailyGoalsRepository,
         private val todoReminderManager: TodoReminderManager,
+        private val dateManager: DateManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : TodoInteractor {
 
         override suspend fun addOrUpdateTodo(todo: Todo) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            todoRepository.addOrUpdateTodo(todo, targetUser).apply {
-                todoReminderManager.scheduleReminders(this, todo.name, todo.deadline, todo.notifications)
-                val linkedGoal = goalsRepository.fetchGoalByContentId(todo.uid, targetUser).first()
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedTodo = todo.copy(updatedAt = updatedAt)
+            todoRepository.addOrUpdateTodo(updatedTodo).apply {
+                todoReminderManager.scheduleReminders(
+                    targetId = this,
+                    name = updatedTodo.name,
+                    deadline = updatedTodo.deadline,
+                    notifications = updatedTodo.notifications,
+                )
+                val linkedGoal = goalsRepository.fetchGoalByContentId(updatedTodo.uid).first()
                 if (linkedGoal != null) {
-                    goalsRepository.addOrUpdateGoal(linkedGoal.copy(contentTodo = todo), targetUser)
+                    val updatedGoal = linkedGoal.copy(contentTodo = updatedTodo, updatedAt = updatedAt)
+                    goalsRepository.addOrUpdateGoal(updatedGoal)
                 }
             }
         }
 
         override suspend fun fetchTodoById(uid: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            todoRepository.fetchTodoById(uid, targetUser)
+            todoRepository.fetchTodoById(uid)
         }
 
         override suspend fun deleteTodo(targetId: UID) = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            todoRepository.deleteTodo(targetId, targetUser)
+            todoRepository.deleteTodo(targetId)
             todoReminderManager.clearAllReminders(targetId)
         }
     }

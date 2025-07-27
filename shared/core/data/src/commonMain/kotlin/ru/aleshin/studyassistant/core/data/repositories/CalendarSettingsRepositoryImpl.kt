@@ -16,18 +16,24 @@
 
 package ru.aleshin.studyassistant.core.data.repositories
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import ru.aleshin.studyassistant.core.common.functional.UID
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
+import ru.aleshin.studyassistant.core.data.mappers.settings.convertToLocal
+import ru.aleshin.studyassistant.core.data.mappers.settings.convertToRemote
 import ru.aleshin.studyassistant.core.data.mappers.settings.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.settings.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.settings.mapToRemoteData
+import ru.aleshin.studyassistant.core.data.utils.SubscriptionChecker
+import ru.aleshin.studyassistant.core.data.utils.sync.RemoteResultSyncHandler
 import ru.aleshin.studyassistant.core.database.datasource.settings.CalendarSettingsLocalDataSource
 import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
+import ru.aleshin.studyassistant.core.domain.entities.sync.OfflineChangeType
+import ru.aleshin.studyassistant.core.domain.managers.sync.CalendarSettingsSourceSyncManager.Companion.CALENDAR_SETTINGS_SOURCE_KEY
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
-import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.settings.CalendarSettingsRemoteDataSource
 
 /**
@@ -37,46 +43,58 @@ class CalendarSettingsRepositoryImpl(
     private val localDataSource: CalendarSettingsLocalDataSource,
     private val remoteDataSource: CalendarSettingsRemoteDataSource,
     private val subscriptionChecker: SubscriptionChecker,
+    private val resultSyncHandler: RemoteResultSyncHandler,
 ) : CalendarSettingsRepository {
 
-    override suspend fun fetchSettings(targetUser: UID): Flow<CalendarSettings> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchSettings(targetUser).map { settingsPojo -> settingsPojo.mapToDomain() }
-        } else {
-            localDataSource.fetchSettings().map { settingsEntity -> settingsEntity.mapToDomain() }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override suspend fun fetchSettings(): Flow<CalendarSettings> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchItem().mapNotNull { settingsEntity ->
+                    settingsEntity?.mapToDomain()
+                }
+            } else {
+                localDataSource.offline().fetchItem().mapNotNull { settingsEntity ->
+                    settingsEntity?.mapToDomain()
+                }
+            }
         }
     }
 
-    override suspend fun updateSettings(settings: CalendarSettings, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun updateSettings(settings: CalendarSettings) {
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
 
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateSettings(settings.mapToRemoteData(), targetUser)
+        if (isSubscriber) {
+            localDataSource.sync().addOrUpdateItem(settings.mapToLocalData())
+            resultSyncHandler.executeOrAddToQueue(
+                data = settings.mapToRemoteData(),
+                type = OfflineChangeType.UPSERT,
+                sourceKey = CALENDAR_SETTINGS_SOURCE_KEY,
+            ) {
+                remoteDataSource.addOrUpdateItem(it)
+            }
         } else {
-            localDataSource.updateSettings(settings.mapToLocalData())
+            localDataSource.offline().addOrUpdateItem(settings.mapToLocalData())
         }
     }
 
-    override suspend fun transferData(direction: DataTransferDirection, targetUser: UID) {
+    override suspend fun transferData(direction: DataTransferDirection) {
         when (direction) {
             DataTransferDirection.REMOTE_TO_LOCAL -> {
-                val allSettings = remoteDataSource.fetchSettings(
-                    targetUser = targetUser,
-                ).let { settingsFlow ->
-                    return@let settingsFlow.first().mapToDomain().mapToLocalData()
-                }
-                localDataSource.deleteSettings()
-                localDataSource.updateSettings(allSettings)
-                remoteDataSource.deleteSettings(targetUser)
+                val allSettings = remoteDataSource.fetchItem().first()?.convertToLocal() ?: return
+                localDataSource.offline().deleteItem()
+                localDataSource.offline().addOrUpdateItem(allSettings)
             }
+
             DataTransferDirection.LOCAL_TO_REMOTE -> {
-                val allSettings = localDataSource.fetchSettings().let { settingsFlow ->
-                    return@let settingsFlow.first().mapToDomain().mapToRemoteData()
-                }
-                remoteDataSource.deleteSettings(targetUser)
-                remoteDataSource.addOrUpdateSettings(allSettings, targetUser)
+                val allSettings = localDataSource.offline().fetchItem().first()
+                val settingsRemote = allSettings?.convertToRemote() ?: return
+
+                remoteDataSource.deleteItem()
+                remoteDataSource.addOrUpdateItem(settingsRemote)
+
+                localDataSource.sync().deleteItem()
+                localDataSource.sync().addOrUpdateItem(allSettings)
             }
         }
     }

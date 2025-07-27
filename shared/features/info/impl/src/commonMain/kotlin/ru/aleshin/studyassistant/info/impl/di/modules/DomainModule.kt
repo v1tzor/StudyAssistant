@@ -35,8 +35,8 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<InfoEitherWrapper> { InfoEitherWrapper.Base(instance(), instance()) }
 
     bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance()) }
-    bindSingleton<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<SubjectsInteractor> { SubjectsInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<EmployeesInteractor> { EmployeesInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<ClassesInfoInteractor> { ClassesInfoInteractor.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance()) }
+    bindSingleton<SubjectsInteractor> { SubjectsInteractor.Base(instance(), instance()) }
+    bindSingleton<EmployeesInteractor> { EmployeesInteractor.Base(instance(), instance()) }
+    bindSingleton<ClassesInfoInteractor> { ClassesInfoInteractor.Base(instance(), instance(), instance()) }
 }

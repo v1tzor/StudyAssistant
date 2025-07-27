@@ -39,8 +39,8 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<GeneralSettingsInteractor> { GeneralSettingsInteractor.Base(instance(), instance()) }
     bindSingleton<SubscriptionInteractor> { SubscriptionInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<NotificationSettingsInteractor> { NotificationSettingsInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<NotificationSettingsInteractor> { NotificationSettingsInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance()) }
     bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance()) }
-    bindSingleton<SyncInteractor> { SyncInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<SyncInteractor> { SyncInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 }

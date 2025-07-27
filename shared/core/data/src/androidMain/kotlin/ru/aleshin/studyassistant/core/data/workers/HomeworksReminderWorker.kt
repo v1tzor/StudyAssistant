@@ -21,7 +21,7 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
@@ -46,7 +46,6 @@ import ru.aleshin.studyassistant.core.data.R
 import ru.aleshin.studyassistant.core.data.di.coreDataModule
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
@@ -68,17 +67,15 @@ class HomeworksReminderWorker(
 
     private val dateManager = instance<DateManager>()
     private val notificationCreator = instance<NotificationCreator>()
-    private val usersRepository = instance<UsersRepository>()
     private val homeworksRepository = instance<HomeworksRepository>()
 
     override suspend fun doWork(): Result {
-        val currentUser = usersRepository.fetchCurrentAuthUser() ?: return Result.failure()
         val today = dateManager.fetchBeginningCurrentInstant()
         val tomorrow = today.shiftDay(1)
         val afterTomorrow = today.shiftDay(2)
         val targetTimeRange = TimeRange(from = today, to = afterTomorrow.endThisDay())
 
-        val homeworks = homeworksRepository.fetchHomeworksByTimeRange(targetTimeRange, currentUser.uid).first()
+        val homeworks = homeworksRepository.fetchHomeworksByTimeRange(targetTimeRange).first()
         val groupedHomeworks = homeworks.groupBy { it.deadline.startThisDay() }.mapValues { entry ->
             entry.value.map { homework -> Pair(homework, homework.completeDate == null) }
         }
@@ -95,7 +92,7 @@ class HomeworksReminderWorker(
         nearestHomeworks: List<Pair<Homework, Boolean>>,
         afterTomorrowHomeworks: List<Pair<Homework, Boolean>>,
     ) {
-        val mainActivityUri = Uri.parse("app://studyassistant.com/openMain")
+        val mainActivityUri = Constants.App.OPEN_APP_DEEPLINK.toUri()
         val contentIntent = Intent(ACTION_VIEW, mainActivityUri)
         val requestCode = generateDigitCode().toInt()
         val pContentIntent = PendingIntent.getActivity(context, requestCode, contentIntent, FLAG_IMMUTABLE)

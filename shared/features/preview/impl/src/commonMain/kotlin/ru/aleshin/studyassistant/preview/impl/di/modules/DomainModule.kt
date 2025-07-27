@@ -34,7 +34,7 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<PreviewErrorHandler> { PreviewErrorHandler.Base() }
     bindSingleton<PreviewEitherWrapper> { PreviewEitherWrapper.Base(instance(), instance()) }
 
-    bindProvider<AppUserInteractor> { AppUserInteractor.Base(instance(), instance()) }
+    bindProvider<AppUserInteractor> { AppUserInteractor.Base(instance(), instance(), instance()) }
     bindProvider<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance()) }
     bindProvider<GeneralSettingsInteractor> { GeneralSettingsInteractor.Base(instance(), instance()) }
     bindProvider<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance(), instance()) }

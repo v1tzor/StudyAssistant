@@ -15,35 +15,50 @@ CREATE TABLE employeeEntity (
   emails TEXT AS List<String> NOT NULL,
   phones TEXT AS List<String> NOT NULL,
   locations TEXT AS List<String> NOT NULL,
-  webs TEXT AS List<String> NOT NULL
+  webs TEXT AS List<String> NOT NULL,
+  updated_at INTEGER NOT NULL,
+  is_cache_data INTEGER NOT NULL
 );
 
 addOrUpdateEmployee:
-INSERT OR REPLACE INTO employeeEntity (uid, organization_id, first_name, second_name, patronymic, post, avatar, birthday, workTimeStart, workTimeEnd, emails, phones, locations, webs)
+INSERT OR REPLACE INTO employeeEntity (uid, organization_id, first_name, second_name, patronymic, post, avatar, birthday, workTimeStart, workTimeEnd, emails, phones, locations, webs, updated_at, is_cache_data)
 VALUES ?;
 
 fetchEmployeesByOrganization:
 SELECT *
 FROM employeeEntity
-WHERE organization_id = ?;
+WHERE organization_id = ? AND is_cache_data = ?;
 
 fetchEmployeesByOrganizations:
 SELECT *
 FROM employeeEntity
-WHERE organization_id IN ?;
+WHERE organization_id IN ? AND is_cache_data = ?;
+
 
 fetchEmployeeById:
 SELECT *
 FROM employeeEntity
-WHERE uid = ?;
+WHERE uid = ? AND is_cache_data = ?;
+
+fetchEmployeesById:
+SELECT *
+FROM employeeEntity
+WHERE uid IN ? AND is_cache_data = ?;
 
 fetchAllEmployees:
 SELECT *
-FROM employeeEntity;
+FROM employeeEntity
+WHERE is_cache_data = ?;
 
-deleteEmployee:
+fetchEmptyEmployees:
+SELECT uid, updated_at
+FROM employeeEntity
+WHERE is_cache_data = 1;
+
+deleteEmployeesById:
 DELETE FROM employeeEntity
-WHERE uid = ?;
+WHERE uid IN ? AND is_cache_data = ?;
 
 deleteAllEmployee:
-DELETE FROM employeeEntity;
+DELETE FROM employeeEntity
+WHERE is_cache_data = ?;

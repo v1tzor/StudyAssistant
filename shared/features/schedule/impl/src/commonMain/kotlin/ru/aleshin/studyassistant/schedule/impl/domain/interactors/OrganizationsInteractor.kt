@@ -21,12 +21,12 @@ import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 
@@ -43,30 +43,30 @@ internal interface OrganizationsInteractor {
         private val organizationsRepository: OrganizationsRepository,
         private val subjectsRepository: SubjectsRepository,
         private val employeeRepository: EmployeeRepository,
-        private val usersRepository: UsersRepository,
+        private val dateManager: DateManager,
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : OrganizationsInteractor {
 
         override suspend fun addOrUpdateOrganizationsData(organizations: List<Organization>) = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val subjects = organizations.map { it.subjects }.extractAllItem()
-            val employees = organizations.map { it.employee }.extractAllItem()
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
 
-            organizationsRepository.addOrUpdateOrganizationsGroup(organizations, targetUser)
-            subjectsRepository.addOrUpdateSubjectsGroup(subjects, targetUser)
-            employeeRepository.addOrUpdateEmployeeGroup(employees, targetUser)
+            val organizations = organizations.map { it.copy(updatedAt = updatedAt) }
+            val subjects = organizations.map { it.subjects }.extractAllItem().map { it.copy(updatedAt = updatedAt) }
+            val employees = organizations.map { it.employee }.extractAllItem().map { it.copy(updatedAt = updatedAt) }
+
+            organizationsRepository.addOrUpdateOrganizationsGroup(organizations)
+            subjectsRepository.addOrUpdateSubjectsGroup(subjects)
+            employeeRepository.addOrUpdateEmployeeGroup(employees)
         }
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            organizationsRepository.fetchAllShortOrganization(targetUser).map { organizations ->
+            organizationsRepository.fetchAllShortOrganization().map { organizations ->
                 organizations.sortedByDescending { it.isMain }
             }
         }
 
         override suspend fun fetchOrganizationById(uid: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            organizationsRepository.fetchOrganizationById(uid, targetUser).map { organization ->
+            organizationsRepository.fetchOrganizationById(uid).map { organization ->
                 checkNotNull(organization)
             }
         }

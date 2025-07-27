@@ -30,6 +30,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
@@ -58,6 +59,7 @@ internal data class SubjectScreen(
         )
     ) { state ->
         val strings = EditorThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
         val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
 
@@ -101,7 +103,7 @@ internal data class SubjectScreen(
                 is SubjectEffect.NavigateToBack -> navigator.nestedPop()
                 is SubjectEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
                         withDismissAction = true,
                     )
                 }

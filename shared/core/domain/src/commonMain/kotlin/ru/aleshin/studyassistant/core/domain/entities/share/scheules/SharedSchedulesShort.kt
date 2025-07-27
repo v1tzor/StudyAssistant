@@ -24,4 +24,5 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 data class SharedSchedulesShort(
     val sent: Map<UID, SentMediatedSchedules> = emptyMap(),
     val received: Map<UID, ReceivedMediatedSchedulesShort> = emptyMap(),
+    val updatedAt: Long,
 )

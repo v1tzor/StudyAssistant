@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.database.mappers.tasks
 
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationShortEntity
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
+import ru.aleshin.studyassistant.core.database.models.tasks.BaseHomeworkEntity
 import ru.aleshin.studyassistant.core.database.models.tasks.HomeworkDetailsEntity
 import ru.aleshin.studyassistant.sqldelight.tasks.FetchActiveAndLinkedHomeworks
 import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkEntity
@@ -25,6 +26,40 @@ import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkEntity
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
+fun HomeworkEntity.mapToBase() = BaseHomeworkEntity(
+    uid = uid,
+    classId = class_id,
+    deadline = deadline,
+    subjectId = subject_id,
+    organizationId = organization_id,
+    theoreticalTasks = theoretical_tasks,
+    practicalTasks = practical_tasks,
+    presentations = presentations,
+    test = test,
+    priority = priority,
+    isDone = is_done,
+    completeDate = complete_date,
+    updatedAt = updated_at,
+    isCacheData = is_cache_data,
+)
+
+fun BaseHomeworkEntity.mapToEntity() = HomeworkEntity(
+    uid = uid,
+    class_id = classId,
+    deadline = deadline,
+    subject_id = subjectId,
+    organization_id = organizationId,
+    theoretical_tasks = theoreticalTasks,
+    practical_tasks = practicalTasks,
+    presentations = presentations,
+    test = test,
+    priority = priority,
+    is_done = isDone,
+    complete_date = completeDate,
+    updated_at = updatedAt,
+    is_cache_data = isCacheData,
+)
+
 fun HomeworkDetailsEntity.mapToBase() = HomeworkEntity(
     uid = uid,
     class_id = classId,
@@ -38,37 +73,42 @@ fun HomeworkDetailsEntity.mapToBase() = HomeworkEntity(
     priority = priority,
     is_done = if (isDone) 1L else 0L,
     complete_date = completeDate,
+    updated_at = updatedAt,
+    is_cache_data = 0L,
 )
 
-fun HomeworkEntity.mapToDetails(
+fun BaseHomeworkEntity.mapToDetails(
     organization: OrganizationShortEntity,
     subject: SubjectDetailsEntity?,
 ) = HomeworkDetailsEntity(
     uid = uid,
-    classId = class_id,
+    classId = classId,
     deadline = deadline,
     subject = subject,
     organization = organization,
+    theoreticalTasks = theoreticalTasks,
+    practicalTasks = practicalTasks,
+    presentations = presentations,
+    test = test,
+    priority = priority,
+    isDone = isDone == 1L,
+    completeDate = completeDate,
+    updatedAt = updatedAt,
+)
+
+fun FetchActiveAndLinkedHomeworks.mapToEntity() = BaseHomeworkEntity(
+    uid = uid,
+    classId = class_id,
+    deadline = deadline,
+    subjectId = subject_id,
+    organizationId = organization_id,
     theoreticalTasks = theoretical_tasks,
     practicalTasks = practical_tasks,
     presentations = presentations,
     test = test,
     priority = priority,
-    isDone = is_done == 1L,
+    isDone = is_done,
     completeDate = complete_date,
-)
-
-fun FetchActiveAndLinkedHomeworks.mapToEntity() = HomeworkEntity(
-    uid = uid,
-    class_id = class_id,
-    deadline = deadline,
-    subject_id = subject_id,
-    organization_id = organization_id,
-    theoretical_tasks = theoretical_tasks,
-    practical_tasks = practical_tasks,
-    presentations = presentations,
-    test = test,
-    priority = priority,
-    is_done = is_done,
-    complete_date = complete_date,
+    updatedAt = updated_at,
+    isCacheData = is_cache_data,
 )

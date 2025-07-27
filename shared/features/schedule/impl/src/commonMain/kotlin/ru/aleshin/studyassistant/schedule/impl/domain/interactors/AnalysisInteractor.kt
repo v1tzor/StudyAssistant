@@ -51,7 +51,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsReposi
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 
@@ -68,21 +67,19 @@ internal interface AnalysisInteractor {
         private val baseScheduleRepository: BaseScheduleRepository,
         private val customScheduleRepository: CustomScheduleRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : AnalysisInteractor {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchWeekAnalysis(weekTimeRange: TimeRange) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val calendarSettings = calendarSettingsRepository.fetchSettings(targetUser).first()
+            val calendarSettings = calendarSettingsRepository.fetchSettings().first()
             val week = weekTimeRange.from.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
             val holidays = calendarSettings.holidays
 
-            val baseSchedulesFlow = baseScheduleRepository.fetchSchedulesByVersion(weekTimeRange, week, targetUser)
-            val customSchedulesFlow = customScheduleRepository.fetchSchedulesByTimeRange(weekTimeRange, targetUser)
-            val todosFlow = todoRepository.fetchActiveTodos(targetUser)
-            val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(weekTimeRange, targetUser)
+            val baseSchedulesFlow = baseScheduleRepository.fetchSchedulesByVersion(weekTimeRange, week)
+            val customSchedulesFlow = customScheduleRepository.fetchSchedulesByTimeRange(weekTimeRange)
+            val todosFlow = todoRepository.fetchActiveTodos()
+            val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(weekTimeRange)
 
             combine(
                 baseSchedulesFlow,

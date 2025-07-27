@@ -25,6 +25,9 @@ internal sealed class AuthFailures : DomainFailures {
     /** User with given ID/email/etc. not found */
     data object NotFoundUserInfoError : AuthFailures()
 
+    /** User has no connected to internet */
+    data object InternetError : AuthFailures()
+
     /** Incorrect credentials */
     data object AuthorizationError : AuthFailures()
 

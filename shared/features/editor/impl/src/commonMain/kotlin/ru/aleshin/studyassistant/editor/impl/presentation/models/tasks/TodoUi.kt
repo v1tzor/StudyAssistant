@@ -39,4 +39,5 @@ internal data class TodoUi(
     val isDone: Boolean = false,
     @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant? = null,
+    val updatedAt: Long = 0L,
 ) : Parcelable

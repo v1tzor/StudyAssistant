@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.di.holder
 
+import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
 import org.kodein.di.bindInstance
@@ -26,8 +27,8 @@ import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
-import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -75,6 +76,7 @@ public object ScheduleFeatureDIHolder : BaseFeatureDIHolder<ScheduleFeatureApi, 
                 bindSingleton<StartClassesReminderManager> { dependencies.startClassesReminderManager }
                 bindSingleton<EndClassesReminderManager> { dependencies.endClassesReminderManager }
                 bindSingleton<DateManager> { dependencies.dateManager }
+                bindSingleton<Konnection> { dependencies.connectionManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
                 bindSingleton<ScheduleFeatureApi> {

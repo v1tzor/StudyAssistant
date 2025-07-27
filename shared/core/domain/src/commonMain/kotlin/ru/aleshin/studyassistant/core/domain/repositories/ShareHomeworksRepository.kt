@@ -25,8 +25,8 @@ import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SharedHome
  * @author Stanislav Aleshin on 18.07.2024.
  */
 interface ShareHomeworksRepository {
-    suspend fun addOrUpdateSharedHomework(homeworks: SharedHomeworks, targetUser: UID)
-    suspend fun fetchSharedHomeworksByUser(uid: UID): Flow<SharedHomeworksDetails>
-    suspend fun fetchShortSharedHomeworksByUser(uid: UID): Flow<SharedHomeworks>
-    suspend fun fetchRealtimeSharedHomeworksByUser(uid: UID): SharedHomeworks
+    suspend fun addOrUpdateSharedHomeworkForUser(homeworks: SharedHomeworks, targetUser: UID)
+    suspend fun addOrUpdateCurrentSharedHomework(homeworks: SharedHomeworks)
+    suspend fun fetchCurrentSharedHomeworksDetails(): Flow<SharedHomeworksDetails>
+    suspend fun fetchRealtimeSharedHomeworksByUser(targetUser: UID): SharedHomeworks
 }

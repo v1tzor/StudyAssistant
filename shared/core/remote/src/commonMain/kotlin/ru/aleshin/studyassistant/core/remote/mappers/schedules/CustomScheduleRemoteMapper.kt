@@ -28,16 +28,18 @@ import ru.aleshin.studyassistant.core.remote.models.schedule.CustomSchedulePojo
  * @author Stanislav Aleshin on 04.05.2024.
  */
 fun CustomScheduleDetailsPojo.mapToRemoteData(userId: UID) = CustomSchedulePojo(
-    uid = uid,
+    id = uid,
     userId = userId,
     date = date,
     classes = classes.map { it.mapToBase().toJson<ClassPojo>() },
+    updatedAt = updatedAt,
 )
 
 suspend fun CustomSchedulePojo.mapToDetails(
     classMapper: suspend (ClassPojo) -> ClassDetailsPojo,
 ) = CustomScheduleDetailsPojo(
-    uid = uid,
+    uid = id,
     date = date,
     classes = classes.map { classMapper(it.fromJson<ClassPojo>()) },
+    updatedAt = updatedAt,
 )

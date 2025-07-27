@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.di.modules
 
+import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.bindEagerSingleton
 import org.kodein.di.bindProvider
@@ -30,7 +31,7 @@ import ru.aleshin.studyassistant.billing.impl.di.holder.BillingFeatureDIHolder
 import ru.aleshin.studyassistant.chat.api.navigation.ChatFeatureStarter
 import ru.aleshin.studyassistant.chat.impl.di.ChatFeatureDependencies
 import ru.aleshin.studyassistant.chat.impl.di.holder.ChatFeatureDIHolder
-import ru.aleshin.studyassistant.core.api.auth.AccountApi
+import ru.aleshin.studyassistant.core.api.auth.AccountService
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -39,11 +40,12 @@ import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
-import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.SourceSyncFacade
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
@@ -145,10 +147,12 @@ val featureModule = DI.Module("Feature") {
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val messageRepository = instance<MessageRepository>()
             override val manageUserRepository = instance<ManageUserRepository>()
-            override val accountService = instance<AccountApi>()
+            override val accountService = instance<AccountService>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val sourceSyncFacade = instance<SourceSyncFacade>()
             override val appService = instance<AppService>()
+            override val dateManager = instance<DateManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
@@ -176,6 +180,7 @@ val featureModule = DI.Module("Feature") {
             override val startClassesReminderManager = instance<StartClassesReminderManager>()
             override val endClassesReminderManager = instance<EndClassesReminderManager>()
             override val usersRepository = instance<UsersRepository>()
+            override val connectionManager = instance<Konnection>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
@@ -205,6 +210,7 @@ val featureModule = DI.Module("Feature") {
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
             override val usersRepository = instance<UsersRepository>()
+            override val connectionManager = instance<Konnection>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
@@ -253,6 +259,7 @@ val featureModule = DI.Module("Feature") {
             override val messageRepository = instance<MessageRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val baseSchedulesRepository = instance<BaseScheduleRepository>()
+            override val sourceSyncFacade = instance<SourceSyncFacade>()
             override val friendRequestsRepository = instance<FriendRequestsRepository>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val startClassesReminderManager = instance<StartClassesReminderManager>()
@@ -260,6 +267,7 @@ val featureModule = DI.Module("Feature") {
             override val homeworksReminderManager = instance<HomeworksReminderManager>()
             override val workloadWarningManager = instance<WorkloadWarningManager>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val connectionManager = instance<Konnection>()
             override val dateManager = instance<DateManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
@@ -282,6 +290,7 @@ val featureModule = DI.Module("Feature") {
             override val usersRepository = instance<UsersRepository>()
             override val messageRepository = instance<MessageRepository>()
             override val dateManager = instance<DateManager>()
+            override val connectionManager = instance<Konnection>()
             override val coroutineManager = instance<CoroutineManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
@@ -367,6 +376,7 @@ val featureModule = DI.Module("Feature") {
             override val dateManager = instance<DateManager>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val connectionManager = instance<Konnection>()
             override val iapService = instance<IapService>()
             override val crashlyticsService = instance<CrashlyticsService>()
             override val analyticsService = instance<AnalyticsService>()

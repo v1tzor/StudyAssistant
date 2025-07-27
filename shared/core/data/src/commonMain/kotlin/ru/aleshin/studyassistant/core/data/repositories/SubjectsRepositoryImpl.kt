@@ -14,20 +14,31 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package ru.aleshin.studyassistant.core.data.repositories
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.data.mappers.subjects.convertToLocal
+import ru.aleshin.studyassistant.core.data.mappers.subjects.convertToRemote
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToRemoteData
+import ru.aleshin.studyassistant.core.data.utils.SubscriptionChecker
+import ru.aleshin.studyassistant.core.data.utils.sync.RemoteResultSyncHandler
 import ru.aleshin.studyassistant.core.database.datasource.subjects.SubjectsLocalDataSource
 import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
+import ru.aleshin.studyassistant.core.domain.entities.sync.OfflineChangeType
+import ru.aleshin.studyassistant.core.domain.managers.sync.SubjectsSourceSyncManager.Companion.SUBJECT_SOURCE_KEY
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
-import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.subjects.SubjectsRemoteDataSource
 
 /**
@@ -37,122 +48,145 @@ class SubjectsRepositoryImpl(
     private val remoteDataSource: SubjectsRemoteDataSource,
     private val localDataSource: SubjectsLocalDataSource,
     private val subscriptionChecker: SubscriptionChecker,
+    private val userSessionProvider: UserSessionProvider,
+    private val resultSyncHandler: RemoteResultSyncHandler
 ) : SubjectsRepository {
 
-    override suspend fun addOrUpdateSubject(subject: Subject, targetUser: UID): UID {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun addOrUpdateSubject(subject: Subject): UID {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
 
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateSubject(subject.mapToRemoteData(targetUser), targetUser)
-        } else {
-            localDataSource.addOrUpdateSubject(subject.mapToLocalData())
-        }
-    }
+        val upsertModel = subject.copy(uid = subject.uid.ifBlank { randomUUID() })
 
-    override suspend fun addOrUpdateSubjectsGroup(subjects: List<Subject>, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateSubjectsGroup(subjects.map { it.mapToRemoteData(targetUser) }, targetUser)
-        } else {
-            localDataSource.addOrUpdateSubjectsGroup(subjects.map { it.mapToLocalData() })
-        }
-    }
-
-    override suspend fun fetchSubjectById(uid: UID, targetUser: UID): Flow<Subject?> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchSubjectById(uid, targetUser).map { subjectPojo -> subjectPojo?.mapToDomain() }
-        } else {
-            localDataSource.fetchSubjectById(uid).map { subjectEntity -> subjectEntity?.mapToDomain() }
-        }
-    }
-    override suspend fun fetchAllSubjectsByOrganization(organizationId: UID, targetUser: UID): Flow<List<Subject>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchAllSubjectsByOrganization(organizationId, targetUser).map { subjects ->
-                subjects.map { subjectPojo -> subjectPojo.mapToDomain() }
+        if (isSubscriber) {
+            localDataSource.sync().addOrUpdateItem(upsertModel.mapToLocalData())
+            resultSyncHandler.executeOrAddToQueue(
+                data = upsertModel.mapToRemoteData(userId = currentUser),
+                type = OfflineChangeType.UPSERT,
+                sourceKey = SUBJECT_SOURCE_KEY,
+            ) {
+                remoteDataSource.addOrUpdateItem(it)
             }
         } else {
-            localDataSource.fetchAllSubjectsByOrganization(organizationId).map { subjects ->
-                subjects.map { subjectEntity -> subjectEntity.mapToDomain() }
+            localDataSource.offline().addOrUpdateItem(upsertModel.mapToLocalData())
+        }
+
+        return upsertModel.uid
+    }
+
+    override suspend fun addOrUpdateSubjectsGroup(subjects: List<Subject>) {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+
+        val upsertModels = subjects.map { subject ->
+            subject.copy(uid = subject.uid.ifBlank { randomUUID() })
+        }
+
+        if (isSubscriber) {
+            localDataSource.sync().addOrUpdateItems(upsertModels.map { it.mapToLocalData() })
+            resultSyncHandler.executeOrAddToQueue(
+                data = upsertModels.map { it.mapToRemoteData(userId = currentUser) },
+                type = OfflineChangeType.UPSERT,
+                sourceKey = SUBJECT_SOURCE_KEY,
+            ) {
+                remoteDataSource.addOrUpdateItems(it)
+            }
+        } else {
+            localDataSource.offline().addOrUpdateItems(upsertModels.map { it.mapToLocalData() })
+        }
+    }
+
+    override suspend fun fetchSubjectById(uid: UID): Flow<Subject?> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchSubjectDetailsById(uid).map { subjectEntity ->
+                    subjectEntity?.mapToDomain()
+                }
+            } else {
+                localDataSource.offline().fetchSubjectDetailsById(uid).map { subjectEntity ->
+                    subjectEntity?.mapToDomain()
+                }
+            }
+        }
+    }
+    override suspend fun fetchAllSubjectsByOrganization(organizationId: UID): Flow<List<Subject>> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchAllSubjectsDetailsByOrg(organizationId).map { subjects ->
+                    subjects.map { subjectEntity -> subjectEntity.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchAllSubjectsDetailsByOrg(organizationId).map { subjects ->
+                    subjects.map { subjectEntity -> subjectEntity.mapToDomain() }
+                }
             }
         }
     }
 
-    override suspend fun fetchAllSubjectsByNames(
-        names: List<UID>,
-        targetUser: UID
-    ): List<Subject> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun fetchSubjectsByEmployee(employeeId: UID): Flow<List<Subject>> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchSubjectsDetailsByEmployee(employeeId).map { subjects ->
+                    subjects.map { subjectEntity -> subjectEntity.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchSubjectsDetailsByEmployee(employeeId).map { subjects ->
+                    subjects.map { subjectEntity -> subjectEntity.mapToDomain() }
+                }
+            }
+        }
+    }
+
+    override suspend fun fetchAllSubjectsByNames(names: List<UID>): List<Subject> {
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
 
         return if (isSubscriber) {
-            remoteDataSource.fetchAllSubjectsByNames(names, targetUser).map { subjectPojo ->
-                subjectPojo.mapToDomain()
+            localDataSource.sync().fetchAllSubjectsDetailsByNames(names).map { subjectEntity ->
+                subjectEntity.mapToDomain()
             }
         } else {
-            localDataSource.fetchAllSubjectsByNames(names).map { subjectEntity ->
+            localDataSource.offline().fetchAllSubjectsDetailsByNames(names).map { subjectEntity ->
                 subjectEntity.mapToDomain()
             }
         }
     }
 
-    override suspend fun fetchSubjectsByEmployee(employeeId: UID, targetUser: UID): Flow<List<Subject>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun deleteSubject(targetId: UID) {
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
 
         return if (isSubscriber) {
-            remoteDataSource.fetchSubjectsByEmployee(employeeId, targetUser).map { subjects ->
-                subjects.map { subjectPojo -> subjectPojo.mapToDomain() }
+            localDataSource.sync().deleteItemsById(listOf(targetId))
+            resultSyncHandler.executeOrAddToQueue(
+                documentId = targetId,
+                type = OfflineChangeType.DELETE,
+                sourceKey = SUBJECT_SOURCE_KEY,
+            ) {
+                remoteDataSource.deleteItemById(targetId)
             }
         } else {
-            localDataSource.fetchSubjectsByEmployee(employeeId).map { subjects ->
-                subjects.map { subjectEntity -> subjectEntity.mapToDomain() }
-            }
+            localDataSource.offline().deleteItemsById(listOf(targetId))
         }
     }
 
-    override suspend fun deleteSubject(targetId: UID, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.deleteSubject(targetId, targetUser)
-        } else {
-            localDataSource.deleteSubject(targetId)
-        }
-    }
-
-    override suspend fun deleteAllSubjects(targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.deleteAllSubjects(targetUser)
-        } else {
-            localDataSource.deleteAllSubjects()
-        }
-    }
-
-    override suspend fun transferData(direction: DataTransferDirection, targetUser: UID) {
+    override suspend fun transferData(direction: DataTransferDirection) {
+        val currentUser = userSessionProvider.getCurrentUserId()
         when (direction) {
             DataTransferDirection.REMOTE_TO_LOCAL -> {
-                val allSubjects = remoteDataSource.fetchAllSubjectsByOrganization(
-                    organizationId = null,
-                    targetUser = targetUser,
-                ).let { subjectsFlow ->
-                    return@let subjectsFlow.first().map { it.mapToDomain().mapToLocalData() }
-                }
-                localDataSource.deleteAllSubjects()
-                localDataSource.addOrUpdateSubjectsGroup(allSubjects)
+                val allSubjectsFlow = remoteDataSource.fetchAllItems(currentUser)
+                val subjects = allSubjectsFlow.first().map { it.convertToLocal() }
+
+                localDataSource.offline().deleteAllItems()
+                localDataSource.offline().addOrUpdateItems(subjects)
             }
             DataTransferDirection.LOCAL_TO_REMOTE -> {
-                val allSubjects = localDataSource.fetchAllSubjectsByOrganization(
-                    organizationId = null,
-                ).let { subjectsFlow ->
-                    return@let subjectsFlow.first().map { it.mapToDomain().mapToRemoteData(targetUser) }
-                }
-                remoteDataSource.deleteAllSubjects(targetUser)
-                remoteDataSource.addOrUpdateSubjectsGroup(allSubjects, targetUser)
+                val allSubjects = localDataSource.offline().fetchAllSubjects().first()
+                val subjectsRemote = allSubjects.map { it.convertToRemote(currentUser) }
+
+                remoteDataSource.deleteAllItems(currentUser)
+                remoteDataSource.addOrUpdateItems(subjectsRemote)
+
+                localDataSource.sync().deleteAllItems()
+                localDataSource.sync().addOrUpdateItems(allSubjects)
             }
         }
     }

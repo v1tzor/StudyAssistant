@@ -19,11 +19,13 @@ package ru.aleshin.studyassistant.di.modules
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.domain.managers.sync.SourceSyncFacade
 import ru.aleshin.studyassistant.domain.common.MainEitherWrapper
 import ru.aleshin.studyassistant.domain.common.MainErrorHandler
 import ru.aleshin.studyassistant.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.domain.interactors.GeneralSettingsInteractor
 import ru.aleshin.studyassistant.domain.interactors.ReminderInteractor
+import ru.aleshin.studyassistant.domain.interactors.SyncInteractor
 
 /**
  * @author Stanislav Aleshin on 25.04.2024.
@@ -34,5 +36,8 @@ val domainModule = DI.Module("DomainModule") {
 
     bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<GeneralSettingsInteractor> { GeneralSettingsInteractor.Base(instance(), instance()) }
-    bindSingleton<ReminderInteractor> { ReminderInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ReminderInteractor> { ReminderInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<SyncInteractor> { SyncInteractor.Base(instance(), instance(), instance()) }
+
+    bindSingleton<SourceSyncFacade> { SourceSyncFacade.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 }

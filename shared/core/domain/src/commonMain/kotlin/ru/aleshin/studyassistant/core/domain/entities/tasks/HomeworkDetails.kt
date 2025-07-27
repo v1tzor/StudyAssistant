@@ -40,6 +40,7 @@ data class HomeworkDetails(
     val linkedGoal: GoalShort? = null,
     val status: HomeworkStatus,
     val completeDate: Instant?,
+    val updatedAt: Long,
 )
 
 fun Homework.convertToDetails(
@@ -69,4 +70,5 @@ fun Homework.convertToDetails(
     linkedGoal = linkedGoal,
     status = status,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )

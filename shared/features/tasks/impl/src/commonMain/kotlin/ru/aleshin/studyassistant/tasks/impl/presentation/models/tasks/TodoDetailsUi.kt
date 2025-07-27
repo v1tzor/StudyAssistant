@@ -49,6 +49,7 @@ internal data class TodoDetailsUi(
     val isDone: Boolean = false,
     @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant? = null,
+    val updatedAt: Long,
 ) : Parcelable
 
 internal fun TodoDetailsUi.convertToBase() = TodoUi(
@@ -60,4 +61,5 @@ internal fun TodoDetailsUi.convertToBase() = TodoUi(
     notifications = notifications,
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )

@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.codingfeline.buildkonfig.compiler.FieldSpec
 
 plugins {
@@ -83,8 +84,10 @@ buildkonfig {
     packageName = "ru.aleshin.studyassistant.core.api"
 
     val isDebug = gradle.startParameter.taskNames.any { it.contains("debug", ignoreCase = true) }
+    val appwriteKey = gradleLocalProperties(rootDir, providers).getProperty("appwriteServerKey")
 
     defaultConfigs {
+        buildConfigField(FieldSpec.Type.STRING, "APPWRITE_SERVER_KEY", appwriteKey)
         buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", isDebug.toString())
     }
 }

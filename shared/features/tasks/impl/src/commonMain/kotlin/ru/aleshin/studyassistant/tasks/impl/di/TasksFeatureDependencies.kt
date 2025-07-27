@@ -16,12 +16,13 @@
 
 package ru.aleshin.studyassistant.tasks.impl.di
 
+import dev.tmapps.konnection.Konnection
 import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
-import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -56,6 +57,7 @@ public interface TasksFeatureDependencies : BaseFeatureDependencies {
     public val subjectsRepository: SubjectsRepository
     public val usersRepository: UsersRepository
     public val dateManager: DateManager
+    public val connectionManager: Konnection
     public val coroutineManager: CoroutineManager
     public val crashlyticsService: CrashlyticsService
 }

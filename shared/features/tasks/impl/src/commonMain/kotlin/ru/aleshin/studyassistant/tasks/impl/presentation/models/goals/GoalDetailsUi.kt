@@ -44,4 +44,5 @@ internal data class GoalDetailsUi(
     val completeAfterTimeElapsed: Boolean = false,
     val isDone: Boolean = false,
     @TypeParceler<Instant?, NullInstantParceler> val completeDate: Instant?,
+    val updatedAt: Long,
 ) : Parcelable

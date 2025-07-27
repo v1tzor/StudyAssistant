@@ -30,6 +30,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.root
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.profile.api.presentation.ProfileRootScreen
 import ru.aleshin.studyassistant.profile.impl.presentation.mappers.mapToMessage
@@ -53,6 +54,7 @@ internal class ProfileScreen : ProfileRootScreen() {
     ) { state ->
         ProfileTheme {
             val strings = ProfileThemeRes.strings
+            val coreStrings = StudyAssistantRes.strings
             val rootNavigator = LocalNavigator.currentOrThrow.root()
             val snackbarState = remember { SnackbarHostState() }
 
@@ -94,7 +96,7 @@ internal class ProfileScreen : ProfileRootScreen() {
                     is ProfileEffect.ReplaceGlobalScreen -> rootNavigator.replaceAll(effect.screen)
                     is ProfileEffect.ShowError -> {
                         snackbarState.showSnackbar(
-                            message = effect.failures.mapToMessage(strings),
+                            message = effect.failures.mapToMessage(strings, coreStrings),
                             withDismissAction = true,
                         )
                     }

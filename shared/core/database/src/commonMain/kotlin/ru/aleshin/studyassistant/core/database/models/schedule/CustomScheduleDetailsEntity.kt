@@ -26,4 +26,5 @@ data class CustomScheduleDetailsEntity(
     val uid: UID,
     val date: Long,
     val classes: List<ClassDetailsEntity>,
+    val updatedAt: Long,
 )

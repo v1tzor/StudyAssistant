@@ -22,17 +22,17 @@ import ru.aleshin.studyassistant.core.domain.entities.auth.AuthCredentials
 import ru.aleshin.studyassistant.core.domain.entities.users.AuthUser
 import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
-import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.api.auth.AuthRemoteApi
 
 /**
  * @author Stanislav Aleshin on 22.04.2024.
  */
 class AuthRepositoryImpl(
-    private val remoteDataSource: AuthRemoteDataSource,
+    private val authApi: AuthRemoteApi,
 ) : AuthRepository {
 
     override suspend fun registerByEmail(credentials: AuthCredentials): AuthUser {
-        val user = remoteDataSource.createUserWithEmail(
+        val user = authApi.createUserWithEmail(
             email = credentials.email,
             password = credentials.password,
             name = credentials.username,
@@ -41,7 +41,7 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun signInWithEmail(credentials: AuthCredentials): UserSession {
-        val user = remoteDataSource.signInWithEmail(
+        val user = authApi.signInWithEmail(
             email = credentials.email,
             password = credentials.password
         )
@@ -49,6 +49,6 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun signOut() {
-        remoteDataSource.signOut()
+        authApi.signOut()
     }
 }

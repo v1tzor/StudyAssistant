@@ -23,6 +23,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.iap.IapFailure
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal sealed class BillingFailures : DomainFailures {
+    object InternetError : BillingFailures()
     data class PaymentError(val type: IapFailure) : BillingFailures()
     data class OtherError(val throwable: Throwable) : BillingFailures()
 }

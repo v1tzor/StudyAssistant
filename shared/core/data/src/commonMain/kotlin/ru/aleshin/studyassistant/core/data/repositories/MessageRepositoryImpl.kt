@@ -21,24 +21,24 @@ import ru.aleshin.studyassistant.core.common.messages.UniversalPushToken
 import ru.aleshin.studyassistant.core.data.mappers.message.mapToData
 import ru.aleshin.studyassistant.core.domain.entities.message.Message
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
-import ru.aleshin.studyassistant.core.remote.datasources.message.MessageRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.api.message.MessageRemoteApi
 
 /**
  * @author Stanislav Aleshin on 05.08.2024.
  */
 class MessageRepositoryImpl(
-    private val remoteDateSource: MessageRemoteDataSource,
+    private val messageApi: MessageRemoteApi,
 ) : MessageRepository {
 
     override suspend fun fetchToken(): Flow<UniversalPushToken> {
-        return remoteDateSource.fetchToken()
+        return messageApi.fetchToken()
     }
 
     override suspend fun sendMessage(message: Message) {
-        remoteDateSource.sendMessage(message.mapToData())
+        messageApi.sendMessage(message.mapToData())
     }
 
     override suspend fun deleteToken() {
-        remoteDateSource.deleteToken()
+        messageApi.deleteToken()
     }
 }

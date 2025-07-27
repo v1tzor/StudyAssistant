@@ -28,6 +28,7 @@ internal fun CalendarSettings.mapToUi() = CalendarSettingsUi(
     numberOfWeek = numberOfWeek,
     weekScheduleViewType = weekScheduleViewType,
     holidays = holidays.map { it.mapToUi() },
+    updatedAt = updatedAt,
 )
 
 internal fun Holidays.mapToUi() = HolidaysUi(

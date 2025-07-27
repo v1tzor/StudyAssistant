@@ -39,25 +39,26 @@ data class EmployeeDetails(
     val phones: List<ContactInfo> = emptyList(),
     val locations: List<ContactInfo> = emptyList(),
     val webs: List<ContactInfo> = emptyList(),
+    val updatedAt: Long,
 )
 
-fun Employee.convertToDetails(subjects: List<Subject>) =
-    EmployeeDetails(
-        uid = uid,
-        organizationId = organizationId,
-        firstName = firstName,
-        secondName = secondName,
-        patronymic = patronymic,
-        post = post,
-        subjects = subjects,
-        avatar = avatar,
-        birthday = birthday,
-        workTime = workTime,
-        emails = emails,
-        phones = phones,
-        locations = locations,
-        webs = webs,
-    )
+fun Employee.convertToDetails(subjects: List<Subject>) = EmployeeDetails(
+    uid = uid,
+    organizationId = organizationId,
+    firstName = firstName,
+    secondName = secondName,
+    patronymic = patronymic,
+    post = post,
+    subjects = subjects,
+    avatar = avatar,
+    birthday = birthday,
+    workTime = workTime,
+    emails = emails,
+    phones = phones,
+    locations = locations,
+    webs = webs,
+    updatedAt = updatedAt,
+)
 
 fun EmployeeDetails.convertToBase() = Employee(
     uid = uid,
@@ -73,4 +74,5 @@ fun EmployeeDetails.convertToBase() = Employee(
     phones = phones,
     locations = locations,
     webs = webs,
+    updatedAt = updatedAt,
 )

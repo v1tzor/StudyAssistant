@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.billing.impl.domain.common
 
 import ru.aleshin.studyassistant.billing.impl.domain.entities.BillingFailures
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapServiceError
 
@@ -26,6 +27,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.iap.IapServiceErr
 internal interface BillingErrorHandler : ErrorHandler<BillingFailures> {
     class Base : BillingErrorHandler {
         override fun handle(throwable: Throwable) = when (throwable) {
+            is InternetConnectionException -> BillingFailures.InternetError
             is IapServiceError -> BillingFailures.PaymentError(throwable.type)
             else -> BillingFailures.OtherError(throwable)
         }

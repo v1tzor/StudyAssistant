@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package ru.aleshin.studyassistant.core.data.repositories
 
+import dev.tmapps.konnection.Konnection
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.data.mappers.requsts.mapToData
+import ru.aleshin.studyassistant.core.data.mappers.requsts.mapToDomain
+import ru.aleshin.studyassistant.core.data.mappers.requsts.mapToDomainDetails
 import ru.aleshin.studyassistant.core.data.mappers.requsts.mapToRemote
+import ru.aleshin.studyassistant.core.database.datasource.requests.FriendRequestsLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.requests.FriendRequests
 import ru.aleshin.studyassistant.core.domain.entities.requests.FriendRequestsDetails
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
@@ -31,21 +42,55 @@ import ru.aleshin.studyassistant.core.remote.datasources.requests.FriendRequests
  */
 class FriendRequestsRepositoryImpl(
     private val remoteDataSource: FriendRequestsRemoteDataSource,
+    private val localDataSource: FriendRequestsLocalDataSource,
+    private val userSessionProvider: UserSessionProvider,
+    private val connectionManager: Konnection,
 ) : FriendRequestsRepository {
 
-    override suspend fun addOrUpdateRequests(requests: FriendRequests, targetUser: UID) {
-        remoteDataSource.addOrUpdateRequests(requests.mapToRemote(), targetUser)
+    override suspend fun addOrUpdateCurrentRequests(requests: FriendRequests) {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        val upsertModel = requests.mapToRemote(currentUser)
+        remoteDataSource.addOrUpdateRequestsForUser(upsertModel, currentUser)
     }
 
-    override suspend fun fetchRequestsByUser(uid: UID): Flow<FriendRequestsDetails> {
-        return remoteDataSource.fetchRequestsByUser(uid).map { it.mapToData() }
+    override suspend fun addOrUpdateRequestsForUser(requests: FriendRequests, targetUser: UID) {
+        val upsertModel = requests.mapToRemote(targetUser)
+        remoteDataSource.addOrUpdateRequestsForUser(upsertModel, targetUser)
     }
 
-    override suspend fun fetchShortRequestsByUser(uid: UID): Flow<FriendRequests> {
-        return remoteDataSource.fetchShortRequestsByUser(uid).map { it.mapToData() }
+    override suspend fun fetchCurrentRequestsDetails(): Flow<FriendRequestsDetails> {
+        return connectionManager.observeHasConnection().flatMapLatest { hasConnection ->
+            if (hasConnection) {
+                remoteDataSource.fetchItem().catch { exception ->
+                    if (exception is InternetConnectionException) emit(null) else throw exception
+                }.map { friendRequests ->
+                    friendRequests?.mapToDomainDetails()
+                }
+            } else {
+                localDataSource.fetchItem().map { friendRequests ->
+                    friendRequests?.mapToDomainDetails()
+                }
+            }
+        }.filterNotNull()
     }
 
-    override suspend fun fetchRealtimeShortRequestsByUser(uid: UID): FriendRequests {
-        return remoteDataSource.fetchRealtimeShortRequestsByUser(uid).mapToData()
+    override suspend fun fetchCurrentRequests(): Flow<FriendRequests> {
+        return connectionManager.observeHasConnection().flatMapLatest { hasConnection ->
+            if (hasConnection) {
+                remoteDataSource.fetchItem().catch { exception ->
+                    if (exception is InternetConnectionException) emit(null) else throw exception
+                }.map { friendRequests ->
+                    friendRequests?.mapToDomain()
+                }
+            } else {
+                localDataSource.fetchItem().map { friendRequests ->
+                    friendRequests?.mapToDomain()
+                }
+            }
+        }.filterNotNull()
+    }
+
+    override suspend fun fetchRealtimeRequestsByUser(targetUser: UID): FriendRequests {
+        return remoteDataSource.fetchRealtimeShortRequestsByUser(targetUser).mapToDomain()
     }
 }

@@ -20,6 +20,9 @@ import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToDomain
+import ru.aleshin.studyassistant.core.data.utils.sync.MultipleSyncMapper
+import ru.aleshin.studyassistant.core.database.models.shared.homeworks.MediatedHomeworkEntity
+import ru.aleshin.studyassistant.core.database.models.tasks.BaseHomeworkEntity
 import ru.aleshin.studyassistant.core.database.models.tasks.HomeworkDetailsEntity
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.entities.tasks.MediatedHomework
@@ -27,11 +30,40 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.remote.models.tasks.HomeworkDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.tasks.HomeworkPojo
 import ru.aleshin.studyassistant.core.remote.models.tasks.MediatedHomeworkPojo
-import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkEntity
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
+
+// Remote
+
+fun Homework.mapToRemoteData(userId: UID) = HomeworkPojo(
+    id = uid,
+    userId = userId,
+    classId = classId,
+    deadline = deadline.toEpochMilliseconds(),
+    subjectId = subject?.uid,
+    organizationId = organization.uid,
+    theoreticalTasks = theoreticalTasks,
+    practicalTasks = practicalTasks,
+    presentations = presentationTasks,
+    test = test,
+    priority = priority.name,
+    done = isDone,
+    completeDate = completeDate?.toEpochMilliseconds(),
+    updatedAt = updatedAt,
+)
+
+fun MediatedHomework.mapToRemoteData() = MediatedHomeworkPojo(
+    uid = uid,
+    subjectName = subjectName,
+    theoreticalTasks = theoreticalTasks,
+    practicalTasks = practicalTasks,
+    presentationTasks = presentationTasks,
+    test = test,
+    priority = priority.name,
+)
+
 fun HomeworkDetailsPojo.mapToDomain() = Homework(
     uid = uid,
     classId = classId,
@@ -45,6 +77,7 @@ fun HomeworkDetailsPojo.mapToDomain() = Homework(
     priority = TaskPriority.valueOf(priority),
     isDone = isDone,
     completeDate = completeDate?.mapEpochTimeToInstant(),
+    updatedAt = updatedAt,
 )
 
 fun MediatedHomeworkPojo.mapToDomain() = MediatedHomework(
@@ -55,6 +88,35 @@ fun MediatedHomeworkPojo.mapToDomain() = MediatedHomework(
     presentationTasks = presentationTasks,
     test = test,
     priority = TaskPriority.valueOf(priority),
+)
+
+// Local
+
+fun Homework.mapToLocalData() = BaseHomeworkEntity(
+    uid = uid,
+    classId = classId,
+    deadline = deadline.toEpochMilliseconds(),
+    subjectId = subject?.uid,
+    organizationId = organization.uid,
+    theoreticalTasks = theoreticalTasks,
+    practicalTasks = practicalTasks,
+    presentations = presentationTasks,
+    test = test,
+    priority = priority.name,
+    isDone = if (isDone) 1L else 0L,
+    completeDate = completeDate?.toEpochMilliseconds(),
+    updatedAt = updatedAt,
+    isCacheData = 0L,
+)
+
+fun MediatedHomework.mapToLocalData() = MediatedHomeworkEntity(
+    uid = uid,
+    subjectName = subjectName,
+    theoreticalTasks = theoreticalTasks,
+    practicalTasks = practicalTasks,
+    presentationTasks = presentationTasks,
+    test = test,
+    priority = priority.name,
 )
 
 fun HomeworkDetailsEntity.mapToDomain() = Homework(
@@ -70,45 +132,55 @@ fun HomeworkDetailsEntity.mapToDomain() = Homework(
     priority = TaskPriority.valueOf(priority),
     isDone = isDone,
     completeDate = completeDate?.mapEpochTimeToInstant(),
+    updatedAt = updatedAt,
 )
 
-fun Homework.mapToRemoteData(userId: UID) = HomeworkPojo(
-    uid = uid,
-    userId = userId,
-    classId = classId,
-    deadline = deadline.toEpochMilliseconds(),
-    subjectId = subject?.uid,
-    organizationId = organization.uid,
-    theoreticalTasks = theoreticalTasks,
-    practicalTasks = practicalTasks,
-    presentations = presentationTasks,
-    test = test,
-    priority = priority.name,
-    done = isDone,
-    completeDate = completeDate?.toEpochMilliseconds(),
-)
-
-fun MediatedHomework.mapToRemoteData() = MediatedHomeworkPojo(
+fun MediatedHomeworkEntity.mapToDomain() = MediatedHomework(
     uid = uid,
     subjectName = subjectName,
     theoreticalTasks = theoreticalTasks,
     practicalTasks = practicalTasks,
     presentationTasks = presentationTasks,
     test = test,
-    priority = priority.name,
+    priority = TaskPriority.valueOf(priority),
 )
 
-fun Homework.mapToLocalData() = HomeworkEntity(
-    uid = uid,
-    class_id = classId,
-    deadline = deadline.toEpochMilliseconds(),
-    subject_id = subject?.uid,
-    organization_id = organization.uid,
-    theoretical_tasks = theoreticalTasks,
-    practical_tasks = practicalTasks,
-    presentations = presentationTasks,
+// Combined
+
+fun HomeworkPojo.convertToLocal() = BaseHomeworkEntity(
+    uid = id,
+    classId = classId,
+    deadline = deadline,
+    subjectId = subjectId,
+    organizationId = organizationId,
+    theoreticalTasks = theoreticalTasks,
+    practicalTasks = practicalTasks,
+    presentations = presentations,
     test = test,
-    priority = priority.name,
-    is_done = if (isDone) 1L else 0L,
-    complete_date = completeDate?.toEpochMilliseconds(),
+    priority = priority,
+    isDone = if (done) 1L else 0L,
+    completeDate = completeDate,
+    updatedAt = updatedAt,
+    isCacheData = 1L,
+)
+
+fun BaseHomeworkEntity.convertToRemote(userId: UID) = HomeworkPojo(
+    id = uid,
+    userId = userId,
+    classId = classId,
+    deadline = deadline,
+    subjectId = subjectId,
+    organizationId = organizationId,
+    theoreticalTasks = theoreticalTasks,
+    practicalTasks = practicalTasks,
+    presentations = presentations,
+    test = test,
+    priority = priority,
+    done = isDone == 1L,
+    completeDate = completeDate,
+)
+
+class HomeworkSyncMapper : MultipleSyncMapper<BaseHomeworkEntity, HomeworkPojo>(
+    localToRemote = { userId -> convertToRemote(userId) },
+    remoteToLocal = { convertToLocal() },
 )

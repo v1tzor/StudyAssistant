@@ -31,6 +31,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.root
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
 import ru.aleshin.studyassistant.core.ui.theme.tokens.WindowSize
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
@@ -54,6 +55,7 @@ internal class IntroScreen : Screen {
         initialState = IntroViewState,
     ) {
         val strings = PreviewThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
         val windowSize = LocalWindowSize.current
         val rootNavigator = LocalNavigator.currentOrThrow.root()
         val pagerState = rememberPagerState { IntroPage.entries.size }
@@ -95,7 +97,7 @@ internal class IntroScreen : Screen {
                 is IntroEffect.ScrollToPage -> pagerState.animateScrollToPage(effect.pageIndex)
                 is IntroEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
                         withDismissAction = true,
                     )
                 }

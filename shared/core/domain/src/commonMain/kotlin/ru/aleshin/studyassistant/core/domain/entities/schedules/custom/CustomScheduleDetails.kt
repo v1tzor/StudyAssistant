@@ -28,6 +28,7 @@ data class CustomScheduleDetails(
     val uid: UID,
     val date: Instant,
     val classes: List<ClassDetails>,
+    val updatedAt: Long,
 )
 
 fun CustomSchedule.convertToDetails(
@@ -36,4 +37,5 @@ fun CustomSchedule.convertToDetails(
     uid = uid,
     date = date,
     classes = classes.map { classesMapper(it) },
+    updatedAt = updatedAt,
 )

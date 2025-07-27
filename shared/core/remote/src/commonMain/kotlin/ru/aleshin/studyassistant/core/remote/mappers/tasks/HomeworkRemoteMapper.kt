@@ -25,7 +25,7 @@ import ru.aleshin.studyassistant.core.remote.models.tasks.HomeworkPojo
  * @author Stanislav Aleshin on 04.05.2024.
  */
 fun HomeworkDetailsPojo.mapToBase() = HomeworkPojo(
-    uid = uid,
+    id = uid,
     userId = userId,
     classId = classId,
     deadline = deadline,
@@ -38,13 +38,14 @@ fun HomeworkDetailsPojo.mapToBase() = HomeworkPojo(
     priority = priority,
     done = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 fun HomeworkPojo.mapToDetails(
     organization: OrganizationShortPojo,
     subject: SubjectDetailsPojo?,
 ) = HomeworkDetailsPojo(
-    uid = uid,
+    uid = id,
     userId = userId,
     classId = classId,
     deadline = deadline,
@@ -57,4 +58,5 @@ fun HomeworkPojo.mapToDetails(
     priority = priority,
     isDone = done,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )

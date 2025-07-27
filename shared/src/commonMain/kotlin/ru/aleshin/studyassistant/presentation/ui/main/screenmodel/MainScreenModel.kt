@@ -70,6 +70,10 @@ class MainScreenModel(
                     val command = MainWorkCommand.UpdateSubscriptionInfo
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(MainWorkCommand.PushOfflineChanges) {
+                    val command = MainWorkCommand.PushOfflineChanges
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is MainEvent.InitNavigation -> {
                 launchBackgroundWork(MainWorkCommand.InitialNavigation) {

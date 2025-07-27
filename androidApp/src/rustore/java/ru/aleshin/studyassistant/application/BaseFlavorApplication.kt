@@ -21,7 +21,7 @@ import ru.aleshin.studyassistant.PlatformSDK
 import ru.aleshin.studyassistant.android.BuildConfig
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.platform.BaseApplication
-import ru.aleshin.studyassistant.core.remote.datasources.message.MessagingServiceImpl
+import ru.aleshin.studyassistant.core.remote.api.message.MessagingServiceImpl
 import ru.aleshin.studyassistant.data.AnalyticsServiceImpl
 import ru.aleshin.studyassistant.data.AppServiceImpl
 import ru.aleshin.studyassistant.data.CrashlyticsServiceImpl

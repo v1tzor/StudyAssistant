@@ -19,42 +19,81 @@ package ru.aleshin.studyassistant.core.database.mappers.organizations
 import kotlinx.serialization.json.Json
 import ru.aleshin.studyassistant.core.common.extensions.fromJson
 import ru.aleshin.studyassistant.core.common.extensions.toJson
+import ru.aleshin.studyassistant.core.database.models.employee.BaseEmployeeEntity
+import ru.aleshin.studyassistant.core.database.models.organizations.BaseOrganizationEntity
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationShortEntity
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
-import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationEntity
 
 /**
  * @author Stanislav Aleshin on 08.07.2024.
  */
-fun OrganizationDetailsEntity.mapToBase() = OrganizationEntity(
+fun BaseOrganizationEntity.mapToEntity() = OrganizationEntity(
     uid = uid,
-    is_main = if (isMain) 1L else 0L,
+    is_main = isMain,
     short_name = shortName,
     full_name = fullName,
     type = type,
     avatar = avatar,
-    schedule_time_intervals = Json.encodeToString(scheduleTimeIntervals),
+    schedule_time_intervals = scheduleTimeIntervals,
+    emails = emails,
+    phones = phones,
+    locations = locations,
+    webs = webs,
+    offices = offices,
+    is_hide = isHide,
+    updated_at = updatedAt,
+    is_cache_data = isCacheData,
+)
+
+fun OrganizationEntity.mapToBase() = BaseOrganizationEntity(
+    uid = uid,
+    isMain = is_main,
+    shortName = short_name,
+    fullName = full_name,
+    type = type,
+    avatar = avatar,
+    scheduleTimeIntervals = schedule_time_intervals,
+    emails = emails,
+    phones = phones,
+    locations = locations,
+    webs = webs,
+    offices = offices,
+    isHide = is_hide,
+    updatedAt = updated_at,
+    isCacheData = is_cache_data,
+)
+
+fun OrganizationDetailsEntity.mapToBase() = BaseOrganizationEntity(
+    uid = uid,
+    isMain = if (isMain) 1L else 0L,
+    shortName = shortName,
+    fullName = fullName,
+    type = type,
+    avatar = avatar,
+    scheduleTimeIntervals = Json.encodeToString(scheduleTimeIntervals),
     emails = emails.map { it.toJson() },
     phones = phones.map { it.toJson() },
     locations = locations.map { it.toJson() },
     webs = webs.map { it.toJson() },
     offices = offices,
-    is_hide = if (isHide) 1L else 0L,
+    isHide = if (isHide) 1L else 0L,
+    updatedAt = updatedAt,
+    isCacheData = 0L,
 )
 
-fun OrganizationEntity.mapToDetails(
+fun BaseOrganizationEntity.mapToDetails(
     subjects: List<SubjectDetailsEntity>,
-    employee: List<EmployeeEntity>,
+    employee: List<BaseEmployeeEntity>,
 ) = OrganizationDetailsEntity(
     uid = uid,
-    isMain = is_main == 1L,
-    shortName = short_name,
-    fullName = full_name,
+    isMain = isMain == 1L,
+    shortName = shortName,
+    fullName = fullName,
     type = type,
     avatar = avatar,
-    scheduleTimeIntervals = Json.decodeFromString(schedule_time_intervals),
+    scheduleTimeIntervals = Json.decodeFromString(scheduleTimeIntervals),
     subjects = subjects,
     employee = employee,
     emails = emails.map { it.fromJson() },
@@ -62,16 +101,18 @@ fun OrganizationEntity.mapToDetails(
     locations = locations.map { it.fromJson() },
     webs = webs.map { it.fromJson() },
     offices = offices,
-    isHide = is_hide == 1L,
+    isHide = isHide == 1L,
+    updatedAt = updatedAt,
 )
 
-fun OrganizationEntity.mapToShort() = OrganizationShortEntity(
+fun BaseOrganizationEntity.mapToShort() = OrganizationShortEntity(
     uid = uid,
-    main = is_main == 1L,
-    shortName = short_name,
+    main = isMain == 1L,
+    shortName = shortName,
     type = type,
     avatar = avatar,
     locations = locations.map { it.fromJson() },
     offices = offices,
-    scheduleTimeIntervals = Json.decodeFromString(schedule_time_intervals),
+    scheduleTimeIntervals = Json.decodeFromString(scheduleTimeIntervals),
+    updatedAt = updatedAt,
 )

@@ -21,7 +21,33 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.api.di.coreClintApiModule
-import ru.aleshin.studyassistant.core.data.managers.TodoReminderManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.reminders.TodoReminderManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.BaseScheduleSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.CalendarSettingsSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.CurrentUserSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.CustomScheduleSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.DailyGoalsSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.EmployeeSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.FriendRequestsSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.HomeworkSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.OrganizationsSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.SharedHomeworksSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.SharedSchedulesSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.SubjectsSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.TodoSourceSyncManagerImpl
+import ru.aleshin.studyassistant.core.data.mappers.goals.GoalSyncMapper
+import ru.aleshin.studyassistant.core.data.mappers.organizations.OrganizationSyncMapper
+import ru.aleshin.studyassistant.core.data.mappers.requsts.FriendRequestsSyncMapper
+import ru.aleshin.studyassistant.core.data.mappers.schedules.BaseScheduleSyncMapper
+import ru.aleshin.studyassistant.core.data.mappers.schedules.CustomScheduleSyncMapper
+import ru.aleshin.studyassistant.core.data.mappers.settings.CalendarSettingsSyncMapper
+import ru.aleshin.studyassistant.core.data.mappers.share.ShareHomeworksSyncMapper
+import ru.aleshin.studyassistant.core.data.mappers.share.SharedSchedulesSyncMapper
+import ru.aleshin.studyassistant.core.data.mappers.subjects.SubjectSyncMapper
+import ru.aleshin.studyassistant.core.data.mappers.tasks.HomeworkSyncMapper
+import ru.aleshin.studyassistant.core.data.mappers.tasks.TodoSyncMapper
+import ru.aleshin.studyassistant.core.data.mappers.users.AppUserSyncMapper
+import ru.aleshin.studyassistant.core.data.mappers.users.EmployeeSyncMapper
 import ru.aleshin.studyassistant.core.data.repositories.AiAssistantRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.AuthRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.BaseScheduleRepositoryImpl
@@ -42,8 +68,23 @@ import ru.aleshin.studyassistant.core.data.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.data.repositories.SubjectsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.TodoRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.UsersRepositoryImpl
+import ru.aleshin.studyassistant.core.data.utils.SubscriptionChecker
+import ru.aleshin.studyassistant.core.data.utils.sync.RemoteResultSyncHandler
 import ru.aleshin.studyassistant.core.database.di.coreDatabaseModule
-import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.BaseScheduleSourceSyncManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.CalendarSettingsSourceSyncManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.CurrentUserSourceSyncManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.CustomScheduleSourceSyncManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.DailyGoalsSourceSyncManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.EmployeeSourceSyncManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.FriendRequestsSourceSyncManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.HomeworkSourceSyncManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.OrganizationsSourceSyncManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.SharedHomeworksSourceSyncManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.SharedSchedulesSourceSyncManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.SubjectsSourceSyncManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.TodoSourceSyncManager
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
@@ -72,26 +113,70 @@ import ru.aleshin.studyassistant.core.remote.di.coreRemoteModule
 val coreDataModule = DI.Module("CoreData") {
     importAll(coreDataPlatformModule, coreDatabaseModule, coreRemoteModule, coreClintApiModule)
 
+    bindSingleton<RemoteResultSyncHandler> { RemoteResultSyncHandler.Base(instance(), instance()) }
+    bindSingleton<SubscriptionChecker> { SubscriptionChecker.Base(instance(), instance(), instance()) }
+
+    bindSingleton<TodoSyncMapper> { TodoSyncMapper() }
+    bindSingleton<TodoSourceSyncManager> { TodoSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<TodoRepository> { TodoRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
+
+    bindSingleton<EmployeeSyncMapper> { EmployeeSyncMapper() }
+    bindSingleton<EmployeeSourceSyncManager> { EmployeeSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<EmployeeRepository> { EmployeeRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
+
+    bindSingleton<SubjectSyncMapper> { SubjectSyncMapper() }
+    bindSingleton<SubjectsSourceSyncManager> { SubjectsSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<SubjectsRepository> { SubjectsRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
+
+    bindSingleton<OrganizationSyncMapper> { OrganizationSyncMapper() }
+    bindSingleton<OrganizationsSourceSyncManager> { OrganizationsSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<OrganizationsRepository> { OrganizationsRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
+
+    bindSingleton<BaseScheduleSyncMapper> { BaseScheduleSyncMapper() }
+    bindSingleton<BaseScheduleSourceSyncManager> { BaseScheduleSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<BaseScheduleRepository> { BaseScheduleRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
+
+    bindSingleton<CustomScheduleSyncMapper> { CustomScheduleSyncMapper() }
+    bindSingleton<CustomScheduleSourceSyncManager> { CustomScheduleSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<CustomScheduleRepository> { CustomScheduleRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
+
+    bindSingleton<HomeworkSyncMapper> { HomeworkSyncMapper() }
+    bindSingleton<HomeworkSourceSyncManager> { HomeworkSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<HomeworksRepository> { HomeworksRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
+
+    bindSingleton<GoalSyncMapper> { GoalSyncMapper() }
+    bindSingleton<DailyGoalsSourceSyncManager> { DailyGoalsSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<DailyGoalsRepository> { DailyGoalsRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
+
+    bindSingleton<CalendarSettingsSyncMapper> { CalendarSettingsSyncMapper() }
+    bindSingleton<CalendarSettingsSourceSyncManager> { CalendarSettingsSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance(), instance(), instance()) }
+
+    bindSingleton<FriendRequestsSyncMapper> { FriendRequestsSyncMapper() }
+    bindSingleton<FriendRequestsSourceSyncManager> { FriendRequestsSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<FriendRequestsRepository> { FriendRequestsRepositoryImpl(instance(), instance(), instance(), instance()) }
+
+    bindSingleton<SharedSchedulesSyncMapper> { SharedSchedulesSyncMapper() }
+    bindSingleton<SharedSchedulesSourceSyncManager> { SharedSchedulesSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ShareSchedulesRepository> { ShareSchedulesRepositoryImpl(instance(), instance(), instance(), instance(),) }
+
+    bindSingleton<ShareHomeworksSyncMapper> { ShareHomeworksSyncMapper() }
+    bindSingleton<SharedHomeworksSourceSyncManager> { SharedHomeworksSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ShareHomeworksRepository> { ShareHomeworksRepositoryImpl(instance(), instance(), instance(), instance()) }
+
+    bindSingleton<AppUserSyncMapper> { AppUserSyncMapper() }
+    bindSingleton<CurrentUserSourceSyncManager> { CurrentUserSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance(),) }
+    bindSingleton<UsersRepository> { UsersRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
+
+    bindSingleton<GeneralSettingsRepository> { GeneralSettingsRepositoryImpl(instance()) }
+    bindSingleton<NotificationSettingsRepository> { NotificationSettingsRepositoryImpl(instance()) }
+
+    bindSingleton<AiAssistantRepository> { AiAssistantRepositoryImpl(instance(), instance(), instance()) }
+
     bindSingleton<AuthRepository> { AuthRepositoryImpl(instance()) }
-    bindSingleton<ProductsRepository> { ProductsRepositoryImpl(instance()) }
     bindSingleton<ManageUserRepository> { ManageUserRepositoryImpl(instance()) }
-    bindSingleton<UsersRepository> { UsersRepositoryImpl(instance(), instance()) }
-    bindSingleton<FriendRequestsRepository> { FriendRequestsRepositoryImpl(instance()) }
-    bindSingleton<ShareHomeworksRepository> { ShareHomeworksRepositoryImpl(instance()) }
-    bindSingleton<ShareSchedulesRepository> { ShareSchedulesRepositoryImpl(instance()) }
-    bindProvider<GeneralSettingsRepository> { GeneralSettingsRepositoryImpl(instance()) }
-    bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance(), instance()) }
-    bindProvider<NotificationSettingsRepository> { NotificationSettingsRepositoryImpl(instance()) }
-    bindProvider<BaseScheduleRepository> { BaseScheduleRepositoryImpl(instance(), instance(), instance()) }
-    bindProvider<CustomScheduleRepository> { CustomScheduleRepositoryImpl(instance(), instance(), instance()) }
-    bindProvider<SubjectsRepository> { SubjectsRepositoryImpl(instance(), instance(), instance()) }
-    bindProvider<EmployeeRepository> { EmployeeRepositoryImpl(instance(), instance(), instance()) }
-    bindProvider<HomeworksRepository> { HomeworksRepositoryImpl(instance(), instance(), instance()) }
-    bindProvider<DailyGoalsRepository> { DailyGoalsRepositoryImpl(instance(), instance(), instance()) }
-    bindProvider<TodoRepository> { TodoRepositoryImpl(instance(), instance(), instance()) }
-    bindProvider<OrganizationsRepository> { OrganizationsRepositoryImpl(instance(), instance(), instance()) }
-    bindProvider<MessageRepository> { MessageRepositoryImpl(instance()) }
-    bindProvider<AiAssistantRepository> { AiAssistantRepositoryImpl(instance(), instance(), instance()) }
+    bindSingleton<ProductsRepository> { ProductsRepositoryImpl(instance()) }
+    bindSingleton<MessageRepository> { MessageRepositoryImpl(instance()) }
 
     bindProvider<TodoReminderManager> { TodoReminderManagerImpl(instance(), instance(), instance()) }
 }

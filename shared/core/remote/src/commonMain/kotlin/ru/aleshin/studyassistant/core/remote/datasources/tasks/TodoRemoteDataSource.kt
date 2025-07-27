@@ -16,204 +16,36 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.tasks
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.api.AppwriteApi.Todo
-import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
+import ru.aleshin.studyassistant.core.api.databases.DatabaseService
+import ru.aleshin.studyassistant.core.api.realtime.RealtimeService
 import ru.aleshin.studyassistant.core.api.utils.Permission
-import ru.aleshin.studyassistant.core.api.utils.Query
-import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
-import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.remote.mappers.tasks.convertToBase
-import ru.aleshin.studyassistant.core.remote.mappers.tasks.convertToDetails
 import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojo
-import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojoDetails
+import ru.aleshin.studyassistant.core.remote.utils.RemoteDataSource
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.
  */
-interface TodoRemoteDataSource {
-
-    suspend fun addOrUpdateTodo(todo: TodoPojoDetails, targetUser: UID): UID
-    suspend fun addOrUpdateTodosGroup(todos: List<TodoPojoDetails>, targetUser: UID)
-    suspend fun fetchTodoById(uid: UID, targetUser: UID): Flow<TodoPojoDetails?>
-    suspend fun fetchTodosByTimeRange(from: Long, to: Long, targetUser: UID): Flow<List<TodoPojoDetails>>
-    suspend fun fetchActiveTodos(targetUser: UID): Flow<List<TodoPojoDetails>>
-    suspend fun fetchCompletedTodos(from: Long?, to: Long?, targetUser: UID): Flow<List<TodoPojoDetails>>
-    suspend fun fetchOverdueTodos(currentDate: Long, targetUser: UID): Flow<List<TodoPojoDetails>>
-    suspend fun deleteTodo(uid: UID, targetUser: UID)
-    suspend fun deleteAllTodos(targetUser: UID)
+interface TodoRemoteDataSource : RemoteDataSource.FullSynced.MultipleDocuments<TodoPojo> {
 
     class Base(
-        private val database: DatabaseApi,
-    ) : TodoRemoteDataSource {
+        database: DatabaseService,
+        realtime: RealtimeService,
+        userSessionProvider: UserSessionProvider
+    ) : TodoRemoteDataSource, RemoteDataSource.FullSynced.MultipleDocuments.BaseAppwrite<TodoPojo>(
+        database = database,
+        realtime = realtime,
+        userSessionProvider = userSessionProvider,
+    ) {
 
-        override suspend fun addOrUpdateTodo(todo: TodoPojoDetails, targetUser: UID): UID {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
+        override val databaseId = Todo.DATABASE_ID
 
-            val todoId = todo.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+        override val collectionId = Todo.COLLECTION_ID
 
-            database.upsertDocument(
-                databaseId = Todo.DATABASE_ID,
-                collectionId = Todo.COLLECTION_ID,
-                documentId = todoId,
-                data = todo.convertToBase().copy(uid = todoId),
-                permissions = Permission.onlyUserData(targetUser),
-                nestedType = TodoPojo.serializer(),
-            )
+        override val nestedType = TodoPojo.serializer()
 
-            return todoId
-        }
-
-        override suspend fun addOrUpdateTodosGroup(todos: List<TodoPojoDetails>, targetUser: UID) {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
-            todos.forEach { todo -> addOrUpdateTodo(todo, targetUser) }
-        }
-
-        override suspend fun fetchTodoById(uid: UID, targetUser: UID): Flow<TodoPojoDetails?> {
-            if (uid.isEmpty()) return flowOf(null)
-            if (targetUser.isEmpty()) throw AppwriteUserException()
-
-            val todoFlow = database.getDocumentFlow(
-                databaseId = Todo.DATABASE_ID,
-                collectionId = Todo.COLLECTION_ID,
-                documentId = uid,
-                nestedType = TodoPojo.serializer(),
-            )
-
-            return todoFlow.map { todo -> todo?.convertToDetails() }
-        }
-
-        override suspend fun fetchTodosByTimeRange(
-            from: Long,
-            to: Long,
-            targetUser: UID
-        ): Flow<List<TodoPojoDetails>> {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
-
-            val todosWithDeadlineFlow = database.listDocumentsFlow(
-                databaseId = Todo.DATABASE_ID,
-                collectionId = Todo.COLLECTION_ID,
-                queries = listOf(
-                    Query.equal(Todo.USER_ID, targetUser),
-                    Query.between(Todo.DEADLINE, from, to),
-                    Query.orderDesc(Todo.DEADLINE),
-                ),
-                nestedType = TodoPojo.serializer(),
-            )
-
-            val freeTodosFlow = database.listDocumentsFlow(
-                databaseId = Todo.DATABASE_ID,
-                collectionId = Todo.COLLECTION_ID,
-                queries = listOf(
-                    Query.equal(Todo.USER_ID, targetUser),
-                    Query.isNull(Todo.DEADLINE),
-                    Query.orderDesc(Todo.DEADLINE),
-                ),
-                nestedType = TodoPojo.serializer(),
-            )
-
-            val todosFlow = combine(todosWithDeadlineFlow, freeTodosFlow) { deadlinedTodos, freeTodos ->
-                deadlinedTodos + freeTodos
-            }
-
-            return todosFlow.map { todos ->
-                todos.map { it.convertToDetails() }
-            }
-        }
-
-        override suspend fun fetchActiveTodos(targetUser: UID): Flow<List<TodoPojoDetails>> {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
-
-            val todosFlow = database.listDocumentsFlow(
-                databaseId = Todo.DATABASE_ID,
-                collectionId = Todo.COLLECTION_ID,
-                queries = listOf(
-                    Query.equal(Todo.USER_ID, targetUser),
-                    Query.equal(Todo.DONE, false),
-                    Query.isNull(Todo.COMPLETE_DATE),
-                ),
-                nestedType = TodoPojo.serializer(),
-            )
-
-            return todosFlow.map { todos ->
-                todos.map { it.convertToDetails() }
-            }
-        }
-
-        override suspend fun fetchCompletedTodos(
-            from: Long?,
-            to: Long?,
-            targetUser: UID
-        ): Flow<List<TodoPojoDetails>> {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
-
-            val todosFlow = database.listDocumentsFlow(
-                databaseId = Todo.DATABASE_ID,
-                collectionId = Todo.COLLECTION_ID,
-                queries = if (from != null && to != null) {
-                    listOf(
-                        Query.equal(Todo.USER_ID, targetUser),
-                        Query.equal(Todo.DONE, true),
-                        Query.between(Todo.COMPLETE_DATE, from, to),
-                    )
-                } else {
-                    listOf(
-                        Query.equal(Todo.USER_ID, targetUser),
-                        Query.equal(Todo.DONE, true),
-                        Query.isNotNull(Todo.COMPLETE_DATE),
-                    )
-                },
-                nestedType = TodoPojo.serializer(),
-            )
-
-            return todosFlow.map { todos ->
-                todos.map { it.convertToDetails() }
-            }
-        }
-
-        override suspend fun fetchOverdueTodos(
-            currentDate: Long,
-            targetUser: UID
-        ): Flow<List<TodoPojoDetails>> {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
-
-            val todosFlow = database.listDocumentsFlow(
-                databaseId = Todo.DATABASE_ID,
-                collectionId = Todo.COLLECTION_ID,
-                queries = listOf(
-                    Query.equal(Todo.USER_ID, targetUser),
-                    Query.lessThan(Todo.DEADLINE, currentDate),
-                    Query.equal(Todo.DONE, false),
-                    Query.isNull(Todo.COMPLETE_DATE),
-                    Query.orderDesc(Todo.DEADLINE)
-                ),
-                nestedType = TodoPojo.serializer(),
-            )
-
-            return todosFlow.map { todos ->
-                todos.map { it.convertToDetails() }
-            }
-        }
-
-        override suspend fun deleteTodo(uid: UID, targetUser: UID) {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
-
-            database.deleteDocument(
-                databaseId = Todo.DATABASE_ID,
-                collectionId = Todo.COLLECTION_ID,
-                documentId = targetUser,
-            )
-        }
-
-        override suspend fun deleteAllTodos(targetUser: UID) {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
-            val todosFlow = fetchTodosByTimeRange(Long.MIN_VALUE, Long.MAX_VALUE, targetUser)
-            todosFlow.first().forEach { todo -> deleteTodo(todo.uid, targetUser) }
-        }
+        override fun permissions(currentUser: UID) = Permission.onlyUserData(currentUser)
     }
 }

@@ -16,12 +16,17 @@
 
 package ru.aleshin.studyassistant.users.impl.presentation.mappers
 
+import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.users.impl.domain.entities.UsersFailures
 import ru.aleshin.studyassistant.users.impl.presentation.theme.tokens.UsersStrings
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-internal fun UsersFailures.mapToMessage(strings: UsersStrings) = when (this) {
+internal fun UsersFailures.mapToMessage(
+    strings: UsersStrings,
+    coreStrings: StudyAssistantStrings,
+) = when (this) {
+    is UsersFailures.InternetError -> coreStrings.networkErrorMessage
     is UsersFailures.OtherError -> strings.otherErrorMessage
 }

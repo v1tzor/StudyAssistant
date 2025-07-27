@@ -16,12 +16,17 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.mappers
 
+import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens.PreviewStrings
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-internal fun PreviewFailures.mapToMessage(strings: PreviewStrings) = when(this) {
+internal fun PreviewFailures.mapToMessage(
+    strings: PreviewStrings,
+    coreStrings: StudyAssistantStrings,
+) = when (this) {
+    is PreviewFailures.InternetError -> coreStrings.networkErrorMessage
     is PreviewFailures.OtherError -> strings.otherErrorMessage
 }

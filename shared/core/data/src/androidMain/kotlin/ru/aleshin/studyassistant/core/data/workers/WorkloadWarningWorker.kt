@@ -21,7 +21,7 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
@@ -35,7 +35,6 @@ import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
 import ru.aleshin.studyassistant.core.common.extensions.generateDigitCode
 import ru.aleshin.studyassistant.core.common.functional.Constants
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.notifications.NotificationCreator
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationCategory
@@ -61,7 +60,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleReposito
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
@@ -83,7 +81,6 @@ class WorkloadWarningWorker(
 
     private val dateManager = instance<DateManager>()
     private val notificationCreator = instance<NotificationCreator>()
-    private val usersRepository = instance<UsersRepository>()
     private val calendarSettingsRepository = instance<CalendarSettingsRepository>()
     private val notificationSettingsRepository = instance<NotificationSettingsRepository>()
     private val homeworksRepository = instance<HomeworksRepository>()
@@ -93,15 +90,14 @@ class WorkloadWarningWorker(
 
     override suspend fun doWork(): Result {
         val coreStrings = fetchCoreStrings(fetchAppLanguage(applicationContext.fetchCurrentLanguage()))
-        val currentUser = usersRepository.fetchCurrentAuthUser()?.uid ?: return Result.failure()
         val currentDate = dateManager.fetchBeginningCurrentInstant()
 
-        val notificationSettings = notificationSettingsRepository.fetchSettings(currentUser).first()
+        val notificationSettings = notificationSettingsRepository.fetchSettings().first()
         val maxWorkloadValue = notificationSettings.highWorkload ?: return Result.failure()
 
-        val value = fetchDailyWorkload(currentUser, currentDate)
+        val value = fetchDailyWorkload(currentDate)
         if (value.toInt() >= maxWorkloadValue) {
-            val mainActivityUri = Uri.parse("app://studyassistant.com/openMain")
+            val mainActivityUri = Constants.App.OPEN_APP_DEEPLINK.toUri()
             val contentIntent = Intent(ACTION_VIEW, mainActivityUri)
             val requestCode = generateDigitCode().toInt()
             val pContentIntent = PendingIntent.getActivity(context, requestCode, contentIntent, FLAG_IMMUTABLE)
@@ -120,14 +116,14 @@ class WorkloadWarningWorker(
         return Result.success()
     }
 
-    private suspend fun fetchDailyWorkload(currentUser: UID, date: Instant): Float {
-        val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(currentUser).first().numberOfWeek
+    private suspend fun fetchDailyWorkload(date: Instant): Float {
+        val maxNumberOfWeek = calendarSettingsRepository.fetchSettings().first().numberOfWeek
         val week = date.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
 
-        val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, week, currentUser).first()
-        val customSchedule = customScheduleRepository.fetchScheduleByDate(date, currentUser).first()
-        val todos = todoRepository.fetchTodosByDate(date, currentUser).first()
-        val homeworks = homeworksRepository.fetchHomeworksByDate(date, currentUser).first()
+        val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, week).first()
+        val customSchedule = customScheduleRepository.fetchScheduleByDate(date).first()
+        val todos = todoRepository.fetchTodosByDate(date).first()
+        val homeworks = homeworksRepository.fetchHomeworksByDate(date).first()
 
         val classes = customSchedule?.classes ?: baseSchedule?.classes
         val movementMap = classes?.groupBy { it.organization }?.mapValues { classEntry ->

@@ -23,13 +23,13 @@ import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeeDetails
 import ru.aleshin.studyassistant.core.domain.entities.employee.convertToDetails
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 
@@ -47,25 +47,24 @@ internal interface EmployeeInteractor {
     class Base(
         private val employeeRepository: EmployeeRepository,
         private val subjectsRepository: SubjectsRepository,
-        private val usersRepository: UsersRepository,
+        private val dateManager: DateManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : EmployeeInteractor {
 
         override suspend fun addOrUpdateEmployee(employee: Employee) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            employeeRepository.addOrUpdateEmployee(employee, targetUser)
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedEmployee = employee.copy(updatedAt = updatedAt)
+            employeeRepository.addOrUpdateEmployee(updatedEmployee)
         }
 
         override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            employeeRepository.uploadAvatar(oldAvatarUrl, file, targetUser)
+            employeeRepository.uploadAvatar(oldAvatarUrl, file)
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchAllDetailsEmployee(organizationId: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val subjectsFlow = subjectsRepository.fetchAllSubjectsByOrganization(organizationId, targetUser)
-            val employeesFlow = employeeRepository.fetchAllEmployeeByOrganization(organizationId, targetUser)
+            val subjectsFlow = subjectsRepository.fetchAllSubjectsByOrganization(organizationId)
+            val employeesFlow = employeeRepository.fetchAllEmployeeByOrganization(organizationId)
 
             return@wrapFlow employeesFlow.flatMapLatest { employeeList ->
                 subjectsFlow.map { subjects ->
@@ -79,13 +78,11 @@ internal interface EmployeeInteractor {
         }
 
         override suspend fun fetchEmployeeById(uid: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            employeeRepository.fetchEmployeeById(uid, targetUser)
+            employeeRepository.fetchEmployeeById(uid)
         }
 
         override suspend fun deleteAvatar(avatarUrl: UID) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            employeeRepository.deleteAvatar(avatarUrl, targetUser)
+            employeeRepository.deleteAvatar(avatarUrl)
         }
     }
 }

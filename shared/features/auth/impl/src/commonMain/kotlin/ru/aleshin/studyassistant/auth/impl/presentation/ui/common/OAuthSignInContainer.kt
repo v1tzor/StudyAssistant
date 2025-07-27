@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 import org.kodein.di.compose.localDI
 import org.kodein.di.direct
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.api.auth.AccountApi
+import ru.aleshin.studyassistant.core.api.auth.AccountService
 import ru.aleshin.studyassistant.core.common.platform.getPlatformActivity
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
@@ -57,7 +57,7 @@ internal fun OAuthSignInRowContainer(
             val localDI = localDI().direct
             val coroutineScope = rememberCoroutineScope()
 
-            val accountService = remember { localDI.instance<AccountApi>() }
+            val accountService = remember { localDI.instance<AccountService>() }
             val platformActivity = getPlatformActivity()
 
             val createSessionCallback by rememberUpdatedState(onCreateSession)

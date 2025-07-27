@@ -14,21 +14,32 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package ru.aleshin.studyassistant.core.data.repositories
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.data.mappers.users.convertToLocal
+import ru.aleshin.studyassistant.core.data.mappers.users.convertToRemote
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToRemoteData
+import ru.aleshin.studyassistant.core.data.utils.SubscriptionChecker
+import ru.aleshin.studyassistant.core.data.utils.sync.RemoteResultSyncHandler
 import ru.aleshin.studyassistant.core.database.datasource.employee.EmployeeLocalDataSource
 import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
+import ru.aleshin.studyassistant.core.domain.entities.sync.OfflineChangeType
+import ru.aleshin.studyassistant.core.domain.managers.sync.EmployeeSourceSyncManager.Companion.EMPLOYEE_SOURCE_KEY
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
-import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
 
 /**
@@ -38,109 +49,119 @@ class EmployeeRepositoryImpl(
     private val remoteDataSource: EmployeeRemoteDataSource,
     private val localDataSource: EmployeeLocalDataSource,
     private val subscriptionChecker: SubscriptionChecker,
+    private val userSessionProvider: UserSessionProvider,
+    private val resultSyncHandler: RemoteResultSyncHandler,
 ) : EmployeeRepository {
 
-    override suspend fun addOrUpdateEmployee(employee: Employee, targetUser: UID): UID {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun addOrUpdateEmployee(employee: Employee): UID {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
 
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateEmployee(employee.mapToRemoteData(targetUser), targetUser)
-        } else {
-            localDataSource.addOrUpdateEmployee(employee.mapToLocalData())
-        }
-    }
-
-    override suspend fun addOrUpdateEmployeeGroup(employees: List<Employee>, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateEmployeeGroup(employees.map { it.mapToRemoteData(targetUser) }, targetUser)
-        } else {
-            localDataSource.addOrUpdateEmployeeGroup(employees.map { it.mapToLocalData() })
-        }
-    }
-
-    override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile, targetUser: UID): String {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.uploadAvatar(oldAvatarUrl, file, targetUser)
-        } else {
-            checkNotNull(file.uri)
-        }
-    }
-
-    override suspend fun fetchEmployeeById(uid: UID, targetUser: UID): Flow<Employee?> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchEmployeeById(uid, targetUser).map { employeePojo -> employeePojo?.mapToDomain() }
-        } else {
-            localDataSource.fetchEmployeeById(uid).map { employeeEntity -> employeeEntity?.mapToDomain() }
-        }
-    }
-    override suspend fun fetchAllEmployeeByOrganization(organizationId: UID, targetUser: UID): Flow<List<Employee>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchAllEmployeeByOrganization(organizationId, targetUser).map { employees ->
-                employees.map { employeePojo -> employeePojo.mapToDomain() }
-            }
-        } else {
-            localDataSource.fetchAllEmployeeByOrganization(organizationId).map { employees ->
-                employees.map { employeeEntity -> employeeEntity.mapToDomain() }
-            }
-        }
-    }
-
-    override suspend fun deleteEmployee(targetId: UID, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.deleteEmployee(targetId, targetUser)
-        } else {
-            localDataSource.deleteEmployee(targetId)
-        }
-    }
-
-    override suspend fun deleteAvatar(avatarUrl: String, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val upsertModel = employee.copy(uid = employee.uid.ifBlank { randomUUID() })
 
         if (isSubscriber) {
-            remoteDataSource.deleteAvatar(avatarUrl, targetUser)
+            localDataSource.sync().addOrUpdateItem(upsertModel.mapToLocalData())
+            resultSyncHandler.executeOrAddToQueue(
+                data = upsertModel.mapToRemoteData(userId = currentUser),
+                type = OfflineChangeType.UPSERT,
+                sourceKey = EMPLOYEE_SOURCE_KEY,
+            ) {
+                remoteDataSource.addOrUpdateItem(it)
+            }
+        } else {
+            localDataSource.offline().addOrUpdateItem(upsertModel.mapToLocalData())
+        }
+
+        return upsertModel.uid
+    }
+
+    override suspend fun addOrUpdateEmployeeGroup(employees: List<Employee>) {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+
+        val upsertModels = employees.map { it.copy(uid = it.uid.ifBlank { randomUUID() }) }
+
+        if (isSubscriber) {
+            localDataSource.sync().addOrUpdateItems(upsertModels.map { it.mapToLocalData() })
+            resultSyncHandler.executeOrAddToQueue(
+                data = upsertModels.map { it.mapToRemoteData(currentUser) },
+                type = OfflineChangeType.UPSERT,
+                sourceKey = EMPLOYEE_SOURCE_KEY,
+            ) {
+                remoteDataSource.addOrUpdateItems(it)
+            }
+        } else {
+            localDataSource.offline().addOrUpdateItems(upsertModels.map { it.mapToLocalData() })
         }
     }
 
-    override suspend fun deleteAllEmployee(targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile): String {
+        return remoteDataSource.uploadAvatar(oldAvatarUrl, file)
+    }
+
+    override suspend fun fetchEmployeeById(uid: UID): Flow<Employee?> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchItemById(uid).map { it?.mapToDomain() }
+            } else {
+                localDataSource.offline().fetchItemById(uid).map { it?.mapToDomain() }
+            }
+        }
+    }
+    override suspend fun fetchAllEmployeeByOrganization(organizationId: UID): Flow<List<Employee>> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchAllEmployeeByOrganization(organizationId).map { employees ->
+                    employees.map { employeeEntity -> employeeEntity.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchAllEmployeeByOrganization(organizationId).map { employees ->
+                    employees.map { employeeEntity -> employeeEntity.mapToDomain() }
+                }
+            }
+        }
+    }
+
+    override suspend fun deleteEmployee(targetId: UID) {
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
 
         return if (isSubscriber) {
-            remoteDataSource.deleteAllEmployee(targetUser)
+            localDataSource.sync().deleteItemsById(listOf(targetId))
+            resultSyncHandler.executeOrAddToQueue(
+                documentId = targetId,
+                type = OfflineChangeType.DELETE,
+                sourceKey = EMPLOYEE_SOURCE_KEY,
+            ) {
+                remoteDataSource.deleteItemById(targetId)
+            }
         } else {
-            localDataSource.deleteAllEmployee()
+            localDataSource.offline().deleteItemsById(listOf(targetId))
         }
     }
 
-    override suspend fun transferData(direction: DataTransferDirection, targetUser: UID) {
+    override suspend fun deleteAvatar(avatarUrl: String) {
+        remoteDataSource.deleteAvatar(avatarUrl)
+    }
+
+    override suspend fun transferData(direction: DataTransferDirection) {
+        val currentUser = userSessionProvider.getCurrentUserId()
         when (direction) {
             DataTransferDirection.REMOTE_TO_LOCAL -> {
-                val allEmployee = remoteDataSource.fetchAllEmployeeByOrganization(
-                    organizationId = null,
-                    targetUser = targetUser,
-                ).let { employeesFlow ->
-                    return@let employeesFlow.first().map { it.mapToDomain().mapToLocalData() }
-                }
-                localDataSource.deleteAllEmployee()
-                localDataSource.addOrUpdateEmployeeGroup(allEmployee)
+                val allEmployeesFlow = remoteDataSource.fetchAllItems(currentUser)
+                val employees = allEmployeesFlow.first().map { it.convertToLocal() }
+
+                localDataSource.offline().deleteAllItems()
+                localDataSource.offline().addOrUpdateItems(employees)
             }
             DataTransferDirection.LOCAL_TO_REMOTE -> {
-                val allSchedules = localDataSource.fetchAllEmployeeByOrganization(
-                    organizationId = null,
-                ).let { employeesFlow ->
-                    return@let employeesFlow.first().map { it.mapToDomain().mapToRemoteData(targetUser) }
-                }
-                remoteDataSource.deleteAllEmployee(targetUser)
-                remoteDataSource.addOrUpdateEmployeeGroup(allSchedules, targetUser)
+                val allEmployees = localDataSource.offline().fetchAllEmployees().first()
+                val employeesRemote = allEmployees.map { it.convertToRemote(currentUser) }
+
+                remoteDataSource.deleteAllItems(currentUser)
+                remoteDataSource.addOrUpdateItems(employeesRemote)
+
+                localDataSource.sync().deleteAllItems()
+                localDataSource.sync().addOrUpdateItems(allEmployees)
             }
         }
     }

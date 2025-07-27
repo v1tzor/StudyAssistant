@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.core.remote.di
 import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
-import ru.aleshin.studyassistant.core.remote.datasources.message.HmsAuthTokenProvider
+import ru.aleshin.studyassistant.core.remote.api.message.HmsAuthTokenProvider
 
 /**
  * @author Stanislav Aleshin on 08.08.2024.

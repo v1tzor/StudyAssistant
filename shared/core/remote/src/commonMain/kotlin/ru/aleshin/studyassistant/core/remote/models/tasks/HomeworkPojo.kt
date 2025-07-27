@@ -17,18 +17,21 @@
 package ru.aleshin.studyassistant.core.remote.models.tasks
 
 import kotlinx.datetime.Clock
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.core.remote.utils.BaseMultipleRemotePojo
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
 @Serializable
 data class HomeworkPojo(
-    val uid: UID = "",
-    val userId: UID,
+    @SerialName("\$id")
+    override val id: UID = "",
+    override val userId: UID,
     val classId: UID? = null,
     val deadline: Long = Clock.System.now().startThisDay().toEpochMilliseconds(),
     val subjectId: UID? = null,
@@ -40,4 +43,5 @@ data class HomeworkPojo(
     val priority: String = TaskPriority.STANDARD.name,
     val done: Boolean = false,
     val completeDate: Long? = null,
-)
+    override val updatedAt: Long = 0L,
+) : BaseMultipleRemotePojo()

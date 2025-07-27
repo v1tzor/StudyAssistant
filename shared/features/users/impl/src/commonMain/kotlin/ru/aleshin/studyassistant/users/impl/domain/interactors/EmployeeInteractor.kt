@@ -26,7 +26,6 @@ import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeeDetails
 import ru.aleshin.studyassistant.core.domain.entities.employee.convertToDetails
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.users.impl.domain.common.UsersEitherWrapper
 import ru.aleshin.studyassistant.users.impl.domain.entities.UsersFailures
 
@@ -40,18 +39,16 @@ internal interface EmployeeInteractor {
     class Base(
         private val employeeRepository: EmployeeRepository,
         private val subjectsRepository: SubjectsRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: UsersEitherWrapper,
     ) : EmployeeInteractor {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchEmployeeById(uid: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val employeeFlow = employeeRepository.fetchEmployeeById(uid, targetUser)
+            val employeeFlow = employeeRepository.fetchEmployeeById(uid)
 
             return@wrapFlow employeeFlow.flatMapLatest { employee ->
                 if (employee == null) return@flatMapLatest flowOf(null)
-                subjectsRepository.fetchSubjectsByEmployee(employee.uid, targetUser).map { subjects ->
+                subjectsRepository.fetchSubjectsByEmployee(employee.uid).map { subjects ->
                     employee.convertToDetails(subjects = subjects)
                 }
             }

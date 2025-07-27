@@ -20,6 +20,7 @@ import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteDataAuthException
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteException
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 
 /**
@@ -32,6 +33,7 @@ internal interface AuthErrorHandler : ErrorHandler<AuthFailures> {
             is AppwriteDataAuthException -> AuthFailures.AuthorizationError
             is AppwriteUserException -> AuthFailures.NotFoundUserInfoError
             is NullPointerException -> AuthFailures.NotFoundUserInfoError
+            is InternetConnectionException -> AuthFailures.InternetError
             is AppwriteException -> when (throwable.type) {
                 "user_password_mismatch" -> AuthFailures.AuthorizationError
                 "password_recently_used" -> AuthFailures.PasswordRecentlyUsedError

@@ -26,4 +26,5 @@ data class FriendRequests(
     val received: Map<UID, Instant> = emptyMap(),
     val send: Map<UID, Instant> = emptyMap(),
     val lastActions: Map<UID, Boolean> = emptyMap(),
+    val updatedAt: Long,
 )

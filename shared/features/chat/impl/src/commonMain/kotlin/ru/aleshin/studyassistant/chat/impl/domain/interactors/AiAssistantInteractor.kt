@@ -53,7 +53,7 @@ import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
-import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
@@ -97,8 +97,7 @@ internal interface AiAssistantInteractor {
     ) : AiAssistantInteractor {
 
         override suspend fun addChat() = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val appUserInfo = checkNotNull(usersRepository.fetchUserById(targetUser).first())
+            val appUserInfo = checkNotNull(usersRepository.fetchCurrentUserProfile().first())
             val chatId = randomUUID()
             val systemMessage = AiAssistantMessage.SystemMessage(
                 id = chatId,
@@ -139,11 +138,10 @@ internal interface AiAssistantInteractor {
         }
 
         override suspend fun clearHistory(chatId: UID) = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val chat = aiAssistantRepository.fetchChatHistoryById(chatId).first()
 
             if (chat != null) {
-                val appUserInfo = checkNotNull(usersRepository.fetchUserById(targetUser).first())
+                val appUserInfo = checkNotNull(usersRepository.fetchCurrentUserProfile().first())
                 val systemMessage = AiAssistantMessage.SystemMessage(
                     id = chatId,
                     content = systemPromt(
@@ -209,15 +207,15 @@ internal interface AiAssistantInteractor {
                 val functionArgs = call.function.arguments ?: emptyMap()
 
                 val resultContent = when (functionName) {
-                    "create_todo" -> createTodo(functionArgs, targetUser)
-                    "create_homework" -> createHomeworks(functionArgs, targetUser)
-                    "get_homeworks" -> getHomeworks(functionArgs, targetUser)
-                    "get_overdue_homeworks" -> getOverdueHomeworks(functionArgs, targetUser)
-                    "get_subjects" -> getSubjects(functionArgs, targetUser)
-                    "get_employee" -> getEmployee(functionArgs, targetUser)
-                    "get_organizations" -> getOrganizations(functionArgs, targetUser)
-                    "get_classes_by_date" -> getClassesByDate(functionArgs, targetUser)
-                    "get_near_class" -> getNearClass(functionArgs, targetUser)
+                    "create_todo" -> createTodo(functionArgs)
+                    "create_homework" -> createHomeworks(functionArgs)
+                    "get_homeworks" -> getHomeworks(functionArgs)
+                    "get_overdue_homeworks" -> getOverdueHomeworks(functionArgs)
+                    "get_subjects" -> getSubjects(functionArgs)
+                    "get_employee" -> getEmployee(functionArgs)
+                    "get_organizations" -> getOrganizations(functionArgs)
+                    "get_classes_by_date" -> getClassesByDate(functionArgs)
+                    "get_near_class" -> getNearClass(functionArgs)
                     else -> """{"error": "Функция $functionName не найдена"}"""
                 }
 
@@ -229,20 +227,22 @@ internal interface AiAssistantInteractor {
             }
         }
 
-        private suspend fun createTodo(args: Map<String, String>, targetUser: UID): String {
+        private suspend fun createTodo(args: Map<String, String>): String {
             val name = args["name"] ?: "Без названия"
             val description = args["description"] ?: ""
             val deadline = args["deadline"]?.let { Instant.parseUsingOffset(it, Formats.iso8601()) }
             val priority = args["priority"]?.let { TaskPriority.valueOf(it) }
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val todo = Todo(
                 uid = randomUUID(),
                 name = name,
                 description = description,
                 deadline = deadline,
                 priority = priority ?: TaskPriority.STANDARD,
+                updatedAt = updatedAt,
             )
             return try {
-                todoRepository.addOrUpdateTodo(todo, targetUser)
+                todoRepository.addOrUpdateTodo(todo)
                 todoReminderManager.scheduleReminders(todo.uid, todo.name, todo.deadline, todo.notifications)
                 """{"status": "success", "message": "Задача '${todo.name}' создана!"}"""
             } catch (e: Exception) {
@@ -250,12 +250,13 @@ internal interface AiAssistantInteractor {
             }
         }
 
-        private suspend fun createHomeworks(args: Map<String, String>, targetUser: UID): String {
+        private suspend fun createHomeworks(args: Map<String, String>): String {
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val organization = args["organizationId"]?.let {
-                organizationsRepository.fetchShortOrganizationById(it, targetUser).first()
+                organizationsRepository.fetchShortOrganizationById(it).first()
             }
             val subject = args["subjectId"]?.let {
-                subjectsRepository.fetchSubjectById(it, targetUser).first()
+                subjectsRepository.fetchSubjectById(it).first()
             }
             val deadline = args["deadline"]?.let {
                 Instant.parseUsingOffset(it + TIME_SUFFIX, Formats.iso8601()).startThisDay()
@@ -276,24 +277,25 @@ internal interface AiAssistantInteractor {
                 practicalTasks = practicalTasks,
                 presentationTasks = presentationTasks,
                 test = testTopic,
+                updatedAt = updatedAt,
             )
             Logger.i("test") { "create homework -> $homework" }
             return try {
-                homeworksRepository.addOrUpdateHomework(homework, targetUser)
+                homeworksRepository.addOrUpdateHomework(homework)
                 """{"status": "success", "message": "Домашнее задание создано!"}"""
             } catch (e: Exception) {
                 """{"error": "Произошла ошибка при создании ДЗ (${e.message})"}"""
             }
         }
 
-        private suspend fun getHomeworks(args: Map<String, String>, targetUser: UID): String {
+        private suspend fun getHomeworks(args: Map<String, String>): String {
             val from = args["from"] ?: return """{"error": "Дата периода не найдена"}"""
             val to = args["to"] ?: return """{"error": "Дата периода не найдена"}"""
             val timeRange = TimeRange(
                 from = Instant.parseUsingOffset(from + TIME_SUFFIX, Formats.iso8601()).startThisDay(),
                 to = Instant.parseUsingOffset(to + TIME_SUFFIX, Formats.iso8601()).endThisDay(),
             )
-            val homeworks = homeworksRepository.fetchHomeworksByTimeRange(timeRange, targetUser).first()
+            val homeworks = homeworksRepository.fetchHomeworksByTimeRange(timeRange).first()
             Logger.i("test") { "getHomeworks($timeRange) -> $homeworks" }
             return buildJsonArray {
                 homeworks.forEach { homework ->
@@ -321,9 +323,9 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
-        private suspend fun getOverdueHomeworks(args: Map<String, String>, targetUser: UID): String {
+        private suspend fun getOverdueHomeworks(args: Map<String, String>): String {
             val currentDate = dateManager.fetchBeginningCurrentInstant()
-            val homeworks = homeworksRepository.fetchOverdueHomeworks(currentDate, targetUser).first()
+            val homeworks = homeworksRepository.fetchOverdueHomeworks(currentDate).first()
             Logger.i("test") { "getOverdueHomeworks -> $homeworks" }
             return buildJsonArray {
                 homeworks.forEach { homework ->
@@ -351,8 +353,8 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
-        private suspend fun getOrganizations(args: Map<String, String>, targetUser: UID): String {
-            val organizations = organizationsRepository.fetchAllShortOrganization(targetUser).first()
+        private suspend fun getOrganizations(args: Map<String, String>): String {
+            val organizations = organizationsRepository.fetchAllShortOrganization().first()
             Logger.i("test") { "getOrganizations -> $organizations" }
             return buildJsonArray {
                 organizations.forEach { organization ->
@@ -365,9 +367,9 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
-        private suspend fun getSubjects(args: Map<String, String>, targetUser: UID): String {
+        private suspend fun getSubjects(args: Map<String, String>): String {
             val organizationId = args["organizationId"] ?: return """{"error": "Организация не найдена"}"""
-            val subjects = subjectsRepository.fetchAllSubjectsByOrganization(organizationId, targetUser).first()
+            val subjects = subjectsRepository.fetchAllSubjectsByOrganization(organizationId).first()
             Logger.i("test") { "getSubjects(org: $organizationId) -> $subjects" }
             return buildJsonArray {
                 subjects.forEach { subject ->
@@ -382,9 +384,9 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
-        private suspend fun getEmployee(args: Map<String, String>, targetUser: UID): String {
+        private suspend fun getEmployee(args: Map<String, String>): String {
             val teacherId = args["teacherId"] ?: return """{"error": "Сотрудник не найден"}"""
-            val teacher = employeeRepository.fetchEmployeeById(teacherId, targetUser).first()
+            val teacher = employeeRepository.fetchEmployeeById(teacherId).first()
             if (teacher == null) return """{"error": "Сотрудник не найден"}"""
             return buildJsonObject {
                 put("teacherId", teacherId)
@@ -394,16 +396,16 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
-        private suspend fun getClassesByDate(args: Map<String, String>, targetUser: UID): String {
+        private suspend fun getClassesByDate(args: Map<String, String>): String {
             val date = args["date"]?.let {
                 Instant.parseUsingOffset(it + TIME_SUFFIX, Formats.iso8601()).startThisDay()
             } ?: return """{"error": "Ошибка получения даты"}"""
-            val calendarSettings = calendarSettingsRepository.fetchSettings(targetUser).first()
+            val calendarSettings = calendarSettingsRepository.fetchSettings().first()
             val currentNumberOfWeek = date.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
             val holidays = calendarSettings.holidays
 
-            val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek, targetUser).first()
-            val customSchedule = customScheduleRepository.fetchScheduleByDate(date, targetUser).first()
+            val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek).first()
+            val customSchedule = customScheduleRepository.fetchScheduleByDate(date).first()
             val classes = if (customSchedule != null) {
                 customSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
             } else {
@@ -436,10 +438,10 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
-        private suspend fun getNearClass(args: Map<String, String>, targetUser: UID): String {
+        private suspend fun getNearClass(args: Map<String, String>): String {
             val subjectId = args["subjectId"] ?: return """{"error": "Ошибка получения предмета"}"""
             val currentDate = dateManager.fetchBeginningCurrentInstant()
-            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
+            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings().first().numberOfWeek
 
             val searchedTimeRange = TimeRange(
                 from = currentDate.startThisDay().shiftDay(1),
@@ -448,12 +450,10 @@ internal interface AiAssistantInteractor {
 
             val customSchedules = customScheduleRepository.fetchSchedulesByTimeRange(
                 timeRange = searchedTimeRange,
-                targetUser = targetUser,
             ).first()
             val baseSchedules = baseScheduleRepository.fetchSchedulesByTimeRange(
                 timeRange = searchedTimeRange,
                 maxNumberOfWeek = maxNumberOfWeek,
-                targetUser = targetUser,
             ).first()
 
             val classesMap = buildMap {

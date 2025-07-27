@@ -26,7 +26,7 @@ import ru.aleshin.studyassistant.core.remote.models.tasks.TodoPojoDetails
  * @author Stanislav Aleshin on 06.07.2025.
  */
 fun TodoPojo.convertToDetails() = TodoPojoDetails(
-    uid = uid,
+    uid = id,
     userId = userId,
     deadline = deadline,
     name = name,
@@ -35,10 +35,11 @@ fun TodoPojo.convertToDetails() = TodoPojoDetails(
     notifications = notifications.fromJson<TodoNotificationsPojo>(),
     done = done,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 fun TodoPojoDetails.convertToBase() = TodoPojo(
-    uid = uid,
+    id = uid,
     userId = userId,
     deadline = deadline,
     name = name,
@@ -47,4 +48,5 @@ fun TodoPojoDetails.convertToBase() = TodoPojo(
     notifications = notifications.toJson<TodoNotificationsPojo>(),
     done = done,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )

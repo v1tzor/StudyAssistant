@@ -50,6 +50,7 @@ internal fun Homework.mapToUi(status: HomeworkStatus) = HomeworkDetailsUi(
     isDone = isDone,
     status = status,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun HomeworkDetailsUi.mapToDomain() = Homework(
@@ -65,6 +66,7 @@ internal fun HomeworkDetailsUi.mapToDomain() = Homework(
     priority = priority,
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun HomeworkTaskComponent.mapToUi() = when (this) {

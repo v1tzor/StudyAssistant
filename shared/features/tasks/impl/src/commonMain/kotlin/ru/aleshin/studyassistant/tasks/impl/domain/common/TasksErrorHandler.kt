@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 
@@ -27,6 +28,7 @@ internal interface TasksErrorHandler : ErrorHandler<TasksFailures> {
     class Base : TasksErrorHandler {
 
         override fun handle(throwable: Throwable) = when (throwable) {
+            is InternetConnectionException -> TasksFailures.InternetError
             else -> TasksFailures.OtherError(throwable)
         }
     }

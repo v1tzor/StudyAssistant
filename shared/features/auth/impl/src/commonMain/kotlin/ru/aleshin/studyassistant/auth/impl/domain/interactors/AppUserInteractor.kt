@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.auth.impl.domain.interactors
 
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.auth.impl.domain.common.AuthEitherWrapper
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
@@ -38,14 +40,11 @@ internal interface AppUserInteractor {
     ) : AppUserInteractor {
 
         override suspend fun fetchAppUser() = eitherWrapper.wrapFlow {
-            val firebaseUser = checkNotNull(usersRepository.fetchCurrentAuthUser())
-            usersRepository.fetchUserById(firebaseUser.uid).map { appUser ->
-                checkNotNull(appUser)
-            }
+            usersRepository.fetchCurrentUserProfile().filterNotNull()
         }
 
         override suspend fun checkEmailVerification() = eitherWrapper.wrapFlow {
-            usersRepository.fetchStateChanged().map { it?.emailVerification == true }
+            usersRepository.fetchStateChanged().map { it?.emailVerification == true }.distinctUntilChanged()
         }
     }
 }

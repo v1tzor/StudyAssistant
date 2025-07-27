@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.remote.mappers.share
 
 import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
+import ru.aleshin.studyassistant.core.common.extensions.encodeToString
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.models.shared.schedules.ReceivedMediatedSchedulesDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.shared.schedules.ReceivedMediatedSchedulesPojo
@@ -34,28 +35,39 @@ import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojoDetails
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
+fun SharedSchedulesDetailsPojo.convertToBase() = SharedSchedulesPojo(
+    id = id,
+    sent = sent.mapValues { it.value.convertToBase() }.encodeToString(),
+    received = received.mapValues { it.value.convertToBase() }.encodeToString(),
+    updatedAt = updatedAt,
+)
+
 fun SharedSchedulesPojo.convertToDetails(
     recipientMapper: (UID) -> AppUserPojoDetails,
     senderMapper: (UID) -> AppUserPojoDetails,
 ) = SharedSchedulesDetailsPojo(
+    id = id,
     sent = sent.decodeFromString<SentMediatedSchedulesPojo>().mapValues {
         it.value.convertToDetails(recipientMapper)
     },
     received = received.decodeFromString<ReceivedMediatedSchedulesPojo>().mapValues {
         it.value.convertToDetails(senderMapper(it.value.sender))
     },
+    updatedAt = updatedAt,
 )
 
 fun SharedSchedulesShortPojo.convertToShortDetails(
     recipientMapper: (UID) -> AppUserPojoDetails,
     senderMapper: (UID) -> AppUserPojoDetails,
 ) = SharedSchedulesShortDetailsPojo(
+    id = id,
     sent = sent.decodeFromString<SentMediatedSchedulesPojo>().mapValues {
         it.value.convertToShortDetails(recipientMapper)
     },
     received = received.decodeFromString<ReceivedMediatedSchedulesShortPojo>().mapValues {
         it.value.convertToShortDetails(senderMapper(it.value.sender))
     },
+    updatedAt = updatedAt,
 )
 
 fun SentMediatedSchedulesPojo.convertToDetails(
@@ -67,6 +79,13 @@ fun SentMediatedSchedulesPojo.convertToDetails(
     organizationNames = organizationNames,
 )
 
+fun SentMediatedSchedulesDetailsPojo.convertToBase() = SentMediatedSchedulesPojo(
+    uid = uid,
+    sendDate = sendDate,
+    recipient = recipient.uid,
+    organizationNames = organizationNames,
+)
+
 fun SentMediatedSchedulesPojo.convertToShortDetails(
     recipientMapper: (UID) -> AppUserPojoDetails,
 ) = SentMediatedSchedulesShortDetailsPojo(
@@ -74,6 +93,14 @@ fun SentMediatedSchedulesPojo.convertToShortDetails(
     sendDate = sendDate,
     recipient = recipientMapper(recipient),
     organizationNames = organizationNames,
+)
+
+fun ReceivedMediatedSchedulesDetailsPojo.convertToBase() = ReceivedMediatedSchedulesPojo(
+    uid = uid,
+    sendDate = sendDate,
+    sender = sender.uid,
+    schedules = schedules,
+    organizationsData = organizationsData,
 )
 
 fun ReceivedMediatedSchedulesPojo.convertToDetails(

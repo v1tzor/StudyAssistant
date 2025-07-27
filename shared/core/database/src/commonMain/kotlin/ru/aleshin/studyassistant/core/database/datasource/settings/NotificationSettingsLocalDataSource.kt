@@ -20,6 +20,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToOne
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.database.utils.LocalDataSource
 import ru.aleshin.studyassistant.sqldelight.settings.NotificationQueries
 import ru.aleshin.studyassistant.sqldelight.settings.NotificationSettingsEntity
 import kotlin.coroutines.CoroutineContext
@@ -27,7 +28,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * @author Stanislav Aleshin on 24.04.2024.
  */
-interface NotificationSettingsLocalDataSource {
+interface NotificationSettingsLocalDataSource : LocalDataSource.OnlyOffline {
 
     suspend fun fetchSettings(): Flow<NotificationSettingsEntity>
 
@@ -46,7 +47,7 @@ interface NotificationSettingsLocalDataSource {
         }
 
         override suspend fun updateSettings(settings: NotificationSettingsEntity) {
-            calendarQueries.updateSettings(settings)
+            calendarQueries.updateSettings(settings).await()
         }
     }
 }

@@ -11,51 +11,69 @@ CREATE TABLE todoEntity (
     notify_one_day_before INTEGER NOT NULL,
     notify_one_week_before INTEGER NOT NULL,
     is_done INTEGER NOT NULL,
-    complete_date INTEGER
+    complete_date INTEGER,
+    updated_at INTEGER NOT NULL,
+    is_cache_data INTEGER NOT NULL
 );
 
 addOrUpdateTodo:
-INSERT OR REPLACE INTO todoEntity (uid, deadline, name, description, priority, notify_before_start, notify_fifteen_minutes_before, notify_one_hour_before, notify_three_hour_before, notify_one_day_before, notify_one_week_before, is_done, complete_date)
+INSERT OR REPLACE INTO todoEntity (uid, deadline, name, description, priority, notify_before_start, notify_fifteen_minutes_before, notify_one_hour_before, notify_three_hour_before, notify_one_day_before, notify_one_week_before, is_done, complete_date, updated_at, is_cache_data)
 VALUES ?;
+
+fetchTodoById:
+SELECT *
+FROM todoEntity
+WHERE uid = ? AND is_cache_data = ?;
+
+fetchTodoByIds:
+SELECT *
+FROM todoEntity
+WHERE uid IN ? AND is_cache_data = ?;
 
 fetchTodosByTimeRange:
 SELECT *
 FROM todoEntity
-WHERE deadline BETWEEN ? AND ? OR deadline IS NULL
+WHERE (deadline BETWEEN ? AND ? OR deadline IS NULL) AND is_cache_data = ?
 ORDER BY deadline DESC;
 
 fetchActiveTodos:
 SELECT *
 FROM todoEntity
-WHERE is_done = 0 AND complete_date IS NULL
+WHERE (is_done = 0 AND complete_date IS NULL) AND is_cache_data = ?
 ORDER BY deadline DESC;
 
 fetchCompletedTodos:
 SELECT *
 FROM todoEntity
-WHERE is_done = 1 AND complete_date IS NOT NULL
+WHERE (is_done = 1 AND complete_date IS NOT NULL) AND is_cache_data = ?
 ORDER BY deadline DESC;
 
 fetchCompletedTodosByTimeRange:
 SELECT *
 FROM todoEntity
-WHERE is_done = 1 AND complete_date IS NOT NULL AND complete_date BETWEEN ? AND ?
+WHERE (is_done = 1 AND complete_date IS NOT NULL AND complete_date BETWEEN ? AND ?) AND is_cache_data = ?
 ORDER BY deadline DESC;
 
 fetchOverdueTodos:
 SELECT *
 FROM todoEntity
-WHERE deadline < ? AND is_done = 0 AND complete_date IS NULL
+WHERE (deadline < ? AND is_done = 0 AND complete_date IS NULL) AND is_cache_data = ?
 ORDER BY deadline DESC;
 
-fetchTodoById:
+fetchAllTodos:
 SELECT *
 FROM todoEntity
-WHERE uid = ?;
+WHERE is_cache_data = ?;
 
-deleteTodo:
+fetchEmptyTodos:
+SELECT uid, updated_at
+FROM todoEntity
+WHERE is_cache_data = 1;
+
+deleteTodosById:
 DELETE FROM todoEntity
-WHERE uid = ?;
+WHERE uid IN ? AND is_cache_data = ?;
 
 deleteAllTodos:
-DELETE FROM todoEntity;
+DELETE FROM todoEntity
+WHERE is_cache_data = ?;

@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.subject
 
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.ContactInfo
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
-import ru.aleshin.studyassistant.core.common.functional.UID
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
@@ -32,4 +32,5 @@ data class Subject(
     val office: String,
     val color: Int,
     val location: ContactInfo?,
+    val updatedAt: Long,
 )

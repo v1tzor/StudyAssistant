@@ -39,4 +39,5 @@ data class HomeworkDetailsPojo(
     val priority: String,
     val isDone: Boolean = false,
     val completeDate: Long? = null,
+    val updatedAt: Long = 0L,
 )

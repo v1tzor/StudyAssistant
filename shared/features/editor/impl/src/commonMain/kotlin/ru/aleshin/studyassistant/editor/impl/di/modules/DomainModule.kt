@@ -41,16 +41,16 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<EditorErrorHandler> { EditorErrorHandler.Base() }
     bindSingleton<EditorEitherWrapper> { EditorEitherWrapper.Base(instance(), instance()) }
 
-    bindSingleton<BaseScheduleInteractor> { BaseScheduleInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<CustomScheduleInteractor> { CustomScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<BaseClassInteractor> { BaseClassInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<BaseScheduleInteractor> { BaseScheduleInteractor.Base(instance(), instance()) }
+    bindSingleton<CustomScheduleInteractor> { CustomScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<BaseClassInteractor> { BaseClassInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<CustomClassInteractor> { CustomClassInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<EmployeeInteractor> { EmployeeInteractor.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<SubjectInteractor> { SubjectInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<HomeworkInteractor> { HomeworkInteractor.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<HomeworkInteractor> { HomeworkInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<TodoInteractor> { TodoInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<LinkingClassInteractor> { LinkingClassInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<LinkingClassInteractor> { LinkingClassInteractor.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<CalendarSettingsInteractor> { CalendarSettingsInteractor.Base(instance(), instance()) }
 }

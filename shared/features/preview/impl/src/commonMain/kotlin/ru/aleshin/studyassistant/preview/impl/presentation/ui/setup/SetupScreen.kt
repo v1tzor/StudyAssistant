@@ -115,7 +115,7 @@ internal class SetupScreen : Screen {
                 is SetupEffect.NavigateToBack -> navigator.nestedPop()
                 is SetupEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
                         withDismissAction = true,
                     )
                 }

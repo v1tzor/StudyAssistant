@@ -26,7 +26,6 @@ import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseWeekSchedule
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 
@@ -41,13 +40,11 @@ internal interface BaseScheduleInteractor {
 
     class Base(
         private val scheduleRepository: BaseScheduleRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: EditorEitherWrapper,
     ) : BaseScheduleInteractor {
 
         override suspend fun fetchScheduleById(uid: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            scheduleRepository.fetchScheduleById(uid, targetUser).map { schedule ->
+            scheduleRepository.fetchScheduleById(uid).map { schedule ->
                 schedule?.copy(classes = schedule.classes.sortedBy { it.timeRange.from.dateTime().time })
             }
         }
@@ -57,8 +54,7 @@ internal interface BaseScheduleInteractor {
             week: NumberOfRepeatWeek,
         ) = eitherWrapper.wrapFlow {
             val weekDaySchedules = mutableMapOf<DayOfWeek, BaseSchedule>()
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val schedulesByVersion = scheduleRepository.fetchSchedulesByVersion(timeRange, week, targetUser)
+            val schedulesByVersion = scheduleRepository.fetchSchedulesByVersion(timeRange, week)
 
             return@wrapFlow schedulesByVersion.map { rawSchedules ->
                 rawSchedules.forEach { schedule ->

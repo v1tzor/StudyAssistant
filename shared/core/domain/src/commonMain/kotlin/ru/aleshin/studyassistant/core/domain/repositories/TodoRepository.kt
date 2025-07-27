@@ -27,14 +27,13 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
  * @author Stanislav Aleshin on 01.07.2024.
  */
 interface TodoRepository {
-    suspend fun addOrUpdateTodo(todo: Todo, targetUser: UID): UID
-    suspend fun fetchTodoById(uid: UID, targetUser: UID): Flow<Todo?>
-    suspend fun fetchTodosByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Todo>>
-    suspend fun fetchActiveTodos(targetUser: UID): Flow<List<Todo>>
-    suspend fun fetchCompletedTodos(completeTimeRange: TimeRange? = null, targetUser: UID): Flow<List<Todo>>
-    suspend fun fetchOverdueTodos(currentDate: Instant, targetUser: UID): Flow<List<Todo>>
-    suspend fun fetchTodosByDate(date: Instant, targetUser: UID): Flow<List<Todo>>
-    suspend fun deleteTodo(uid: UID, targetUser: UID)
-    suspend fun deleteAllTodos(targetUser: UID)
-    suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
+    suspend fun addOrUpdateTodo(todo: Todo): UID
+    suspend fun fetchTodoById(uid: UID): Flow<Todo?>
+    suspend fun fetchTodosByTimeRange(timeRange: TimeRange): Flow<List<Todo>>
+    suspend fun fetchActiveTodos(): Flow<List<Todo>>
+    suspend fun fetchCompletedTodos(completeTimeRange: TimeRange? = null): Flow<List<Todo>>
+    suspend fun fetchOverdueTodos(currentDate: Instant): Flow<List<Todo>>
+    suspend fun fetchTodosByDate(date: Instant): Flow<List<Todo>>
+    suspend fun deleteTodo(uid: UID)
+    suspend fun transferData(direction: DataTransferDirection)
 }

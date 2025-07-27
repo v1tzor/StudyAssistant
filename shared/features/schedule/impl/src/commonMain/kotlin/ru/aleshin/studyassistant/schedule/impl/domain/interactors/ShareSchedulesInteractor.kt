@@ -16,7 +16,9 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.interactors
 
+import dev.tmapps.konnection.Konnection
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
@@ -37,19 +39,21 @@ internal interface ShareSchedulesInteractor {
     class Base(
         private val shareRepository: ShareSchedulesRepository,
         private val usersRepository: UsersRepository,
+        private val connectionManager: Konnection,
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : ShareSchedulesInteractor {
 
         override suspend fun fetchReceivedSharedSchedules(shareId: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            shareRepository.fetchShareSchedulesByUser(targetUser).map { sharedSchedules ->
+            shareRepository.fetchCurrentSharedSchedules().map { sharedSchedules ->
                 checkNotNull(sharedSchedules.received[shareId])
             }
         }
 
         override suspend fun acceptOrRejectSchedules(schedules: ReceivedMediatedSchedules) = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(targetUser)
+            if (!connectionManager.isConnected()) throw InternetConnectionException()
+
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
+            val currentSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(currentUser)
             val senderSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(schedules.sender.uid)
 
             val updatedCurrentSharedSchedules = currentSharedSchedules.copy(
@@ -65,11 +69,11 @@ internal interface ShareSchedulesInteractor {
                 }
             )
 
-            shareRepository.addOrUpdateSharedSchedules(
+            shareRepository.addOrUpdateSharedSchedulesForUser(
                 schedules = updatedCurrentSharedSchedules,
-                targetUser = targetUser,
+                targetUser = currentUser,
             )
-            shareRepository.addOrUpdateSharedSchedules(
+            shareRepository.addOrUpdateSharedSchedulesForUser(
                 schedules = updatedSenderSharedSchedules,
                 targetUser = schedules.sender.uid,
             )

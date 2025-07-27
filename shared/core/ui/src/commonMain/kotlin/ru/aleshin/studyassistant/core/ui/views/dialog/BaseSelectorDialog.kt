@@ -283,6 +283,7 @@ fun LazyItemScope.SelectorAddItemView(
 fun LazyItemScope.SelectorTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    confirmEnabled: Boolean = true,
     value: String,
     onValueChange: (String) -> Unit,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -330,9 +331,10 @@ fun LazyItemScope.SelectorTextField(
                 IconButton(
                     onClick = onConfirm,
                     modifier = Modifier.size(24.dp),
-                    enabled = enabled,
+                    enabled = enabled && confirmEnabled,
                 ) {
                     Icon(
+                        modifier = Modifier.alphaByEnabled(confirmEnabled),
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
                         tint = StudyAssistantRes.colors.accents.green,

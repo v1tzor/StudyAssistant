@@ -29,5 +29,6 @@ internal fun BillingFailures.mapToMessage(
     coreStrings: StudyAssistantStrings,
 ) = when (this) {
     is BillingFailures.PaymentError -> type.mapToString(coreStrings)
+    is BillingFailures.InternetError -> coreStrings.networkErrorMessage
     is BillingFailures.OtherError -> strings.otherErrorMessage
 }

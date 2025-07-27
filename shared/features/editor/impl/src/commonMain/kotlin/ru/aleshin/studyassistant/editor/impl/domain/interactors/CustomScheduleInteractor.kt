@@ -28,12 +28,13 @@ import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.domain.entities.organizations.NumberedDuration
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
-import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -73,26 +74,26 @@ internal interface CustomScheduleInteractor {
         private val usersRepository: UsersRepository,
         private val startClassesReminderManager: StartClassesReminderManager,
         private val endClassesReminderManager: EndClassesReminderManager,
+        private val dateManager: DateManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : CustomScheduleInteractor {
 
         override suspend fun addOrUpdateSchedule(schedule: CustomSchedule) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            return@wrap scheduleRepository.addOrUpdateSchedule(schedule, targetUser).apply {
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedSchedule = schedule.copy(updatedAt = updatedAt)
+            return@wrap scheduleRepository.addOrUpdateSchedule(updatedSchedule).apply {
                 updateReminderServices()
             }
         }
 
         override suspend fun fetchScheduleById(uid: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            scheduleRepository.fetchScheduleById(uid, targetUser).map { schedule ->
+            scheduleRepository.fetchScheduleById(uid).map { schedule ->
                 schedule?.copy(classes = schedule.classes.sortedBy { it.timeRange.from.dateTime().time })
             }
         }
 
         override suspend fun deleteScheduleById(uid: UID) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            scheduleRepository.deleteScheduleById(uid, targetUser).apply {
+            scheduleRepository.deleteScheduleById(uid).apply {
                 updateReminderServices()
             }
         }
@@ -101,8 +102,6 @@ internal interface CustomScheduleInteractor {
             schedule: CustomSchedule,
             time: Instant,
         ) = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-
             val startOfDay = schedule.classes.first().timeRange.from
             val endOfDay = schedule.classes.last().timeRange.to
 
@@ -122,7 +121,9 @@ internal interface CustomScheduleInteractor {
                     )
                 )
             }
-            scheduleRepository.addOrUpdateSchedule(schedule.copy(classes = updatedClasses), targetUser).apply {
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedSchedule = schedule.copy(classes = updatedClasses, updatedAt = updatedAt)
+            scheduleRepository.addOrUpdateSchedule(updatedSchedule).apply {
                 updateReminderServices()
             }
         }
@@ -132,7 +133,6 @@ internal interface CustomScheduleInteractor {
             baseDuration: Millis,
             specificDurations: List<NumberedDuration>
         ) = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val updatedClasses = buildList<Class> {
                 schedule.classes.forEachIndexed { index, classModel ->
                     val targetClass = lastOrNull() ?: classModel
@@ -171,7 +171,9 @@ internal interface CustomScheduleInteractor {
                 }
             }
 
-            scheduleRepository.addOrUpdateSchedule(schedule.copy(classes = updatedClasses), targetUser).apply {
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedSchedule = schedule.copy(classes = updatedClasses, updatedAt = updatedAt)
+            scheduleRepository.addOrUpdateSchedule(updatedSchedule).apply {
                 updateReminderServices()
             }
         }
@@ -181,7 +183,6 @@ internal interface CustomScheduleInteractor {
             baseDuration: Millis,
             specificDurations: List<NumberedDuration>
         ) = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val updatedClasses = buildList {
                 schedule.classes.forEachIndexed { index, targetClass ->
                     val targetDuration = specificDurations.find { it.number == index }?.duration ?: baseDuration
@@ -212,14 +213,15 @@ internal interface CustomScheduleInteractor {
                 }
             }
 
-            scheduleRepository.addOrUpdateSchedule(schedule.copy(classes = updatedClasses), targetUser).apply {
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedSchedule = schedule.copy(classes = updatedClasses, updatedAt = updatedAt)
+            scheduleRepository.addOrUpdateSchedule(updatedSchedule).apply {
                 updateReminderServices()
             }
         }
 
         private suspend fun updateReminderServices() {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val notificationSettings = notificationSettingsRepository.fetchSettings(targetUser).first()
+            val notificationSettings = notificationSettingsRepository.fetchSettings().first()
             if (notificationSettings.beginningOfClasses != null) {
                 startClassesReminderManager.startOrRetryReminderService()
             }

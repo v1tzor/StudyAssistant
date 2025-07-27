@@ -34,4 +34,5 @@ data class OrganizationShortEntity(
     val locations: List<ContactInfoEntity> = emptyList(),
     val offices: List<String> = emptyList(),
     val scheduleTimeIntervals: ScheduleTimeIntervalsEntity = ScheduleTimeIntervalsEntity(),
+    val updatedAt: Long,
 )

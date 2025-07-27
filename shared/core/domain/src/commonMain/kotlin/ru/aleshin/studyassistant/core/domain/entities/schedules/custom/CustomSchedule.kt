@@ -27,4 +27,5 @@ data class CustomSchedule(
     val uid: UID,
     val date: Instant,
     val classes: List<Class>,
+    val updatedAt: Long,
 )

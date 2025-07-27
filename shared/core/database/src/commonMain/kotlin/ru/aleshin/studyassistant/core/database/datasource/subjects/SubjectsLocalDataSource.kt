@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.core.database.datasource.subjects
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import app.cash.sqldelight.coroutines.mapToOneOrNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -26,117 +26,193 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import ru.aleshin.studyassistant.core.common.architecture.data.MetadataModel
+import ru.aleshin.studyassistant.core.common.extensions.mapToListFlow
+import ru.aleshin.studyassistant.core.common.extensions.mapToOneOrNullFlow
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.database.datasource.subjects.SubjectsLocalDataSource.OfflineStorage
+import ru.aleshin.studyassistant.core.database.datasource.subjects.SubjectsLocalDataSource.SyncStorage
+import ru.aleshin.studyassistant.core.database.mappers.employee.mapToBase
+import ru.aleshin.studyassistant.core.database.mappers.subjects.mapToBase
 import ru.aleshin.studyassistant.core.database.mappers.subjects.mapToDetails
+import ru.aleshin.studyassistant.core.database.mappers.subjects.mapToEntity
+import ru.aleshin.studyassistant.core.database.models.subjects.BaseSubjectEntity
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
+import ru.aleshin.studyassistant.core.database.utils.CombinedLocalDataSource
+import ru.aleshin.studyassistant.core.database.utils.LocalDataSource
+import ru.aleshin.studyassistant.core.database.utils.LocalMultipleDocumentsCommands
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
-import ru.aleshin.studyassistant.sqldelight.subjects.SubjectEntity
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries
 import kotlin.coroutines.CoroutineContext
 
 /**
  * @author Stanislav Aleshin on 02.06.2024.
  */
-interface SubjectsLocalDataSource {
+interface SubjectsLocalDataSource : CombinedLocalDataSource<BaseSubjectEntity, OfflineStorage, SyncStorage> {
 
-    suspend fun addOrUpdateSubject(subject: SubjectEntity): UID
-    suspend fun addOrUpdateSubjectsGroup(subjects: List<SubjectEntity>)
-    suspend fun fetchSubjectById(uid: UID): Flow<SubjectDetailsEntity?>
-    suspend fun fetchAllSubjectsByOrganization(organizationId: UID?): Flow<List<SubjectDetailsEntity>>
-    suspend fun fetchAllSubjectsByNames(names: List<String>): List<SubjectDetailsEntity>
-    suspend fun fetchSubjectsByEmployee(employeeId: UID): Flow<List<SubjectDetailsEntity>>
-    suspend fun deleteSubject(targetId: UID)
-    suspend fun deleteAllSubjects()
+    interface Commands : LocalMultipleDocumentsCommands<BaseSubjectEntity> {
 
-    class Base(
-        private val subjectQueries: SubjectQueries,
-        private val employeeQueries: EmployeeQueries,
-        private val coroutineManager: CoroutineManager,
-    ) : SubjectsLocalDataSource {
+        suspend fun fetchSubjectDetailsById(uid: UID): Flow<SubjectDetailsEntity?>
+        suspend fun fetchAllSubjectsDetailsByOrg(organizationId: UID?): Flow<List<SubjectDetailsEntity>>
+        suspend fun fetchSubjectsDetailsByEmployee(employeeId: UID): Flow<List<SubjectDetailsEntity>>
+        suspend fun fetchAllSubjectsDetailsByNames(names: List<String>): List<SubjectDetailsEntity>
+        suspend fun fetchAllSubjects(): Flow<List<BaseSubjectEntity>>
 
-        private val coroutineContext: CoroutineContext
-            get() = coroutineManager.backgroundDispatcher
+        abstract class Abstract(
+            isCacheSource: Boolean,
+            private val subjectQueries: SubjectQueries,
+            private val employeeQueries: EmployeeQueries,
+            private val coroutineManager: CoroutineManager,
+        ) : Commands {
 
-        override suspend fun addOrUpdateSubject(subject: SubjectEntity): UID {
-            val uid = subject.uid.ifEmpty { randomUUID() }
-            subjectQueries.addOrUpdateSubject(subject.copy(uid = uid))
+            private val coroutineContext: CoroutineContext
+                get() = coroutineManager.backgroundDispatcher
 
-            return uid
-        }
+            private val isCacheData = if (isCacheSource) 1L else 0L
 
-        override suspend fun addOrUpdateSubjectsGroup(subjects: List<SubjectEntity>) {
-            subjects.forEach { subject -> addOrUpdateSubject(subject) }
-        }
-
-        override suspend fun fetchSubjectById(uid: UID): Flow<SubjectDetailsEntity?> {
-            val query = subjectQueries.fetchSubjectById(uid)
-            return query.asFlow().mapToOneOrNull(coroutineContext).flatMapToDetails()
-        }
-
-        override suspend fun fetchAllSubjectsByOrganization(organizationId: UID?): Flow<List<SubjectDetailsEntity>> {
-            val query = if (organizationId != null) {
-                subjectQueries.fetchSubjectsByOrganization(organizationId)
-            } else {
-                subjectQueries.fetchAllSubjects()
+            override suspend fun addOrUpdateItem(item: BaseSubjectEntity) {
+                val uid = item.uid.ifEmpty { randomUUID() }
+                val updatedItem = item.copy(uid = uid, isCacheData = isCacheData).mapToEntity()
+                subjectQueries.addOrUpdateSubject(updatedItem).await()
             }
-            return query.asFlow().mapToList(coroutineContext).flatMapListToDetails()
-        }
 
-        override suspend fun fetchAllSubjectsByNames(names: List<String>): List<SubjectDetailsEntity> {
-            val query = subjectQueries.fetchSubjectsByNames(names)
-            val subjectEntityList = query.executeAsList()
+            override suspend fun addOrUpdateItems(items: List<BaseSubjectEntity>) {
+                items.forEach { item -> addOrUpdateItem(item) }
+            }
 
-            return subjectEntityList.map { subjectEntity ->
-                val employee = subjectEntity.teacher_id?.let { teacherId ->
-                    val employeeQuery = employeeQueries.fetchEmployeeById(teacherId)
-                    employeeQuery.executeAsOneOrNull()
+            override suspend fun fetchItemById(id: String): Flow<BaseSubjectEntity?> {
+                val query = subjectQueries.fetchSubjectById(id, isCacheData)
+                return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }
+            }
+
+            override suspend fun fetchItemsById(ids: List<String>): Flow<List<BaseSubjectEntity>> {
+                val query = subjectQueries.fetchSubjectsById(ids, isCacheData)
+                return query.mapToListFlow(coroutineContext) { it.mapToBase() }
+            }
+
+            override suspend fun fetchSubjectDetailsById(uid: UID): Flow<SubjectDetailsEntity?> {
+                return fetchItemById(uid).flatMapToDetails()
+            }
+
+            override suspend fun fetchAllSubjectsDetailsByOrg(organizationId: UID?): Flow<List<SubjectDetailsEntity>> {
+                val query = if (organizationId != null) {
+                    subjectQueries.fetchSubjectsByOrganization(organizationId, isCacheData)
+                } else {
+                    subjectQueries.fetchAllSubjects(isCacheData)
                 }
-                subjectEntity.mapToDetails(employee = employee)
+                return query.mapToListFlow(coroutineContext) { it.mapToBase() }.flatMapListToDetails()
             }
-        }
 
-        override suspend fun fetchSubjectsByEmployee(employeeId: UID): Flow<List<SubjectDetailsEntity>> {
-            val query = subjectQueries.fetchSubjectsByEmployee(employeeId)
-            return query.asFlow().mapToList(coroutineContext).flatMapListToDetails()
-        }
+            override suspend fun fetchSubjectsDetailsByEmployee(employeeId: UID): Flow<List<SubjectDetailsEntity>> {
+                val query = subjectQueries.fetchSubjectsByEmployee(employeeId, isCacheData)
+                return query.mapToListFlow(coroutineContext) { it.mapToBase() }.flatMapListToDetails()
+            }
 
-        override suspend fun deleteSubject(targetId: UID) {
-            subjectQueries.deleteSubject(targetId)
-        }
+            override suspend fun fetchAllSubjectsDetailsByNames(names: List<String>): List<SubjectDetailsEntity> {
+                val query = subjectQueries.fetchSubjectsByNames(names, isCacheData)
+                val subjects = query.awaitAsList().map { it.mapToBase() }
 
-        override suspend fun deleteAllSubjects() {
-            subjectQueries.deleteAllSubjects()
-        }
+                val employeeIds = subjects.mapNotNull { it.teacherId }
+                val employeeMap = if (employeeIds.isNotEmpty()) {
+                    val query = employeeQueries.fetchEmployeesById(employeeIds, isCacheData)
+                    query.awaitAsList().associate { Pair(it.uid, it.mapToBase()) }
+                } else {
+                    emptyMap()
+                }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private fun Flow<List<SubjectEntity>>.flatMapListToDetails() = flatMapLatest { subjects ->
-            if (subjects.isEmpty()) {
-                flowOf(emptyList())
-            } else {
-                val organizationsIds = subjects.map { it.organization_id }
+                return subjects.map { subjectEntity ->
+                    subjectEntity.mapToDetails(employee = employeeMap[subjectEntity.teacherId])
+                }
+            }
 
-                val employeesMapFlow = employeeQueries.fetchEmployeesByOrganizations(organizationsIds)
-                    .asFlow()
-                    .mapToList(coroutineContext)
-                    .map { employee -> employee.associateBy { it.uid } }
+            override suspend fun fetchAllSubjects(): Flow<List<BaseSubjectEntity>> {
+                val query = subjectQueries.fetchAllSubjects(isCacheData)
+                return query.mapToListFlow(coroutineContext) { it.mapToBase() }
+            }
 
-                combine(
-                    flowOf(subjects),
-                    employeesMapFlow,
-                ) { subjectsList, employeesMap ->
-                    subjectsList.map { subject ->
-                        subject.mapToDetails(employee = employeesMap[subject.teacher_id])
+            override suspend fun fetchAllMetadata(): List<MetadataModel> {
+                val query = subjectQueries.fetchEmptySubjects()
+                return query.awaitAsList().map { entity ->
+                    MetadataModel(entity.uid, entity.updated_at)
+                }
+            }
+
+            override suspend fun deleteItemsById(ids: List<String>) {
+                subjectQueries.deleteSubjects(ids, isCacheData).await()
+            }
+
+            override suspend fun deleteAllItems() {
+                subjectQueries.deleteAllSubjects(isCacheData).await()
+            }
+
+            @OptIn(ExperimentalCoroutinesApi::class)
+            private fun Flow<List<BaseSubjectEntity>>.flatMapListToDetails() = flatMapLatest { subjects ->
+                if (subjects.isEmpty()) {
+                    flowOf(emptyList())
+                } else {
+                    val organizationsIds = subjects.map { it.organizationId }
+
+                    val employeesMapFlow = employeeQueries.fetchEmployeesByOrganizations(
+                        organization_id = organizationsIds,
+                        is_cache_data = isCacheData
+                    ).asFlow()
+                        .mapToList(coroutineContext)
+                        .map { employee -> employee.associate { Pair(it.uid, it.mapToBase()) } }
+
+                    combine(
+                        flowOf(subjects),
+                        employeesMapFlow,
+                    ) { subjectsList, employeesMap ->
+                        subjectsList.map { subject ->
+                            subject.mapToDetails(employee = employeesMap[subject.teacherId])
+                        }
                     }
                 }
             }
-        }
 
-        private fun Flow<SubjectEntity?>.flatMapToDetails(): Flow<SubjectDetailsEntity?> {
-            return mapNotNull { it?.let { listOf(it) } ?: emptyList() }
-                .flatMapListToDetails()
-                .map { it.getOrNull(0) }
+            private fun Flow<BaseSubjectEntity?>.flatMapToDetails(): Flow<SubjectDetailsEntity?> {
+                return mapNotNull { it?.let { listOf(it) } ?: emptyList() }
+                    .flatMapListToDetails()
+                    .map { it.getOrNull(0) }
+            }
         }
+    }
+
+    interface OfflineStorage : LocalDataSource.OnlyOffline, Commands {
+
+        class Base(
+            subjectQueries: SubjectQueries,
+            employeeQueries: EmployeeQueries,
+            coroutineManager: CoroutineManager,
+        ) : OfflineStorage, Commands.Abstract(
+            isCacheSource = false,
+            subjectQueries = subjectQueries,
+            employeeQueries = employeeQueries,
+            coroutineManager = coroutineManager,
+        )
+    }
+
+    interface SyncStorage : LocalDataSource.FullSynced.MultipleDocuments<BaseSubjectEntity>, Commands {
+
+        class Base(
+            subjectQueries: SubjectQueries,
+            employeeQueries: EmployeeQueries,
+            coroutineManager: CoroutineManager,
+        ) : SyncStorage, Commands.Abstract(
+            isCacheSource = true,
+            subjectQueries = subjectQueries,
+            employeeQueries = employeeQueries,
+            coroutineManager = coroutineManager,
+        )
+    }
+
+    class Base(
+        private val offlineStorage: OfflineStorage,
+        private val syncStorage: SyncStorage
+    ) : SubjectsLocalDataSource {
+        override fun offline() = offlineStorage
+        override fun sync() = syncStorage
     }
 }

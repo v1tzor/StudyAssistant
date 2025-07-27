@@ -72,6 +72,7 @@ internal data class WeekScheduleScreen(val week: NumberOfRepeatWeek) : Screen {
         dependencies = WeekScheduleDeps(week = week),
     ) { state ->
         val strings = EditorThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
         val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
         val sheetState = rememberStandardBottomSheetState(confirmValueChange = { it != SheetValue.Hidden })
@@ -139,7 +140,7 @@ internal data class WeekScheduleScreen(val week: NumberOfRepeatWeek) : Screen {
                 is WeekScheduleEffect.NavigateToLocal -> navigator.push(effect.pushScreen)
                 is WeekScheduleEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
                         withDismissAction = true,
                     )
                 }

@@ -40,6 +40,7 @@ internal fun Employee.mapToUi() = EmployeeUi(
     phones = phones.map { it.mapToUi() },
     locations = locations.map { it.mapToUi() },
     webs = webs.map { it.mapToUi() },
+    updatedAt = updatedAt,
 )
 
 internal fun EmployeeDetails.mapToUi() = EmployeeDetailsUi(
@@ -58,6 +59,7 @@ internal fun EmployeeDetails.mapToUi() = EmployeeDetailsUi(
     phones = phones.map { it.mapToUi() },
     locations = locations.map { it.mapToUi() },
     webs = webs.map { it.mapToUi() },
+    updatedAt = updatedAt,
 )
 
 internal fun EmployeeUi.mapToDomain() = Employee(
@@ -74,4 +76,5 @@ internal fun EmployeeUi.mapToDomain() = Employee(
     phones = phones.map { it.mapToDomain() },
     locations = locations.map { it.mapToDomain() },
     webs = webs.map { it.mapToDomain() },
+    updatedAt = updatedAt,
 )

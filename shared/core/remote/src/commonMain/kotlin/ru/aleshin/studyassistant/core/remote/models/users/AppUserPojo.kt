@@ -16,15 +16,18 @@
 
 package ru.aleshin.studyassistant.core.remote.models.users
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.remote.utils.BaseRemotePojo
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
 @Serializable
 data class AppUserPojo(
-    val uid: UID,
+    @SerialName("\$id")
+    override val id: UID,
     val devices: List<String> = emptyList(),
     val username: String = "",
     val email: String = "",
@@ -37,4 +40,5 @@ data class AppUserPojo(
     val friends: List<UID> = emptyList(),
     val subscriptionInfo: String? = null,
     val socialNetworks: List<String> = emptyList(),
-)
+    override val updatedAt: Long = 0L,
+) : BaseRemotePojo()

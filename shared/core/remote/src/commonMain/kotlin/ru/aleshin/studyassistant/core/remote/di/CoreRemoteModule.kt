@@ -44,23 +44,22 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.remote.BuildKonfig
-import ru.aleshin.studyassistant.core.remote.datasources.ai.AiRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.auth.AuthRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.billing.ProductsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
+import ru.aleshin.studyassistant.core.remote.api.ai.AiRemoteApi
+import ru.aleshin.studyassistant.core.remote.api.auth.AuthRemoteApi
+import ru.aleshin.studyassistant.core.remote.api.billing.ProductsRemoteApi
+import ru.aleshin.studyassistant.core.remote.api.message.HmsAuthTokenProvider
+import ru.aleshin.studyassistant.core.remote.api.message.MessageRemoteApi
+import ru.aleshin.studyassistant.core.remote.api.message.PushServiceAuthTokenFactory
+import ru.aleshin.studyassistant.core.remote.api.message.PushServiceAuthTokenProvider
 import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.goals.DailyGoalsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.message.HmsAuthTokenProvider
-import ru.aleshin.studyassistant.core.remote.datasources.message.MessageRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.message.PushServiceAuthTokenFactory
-import ru.aleshin.studyassistant.core.remote.datasources.message.PushServiceAuthTokenProvider
 import ru.aleshin.studyassistant.core.remote.datasources.organizations.OrganizationsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.requests.FriendRequestsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.schedules.BaseScheduleRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.schedules.CustomScheduleRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.settings.CalendarSettingsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.share.ShareHomeworksRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.share.ShareSchedulesRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.share.SharedHomeworksRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.share.SharedSchedulesRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.subjects.SubjectsRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.HomeworksRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.TodoRemoteDataSource
@@ -104,6 +103,7 @@ val coreRemoteModule = DI.Module("CoreRemote") {
                 }
             }
             install(HttpTimeout) {
+                connectTimeoutMillis = 15_000
                 requestTimeoutMillis = 15_000
                 socketTimeoutMillis = 15_000
             }
@@ -132,6 +132,7 @@ val coreRemoteModule = DI.Module("CoreRemote") {
                 }
             }
             install(HttpTimeout) {
+                connectTimeoutMillis = 300_000
                 requestTimeoutMillis = 300_000
                 socketTimeoutMillis = 300_000
             }
@@ -172,24 +173,25 @@ val coreRemoteModule = DI.Module("CoreRemote") {
         }
     }
 
-    bindSingleton<AiRemoteDataSource> { AiRemoteDataSource.Base(instance(tag = "DeepSeek")) }
-    bindSingleton<SubscriptionChecker> { SubscriptionChecker.Base(instance(), instance(), instance()) }
-    bindSingleton<AuthRemoteDataSource> { AuthRemoteDataSource.Base(instance()) }
-    bindProvider<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance()) }
-    bindSingleton<FriendRequestsRemoteDataSource> { FriendRequestsRemoteDataSource.Base(instance()) }
-    bindSingleton<ShareHomeworksRemoteDataSource> { ShareHomeworksRemoteDataSource.Base(instance()) }
-    bindSingleton<ShareSchedulesRemoteDataSource> { ShareSchedulesRemoteDataSource.Base(instance()) }
-    bindSingleton<BaseScheduleRemoteDataSource> { BaseScheduleRemoteDataSource.Base(instance()) }
-    bindSingleton<CustomScheduleRemoteDataSource> { CustomScheduleRemoteDataSource.Base(instance()) }
-    bindSingleton<SubjectsRemoteDataSource> { SubjectsRemoteDataSource.Base(instance()) }
-    bindSingleton<EmployeeRemoteDataSource> { EmployeeRemoteDataSource.Base(instance(), instance()) }
-    bindSingleton<HomeworksRemoteDataSource> { HomeworksRemoteDataSource.Base(instance()) }
-    bindSingleton<DailyGoalsRemoteDataSource> { DailyGoalsRemoteDataSource.Base(instance()) }
-    bindSingleton<TodoRemoteDataSource> { TodoRemoteDataSource.Base(instance()) }
-    bindSingleton<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance(), instance()) }
-    bindSingleton<ProductsRemoteDataSource> { ProductsRemoteDataSource.Base(instance()) }
-    bindSingleton<MessageRemoteDataSource> { MessageRemoteDataSource.Base(instance(tag = "Messages"), instance(), instance(), instance()) }
+    bindSingleton<AiRemoteApi> { AiRemoteApi.Base(instance(tag = "DeepSeek"), instance()) }
+    bindSingleton<AuthRemoteApi> { AuthRemoteApi.Base(instance()) }
+    bindSingleton<ProductsRemoteApi> { ProductsRemoteApi.Base(instance()) }
+    bindSingleton<MessageRemoteApi> { MessageRemoteApi.Base(instance(tag = "Messages"), instance(), instance(), instance(), instance()) }
+
+    bindSingleton<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance(), instance(), instance()) }
+    bindSingleton<FriendRequestsRemoteDataSource> { FriendRequestsRemoteDataSource.Base(instance(), instance(), instance()) }
+    bindSingleton<SharedHomeworksRemoteDataSource> { SharedHomeworksRemoteDataSource.Base(instance(), instance(), instance()) }
+    bindSingleton<SharedSchedulesRemoteDataSource> { SharedSchedulesRemoteDataSource.Base(instance(), instance(), instance()) }
+    bindSingleton<BaseScheduleRemoteDataSource> { BaseScheduleRemoteDataSource.Base(instance(), instance(), instance()) }
+    bindSingleton<CustomScheduleRemoteDataSource> { CustomScheduleRemoteDataSource.Base(instance(), instance(), instance()) }
+    bindSingleton<SubjectsRemoteDataSource> { SubjectsRemoteDataSource.Base(instance(), instance(), instance()) }
+    bindSingleton<EmployeeRemoteDataSource> { EmployeeRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<HomeworksRemoteDataSource> { HomeworksRemoteDataSource.Base(instance(), instance(), instance()) }
+    bindSingleton<DailyGoalsRemoteDataSource> { DailyGoalsRemoteDataSource.Base(instance(), instance(), instance()) }
+    bindSingleton<TodoRemoteDataSource> { TodoRemoteDataSource.Base(instance(), instance(), instance()) }
+    bindSingleton<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
+
     bindProvider<PushServiceAuthTokenFactory> { PushServiceAuthTokenFactory.Base(instance(), instance(), instance()) }
     bindProvider<PushServiceAuthTokenProvider.Firebase> { PushServiceAuthTokenProvider.Firebase(instance()) }
     bindProvider<PushServiceAuthTokenProvider.RuStore> { PushServiceAuthTokenProvider.RuStore() }

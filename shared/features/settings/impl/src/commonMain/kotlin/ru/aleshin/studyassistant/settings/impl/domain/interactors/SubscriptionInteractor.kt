@@ -54,7 +54,7 @@ internal interface SubscriptionInteractor {
 
         override suspend fun fetchSubscriptions() = eitherWrapper.wrap {
             val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val appUserInfo = usersRepository.fetchUserById(targetUser).first()
+            val appUserInfo = usersRepository.fetchCurrentUserProfile().first()
             val userSubscriptionInfo = appUserInfo?.subscriptionInfo
 
             val allPurchases = try {
@@ -94,7 +94,7 @@ internal interface SubscriptionInteractor {
                 product.status == CONFIRMED && product.developerPayload == targetUser
             }
 
-            val appUserInfo = checkNotNull(usersRepository.fetchUserById(targetUser).first())
+            val appUserInfo = checkNotNull(usersRepository.fetchCurrentUserProfile().first())
             val currentSubscriptionInfo = appUserInfo.subscriptionInfo
 
             return@wrap if (activePurchase != null) {
@@ -118,7 +118,7 @@ internal interface SubscriptionInteractor {
                             expiryTimeMillis = endTime.toEpochMilliseconds(),
                         )
                         val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
-                        usersRepository.updateAppUser(updatedAppUser)
+                        usersRepository.updateCurrentUserProfile(updatedAppUser)
                     } else {
                         val updatedSubscriptionInfo = SubscribeInfo(
                             deviceId = deviceInfoProvider.fetchDeviceId(),
@@ -131,7 +131,7 @@ internal interface SubscriptionInteractor {
                             store = iapService.fetchStore(),
                         )
                         val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
-                        usersRepository.updateAppUser(updatedAppUser)
+                        usersRepository.updateCurrentUserProfile(updatedAppUser)
                     }
                     true
                 } else {

@@ -18,59 +18,75 @@ package ru.aleshin.studyassistant.core.remote.datasources.settings
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.format.DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET
+import kotlinx.serialization.json.JsonElement
 import ru.aleshin.studyassistant.core.api.AppwriteApi.CalendarSettings
-import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Common.UPDATED_AT
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
+import ru.aleshin.studyassistant.core.api.databases.DatabaseService
+import ru.aleshin.studyassistant.core.api.realtime.RealtimeService
 import ru.aleshin.studyassistant.core.api.utils.Permission
-import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
+import ru.aleshin.studyassistant.core.common.architecture.data.MetadataModel
+import ru.aleshin.studyassistant.core.common.extensions.getStringOrNull
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.models.settings.CalendarSettingsPojo
+import ru.aleshin.studyassistant.core.remote.utils.RemoteDataSource
 
 /**
  * @author Stanislav Aleshin on 24.04.2024.
  */
-interface CalendarSettingsRemoteDataSource {
-
-    suspend fun addOrUpdateSettings(settings: CalendarSettingsPojo, targetUser: UID)
-    suspend fun fetchSettings(targetUser: UID): Flow<CalendarSettingsPojo>
-    suspend fun deleteSettings(targetUser: UID)
+interface CalendarSettingsRemoteDataSource : RemoteDataSource.FullSynced.SingleDocument<CalendarSettingsPojo> {
 
     class Base(
-        private val database: DatabaseApi,
-    ) : CalendarSettingsRemoteDataSource {
-        override suspend fun addOrUpdateSettings(settings: CalendarSettingsPojo, targetUser: UID) {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
+        database: DatabaseService,
+        realtime: RealtimeService,
+        userSessionProvider: UserSessionProvider
+    ) : CalendarSettingsRemoteDataSource, RemoteDataSource.FullSynced.SingleDocument.BaseAppwrite<CalendarSettingsPojo>(
+        database = database,
+        realtime = realtime,
+        userSessionProvider = userSessionProvider,
+    ) {
 
-            database.upsertDocument(
-                databaseId = CalendarSettings.DATABASE_ID,
-                collectionId = CalendarSettings.COLLECTION_ID,
-                documentId = targetUser,
-                data = settings,
-                permissions = Permission.onlyUserData(targetUser),
-                nestedType = CalendarSettingsPojo.serializer(),
-            )
+        override val databaseId = CalendarSettings.DATABASE_ID
+
+        override val collectionId = CalendarSettings.COLLECTION_ID
+
+        override val nestedType = CalendarSettingsPojo.serializer()
+
+        override fun permissions(currentUser: UID) = Permission.onlyUserData(currentUser)
+
+        override suspend fun fetchItem(): Flow<CalendarSettingsPojo?> {
+            val currentUser = userSessionProvider.getCurrentUserId()
+
+            return database.getDocumentFlow(
+                databaseId = databaseId,
+                collectionId = collectionId,
+                documentId = currentUser,
+                nestedType = nestedType,
+            ).map { item ->
+                item?.data ?: CalendarSettingsPojo.default(currentUser)
+            }
         }
 
-        override suspend fun fetchSettings(targetUser: UID): Flow<CalendarSettingsPojo> {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
+        override suspend fun fetchMetadata(): MetadataModel? {
+            val currentUser = userSessionProvider.getCurrentUserId()
 
-            val settingsFlow = database.getDocumentFlow(
-                databaseId = CalendarSettings.DATABASE_ID,
-                collectionId = CalendarSettings.COLLECTION_ID,
-                documentId = targetUser,
-                nestedType = CalendarSettingsPojo.serializer(),
+            val document = database.getDocumentOrNull(
+                databaseId = databaseId,
+                collectionId = collectionId,
+                documentId = currentUser,
+                nestedType = JsonElement.serializer(),
             )
 
-            return settingsFlow.map { it ?: CalendarSettingsPojo.default() }
-        }
-
-        override suspend fun deleteSettings(targetUser: UID) {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
-
-            database.deleteDocument(
-                databaseId = CalendarSettings.DATABASE_ID,
-                collectionId = CalendarSettings.COLLECTION_ID,
-                documentId = targetUser
-            )
+            return if (document != null) {
+                val documentUpdatedAt = ISO_DATE_TIME_OFFSET.parse(document.updatedAt)
+                val updatedAt = document.data.getStringOrNull(UPDATED_AT).let {
+                    it?.toLongOrNull() ?: documentUpdatedAt.toInstantUsingOffset().toEpochMilliseconds()
+                }
+                MetadataModel(id = currentUser, updatedAt = updatedAt)
+            } else {
+                MetadataModel(id = currentUser, updatedAt = 0L)
+            }
         }
     }
 }

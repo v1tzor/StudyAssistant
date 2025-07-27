@@ -10,45 +10,63 @@ CREATE TABLE homeworkEntity (
     test TEXT,
     priority TEXT NOT NULL,
     is_done INTEGER NOT NULL,
-    complete_date INTEGER
+    complete_date INTEGER,
+    updated_at INTEGER NOT NULL,
+    is_cache_data INTEGER NOT NULL
 );
 
 addOrUpdateHomework:
-INSERT OR REPLACE INTO homeworkEntity (uid, class_id, deadline, subject_id, organization_id, theoretical_tasks, practical_tasks, presentations, test, priority, is_done, complete_date)
+INSERT OR REPLACE INTO homeworkEntity (uid, class_id, deadline, subject_id, organization_id, theoretical_tasks, practical_tasks, presentations, test, priority, is_done, complete_date, updated_at, is_cache_data)
 VALUES ?;
+
+fetchHomeworkById:
+SELECT *
+FROM homeworkEntity
+WHERE uid = ? AND is_cache_data = ?;
+
+fetchHomeworksById:
+SELECT *
+FROM homeworkEntity
+WHERE uid IN ? AND is_cache_data = ?;
 
 fetchHomeworksByTimeRange:
 SELECT *
 FROM homeworkEntity
-WHERE deadline BETWEEN ? AND ?
+WHERE (deadline BETWEEN ? AND ?) AND is_cache_data = ?
 ORDER BY deadline DESC;
 
 fetchActiveAndLinkedHomeworks:
 SELECT *
 FROM homeworkEntity
-WHERE deadline >= ? AND is_done = 0 AND class_id IS NOT NULL
+WHERE (deadline >= ? AND is_done = 0 AND class_id IS NOT NULL) AND is_cache_data = ?
 ORDER BY deadline DESC;
 
 fetchOverdueHomeworks:
 SELECT *
 FROM homeworkEntity
-WHERE deadline < ? AND is_done = 0 AND complete_date IS NULL
+WHERE (deadline < ? AND is_done = 0 AND complete_date IS NULL) AND is_cache_data = ?
 ORDER BY deadline DESC;
 
 fetchCompletedHomeworksCount:
 SELECT COUNT(*)
 FROM homeworkEntity
-WHERE is_done = 1 AND complete_date IS NOT NULL
+WHERE (is_done = 1 AND complete_date IS NOT NULL) AND is_cache_data = ?
 ORDER BY deadline DESC;
 
-fetchHomeworkById:
+fetchAllHomeworks:
 SELECT *
 FROM homeworkEntity
-WHERE uid = ?;
+WHERE is_cache_data = ?;
 
-deleteHomework:
+fetchEmptyHomeworks:
+SELECT uid, updated_at
+FROM homeworkEntity
+WHERE is_cache_data = 1;
+
+deleteHomeworks:
 DELETE FROM homeworkEntity
-WHERE uid = ?;
+WHERE uid IN ? AND is_cache_data = ?;
 
 deleteAllHomeworks:
-DELETE FROM homeworkEntity;
+DELETE FROM homeworkEntity
+WHERE is_cache_data = ?;

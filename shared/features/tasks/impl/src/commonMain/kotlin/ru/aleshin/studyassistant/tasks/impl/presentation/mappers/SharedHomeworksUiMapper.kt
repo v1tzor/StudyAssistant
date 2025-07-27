@@ -38,12 +38,14 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.MediatedHo
  */
 internal fun SharedHomeworksDetails.mapToUi() = SharedHomeworksDetailsUi(
     received = received.mapValues { it.value.mapToUi() },
-    sent = sent.mapValues { it.value.mapToUi() }
+    sent = sent.mapValues { it.value.mapToUi() },
+    updatedAt = updatedAt,
 )
 
 internal fun SharedHomeworks.mapToUi() = SharedHomeworksUi(
     received = received.mapValues { it.value.mapToUi() },
-    sent = sent.mapValues { it.value.mapToUi() }
+    sent = sent.mapValues { it.value.mapToUi() },
+    updatedAt = updatedAt,
 )
 
 internal fun ReceivedMediatedHomeworksDetails.mapToUi() = ReceivedMediatedHomeworksDetailsUi(
@@ -99,12 +101,14 @@ internal fun MediatedHomework.mapToUi() = MediatedHomeworkUi(
 
 internal fun SharedHomeworksDetailsUi.mapToDomain() = SharedHomeworksDetails(
     received = received.mapValues { it.value.mapToDomain() },
-    sent = sent.mapValues { it.value.mapToDomain() }
+    sent = sent.mapValues { it.value.mapToDomain() },
+    updatedAt = updatedAt,
 )
 
 internal fun SharedHomeworksUi.mapToDomain() = SharedHomeworks(
     received = received.mapValues { it.value.mapToDomain() },
-    sent = sent.mapValues { it.value.mapToDomain() }
+    sent = sent.mapValues { it.value.mapToDomain() },
+    updatedAt = updatedAt,
 )
 
 internal fun ReceivedMediatedHomeworksDetailsUi.mapToDomain() = ReceivedMediatedHomeworksDetails(

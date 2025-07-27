@@ -22,5 +22,6 @@ import ru.aleshin.studyassistant.core.common.functional.DomainFailures
  * @author Stanislav Aleshin on 21.04.2024.
  */
 internal sealed class ScheduleFailures : DomainFailures {
+    object InternetError : ScheduleFailures()
     data class OtherError(val throwable: Throwable) : ScheduleFailures()
 }

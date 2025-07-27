@@ -28,7 +28,7 @@ fun GoalPojo.mapToDetails(
     homeworksMapper: (() -> HomeworkDetailsPojo?)? = null,
     todoMapper: (() -> TodoPojoDetails?)? = null,
 ) = GoalDetailsPojo(
-    uid = uid,
+    uid = id,
     contentType = type,
     contentHomework = homeworksMapper?.invoke(),
     contentTodo = todoMapper?.invoke(),
@@ -43,4 +43,5 @@ fun GoalPojo.mapToDetails(
     completeAfterTimeElapsed = completeAfterTimeElapsed,
     isDone = done,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )

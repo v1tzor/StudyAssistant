@@ -41,6 +41,7 @@ internal data class GoalShortUi(
     val completeAfterTimeElapsed: Boolean = false,
     val isDone: Boolean = false,
     @TypeParceler<Instant?, NullInstantParceler> val completeDate: Instant?,
+    val updatedAt: Long,
 ) : Parcelable
 
 internal fun GoalDetailsUi.convertToShort() = GoalShortUi(
@@ -67,4 +68,5 @@ internal fun GoalDetailsUi.convertToShort() = GoalShortUi(
     completeAfterTimeElapsed = completeAfterTimeElapsed,
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )

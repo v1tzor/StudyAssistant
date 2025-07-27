@@ -25,7 +25,7 @@ import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojoDetails
  * @author Stanislav Aleshin on 06.07.2025.
  */
 fun AppUserPojo.convertToDetails() = AppUserPojoDetails(
-    uid = uid,
+    uid = id,
     devices = devices.map { it.fromJson() },
     username = username,
     email = email,
@@ -38,10 +38,11 @@ fun AppUserPojo.convertToDetails() = AppUserPojoDetails(
     friends = friends,
     subscriptionInfo = subscriptionInfo?.fromJson(),
     socialNetworks = socialNetworks.map { it.fromJson() },
+    updatedAt = updatedAt,
 )
 
 fun AppUserPojoDetails.convertToBase() = AppUserPojo(
-    uid = uid,
+    id = uid,
     devices = devices.map { it.toJson() },
     username = username,
     email = email,
@@ -54,4 +55,5 @@ fun AppUserPojoDetails.convertToBase() = AppUserPojo(
     friends = friends,
     subscriptionInfo = subscriptionInfo?.toJson(),
     socialNetworks = socialNetworks.map { it.toJson() },
+    updatedAt = updatedAt,
 )

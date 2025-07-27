@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.users.impl.domain.interactors
 
+import dev.tmapps.konnection.Konnection
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
@@ -45,20 +47,22 @@ internal interface FriendRequestsInteractor {
         private val usersRepository: UsersRepository,
         private val messageRepository: MessageRepository,
         private val dateManager: DateManager,
+        private val connectionManager: Konnection,
         private val eitherWrapper: UsersEitherWrapper,
     ) : FriendRequestsInteractor {
 
         override suspend fun fetchUserFriendRequests() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            requestsRepository.fetchRequestsByUser(targetUser)
+            requestsRepository.fetchCurrentRequestsDetails()
         }
 
         override suspend fun sendRequest(userId: UID) = eitherWrapper.wrapUnit {
+            if (!connectionManager.isConnected()) throw InternetConnectionException()
+
             val currentInstant = dateManager.fetchCurrentInstant()
 
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(currentUser)
-            val targetUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(userId)
+            val currentUserRequests = requestsRepository.fetchRealtimeRequestsByUser(currentUser)
+            val targetUserRequests = requestsRepository.fetchRealtimeRequestsByUser(userId)
             val currentUserInfo = usersRepository.fetchRealtimeUserById(currentUser)
             val targetUserInfo = usersRepository.fetchRealtimeUserById(userId)
 
@@ -75,8 +79,8 @@ internal interface FriendRequestsInteractor {
                 },
             )
 
-            requestsRepository.addOrUpdateRequests(updatedCurrentRequests, currentUser)
-            requestsRepository.addOrUpdateRequests(updatedTargetRequests, userId)
+            requestsRepository.addOrUpdateCurrentRequests(updatedCurrentRequests)
+            requestsRepository.addOrUpdateRequestsForUser(updatedTargetRequests, userId)
 
             val notifyContent = NotifyPushContent.AddToFriends(
                 devices = checkNotNull(targetUserInfo?.devices),
@@ -87,9 +91,11 @@ internal interface FriendRequestsInteractor {
         }
 
         override suspend fun cancelSendRequest(userId: UID) = eitherWrapper.wrapUnit {
+            if (!connectionManager.isConnected()) throw InternetConnectionException()
+
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(currentUser)
-            val targetUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(userId)
+            val currentUserRequests = requestsRepository.fetchRealtimeRequestsByUser(currentUser)
+            val targetUserRequests = requestsRepository.fetchRealtimeRequestsByUser(userId)
 
             val updatedCurrentRequests = currentUserRequests.copy(
                 send = buildMap {
@@ -104,14 +110,16 @@ internal interface FriendRequestsInteractor {
                 },
             )
 
-            requestsRepository.addOrUpdateRequests(updatedCurrentRequests, currentUser)
-            requestsRepository.addOrUpdateRequests(updatedTargetRequests, userId)
+            requestsRepository.addOrUpdateCurrentRequests(updatedCurrentRequests)
+            requestsRepository.addOrUpdateRequestsForUser(updatedTargetRequests, userId)
         }
 
         override suspend fun acceptRequest(userId: UID) = eitherWrapper.wrapUnit {
+            if (!connectionManager.isConnected()) throw InternetConnectionException()
+
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(currentUser)
-            val targetUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(userId)
+            val currentUserRequests = requestsRepository.fetchRealtimeRequestsByUser(currentUser)
+            val targetUserRequests = requestsRepository.fetchRealtimeRequestsByUser(userId)
             val currentUserInfo = usersRepository.fetchRealtimeUserById(currentUser)
             val targetUserInfo = usersRepository.fetchRealtimeUserById(userId)
 
@@ -136,8 +144,8 @@ internal interface FriendRequestsInteractor {
                 }
             )
 
-            requestsRepository.addOrUpdateRequests(updatedCurrentRequests, currentUser)
-            requestsRepository.addOrUpdateRequests(updatedTargetRequests, userId)
+            requestsRepository.addOrUpdateCurrentRequests(updatedCurrentRequests)
+            requestsRepository.addOrUpdateRequestsForUser(updatedTargetRequests, userId)
 
             val notifyContent = NotifyPushContent.AcceptFriendRequest(
                 devices = checkNotNull(targetUserInfo?.devices),
@@ -149,9 +157,11 @@ internal interface FriendRequestsInteractor {
         }
 
         override suspend fun rejectRequest(userId: UID) = eitherWrapper.wrapUnit {
+            if (!connectionManager.isConnected()) throw InternetConnectionException()
+
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(currentUser)
-            val targetUserRequests = requestsRepository.fetchRealtimeShortRequestsByUser(userId)
+            val currentUserRequests = requestsRepository.fetchRealtimeRequestsByUser(currentUser)
+            val targetUserRequests = requestsRepository.fetchRealtimeRequestsByUser(userId)
             val currentUserInfo = usersRepository.fetchRealtimeUserById(currentUser)
             val targetUserInfo = usersRepository.fetchRealtimeUserById(userId)
 
@@ -176,8 +186,8 @@ internal interface FriendRequestsInteractor {
                 }
             )
 
-            requestsRepository.addOrUpdateRequests(updatedCurrentRequests, currentUser)
-            requestsRepository.addOrUpdateRequests(updatedTargetRequests, userId)
+            requestsRepository.addOrUpdateCurrentRequests(updatedCurrentRequests)
+            requestsRepository.addOrUpdateRequestsForUser(updatedTargetRequests, userId)
 
             val notifyContent = NotifyPushContent.RejectFriendRequest(
                 devices = checkNotNull(targetUserInfo?.devices),
@@ -190,14 +200,14 @@ internal interface FriendRequestsInteractor {
 
         override suspend fun deleteHistoryRequestByUser(userId: UID) = eitherWrapper.wrapUnit {
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            val userRequests = requestsRepository.fetchRealtimeShortRequestsByUser(currentUser)
+            val userRequests = requestsRepository.fetchRealtimeRequestsByUser(currentUser)
             val updatedUserRequests = userRequests.copy(
                 lastActions = buildMap {
                     putAll(userRequests.lastActions)
                     remove(userId)
                 }
             )
-            requestsRepository.addOrUpdateRequests(updatedUserRequests, currentUser)
+            requestsRepository.addOrUpdateCurrentRequests(updatedUserRequests)
         }
     }
 }

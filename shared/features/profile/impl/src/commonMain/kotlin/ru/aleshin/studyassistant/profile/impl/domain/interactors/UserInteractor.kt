@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.profile.impl.domain.interactors
 
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.filterNotNull
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -38,13 +38,11 @@ internal interface UserInteractor {
     ) : UserInteractor {
 
         override suspend fun fetchAppUser() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            usersRepository.fetchUserById(targetUser).map { info -> checkNotNull(info) }
+            usersRepository.fetchCurrentUserProfile().filterNotNull()
         }
 
         override suspend fun fetchAllFriends() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            usersRepository.fetchUserFriends(targetUser)
+            usersRepository.fetchCurrentUserFriends()
         }
     }
 }

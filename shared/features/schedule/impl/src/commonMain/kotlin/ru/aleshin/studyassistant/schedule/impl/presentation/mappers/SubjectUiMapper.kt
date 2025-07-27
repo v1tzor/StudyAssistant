@@ -33,6 +33,7 @@ internal fun Subject.mapToUi() = SubjectUi(
     office = office,
     color = color,
     location = location?.mapToUi(),
+    updatedAt = updatedAt,
 )
 
 internal fun MediatedSubject.mapToUi() = MediatedSubjectUi(
@@ -55,6 +56,7 @@ internal fun SubjectUi.mapToDomain() = Subject(
     office = office,
     color = color,
     location = location?.mapToDomain(),
+    updatedAt = updatedAt,
 )
 
 internal fun MediatedSubjectUi.mapToDomain() = MediatedSubject(

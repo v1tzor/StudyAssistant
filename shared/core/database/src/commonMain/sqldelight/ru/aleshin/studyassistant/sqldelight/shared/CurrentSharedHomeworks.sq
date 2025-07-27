@@ -1,0 +1,28 @@
+import kotlin.String;
+import kotlin.collections.List;
+
+CREATE TABLE currentSharedHomeworksEntity (
+    id INTEGER PRIMARY KEY NOT NULL,
+    document_id TEXT NOT NULL,
+    received TEXT AS List<String> NOT NULL,
+    sent TEXT AS List<String> NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+addOrUpdateHomeworks:
+INSERT OR REPLACE INTO currentSharedHomeworksEntity (id, document_id, received, sent, updated_at)
+VALUES ?;
+
+fetchHomeworks:
+SELECT *
+FROM currentSharedHomeworksEntity
+WHERE id = 1;
+
+fetchEmptyHomeworks:
+SELECT document_id, updated_at
+FROM currentSharedHomeworksEntity
+WHERE id = 1;
+
+deleteHomeworks:
+DELETE FROM currentSharedHomeworksEntity
+WHERE id = 1;

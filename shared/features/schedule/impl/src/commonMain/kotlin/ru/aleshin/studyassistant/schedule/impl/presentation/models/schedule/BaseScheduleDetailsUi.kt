@@ -33,4 +33,5 @@ internal data class BaseScheduleDetailsUi(
     val dayOfWeek: DayOfWeek,
     val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val classes: List<ClassDetailsUi>,
+    val updatedAt: Long,
 ) : Parcelable

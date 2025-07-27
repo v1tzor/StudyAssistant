@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.users.impl.di.holder
 
+import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
 import org.kodein.di.bindInstance
@@ -61,6 +62,7 @@ public object UsersFeatureDIHolder : BaseFeatureDIHolder<UsersFeatureApi, UsersF
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<MessageRepository> { dependencies.messageRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }
+                bindSingleton<Konnection> { dependencies.connectionManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
                 bindSingleton<UsersFeatureApi> {

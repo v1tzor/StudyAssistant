@@ -16,14 +16,19 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.mappers
 
+import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.theme.tokens.EditorStrings
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-internal fun EditorFailures.mapToMessage(strings: EditorStrings) = when (this) {
+internal fun EditorFailures.mapToMessage(
+    strings: EditorStrings,
+    coreString: StudyAssistantStrings,
+) = when (this) {
     is EditorFailures.CredentialsError -> strings.credentialsErrorMessage
     is EditorFailures.ShiftTimeError -> strings.shiftTimeError
+    is EditorFailures.InternetError -> coreString.networkErrorMessage
     is EditorFailures.OtherError -> strings.otherErrorMessage
 }

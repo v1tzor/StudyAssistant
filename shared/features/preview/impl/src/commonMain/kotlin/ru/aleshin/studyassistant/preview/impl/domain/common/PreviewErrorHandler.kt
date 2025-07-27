@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.preview.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 
@@ -27,6 +28,7 @@ internal interface PreviewErrorHandler : ErrorHandler<PreviewFailures> {
     class Base : PreviewErrorHandler {
 
         override fun handle(throwable: Throwable) = when (throwable) {
+            is InternetConnectionException -> PreviewFailures.InternetError
             else -> PreviewFailures.OtherError(throwable)
         }
     }

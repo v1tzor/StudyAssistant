@@ -31,7 +31,7 @@ import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantResponse
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiChat
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiChatHistory
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
-import ru.aleshin.studyassistant.core.remote.datasources.ai.AiRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.api.ai.AiRemoteApi
 import ru.aleshin.studyassistant.core.remote.models.ai.ChatCompletionRequest
 import ru.aleshin.studyassistant.core.remote.models.ai.ChatCompletionToolChoicePojo
 import ru.aleshin.studyassistant.core.remote.models.ai.ChatModel
@@ -41,7 +41,7 @@ import ru.aleshin.studyassistant.core.remote.models.ai.optimisedMessagesForSend
  * @author Stanislav Aleshin on 21.06.2025.
  */
 class AiAssistantRepositoryImpl(
-    private val remoteDataSource: AiRemoteDataSource,
+    private val aiApi: AiRemoteApi,
     private val localDataSource: AiLocalDataSource,
     private val dateManager: DateManager,
 ) : AiAssistantRepository {
@@ -84,19 +84,19 @@ class AiAssistantRepositoryImpl(
             model = ChatModel.DEEPSEEK_CHAT.model,
             messages = messages,
             tools = listOf(
-                AiRemoteDataSource.Base.createTodoTool,
-                AiRemoteDataSource.Base.createHomework,
-                AiRemoteDataSource.Base.getOrganizationsTool,
-                AiRemoteDataSource.Base.getSubjectsTool,
-                AiRemoteDataSource.Base.getEmployeeTool,
-                AiRemoteDataSource.Base.getHomeworksTool,
-                AiRemoteDataSource.Base.getOverdueHomeworksTool,
-                AiRemoteDataSource.Base.getClassesByDateTool,
-                AiRemoteDataSource.Base.getNearClassTool,
+                AiRemoteApi.Base.createTodoTool,
+                AiRemoteApi.Base.createHomework,
+                AiRemoteApi.Base.getOrganizationsTool,
+                AiRemoteApi.Base.getSubjectsTool,
+                AiRemoteApi.Base.getEmployeeTool,
+                AiRemoteApi.Base.getHomeworksTool,
+                AiRemoteApi.Base.getOverdueHomeworksTool,
+                AiRemoteApi.Base.getClassesByDateTool,
+                AiRemoteApi.Base.getNearClassTool,
             ),
             toolChoice = ChatCompletionToolChoicePojo.AUTO
         )
-        return remoteDataSource.chatCompletion(request).mapToDomain(
+        return aiApi.chatCompletion(request).mapToDomain(
             time = dateManager.fetchCurrentInstant(),
         )
     }
@@ -113,19 +113,19 @@ class AiAssistantRepositoryImpl(
             model = ChatModel.DEEPSEEK_CHAT.model,
             messages = messages,
             tools = listOf(
-                AiRemoteDataSource.Base.createTodoTool,
-                AiRemoteDataSource.Base.createHomework,
-                AiRemoteDataSource.Base.getOrganizationsTool,
-                AiRemoteDataSource.Base.getEmployeeTool,
-                AiRemoteDataSource.Base.getSubjectsTool,
-                AiRemoteDataSource.Base.getHomeworksTool,
-                AiRemoteDataSource.Base.getOverdueHomeworksTool,
-                AiRemoteDataSource.Base.getClassesByDateTool,
-                AiRemoteDataSource.Base.getNearClassTool,
+                AiRemoteApi.Base.createTodoTool,
+                AiRemoteApi.Base.createHomework,
+                AiRemoteApi.Base.getOrganizationsTool,
+                AiRemoteApi.Base.getEmployeeTool,
+                AiRemoteApi.Base.getSubjectsTool,
+                AiRemoteApi.Base.getHomeworksTool,
+                AiRemoteApi.Base.getOverdueHomeworksTool,
+                AiRemoteApi.Base.getClassesByDateTool,
+                AiRemoteApi.Base.getNearClassTool,
             ),
             toolChoice = ChatCompletionToolChoicePojo.AUTO,
         )
-        return remoteDataSource.chatCompletion(request).mapToDomain(
+        return aiApi.chatCompletion(request).mapToDomain(
             time = dateManager.fetchCurrentInstant(),
         )
     }

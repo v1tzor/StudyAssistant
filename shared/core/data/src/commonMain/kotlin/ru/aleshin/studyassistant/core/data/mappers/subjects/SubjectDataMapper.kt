@@ -21,7 +21,8 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToRemoteData
-import ru.aleshin.studyassistant.core.database.mappers.employee.mapToLocal
+import ru.aleshin.studyassistant.core.data.utils.sync.MultipleSyncMapper
+import ru.aleshin.studyassistant.core.database.models.subjects.BaseSubjectEntity
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.domain.entities.subject.MediatedSubject
@@ -29,46 +30,15 @@ import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 import ru.aleshin.studyassistant.core.remote.models.subjects.MediatedSubjectPojo
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectPojo
-import ru.aleshin.studyassistant.sqldelight.subjects.SubjectEntity
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
-fun SubjectDetailsPojo.mapToDomain() = Subject(
-    uid = uid,
-    organizationId = organizationId,
-    eventType = EventType.valueOf(eventType),
-    name = name,
-    teacher = teacher?.mapToDomain(),
-    office = office,
-    color = color,
-    location = location?.mapToDomain(),
-)
 
-fun MediatedSubjectPojo.mapToDomain() = MediatedSubject(
-    uid = uid,
-    organizationId = organizationId,
-    eventType = EventType.valueOf(eventType),
-    name = name,
-    teacherId = teacherId,
-    office = office,
-    color = color,
-    location = location?.mapToDomain(),
-)
-
-fun SubjectDetailsEntity.mapToDomain() = Subject(
-    uid = uid,
-    organizationId = organizationId,
-    eventType = EventType.valueOf(eventType),
-    name = name,
-    teacher = teacher?.mapToLocal()?.mapToDomain(),
-    office = office,
-    color = color,
-    location = location?.mapToDomain(),
-)
+// Remote
 
 fun Subject.mapToRemoteData(userId: UID) = SubjectPojo(
-    uid = uid,
+    id = uid,
     userId = userId,
     organizationId = organizationId,
     eventType = eventType.name,
@@ -77,6 +47,7 @@ fun Subject.mapToRemoteData(userId: UID) = SubjectPojo(
     office = office,
     color = color,
     location = location?.mapToRemoteData()?.toJson(),
+    updatedAt = updatedAt,
 )
 
 fun MediatedSubject.mapToRemoteData() = MediatedSubjectPojo(
@@ -90,13 +61,85 @@ fun MediatedSubject.mapToRemoteData() = MediatedSubjectPojo(
     location = location?.mapToRemoteData(),
 )
 
-fun Subject.mapToLocalData() = SubjectEntity(
+fun SubjectDetailsPojo.mapToDomain() = Subject(
     uid = uid,
-    organization_id = organizationId,
-    event_type = eventType.name,
+    organizationId = organizationId,
+    eventType = EventType.valueOf(eventType),
     name = name,
-    teacher_id = teacher?.uid,
+    teacher = teacher?.mapToDomain(),
+    office = office,
+    color = color,
+    location = location?.mapToDomain(),
+    updatedAt = updatedAt,
+)
+
+fun MediatedSubjectPojo.mapToDomain() = MediatedSubject(
+    uid = uid,
+    organizationId = organizationId,
+    eventType = EventType.valueOf(eventType),
+    name = name,
+    teacherId = teacherId,
+    office = office,
+    color = color,
+    location = location?.mapToDomain(),
+)
+
+// Local
+
+fun Subject.mapToLocalData() = BaseSubjectEntity(
+    uid = uid,
+    organizationId = organizationId,
+    eventType = eventType.name,
+    name = name,
+    teacherId = teacher?.uid,
     office = office,
     color = color.toLong(),
     location = location?.mapToLocalData()?.toJson(),
+    updatedAt = updatedAt,
+    isCacheData = 0L,
+)
+
+fun SubjectDetailsEntity.mapToDomain() = Subject(
+    uid = uid,
+    organizationId = organizationId,
+    eventType = EventType.valueOf(eventType),
+    name = name,
+    teacher = teacher?.mapToDomain(),
+    office = office,
+    color = color,
+    location = location?.mapToDomain(),
+    updatedAt = updatedAt,
+)
+
+// Combined
+
+fun BaseSubjectEntity.convertToRemote(userId: String) = SubjectPojo(
+    id = uid,
+    userId = userId,
+    organizationId = organizationId,
+    eventType = eventType,
+    name = name,
+    teacherId = teacherId,
+    office = office,
+    color = color.toInt(),
+    location = location,
+    updatedAt = updatedAt,
+)
+
+fun SubjectPojo.convertToLocal() = BaseSubjectEntity(
+    uid = id,
+    organizationId = organizationId,
+    eventType = eventType,
+    name = name,
+    teacherId = teacherId,
+    office = office,
+    color = color.toLong(),
+    location = location,
+    updatedAt = updatedAt,
+    isCacheData = 1L,
+)
+
+class SubjectSyncMapper : MultipleSyncMapper<BaseSubjectEntity, SubjectPojo>(
+    localToRemote = { userId -> convertToRemote(userId) },
+    remoteToLocal = { convertToLocal() },
 )

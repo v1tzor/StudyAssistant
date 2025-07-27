@@ -16,17 +16,22 @@
 
 package ru.aleshin.studyassistant.core.remote.models.shared.schedules
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.remote.utils.BaseRemotePojo
 
 /**
  * @author Stanislav Aleshin on 14.08.2024.
  */
 @Serializable
 data class SharedSchedulesPojo(
+    @SerialName("\$id")
+    override val id: String,
     val sent: List<String> = emptyList(),
     val received: List<String> = emptyList(),
-) {
+    override val updatedAt: Long = 0L,
+) : BaseRemotePojo() {
     companion object {
-        fun default() = SharedSchedulesPojo()
+        fun default(id: String) = SharedSchedulesPojo(id)
     }
 }

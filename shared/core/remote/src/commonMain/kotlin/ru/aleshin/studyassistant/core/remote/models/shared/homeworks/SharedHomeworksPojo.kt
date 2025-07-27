@@ -16,17 +16,22 @@
 
 package ru.aleshin.studyassistant.core.remote.models.shared.homeworks
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.remote.utils.BaseRemotePojo
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
 @Serializable
 data class SharedHomeworksPojo(
+    @SerialName("\$id")
+    override val id: String,
     val received: List<String> = emptyList(),
     val sent: List<String> = emptyList(),
-) {
+    override val updatedAt: Long = 0L,
+) : BaseRemotePojo() {
     companion object {
-        fun default() = SharedHomeworksPojo()
+        fun default(id: String) = SharedHomeworksPojo(id)
     }
 }

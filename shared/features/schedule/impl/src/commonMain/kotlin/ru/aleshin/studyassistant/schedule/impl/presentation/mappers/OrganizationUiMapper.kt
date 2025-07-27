@@ -35,6 +35,7 @@ internal fun OrganizationShort.mapToUi() = OrganizationShortUi(
     offices = offices,
     avatar = avatar,
     scheduleTimeIntervals = scheduleTimeIntervals.mapToUi(),
+    updatedAt = updatedAt,
 )
 
 internal fun Organization.mapToUi() = OrganizationUi(
@@ -53,6 +54,7 @@ internal fun Organization.mapToUi() = OrganizationUi(
     webs = webs.map { it.mapToUi() },
     offices = offices,
     isHide = isHide,
+    updatedAt = updatedAt,
 )
 
 internal fun MediatedOrganization.mapToUi() = MediatedOrganizationUi(
@@ -87,6 +89,7 @@ internal fun OrganizationUi.mapToDomain() = Organization(
     webs = webs.map { it.mapToDomain() },
     offices = offices,
     isHide = isHide,
+    updatedAt = updatedAt,
 )
 
 internal fun OrganizationShortUi.mapToDomain() = OrganizationShort(
@@ -98,6 +101,7 @@ internal fun OrganizationShortUi.mapToDomain() = OrganizationShort(
     offices = offices,
     avatar = avatar,
     scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
+    updatedAt = updatedAt,
 )
 
 internal fun MediatedOrganizationUi.mapToDomain() = MediatedOrganization(

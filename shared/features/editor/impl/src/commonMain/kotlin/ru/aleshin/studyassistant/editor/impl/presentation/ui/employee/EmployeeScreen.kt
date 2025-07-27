@@ -116,7 +116,7 @@ internal data class EmployeeScreen(
                 is EmployeeEffect.NavigateToBack -> navigator.nestedPop()
                 is EmployeeEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
                         withDismissAction = true,
                     )
                 }

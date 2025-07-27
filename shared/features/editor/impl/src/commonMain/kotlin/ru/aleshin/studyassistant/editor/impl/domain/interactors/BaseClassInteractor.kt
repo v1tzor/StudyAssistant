@@ -33,12 +33,11 @@ import ru.aleshin.studyassistant.core.domain.entities.common.DayOfNumberedWeek
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
-import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 
@@ -63,7 +62,6 @@ internal interface BaseClassInteractor {
         private val scheduleRepository: BaseScheduleRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
         private val notificationSettingsRepository: NotificationSettingsRepository,
-        private val usersRepository: UsersRepository,
         private val startClassesReminderManager: StartClassesReminderManager,
         private val endClassesReminderManager: EndClassesReminderManager,
         private val dateManager: DateManager,
@@ -76,8 +74,8 @@ internal interface BaseClassInteractor {
             targetDay: DayOfNumberedWeek
         ) = eitherWrapper.wrap {
             val createClassModel = classModel.copy(uid = randomUUID())
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val currentDate = dateManager.fetchBeginningCurrentInstant()
+            val currentTime = dateManager.fetchCurrentInstant()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
             return@wrap if (schedule != null) {
@@ -86,11 +84,11 @@ internal interface BaseClassInteractor {
                 }
                 if (mondayDate.equalsDay(schedule.dateVersion.from)) {
                     val updatedSchedule = schedule.copy(classes = actualClasses)
-                    scheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser)
+                    scheduleRepository.addOrUpdateSchedule(updatedSchedule)
                 } else {
                     val deprecatedVersion = schedule.dateVersion.makeDeprecated(currentDate)
                     val deprecatedSchedule = schedule.copy(dateVersion = deprecatedVersion)
-                    scheduleRepository.addOrUpdateSchedule(deprecatedSchedule, targetUser)
+                    scheduleRepository.addOrUpdateSchedule(deprecatedSchedule)
 
                     val actualVersion = DateVersion.createNewVersion(currentDate)
                     val actualSchedule = schedule.copy(
@@ -98,7 +96,7 @@ internal interface BaseClassInteractor {
                         dateVersion = actualVersion,
                         classes = actualClasses,
                     )
-                    scheduleRepository.addOrUpdateSchedule(actualSchedule, targetUser).let {
+                    scheduleRepository.addOrUpdateSchedule(actualSchedule).let {
                         return@let createClassModel.uid
                     }
                 }
@@ -107,8 +105,9 @@ internal interface BaseClassInteractor {
                     currentDate = currentDate,
                     dayOfNumberedWeek = targetDay,
                     classes = listOf(createClassModel),
+                    createdAt = currentTime.toEpochMilliseconds(),
                 )
-                scheduleRepository.addOrUpdateSchedule(createSchedule, targetUser).let {
+                scheduleRepository.addOrUpdateSchedule(createSchedule).let {
                     createClassModel.uid
                 }
             }.apply {
@@ -117,13 +116,11 @@ internal interface BaseClassInteractor {
         }
 
         override suspend fun fetchClass(classId: UID, scheduleId: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            scheduleRepository.fetchClassById(classId, scheduleId, targetUser)
+            scheduleRepository.fetchClassById(classId, scheduleId)
         }
 
         override suspend fun updateClassBySchedule(classModel: Class, schedule: BaseSchedule) = eitherWrapper.wrap {
             val classId = classModel.uid
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val currentDate = dateManager.fetchBeginningCurrentInstant()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
@@ -144,11 +141,11 @@ internal interface BaseClassInteractor {
 
             return@wrap if (mondayDate.equalsDay(schedule.dateVersion.from)) {
                 val updatedSchedule = schedule.copy(classes = actualClasses)
-                scheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser)
+                scheduleRepository.addOrUpdateSchedule(updatedSchedule)
             } else {
                 val deprecatedVersion = schedule.dateVersion.makeDeprecated(currentDate)
                 val deprecatedSchedule = schedule.copy(dateVersion = deprecatedVersion)
-                scheduleRepository.addOrUpdateSchedule(deprecatedSchedule, targetUser)
+                scheduleRepository.addOrUpdateSchedule(deprecatedSchedule)
 
                 val actualVersion = DateVersion.createNewVersion(currentDate)
                 val actualSchedule = schedule.copy(
@@ -156,7 +153,7 @@ internal interface BaseClassInteractor {
                     dateVersion = actualVersion,
                     classes = actualClasses,
                 )
-                scheduleRepository.addOrUpdateSchedule(actualSchedule, targetUser).let {
+                scheduleRepository.addOrUpdateSchedule(actualSchedule).let {
                     return@let updatedClassId
                 }
             }.apply {
@@ -166,7 +163,6 @@ internal interface BaseClassInteractor {
         }
 
         override suspend fun deleteClassBySchedule(uid: UID, schedule: BaseSchedule) = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val currentDate = dateManager.fetchBeginningCurrentInstant()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
@@ -176,11 +172,11 @@ internal interface BaseClassInteractor {
 
             if (mondayDate.equalsDay(schedule.dateVersion.from)) {
                 val updatedSchedule = schedule.copy(classes = actualClasses)
-                scheduleRepository.addOrUpdateSchedule(updatedSchedule, targetUser)
+                scheduleRepository.addOrUpdateSchedule(updatedSchedule)
             } else {
                 val deprecatedVersion = schedule.dateVersion.makeDeprecated(currentDate)
                 val deprecatedSchedule = schedule.copy(dateVersion = deprecatedVersion)
-                scheduleRepository.addOrUpdateSchedule(deprecatedSchedule, targetUser)
+                scheduleRepository.addOrUpdateSchedule(deprecatedSchedule)
 
                 val actualVersion = DateVersion.createNewVersion(currentDate)
                 val actualSchedule = schedule.copy(
@@ -188,7 +184,7 @@ internal interface BaseClassInteractor {
                     dateVersion = actualVersion,
                     classes = actualClasses,
                 )
-                scheduleRepository.addOrUpdateSchedule(actualSchedule, targetUser)
+                scheduleRepository.addOrUpdateSchedule(actualSchedule)
             }.apply {
                 val targetDay = DayOfNumberedWeek(schedule.dayOfWeek, schedule.week)
                 updateReminderServices(currentDate, targetDay)
@@ -196,9 +192,8 @@ internal interface BaseClassInteractor {
         }
 
         private suspend fun updateReminderServices(currentDate: Instant, targetDay: DayOfNumberedWeek) {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val calendarSettings = calendarSettingsRepository.fetchSettings(targetUser).first()
-            val notificationSettings = notificationSettingsRepository.fetchSettings(targetUser).first()
+            val calendarSettings = calendarSettingsRepository.fetchSettings().first()
+            val notificationSettings = notificationSettingsRepository.fetchSettings().first()
 
             val currentWeek = currentDate.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
             val currentWeekDay = currentDate.dateTime().dayOfWeek

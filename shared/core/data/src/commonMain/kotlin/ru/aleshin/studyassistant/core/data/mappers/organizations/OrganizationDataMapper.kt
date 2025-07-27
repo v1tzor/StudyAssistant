@@ -23,6 +23,8 @@ import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToRemoteData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToRemoteData
+import ru.aleshin.studyassistant.core.data.utils.sync.MultipleSyncMapper
+import ru.aleshin.studyassistant.core.database.models.organizations.BaseOrganizationEntity
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationDetailsEntity
 import ru.aleshin.studyassistant.core.domain.entities.organizations.MediatedOrganization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
@@ -30,65 +32,15 @@ import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.remote.models.organizations.MediatedOrganizationPojo
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationPojo
-import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationEntity
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
-fun OrganizationDetailsPojo.mapToDomain() = Organization(
-    uid = uid,
-    isMain = isMain,
-    shortName = shortName,
-    fullName = fullName,
-    type = OrganizationType.valueOf(type),
-    avatar = avatar,
-    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
-    subjects = subjects.map { it.mapToDomain() },
-    employee = employee.map { it.mapToDomain() },
-    emails = emails.map { it.mapToDomain() },
-    phones = phones.map { it.mapToDomain() },
-    locations = locations.map { it.mapToDomain() },
-    webs = webs.map { it.mapToDomain() },
-    offices = offices,
-    isHide = isHide,
-)
 
-fun MediatedOrganizationPojo.mapToDomain() = MediatedOrganization(
-    uid = uid,
-    isMain = main,
-    shortName = shortName,
-    fullName = fullName,
-    type = OrganizationType.valueOf(type),
-    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
-    subjects = subjects.map { it.mapToDomain() },
-    employee = employee.map { it.mapToDomain() },
-    emails = emails.map { it.mapToDomain() },
-    phones = phones.map { it.mapToDomain() },
-    locations = locations.map { it.mapToDomain() },
-    webs = webs.map { it.mapToDomain() },
-    offices = offices,
-)
-
-fun OrganizationDetailsEntity.mapToDomain() = Organization(
-    uid = uid,
-    isMain = isMain,
-    shortName = shortName,
-    fullName = fullName,
-    type = OrganizationType.valueOf(type),
-    avatar = avatar,
-    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
-    subjects = subjects.map { it.mapToDomain() },
-    employee = employee.map { it.mapToDomain() },
-    emails = emails.map { it.mapToDomain() },
-    phones = phones.map { it.mapToDomain() },
-    locations = locations.map { it.mapToDomain() },
-    webs = webs.map { it.mapToDomain() },
-    offices = offices,
-    isHide = isHide,
-)
+// Remote
 
 fun Organization.mapToRemoteData(userId: UID) = OrganizationPojo(
-    uid = uid,
+    id = uid,
     userId = userId,
     main = isMain,
     shortName = shortName,
@@ -102,6 +54,7 @@ fun Organization.mapToRemoteData(userId: UID) = OrganizationPojo(
     webs = webs.map { it.mapToRemoteData().toJson() },
     offices = offices,
     hide = isHide,
+    updatedAt = updatedAt,
 )
 
 fun MediatedOrganization.mapToRemoteData() = MediatedOrganizationPojo(
@@ -120,18 +73,119 @@ fun MediatedOrganization.mapToRemoteData() = MediatedOrganizationPojo(
     offices = offices,
 )
 
-fun Organization.mapToLocalData() = OrganizationEntity(
+fun OrganizationDetailsPojo.mapToDomain() = Organization(
     uid = uid,
-    is_main = if (isMain) 1L else 0L,
-    short_name = shortName,
-    full_name = fullName,
+    isMain = isMain,
+    shortName = shortName,
+    fullName = fullName,
+    type = OrganizationType.valueOf(type),
+    avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
+    subjects = subjects.map { it.mapToDomain() },
+    employee = employee.map { it.mapToDomain() },
+    emails = emails.map { it.mapToDomain() },
+    phones = phones.map { it.mapToDomain() },
+    locations = locations.map { it.mapToDomain() },
+    webs = webs.map { it.mapToDomain() },
+    offices = offices,
+    isHide = isHide,
+    updatedAt = updatedAt,
+)
+
+fun MediatedOrganizationPojo.mapToDomain() = MediatedOrganization(
+    uid = uid,
+    isMain = main,
+    shortName = shortName,
+    fullName = fullName,
+    type = OrganizationType.valueOf(type),
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
+    subjects = subjects.map { it.mapToDomain() },
+    employee = employee.map { it.mapToDomain() },
+    emails = emails.map { it.mapToDomain() },
+    phones = phones.map { it.mapToDomain() },
+    locations = locations.map { it.mapToDomain() },
+    webs = webs.map { it.mapToDomain() },
+    offices = offices,
+)
+
+// Local
+
+fun Organization.mapToLocalData() = BaseOrganizationEntity(
+    uid = uid,
+    isMain = if (isMain) 1L else 0L,
+    shortName = shortName,
+    fullName = fullName,
     type = type.toString(),
     avatar = avatar,
-    schedule_time_intervals = scheduleTimeIntervals.mapToLocalDate().toJson(),
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToLocalDate().toJson(),
     emails = emails.map { it.mapToLocalData().toJson() },
     phones = phones.map { it.mapToLocalData().toJson() },
     locations = locations.map { it.mapToLocalData().toJson() },
     webs = webs.map { it.mapToLocalData().toJson() },
     offices = offices,
-    is_hide = if (isHide) 1L else 0L,
+    isHide = if (isHide) 1L else 0L,
+    updatedAt = updatedAt,
+    isCacheData = 0L,
+)
+
+fun OrganizationDetailsEntity.mapToDomain() = Organization(
+    uid = uid,
+    isMain = isMain,
+    shortName = shortName,
+    fullName = fullName,
+    type = OrganizationType.valueOf(type),
+    avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
+    subjects = subjects.map { it.mapToDomain() },
+    employee = employee.map { it.mapToDomain() },
+    emails = emails.map { it.mapToDomain() },
+    phones = phones.map { it.mapToDomain() },
+    locations = locations.map { it.mapToDomain() },
+    webs = webs.map { it.mapToDomain() },
+    offices = offices,
+    isHide = isHide,
+    updatedAt = updatedAt,
+)
+
+// Combined
+
+fun BaseOrganizationEntity.convertToRemote(userId: String) = OrganizationPojo(
+    id = uid,
+    userId = userId,
+    main = isMain == 1L,
+    shortName = shortName,
+    fullName = fullName,
+    type = type,
+    avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals,
+    emails = emails,
+    phones = phones,
+    locations = locations,
+    webs = webs,
+    offices = offices,
+    hide = isHide == 1L,
+    updatedAt = updatedAt,
+)
+
+fun OrganizationPojo.convertToLocal() = BaseOrganizationEntity(
+    uid = id,
+    isMain = if (main) 1L else 0L,
+    shortName = shortName,
+    fullName = fullName,
+    type = type,
+    avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals,
+    emails = emails,
+    phones = phones,
+    locations = locations,
+    webs = webs,
+    offices = offices,
+    isHide = if (hide) 1L else 0L,
+    updatedAt = updatedAt,
+    isCacheData = 1L,
+)
+
+class OrganizationSyncMapper : MultipleSyncMapper<BaseOrganizationEntity, OrganizationPojo>(
+    localToRemote = { userId -> convertToRemote(userId) },
+    remoteToLocal = { convertToLocal() },
 )

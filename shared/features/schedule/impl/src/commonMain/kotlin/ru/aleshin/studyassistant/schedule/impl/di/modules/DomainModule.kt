@@ -34,9 +34,9 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<ScheduleErrorHandler> { ScheduleErrorHandler.Base() }
     bindSingleton<ScheduleEitherWrapper> { ScheduleEitherWrapper.Base(instance(), instance()) }
 
-    bindSingleton<ScheduleInteractor> { ScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ScheduleInteractor> { ScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<HomeworkInteractor> { HomeworkInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<ShareSchedulesInteractor> { ShareSchedulesInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<ShareSchedulesInteractor> { ShareSchedulesInteractor.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<AnalysisInteractor> { AnalysisInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<AnalysisInteractor> { AnalysisInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
 }

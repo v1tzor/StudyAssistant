@@ -110,7 +110,7 @@ internal data class OrganizationScreen(val organizationId: UID?) : Screen {
                 is OrganizationEffect.NavigateToBack -> navigator.nestedPop()
                 is OrganizationEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
                         withDismissAction = true,
                     )
                 }

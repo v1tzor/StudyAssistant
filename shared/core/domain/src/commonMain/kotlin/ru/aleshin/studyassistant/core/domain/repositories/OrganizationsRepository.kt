@@ -27,15 +27,14 @@ import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
  * @author Stanislav Aleshin on 29.04.2024.
  */
 interface OrganizationsRepository {
-    suspend fun addOrUpdateOrganization(organization: Organization, targetUser: UID): UID
-    suspend fun addOrUpdateOrganizationsGroup(organizations: List<Organization>, targetUser: UID)
-    suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile, targetUser: UID): String
-    suspend fun fetchOrganizationById(uid: UID, targetUser: UID): Flow<Organization?>
-    suspend fun fetchOrganizationsById(uid: List<UID>, targetUser: UID): Flow<List<Organization>>
-    suspend fun fetchShortOrganizationById(uid: UID, targetUser: UID): Flow<OrganizationShort?>
-    suspend fun fetchAllOrganization(targetUser: UID): Flow<List<Organization>>
-    suspend fun fetchAllShortOrganization(targetUser: UID): Flow<List<OrganizationShort>>
-    suspend fun deleteAllOrganizations(targetUser: UID)
-    suspend fun deleteAvatar(avatarUrl: String, targetUser: UID)
-    suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
+    suspend fun addOrUpdateOrganization(organization: Organization): UID
+    suspend fun addOrUpdateOrganizationsGroup(organizations: List<Organization>)
+    suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile): String
+    suspend fun fetchOrganizationById(uid: UID): Flow<Organization?>
+    suspend fun fetchOrganizationsById(uid: List<UID>): Flow<List<Organization>>
+    suspend fun fetchShortOrganizationById(uid: UID): Flow<OrganizationShort?>
+    suspend fun fetchAllOrganization(): Flow<List<Organization>>
+    suspend fun fetchAllShortOrganization(): Flow<List<OrganizationShort>>
+    suspend fun deleteAvatar(avatarUrl: String)
+    suspend fun transferData(direction: DataTransferDirection)
 }

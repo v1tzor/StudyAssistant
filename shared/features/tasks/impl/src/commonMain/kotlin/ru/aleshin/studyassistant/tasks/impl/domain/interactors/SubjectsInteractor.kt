@@ -21,7 +21,6 @@ import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 
@@ -35,18 +34,15 @@ internal interface SubjectsInteractor {
 
     class Base(
         private val subjectsRepository: SubjectsRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: TasksEitherWrapper,
     ) : SubjectsInteractor {
 
         override suspend fun fetchSubjectsByOrganization(organizationId: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            subjectsRepository.fetchAllSubjectsByOrganization(organizationId, targetUser)
+            subjectsRepository.fetchAllSubjectsByOrganization(organizationId)
         }
 
         override suspend fun fetchSubjectsByNames(names: List<String>) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            subjectsRepository.fetchAllSubjectsByNames(names, targetUser)
+            subjectsRepository.fetchAllSubjectsByNames(names)
         }
     }
 }

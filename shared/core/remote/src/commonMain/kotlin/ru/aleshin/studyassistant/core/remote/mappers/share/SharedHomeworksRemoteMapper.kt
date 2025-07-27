@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.remote.mappers.share
 
 import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
+import ru.aleshin.studyassistant.core.common.extensions.encodeToString
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.ReceivedMediatedHomeworksDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.ReceivedMediatedHomeworksPojo
@@ -29,16 +30,33 @@ import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojoDetails
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
+fun SharedHomeworksDetailsPojo.convertToBase() = SharedHomeworksPojo(
+    id = id,
+    received = received.mapValues { it.value.convertToBase() }.encodeToString(),
+    sent = sent.mapValues { it.value.convertToBase() }.encodeToString(),
+    updatedAt = updatedAt,
+)
+
 fun SharedHomeworksPojo.convertToDetails(
     recipientsMapper: (List<UID>) -> List<AppUserPojoDetails>,
     sendersMapper: (UID) -> AppUserPojoDetails,
 ) = SharedHomeworksDetailsPojo(
+    id = id,
     received = received.decodeFromString<ReceivedMediatedHomeworksPojo>().mapValues {
         it.value.convertToDetails(sendersMapper)
     },
     sent = sent.decodeFromString<SentMediatedHomeworksPojo>().mapValues {
         it.value.convertToDetails(recipientsMapper)
     },
+    updatedAt = updatedAt,
+)
+
+fun SentMediatedHomeworksDetailsPojo.convertToBase() = SentMediatedHomeworksPojo(
+    uid = uid,
+    date = date,
+    sendDate = sendDate,
+    recipients = recipients.map { it.uid },
+    homeworks = homeworks,
 )
 
 fun SentMediatedHomeworksPojo.convertToDetails(
@@ -48,6 +66,14 @@ fun SentMediatedHomeworksPojo.convertToDetails(
     date = date,
     sendDate = sendDate,
     recipients = recipientsMapper(recipients),
+    homeworks = homeworks,
+)
+
+fun ReceivedMediatedHomeworksDetailsPojo.convertToBase() = ReceivedMediatedHomeworksPojo(
+    uid = uid,
+    date = date,
+    sendDate = sendDate,
+    sender = sender.uid,
     homeworks = homeworks,
 )
 

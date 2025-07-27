@@ -18,12 +18,11 @@ package ru.aleshin.studyassistant.profile.impl.domain.interactors
 
 import kotlinx.coroutines.flow.first
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
-import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.profile.impl.domain.common.ProfileEitherWrapper
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 
@@ -40,14 +39,11 @@ internal interface ReminderInteractor {
         private val homeworksReminderManager: HomeworksReminderManager,
         private val workloadWarningManager: WorkloadWarningManager,
         private val organizationsRepository: OrganizationsRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: ProfileEitherWrapper,
     ) : ReminderInteractor {
 
         override suspend fun stopReminders() = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-
-            val allOrganizations = organizationsRepository.fetchAllShortOrganization(targetUser).first()
+            val allOrganizations = organizationsRepository.fetchAllShortOrganization().first()
             val organizationIds = allOrganizations.map { it.uid }
 
             startClassesReminderManager.stopReminderService(organizationIds)

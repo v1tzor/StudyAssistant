@@ -16,10 +16,11 @@
 
 package ru.aleshin.studyassistant.preview.impl.domain.interactors
 
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.filterNotNull
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -39,28 +40,26 @@ internal interface AppUserInteractor {
 
     class Base(
         private val usersRepository: UsersRepository,
+        private val dateManager: DateManager,
         private val eitherWrapper: PreviewEitherWrapper,
     ) : AppUserInteractor {
 
         override suspend fun fetchAppUser() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            usersRepository.fetchUserById(targetUser).map { appUser ->
-                checkNotNull(appUser)
-            }
+            usersRepository.fetchCurrentUserProfile().filterNotNull()
         }
 
         override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {
-            usersRepository.updateAppUser(user)
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedUser = user.copy(updatedAt = updatedAt)
+            usersRepository.updateCurrentUserProfile(updatedUser)
         }
 
         override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            usersRepository.uploadUserAvatar(oldAvatarUrl, file, targetUser)
+            usersRepository.uploadCurrentUserAvatar(oldAvatarUrl, file)
         }
 
         override suspend fun deleteAvatar(avatarUrl: String) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            usersRepository.deleteUserAvatar(avatarUrl, targetUser)
+            usersRepository.deleteCurrentUserAvatar(avatarUrl)
         }
 
         override suspend fun fetchAppUserPaidStatus() = eitherWrapper.wrapFlow {

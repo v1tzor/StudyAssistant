@@ -1,0 +1,28 @@
+import kotlin.String;
+import kotlin.collections.List;
+
+CREATE TABLE currentSharedSchedulesEntity (
+    id INTEGER PRIMARY KEY NOT NULL,
+    document_id TEXT NOT NULL,
+    received TEXT AS List<String> NOT NULL,
+    sent TEXT AS List<String> NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+addOrUpdateSchedules:
+INSERT OR REPLACE INTO currentSharedSchedulesEntity (id, document_id, received, sent, updated_at)
+VALUES ?;
+
+fetchSchedules:
+SELECT *
+FROM currentSharedSchedulesEntity
+WHERE id = 1;
+
+fetchEmptySchedules:
+SELECT document_id, updated_at
+FROM currentSharedSchedulesEntity
+WHERE id = 1;
+
+deleteSchedule:
+DELETE FROM currentSharedSchedulesEntity
+WHERE id = 1;

@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -363,9 +364,12 @@ internal fun OfficeSelectorBottomSheet(
         addItemView = {
             AnimatedContent(targetState = isEdited) { edit ->
                 if (edit) {
+                    val isConfirmEnabled by derivedStateOf { !offices.contains(editableOffice) }
+
                     SelectorTextField(
                         modifier = Modifier.focusRequester(focusRequester),
                         value = editableOffice,
+                        confirmEnabled = isConfirmEnabled,
                         onValueChange = {
                             if (it.length < Constants.Text.DEFAULT_MAX_TEXT_LENGTH) {
                                 editableOffice = it

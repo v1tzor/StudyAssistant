@@ -36,7 +36,7 @@ class AppwriteHeadersProviderAndroid(
             }
         }
 
-    override fun fetchHeaders(): MutableMap<String, String> {
+    override fun fetchBaseClientHeaders(): MutableMap<String, String> {
         return mutableMapOf(
             "content-type" to "application/json",
             "origin" to "appwrite-android://${context.packageName}",
@@ -45,6 +45,17 @@ class AppwriteHeadersProviderAndroid(
             "x-sdk-platform" to "client",
             "x-sdk-language" to "android",
             "x-sdk-version" to "8.1.0",
+            "x-appwrite-response-format" to "1.7.0",
+        )
+    }
+
+    override fun fetchBaseServerHeaders(): MutableMap<String, String> {
+        return mutableMapOf(
+            "user-agent" to "AppwriteKotlinSDK/9.0.0 ${System.getProperty("http.agent")}",
+            "x-sdk-name" to "Kotlin",
+            "x-sdk-platform" to "server",
+            "x-sdk-language" to "kotlin",
+            "x-sdk-version" to "9.0.0",
             "x-appwrite-response-format" to "1.7.0",
         )
     }

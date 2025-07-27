@@ -16,17 +16,20 @@
 
 package ru.aleshin.studyassistant.core.remote.models.organizations
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
+import ru.aleshin.studyassistant.core.remote.utils.BaseMultipleRemotePojo
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
 @Serializable
 data class OrganizationPojo(
-    val uid: UID = "",
-    val userId: UID,
+    @SerialName("\$id")
+    override val id: UID,
+    override val userId: UID,
     val main: Boolean = false,
     val shortName: String = "",
     val fullName: String? = null,
@@ -39,4 +42,5 @@ data class OrganizationPojo(
     val webs: List<String> = emptyList(),
     val offices: List<String> = emptyList(),
     val hide: Boolean = false,
-)
+    override val updatedAt: Long = 0L,
+) : BaseMultipleRemotePojo()

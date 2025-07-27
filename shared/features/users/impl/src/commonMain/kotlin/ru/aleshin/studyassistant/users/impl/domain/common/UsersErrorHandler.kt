@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.users.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 import ru.aleshin.studyassistant.users.impl.domain.entities.UsersFailures
 
@@ -25,6 +26,7 @@ import ru.aleshin.studyassistant.users.impl.domain.entities.UsersFailures
 internal interface UsersErrorHandler : ErrorHandler<UsersFailures> {
     class Base : UsersErrorHandler {
         override fun handle(throwable: Throwable) = when (throwable) {
+            is InternetConnectionException -> UsersFailures.InternetError
             else -> UsersFailures.OtherError(throwable)
         }
     }

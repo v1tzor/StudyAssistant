@@ -23,10 +23,12 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class SharedSchedulesShortPojo(
+    val id: String,
     val sent: List<String> = emptyList(),
     val received: List<String> = emptyList(),
+    val updatedAt: Long = 0L,
 ) {
     companion object {
-        fun default() = SharedSchedulesShortPojo()
+        fun default(id: String) = SharedSchedulesShortPojo(id)
     }
 }

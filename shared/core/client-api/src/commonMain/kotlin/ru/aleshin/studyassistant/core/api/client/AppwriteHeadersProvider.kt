@@ -20,5 +20,6 @@ package ru.aleshin.studyassistant.core.api.client
  * @author Stanislav Aleshin on 09.07.2025.
  */
 interface AppwriteHeadersProvider {
-    fun fetchHeaders(): MutableMap<String, String>
+    fun fetchBaseClientHeaders(): MutableMap<String, String>
+    fun fetchBaseServerHeaders(): MutableMap<String, String>
 }

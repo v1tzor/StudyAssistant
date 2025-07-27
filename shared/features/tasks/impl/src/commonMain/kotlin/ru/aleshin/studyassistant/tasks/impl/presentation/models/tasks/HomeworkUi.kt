@@ -50,6 +50,7 @@ internal data class HomeworkUi(
     val isDone: Boolean = false,
     @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant?,
+    val updatedAt: Long = 0L,
 ) : Parcelable
 
 internal fun HomeworkUi.convertToDetails(
@@ -79,6 +80,7 @@ internal fun HomeworkUi.convertToDetails(
     status = status,
     linkedGoal = linkedGoal,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun HomeworkDetailsUi.convertToBase() = HomeworkUi(
@@ -94,4 +96,5 @@ internal fun HomeworkDetailsUi.convertToBase() = HomeworkUi(
     priority = priority,
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )

@@ -42,6 +42,7 @@ internal fun AppUser.mapToUi() = AppUserUi(
     friends = friends,
     subscriptionInfo = subscriptionInfo?.mapToUi(),
     socialNetworks = socialNetworks.map { it.mapToUi() },
+    updatedAt = updatedAt,
 )
 
 internal fun AppUserUi.mapToDomain() = AppUser(
@@ -58,6 +59,7 @@ internal fun AppUserUi.mapToDomain() = AppUser(
     friends = friends,
     subscriptionInfo = subscriptionInfo?.mapToDomain(),
     socialNetworks = socialNetworks.map { it.mapToDomain() },
+    updatedAt = updatedAt,
 )
 
 internal fun SubscribeInfo.mapToUi() = SubscribeInfoUi(

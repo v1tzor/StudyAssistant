@@ -16,18 +16,21 @@
 
 package ru.aleshin.studyassistant.core.remote.models.goals
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
+import ru.aleshin.studyassistant.core.remote.utils.BaseMultipleRemotePojo
 
 /**
  * @author Stanislav Aleshin on 18.04.2025.
  */
 @Serializable
 data class GoalPojo(
-    val uid: UID = "",
-    val userId: UID,
+    @SerialName("\$id")
+    override val id: UID = "",
+    override val userId: UID,
     val type: String = "",
     val number: Int = 0,
     val contentId: UID = "",
@@ -43,4 +46,5 @@ data class GoalPojo(
     val completeAfterTimeElapsed: Boolean = false,
     val done: Boolean = false,
     val completeDate: Long? = null,
-)
+    override val updatedAt: Long = 0L,
+) : BaseMultipleRemotePojo()

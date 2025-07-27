@@ -28,4 +28,5 @@ data class CustomScheduleDetailsPojo(
     val uid: UID,
     val date: Long,
     val classes: List<ClassDetailsPojo>,
+    val updatedAt: Long = 0L,
 )

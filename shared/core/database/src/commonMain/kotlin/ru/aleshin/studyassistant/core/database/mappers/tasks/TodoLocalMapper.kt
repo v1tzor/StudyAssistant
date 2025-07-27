@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.database.mappers.tasks
 
+import ru.aleshin.studyassistant.core.database.models.tasks.BaseTodoEntity
 import ru.aleshin.studyassistant.sqldelight.tasks.FetchCompletedTodos
 import ru.aleshin.studyassistant.sqldelight.tasks.FetchCompletedTodosByTimeRange
 import ru.aleshin.studyassistant.sqldelight.tasks.TodoEntity
@@ -23,34 +24,74 @@ import ru.aleshin.studyassistant.sqldelight.tasks.TodoEntity
 /**
  * @author Stanislav Aleshin on 12.06.2025.
  */
-internal fun FetchCompletedTodos.mapToBase() = TodoEntity(
+internal fun FetchCompletedTodos.mapToBase() = BaseTodoEntity(
     uid = uid,
     deadline = deadline,
     name = name,
     description = description,
     priority = priority,
-    notify_before_start = notify_before_start,
-    notify_fifteen_minutes_before = notify_fifteen_minutes_before,
-    notify_one_hour_before = notify_one_hour_before,
-    notify_three_hour_before = notify_three_hour_before,
-    notify_one_day_before = notify_one_day_before,
-    notify_one_week_before = notify_one_week_before,
-    is_done = is_done,
-    complete_date = complete_date,
+    notifyBeforeStart = notify_before_start,
+    notifyFifteenMinutesBefore = notify_fifteen_minutes_before,
+    notifyOneHourBefore = notify_one_hour_before,
+    notifyThreeHourBefore = notify_three_hour_before,
+    notifyOneDayBefore = notify_one_day_before,
+    notifyOneWeekBefore = notify_one_week_before,
+    isDone = is_done,
+    completeDate = complete_date,
+    updatedAt = updated_at,
+    isCacheData = is_cache_data,
 )
 
-internal fun FetchCompletedTodosByTimeRange.mapToBase() = TodoEntity(
+internal fun FetchCompletedTodosByTimeRange.mapToBase() = BaseTodoEntity(
     uid = uid,
     deadline = deadline,
     name = name,
     description = description,
     priority = priority,
-    notify_before_start = notify_before_start,
-    notify_fifteen_minutes_before = notify_fifteen_minutes_before,
-    notify_one_hour_before = notify_one_hour_before,
-    notify_three_hour_before = notify_three_hour_before,
-    notify_one_day_before = notify_one_day_before,
-    notify_one_week_before = notify_one_week_before,
-    is_done = is_done,
-    complete_date = complete_date,
+    notifyBeforeStart = notify_before_start,
+    notifyFifteenMinutesBefore = notify_fifteen_minutes_before,
+    notifyOneHourBefore = notify_one_hour_before,
+    notifyThreeHourBefore = notify_three_hour_before,
+    notifyOneDayBefore = notify_one_day_before,
+    notifyOneWeekBefore = notify_one_week_before,
+    isDone = is_done,
+    completeDate = complete_date,
+    updatedAt = updated_at,
+    isCacheData = is_cache_data,
+)
+
+internal fun TodoEntity.mapToBase() = BaseTodoEntity(
+    uid = uid,
+    deadline = deadline,
+    name = name,
+    description = description,
+    priority = priority,
+    notifyBeforeStart = notify_before_start,
+    notifyFifteenMinutesBefore = notify_fifteen_minutes_before,
+    notifyOneHourBefore = notify_one_hour_before,
+    notifyThreeHourBefore = notify_three_hour_before,
+    notifyOneDayBefore = notify_one_day_before,
+    notifyOneWeekBefore = notify_one_week_before,
+    isDone = is_done,
+    completeDate = complete_date,
+    updatedAt = updated_at,
+    isCacheData = is_cache_data,
+)
+
+internal fun BaseTodoEntity.mapToEntity() = TodoEntity(
+    uid = uid,
+    deadline = deadline,
+    name = name,
+    description = description,
+    priority = priority,
+    notify_before_start = notifyBeforeStart,
+    notify_fifteen_minutes_before = notifyFifteenMinutesBefore,
+    notify_one_hour_before = notifyOneHourBefore,
+    notify_three_hour_before = notifyThreeHourBefore,
+    notify_one_day_before = notifyOneDayBefore,
+    notify_one_week_before = notifyOneWeekBefore,
+    is_done = isDone,
+    complete_date = completeDate,
+    updated_at = updatedAt,
+    is_cache_data = isCacheData,
 )

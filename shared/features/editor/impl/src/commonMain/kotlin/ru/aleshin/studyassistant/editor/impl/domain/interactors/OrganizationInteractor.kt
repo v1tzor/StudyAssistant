@@ -22,12 +22,12 @@ import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.entities.organizations.convertToBase
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 
@@ -46,52 +46,48 @@ internal interface OrganizationInteractor {
 
     class Base(
         private val organizationsRepository: OrganizationsRepository,
-        private val usersRepository: UsersRepository,
+        private val dateManager: DateManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : OrganizationInteractor {
 
         override suspend fun addOrUpdateOrganization(organization: Organization) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            organizationsRepository.addOrUpdateOrganization(organization, targetUser)
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedOrganization = organization.copy(updatedAt = updatedAt)
+            organizationsRepository.addOrUpdateOrganization(updatedOrganization)
         }
 
         override suspend fun fetchOrganizationById(uid: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            organizationsRepository.fetchOrganizationById(uid, targetUser).map { organization ->
+            organizationsRepository.fetchOrganizationById(uid).map { organization ->
                 checkNotNull(organization)
             }
         }
 
         override suspend fun fetchShortOrganizationById(uid: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            organizationsRepository.fetchShortOrganizationById(uid, targetUser).map { organization ->
+            organizationsRepository.fetchShortOrganizationById(uid).map { organization ->
                 checkNotNull(organization)
             }
         }
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            organizationsRepository.fetchAllShortOrganization(targetUser).map { organizations ->
+            organizationsRepository.fetchAllShortOrganization().map { organizations ->
                 organizations.sortedByDescending { it.isMain }
             }
         }
 
         override suspend fun updateShortOrganization(organization: OrganizationShort) = eitherWrapper.wrapUnit {
             val baseUid = organization.uid
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val baseModel = organizationsRepository.fetchOrganizationById(baseUid, targetUser).first()
-            val updatedModel = organization.convertToBase(checkNotNull(baseModel))
+            val baseModel = organizationsRepository.fetchOrganizationById(baseUid).first()
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedModel = organization.convertToBase(checkNotNull(baseModel)).copy(updatedAt = updatedAt)
 
-            organizationsRepository.addOrUpdateOrganization(updatedModel, targetUser)
+            organizationsRepository.addOrUpdateOrganization(updatedModel)
         }
 
         override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            organizationsRepository.uploadAvatar(oldAvatarUrl, file, targetUser)
+            organizationsRepository.uploadAvatar(oldAvatarUrl, file)
         }
         override suspend fun deleteAvatar(avatarUrl: String) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            organizationsRepository.deleteAvatar(avatarUrl, targetUser)
+            organizationsRepository.deleteAvatar(avatarUrl)
         }
     }
 }

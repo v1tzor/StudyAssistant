@@ -25,8 +25,9 @@ import ru.aleshin.studyassistant.core.domain.entities.share.scheules.SharedSched
  * @author Stanislav Aleshin on 18.07.2024.
  */
 interface ShareSchedulesRepository {
-    suspend fun addOrUpdateSharedSchedules(schedules: SharedSchedules, targetUser: UID)
-    suspend fun fetchShareSchedulesByUser(uid: UID): Flow<SharedSchedules>
-    suspend fun fetchShortSharedSchedulesByUser(uid: UID): Flow<SharedSchedulesShort>
-    suspend fun fetchRealtimeSharedSchedulesByUser(uid: UID): SharedSchedules
+    suspend fun addOrUpdateCurrentSharedSchedules(schedules: SharedSchedules)
+    suspend fun addOrUpdateSharedSchedulesForUser(schedules: SharedSchedules, targetUser: UID)
+    suspend fun fetchCurrentSharedSchedules(): Flow<SharedSchedules>
+    suspend fun fetchCurrentShortSharedSchedules(): Flow<SharedSchedulesShort>
+    suspend fun fetchRealtimeSharedSchedulesByUser(targetUser: UID): SharedSchedules
 }

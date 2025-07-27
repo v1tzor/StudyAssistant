@@ -47,11 +47,14 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.auth)
             implementation(libs.ktor.websockets)
+
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
             implementation(libs.kotlin.atomicfu)
             implementation(libs.kotlin.io)
+
             implementation(libs.networkcheker)
+
             implementation(libs.settings.core)
             implementation(libs.settings.noargs)
         }

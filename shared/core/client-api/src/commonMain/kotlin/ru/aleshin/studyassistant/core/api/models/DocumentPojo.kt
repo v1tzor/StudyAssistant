@@ -69,7 +69,7 @@ data class DocumentPojo<T>(
 )
 
 fun <T> JsonElement.asDocument(deserializer: DeserializationStrategy<T>): DocumentPojo<T> {
-    val keys = listOf("\$id", "\$collectionId", "\$databaseId", "\$createdAt", "\$updatedAt", "\$permissions")
+    val keys = listOf("\$collectionId", "\$databaseId", "\$createdAt", "\$updatedAt", "\$permissions")
     val dataObject = buildJsonObject {
         jsonObject.entries.forEach {
             if (!keys.contains(it.key)) {

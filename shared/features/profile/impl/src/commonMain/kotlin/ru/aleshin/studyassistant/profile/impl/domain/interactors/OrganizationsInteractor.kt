@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.profile.impl.domain.common.ProfileEitherWrapper
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 
@@ -33,13 +32,11 @@ internal interface OrganizationsInteractor {
 
     class Base(
         private val organizationsRepository: OrganizationsRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: ProfileEitherWrapper,
     ) : OrganizationsInteractor {
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            organizationsRepository.fetchAllShortOrganization(targetUser).map { organizations ->
+            organizationsRepository.fetchAllShortOrganization().map { organizations ->
                 organizations.sortedByDescending { it.isMain }
             }
         }

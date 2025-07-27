@@ -17,13 +17,12 @@
 package ru.aleshin.studyassistant.core.domain.repositories
 
 import kotlinx.coroutines.flow.Flow
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.settings.NotificationSettings
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
 interface NotificationSettingsRepository {
-    suspend fun fetchSettings(targetUser: UID): Flow<NotificationSettings>
-    suspend fun updateSettings(settings: NotificationSettings, targetUser: UID)
+    suspend fun fetchSettings(): Flow<NotificationSettings>
+    suspend fun updateSettings(settings: NotificationSettings)
 }

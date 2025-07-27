@@ -17,9 +17,9 @@
 package ru.aleshin.studyassistant.core.database.models.organizations
 
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.database.models.employee.BaseEmployeeEntity
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.users.ContactInfoEntity
-import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
@@ -33,11 +33,12 @@ data class OrganizationDetailsEntity(
     val avatar: String? = null,
     val scheduleTimeIntervals: ScheduleTimeIntervalsEntity,
     val subjects: List<SubjectDetailsEntity> = emptyList(),
-    val employee: List<EmployeeEntity> = emptyList(),
+    val employee: List<BaseEmployeeEntity> = emptyList(),
     val emails: List<ContactInfoEntity> = emptyList(),
     val phones: List<ContactInfoEntity> = emptyList(),
     val locations: List<ContactInfoEntity> = emptyList(),
     val webs: List<ContactInfoEntity> = emptyList(),
     val offices: List<String> = emptyList(),
     val isHide: Boolean = false,
+    val updatedAt: Long,
 )

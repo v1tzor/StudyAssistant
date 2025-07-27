@@ -17,12 +17,11 @@
 package ru.aleshin.studyassistant.core.database.mappers.schedules
 
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.database.mappers.employee.mapToBase
 import ru.aleshin.studyassistant.core.database.models.classes.ClassDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.classes.ClassEntity
+import ru.aleshin.studyassistant.core.database.models.employee.BaseEmployeeEntity
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationShortEntity
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
-import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
@@ -44,7 +43,7 @@ fun ClassEntity.mapToDetails(
     scheduleId: UID,
     organization: OrganizationShortEntity,
     subject: SubjectDetailsEntity?,
-    employee: EmployeeEntity?,
+    employee: BaseEmployeeEntity?,
 ) = ClassDetailsEntity(
     uid = uid,
     scheduleId = scheduleId,
@@ -52,7 +51,7 @@ fun ClassEntity.mapToDetails(
     eventType = eventType,
     subject = subject,
     customData = customData,
-    teacher = employee?.mapToBase(),
+    teacher = employee,
     office = office,
     location = location,
     startTime = startTime,

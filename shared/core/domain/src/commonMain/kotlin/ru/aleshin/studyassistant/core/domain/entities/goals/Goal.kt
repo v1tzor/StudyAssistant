@@ -37,4 +37,5 @@ data class Goal(
     val completeAfterTimeElapsed: Boolean = true,
     val isDone: Boolean = false,
     val completeDate: Instant? = null,
+    val updatedAt: Long,
 )

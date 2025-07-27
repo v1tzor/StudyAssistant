@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.core.data.repositories
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.settings.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.settings.mapToLocalData
 import ru.aleshin.studyassistant.core.database.datasource.settings.NotificationSettingsLocalDataSource
@@ -32,13 +31,13 @@ class NotificationSettingsRepositoryImpl(
     private val localDataSource: NotificationSettingsLocalDataSource,
 ) : NotificationSettingsRepository {
 
-    override suspend fun fetchSettings(targetUser: UID): Flow<NotificationSettings> {
+    override suspend fun fetchSettings(): Flow<NotificationSettings> {
         return localDataSource.fetchSettings().map { settingsEntity ->
             settingsEntity.mapToDomain()
         }
     }
 
-    override suspend fun updateSettings(settings: NotificationSettings, targetUser: UID) {
+    override suspend fun updateSettings(settings: NotificationSettings) {
         localDataSource.updateSettings(settings.mapToLocalData())
     }
 }

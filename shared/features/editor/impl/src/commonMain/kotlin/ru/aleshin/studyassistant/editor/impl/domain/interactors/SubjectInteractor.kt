@@ -20,9 +20,9 @@ import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 
@@ -37,25 +37,24 @@ internal interface SubjectInteractor {
 
     class Base(
         private val subjectsRepository: SubjectsRepository,
-        private val usersRepository: UsersRepository,
+        private val dateManager: DateManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : SubjectInteractor {
 
         override suspend fun addOrUpdateSubject(subject: Subject) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            subjectsRepository.addOrUpdateSubject(subject, targetUser)
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedSubject = subject.copy(updatedAt = updatedAt)
+            subjectsRepository.addOrUpdateSubject(updatedSubject)
         }
 
         override suspend fun fetchAllSubjectsByOrganization(organizationId: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            subjectsRepository.fetchAllSubjectsByOrganization(organizationId, targetUser).map { subjects ->
+            subjectsRepository.fetchAllSubjectsByOrganization(organizationId).map { subjects ->
                 subjects.sortedBy { subject -> subject.name }
             }
         }
 
         override suspend fun fetchSubjectById(uid: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            subjectsRepository.fetchSubjectById(uid, targetUser)
+            subjectsRepository.fetchSubjectById(uid)
         }
     }
 }

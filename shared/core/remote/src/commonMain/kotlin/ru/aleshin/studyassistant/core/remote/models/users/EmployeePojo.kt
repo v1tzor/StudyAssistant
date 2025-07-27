@@ -16,16 +16,19 @@
 
 package ru.aleshin.studyassistant.core.remote.models.users
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.remote.utils.BaseMultipleRemotePojo
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
 @Serializable
 data class EmployeePojo(
-    val uid: UID,
-    val userId: UID,
+    @SerialName("\$id")
+    override val id: UID,
+    override val userId: UID,
     val organizationId: UID,
     val firstName: String,
     val secondName: String? = null,
@@ -39,4 +42,5 @@ data class EmployeePojo(
     val phones: List<String> = emptyList(),
     val locations: List<String> = emptyList(),
     val webs: List<String> = emptyList(),
-)
+    override val updatedAt: Long = 0L,
+) : BaseMultipleRemotePojo()

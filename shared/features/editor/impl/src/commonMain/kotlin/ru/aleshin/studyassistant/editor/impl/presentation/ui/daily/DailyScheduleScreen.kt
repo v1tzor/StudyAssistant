@@ -79,6 +79,7 @@ internal data class DailyScheduleScreen(
         )
     ) { state ->
         val strings = EditorThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
         val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
         val sheetState = rememberStandardBottomSheetState(confirmValueChange = { it != SheetValue.Hidden })
@@ -141,7 +142,7 @@ internal data class DailyScheduleScreen(
                 is DailyScheduleEffect.NavigateToBack -> navigator.nestedPop()
                 is DailyScheduleEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
                         withDismissAction = true,
                     )
                 }

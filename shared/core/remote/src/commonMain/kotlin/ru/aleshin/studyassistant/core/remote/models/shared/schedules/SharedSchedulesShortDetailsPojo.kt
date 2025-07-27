@@ -24,6 +24,8 @@ import ru.aleshin.studyassistant.core.common.functional.UID
  */
 @Serializable
 data class SharedSchedulesShortDetailsPojo(
+    val id: String,
     val sent: Map<UID, SentMediatedSchedulesShortDetailsPojo> = emptyMap(),
     val received: Map<UID, ReceivedMediatedSchedulesShortDetailsPojo> = emptyMap(),
+    val updatedAt: Long,
 )

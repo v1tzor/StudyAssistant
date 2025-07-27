@@ -1,0 +1,29 @@
+import kotlin.String;
+import kotlin.collections.List;
+
+CREATE TABLE currentFriendRequestsEntity (
+    id INTEGER PRIMARY KEY NOT NULL,
+    document_id TEXT NOT NULL,
+    received TEXT AS List<String> NOT NULL,
+    sent TEXT AS List<String> NOT NULL,
+    last_actions TEXT AS List<String> NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+addOrUpdateFriendRequsts:
+INSERT OR REPLACE INTO currentFriendRequestsEntity (id, document_id, received, sent, last_actions, updated_at)
+VALUES ?;
+
+fetchFriendRequsts:
+SELECT *
+FROM currentFriendRequestsEntity
+WHERE id = 1;
+
+fetchEmptyRequests:
+SELECT document_id, updated_at
+FROM currentFriendRequestsEntity
+WHERE id = 1;
+
+deleteFriendRequsts:
+DELETE FROM currentFriendRequestsEntity
+WHERE id = 1;

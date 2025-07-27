@@ -14,25 +14,34 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package ru.aleshin.studyassistant.core.data.repositories
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
-import kotlinx.datetime.Instant.Companion.DISTANT_FUTURE
-import kotlinx.datetime.Instant.Companion.DISTANT_PAST
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.data.mappers.goals.convertToLocal
+import ru.aleshin.studyassistant.core.data.mappers.goals.convertToRemote
 import ru.aleshin.studyassistant.core.data.mappers.goals.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.goals.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.goals.mapToRemoteData
+import ru.aleshin.studyassistant.core.data.utils.SubscriptionChecker
+import ru.aleshin.studyassistant.core.data.utils.sync.RemoteResultSyncHandler
 import ru.aleshin.studyassistant.core.database.datasource.goals.DailyGoalsLocalDataSource
 import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.goals.Goal
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalShort
+import ru.aleshin.studyassistant.core.domain.entities.sync.OfflineChangeType
+import ru.aleshin.studyassistant.core.domain.managers.sync.DailyGoalsSourceSyncManager.Companion.GOAL_SOURCE_KEY
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
-import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.goals.DailyGoalsRemoteDataSource
 
 /**
@@ -42,176 +51,195 @@ class DailyGoalsRepositoryImpl(
     private val remoteDataSource: DailyGoalsRemoteDataSource,
     private val localDataSource: DailyGoalsLocalDataSource,
     private val subscriptionChecker: SubscriptionChecker,
+    private val userSessionProvider: UserSessionProvider,
+    private val resultSyncHandler: RemoteResultSyncHandler,
 ) : DailyGoalsRepository {
 
-    override suspend fun addOrUpdateGoal(goal: Goal, targetUser: UID): UID {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun addOrUpdateGoal(goal: Goal): UID {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
 
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateGoal(goal.mapToRemoteData(targetUser), targetUser)
-        } else {
-            localDataSource.addOrUpdateGoal(goal.mapToLocalData())
-        }
-    }
-
-    override suspend fun addDailyDailyGoals(dailyGoals: List<Goal>, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val upsertModel = goal.copy(uid = goal.uid.ifBlank { randomUUID() })
 
         if (isSubscriber) {
-            remoteDataSource.addDailyDailyGoals(dailyGoals.map { it.mapToRemoteData(targetUser) }, targetUser)
+            localDataSource.sync().addOrUpdateItem(upsertModel.mapToLocalData())
+            resultSyncHandler.executeOrAddToQueue(
+                data = upsertModel.mapToRemoteData(userId = currentUser),
+                type = OfflineChangeType.UPSERT,
+                sourceKey = GOAL_SOURCE_KEY,
+            ) {
+                remoteDataSource.addOrUpdateItem(it)
+            }
         } else {
-            localDataSource.addDailyDailyGoals(dailyGoals.map { it.mapToLocalData() })
+            localDataSource.offline().addOrUpdateItem(upsertModel.mapToLocalData())
+        }
+
+        return upsertModel.uid
+    }
+
+    override suspend fun addDailyDailyGoals(dailyGoals: List<Goal>) {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+
+        val upsertModels = dailyGoals.map { goal -> goal.copy(uid = goal.uid.ifBlank { randomUUID() }) }
+
+        if (isSubscriber) {
+            localDataSource.sync().addOrUpdateItems(upsertModels.map { it.mapToLocalData() })
+            resultSyncHandler.executeOrAddToQueue(
+                data = upsertModels.map { it.mapToRemoteData(currentUser) },
+                type = OfflineChangeType.UPSERT,
+                sourceKey = GOAL_SOURCE_KEY,
+            ) {
+                remoteDataSource.addOrUpdateItems(it)
+            }
+        } else {
+            localDataSource.offline().addOrUpdateItems(upsertModels.map { it.mapToLocalData() })
         }
     }
 
-    override suspend fun fetchGoalById(uid: UID, targetUser: UID): Flow<Goal?> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchGoalById(uid, targetUser).map { goal -> goal?.mapToDomain() }
-        } else {
-            localDataSource.fetchGoalById(uid).map { goal -> goal?.mapToDomain() }
+    override suspend fun fetchGoalById(uid: UID): Flow<Goal?> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchGoalDetailsById(uid).map { goal ->
+                    goal?.mapToDomain()
+                }
+            } else {
+                localDataSource.offline().fetchGoalDetailsById(uid).map { goal ->
+                    goal?.mapToDomain()
+                }
+            }
         }
     }
 
-    override suspend fun fetchGoalByContentId(contentId: UID, targetUser: UID): Flow<Goal?> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchGoalByContentId(contentId, targetUser).map { goal -> goal?.mapToDomain() }
-        } else {
-            localDataSource.fetchGoalByContentId(contentId).map { goal -> goal?.mapToDomain() }
+    override suspend fun fetchGoalByContentId(contentId: UID): Flow<Goal?> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchGoalDetailsByContentId(contentId).map { goal ->
+                    goal?.mapToDomain()
+                }
+            } else {
+                localDataSource.offline().fetchGoalDetailsByContentId(contentId).map { goal ->
+                    goal?.mapToDomain()
+                }
+            }
         }
     }
 
-    override suspend fun fetchDailyGoalsByTimeRange(
-        timeRange: TimeRange,
-        targetUser: UID
-    ): Flow<List<Goal>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun fetchDailyGoalsByTimeRange(timeRange: TimeRange): Flow<List<Goal>> {
         val from = timeRange.from.toEpochMilliseconds()
         val to = timeRange.to.toEpochMilliseconds()
 
-        return if (isSubscriber) {
-            remoteDataSource.fetchDailyGoalsByTimeRange(from, to, targetUser).map { goals ->
-                goals.map { it.mapToDomain() }
-            }
-        } else {
-            localDataSource.fetchDailyGoalsByTimeRange(from, to).map { goals ->
-                goals.map { it.mapToDomain() }
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchGoalsDetailsByTimeRange(from, to).map { goals ->
+                    goals.map { goal -> goal.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchGoalsDetailsByTimeRange(from, to).map { goals ->
+                    goals.map { goal -> goal.mapToDomain() }
+                }
             }
         }
     }
 
-    override suspend fun fetchShortDailyGoalsByTimeRange(
-        timeRange: TimeRange,
-        targetUser: UID
-    ): Flow<List<GoalShort>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun fetchShortDailyGoalsByTimeRange(timeRange: TimeRange): Flow<List<GoalShort>> {
         val from = timeRange.from.toEpochMilliseconds()
         val to = timeRange.to.toEpochMilliseconds()
 
-        return if (isSubscriber) {
-            remoteDataSource.fetchShortDailyGoalsByTimeRange(from, to, targetUser).map { goals ->
-                goals.map { it.mapToDomain() }
-            }
-        } else {
-            localDataSource.fetchShortDailyGoalsByTimeRange(from, to).map { goals ->
-                goals.map { it.mapToDomain() }
-            }
-        }
-    }
-
-    override suspend fun fetchShortActiveDailyGoals(targetUser: UID): Flow<List<GoalShort>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchShortActiveDailyGoals(targetUser).map { goals ->
-                goals.map { it.mapToDomain() }
-            }
-        } else {
-            localDataSource.fetchShortActiveDailyGoals().map { goals ->
-                goals.map { it.mapToDomain() }
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchShortGoalsByTimeRange(from, to).map { goals ->
+                    goals.map { it.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchShortGoalsByTimeRange(from, to).map { goals ->
+                    goals.map { it.mapToDomain() }
+                }
             }
         }
     }
 
-    override suspend fun fetchOverdueDailyGoals(
-        currentDate: Instant,
-        targetUser: UID
-    ): Flow<List<Goal>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun fetchShortActiveDailyGoals(): Flow<List<GoalShort>> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchShortActiveDailyGoals().map { goals ->
+                    goals.map { it.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchShortActiveDailyGoals().map { goals ->
+                    goals.map { it.mapToDomain() }
+                }
+            }
+        }
+    }
+
+    override suspend fun fetchOverdueDailyGoals(currentDate: Instant): Flow<List<Goal>> {
         val date = currentDate.toEpochMilliseconds()
 
-        return if (isSubscriber) {
-            remoteDataSource.fetchOverdueDailyGoals(date, targetUser).map { goals ->
-                goals.map { it.mapToDomain() }
-            }
-        } else {
-            localDataSource.fetchOverdueDailyGoals(date).map { goals ->
-                goals.map { it.mapToDomain() }
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchOverdueGoalsDetails(date).map { goals ->
+                    goals.map { it.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchOverdueGoalsDetails(date).map { goals ->
+                    goals.map { it.mapToDomain() }
+                }
             }
         }
     }
 
-    override suspend fun fetchDailyGoalsByDate(date: Instant, targetUser: UID): Flow<List<Goal>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun fetchDailyGoalsByDate(date: Instant): Flow<List<Goal>> {
         val targetDate = date.toEpochMilliseconds()
 
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchGoalDetailsByDate(targetDate).map { goals ->
+                    goals.map { it.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchGoalDetailsByDate(targetDate).map { goals ->
+                    goals.map { it.mapToDomain() }
+                }
+            }
+        }
+    }
+
+    override suspend fun deleteGoal(uid: UID) {
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+
         return if (isSubscriber) {
-            remoteDataSource.fetchDailyGoalsByDate(targetDate, targetUser).map { goals ->
-                goals.map { it.mapToDomain() }
+            localDataSource.sync().deleteItemsById(listOf(uid))
+            resultSyncHandler.executeOrAddToQueue(
+                documentId = uid,
+                type = OfflineChangeType.DELETE,
+                sourceKey = GOAL_SOURCE_KEY,
+            ) {
+                remoteDataSource.deleteItemById(uid)
             }
         } else {
-            localDataSource.fetchDailyGoalsByDate(targetDate).map { goals ->
-                goals.map { it.mapToDomain() }
-            }
+            localDataSource.offline().deleteItemsById(listOf(uid))
         }
     }
 
-    override suspend fun deleteGoal(uid: UID, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        if (isSubscriber) {
-            remoteDataSource.deleteGoal(uid, targetUser)
-        } else {
-            localDataSource.deleteGoal(uid)
-        }
-    }
-
-    override suspend fun deleteAllDailyGoals(targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        if (isSubscriber) {
-            remoteDataSource.deleteAllDailyGoals(targetUser)
-        } else {
-            localDataSource.deleteAllDailyGoals()
-        }
-    }
-
-    override suspend fun transferData(direction: DataTransferDirection, targetUser: UID) {
+    override suspend fun transferData(direction: DataTransferDirection) {
+        val currentUser = userSessionProvider.getCurrentUserId()
         when (direction) {
             DataTransferDirection.REMOTE_TO_LOCAL -> {
-                val allGoals = remoteDataSource.fetchDailyGoalsByTimeRange(
-                    from = DISTANT_PAST.toEpochMilliseconds(),
-                    to = DISTANT_FUTURE.toEpochMilliseconds(),
-                    targetUser = targetUser,
-                ).let { goalsFlow ->
-                    return@let goalsFlow.first().map { it.mapToDomain().mapToLocalData() }
-                }
-                localDataSource.deleteAllDailyGoals()
-                localDataSource.addDailyDailyGoals(allGoals)
-                remoteDataSource.deleteAllDailyGoals(targetUser)
+                val allGoalsFlow = remoteDataSource.fetchAllItems(currentUser)
+                val goals = allGoalsFlow.first().map { it.convertToLocal() }
+                localDataSource.offline().deleteAllItems()
+                localDataSource.offline().addOrUpdateItems(goals)
             }
             DataTransferDirection.LOCAL_TO_REMOTE -> {
-                val allGoals = localDataSource.fetchDailyGoalsByTimeRange(
-                    from = DISTANT_PAST.toEpochMilliseconds(),
-                    to = DISTANT_FUTURE.toEpochMilliseconds(),
-                ).let { goalsFlow ->
-                    return@let goalsFlow.first().map { it.mapToDomain().mapToRemoteData(targetUser) }
-                }
-                remoteDataSource.deleteAllDailyGoals(targetUser)
-                remoteDataSource.addDailyDailyGoals(allGoals, targetUser)
+                val allGoals = localDataSource.offline().fetchAllGoals().first()
+                val goalsRemote = allGoals.map { it.convertToRemote(currentUser) }
+
+                remoteDataSource.deleteAllItems(currentUser)
+                remoteDataSource.addOrUpdateItems(goalsRemote)
+
+                localDataSource.sync().deleteAllItems()
+                localDataSource.sync().addOrUpdateItems(allGoals)
             }
         }
     }

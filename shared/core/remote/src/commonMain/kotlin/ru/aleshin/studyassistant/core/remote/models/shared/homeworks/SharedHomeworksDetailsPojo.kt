@@ -18,12 +18,15 @@ package ru.aleshin.studyassistant.core.remote.models.shared.homeworks
 
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.remote.utils.BaseRemotePojo
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
 @Serializable
 data class SharedHomeworksDetailsPojo(
+    override val id: String,
     val received: Map<UID, ReceivedMediatedHomeworksDetailsPojo> = emptyMap(),
     val sent: Map<UID, SentMediatedHomeworksDetailsPojo> = emptyMap(),
-)
+    override val updatedAt: Long,
+) : BaseRemotePojo()

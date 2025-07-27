@@ -37,6 +37,7 @@ internal fun Todo.mapToUi() = TodoUi(
     notifications = notifications.mapToUi(),
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun TodoDetails.mapToUi() = TodoDetailsUi(
@@ -52,6 +53,7 @@ internal fun TodoDetails.mapToUi() = TodoDetailsUi(
     linkedGoal = linkedGoal?.mapToUi(),
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun DetailsGroupedTodos.mapToUi() = DetailsGroupedTodosUi(
@@ -78,6 +80,7 @@ internal fun TodoDetailsUi.mapToDomain() = Todo(
     notifications = notifications.mapToDomain(),
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun TodoUi.mapToDomain() = Todo(
@@ -89,6 +92,7 @@ internal fun TodoUi.mapToDomain() = Todo(
     notifications = notifications.mapToDomain(),
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun TodoNotificationsUi.mapToDomain() = TodoNotifications(

@@ -5,13 +5,9 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvmToolchain(17)
+
+    androidTarget()
 
     listOf(
         iosX64(),
@@ -32,6 +28,10 @@ kotlin {
             implementation(project(":shared:core:database"))
             implementation(project(":shared:core:remote"))
             implementation(project(":shared:core:client-api"))
+
+            implementation(libs.sqldelight.core)
+            implementation(libs.sqldelight.coroutines)
+            implementation(libs.sqldelight.async)
 
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)

@@ -21,7 +21,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.AnySerializer
 import ru.aleshin.studyassistant.core.common.functional.ListAnySerializer
-import ru.aleshin.studyassistant.core.common.functional.MapAnySerializer
 
 /**
  * @author Stanislav Aleshin on 29.06.2025.
@@ -123,9 +122,9 @@ data class AuthUserPojo(
     /**
      * User preferences as a key-value object
      */
-    @Serializable(with = MapAnySerializer::class)
+    @Serializable(with = AnySerializer::class)
     @SerialName("prefs")
-    val prefs: Map<String, Any>? = null,
+    val prefs: Any? = null,
 
     @SerialName("targets")
     val targets: List<TargetPojo> = emptyList(),

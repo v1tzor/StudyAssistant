@@ -28,15 +28,15 @@ import ru.aleshin.studyassistant.core.api.AppwriteApi.Client.PROJECT_ID
 data class FilePojo(
     @SerialName("\$id") val id: String,
     @SerialName("bucketId") val bucketId: String,
-    @SerialName("\$createdAt") val createdAt: String,
-    @SerialName("\$updatedAt") val updatedAt: String,
-    @SerialName("\$permissions") val permissions: List<String>,
-    @SerialName("name") val name: String,
-    @SerialName("signature") val signature: String,
-    @SerialName("mimeType") val mimeType: String,
-    @SerialName("sizeOriginal") val sizeOriginal: Long,
-    @SerialName("chunksTotal") val chunksTotal: Long,
-    @SerialName("chunksUploaded") val chunksUploaded: Long,
+    @SerialName("\$createdAt") val createdAt: String = "",
+    @SerialName("\$updatedAt") val updatedAt: String = "",
+    @SerialName("\$permissions") val permissions: List<String> = emptyList(),
+    @SerialName("name") val name: String = "",
+    @SerialName("signature") val signature: String = "",
+    @SerialName("mimeType") val mimeType: String = "",
+    @SerialName("sizeOriginal") val sizeOriginal: Long = 0L,
+    @SerialName("chunksTotal") val chunksTotal: Long = 0L,
+    @SerialName("chunksUploaded") val chunksUploaded: Long = 0L,
 ) {
     fun getDownloadUrl() = buildString {
         append(ENDPOINT)
@@ -53,6 +53,10 @@ data class FilePojo(
         append('/')
         append("view?project=")
         append(PROJECT_ID)
+    }
+
+    companion object {
+        fun getDownloadUrl(id: String, bucketId: String): String = FilePojo(id, bucketId).getDownloadUrl()
     }
 }
 

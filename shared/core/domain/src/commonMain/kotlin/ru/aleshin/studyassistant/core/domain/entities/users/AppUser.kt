@@ -36,19 +36,22 @@ data class AppUser(
     val friends: List<UID> = emptyList(),
     val subscriptionInfo: SubscribeInfo? = null,
     val socialNetworks: List<SocialNetwork> = emptyList(),
+    val updatedAt: Long,
 ) {
     companion object {
         fun createNewUser(
             uid: UID,
             device: UserDevice,
             username: String,
-            email: String
+            email: String,
+            createdAt: Long,
         ) = AppUser(
             uid = uid,
             devices = listOf(device),
             username = username,
             email = email,
             code = generateDigitCode(),
+            updatedAt = createdAt,
         )
     }
 }

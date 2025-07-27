@@ -31,6 +31,7 @@ internal fun OrganizationShort.mapToUi() = OrganizationShortUi(
     offices = offices,
     avatar = avatar,
     scheduleTimeIntervals = scheduleTimeIntervals.mapToUi(),
+    updatedAt = updatedAt,
 )
 
 internal fun OrganizationShortUi.mapToDomain() = OrganizationShort(
@@ -42,4 +43,5 @@ internal fun OrganizationShortUi.mapToDomain() = OrganizationShort(
     offices = offices,
     avatar = avatar,
     scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
+    updatedAt = updatedAt,
 )

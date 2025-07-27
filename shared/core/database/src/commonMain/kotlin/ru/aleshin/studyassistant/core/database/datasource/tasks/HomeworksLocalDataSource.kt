@@ -16,10 +16,9 @@
 
 package ru.aleshin.studyassistant.core.database.datasource.tasks
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import app.cash.sqldelight.coroutines.mapToOne
-import app.cash.sqldelight.coroutines.mapToOneOrNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -28,158 +27,224 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.architecture.data.MetadataModel
+import ru.aleshin.studyassistant.core.common.extensions.mapToListFlow
+import ru.aleshin.studyassistant.core.common.extensions.mapToOneFlow
+import ru.aleshin.studyassistant.core.common.extensions.mapToOneOrNullFlow
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.database.datasource.tasks.HomeworksLocalDataSource.OfflineStorage
+import ru.aleshin.studyassistant.core.database.datasource.tasks.HomeworksLocalDataSource.SyncStorage
+import ru.aleshin.studyassistant.core.database.mappers.employee.mapToBase
+import ru.aleshin.studyassistant.core.database.mappers.subjects.mapToBase
 import ru.aleshin.studyassistant.core.database.mappers.subjects.mapToDetails
+import ru.aleshin.studyassistant.core.database.mappers.tasks.mapToBase
 import ru.aleshin.studyassistant.core.database.mappers.tasks.mapToDetails
 import ru.aleshin.studyassistant.core.database.mappers.tasks.mapToEntity
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationShortEntity
 import ru.aleshin.studyassistant.core.database.models.organizations.ScheduleTimeIntervalsEntity
+import ru.aleshin.studyassistant.core.database.models.tasks.BaseHomeworkEntity
 import ru.aleshin.studyassistant.core.database.models.tasks.HomeworkDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.users.ContactInfoEntity
+import ru.aleshin.studyassistant.core.database.utils.CombinedLocalDataSource
+import ru.aleshin.studyassistant.core.database.utils.LocalDataSource
+import ru.aleshin.studyassistant.core.database.utils.LocalMultipleDocumentsCommands
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.organizations.OrganizationQueries
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectQueries
-import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkEntity
 import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkQueries
 import kotlin.coroutines.CoroutineContext
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
-interface HomeworksLocalDataSource {
+interface HomeworksLocalDataSource : CombinedLocalDataSource<BaseHomeworkEntity, OfflineStorage, SyncStorage> {
 
-    suspend fun addOrUpdateHomework(homework: HomeworkEntity): UID
-    suspend fun addOrUpdateHomeworksGroup(homeworks: List<HomeworkEntity>)
-    suspend fun fetchHomeworkById(uid: UID): Flow<HomeworkDetailsEntity?>
-    suspend fun fetchHomeworksByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsEntity>>
-    suspend fun fetchOverdueHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
-    suspend fun fetchActiveLinkedHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
-    suspend fun fetchCompletedHomeworksCount(): Flow<Int>
-    suspend fun deleteHomework(uid: UID)
-    suspend fun deleteAllHomework()
+    interface Commands : LocalMultipleDocumentsCommands<BaseHomeworkEntity> {
 
-    class Base(
-        private val homeworkQueries: HomeworkQueries,
-        private val organizationsQueries: OrganizationQueries,
-        private val employeeQueries: EmployeeQueries,
-        private val subjectQueries: SubjectQueries,
-        private val coroutineManager: CoroutineManager,
-    ) : HomeworksLocalDataSource {
+        suspend fun fetchHomeworkDetailsById(uid: UID): Flow<HomeworkDetailsEntity?>
+        suspend fun fetchHomeworksDetailsByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsEntity>>
+        suspend fun fetchOverdueHomeworksDetails(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
+        suspend fun fetchActiveLinkedHomeworksDetails(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
+        suspend fun fetchAllHomeworks(): Flow<List<BaseHomeworkEntity>>
+        suspend fun fetchCompletedHomeworksCount(): Flow<Int>
 
-        private val coroutineContext: CoroutineContext
-            get() = coroutineManager.backgroundDispatcher
+        abstract class Abstract(
+            isCacheSource: Boolean,
+            private val homeworkQueries: HomeworkQueries,
+            private val organizationsQueries: OrganizationQueries,
+            private val employeeQueries: EmployeeQueries,
+            private val subjectQueries: SubjectQueries,
+            private val coroutineManager: CoroutineManager,
+        ) : Commands {
 
-        override suspend fun addOrUpdateHomework(homework: HomeworkEntity): UID {
-            val uid = homework.uid.ifEmpty { randomUUID() }
-            homeworkQueries.addOrUpdateHomework(homework.copy(uid = uid))
+            private val coroutineContext: CoroutineContext
+                get() = coroutineManager.backgroundDispatcher
 
-            return uid
-        }
+            private val isCacheData = if (isCacheSource) 1L else 0L
 
-        override suspend fun addOrUpdateHomeworksGroup(homeworks: List<HomeworkEntity>) {
-            homeworks.forEach { addOrUpdateHomework(it) }
-        }
-
-        override suspend fun fetchHomeworkById(uid: UID): Flow<HomeworkDetailsEntity?> {
-            val query = homeworkQueries.fetchHomeworkById(uid)
-            return query.asFlow().mapToOneOrNull(coroutineContext).flatMapToDetails()
-        }
-
-        override suspend fun fetchHomeworksByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsEntity>> {
-            val query = homeworkQueries.fetchHomeworksByTimeRange(from, to)
-            return query.asFlow().mapToList(coroutineContext).flatMapListToDetails()
-        }
-
-        override suspend fun fetchOverdueHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>> {
-            val query = homeworkQueries.fetchOverdueHomeworks(currentDate)
-            return query.asFlow().mapToList(coroutineContext).flatMapListToDetails()
-        }
-
-        override suspend fun fetchCompletedHomeworksCount(): Flow<Int> {
-            val query = homeworkQueries.fetchCompletedHomeworksCount()
-            return query.asFlow().mapToOne(coroutineContext).map { it.toInt() }
-        }
-
-        override suspend fun fetchActiveLinkedHomeworks(currentDate: Long): Flow<List<HomeworkDetailsEntity>> {
-            val query = homeworkQueries.fetchActiveAndLinkedHomeworks(currentDate)
-            val homeworksFlow = query.asFlow().mapToList(coroutineContext).map { homeworksList ->
-                homeworksList.map { it.mapToEntity() }
+            override suspend fun addOrUpdateItem(item: BaseHomeworkEntity) {
+                val uid = item.uid.ifEmpty { randomUUID() }
+                val updatedItem = item.copy(uid = uid, isCacheData = isCacheData).mapToEntity()
+                homeworkQueries.addOrUpdateHomework(updatedItem).await()
             }
-            return homeworksFlow.flatMapListToDetails()
-        }
 
-        override suspend fun deleteHomework(uid: UID) {
-            homeworkQueries.deleteHomework(uid)
-        }
+            override suspend fun addOrUpdateItems(items: List<BaseHomeworkEntity>) {
+                items.forEach { item -> addOrUpdateItem(item) }
+            }
 
-        override suspend fun deleteAllHomework() {
-            homeworkQueries.deleteAllHomeworks()
-        }
+            override suspend fun fetchItemById(id: String): Flow<BaseHomeworkEntity?> {
+                val query = homeworkQueries.fetchHomeworkById(id, isCacheData)
+                return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }
+            }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private fun Flow<List<HomeworkEntity>>.flatMapListToDetails() = flatMapLatest { homeworks ->
-            if (homeworks.isEmpty()) {
-                flowOf(emptyList())
-            } else {
-                val organizationsIds = homeworks.map { it.organization_id }.toSet()
+            override suspend fun fetchItemsById(ids: List<String>): Flow<List<BaseHomeworkEntity>> {
+                val query = homeworkQueries.fetchHomeworksById(ids, isCacheData)
+                return query.mapToListFlow(coroutineContext) { it.mapToBase() }
+            }
+            override suspend fun fetchHomeworkDetailsById(uid: UID): Flow<HomeworkDetailsEntity?> {
+                return fetchItemById(uid).flatMapToDetails()
+            }
 
-                val organizationsMapFlow = organizationsQueries
-                    .fetchOrganizationsById(
+            override suspend fun fetchHomeworksDetailsByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsEntity>> {
+                val query = homeworkQueries.fetchHomeworksByTimeRange(from, to, isCacheData)
+                return query.mapToListFlow(coroutineContext) { it.mapToBase() }.flatMapListToDetails()
+            }
+
+            override suspend fun fetchOverdueHomeworksDetails(currentDate: Long): Flow<List<HomeworkDetailsEntity>> {
+                val query = homeworkQueries.fetchOverdueHomeworks(currentDate, isCacheData)
+                return query.mapToListFlow(coroutineContext) { it.mapToBase() }.flatMapListToDetails()
+            }
+
+            override suspend fun fetchActiveLinkedHomeworksDetails(currentDate: Long): Flow<List<HomeworkDetailsEntity>> {
+                val query = homeworkQueries.fetchActiveAndLinkedHomeworks(currentDate, isCacheData)
+                return query.mapToListFlow(coroutineContext) { it.mapToEntity() }.flatMapListToDetails()
+            }
+
+            override suspend fun fetchAllHomeworks(): Flow<List<BaseHomeworkEntity>> {
+                val query = homeworkQueries.fetchAllHomeworks(isCacheData)
+                return query.mapToListFlow(coroutineContext) { it.mapToBase() }
+            }
+
+            override suspend fun fetchCompletedHomeworksCount(): Flow<Int> {
+                val query = homeworkQueries.fetchCompletedHomeworksCount(isCacheData)
+                return query.mapToOneFlow(coroutineContext) { it.toInt() }
+            }
+
+            override suspend fun fetchAllMetadata(): List<MetadataModel> {
+                val query = homeworkQueries.fetchEmptyHomeworks()
+                return query.awaitAsList().map { entity ->
+                    MetadataModel(entity.uid, entity.updated_at)
+                }
+            }
+
+            override suspend fun deleteItemsById(ids: List<String>) {
+                homeworkQueries.deleteHomeworks(ids, isCacheData).await()
+            }
+
+            override suspend fun deleteAllItems() {
+                homeworkQueries.deleteAllHomeworks(isCacheData).await()
+            }
+
+            @OptIn(ExperimentalCoroutinesApi::class)
+            private fun Flow<List<BaseHomeworkEntity>>.flatMapListToDetails() = flatMapLatest { homeworks ->
+                if (homeworks.isEmpty()) {
+                    flowOf(emptyList())
+                } else {
+                    val organizationsIds = homeworks.map { it.organizationId }.toSet()
+
+                    val organizationsMapFlow = organizationsQueries.fetchOrganizationsById(
                         uid = organizationsIds,
-                        mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel,
-                                   _, _, locationList, _, offices, _ ->
-                            val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsEntity>(timeIntervalsModel)
-                            val locations = locationList.map { Json.decodeFromString<ContactInfoEntity>(it) }
-                            OrganizationShortEntity(
-                                uid,
-                                isMain == 1L,
-                                name,
-                                type,
-                                avatar,
-                                locations,
-                                offices,
-                                timeIntervals
+                        is_cache_data = isCacheData,
+                        mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel, _, _, locationList, _, offices, _, updatedAt, _ ->
+                            val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsEntity>(
+                                timeIntervalsModel
                             )
+                            val locations = locationList.map {
+                                Json.decodeFromString<ContactInfoEntity>(it)
+                            }
+                            OrganizationShortEntity(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals, updatedAt)
                         },
-                    )
-                    .asFlow()
-                    .mapToList(coroutineContext)
-                    .map { organization -> organization.associateBy { it.uid } }
+                    ).asFlow()
+                        .mapToList(coroutineContext)
+                        .map { organization -> organization.associateBy { it.uid } }
 
-                val subjectsMapFlow = subjectQueries.fetchSubjectsByOrganizations(organizationsIds)
-                    .asFlow()
-                    .mapToList(coroutineContext)
-                    .map { subject -> subject.associateBy { it.uid } }
+                    val subjectsMapFlow = subjectQueries.fetchSubjectsByOrganizations(organizationsIds, isCacheData)
+                        .mapToListFlow(coroutineContext) { it.mapToBase() }
+                        .map { subject -> subject.associateBy { it.uid } }
 
-                val employeesMapFlow = employeeQueries.fetchEmployeesByOrganizations(organizationsIds)
-                    .asFlow()
-                    .mapToList(coroutineContext)
-                    .map { employee -> employee.associateBy { it.uid } }
+                    val employeesMapFlow = employeeQueries.fetchEmployeesByOrganizations(organizationsIds, isCacheData)
+                        .mapToListFlow(coroutineContext) { it.mapToBase() }
+                        .map { employee -> employee.associateBy { it.uid } }
 
-                combine(
-                    flowOf(homeworks),
-                    organizationsMapFlow,
-                    subjectsMapFlow,
-                    employeesMapFlow,
-                ) { homeworksList, organizationsMap, subjectsMap, employeesMap ->
-                    homeworksList.map { homework ->
-                        homework.mapToDetails(
-                            organization = checkNotNull(organizationsMap[homework.organization_id]),
-                            subject = subjectsMap[homework.subject_id]?.mapToDetails(
-                                employee = employeesMap[subjectsMap[homework.subject_id]?.teacher_id]
-                            ),
-                        )
+                    combine(
+                        flowOf(homeworks),
+                        organizationsMapFlow,
+                        subjectsMapFlow,
+                        employeesMapFlow,
+                    ) { homeworksList, organizationsMap, subjectsMap, employeesMap ->
+                        homeworksList.map { homework ->
+                            homework.mapToDetails(
+                                organization = checkNotNull(organizationsMap[homework.organizationId]),
+                                subject = subjectsMap[homework.subjectId]?.mapToDetails(
+                                    employee = employeesMap[subjectsMap[homework.subjectId]?.teacherId]
+                                ),
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        private fun Flow<HomeworkEntity?>.flatMapToDetails(): Flow<HomeworkDetailsEntity?> {
-            return mapNotNull { it?.let { listOf(it) } ?: emptyList() }
-                .flatMapListToDetails()
-                .map { it.getOrNull(0) }
+            private fun Flow<BaseHomeworkEntity?>.flatMapToDetails(): Flow<HomeworkDetailsEntity?> {
+                return mapNotNull { it?.let { listOf(it) } ?: emptyList() }
+                    .flatMapListToDetails()
+                    .map { it.getOrNull(0) }
+            }
         }
+    }
+
+    interface OfflineStorage : LocalDataSource.OnlyOffline, Commands {
+
+        class Base(
+            homeworkQueries: HomeworkQueries,
+            organizationsQueries: OrganizationQueries,
+            employeeQueries: EmployeeQueries,
+            subjectQueries: SubjectQueries,
+            coroutineManager: CoroutineManager,
+        ) : OfflineStorage, Commands.Abstract(
+            isCacheSource = false,
+            homeworkQueries = homeworkQueries,
+            organizationsQueries = organizationsQueries,
+            employeeQueries = employeeQueries,
+            subjectQueries = subjectQueries,
+            coroutineManager = coroutineManager,
+        )
+    }
+
+    interface SyncStorage : LocalDataSource.FullSynced.MultipleDocuments<BaseHomeworkEntity>, Commands {
+
+        class Base(
+            homeworkQueries: HomeworkQueries,
+            organizationsQueries: OrganizationQueries,
+            employeeQueries: EmployeeQueries,
+            subjectQueries: SubjectQueries,
+            coroutineManager: CoroutineManager,
+        ) : SyncStorage, Commands.Abstract(
+            isCacheSource = true,
+            homeworkQueries = homeworkQueries,
+            organizationsQueries = organizationsQueries,
+            employeeQueries = employeeQueries,
+            subjectQueries = subjectQueries,
+            coroutineManager = coroutineManager,
+        )
+    }
+
+    class Base(
+        private val offlineStorage: OfflineStorage,
+        private val syncStorage: SyncStorage
+    ) : HomeworksLocalDataSource {
+        override fun offline() = offlineStorage
+        override fun sync() = syncStorage
     }
 }

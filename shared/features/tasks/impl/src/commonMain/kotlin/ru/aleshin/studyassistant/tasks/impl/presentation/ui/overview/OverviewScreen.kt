@@ -40,6 +40,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.navigation.root
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
@@ -60,6 +61,7 @@ internal class OverviewScreen : Screen {
         initialState = OverviewViewState(),
     ) { state ->
         val strings = TasksThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
         val navigator = LocalNavigator.currentOrThrow
         var overviewTasksTab by rememberSaveable { mutableStateOf(OverviewTasksTab.HOMEWORKS) }
         val snackbarState = remember { SnackbarHostState() }
@@ -137,7 +139,7 @@ internal class OverviewScreen : Screen {
                 is OverviewEffect.NavigateToGlobal -> navigator.root().push(effect.pushScreen)
                 is OverviewEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
                         withDismissAction = true,
                     )
                 }

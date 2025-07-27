@@ -34,12 +34,14 @@ data class BaseSchedule(
     val dayOfWeek: DayOfWeek,
     val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val classes: List<Class>,
+    val updatedAt: Long,
 ) {
     companion object {
         fun createActual(
             currentDate: Instant,
             dayOfNumberedWeek: DayOfNumberedWeek,
             classes: List<Class> = emptyList(),
+            createdAt: Long,
         ): BaseSchedule {
             return BaseSchedule(
                 uid = randomUUID(),
@@ -47,6 +49,7 @@ data class BaseSchedule(
                 dayOfWeek = dayOfNumberedWeek.dayOfWeek,
                 week = dayOfNumberedWeek.week,
                 classes = classes,
+                updatedAt = createdAt,
             )
         }
     }

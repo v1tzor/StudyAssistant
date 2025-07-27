@@ -21,9 +21,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngineConfig
 import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.plugins.DefaultRequest
-import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.cookies.CookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
@@ -47,6 +45,7 @@ import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.io.IOException
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -56,7 +55,12 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Client.ENDPOINT
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Client.ENDPOINT_REALTIME
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Client.PROJECT_ID
+import ru.aleshin.studyassistant.core.api.BuildKonfig.APPWRITE_SERVER_KEY
 import ru.aleshin.studyassistant.core.api.BuildKonfig.IS_DEBUG
+import ru.aleshin.studyassistant.core.api.cookies.PreferencesCookiesStorage
 import ru.aleshin.studyassistant.core.api.models.ClientParam
 import ru.aleshin.studyassistant.core.api.models.FilePojo
 import ru.aleshin.studyassistant.core.api.models.ProgressPojo
@@ -76,202 +80,124 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * @author Stanislav Aleshin on 30.06.2025.
  */
-class AppwriteClient(
+class AppwriteClient private constructor(
     internal val coroutineManager: CoroutineManager,
-    private val httpClientEngineFactory: HttpClientEngineFactory<HttpClientEngineConfig>,
-    private val cookiesStorage: CookiesStorage,
+    private val cookiesStorage: PreferencesCookiesStorage,
     private val connectionManager: Konnection,
-    private val headersProvider: AppwriteHeadersProvider,
 ) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = coroutineManager.backgroundDispatcher + job
 
-    internal lateinit var httpClient: HttpClient
-
-    internal val headers: MutableMap<String, String> = headersProvider.fetchHeaders()
-    internal val config: MutableMap<String, String> = mutableMapOf()
-
-    internal var endpoint: String = "https://cloud.appwrite.io/v1"
-    internal var endpointRealtime: String? = null
-    internal var selfSigned: Boolean = false
-
     private val job = Job()
-    private var updated: Boolean = true
 
-    private companion object {
-        const val CHUNK_SIZE = 5 * 1024 * 1024 // 5MB
-    }
+    companion object {
 
-    /**
-     * Set Project
-     *
-     * Your project ID
-     *
-     * @param {string} project
-     *
-     * @return this
-     */
-    fun setProject(value: String): AppwriteClient {
-        config["project"] = value
-        addHeader("x-appwrite-project", value)
-        return this
-    }
+        public var config: MutableMap<String, String> = mutableMapOf()
+        public var endpoint: String = "https://cloud.appwrite.io/v1"
+        public var endpointRealtime: String? = ENDPOINT_REALTIME
 
-    /**
-     * Set Key
-     *
-     * Your secret API key
-     *
-     * @param {string} key
-     *
-     * @return this
-     */
-    fun setKey(value: String): AppwriteClient {
-        if (value.isEmpty()) return this
-        config["key"] = value
-        addHeader("x-appwrite-key", value)
-        return this
-    }
+        private lateinit var baseHttpClient: HttpClient
+        private lateinit var serverHttpClient: HttpClient
 
-    /**
-     * Set JWT
-     *
-     * Your secret JSON Web Token
-     *
-     * @param {string} jwt
-     *
-     * @return this
-     */
-    fun setJWT(value: String): AppwriteClient {
-        config["jWT"] = value
-        addHeader("x-appwrite-jwt", value)
-        return this
-    }
+        private val clientHeaders: MutableMap<String, String> = mutableMapOf()
+        private val serverHeaders: MutableMap<String, String> = mutableMapOf()
 
-    /**
-     * Set Locale
-     *
-     * @param {string} locale
-     *
-     * @return this
-     */
-    fun setLocale(value: String): AppwriteClient {
-        config["locale"] = value
-        addHeader("x-appwrite-locale", value)
-        return this
-    }
+        private const val CHUNK_SIZE = 5 * 1024 * 1024 // 5MB
+        private const val CACHE_CONTROL_TYPE = "private, max-age=3600"
 
-    /**
-     * Set Session
-     *
-     * The user session to authenticate with
-     *
-     * @param {string} session
-     *
-     * @return this
-     */
-    fun setSession(value: String): AppwriteClient {
-        config["session"] = value
-        addHeader("x-appwrite-session", value)
-        return this
-    }
+        class Creator(
+            internal val coroutineManager: CoroutineManager,
+            private val httpClientEngineFactory: HttpClientEngineFactory<HttpClientEngineConfig>,
+            private val cookiesStorage: PreferencesCookiesStorage,
+            private val connectionManager: Konnection,
+            private val headersProvider: AppwriteHeadersProvider,
+        ) {
+            fun setup(
+                endpoint: String = ENDPOINT,
+                endpointRealtime: String = ENDPOINT_REALTIME,
+                projectId: String = PROJECT_ID,
+                serverKey: String = APPWRITE_SERVER_KEY,
+            ): AppwriteClient {
+                clientHeaders.putAll(headersProvider.fetchBaseClientHeaders())
+                serverHeaders.putAll(headersProvider.fetchBaseServerHeaders())
 
-    /**
-     * Set self Signed
-     *
-     * @param status
-     *
-     * @return this
-     */
-    fun setSelfSigned(status: Boolean): AppwriteClient {
-        selfSigned = status
-        updated = true
-        return this
-    }
+                setEndpoint(endpoint)
+                setEndpointRealtime(endpointRealtime)
+                setProject(projectId)
+                setKey(serverKey)
+                // addHeader(CacheControl, CACHE_CONTROL_TYPE)
 
-    /**
-     * Set endpoint and realtime endpoint.
-     *
-     * @param endpoint
-     *
-     * @return this
-     */
-    fun setEndpoint(endpoint: String): AppwriteClient {
-        this.endpoint = endpoint
+                baseHttpClient = createHttpClient(AppwriteClientType.CLIENT)
+                serverHttpClient = createHttpClient(AppwriteClientType.SERVER)
 
-        if (this.endpointRealtime == null && endpoint.startsWith("http")) {
-            this.endpointRealtime = endpoint.replaceFirst("http", "ws")
-        }
-        updated = true
-        return this
-    }
-
-    /**
-     * Set realtime endpoint
-     *
-     * @param endpoint
-     *
-     * @return this
-     */
-    fun setEndpointRealtime(endpoint: String): AppwriteClient {
-        this.endpointRealtime = endpoint
-        updated = true
-        return this
-    }
-
-    /**
-     * Add Header
-     *
-     * @param key
-     * @param value
-     *
-     * @return this
-     */
-    fun addHeader(
-        key: String,
-        value: String,
-    ): AppwriteClient {
-        headers[key] = value
-        updated = true
-        return this
-    }
-
-    internal fun createOrGetClient(): HttpClient {
-        if (!updated) return httpClient
-        httpClient = HttpClient(httpClientEngineFactory) {
-            install(HttpCache)
-            install(HttpCookies) {
-                storage = cookiesStorage
+                return AppwriteClient(
+                    coroutineManager = coroutineManager,
+                    connectionManager = connectionManager,
+                    cookiesStorage = cookiesStorage,
+                )
             }
-            install(Logging) {
-                level = if (IS_DEBUG) LogLevel.ALL else LogLevel.NONE
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }
+
+            private fun addHeader(key: String, value: String) {
+                clientHeaders[key] = value
+                serverHeaders[key] = value
+            }
+
+            private fun setProject(value: String) {
+                addHeader("x-appwrite-project", value)
+                config["project"] = value
+            }
+
+            private fun setKey(value: String) {
+                if (value.isEmpty()) return
+                config["key"] = value
+                serverHeaders["x-appwrite-key"] = value
+            }
+
+            private fun setEndpoint(endpoint: String) {
+                this@Companion.endpoint = endpoint
+
+                if (this@Companion.endpointRealtime == null && endpoint.startsWith("http")) {
+                    this@Companion.endpointRealtime = endpoint.replaceFirst("http", "ws")
+                }
+            }
+
+            private fun setEndpointRealtime(endpoint: String) {
+                this@Companion.endpointRealtime = endpoint
+            }
+
+            private fun createHttpClient(type: AppwriteClientType): HttpClient {
+                return HttpClient(httpClientEngineFactory) {
+                    // install(HttpCache)
+                    if (type == AppwriteClientType.CLIENT) {
+                        install(HttpCookies) { storage = cookiesStorage }
+                    }
+                    install(WebSockets) {
+                        pingInterval = 20.seconds
+                    }
+                    install(ContentNegotiation) { json(Json.Decode) }
+                    install(Logging) {
+                        level = if (IS_DEBUG) LogLevel.ALL else LogLevel.NONE
+                        logger = object : Logger {
+                            override fun log(message: String) {
+                                co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }
+                            }
+                        }
+                    }
+                    install(DefaultRequest) {
+                        if (endpoint.endsWith("/")) url(endpoint) else url("$endpoint/")
+                        when (type) {
+                            AppwriteClientType.CLIENT -> clientHeaders.forEach {
+                                headers.append(it.key, it.value)
+                            }
+                            AppwriteClientType.SERVER -> serverHeaders.forEach {
+                                headers.append(it.key, it.value)
+                            }
+                        }
                     }
                 }
             }
-            install(DefaultRequest) {
-                if (endpoint.endsWith("/")) {
-                    url(endpoint)
-                } else {
-                    url("$endpoint/")
-                }
-                this.headers.append(HttpHeaders.CacheControl, "private, max-age=3600")
-                this@AppwriteClient.headers.forEach {
-                    headers.append(it.key, it.value)
-                }
-            }
-            install(WebSockets) {
-                pingInterval = 0.seconds
-            }
-            install(ContentNegotiation) {
-                json(Json.Decode)
-            }
         }
-        updated = false
-        return httpClient
     }
 
     /**
@@ -290,50 +216,49 @@ class AppwriteClient(
         deserializer: DeserializationStrategy<T>,
         headers: Map<String, String> = mapOf(),
         params: List<ClientParam> = emptyList(),
+        clientType: AppwriteClientType = AppwriteClientType.CLIENT,
         onUpload: ((ProgressPojo) -> Unit)? = null,
         onDownload: ((ProgressPojo) -> Unit)? = null,
     ): T {
-        return try {
+        if (!connectionManager.isConnected()) throw InternetConnectionException()
+
+        try {
             val path = path.replaceFirst("/", "")
-            if (connectionManager.isConnected()) {
-                val httpClient = createOrGetClient()
-                val response = httpClient.request(path) {
-                    this.method = method
-                    if (method == HttpMethod.Get) {
-                        setupGetRequest(params)
-                    } else if (headers["content-type"] == ContentType.MultiPart.FormData.toString()) {
-                        setupPostMultipartDataRequest(params)
-                    } else {
-                        setupPostJsonRequest(params)
-                    }
-
-                    headers.forEach {
-                        this.headers.append(it.key, it.value)
-                    }
-
-                    if (onUpload != null) {
-                        onUpload { sent, total ->
-                            onUpload(ProgressPojo(total ?: 0L, sent))
-                        }
-                    }
-                    if (onDownload != null) {
-                        onDownload { received, total ->
-                            onDownload(ProgressPojo(total ?: 0, received))
-                        }
-                    }
-                }
-                val body = response.bodyAsText()
-                if (response.status.isSuccess()) {
-                    body.fromJson(deserializer)
-                } else {
-                    throw body.fromJson<AppwriteException>()
-                }
-            } else {
-                throw InternetConnectionException()
+            val httpClient = when (clientType) {
+                AppwriteClientType.CLIENT -> baseHttpClient
+                AppwriteClientType.SERVER -> serverHttpClient
             }
-        } catch (exception: Exception) {
-            exception.printStackTrace()
-            throw exception
+            val response = httpClient.request(path) {
+                this.method = method
+                if (method == HttpMethod.Get) {
+                    setupGetRequest(params)
+                } else if (headers["content-type"] == ContentType.MultiPart.FormData.toString()) {
+                    setupPostMultipartDataRequest(params)
+                } else {
+                    setupPostJsonRequest(params)
+                }
+
+                headers.forEach { this.headers.append(it.key, it.value) }
+
+                if (onUpload != null) {
+                    onUpload { sent, total ->
+                        onUpload(ProgressPojo(total ?: 0L, sent))
+                    }
+                }
+                if (onDownload != null) {
+                    onDownload { received, total ->
+                        onDownload(ProgressPojo(total ?: 0, received))
+                    }
+                }
+            }
+            val body = response.bodyAsText()
+            return if (response.status.isSuccess()) {
+                body.fromJson(deserializer)
+            } else {
+                throw body.fromJson<AppwriteException>()
+            }
+        } catch (e: IOException) {
+            throw InternetConnectionException()
         }
     }
 
@@ -351,119 +276,45 @@ class AppwriteClient(
         path: String,
         headers: Map<String, String> = mapOf(),
         params: List<ClientParam> = emptyList(),
+        clientType: AppwriteClientType = AppwriteClientType.CLIENT,
         onUpload: ((ProgressPojo) -> Unit)? = null,
         onDownload: ((ProgressPojo) -> Unit)? = null,
     ) {
         if (!connectionManager.isConnected()) throw InternetConnectionException()
 
         val path = path.replaceFirst("/", "")
-        val httpClient = createOrGetClient()
-        val response = httpClient.request(path) {
-            this.method = method
-            if (method == HttpMethod.Get) {
-                setupGetRequest(params)
-            } else if (headers["content-type"] == ContentType.MultiPart.FormData.toString()) {
-                setupPostMultipartDataRequest(params)
-            } else {
-                setupPostJsonRequest(params)
-            }
+        try {
+            val response = httpClient(clientType).request(path) {
+                this.method = method
+                if (method == HttpMethod.Get) {
+                    setupGetRequest(params)
+                } else if (headers["content-type"] == ContentType.MultiPart.FormData.toString()) {
+                    setupPostMultipartDataRequest(params)
+                } else {
+                    setupPostJsonRequest(params)
+                }
 
-            headers.forEach {
-                this.headers.append(it.key, it.value)
-            }
+                headers.forEach {
+                    this.headers.append(it.key, it.value)
+                }
 
-            if (onUpload != null) {
-                onUpload { sent, total ->
-                    onUpload(ProgressPojo(total ?: 0L, sent))
+                if (onUpload != null) {
+                    onUpload { sent, total ->
+                        onUpload(ProgressPojo(total ?: 0L, sent))
+                    }
+                }
+                if (onDownload != null) {
+                    onDownload { received, total ->
+                        onDownload(ProgressPojo(total ?: 0, received))
+                    }
                 }
             }
-            if (onDownload != null) {
-                onDownload { received, total ->
-                    onDownload(ProgressPojo(total ?: 0, received))
-                }
+            if (!response.status.isSuccess()) {
+                throw response.bodyAsText().fromJson<AppwriteException>()
             }
+        } catch (e: IOException) {
+            throw InternetConnectionException()
         }
-        if (!response.status.isSuccess()) {
-            throw response.bodyAsText().fromJson<AppwriteException>()
-        }
-    }
-
-    private fun HttpRequestBuilder.setupGetRequest(
-        params: List<ClientParam> = emptyList(),
-    ) {
-        params.forEach { param ->
-            when (param) {
-                is ClientParam.FileParam -> {}
-                is ClientParam.ListParam -> {
-                    param.value.forEach { paramValue ->
-                        parameter("${param.key}[]", paramValue)
-                    }
-                }
-
-                is ClientParam.StringParam -> {
-                    parameter(param.key, param.value)
-                }
-
-                is ClientParam.MapParam -> {}
-            }
-        }
-    }
-
-    private fun HttpRequestBuilder.setupPostMultipartDataRequest(
-        params: List<ClientParam> = emptyList(),
-    ) {
-        val formDataContent = formData {
-            params.forEach { param ->
-                when (param) {
-                    is ClientParam.FileParam -> {
-                        val headers = Headers.build {
-                            append(HttpHeaders.ContentType, ContentType.Application.OctetStream.toString())
-                            append(HttpHeaders.ContentDisposition, "filename=\"${param.fileName}\"")
-                        }
-                        append("file", param.data, headers)
-                    }
-                    is ClientParam.ListParam -> {
-                        param.value.forEach { paramValue ->
-                            append("${param.key}[]", paramValue)
-                        }
-                    }
-                    is ClientParam.StringParam -> {
-                        append(param.key, param.value.toString())
-                    }
-                    is ClientParam.MapParam -> {}
-                }
-            }
-        }
-        setBody(MultiPartFormDataContent(formDataContent))
-    }
-
-    @OptIn(ExperimentalSerializationApi::class)
-    private fun HttpRequestBuilder.setupPostJsonRequest(
-        params: List<ClientParam> = emptyList(),
-    ) {
-        val bodyMap = buildJsonObject {
-            params.forEach { param ->
-                when (param) {
-                    is ClientParam.FileParam -> {}
-                    is ClientParam.ListParam -> {
-                        putJsonArray(param.key) {
-                            addAll(param.value)
-                        }
-                    }
-                    is ClientParam.StringParam -> {
-                        put(param.key, param.value)
-                    }
-                    is ClientParam.MapParam -> {
-                        putJsonObject(param.key) {
-                            param.value.forEach { entry ->
-                                put(entry.key, entry.value.toJsonElement())
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        setBody(bodyMap.toJson())
     }
 
     /**
@@ -480,6 +331,7 @@ class AppwriteClient(
         deserializer: DeserializationStrategy<T>,
         headers: MutableMap<String, String>,
         params: List<ClientParam>,
+        clientType: AppwriteClientType = AppwriteClientType.CLIENT,
         onProgress: ((UploadProgressPojo) -> Unit)? = null,
     ): T {
         val fileId = params.find { it is ClientParam.StringParam && it.key == "fileId" } as? ClientParam.StringParam
@@ -497,6 +349,7 @@ class AppwriteClient(
                 deserializer = deserializer,
                 headers = headers,
                 params = params,
+                clientType = clientType,
             )
         }
 
@@ -510,6 +363,7 @@ class AppwriteClient(
             deserializer = FilePojo.serializer(),
             headers = headers,
             params = emptyList(),
+            clientType = clientType,
         )
         val chunksUploaded = current.chunksUploaded
         offset = chunksUploaded * CHUNK_SIZE
@@ -533,6 +387,7 @@ class AppwriteClient(
                 deserializer = JsonElement.serializer(),
                 headers = headers,
                 params = params,
+                clientType = clientType,
             )
 
             offset += CHUNK_SIZE
@@ -553,5 +408,95 @@ class AppwriteClient(
         return checkNotNull(result?.fromJson(deserializer)) {
             "chunkedUpload result is null"
         }
+    }
+
+    fun httpClient(type: AppwriteClientType = AppwriteClientType.CLIENT) = when (type) {
+        AppwriteClientType.CLIENT -> baseHttpClient
+        AppwriteClientType.SERVER -> serverHttpClient
+    }
+
+    fun clearCookies() {
+        cookiesStorage.cleanStorage()
+    }
+
+    private fun HttpRequestBuilder.setupGetRequest(params: List<ClientParam>) {
+        params.forEach { param ->
+            when (param) {
+                is ClientParam.FileParam -> {}
+                is ClientParam.ListParam -> {
+                    param.value.forEach { paramValue ->
+                        parameter("${param.key}[]", paramValue)
+                    }
+                }
+                is ClientParam.JsonListParam -> {}
+                is ClientParam.StringParam -> {
+                    parameter(param.key, param.value)
+                }
+                is ClientParam.MapParam -> {}
+            }
+        }
+    }
+
+    private fun HttpRequestBuilder.setupPostMultipartDataRequest(params: List<ClientParam>) {
+        val formDataContent = formData {
+            params.forEach { param ->
+                when (param) {
+                    is ClientParam.FileParam -> {
+                        val headers = Headers.build {
+                            append(HttpHeaders.ContentType, ContentType.Application.OctetStream.toString())
+                            append(HttpHeaders.ContentDisposition, "filename=\"${param.fileName}\"")
+                        }
+                        append("file", param.data, headers)
+                    }
+                    is ClientParam.ListParam -> {
+                        param.value.forEach { paramValue ->
+                            append("${param.key}[]", paramValue)
+                        }
+                    }
+                    is ClientParam.JsonListParam -> {
+                        param.value.forEach { paramValue ->
+                            append("${param.key}[]", paramValue.toString())
+                        }
+                    }
+                    is ClientParam.StringParam -> {
+                        append(param.key, param.value.toString())
+                    }
+                    is ClientParam.MapParam -> {}
+                }
+            }
+        }
+        setBody(MultiPartFormDataContent(formDataContent))
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    private fun HttpRequestBuilder.setupPostJsonRequest(params: List<ClientParam>) {
+        val bodyMap = buildJsonObject {
+            params.forEach { param ->
+                when (param) {
+                    is ClientParam.FileParam -> {}
+                    is ClientParam.ListParam -> {
+                        putJsonArray(param.key) {
+                            addAll(param.value)
+                        }
+                    }
+                    is ClientParam.JsonListParam -> {
+                        putJsonArray(param.key) {
+                            addAll(param.value)
+                        }
+                    }
+                    is ClientParam.StringParam -> {
+                        put(param.key, param.value)
+                    }
+                    is ClientParam.MapParam -> {
+                        putJsonObject(param.key) {
+                            param.value.forEach { entry ->
+                                put(entry.key, entry.value.toJsonElement())
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        setBody(bodyMap.toJson())
     }
 }

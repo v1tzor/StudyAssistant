@@ -27,26 +27,28 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
  * @author Stanislav Aleshin on 30.04.2024.
  */
 fun SubjectDetailsPojo.mapToBase(userId: UID) = SubjectPojo(
-    uid = uid,
+    id = uid,
     userId = userId,
     organizationId = organizationId,
     eventType = eventType,
     name = name,
-    teacherId = teacher?.uid,
+    teacherId = teacher?.id,
     office = office,
     color = color,
-    location = location?.toJson()
+    location = location?.toJson(),
+    updatedAt = updatedAt,
 )
 
 fun SubjectPojo.mapToDetails(
     employee: EmployeePojo?,
 ) = SubjectDetailsPojo(
-    uid = uid,
+    uid = id,
     organizationId = organizationId,
     eventType = eventType,
     name = name,
     teacher = employee,
     office = office,
     color = color,
-    location = location?.fromJson()
+    location = location?.fromJson(),
+    updatedAt = updatedAt,
 )

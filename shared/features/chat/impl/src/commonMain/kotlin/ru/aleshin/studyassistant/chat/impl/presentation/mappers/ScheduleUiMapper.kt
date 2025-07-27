@@ -45,7 +45,8 @@ internal fun BaseSchedule.mapToUi(): BaseScheduleUi {
         classes = classes.map {
             val number = groupedClasses[it.organization.uid]?.indexOf(it)?.inc() ?: 0
             it.mapToUi(number)
-        }
+        },
+        updatedAt = updatedAt,
     )
 }
 
@@ -57,7 +58,8 @@ internal fun CustomSchedule.mapToUi(): CustomScheduleUi {
         classes = classes.map {
             val number = groupedClasses[it.organization.uid]?.indexOf(it)?.inc() ?: 0
             it.mapToUi(number)
-        }
+        },
+        updatedAt = updatedAt,
     )
 }
 
@@ -79,12 +81,14 @@ internal fun BaseScheduleUi.mapToDomain() = BaseSchedule(
     dayOfWeek = dayOfWeek,
     week = week,
     classes = classes.map { it.mapToDomain() },
+    updatedAt = updatedAt,
 )
 
 internal fun CustomScheduleUi.mapToDomain() = CustomSchedule(
     uid = uid,
     date = date,
     classes = classes.map { it.mapToDomain() },
+    updatedAt = updatedAt,
 )
 
 internal fun DateVersionUi.mapToDomain() = DateVersion(

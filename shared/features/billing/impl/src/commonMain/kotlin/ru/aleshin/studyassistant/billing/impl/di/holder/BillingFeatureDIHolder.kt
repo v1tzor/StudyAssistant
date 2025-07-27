@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.billing.impl.di.holder
 
+import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
 import org.kodein.di.bindSingleton
@@ -57,6 +58,7 @@ public object BillingFeatureDIHolder : BaseFeatureDIHolder<BillingFeatureApi, Bi
                 bindSingleton<IapService> { dependencies.iapService }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
+                bindSingleton<Konnection> { dependencies.connectionManager }
                 bindSingleton<AnalyticsService> { dependencies.analyticsService }
                 bindSingleton<BillingFeatureApi> {
                     object : BillingFeatureApi {

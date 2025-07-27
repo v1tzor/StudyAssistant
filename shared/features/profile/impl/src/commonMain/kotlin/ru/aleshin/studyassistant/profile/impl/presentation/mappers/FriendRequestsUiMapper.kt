@@ -26,4 +26,5 @@ internal fun FriendRequests.mapToUi() = FriendRequestsUi(
     received = received,
     send = send,
     lastActions = lastActions,
+    updatedAt = updatedAt,
 )

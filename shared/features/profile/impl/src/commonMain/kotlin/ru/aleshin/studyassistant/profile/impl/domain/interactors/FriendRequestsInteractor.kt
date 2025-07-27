@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.profile.impl.domain.interactors
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.requests.FriendRequests
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.profile.impl.domain.common.ProfileEitherWrapper
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 
@@ -32,13 +31,11 @@ internal interface FriendRequestsInteractor {
 
     class Base(
         private val requestsRepository: FriendRequestsRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: ProfileEitherWrapper,
     ) : FriendRequestsInteractor {
 
         override suspend fun fetchAllFriendRequests() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            requestsRepository.fetchShortRequestsByUser(targetUser)
+            requestsRepository.fetchCurrentRequests()
         }
     }
 }

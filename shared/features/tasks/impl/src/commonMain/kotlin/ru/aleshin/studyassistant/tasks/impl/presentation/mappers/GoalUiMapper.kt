@@ -49,6 +49,7 @@ internal fun GoalDetails.mapToUi() = GoalDetailsUi(
     completeAfterTimeElapsed = completeAfterTimeElapsed,
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun GoalShort.mapToUi() = GoalShortUi(
@@ -66,6 +67,7 @@ internal fun GoalShort.mapToUi() = GoalShortUi(
     completeAfterTimeElapsed = completeAfterTimeElapsed,
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun DailyGoalsProgress.mapToUi() = DailyGoalsProgressUi(
@@ -121,6 +123,7 @@ internal fun GoalDetailsUi.mapToDomain() = Goal(
     completeAfterTimeElapsed = completeAfterTimeElapsed,
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun GoalShortUi.mapToDomain() = GoalShort(
@@ -138,6 +141,7 @@ internal fun GoalShortUi.mapToDomain() = GoalShort(
     completeAfterTimeElapsed = completeAfterTimeElapsed,
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun GoalTimeDetailsUi.Timer.mapToDomain() = GoalTime.Timer(

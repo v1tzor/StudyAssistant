@@ -34,4 +34,5 @@ internal data class SubjectUi(
     val office: String,
     val color: Int,
     val location: ContactInfoUi?,
+    val updatedAt: Long,
 ) : Parcelable

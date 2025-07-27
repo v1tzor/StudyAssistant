@@ -23,15 +23,15 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.data.managers.EndClassesReminderManagerImpl
-import ru.aleshin.studyassistant.core.data.managers.HomeworksReminderManagerImpl
-import ru.aleshin.studyassistant.core.data.managers.NotificationScheduler
-import ru.aleshin.studyassistant.core.data.managers.StartClassesReminderManagerImpl
-import ru.aleshin.studyassistant.core.data.managers.WorkloadWarningManagerImpl
-import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.data.managers.reminders.EndClassesReminderManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.reminders.HomeworksReminderManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.reminders.NotificationScheduler
+import ru.aleshin.studyassistant.core.data.managers.reminders.StartClassesReminderManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.reminders.WorkloadWarningManagerImpl
+import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
 
 /**
  * @author Stanislav Aleshin on 22.08.2024.

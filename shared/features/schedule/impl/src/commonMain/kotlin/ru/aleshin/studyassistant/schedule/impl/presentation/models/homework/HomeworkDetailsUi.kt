@@ -48,4 +48,5 @@ internal data class HomeworkDetailsUi(
     val status: HomeworkStatus,
     @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant?,
+    val updatedAt: Long,
 ) : Parcelable

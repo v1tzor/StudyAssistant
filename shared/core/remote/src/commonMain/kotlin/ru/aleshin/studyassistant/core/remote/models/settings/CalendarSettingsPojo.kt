@@ -16,20 +16,24 @@
 
 package ru.aleshin.studyassistant.core.remote.models.settings
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
+import ru.aleshin.studyassistant.core.remote.utils.BaseRemotePojo
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
 @Serializable
 data class CalendarSettingsPojo(
+    @SerialName("\$id") override val id: String = "",
     val numberOfWeek: String = NumberOfRepeatWeek.ONE.name,
     val weekScheduleViewType: String = WeekScheduleViewType.COMMON.name,
     val holidays: List<String> = emptyList(),
-) {
+    override val updatedAt: Long = 0L,
+) : BaseRemotePojo() {
     companion object {
-        fun default() = CalendarSettingsPojo()
+        fun default(id: String) = CalendarSettingsPojo(id)
     }
 }

@@ -16,17 +16,20 @@
 
 package ru.aleshin.studyassistant.core.remote.models.tasks
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.core.remote.utils.BaseMultipleRemotePojo
 
 /**
  * @author Stanislav Aleshin on 06.07.2025.
  */
 @Serializable
 data class TodoPojo(
-    val uid: UID,
-    val userId: UID,
+    @SerialName("\$id")
+    override val id: UID,
+    override val userId: UID,
     val deadline: Long? = null,
     val name: String = "",
     val description: String? = null,
@@ -34,4 +37,5 @@ data class TodoPojo(
     val notifications: String = "",
     val done: Boolean = false,
     val completeDate: Long? = null,
-)
+    override val updatedAt: Long = 0L,
+) : BaseMultipleRemotePojo()

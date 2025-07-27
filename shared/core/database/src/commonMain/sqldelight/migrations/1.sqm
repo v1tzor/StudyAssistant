@@ -2,7 +2,36 @@ import kotlin.String;
 import kotlin.collections.List;
 
 ALTER TABLE `todoEntity` ADD COLUMN description TEXT DEFAULT '';
+ALTER TABLE `todoEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `todoEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `homeworkEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `homeworkEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `employeeEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `employeeEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `goalEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `goalEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `organizationEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `organizationEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `baseScheduleEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `baseScheduleEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `customScheduleEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `customScheduleEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `subjectEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `subjectEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `calendarSettingsEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `calendarSettingsEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `calendarSettingsEntity` ADD COLUMN document_id TEXT NOT NULL DEFAULT NULL;
+
 ALTER TABLE `generalSettingsEntity` ADD COLUMN is_unfinished_setup TEXT DEFAULT NULL;
+
 CREATE TABLE IF NOT EXISTS `goalEntity` (
     uid TEXT PRIMARY KEY NOT NULL,
     type TEXT NOT NULL,
@@ -21,9 +50,11 @@ CREATE TABLE IF NOT EXISTS `goalEntity` (
     is_done INTEGER NOT NULL,
     complete_date INTEGER
 );
+
 CREATE TABLE IF NOT EXISTS `aiChatHistoryEntity` (
    uid TEXT PRIMARY KEY NOT NULL
 );
+
 CREATE TABLE IF NOT EXISTS `aiChatMessageEntity` (
    uid TEXT PRIMARY KEY NOT NULL,
    chat_id TEXT NOT NULL,
@@ -37,14 +68,53 @@ CREATE TABLE IF NOT EXISTS `aiChatMessageEntity` (
    time INTEGER NOT NULL,
    CONSTRAINT message_to_chat FOREIGN KEY (chat_id) REFERENCES aiChatHistoryEntity (uid) ON DELETE CASCADE
 );
-CREATE TABLE IF NOT EXISTS `CachedResponseDataEntity` (
-    url TEXT PRIMARY KEY,
-    status_code INTEGER NOT NULL,
-    request_time INTEGER NOT NULL,
-    response_time INTEGER NOT NULL,
-    http_version TEXT NOT NULL,
-    expires_time INTEGER NOT NULL,
-    headers TEXT NOT NULL,
-    vary_keys TEXT NOT NULL,
-    body BLOB NOT NULL
+
+CREATE TABLE IF NOT EXISTS `offlineChangeEntity` (
+    id TEXT PRIMARY KEY NOT NULL,
+    document_id TEXT NOT NULL,
+    updated_at INTEGER NOT NULL,
+    type TEXT NOT NULL,
+    source_key TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS `currentSharedHomeworksEntity` (
+    id INTEGER PRIMARY KEY NOT NULL,
+    document_id TEXT NOT NULL,
+    received TEXT AS List<String> NOT NULL,
+    sent TEXT AS List<String> NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS `currentSharedSchedulesEntity` (
+    id INTEGER PRIMARY KEY NOT NULL,
+    document_id TEXT NOT NULL,
+    sent TEXT AS List<String> NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS `currentFriendRequestsEntity` (
+    id INTEGER PRIMARY KEY NOT NULL,
+    document_id TEXT NOT NULL,
+    received TEXT AS List<String> NOT NULL,
+    sent TEXT AS List<String> NOT NULL,
+    last_actions TEXT AS List<String> NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS `currentUserEntity` (
+  id INTEGER PRIMARY KEY NOT NULL,
+  document_id TEXT NOT NULL,
+  devices TEXT AS List<String> NOT NULL,
+  username TEXT NOT NULL,
+  email TEXT NOT NULL,
+  code TEXT NOT NULL ,
+  avatar TEXT,
+  description TEXT,
+  city TEXT,
+  birthday TEXT,
+  sex TEXT,
+  friends TEXT AS List<String> NOT NULL,
+  subscriptionInfo TEXT,
+  socialNetworks TEXT AS List<String> NOT NULL,
+  updated_at INTEGER NOT NULL
 );

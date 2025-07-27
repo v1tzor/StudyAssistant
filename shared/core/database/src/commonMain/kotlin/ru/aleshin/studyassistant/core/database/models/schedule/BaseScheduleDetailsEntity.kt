@@ -29,4 +29,5 @@ data class BaseScheduleDetailsEntity(
     val weekDayOfWeek: String,
     val week: String,
     val classes: List<ClassDetailsEntity>,
+    val updatedAt: Long,
 )

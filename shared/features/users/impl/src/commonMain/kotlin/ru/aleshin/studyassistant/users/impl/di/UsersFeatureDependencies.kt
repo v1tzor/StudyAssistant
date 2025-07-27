@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.users.impl.di
 
+import dev.tmapps.konnection.Konnection
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -42,6 +43,7 @@ public interface UsersFeatureDependencies : BaseFeatureDependencies {
     public val usersRepository: UsersRepository
     public val messageRepository: MessageRepository
     public val dateManager: DateManager
+    public val connectionManager: Konnection
     public val coroutineManager: CoroutineManager
     public val crashlyticsService: CrashlyticsService
 }

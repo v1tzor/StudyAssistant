@@ -34,4 +34,5 @@ internal data class OrganizationShortUi(
     val avatar: String?,
     val offices: List<String>,
     val scheduleTimeIntervals: ScheduleTimeIntervalsUi = ScheduleTimeIntervalsUi(),
+    val updatedAt: Long,
 ) : Parcelable

@@ -58,5 +58,6 @@ internal fun AuthFailures.mapToMessage(strings: AuthStrings): String = when (thi
     is AuthFailures.UserCountExceededError -> strings.userCountExceededMessage
     is AuthFailures.AuthMethodUnsupportedError -> strings.authMethodUnsupportedMessage
     is AuthFailures.AccessDeniedError -> strings.accessDeniedMessage
+    is AuthFailures.InternetError -> strings.networkErrorMessage
     is AuthFailures.OtherError -> strings.otherErrorMessage
 }

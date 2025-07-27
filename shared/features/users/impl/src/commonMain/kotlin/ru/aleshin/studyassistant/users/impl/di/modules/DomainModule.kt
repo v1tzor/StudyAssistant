@@ -32,7 +32,7 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<UsersErrorHandler> { UsersErrorHandler.Base() }
     bindSingleton<UsersEitherWrapper> { UsersEitherWrapper.Base(instance(), instance()) }
 
-    bindSingleton<EmployeeInteractor> { EmployeeInteractor.Base(instance(), instance(), instance(), instance()) }
-    bindSingleton<FriendRequestsInteractor> { FriendRequestsInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<UsersInteractor> { UsersInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<EmployeeInteractor> { EmployeeInteractor.Base(instance(), instance(), instance()) }
+    bindSingleton<FriendRequestsInteractor> { FriendRequestsInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<UsersInteractor> { UsersInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
 }

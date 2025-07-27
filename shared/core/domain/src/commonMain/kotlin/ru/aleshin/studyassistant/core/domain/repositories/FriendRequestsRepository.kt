@@ -25,8 +25,9 @@ import ru.aleshin.studyassistant.core.domain.entities.requests.FriendRequestsDet
  * @author Stanislav Aleshin on 12.07.2024.
  */
 interface FriendRequestsRepository {
-    suspend fun addOrUpdateRequests(requests: FriendRequests, targetUser: UID)
-    suspend fun fetchRequestsByUser(uid: UID): Flow<FriendRequestsDetails>
-    suspend fun fetchShortRequestsByUser(uid: UID): Flow<FriendRequests>
-    suspend fun fetchRealtimeShortRequestsByUser(uid: UID): FriendRequests
+    suspend fun addOrUpdateCurrentRequests(requests: FriendRequests)
+    suspend fun addOrUpdateRequestsForUser(requests: FriendRequests, targetUser: UID)
+    suspend fun fetchCurrentRequestsDetails(): Flow<FriendRequestsDetails>
+    suspend fun fetchCurrentRequests(): Flow<FriendRequests>
+    suspend fun fetchRealtimeRequestsByUser(targetUser: UID): FriendRequests
 }

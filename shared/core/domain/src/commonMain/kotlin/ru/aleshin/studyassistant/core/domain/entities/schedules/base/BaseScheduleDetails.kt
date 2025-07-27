@@ -32,6 +32,7 @@ data class BaseScheduleDetails(
     val dayOfWeek: DayOfWeek,
     val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val classes: List<ClassDetails>,
+    val updatedAt: Long,
 )
 
 fun BaseSchedule.convertToDetails(
@@ -42,4 +43,5 @@ fun BaseSchedule.convertToDetails(
     dayOfWeek = dayOfWeek,
     week = week,
     classes = classes.map { classesMapper(it) },
+    updatedAt = updatedAt,
 )

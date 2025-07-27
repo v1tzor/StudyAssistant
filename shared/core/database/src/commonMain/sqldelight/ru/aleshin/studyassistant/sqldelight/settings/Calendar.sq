@@ -3,21 +3,31 @@ import kotlin.collections.List;
 
 CREATE TABLE calendarSettingsEntity (
   id INTEGER PRIMARY KEY NOT NULL,
+  document_id TEXT,
   number_of_week TEXT NOT NULL,
   week_schedule_view_type TEXT NOT NULL,
-  holidays TEXT AS List<String>
+  holidays TEXT AS List<String>,
+  updated_at INTEGER NOT NULL,
+  is_cache_data INTEGER NOT NULL
 );
 
-INSERT INTO calendarSettingsEntity (id, number_of_week, week_schedule_view_type, holidays)
-VALUES (1, 'ONE', 'COMMON', NULL);
+INSERT INTO calendarSettingsEntity (id, document_id, number_of_week, week_schedule_view_type, holidays, updated_at, is_cache_data)
+VALUES (1, NULL, 'ONE', 'COMMON', NULL, 0, 0);
 
 fetchSettings:
 SELECT *
-FROM calendarSettingsEntity;
+FROM calendarSettingsEntity
+WHERE is_cache_data = ?;
 
-updateSettings:
-INSERT OR REPLACE INTO calendarSettingsEntity (id, number_of_week, week_schedule_view_type, holidays)
+addOrUpdateSettings:
+INSERT OR REPLACE INTO calendarSettingsEntity (id, document_id, number_of_week, week_schedule_view_type, holidays, updated_at, is_cache_data)
 VALUES ?;
 
+fetchEmptySettings:
+SELECT document_id, updated_at
+FROM calendarSettingsEntity
+WHERE is_cache_data = 1;
+
 deleteSettings:
-DELETE FROM  calendarSettingsEntity;
+DELETE FROM  calendarSettingsEntity
+WHERE is_cache_data = ?;

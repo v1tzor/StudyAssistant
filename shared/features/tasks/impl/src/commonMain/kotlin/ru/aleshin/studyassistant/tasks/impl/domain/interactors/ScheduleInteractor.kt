@@ -27,7 +27,6 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 
@@ -42,18 +41,16 @@ internal interface ScheduleInteractor {
         private val baseScheduleRepository: BaseScheduleRepository,
         private val customScheduleRepository: CustomScheduleRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: TasksEitherWrapper,
     ) : ScheduleInteractor {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchScheduleByDate(date: Instant) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(targetUser).first().numberOfWeek
+            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings().first().numberOfWeek
             val currentNumberOfWeek = date.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
 
-            val baseScheduleFlow = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek, targetUser)
-            val customScheduleFlow = customScheduleRepository.fetchScheduleByDate(date, targetUser)
+            val baseScheduleFlow = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek)
+            val customScheduleFlow = customScheduleRepository.fetchScheduleByDate(date)
 
             combine(baseScheduleFlow, customScheduleFlow) { baseSchedule, customSchedule ->
                 return@combine if (customSchedule != null) {

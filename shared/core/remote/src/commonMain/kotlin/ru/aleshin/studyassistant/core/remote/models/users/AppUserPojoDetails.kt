@@ -37,4 +37,5 @@ data class AppUserPojoDetails(
     val friends: List<UID> = emptyList(),
     val subscriptionInfo: SubscribeInfoPojo? = null,
     val socialNetworks: List<SocialNetworkPojo> = emptyList(),
+    val updatedAt: Long = 0,
 )

@@ -31,4 +31,5 @@ data class BaseScheduleDetailsPojo(
     val weekDayOfWeek: String,
     val week: String,
     val classes: List<ClassDetailsPojo>,
+    val updatedAt: Long = 0L,
 )

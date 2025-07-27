@@ -31,4 +31,5 @@ data class Todo(
     val notifications: TodoNotifications = TodoNotifications(),
     val isDone: Boolean = false,
     val completeDate: Instant? = null,
+    val updatedAt: Long
 )

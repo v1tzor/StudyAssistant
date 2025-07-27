@@ -33,13 +33,15 @@ internal fun BaseSchedule.mapToUi() = BaseScheduleUi(
     dateVersion = dateVersion.mapToUi(),
     dayOfWeek = dayOfWeek,
     week = week,
-    classes = classes.map { it.mapToUi() }
+    classes = classes.map { it.mapToUi() },
+    updatedAt = updatedAt,
 )
 
 internal fun CustomSchedule.mapToUi() = CustomScheduleUi(
     uid = uid,
     date = date,
-    classes = classes.map { it.mapToUi() }
+    classes = classes.map { it.mapToUi() },
+    updatedAt = updatedAt,
 )
 
 internal fun Schedule.mapToUi() = when (this) {

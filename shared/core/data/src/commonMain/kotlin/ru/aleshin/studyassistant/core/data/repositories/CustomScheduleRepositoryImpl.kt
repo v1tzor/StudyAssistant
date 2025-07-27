@@ -14,25 +14,34 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package ru.aleshin.studyassistant.core.data.repositories
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
-import kotlinx.datetime.Instant.Companion.DISTANT_FUTURE
-import kotlinx.datetime.Instant.Companion.DISTANT_PAST
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.data.mappers.schedules.convertToLocal
+import ru.aleshin.studyassistant.core.data.mappers.schedules.convertToRemote
 import ru.aleshin.studyassistant.core.data.mappers.schedules.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.schedules.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.schedules.mapToRemoteData
+import ru.aleshin.studyassistant.core.data.utils.SubscriptionChecker
+import ru.aleshin.studyassistant.core.data.utils.sync.RemoteResultSyncHandler
 import ru.aleshin.studyassistant.core.database.datasource.schedules.CustomScheduleLocalDataSource
 import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
+import ru.aleshin.studyassistant.core.domain.entities.sync.OfflineChangeType
+import ru.aleshin.studyassistant.core.domain.managers.sync.CustomScheduleSourceSyncManager.Companion.CUSTOM_SCHEDULE_SOURCE_KEY
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
-import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.schedules.CustomScheduleRemoteDataSource
 
 /**
@@ -42,125 +51,142 @@ class CustomScheduleRepositoryImpl(
     private val remoteDataSource: CustomScheduleRemoteDataSource,
     private val localDataSource: CustomScheduleLocalDataSource,
     private val subscriptionChecker: SubscriptionChecker,
+    private val userSessionProvider: UserSessionProvider,
+    private val resultSyncHandler: RemoteResultSyncHandler,
 ) : CustomScheduleRepository {
 
-    override suspend fun addOrUpdateSchedule(
-        schedule: CustomSchedule,
-        targetUser: UID
-    ): UID {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun addOrUpdateSchedule(schedule: CustomSchedule): UID {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
 
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateSchedule(schedule.mapToRemoteData(targetUser), targetUser)
-        } else {
-            localDataSource.addOrUpdateSchedule(schedule.mapToLocalData())
-        }
-    }
-
-    override suspend fun fetchScheduleById(
-        uid: UID,
-        targetUser: UID
-    ): Flow<CustomSchedule?> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchScheduleById(uid, targetUser).map { schedulePojo ->
-                schedulePojo?.mapToDomain()
-            }
-        } else {
-            localDataSource.fetchScheduleById(uid).map { scheduleEntity ->
-                scheduleEntity?.mapToDomain()
-            }
-        }
-    }
-
-    override suspend fun fetchScheduleByDate(
-        date: Instant,
-        targetUser: UID
-    ): Flow<CustomSchedule?> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchScheduleByDate(date, targetUser).map { schedulePojo ->
-                schedulePojo?.mapToDomain()
-            }
-        } else {
-            localDataSource.fetchScheduleByDate(date).map { scheduleEntity ->
-                scheduleEntity?.mapToDomain()
-            }
-        }
-    }
-
-    override suspend fun fetchSchedulesByTimeRange(
-        timeRange: TimeRange,
-        targetUser: UID
-    ): Flow<List<CustomSchedule>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchSchedulesByTimeRange(timeRange.from, timeRange.to, targetUser).map { schedules ->
-                schedules.map { schedulePojo -> schedulePojo.mapToDomain() }
-            }
-        } else {
-            localDataSource.fetchSchedulesByTimeRange(timeRange.from, timeRange.to).map { schedules ->
-                schedules.map { scheduleEntity -> scheduleEntity.mapToDomain() }
-            }
-        }
-    }
-
-    override suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<Class?> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchClassById(uid, scheduleId, targetUser).map { classPojo -> classPojo?.mapToDomain() }
-        } else {
-            localDataSource.fetchClassById(uid, scheduleId).map { classEntity -> classEntity?.mapToDomain() }
-        }
-    }
-
-    override suspend fun deleteScheduleById(scheduleId: UID, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+        val upsertModel = schedule.copy(uid = schedule.uid.ifBlank { randomUUID() })
 
         if (isSubscriber) {
-            remoteDataSource.deleteScheduleById(scheduleId, targetUser)
+            localDataSource.sync().addOrUpdateItem(upsertModel.mapToLocalData())
+            resultSyncHandler.executeOrAddToQueue(
+                data = upsertModel.mapToRemoteData(userId = currentUser),
+                type = OfflineChangeType.UPSERT,
+                sourceKey = CUSTOM_SCHEDULE_SOURCE_KEY,
+            ) {
+                remoteDataSource.addOrUpdateItem(it)
+            }
         } else {
-            localDataSource.deleteScheduleById(scheduleId)
+            localDataSource.offline().addOrUpdateItem(upsertModel.mapToLocalData())
+        }
+
+        return upsertModel.uid
+    }
+
+    override suspend fun fetchScheduleById(uid: UID): Flow<CustomSchedule?> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchScheduleDetailsById(uid).map { scheduleEntity ->
+                    scheduleEntity?.mapToDomain()
+                }
+            } else {
+                localDataSource.offline().fetchScheduleDetailsById(uid).map { scheduleEntity ->
+                    scheduleEntity?.mapToDomain()
+                }
+            }
         }
     }
 
-    override suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        if (isSubscriber) {
-            remoteDataSource.deleteSchedulesByTimeRange(timeRange.from, timeRange.to, targetUser)
-        } else {
-            localDataSource.deleteSchedulesByTimeRange(timeRange.from, timeRange.to)
+    override suspend fun fetchScheduleByDate(date: Instant): Flow<CustomSchedule?> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchScheduleDetailsByDate(date).map { scheduleEntity ->
+                    scheduleEntity?.mapToDomain()
+                }
+            } else {
+                localDataSource.offline().fetchScheduleDetailsByDate(date).map { scheduleEntity ->
+                    scheduleEntity?.mapToDomain()
+                }
+            }
         }
     }
 
-    override suspend fun transferData(direction: DataTransferDirection, targetUser: UID) {
+    override suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange): Flow<List<CustomSchedule>> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchSchedulesDetailsByTimeRange(timeRange.from, timeRange.to).map { schedules ->
+                    schedules.map { scheduleEntity -> scheduleEntity.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchSchedulesDetailsByTimeRange(timeRange.from, timeRange.to).map { schedules ->
+                    schedules.map { scheduleEntity -> scheduleEntity.mapToDomain() }
+                }
+            }
+        }
+    }
+
+    override suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<Class?> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchClassById(uid, scheduleId).map { classEntity ->
+                    classEntity?.mapToDomain()
+                }
+            } else {
+                localDataSource.offline().fetchClassById(uid, scheduleId).map { classEntity ->
+                    classEntity?.mapToDomain()
+                }
+            }
+        }
+    }
+
+    override suspend fun deleteScheduleById(scheduleId: UID) {
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+
+        return if (isSubscriber) {
+            localDataSource.sync().deleteItemsById(listOf(scheduleId))
+            resultSyncHandler.executeOrAddToQueue(
+                documentId = scheduleId,
+                type = OfflineChangeType.DELETE,
+                sourceKey = CUSTOM_SCHEDULE_SOURCE_KEY,
+            ) {
+                remoteDataSource.deleteItemById(scheduleId)
+            }
+        } else {
+            localDataSource.offline().deleteItemsById(listOf(scheduleId))
+        }
+    }
+
+    override suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange) {
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+
+        return if (isSubscriber) {
+            val deletableItems = localDataSource.sync().fetchSchedulesByTimeRangeEmpty(timeRange.from, timeRange.to)
+
+            localDataSource.sync().deleteSchedulesByTimeRange(timeRange.from, timeRange.to)
+            resultSyncHandler.executeOrAddToQueue(
+                documentIds = deletableItems.map { it.id },
+                type = OfflineChangeType.DELETE,
+                sourceKey = CUSTOM_SCHEDULE_SOURCE_KEY,
+            ) {
+                remoteDataSource.deleteItemsByIds(deletableItems.map { it.id })
+            }
+        } else {
+            localDataSource.offline().deleteSchedulesByTimeRange(timeRange.from, timeRange.to)
+        }
+    }
+
+    override suspend fun transferData(direction: DataTransferDirection) {
+        val currentUser = userSessionProvider.getCurrentUserId()
         when (direction) {
             DataTransferDirection.REMOTE_TO_LOCAL -> {
-                val allSchedules = remoteDataSource.fetchSchedulesByTimeRange(
-                    from = DISTANT_PAST,
-                    to = DISTANT_FUTURE,
-                    targetUser = targetUser
-                ).let { schedulesFlow ->
-                    return@let schedulesFlow.first().map { it.mapToDomain().mapToLocalData() }
-                }
-                localDataSource.deleteSchedulesByTimeRange(DISTANT_PAST, DISTANT_FUTURE)
-                localDataSource.addOrUpdateSchedulesGroup(allSchedules)
-                remoteDataSource.deleteSchedulesByTimeRange(DISTANT_PAST, DISTANT_FUTURE, targetUser)
+                val allSchedulesFlow = remoteDataSource.fetchAllItems(currentUser)
+                val schedules = allSchedulesFlow.first().map { it.convertToLocal() }
+                localDataSource.offline().deleteAllItems()
+                localDataSource.offline().addOrUpdateItems(schedules)
             }
             DataTransferDirection.LOCAL_TO_REMOTE -> {
-                val allSchedules = localDataSource.fetchSchedulesByTimeRange(
-                    from = DISTANT_PAST,
-                    to = DISTANT_FUTURE,
-                ).let { schedulesFlow ->
-                    return@let schedulesFlow.first().map { it.mapToDomain().mapToRemoteData(targetUser) }
-                }
-                remoteDataSource.deleteSchedulesByTimeRange(DISTANT_PAST, DISTANT_FUTURE, targetUser)
-                remoteDataSource.addOrUpdateSchedulesGroup(allSchedules, targetUser)
+                val allSchedules = localDataSource.offline().fetchAllSchedules().first()
+                val schedulesRemote = allSchedules.map { it.convertToRemote(currentUser) }
+
+                remoteDataSource.deleteAllItems(currentUser)
+                remoteDataSource.addOrUpdateItems(schedulesRemote)
+
+                localDataSource.sync().deleteAllItems()
+                localDataSource.sync().addOrUpdateItems(allSchedules)
             }
         }
     }

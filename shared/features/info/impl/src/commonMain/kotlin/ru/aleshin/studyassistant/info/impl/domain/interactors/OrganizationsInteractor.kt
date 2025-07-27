@@ -22,7 +22,6 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoEitherWrapper
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
 
@@ -37,25 +36,21 @@ internal interface OrganizationsInteractor {
 
     class Base(
         private val organizationsRepository: OrganizationsRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: InfoEitherWrapper,
     ) : OrganizationsInteractor {
 
         override suspend fun fetchOrganizationById(organizationId: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            organizationsRepository.fetchOrganizationById(organizationId, targetUser)
+            organizationsRepository.fetchOrganizationById(organizationId)
         }
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            organizationsRepository.fetchAllShortOrganization(targetUser).map { organizations ->
+            organizationsRepository.fetchAllShortOrganization().map { organizations ->
                 organizations.sortedByDescending { it.isMain }
             }
         }
 
         override suspend fun fetchMainOrFirstOrganization() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            organizationsRepository.fetchAllShortOrganization(targetUser).map { organizations ->
+            organizationsRepository.fetchAllShortOrganization().map { organizations ->
                 organizations.find { it.isMain } ?: organizations.getOrNull(0)
             }
         }

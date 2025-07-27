@@ -45,6 +45,8 @@ kotlin {
             api(libs.bignum)
             api(libs.logger)
 
+            api(libs.networkcheker)
+
             api(libs.kodein.core)
             implementation(libs.kodein.compose)
 
@@ -55,6 +57,10 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.foundation)
             implementation(compose.components.resources)
+
+            implementation(libs.sqldelight.core)
+            implementation(libs.sqldelight.coroutines)
+            implementation(libs.sqldelight.async)
         }
         commonTest.dependencies {
             api(libs.kotlin.test)

@@ -29,6 +29,7 @@ internal data class CalendarSettingsUi(
     val numberOfWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val weekScheduleViewType: WeekScheduleViewType = WeekScheduleViewType.COMMON,
     val holidays: List<HolidaysUi> = emptyList(),
+    val updatedAt: Long = 0L,
 ) : Parcelable {
     companion object {
         fun createEmpty() = CalendarSettingsUi()

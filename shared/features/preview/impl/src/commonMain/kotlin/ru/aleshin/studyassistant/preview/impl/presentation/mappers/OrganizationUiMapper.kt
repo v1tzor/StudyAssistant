@@ -38,6 +38,7 @@ internal fun Organization.mapToUi() = OrganizationUi(
     webs = webs.map { it.mapToUi() },
     offices = offices,
     isHide = isHide,
+    updatedAt = updatedAt,
 )
 
 internal fun OrganizationUi.mapToDomain() = Organization(
@@ -56,4 +57,5 @@ internal fun OrganizationUi.mapToDomain() = Organization(
     webs = webs.map { it.mapToDomain() },
     offices = offices,
     isHide = isHide,
+    updatedAt = updatedAt,
 )

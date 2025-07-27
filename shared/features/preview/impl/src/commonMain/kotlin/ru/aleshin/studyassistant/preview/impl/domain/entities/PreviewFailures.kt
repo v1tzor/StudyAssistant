@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.common.functional.DomainFailures
  * @author Stanislav Aleshin on 07.04.2024.
  */
 internal sealed class PreviewFailures : DomainFailures {
+    object InternetError : PreviewFailures()
 
     data class OtherError(val error: Throwable) : PreviewFailures()
 }

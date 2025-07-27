@@ -16,13 +16,13 @@
 
 package ru.aleshin.studyassistant.core.database.mappers.employee
 
-import ru.aleshin.studyassistant.core.database.models.employee.EmployeeBaseEntity
+import ru.aleshin.studyassistant.core.database.models.employee.BaseEmployeeEntity
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 
 /**
  * @author Stanislav Aleshin on 08.07.2024.
  */
-fun EmployeeEntity.mapToBase() = EmployeeBaseEntity(
+fun EmployeeEntity.mapToBase() = BaseEmployeeEntity(
     uid = uid,
     organizationId = organization_id,
     firstName = first_name,
@@ -37,9 +37,11 @@ fun EmployeeEntity.mapToBase() = EmployeeBaseEntity(
     phones = phones,
     locations = locations,
     webs = webs,
+    updatedAt = updated_at,
+    isCacheData = is_cache_data
 )
 
-fun EmployeeBaseEntity.mapToLocal() = EmployeeEntity(
+fun BaseEmployeeEntity.mapToEntity() = EmployeeEntity(
     uid = uid,
     organization_id = organizationId,
     first_name = firstName,
@@ -54,4 +56,6 @@ fun EmployeeBaseEntity.mapToLocal() = EmployeeEntity(
     phones = phones,
     locations = locations,
     webs = webs,
+    updated_at = updatedAt,
+    is_cache_data = isCacheData,
 )

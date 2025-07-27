@@ -16,16 +16,20 @@
 
 package ru.aleshin.studyassistant.core.remote.models.schedule
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.remote.utils.BaseMultipleRemotePojo
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
 @Serializable
 data class CustomSchedulePojo(
-    val uid: UID,
-    val userId: UID,
+    @SerialName("\$id")
+    override val id: UID,
+    override val userId: UID,
     val date: Long,
     val classes: List<String>,
-)
+    override val updatedAt: Long = 0L,
+) : BaseMultipleRemotePojo()

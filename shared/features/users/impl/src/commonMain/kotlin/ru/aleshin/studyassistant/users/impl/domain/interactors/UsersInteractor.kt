@@ -16,11 +16,14 @@
 
 package ru.aleshin.studyassistant.users.impl.domain.interactors
 
+import dev.tmapps.konnection.Konnection
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
@@ -50,18 +53,18 @@ internal interface UsersInteractor {
         private val shareSchedulesRepository: ShareSchedulesRepository,
         private val shareHomeworksRepository: ShareHomeworksRepository,
         private val requestsRepository: FriendRequestsRepository,
+        private val connectionManager: Konnection,
         private val eitherWrapper: UsersEitherWrapper,
     ) : UsersInteractor {
 
         override suspend fun fetchUserById(userId: UID) = eitherWrapper.wrapFlow {
-            usersRepository.fetchUserById(userId).map { user -> checkNotNull(user) }
+            usersRepository.fetchCurrentUserProfile().filterNotNull()
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchUserFriendStatus(userId: UID) = eitherWrapper.wrapFlow {
-            val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentUserInfo = usersRepository.fetchUserById(currentUser)
-            val userFriendRequests = requestsRepository.fetchShortRequestsByUser(currentUser)
+            val currentUserInfo = usersRepository.fetchCurrentUserProfile()
+            val userFriendRequests = requestsRepository.fetchCurrentRequests()
 
             currentUserInfo.flatMapLatest { userInfo ->
                 userFriendRequests.map { friendRequests ->
@@ -83,8 +86,7 @@ internal interface UsersInteractor {
         }
 
         override suspend fun fetchAllFriends() = eitherWrapper.wrapFlow {
-            val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            usersRepository.fetchUserFriends(currentUser)
+            usersRepository.fetchCurrentUserFriends()
         }
 
         override suspend fun findUsersByCode(code: String) = eitherWrapper.wrapFlow {
@@ -95,9 +97,11 @@ internal interface UsersInteractor {
         }
 
         override suspend fun addUserToFriends(userId: UID) = eitherWrapper.wrapUnit {
+            if (!connectionManager.isConnected()) throw InternetConnectionException()
+
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentUserInfo = usersRepository.fetchUserById(currentUser).first()
-            val targetUserInfo = usersRepository.fetchUserById(userId).first()
+            val currentUserInfo = usersRepository.fetchCurrentUserProfile().first()
+            val targetUserInfo = usersRepository.fetchCurrentUserProfile().first()
 
             val updatedCurrentUser = checkNotNull(currentUserInfo).copy(
                 friends = buildList {
@@ -111,18 +115,20 @@ internal interface UsersInteractor {
                     add(currentUser)
                 }
             )
-            usersRepository.updateAppUser(updatedCurrentUser)
-            usersRepository.updateAppUser(updatedTargetUser)
+            usersRepository.updateCurrentUserProfile(updatedCurrentUser)
+            usersRepository.updateCurrentUserProfile(updatedTargetUser)
         }
 
         override suspend fun removeUserFromFriends(userId: UID) = eitherWrapper.wrapUnit {
+            if (!connectionManager.isConnected()) throw InternetConnectionException()
+
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
             shareSchedulesRepository.fetchRealtimeSharedSchedulesByUser(currentUser).apply {
                 val updatedCurrentSharedSchedules = copy(
                     received = received.filter { it.value.sender.uid != userId },
                     sent = sent.filter { it.value.recipient.uid != userId },
                 )
-                shareSchedulesRepository.addOrUpdateSharedSchedules(updatedCurrentSharedSchedules, currentUser)
+                shareSchedulesRepository.addOrUpdateSharedSchedulesForUser(updatedCurrentSharedSchedules, currentUser)
             }
 
             shareSchedulesRepository.fetchRealtimeSharedSchedulesByUser(userId).apply {
@@ -130,7 +136,7 @@ internal interface UsersInteractor {
                     received = received.filter { it.value.sender.uid != currentUser },
                     sent = sent.filter { it.value.recipient.uid != currentUser },
                 )
-                shareSchedulesRepository.addOrUpdateSharedSchedules(updatedSenderSharedSchedules, userId)
+                shareSchedulesRepository.addOrUpdateSharedSchedulesForUser(updatedSenderSharedSchedules, userId)
             }
 
             shareHomeworksRepository.fetchRealtimeSharedHomeworksByUser(currentUser).apply {
@@ -142,7 +148,7 @@ internal interface UsersInteractor {
                         entry.value.copy(recipients = entry.value.recipients.filter { it != userId })
                     }
                 )
-                shareHomeworksRepository.addOrUpdateSharedHomework(updatedCurrentSharedHomeworks, currentUser)
+                shareHomeworksRepository.addOrUpdateSharedHomeworkForUser(updatedCurrentSharedHomeworks, currentUser)
             }
 
             shareHomeworksRepository.fetchRealtimeSharedHomeworksByUser(userId).apply {
@@ -154,11 +160,11 @@ internal interface UsersInteractor {
                         entry.value.copy(recipients = entry.value.recipients.filter { it != currentUser })
                     },
                 )
-                shareHomeworksRepository.addOrUpdateSharedHomework(updatedSenderSharedHomeworks, userId)
+                shareHomeworksRepository.addOrUpdateSharedHomeworkForUser(updatedSenderSharedHomeworks, userId)
             }
 
-            val currentUserInfo = usersRepository.fetchUserById(currentUser).first()
-            val targetUserInfo = usersRepository.fetchUserById(userId).first()
+            val currentUserInfo = usersRepository.fetchCurrentUserProfile().first()
+            val targetUserInfo = usersRepository.fetchCurrentUserProfile().first()
 
             val updatedCurrentUser = checkNotNull(currentUserInfo).copy(
                 friends = buildList {
@@ -172,8 +178,8 @@ internal interface UsersInteractor {
                     remove(currentUser)
                 }
             )
-            usersRepository.updateAppUser(updatedCurrentUser)
-            usersRepository.updateAppUser(updatedTargetUser)
+            usersRepository.updateCurrentUserProfile(updatedCurrentUser)
+            usersRepository.updateCurrentUserProfile(updatedTargetUser)
         }
     }
 }

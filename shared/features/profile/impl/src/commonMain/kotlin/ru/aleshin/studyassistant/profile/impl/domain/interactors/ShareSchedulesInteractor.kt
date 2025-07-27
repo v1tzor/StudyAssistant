@@ -16,7 +16,9 @@
 
 package ru.aleshin.studyassistant.profile.impl.domain.interactors
 
+import dev.tmapps.konnection.Konnection
 import kotlinx.coroutines.flow.first
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
@@ -53,24 +55,25 @@ internal interface ShareSchedulesInteractor {
         private val baseSchedulesRepository: BaseScheduleRepository,
         private val usersRepository: UsersRepository,
         private val messageRepository: MessageRepository,
+        private val connectionManager: Konnection,
         private val dataManager: DateManager,
         private val eitherWrapper: ProfileEitherWrapper,
     ) : ShareSchedulesInteractor {
 
         override suspend fun fetchShortSharedSchedules() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            shareRepository.fetchShortSharedSchedulesByUser(targetUser)
+            shareRepository.fetchCurrentShortSharedSchedules()
         }
 
         override suspend fun shareSchedules(sendData: ShareSchedulesSendData) = eitherWrapper.wrapUnit {
+            if (!connectionManager.isConnected()) throw InternetConnectionException()
+
             val shareId = randomUUID()
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
             val currentTime = dataManager.fetchCurrentInstant()
-            val targetUserInfo = usersRepository.fetchUserById(targetUser).first()
+            val targetUserInfo = usersRepository.fetchCurrentUserProfile().first()
             val schedules = baseSchedulesRepository.fetchSchedulesByVersion(
                 version = dataManager.fetchCurrentWeek(),
                 numberOfWeek = null,
-                targetUser = targetUser,
             ).let { schedulesFlow ->
                 val actualVersion = DateVersion.createNewVersion(currentTime)
                 val baseSchedules = schedulesFlow.first()
@@ -86,7 +89,6 @@ internal interface ShareSchedulesInteractor {
             }
             val organizationsData = organizationRepository.fetchOrganizationsById(
                 uid = sendData.organizations,
-                targetUser = targetUser,
             ).let { organizationsFlow ->
                 val organizations = organizationsFlow.first()
                 val allClasses = schedules.map { it.classes }.extractAllItem()
@@ -127,7 +129,7 @@ internal interface ShareSchedulesInteractor {
                 organizationsData = organizationsData,
             )
 
-            val currentSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(targetUser)
+            val currentSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(currentUser)
             val recipientSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(sendData.recipient.uid)
 
             val updatedCurrentSharedSchedules = currentSharedSchedules.copy(
@@ -143,30 +145,32 @@ internal interface ShareSchedulesInteractor {
                 }
             )
 
-            shareRepository.addOrUpdateSharedSchedules(updatedCurrentSharedSchedules, targetUser)
-            shareRepository.addOrUpdateSharedSchedules(updatedRecipientSharedSchedules, sendData.recipient.uid)
+            shareRepository.addOrUpdateCurrentSharedSchedules(updatedCurrentSharedSchedules)
+            shareRepository.addOrUpdateSharedSchedulesForUser(updatedRecipientSharedSchedules, sendData.recipient.uid)
 
             val notifyContent = NotifyPushContent.ShareSchedule(
                 devices = sendData.recipient.devices,
                 senderUsername = targetUserInfo.username,
-                senderUserId = targetUser,
+                senderUserId = currentUser,
             )
             messageRepository.sendMessage(notifyContent.toMessageBody())
         }
 
         override suspend fun cancelSendSchedules(schedules: SentMediatedSchedules) = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(targetUser)
+            if (!connectionManager.isConnected()) throw InternetConnectionException()
+
+            val currentUser = usersRepository.fetchCurrentUserOrError().uid
+            val currentSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(currentUser)
             val updatedCurrentSharedSchedules = currentSharedSchedules.copy(
                 sent = buildMap {
                     putAll(currentSharedSchedules.sent)
                     remove(schedules.uid)
                 }
             )
-            shareRepository.addOrUpdateSharedSchedules(updatedCurrentSharedSchedules, targetUser)
+            shareRepository.addOrUpdateSharedSchedulesForUser(updatedCurrentSharedSchedules, currentUser)
 
             val recipientSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(
-                uid = schedules.recipient.uid,
+                targetUser = schedules.recipient.uid,
             )
             val updatedRecipientSharedSchedules = recipientSharedSchedules.copy(
                 received = buildMap {
@@ -174,7 +178,7 @@ internal interface ShareSchedulesInteractor {
                     remove(schedules.uid)
                 }
             )
-            shareRepository.addOrUpdateSharedSchedules(updatedRecipientSharedSchedules, schedules.recipient.uid)
+            shareRepository.addOrUpdateSharedSchedulesForUser(updatedRecipientSharedSchedules, schedules.recipient.uid)
         }
     }
 }

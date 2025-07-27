@@ -21,7 +21,6 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoEitherWrapper
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
 
@@ -35,18 +34,15 @@ internal interface EmployeesInteractor {
 
     class Base(
         private val employeeRepository: EmployeeRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: InfoEitherWrapper,
     ) : EmployeesInteractor {
 
         override suspend fun fetchEmployeesByOrganization(organizationId: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            employeeRepository.fetchAllEmployeeByOrganization(organizationId, targetUser)
+            employeeRepository.fetchAllEmployeeByOrganization(organizationId)
         }
 
         override suspend fun deleteEmployeeById(targetId: UID) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            employeeRepository.deleteEmployee(targetId, targetUser)
+            employeeRepository.deleteEmployee(targetId)
         }
     }
 }

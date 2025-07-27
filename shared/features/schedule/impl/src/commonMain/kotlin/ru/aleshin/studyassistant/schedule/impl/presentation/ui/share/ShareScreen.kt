@@ -31,6 +31,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
 import ru.aleshin.studyassistant.core.common.navigation.root
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
@@ -54,6 +55,7 @@ internal data class ShareScreen(val receivedShareId: UID) : Screen {
         dependencies = ShareDeps(shareId = receivedShareId),
     ) { state ->
         val strings = ScheduleThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
         val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
 
@@ -102,7 +104,7 @@ internal data class ShareScreen(val receivedShareId: UID) : Screen {
                 is ShareEffect.NavigateToGlobal -> navigator.root().push(effect.pushScreen)
                 is ShareEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
                         withDismissAction = true,
                     )
                 }

@@ -90,6 +90,7 @@ internal data class AuthStrings(
     val oauthProviderErrorMessage: String,
     val userCountExceededMessage: String,
     val authMethodUnsupportedMessage: String,
+    val networkErrorMessage: String,
     val accessDeniedMessage: String,
     val loginTermsAndConditionsBody: String,
     val registerTermsAndConditionsBody: String,
@@ -170,6 +171,7 @@ internal data class AuthStrings(
             userCountExceededMessage = "Достигнут лимит пользователей. Обратитесь в поддержку.",
             authMethodUnsupportedMessage = "Этот способ входа временно недоступен.",
             accessDeniedMessage = "У вас нет доступа к этому разделу.",
+            networkErrorMessage = "Отсутствует подключение к интернету! Повторите попытку позже",
             otherErrorMessage = "Что-то пошло не так. Попробуйте снова или обратитесь в поддержку."
         )
         val ENGLISH = AuthStrings(
@@ -244,6 +246,7 @@ internal data class AuthStrings(
             userCountExceededMessage = "User limit reached. Contact support.",
             authMethodUnsupportedMessage = "This login method is temporarily unavailable.",
             accessDeniedMessage = "You don't have access to this section.",
+            networkErrorMessage = "There is no internet connection! Please try again later",
             otherErrorMessage = "Something went wrong. Try again or contact support.",
         )
     }

@@ -34,16 +34,19 @@ kotlin {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:domain"))
 
-            implementation(libs.ktor.client.core)
             implementation(libs.sqldelight.core)
-            implementation(libs.sqldelight.prmimitiveAdapters)
             implementation(libs.sqldelight.coroutines)
+            implementation(libs.sqldelight.async)
+            implementation(libs.sqldelight.prmimitiveAdapters)
+
+            implementation(libs.settings.core)
+            implementation(libs.settings.noargs)
+
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
             implementation(libs.kotlin.atomicfu)
-            implementation(libs.settings.core)
-            implementation(libs.settings.noargs)
-            implementation(libs.logger)
+
+            implementation(libs.ktor.client.core)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)

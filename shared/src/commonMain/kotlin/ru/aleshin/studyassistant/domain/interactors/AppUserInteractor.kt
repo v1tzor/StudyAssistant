@@ -17,9 +17,10 @@
 package ru.aleshin.studyassistant.domain.interactors
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
@@ -66,8 +67,9 @@ interface AppUserInteractor {
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchAppUserInfo() = eitherWrapper.wrapFlow {
             usersRepository.fetchStateChanged().flatMapLatest { authUser ->
-                val appUserId = authUser?.uid ?: return@flatMapLatest flowOf(null)
-                usersRepository.fetchUserById(appUserId)
+                usersRepository.fetchCurrentUserProfile()
+            }.catch { exception ->
+                if (exception !is InternetConnectionException) throw exception
             }
         }
 
@@ -94,7 +96,7 @@ interface AppUserInteractor {
                     product.status == CONFIRMED && product.developerPayload == currentUser.uid
                 }
 
-                val appUserInfo = usersRepository.fetchUserById(currentUser.uid).first() ?: return@wrap
+                val appUserInfo = usersRepository.fetchCurrentUserProfile().first() ?: return@wrap
                 val currentSubscriptionInfo = appUserInfo.subscriptionInfo
 
                 if (activePurchase != null) {
@@ -120,7 +122,7 @@ interface AppUserInteractor {
                                     expiryTimeMillis = endTime.toEpochMilliseconds(),
                                 )
                                 val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
-                                usersRepository.updateAppUser(updatedAppUser)
+                                usersRepository.updateCurrentUserProfile(updatedAppUser)
                             }
                         } else {
                             val updatedSubscriptionInfo = SubscribeInfo(
@@ -134,7 +136,7 @@ interface AppUserInteractor {
                                 store = iapService.fetchStore(),
                             )
                             val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
-                            usersRepository.updateAppUser(updatedAppUser)
+                            usersRepository.updateCurrentUserProfile(updatedAppUser)
                         }
                     }
                 }
@@ -142,7 +144,7 @@ interface AppUserInteractor {
         }
 
         override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {
-            usersRepository.updateAppUser(user)
+            usersRepository.updateCurrentUserProfile(user)
         }
     }
 }

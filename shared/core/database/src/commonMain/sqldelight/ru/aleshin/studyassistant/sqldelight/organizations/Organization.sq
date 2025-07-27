@@ -14,31 +14,44 @@ CREATE TABLE organizationEntity (
   locations TEXT AS List<String> NOT NULL,
   webs TEXT AS List<String> NOT NULL,
   offices TEXT AS List<String> NOT NULL,
-  is_hide INTEGER NOT NULL
+  is_hide INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  is_cache_data INTEGER NOT NULL
 );
 
 addOrUpdateOrganization:
-INSERT OR REPLACE INTO organizationEntity (uid, is_main, short_name, full_name, type, avatar, schedule_time_intervals, emails, phones, locations, webs, offices, is_hide)
+INSERT OR REPLACE INTO organizationEntity (uid, is_main, short_name, full_name, type, avatar, schedule_time_intervals, emails, phones, locations, webs, offices, is_hide, updated_at, is_cache_data)
 VALUES ?;
 
 fetchAllNotHideOrganizations:
 SELECT *
 FROM organizationEntity
-WHERE is_hide = 0;
+WHERE is_hide = 0 AND is_cache_data = ?;
 
 fetchAllOrganizations:
 SELECT *
-FROM organizationEntity;
+FROM organizationEntity
+WHERE is_cache_data = ?;
 
 fetchOrganizationById:
 SELECT *
 FROM organizationEntity
-WHERE uid = ?;
+WHERE uid = ? AND is_cache_data = ?;
 
 fetchOrganizationsById:
 SELECT *
 FROM organizationEntity
-WHERE uid IN ?;
+WHERE uid IN ? AND is_cache_data = ?;
+
+fetchEmptyOrganizations:
+SELECT uid, updated_at
+FROM organizationEntity
+WHERE is_cache_data = 1;
+
+deleteOrganizationByIds:
+DELETE FROM organizationEntity
+WHERE uid IN ? AND is_cache_data = ?;
 
 deleteAllOrganizations:
-DELETE FROM organizationEntity;
+DELETE FROM organizationEntity
+WHERE is_cache_data = ?;

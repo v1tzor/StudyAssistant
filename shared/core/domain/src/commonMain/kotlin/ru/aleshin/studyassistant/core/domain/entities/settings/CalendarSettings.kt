@@ -25,4 +25,5 @@ data class CalendarSettings(
     val numberOfWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val weekScheduleViewType: WeekScheduleViewType = WeekScheduleViewType.COMMON,
     val holidays: List<Holidays>,
+    val updatedAt: Long,
 )

@@ -1,0 +1,32 @@
+CREATE TABLE offlineChangeEntity (
+    id TEXT PRIMARY KEY NOT NULL,
+    document_id TEXT NOT NULL,
+    updated_at INTEGER NOT NULL,
+    type TEXT NOT NULL,
+    source_key TEXT NOT NULL
+);
+
+addChangeToQueue:
+INSERT OR REPLACE INTO offlineChangeEntity(id, document_id, updated_at, type, source_key)
+VALUES ?;
+
+fetchAllSourceChanges:
+SELECT * FROM offlineChangeEntity
+WHERE source_key = ?
+ORDER BY updated_at;
+
+fetchChangeById:
+SELECT * FROM offlineChangeEntity
+WHERE id = ?;
+
+deleteChangeById:
+DELETE FROM offlineChangeEntity
+WHERE id = ?;
+
+deleteChangesByIds:
+DELETE FROM offlineChangeEntity
+WHERE id IN ?;
+
+deleteAllSourceChanges:
+DELETE FROM offlineChangeEntity
+WHERE source_key = ?;

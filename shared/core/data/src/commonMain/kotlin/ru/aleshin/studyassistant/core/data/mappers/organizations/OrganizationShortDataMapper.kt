@@ -31,27 +31,8 @@ import ru.aleshin.studyassistant.core.remote.models.users.ContactInfoPojo
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
-fun OrganizationShortPojo.mapToDomain() = OrganizationShort(
-    uid = uid,
-    isMain = main,
-    shortName = shortName,
-    type = OrganizationType.valueOf(type),
-    locations = locations.map { it.fromJson<ContactInfoPojo>().mapToDomain() },
-    offices = offices,
-    avatar = avatar,
-    scheduleTimeIntervals = scheduleTimeIntervals.fromJson<ScheduleTimeIntervalsPojo>().mapToDomain(),
-)
 
-fun OrganizationShortEntity.mapToDomain() = OrganizationShort(
-    uid = uid,
-    isMain = main,
-    shortName = shortName,
-    type = OrganizationType.valueOf(type),
-    locations = locations.map { it.mapToDomain() },
-    offices = offices,
-    avatar = avatar,
-    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
-)
+// Remote
 
 fun OrganizationShort.mapToRemoteData() = OrganizationShortPojo(
     uid = uid,
@@ -62,6 +43,33 @@ fun OrganizationShort.mapToRemoteData() = OrganizationShortPojo(
     locations = locations.map { it.mapToRemoteData().toJson() },
     offices = offices,
     scheduleTimeIntervals = scheduleTimeIntervals.mapToRemoteDate().toJson(),
+    updatedAt = updatedAt,
+)
+
+fun OrganizationShortPojo.mapToDomain() = OrganizationShort(
+    uid = uid,
+    isMain = main,
+    shortName = shortName,
+    type = OrganizationType.valueOf(type),
+    locations = locations.map { it.fromJson<ContactInfoPojo>().mapToDomain() },
+    offices = offices,
+    avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals.fromJson<ScheduleTimeIntervalsPojo>().mapToDomain(),
+    updatedAt = updatedAt,
+)
+
+// Local
+
+fun OrganizationShortEntity.mapToDomain() = OrganizationShort(
+    uid = uid,
+    isMain = main,
+    shortName = shortName,
+    type = OrganizationType.valueOf(type),
+    locations = locations.map { it.mapToDomain() },
+    offices = offices,
+    avatar = avatar,
+    scheduleTimeIntervals = scheduleTimeIntervals.mapToDomain(),
+    updatedAt = updatedAt,
 )
 
 fun OrganizationShort.mapToLocalData() = OrganizationShortEntity(
@@ -73,4 +81,5 @@ fun OrganizationShort.mapToLocalData() = OrganizationShortEntity(
     locations = locations.map { it.mapToLocalData() },
     offices = offices,
     scheduleTimeIntervals = scheduleTimeIntervals.mapToLocalDate(),
+    updatedAt = updatedAt,
 )

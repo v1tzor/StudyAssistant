@@ -42,6 +42,7 @@ internal fun Class.mapToUi(number: Int) = ClassUi(
     number = number,
 )
 
+
 internal inline fun ClassDetails.mapToUi(
     number: Int,
     homeworkStatus: (Homework) -> HomeworkStatus,

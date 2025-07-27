@@ -16,36 +16,63 @@
 
 package ru.aleshin.studyassistant.core.data.repositories
 
+import dev.tmapps.konnection.Konnection
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.share.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.share.mapToRemoteData
+import ru.aleshin.studyassistant.core.database.datasource.shared.SharedHomeworksLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SharedHomeworks
 import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SharedHomeworksDetails
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
-import ru.aleshin.studyassistant.core.remote.datasources.share.ShareHomeworksRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.share.SharedHomeworksRemoteDataSource
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
 internal class ShareHomeworksRepositoryImpl(
-    private val remoteDataSource: ShareHomeworksRemoteDataSource,
+    private val remoteDataSource: SharedHomeworksRemoteDataSource,
+    private val localDataSource: SharedHomeworksLocalDataSource,
+    private val userSessionProvider: UserSessionProvider,
+    private val connectionManager: Konnection,
 ) : ShareHomeworksRepository {
 
-    override suspend fun addOrUpdateSharedHomework(homeworks: SharedHomeworks, targetUser: UID) {
-        remoteDataSource.addOrUpdateSharedHomework(homeworks.mapToRemoteData(), targetUser)
+    override suspend fun addOrUpdateCurrentSharedHomework(homeworks: SharedHomeworks) {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        val upsertModel = homeworks.mapToRemoteData(userId = currentUser)
+        remoteDataSource.addOrUpdateSharedHomeworksForUser(upsertModel, currentUser)
     }
 
-    override suspend fun fetchSharedHomeworksByUser(uid: UID): Flow<SharedHomeworksDetails> {
-        return remoteDataSource.fetchSharedHomeworksByUser(uid).map { it.mapToDomain() }
+    override suspend fun addOrUpdateSharedHomeworkForUser(homeworks: SharedHomeworks, targetUser: UID) {
+        val upsertModel = homeworks.mapToRemoteData(userId = targetUser)
+        remoteDataSource.addOrUpdateSharedHomeworksForUser(upsertModel, targetUser)
     }
 
-    override suspend fun fetchShortSharedHomeworksByUser(uid: UID): Flow<SharedHomeworks> {
-        return remoteDataSource.fetchShortSharedHomeworksByUser(uid).map { it.mapToDomain() }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override suspend fun fetchCurrentSharedHomeworksDetails(): Flow<SharedHomeworksDetails> {
+        return connectionManager.observeHasConnection().flatMapLatest { hasConnection ->
+            if (hasConnection) {
+                remoteDataSource.fetchItem().catch { exception ->
+                    if (exception is InternetConnectionException) emit(null) else throw exception
+                }.map { sharedHomeworks ->
+                    sharedHomeworks?.mapToDomain()
+                }
+            } else {
+                localDataSource.fetchItem().map { friendRequests ->
+                    friendRequests?.mapToDomain()
+                }
+            }
+        }.filterNotNull()
     }
 
-    override suspend fun fetchRealtimeSharedHomeworksByUser(uid: UID): SharedHomeworks {
-        return remoteDataSource.fetchRealtimeSharedHomeworksByUser(uid).mapToDomain()
+    override suspend fun fetchRealtimeSharedHomeworksByUser(targetUser: UID): SharedHomeworks {
+        return remoteDataSource.fetchRealtimeSharedHomeworksByUser(targetUser).mapToDomain()
     }
 }

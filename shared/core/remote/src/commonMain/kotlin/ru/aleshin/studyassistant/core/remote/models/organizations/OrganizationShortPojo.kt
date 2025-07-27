@@ -33,4 +33,5 @@ data class OrganizationShortPojo(
     val locations: List<String> = emptyList(),
     val offices: List<String> = emptyList(),
     val scheduleTimeIntervals: String,
+    val updatedAt: Long = 0L,
 )

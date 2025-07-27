@@ -35,6 +35,7 @@ internal data class OrganizationShortUi(
     val avatar: String? = null,
     val offices: List<String>,
     val scheduleTimeIntervals: ScheduleTimeIntervalsUi = ScheduleTimeIntervalsUi(),
+    val updatedAt: Long,
 ) : Parcelable
 
 internal fun OrganizationUi.convertToShort() = OrganizationShortUi(
@@ -45,5 +46,6 @@ internal fun OrganizationUi.convertToShort() = OrganizationShortUi(
     locations = locations,
     offices = offices,
     scheduleTimeIntervals = scheduleTimeIntervals,
-    avatar = avatar
+    avatar = avatar,
+    updatedAt = updatedAt,
 )

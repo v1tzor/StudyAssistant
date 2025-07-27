@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("UNCHECKED_CAST")
+
 package ru.aleshin.studyassistant.core.data.mappers.users
 
 import ru.aleshin.studyassistant.core.api.models.AuthUserPojo
@@ -41,7 +43,7 @@ fun AuthUserPojo.mapToDomain(): AuthUser {
         phone = phone,
         emailVerification = emailVerification,
         phoneVerification = phoneVerification,
-        preferences = prefs ?: emptyMap(),
+        preferences = prefs as? Map<String, Any> ?: emptyMap(),
         mfa = mfa,
         accessedAt = accessedAt
     )

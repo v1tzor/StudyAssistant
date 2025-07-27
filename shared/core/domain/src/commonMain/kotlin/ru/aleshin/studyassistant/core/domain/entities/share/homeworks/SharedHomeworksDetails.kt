@@ -24,4 +24,5 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 data class SharedHomeworksDetails(
     val received: Map<UID, ReceivedMediatedHomeworksDetails> = emptyMap(),
     val sent: Map<UID, SentMediatedHomeworksDetails> = emptyMap(),
+    val updatedAt: Long,
 )

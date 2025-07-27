@@ -27,13 +27,19 @@ object AppwriteApi {
         const val PROJECT_ID = "685aefd7003bf3aab9fc"
     }
 
+    object Common {
+        const val UID = "\$id"
+        const val USER_ID = "userId"
+        const val UPDATED_AT = "updatedAt"
+    }
+
     object Users {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "687a169b0033e3bb56fd"
 
         const val FRIENDS = "friends"
         const val CODE = "code"
-        const val UID = "uid"
+        const val UID = "\$id"
     }
 
     object Organizations {
@@ -41,7 +47,7 @@ object AppwriteApi {
         const val COLLECTION_ID = "68644e7f001f9d9f8bd2"
 
         const val USER_ID = "userId"
-        const val UID = "uid"
+        const val UID = "\$id"
         const val HIDE = "hide"
         const val AVATAR_URL = "avatar"
     }
@@ -60,7 +66,6 @@ object AppwriteApi {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "686a6c1200117f6ac3e4"
 
-        const val UID = "uid"
         const val USER_ID = "userId"
         const val DEADLINE = "deadline"
         const val DONE = "done"
@@ -71,7 +76,7 @@ object AppwriteApi {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "686a6db40026eb4d93e1"
 
-        const val UID = "uid"
+        const val UID = "\$id"
         const val USER_ID = "userId"
         const val CLASS_ID = "classId"
         const val DEADLINE = "deadline"

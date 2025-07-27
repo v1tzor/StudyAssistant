@@ -16,31 +16,75 @@
 
 package ru.aleshin.studyassistant.core.database.mappers.goals
 
+import ru.aleshin.studyassistant.core.database.models.goals.BaseGoalEntity
 import ru.aleshin.studyassistant.core.database.models.goals.GoalEntityDetails
+import ru.aleshin.studyassistant.core.database.models.tasks.BaseTodoEntity
 import ru.aleshin.studyassistant.core.database.models.tasks.HomeworkDetailsEntity
 import ru.aleshin.studyassistant.sqldelight.goals.GoalEntity
-import ru.aleshin.studyassistant.sqldelight.tasks.TodoEntity
 
 /**
  * @author Stanislav Aleshin on 26.04.2025.
  */
-fun GoalEntity.mapToDetails(
+fun GoalEntity.mapToBase() = BaseGoalEntity(
+    uid = uid,
+    type = type,
+    number = number,
+    contentId = content_id,
+    contentOrganizationId = content_organization_id,
+    contentDeadline = content_deadline,
+    targetDate = target_date,
+    desiredTime = desired_time,
+    goalTimeType = goal_time_type,
+    targetTime = target_time,
+    pastStopTime = past_stop_time,
+    startTimePoint = start_time_point,
+    isActive = is_active,
+    completeAfterTimeElapsed = complete_after_time_elapsed,
+    isDone = is_done,
+    completeDate = complete_date,
+    updatedAt = updated_at,
+    isCacheData = is_cache_data,
+)
+
+fun BaseGoalEntity.mapToEntity() = GoalEntity(
+    uid = uid,
+    type = type,
+    number = number,
+    content_id = contentId,
+    content_organization_id = contentOrganizationId,
+    content_deadline = contentDeadline,
+    target_date = targetDate,
+    desired_time = desiredTime,
+    goal_time_type = goalTimeType,
+    target_time = targetTime,
+    past_stop_time = pastStopTime,
+    start_time_point = startTimePoint,
+    is_active = isActive,
+    complete_after_time_elapsed = completeAfterTimeElapsed,
+    is_done = isDone,
+    complete_date = completeDate,
+    updated_at = updatedAt,
+    is_cache_data = isCacheData,
+)
+
+fun BaseGoalEntity.mapToDetails(
     homeworksMapper: (() -> HomeworkDetailsEntity?)? = null,
-    todoMapper: (() -> TodoEntity?)? = null,
+    todoMapper: (() -> BaseTodoEntity?)? = null,
 ) = GoalEntityDetails(
     uid = uid,
     contentType = type,
     contentHomework = homeworksMapper?.invoke(),
     contentTodo = todoMapper?.invoke(),
     number = number.toInt(),
-    targetDate = target_date,
-    desiredTime = desired_time,
-    goalTimeType = goal_time_type,
-    targetTime = target_time,
-    pastStopTime = past_stop_time,
-    isActive = is_active != 0L,
-    startTimePoint = start_time_point,
-    completeAfterTimeElapsed = complete_after_time_elapsed != 0L,
-    isDone = is_done != 0L,
-    completeDate = complete_date,
+    targetDate = targetDate,
+    desiredTime = desiredTime,
+    goalTimeType = goalTimeType,
+    targetTime = targetTime,
+    pastStopTime = pastStopTime,
+    isActive = isActive != 0L,
+    startTimePoint = startTimePoint,
+    completeAfterTimeElapsed = completeAfterTimeElapsed != 0L,
+    isDone = isDone != 0L,
+    completeDate = completeDate,
+    updatedAt = updatedAt,
 )

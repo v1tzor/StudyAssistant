@@ -18,90 +18,79 @@ package ru.aleshin.studyassistant.core.remote.datasources.users
 
 import dev.tmapps.konnection.Konnection
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.api.AppwriteApi.Organizations
 import ru.aleshin.studyassistant.core.api.AppwriteApi.Storage.BUCKET
 import ru.aleshin.studyassistant.core.api.AppwriteApi.Users
-import ru.aleshin.studyassistant.core.api.auth.AccountApi
-import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
+import ru.aleshin.studyassistant.core.api.auth.AccountService
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
+import ru.aleshin.studyassistant.core.api.databases.DatabaseService
 import ru.aleshin.studyassistant.core.api.models.AuthUserPojo
 import ru.aleshin.studyassistant.core.api.models.extractBucketIdFromFileUrl
 import ru.aleshin.studyassistant.core.api.models.extractIdFromFileUrl
-import ru.aleshin.studyassistant.core.api.realtime.RealtimeApi
-import ru.aleshin.studyassistant.core.api.storage.StorageApi
-import ru.aleshin.studyassistant.core.api.utils.Channels
+import ru.aleshin.studyassistant.core.api.realtime.RealtimeService
+import ru.aleshin.studyassistant.core.api.storage.StorageService
 import ru.aleshin.studyassistant.core.api.utils.Permission
 import ru.aleshin.studyassistant.core.api.utils.Query
 import ru.aleshin.studyassistant.core.api.utils.Role
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.extensions.tryFromJson
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
-import ru.aleshin.studyassistant.core.remote.mappers.users.convertToBase
 import ru.aleshin.studyassistant.core.remote.mappers.users.convertToDetails
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojo
 import ru.aleshin.studyassistant.core.remote.models.users.AppUserPojoDetails
+import ru.aleshin.studyassistant.core.remote.utils.RemoteDataSource
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
-interface UsersRemoteDataSource {
+interface UsersRemoteDataSource : RemoteDataSource.FullSynced.SingleDocument<AppUserPojo> {
 
-    suspend fun addUser(user: AppUserPojoDetails): UID
-    suspend fun updateUser(user: AppUserPojoDetails)
+    suspend fun updateAnotherUser(user: AppUserPojo, targetUser: UID)
     suspend fun uploadAvatar(oldAvatarUrl: String?, avatar: InputFile, targetUser: UID): String
-    suspend fun fetchCurrentAppUser(): AuthUserPojo?
+    suspend fun fetchCurrentAuthUser(): AuthUserPojo?
     suspend fun fetchStateChanged(): Flow<AuthUserPojo?>
     suspend fun isExistRemoteData(uid: UID): Boolean
-    suspend fun fetchUserById(uid: UID): Flow<AppUserPojoDetails?>
-    suspend fun fetchRealtimeUserById(uid: UID): AppUserPojoDetails?
-    suspend fun fetchUserFriends(uid: UID): Flow<List<AppUserPojoDetails>>
+    suspend fun fetchUserDetailsById(targetUser: UID): Flow<AppUserPojoDetails?>
+    suspend fun fetchRealtimeUserById(targetUser: UID): AppUserPojoDetails?
+    suspend fun fetchUserFriends(targetUser: UID): Flow<List<AppUserPojoDetails>>
     suspend fun findUsersByCode(code: String): Flow<List<AppUserPojoDetails>>
     suspend fun reloadUser(): AuthUserPojo?
-    suspend fun deleteAvatar(avatarUrl: String, targetUser: UID)
+    suspend fun deleteAvatar(avatarUrl: String)
 
     class Base(
-        private val account: AccountApi,
-        private val database: DatabaseApi,
-        private val realtime: RealtimeApi,
-        private val storage: StorageApi,
+        database: DatabaseService,
+        realtime: RealtimeService,
+        userSessionProvider: UserSessionProvider,
+        private val account: AccountService,
+        private val storage: StorageService,
         private val connectivityChecker: Konnection,
-    ) : UsersRemoteDataSource {
+    ) : UsersRemoteDataSource, RemoteDataSource.FullSynced.SingleDocument.BaseAppwrite<AppUserPojo>(
+        database = database,
+        realtime = realtime,
+        userSessionProvider = userSessionProvider,
+    ) {
 
-        override suspend fun addUser(user: AppUserPojoDetails): UID {
-            if (user.uid.isEmpty()) throw AppwriteUserException()
+        override val databaseId = Users.DATABASE_ID
 
-            database.createDocument(
-                databaseId = Users.DATABASE_ID,
-                collectionId = Users.COLLECTION_ID,
-                documentId = user.uid,
-                data = user.convertToBase(),
-                permissions = listOf(
-                    Permission.read(Role.users()),
-                    Permission.update(Role.users()),
-                    Permission.delete(Role.user(user.uid)),
-                ),
-                nestedType = AppUserPojo.serializer(),
-            )
+        override val collectionId = Users.COLLECTION_ID
 
-            return user.uid
-        }
+        override val nestedType = AppUserPojo.serializer()
 
-        override suspend fun updateUser(user: AppUserPojoDetails) {
-            if (user.uid.isEmpty()) throw AppwriteUserException()
+        override fun permissions(currentUser: UID) = listOf(
+            Permission.read(Role.users()),
+            Permission.update(Role.users()),
+            Permission.delete(Role.user(currentUser)),
+        )
 
+        override suspend fun updateAnotherUser(user: AppUserPojo, targetUser: UID) {
             database.updateDocument(
                 databaseId = Users.DATABASE_ID,
                 collectionId = Users.COLLECTION_ID,
-                documentId = user.uid,
-                data = user.convertToBase(),
-                permissions = listOf(
-                    Permission.read(Role.users()),
-                    Permission.update(Role.users()),
-                    Permission.delete(Role.user(user.uid)),
-                ),
+                documentId = targetUser,
+                data = user,
+                permissions = permissions(targetUser),
                 nestedType = AppUserPojo.serializer(),
             )
         }
@@ -110,7 +99,7 @@ interface UsersRemoteDataSource {
             if (targetUser.isBlank()) throw AppwriteUserException()
 
             if (!oldAvatarUrl.isNullOrBlank()) {
-                deleteAvatar(oldAvatarUrl, targetUser)
+                deleteAvatar(oldAvatarUrl)
             }
 
             val file = storage.createFile(
@@ -123,18 +112,19 @@ interface UsersRemoteDataSource {
             return file.getDownloadUrl()
         }
 
-        override suspend fun fetchCurrentAppUser(): AuthUserPojo? {
+        override suspend fun fetchCurrentAuthUser(): AuthUserPojo? {
             return account.getCurrentUser()
         }
 
-        @Suppress("UNCHECKED_CAST")
-        override suspend fun fetchStateChanged(): Flow<AuthUserPojo?> = channelFlow {
-            send(account.getCurrentUser())
-
-            realtime.subscribe(channels = Channels.account()).collect { event ->
-                val payload = event.payload.tryFromJson(AuthUserPojo.serializer())
-                trySend(payload ?: account.getCurrentUser(true))
-            }
+        override suspend fun fetchStateChanged(): Flow<AuthUserPojo?> {
+            return account.fetchStateChanged()
+//            return realtime.subscribe(channels = Channels.account()).map { event ->
+//                event.payload.tryFromJson(AuthUserPojo.serializer()).apply {
+//                    Logger.i("test2") { "account update: ${this}" }
+//                }
+//            }.onStart {
+//                emit(account.getCurrentUser())
+//            }
         }
 
         override suspend fun isExistRemoteData(uid: UID): Boolean {
@@ -148,44 +138,44 @@ interface UsersRemoteDataSource {
             return documentList.documents.isNotEmpty()
         }
 
-        override suspend fun fetchUserById(uid: UID): Flow<AppUserPojoDetails?> {
-            if (uid.isEmpty()) throw AppwriteUserException()
+        override suspend fun fetchUserDetailsById(targetUser: UID): Flow<AppUserPojoDetails?> {
+            if (targetUser.isEmpty()) throw AppwriteUserException()
 
             return database.getDocumentFlow(
                 databaseId = Users.DATABASE_ID,
                 collectionId = Users.COLLECTION_ID,
-                documentId = uid,
+                documentId = targetUser,
                 nestedType = AppUserPojo.serializer(),
             ).map { user ->
-                user?.convertToDetails()
+                user?.data?.convertToDetails()
             }
         }
 
-        override suspend fun fetchRealtimeUserById(uid: UID): AppUserPojoDetails? {
-            require(uid.isNotEmpty())
+        override suspend fun fetchRealtimeUserById(targetUser: UID): AppUserPojoDetails? {
+            require(targetUser.isNotEmpty())
 
             val document = database.getDocumentOrNull(
                 databaseId = Users.DATABASE_ID,
                 collectionId = Users.COLLECTION_ID,
-                documentId = uid,
+                documentId = targetUser,
                 nestedType = AppUserPojo.serializer(),
             )
 
             return document?.data?.convertToDetails()
         }
 
-        override suspend fun fetchUserFriends(uid: UID): Flow<List<AppUserPojoDetails>> {
-            require(uid.isNotEmpty())
+        override suspend fun fetchUserFriends(targetUser: UID): Flow<List<AppUserPojoDetails>> {
+            require(targetUser.isNotEmpty())
 
             val usersFlow = database.listDocumentsFlow(
                 databaseId = Users.DATABASE_ID,
                 collectionId = Users.COLLECTION_ID,
-                queries = listOf(Query.contains(Users.FRIENDS, uid)),
+                queries = listOf(Query.contains(Users.FRIENDS, targetUser)),
                 nestedType = AppUserPojo.serializer(),
             )
 
             return usersFlow.map { usersList ->
-                usersList.map { it.convertToDetails() }
+                usersList.map { it.data.convertToDetails() }
             }
         }
 
@@ -200,7 +190,7 @@ interface UsersRemoteDataSource {
             )
 
             return usersFlow.map { usersList ->
-                usersList.map { it.convertToDetails() }
+                usersList.map { it.data.convertToDetails() }
             }
         }
 
@@ -213,8 +203,7 @@ interface UsersRemoteDataSource {
             }
         }
 
-        override suspend fun deleteAvatar(avatarUrl: String, targetUser: UID) {
-            if (targetUser.isEmpty()) throw AppwriteUserException()
+        override suspend fun deleteAvatar(avatarUrl: String) {
             require(avatarUrl.isNotBlank()) { "User avatar url is empty" }
 
             storage.deleteFile(

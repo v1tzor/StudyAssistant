@@ -44,6 +44,7 @@ internal data class OrganizationUi(
     val webs: List<ContactInfoUi> = emptyList(),
     val offices: List<String> = emptyList(),
     val isHide: Boolean = false,
+    val updatedAt: Long = 0L,
 ) : Parcelable {
     companion object {
         fun createMainOrganization(uid: String = "") = OrganizationUi(

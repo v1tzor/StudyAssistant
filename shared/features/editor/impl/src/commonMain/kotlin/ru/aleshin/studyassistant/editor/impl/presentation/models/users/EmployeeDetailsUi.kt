@@ -47,6 +47,7 @@ internal data class EmployeeDetailsUi(
     val phones: List<ContactInfoUi> = emptyList(),
     val locations: List<ContactInfoUi> = emptyList(),
     val webs: List<ContactInfoUi> = emptyList(),
+    val updatedAt: Long,
 ) : Parcelable {
     fun fullName(): String {
         return buildString {
@@ -72,4 +73,5 @@ internal fun EmployeeDetailsUi.convertToBase() = EmployeeUi(
     phones = phones,
     locations = locations,
     webs = webs,
+    updatedAt = updatedAt,
 )

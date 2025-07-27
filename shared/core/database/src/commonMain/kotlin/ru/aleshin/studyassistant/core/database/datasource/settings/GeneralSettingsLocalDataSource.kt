@@ -20,6 +20,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToOne
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.database.utils.LocalDataSource
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralSettingsEntity
 import kotlin.coroutines.CoroutineContext
@@ -27,7 +28,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * @author Stanislav Aleshin on 24.04.2024.
  */
-interface GeneralSettingsLocalDataSource {
+interface GeneralSettingsLocalDataSource : LocalDataSource.OnlyOffline {
 
     fun fetchSettings(): Flow<GeneralSettingsEntity>
 
@@ -46,7 +47,7 @@ interface GeneralSettingsLocalDataSource {
         }
 
         override suspend fun updateSettings(settings: GeneralSettingsEntity) {
-            generalQueries.updateSettings(settings)
+            generalQueries.updateSettings(settings).await()
         }
     }
 }

@@ -26,18 +26,20 @@ import ru.aleshin.studyassistant.core.domain.entities.users.AuthUser
  * @author Stanislav Aleshin on 29.04.2024.
  */
 interface UsersRepository {
-    suspend fun addAppUser(user: AppUser): UID
-    suspend fun updateAppUser(user: AppUser)
+    suspend fun createNewUserProfile(user: AppUser): UID
+    suspend fun updateCurrentUserProfile(user: AppUser)
+    suspend fun updateAnotherUserProfile(user: AppUser, targetUser: UID)
     suspend fun fetchCurrentAuthUser(): AuthUser?
     suspend fun fetchCurrentUserOrError(): AuthUser
     suspend fun fetchStateChanged(): Flow<AuthUser?>
     suspend fun fetchCurrentUserPaidStatus(): Flow<Boolean>
-    suspend fun fetchExistRemoteDataStatus(uid: UID): Flow<Boolean>
-    suspend fun fetchUserById(uid: UID): Flow<AppUser?>
-    suspend fun fetchRealtimeUserById(uid: UID): AppUser?
-    suspend fun fetchUserFriends(uid: UID): Flow<List<AppUser>>
+    suspend fun fetchExistRemoteDataStatus(): Flow<Boolean>
+    suspend fun fetchCurrentUserProfile(): Flow<AppUser?>
+    suspend fun fetchUserProfileById(targetUser: UID): Flow<AppUser?>
+    suspend fun fetchRealtimeUserById(targetUser: UID): AppUser?
+    suspend fun fetchCurrentUserFriends(): Flow<List<AppUser>>
     suspend fun findUsersByCode(code: String): Flow<List<AppUser>>
-    suspend fun uploadUserAvatar(oldAvatarUrl: String?, avatar: InputFile, targetUser: UID): String
+    suspend fun uploadCurrentUserAvatar(oldAvatarUrl: String?, avatar: InputFile): String
     suspend fun reloadUser(): AuthUser?
-    suspend fun deleteUserAvatar(avatarUrl: String, targetUser: UID)
+    suspend fun deleteCurrentUserAvatar(avatarUrl: String)
 }

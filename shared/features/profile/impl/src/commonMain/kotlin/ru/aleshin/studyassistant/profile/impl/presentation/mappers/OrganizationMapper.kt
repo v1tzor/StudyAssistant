@@ -33,6 +33,7 @@ internal fun OrganizationShort.mapToUi() = OrganizationShortUi(
     offices = offices,
     avatar = avatar,
     scheduleTimeIntervals = scheduleTimeIntervals.mapToUi(),
+    updatedAt = updatedAt,
 )
 
 internal fun ContactInfo.mapToUi() = ContactInfoUi(

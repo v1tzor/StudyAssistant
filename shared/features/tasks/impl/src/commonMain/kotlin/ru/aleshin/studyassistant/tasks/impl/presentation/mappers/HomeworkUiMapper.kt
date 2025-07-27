@@ -47,6 +47,7 @@ internal fun Homework.mapToUi() = HomeworkUi(
     priority = priority,
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun HomeworkDetails.mapToUi() = HomeworkDetailsUi(
@@ -64,6 +65,7 @@ internal fun HomeworkDetails.mapToUi() = HomeworkDetailsUi(
     status = status,
     linkedGoal = linkedGoal?.mapToUi(),
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun HomeworkUi.mapToDomain() = Homework(
@@ -79,6 +81,7 @@ internal fun HomeworkUi.mapToDomain() = Homework(
     priority = priority,
     isDone = isDone,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 internal fun DailyHomeworks.mapToUi() = DailyHomeworksUi(

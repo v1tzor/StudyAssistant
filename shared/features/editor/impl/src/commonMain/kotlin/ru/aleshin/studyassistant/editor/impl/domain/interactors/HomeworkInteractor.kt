@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
@@ -41,27 +42,28 @@ internal interface HomeworkInteractor {
         private val homeworksRepository: HomeworksRepository,
         private val goalsRepository: DailyGoalsRepository,
         private val usersRepository: UsersRepository,
+        private val dateManager: DateManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : HomeworkInteractor {
 
         override suspend fun addOrUpdateHomework(homework: Homework) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            homeworksRepository.addOrUpdateHomework(homework, targetUser).apply {
-                val linkedGoal = goalsRepository.fetchGoalByContentId(homework.uid, targetUser).first()
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedHomework = homework.copy(updatedAt = updatedAt)
+            homeworksRepository.addOrUpdateHomework(updatedHomework).apply {
+                val linkedGoal = goalsRepository.fetchGoalByContentId(updatedHomework.uid).first()
                 if (linkedGoal != null) {
-                    goalsRepository.addOrUpdateGoal(linkedGoal.copy(contentHomework = homework), targetUser)
+                    val updatedGoal = linkedGoal.copy(contentHomework = updatedHomework, updatedAt = updatedAt)
+                    goalsRepository.addOrUpdateGoal(updatedGoal)
                 }
             }
         }
 
         override suspend fun fetchHomeworkById(homeworkId: UID) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            homeworksRepository.fetchHomeworkById(homeworkId, targetUser)
+            homeworksRepository.fetchHomeworkById(homeworkId)
         }
 
         override suspend fun deleteHomework(targetId: UID) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            homeworksRepository.deleteHomework(targetId, targetUser)
+            homeworksRepository.deleteHomework(targetId)
         }
     }
 }

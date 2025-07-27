@@ -31,6 +31,7 @@ data class OrganizationShort(
     val offices: List<String> = emptyList(),
     val scheduleTimeIntervals: ScheduleTimeIntervals = ScheduleTimeIntervals(),
     val avatar: String? = null,
+    val updatedAt: Long,
 )
 
 fun Organization.convertToShort() = OrganizationShort(
@@ -42,6 +43,7 @@ fun Organization.convertToShort() = OrganizationShort(
     offices = offices,
     scheduleTimeIntervals = scheduleTimeIntervals,
     avatar = avatar,
+    updatedAt = updatedAt,
 )
 
 fun OrganizationShort.convertToBase(base: Organization) = base.copy(
@@ -53,4 +55,5 @@ fun OrganizationShort.convertToBase(base: Organization) = base.copy(
     offices = offices,
     scheduleTimeIntervals = scheduleTimeIntervals,
     avatar = avatar,
+    updatedAt = updatedAt,
 )

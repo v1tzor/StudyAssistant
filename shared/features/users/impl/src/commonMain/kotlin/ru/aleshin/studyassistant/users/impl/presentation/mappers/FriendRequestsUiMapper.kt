@@ -26,4 +26,5 @@ internal fun FriendRequestsDetails.mapToUi() = FriendRequestsDetailsUi(
     received = received.mapKeys { it.key.mapToUi() },
     send = send.mapKeys { it.key.mapToUi() },
     lastActions = lastActions.mapKeys { it.key.mapToUi() },
+    updatedAt = updatedAt,
 )

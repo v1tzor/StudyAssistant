@@ -18,34 +18,64 @@ package ru.aleshin.studyassistant.core.database.mappers.subjects
 
 import ru.aleshin.studyassistant.core.common.extensions.fromJson
 import ru.aleshin.studyassistant.core.common.extensions.toJson
-import ru.aleshin.studyassistant.core.database.mappers.employee.mapToBase
+import ru.aleshin.studyassistant.core.database.models.employee.BaseEmployeeEntity
+import ru.aleshin.studyassistant.core.database.models.subjects.BaseSubjectEntity
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
-import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
+import ru.aleshin.studyassistant.core.database.models.users.ContactInfoEntity
 import ru.aleshin.studyassistant.sqldelight.subjects.SubjectEntity
 
 /**
  * @author Stanislav Aleshin on 08.07.2024.
  */
-fun SubjectDetailsEntity.mapToBase() = SubjectEntity(
-    uid = uid,
-    organization_id = organizationId,
-    event_type = eventType,
-    name = name,
-    teacher_id = teacher?.uid,
-    office = office,
-    color = color.toLong(),
-    location = location?.toJson(),
-)
-
-fun SubjectEntity.mapToDetails(
-    employee: EmployeeEntity?,
-) = SubjectDetailsEntity(
+fun SubjectEntity.mapToBase() = BaseSubjectEntity(
     uid = uid,
     organizationId = organization_id,
     eventType = event_type,
     name = name,
-    teacher = employee?.mapToBase(),
+    teacherId = teacher_id,
+    office = office,
+    color = color,
+    location = location,
+    updatedAt = updated_at,
+    isCacheData = is_cache_data,
+)
+
+fun BaseSubjectEntity.mapToEntity() = SubjectEntity(
+    uid = uid,
+    organization_id = organizationId,
+    event_type = eventType,
+    name = name,
+    teacher_id = teacherId,
+    office = office,
+    color = color,
+    location = location,
+    updated_at = updatedAt,
+    is_cache_data = isCacheData,
+)
+
+fun SubjectDetailsEntity.mapToBase() = BaseSubjectEntity(
+    uid = uid,
+    organizationId = organizationId,
+    eventType = eventType,
+    name = name,
+    teacherId = teacher?.uid,
+    office = office,
+    color = color.toLong(),
+    location = location?.toJson<ContactInfoEntity>(),
+    updatedAt = updatedAt,
+    isCacheData = 0L,
+)
+
+fun BaseSubjectEntity.mapToDetails(
+    employee: BaseEmployeeEntity?,
+) = SubjectDetailsEntity(
+    uid = uid,
+    organizationId = organizationId,
+    eventType = eventType,
+    name = name,
+    teacher = employee,
     office = office,
     color = color.toInt(),
-    location = location?.fromJson(),
+    location = location?.fromJson<ContactInfoEntity>(),
+    updatedAt = updatedAt,
 )

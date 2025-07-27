@@ -45,6 +45,7 @@ internal data class OrganizationUi(
     val webs: List<ContactInfoUi> = emptyList(),
     val offices: List<String> = emptyList(),
     val isHide: Boolean = false,
+    val updatedAt: Long,
 ) : Parcelable {
 
     fun groupedContactInfo(): Map<ContactInfoUi, ContactInfoType> = buildMap {

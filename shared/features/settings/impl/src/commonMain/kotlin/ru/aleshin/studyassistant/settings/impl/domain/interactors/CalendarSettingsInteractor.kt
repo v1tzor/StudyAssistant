@@ -18,9 +18,9 @@ package ru.aleshin.studyassistant.settings.impl.domain.interactors
 
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkResult
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.settings.impl.domain.common.SettingsEitherWrapper
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
 
@@ -34,18 +34,17 @@ internal interface CalendarSettingsInteractor {
 
     class Base(
         private val settingsRepository: CalendarSettingsRepository,
-        private val usersRepository: UsersRepository,
+        private val dateManager: DateManager,
         private val eitherWrapper: SettingsEitherWrapper,
     ) : CalendarSettingsInteractor {
 
         override suspend fun fetchSettings() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            settingsRepository.fetchSettings(targetUser)
+            settingsRepository.fetchSettings()
         }
 
         override suspend fun updateSettings(settings: CalendarSettings) = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            settingsRepository.updateSettings(settings, targetUser)
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            settingsRepository.updateSettings(settings.copy(updatedAt = updatedAt))
         }
     }
 }

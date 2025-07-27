@@ -28,22 +28,24 @@ import ru.aleshin.studyassistant.core.remote.models.schedule.BaseSchedulePojo
  * @author Stanislav Aleshin on 04.05.2024.
  */
 fun BaseScheduleDetailsPojo.mapToBase(userId: UID) = BaseSchedulePojo(
-    uid = uid,
+    id = uid,
     userId = userId,
     dateVersionFrom = dateVersionFrom,
     dateVersionTo = dateVersionTo,
     weekDayOfWeek = weekDayOfWeek,
     week = week,
-    classes = classes.map { it.mapToBase().toJson<ClassPojo>() }
+    classes = classes.map { it.mapToBase().toJson<ClassPojo>() },
+    updatedAt = updatedAt,
 )
 
 suspend fun BaseSchedulePojo.mapToDetails(
     classMapper: suspend (ClassPojo) -> ClassDetailsPojo,
 ) = BaseScheduleDetailsPojo(
-    uid = uid,
+    uid = id,
     dateVersionFrom = dateVersionFrom,
     dateVersionTo = dateVersionTo,
     weekDayOfWeek = weekDayOfWeek,
     week = week,
     classes = classes.map { classMapper(it.fromJson<ClassPojo>()) },
+    updatedAt = updatedAt,
 )

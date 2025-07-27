@@ -14,26 +14,35 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package ru.aleshin.studyassistant.core.data.repositories
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
-import kotlinx.datetime.Instant.Companion.DISTANT_FUTURE
-import kotlinx.datetime.Instant.Companion.DISTANT_PAST
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
 import ru.aleshin.studyassistant.core.common.extensions.endThisDay
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.data.mappers.tasks.convertToLocal
+import ru.aleshin.studyassistant.core.data.mappers.tasks.convertToRemote
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToRemoteData
+import ru.aleshin.studyassistant.core.data.utils.SubscriptionChecker
+import ru.aleshin.studyassistant.core.data.utils.sync.RemoteResultSyncHandler
 import ru.aleshin.studyassistant.core.database.datasource.tasks.HomeworksLocalDataSource
 import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
+import ru.aleshin.studyassistant.core.domain.entities.sync.OfflineChangeType
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
+import ru.aleshin.studyassistant.core.domain.managers.sync.HomeworkSourceSyncManager.Companion.HOMEWORK_SOURCE_KEY
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
-import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.tasks.HomeworksRemoteDataSource
 
 /**
@@ -43,153 +52,180 @@ class HomeworksRepositoryImpl(
     private val remoteDataSource: HomeworksRemoteDataSource,
     private val localDataSource: HomeworksLocalDataSource,
     private val subscriptionChecker: SubscriptionChecker,
+    private val userSessionProvider: UserSessionProvider,
+    private val resultSyncHandler: RemoteResultSyncHandler,
 ) : HomeworksRepository {
 
-    override suspend fun addOrUpdateHomework(homework: Homework, targetUser: UID): UID {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun addOrUpdateHomework(homework: Homework): UID {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
 
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateHomework(homework.mapToRemoteData(targetUser), targetUser)
+        val upsertModel = homework.copy(uid = homework.uid.ifBlank { randomUUID() })
+
+        if (isSubscriber) {
+            localDataSource.sync().addOrUpdateItem(upsertModel.mapToLocalData())
+            resultSyncHandler.executeOrAddToQueue(
+                data = upsertModel.mapToRemoteData(userId = currentUser),
+                type = OfflineChangeType.UPSERT,
+                sourceKey = HOMEWORK_SOURCE_KEY,
+            ) {
+                remoteDataSource.addOrUpdateItem(it)
+            }
         } else {
-            localDataSource.addOrUpdateHomework(homework.mapToLocalData())
+            localDataSource.offline().addOrUpdateItem(upsertModel.mapToLocalData())
+        }
+
+        return upsertModel.uid
+    }
+
+    override suspend fun addHomeworksGroup(homeworks: List<Homework>) {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+
+        val upsertModels = homeworks.map { homework ->
+            homework.copy(uid = homework.uid.ifBlank { randomUUID() })
+        }
+
+        if (isSubscriber) {
+            localDataSource.sync().addOrUpdateItems(upsertModels.map { it.mapToLocalData() })
+            resultSyncHandler.executeOrAddToQueue(
+                data = upsertModels.map { it.mapToRemoteData(userId = currentUser) },
+                type = OfflineChangeType.UPSERT,
+                sourceKey = HOMEWORK_SOURCE_KEY,
+            ) {
+                remoteDataSource.addOrUpdateItems(it)
+            }
+        } else {
+            localDataSource.offline().addOrUpdateItems(upsertModels.map { it.mapToLocalData() })
         }
     }
 
-    override suspend fun addHomeworksGroup(homeworks: List<Homework>, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.addOrUpdateHomeworksGroup(homeworks.map { it.mapToRemoteData(targetUser) }, targetUser)
-        } else {
-            localDataSource.addOrUpdateHomeworksGroup(homeworks.map { it.mapToLocalData() })
+    override suspend fun fetchHomeworkById(uid: UID): Flow<Homework?> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchHomeworkDetailsById(uid).map { homeworkEntity ->
+                    homeworkEntity?.mapToDomain()
+                }
+            } else {
+                localDataSource.offline().fetchHomeworkDetailsById(uid).map { homeworkEntity ->
+                    homeworkEntity?.mapToDomain()
+                }
+            }
         }
     }
 
-    override suspend fun fetchHomeworkById(uid: UID, targetUser: UID): Flow<Homework?> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchHomeworkById(uid, targetUser).map { homeworkPojo -> homeworkPojo?.mapToDomain() }
-        } else {
-            localDataSource.fetchHomeworkById(uid).map { homeworkEntity -> homeworkEntity?.mapToDomain() }
-        }
-    }
-
-    override suspend fun fetchHomeworksByDate(date: Instant, targetUser: UID): Flow<List<Homework>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun fetchHomeworksByDate(date: Instant): Flow<List<Homework>> {
         val timeStart = date.startThisDay().toEpochMilliseconds()
         val timeEnd = date.endThisDay().toEpochMilliseconds()
 
-        return if (isSubscriber) {
-            remoteDataSource.fetchHomeworksByTimeRange(timeStart, timeEnd, targetUser).map { homeworks ->
-                homeworks.map { homeworkPojo -> homeworkPojo.mapToDomain() }
-            }
-        } else {
-            localDataSource.fetchHomeworksByTimeRange(timeStart, timeEnd).map { homeworks ->
-                homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchHomeworksDetailsByTimeRange(timeStart, timeEnd).map { homeworks ->
+                    homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchHomeworksDetailsByTimeRange(timeStart, timeEnd).map { homeworks ->
+                    homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
+                }
             }
         }
     }
 
-    override suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<Homework>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange): Flow<List<Homework>> {
         val timeStart = timeRange.from.toEpochMilliseconds()
         val timeEnd = timeRange.to.toEpochMilliseconds()
 
-        return if (isSubscriber) {
-            remoteDataSource.fetchHomeworksByTimeRange(timeStart, timeEnd, targetUser).map { homeworks ->
-                homeworks.map { homeworkPojo -> homeworkPojo.mapToDomain() }
-            }
-        } else {
-            localDataSource.fetchHomeworksByTimeRange(timeStart, timeEnd).map { homeworks ->
-                homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchHomeworksDetailsByTimeRange(timeStart, timeEnd).map { homeworks ->
+                    homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchHomeworksDetailsByTimeRange(timeStart, timeEnd).map { homeworks ->
+                    homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
+                }
             }
         }
     }
 
-    override suspend fun fetchOverdueHomeworks(currentDate: Instant, targetUser: UID): Flow<List<Homework>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun fetchOverdueHomeworks(currentDate: Instant): Flow<List<Homework>> {
         val date = currentDate.endThisDay().toEpochMilliseconds()
 
-        return if (isSubscriber) {
-            remoteDataSource.fetchOverdueHomeworks(date, targetUser).map { homeworks ->
-                homeworks.map { homeworkPojo -> homeworkPojo.mapToDomain() }
-            }
-        } else {
-            localDataSource.fetchOverdueHomeworks(date).map { homeworks ->
-                homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchOverdueHomeworksDetails(date).map { homeworks ->
+                    homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchOverdueHomeworksDetails(date).map { homeworks ->
+                    homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
+                }
             }
         }
     }
 
-    override suspend fun fetchActiveLinkedHomeworks(currentDate: Instant, targetUser: UID): Flow<List<Homework>> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
+    override suspend fun fetchActiveLinkedHomeworks(currentDate: Instant): Flow<List<Homework>> {
         val date = currentDate.toEpochMilliseconds()
 
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchActiveLinkedHomeworksDetails(date).map { homeworks ->
+                    homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
+                }
+            } else {
+                localDataSource.offline().fetchActiveLinkedHomeworksDetails(date).map { homeworks ->
+                    homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
+                }
+            }
+        }
+    }
+
+    override suspend fun fetchCompletedHomeworksCount(): Flow<Int> {
+        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+            if (isSubscriber) {
+                localDataSource.sync().fetchCompletedHomeworksCount()
+            } else {
+                localDataSource.offline().fetchCompletedHomeworksCount()
+            }
+        }
+    }
+
+    override suspend fun deleteHomework(uid: UID) {
+        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+
         return if (isSubscriber) {
-            remoteDataSource.fetchActiveLinkedHomeworks(date, targetUser).map { homeworks ->
-                homeworks.map { homeworkPojo -> homeworkPojo.mapToDomain() }
+            localDataSource.sync().deleteItemsById(listOf(uid))
+            resultSyncHandler.executeOrAddToQueue(
+                documentId = uid,
+                type = OfflineChangeType.DELETE,
+                sourceKey = HOMEWORK_SOURCE_KEY,
+            ) {
+                remoteDataSource.deleteItemById(uid)
             }
         } else {
-            localDataSource.fetchActiveLinkedHomeworks(date).map { homeworks ->
-                homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
-            }
+            localDataSource.offline().deleteItemsById(listOf(uid))
         }
     }
 
-    override suspend fun fetchCompletedHomeworksCount(targetUser: UID): Flow<Int> {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.fetchCompletedHomeworksCount(targetUser)
-        } else {
-            localDataSource.fetchCompletedHomeworksCount()
-        }
-    }
-
-    override suspend fun deleteHomework(uid: UID, targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.deleteHomework(uid, targetUser)
-        } else {
-            localDataSource.deleteHomework(uid)
-        }
-    }
-
-    override suspend fun deleteAllHomeworks(targetUser: UID) {
-        val isSubscriber = subscriptionChecker.checkSubscriptionActivity()
-
-        return if (isSubscriber) {
-            remoteDataSource.deleteAllHomework(targetUser)
-        } else {
-            localDataSource.deleteAllHomework()
-        }
-    }
-
-    override suspend fun transferData(direction: DataTransferDirection, targetUser: UID) {
+    override suspend fun transferData(direction: DataTransferDirection) {
+        val currentUser = userSessionProvider.getCurrentUserId()
         when (direction) {
             DataTransferDirection.REMOTE_TO_LOCAL -> {
-                val allHomeworks = remoteDataSource.fetchHomeworksByTimeRange(
-                    from = DISTANT_PAST.toEpochMilliseconds(),
-                    to = DISTANT_FUTURE.toEpochMilliseconds(),
-                    targetUser = targetUser,
-                ).let { homeworksFlow ->
-                    return@let homeworksFlow.first().map { it.mapToDomain().mapToLocalData() }
-                }
-                localDataSource.deleteAllHomework()
-                localDataSource.addOrUpdateHomeworksGroup(allHomeworks)
-                remoteDataSource.deleteAllHomework(targetUser)
+                val allHomeworksFlow = remoteDataSource.fetchAllItems(currentUser)
+                val homeworks = allHomeworksFlow.first().map { it.convertToLocal() }
+
+                localDataSource.offline().deleteAllItems()
+                localDataSource.offline().addOrUpdateItems(homeworks)
             }
             DataTransferDirection.LOCAL_TO_REMOTE -> {
-                val allHomeworks = localDataSource.fetchHomeworksByTimeRange(
-                    from = DISTANT_PAST.toEpochMilliseconds(),
-                    to = DISTANT_FUTURE.toEpochMilliseconds(),
-                ).let { homeworksFlow ->
-                    return@let homeworksFlow.first().map { it.mapToDomain().mapToRemoteData(targetUser) }
-                }
-                remoteDataSource.deleteAllHomework(targetUser)
-                remoteDataSource.addOrUpdateHomeworksGroup(allHomeworks, targetUser)
+                val allHomeworks = localDataSource.offline().fetchAllHomeworks().first()
+                val homeworksRemote = allHomeworks.map { it.convertToRemote(currentUser) }
+
+                remoteDataSource.deleteAllItems(currentUser)
+                remoteDataSource.addOrUpdateItems(homeworksRemote)
+
+                localDataSource.sync().deleteAllItems()
+                localDataSource.sync().addOrUpdateItems(allHomeworks)
             }
         }
     }

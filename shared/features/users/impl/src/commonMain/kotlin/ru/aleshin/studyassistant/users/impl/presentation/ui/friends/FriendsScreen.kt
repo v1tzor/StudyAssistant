@@ -30,6 +30,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.users.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
@@ -50,6 +51,7 @@ internal class FriendsScreen : Screen {
         initialState = FriendsViewState(),
     ) { state ->
         val strings = UsersThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
         val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
 
@@ -93,7 +95,7 @@ internal class FriendsScreen : Screen {
                 is FriendsEffect.NavigateToBack -> navigator.nestedPop()
                 is FriendsEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
                         withDismissAction = true,
                     )
                 }

@@ -27,4 +27,5 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 internal data class SharedHomeworksUi(
     val received: Map<UID, ReceivedMediatedHomeworksUi> = emptyMap(),
     val sent: Map<UID, SentMediatedHomeworksUi> = emptyMap(),
+    val updatedAt: Long,
 ) : Parcelable

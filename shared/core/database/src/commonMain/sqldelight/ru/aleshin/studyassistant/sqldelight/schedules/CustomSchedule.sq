@@ -4,34 +4,65 @@ import kotlin.collections.List;
 CREATE TABLE customScheduleEntity (
   uid TEXT PRIMARY KEY NOT NULL,
   date INTEGER NOT NULL,
-  classes TEXT AS List<String> NOT NULL
+  classes TEXT AS List<String> NOT NULL,
+  updated_at INTEGER NOT NULL,
+  is_cache_data INTEGER NOT NULL
 );
 
 addOrUpdateSchedule:
-INSERT OR REPLACE INTO customScheduleEntity (uid, date, classes)
+INSERT OR REPLACE INTO customScheduleEntity (uid, date, classes, updated_at, is_cache_data)
 VALUES ?;
 
 fetchScheduleById:
 SELECT *
 FROM customScheduleEntity
-WHERE uid = ?;
+WHERE uid = ? AND is_cache_data = ?;
+
+fetchSchedulesById:
+SELECT *
+FROM customScheduleEntity
+WHERE uid IN ? AND is_cache_data = ?;
+
 
 fetchSchedulesByDate:
 SELECT *
 FROM customScheduleEntity
-WHERE date = ?
+WHERE date = ? AND is_cache_data = ?
 ORDER BY date DESC;
 
 fetchSchedulesByTimeRange:
 SELECT *
 FROM customScheduleEntity
-WHERE date >= ? AND date <= ?
+WHERE date >= ? AND date <= ? AND is_cache_data = ?
 ORDER BY date DESC;
+
+fetchEmptySchedules:
+SELECT uid, updated_at
+FROM customScheduleEntity
+WHERE is_cache_data = 1;
+
+fetchEmptySchedulesByTimeRange:
+SELECT uid, updated_at
+FROM customScheduleEntity
+WHERE date >= ? AND date <= ? AND is_cache_data = 1;
+
+fetchAllSchedules:
+SELECT *
+FROM customScheduleEntity
+WHERE is_cache_data = ?;
 
 deleteScheduleById:
 DELETE FROM customScheduleEntity
-WHERE uid = ?;
+WHERE uid = ? AND is_cache_data = ?;
+
+deleteSchedulesById:
+DELETE FROM customScheduleEntity
+WHERE uid IN ? AND is_cache_data = ?;
 
 deleteSchedulesByTimeRange:
 DELETE FROM customScheduleEntity
-WHERE date >= ? AND date <= ?;
+WHERE date >= ? AND date <= ? AND is_cache_data = ?;
+
+deleteAllSchedules:
+DELETE FROM customScheduleEntity
+WHERE is_cache_data = ?;

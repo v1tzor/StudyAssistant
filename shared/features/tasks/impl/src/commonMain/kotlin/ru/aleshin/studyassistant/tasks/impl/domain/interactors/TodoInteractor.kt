@@ -31,10 +31,9 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.DetailsGroupedTodos
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.convertToDetails
-import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 
@@ -51,7 +50,6 @@ internal interface TodoInteractor {
         private val todoRepository: TodoRepository,
         private val todoReminderManager: TodoReminderManager,
         private val goalsRepository: DailyGoalsRepository,
-        private val usersRepository: UsersRepository,
         private val dateManager: DateManager,
         private val eitherWrapper: TasksEitherWrapper,
     ) : TodoInteractor {
@@ -60,12 +58,11 @@ internal interface TodoInteractor {
         override suspend fun fetchWeekGroupedTodosByTimeRange(timeRange: TimeRange) = eitherWrapper.wrapFlow {
             val ticker = dateManager.secondTicker()
             val currentTime = dateManager.fetchCurrentInstant()
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val shortGoalsFlow = goalsRepository.fetchShortActiveDailyGoals(targetUser)
-            val weekCompletedTodosFlow = todoRepository.fetchCompletedTodos(timeRange, targetUser).map { todos ->
+            val shortGoalsFlow = goalsRepository.fetchShortActiveDailyGoals()
+            val weekCompletedTodosFlow = todoRepository.fetchCompletedTodos(timeRange).map { todos ->
                 todos.sortedBy { it.deadline }
             }
-            val activeTodosFlow = todoRepository.fetchActiveTodos(targetUser).map { todos ->
+            val activeTodosFlow = todoRepository.fetchActiveTodos().map { todos ->
                 todos.sortedBy { it.deadline }
             }
 
@@ -125,40 +122,39 @@ internal interface TodoInteractor {
         }
 
         override suspend fun fetchCompletedTodos() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            todoRepository.fetchCompletedTodos(null, targetUser)
+            todoRepository.fetchCompletedTodos(null)
         }
 
         override suspend fun updateTodoDone(todo: Todo) = eitherWrapper.wrapUnit {
             val currentTime = dateManager.fetchCurrentInstant()
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val linkedGoal = goalsRepository.fetchGoalByContentId(todo.uid, targetUser).first()
+            val linkedGoal = goalsRepository.fetchGoalByContentId(todo.uid).first()
             if (todo.isDone) {
                 val canceledTodo = todo.copy(
                     isDone = false,
                     completeDate = null,
+                    updatedAt = currentTime.toEpochMilliseconds(),
                 )
                 if (linkedGoal != null && linkedGoal.targetDate >= currentTime.startThisDay()) {
                     cancelLinkedGoal(linkedGoal)
                 }
 
-                todoRepository.addOrUpdateTodo(canceledTodo, targetUser)
+                todoRepository.addOrUpdateTodo(canceledTodo)
                 todoReminderManager.clearAllReminders(todo.uid)
             } else {
                 val completedTodo = todo.copy(
                     isDone = true,
                     completeDate = currentTime,
+                    updatedAt = currentTime.toEpochMilliseconds(),
                 )
                 if (linkedGoal != null && !linkedGoal.isDone) completeLinkedGoal(linkedGoal)
 
-                todoRepository.addOrUpdateTodo(completedTodo, targetUser)
+                todoRepository.addOrUpdateTodo(completedTodo)
                 todoReminderManager.scheduleReminders(todo.uid, todo.name, todo.deadline, todo.notifications)
             }
         }
 
         private suspend fun completeLinkedGoal(linkedGoal: Goal) {
             val currentTime = dateManager.fetchCurrentInstant()
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val updatedGoal = linkedGoal.copy(
                 time = when (linkedGoal.time) {
                     is GoalTime.Stopwatch -> with(linkedGoal.time as GoalTime.Stopwatch) {
@@ -181,13 +177,13 @@ internal interface TodoInteractor {
                 },
                 isDone = true,
                 completeDate = currentTime,
+                updatedAt = currentTime.toEpochMilliseconds(),
             )
-            goalsRepository.addOrUpdateGoal(updatedGoal, targetUser)
+            goalsRepository.addOrUpdateGoal(updatedGoal)
         }
 
         private suspend fun cancelLinkedGoal(linkedGoal: Goal) {
             val currentTime = dateManager.fetchCurrentInstant()
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val canceledGoal = linkedGoal.copy(
                 time = when (linkedGoal.time) {
                     is GoalTime.Stopwatch -> (linkedGoal.time as GoalTime.Stopwatch).copy(
@@ -204,8 +200,9 @@ internal interface TodoInteractor {
                 },
                 isDone = false,
                 completeDate = null,
+                updatedAt = currentTime.toEpochMilliseconds(),
             )
-            goalsRepository.addOrUpdateGoal(canceledGoal, targetUser)
+            goalsRepository.addOrUpdateGoal(canceledGoal)
         }
     }
 }

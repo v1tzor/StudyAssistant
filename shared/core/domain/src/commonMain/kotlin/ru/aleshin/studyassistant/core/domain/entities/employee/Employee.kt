@@ -37,4 +37,5 @@ data class Employee(
     val phones: List<ContactInfo> = emptyList(),
     val locations: List<ContactInfo> = emptyList(),
     val webs: List<ContactInfo> = emptyList(),
+    val updatedAt: Long,
 )

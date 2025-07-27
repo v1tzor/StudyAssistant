@@ -7,36 +7,66 @@ CREATE TABLE baseScheduleEntity (
   date_version_to INTEGER NOT NULL,
   week_day_of_week TEXT NOT NULL,
   week TEXT NOT NULL,
-  classes TEXT AS List<String> NOT NULL
+  classes TEXT AS List<String> NOT NULL,
+  updated_at INTEGER NOT NULL,
+  is_cache_data INTEGER NOT NULL
 );
 
 addOrUpdateSchedule:
-INSERT OR REPLACE INTO baseScheduleEntity (uid, date_version_from, date_version_to, week_day_of_week, week, classes)
+INSERT OR REPLACE INTO baseScheduleEntity (uid, date_version_from, date_version_to, week_day_of_week, week, classes, updated_at, is_cache_data)
 VALUES ?;
 
 fetchScheduleById:
 SELECT *
 FROM baseScheduleEntity
-WHERE uid = ?;
+WHERE uid = ? AND is_cache_data = ?;
+
+fetchSchedulesById:
+SELECT *
+FROM baseScheduleEntity
+WHERE uid IN ? AND is_cache_data = ?;
 
 fetchSchedulesByDate:
 SELECT *
 FROM baseScheduleEntity
-WHERE week = ? AND week_day_of_week = ? AND date_version_from <= ? AND date_version_to >= ?
+WHERE (week = ? AND week_day_of_week = ? AND date_version_from <= ? AND date_version_to >= ?) AND is_cache_data = ?
 ORDER BY date_version_to DESC;
 
 fetchSchedulesByTimeRangeWithWeek:
 SELECT *
 FROM baseScheduleEntity
-WHERE week = ? AND date_version_to >= ? AND date_version_from <= ?
+WHERE (week = ? AND date_version_to >= ? AND date_version_from <= ?) AND is_cache_data = ?
 ORDER BY date_version_to DESC;
 
 fetchSchedulesByTimeRange:
 SELECT *
 FROM baseScheduleEntity
-WHERE date_version_to >= ? AND date_version_from <= ?
+WHERE (date_version_to >= ? AND date_version_from <= ?) AND is_cache_data = ?
 ORDER BY date_version_to DESC;
+
+fetchEmptySchedules:
+SELECT uid, updated_at
+FROM baseScheduleEntity
+WHERE is_cache_data = 1;
+
+fetchEmptySchedulesByTimeRange:
+SELECT uid, updated_at
+FROM baseScheduleEntity
+WHERE date_version_to >= ? AND date_version_from <= ? AND is_cache_data = 1;
+
+fetchAllSchedules:
+SELECT *
+FROM baseScheduleEntity
+WHERE is_cache_data = ?;
 
 deleteSchedulesByTimeRange:
 DELETE FROM baseScheduleEntity
-WHERE date_version_to >= ? AND date_version_from <= ?;
+WHERE (date_version_to >= ? AND date_version_from <= ?) AND is_cache_data = ?;
+
+deleteSchedulesById:
+DELETE FROM baseScheduleEntity
+WHERE uid IN ? AND is_cache_data = ?;
+
+deleteAllSchedules:
+DELETE FROM baseScheduleEntity
+WHERE is_cache_data = ?;

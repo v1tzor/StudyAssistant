@@ -17,15 +17,23 @@
 package ru.aleshin.studyassistant.core.data.repositories
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
+import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToRemoteData
+import ru.aleshin.studyassistant.core.data.utils.SubscriptionChecker
+import ru.aleshin.studyassistant.core.data.utils.sync.RemoteResultSyncHandler
+import ru.aleshin.studyassistant.core.database.datasource.user.UserLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
+import ru.aleshin.studyassistant.core.domain.entities.sync.OfflineChangeType
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.AuthUser
+import ru.aleshin.studyassistant.core.domain.managers.sync.CurrentUserSourceSyncManager.Companion.CURRENT_USER_SOURCE_KEY
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.core.remote.datasources.billing.SubscriptionChecker
 import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSource
 
 /**
@@ -33,19 +41,55 @@ import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSo
  */
 class UsersRepositoryImpl(
     private val remoteDataSource: UsersRemoteDataSource,
+    private val localDataSource: UserLocalDataSource,
     private val subscriptionChecker: SubscriptionChecker,
+    private val userSessionProvider: UserSessionProvider,
+    private val resultSyncHandler: RemoteResultSyncHandler,
 ) : UsersRepository {
 
-    override suspend fun addAppUser(user: AppUser): UID {
-        return remoteDataSource.addUser(user.mapToRemoteData())
+    override suspend fun createNewUserProfile(user: AppUser): UID {
+        val uid = user.uid.takeIf { it.isNotBlank() } ?: randomUUID()
+        val addableItem = user.copy(uid = uid)
+
+        remoteDataSource.addOrUpdateItem(addableItem.mapToRemoteData())
+        localDataSource.addOrUpdateItem(addableItem.mapToLocalData())
+
+        return uid
     }
 
-    override suspend fun updateAppUser(user: AppUser) {
-        return remoteDataSource.updateUser(user.mapToRemoteData())
+    override suspend fun updateCurrentUserProfile(user: AppUser) {
+        localDataSource.addOrUpdateItem(user.mapToLocalData())
+        resultSyncHandler.executeOrAddToQueue(
+            data = user.mapToRemoteData(),
+            type = OfflineChangeType.UPSERT,
+            sourceKey = CURRENT_USER_SOURCE_KEY,
+        ) {
+            remoteDataSource.addOrUpdateItem(it)
+        }
+    }
+
+    override suspend fun updateAnotherUserProfile(user: AppUser, targetUser: UID) {
+        remoteDataSource.updateAnotherUser(user.mapToRemoteData(), targetUser)
+    }
+
+    override suspend fun uploadCurrentUserAvatar(oldAvatarUrl: String?, avatar: InputFile): String {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        return remoteDataSource.uploadAvatar(oldAvatarUrl, avatar, currentUser)
+    }
+
+    override suspend fun fetchCurrentUserProfile(): Flow<AppUser?> {
+        return localDataSource.fetchCurrentUserDetails().map { user -> user?.mapToDomain() }
+    }
+
+    override suspend fun fetchCurrentUserFriends(): Flow<List<AppUser>> {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        return remoteDataSource.fetchUserFriends(targetUser = currentUser).map { users ->
+            users.map { userPojo -> userPojo.mapToDomain() }
+        }
     }
 
     override suspend fun fetchCurrentAuthUser(): AuthUser? {
-        return remoteDataSource.fetchCurrentAppUser()?.mapToDomain()
+        return remoteDataSource.fetchCurrentAuthUser()?.mapToDomain()
     }
 
     override suspend fun fetchCurrentUserOrError(): AuthUser {
@@ -57,29 +101,22 @@ class UsersRepositoryImpl(
     }
 
     override suspend fun fetchCurrentUserPaidStatus(): Flow<Boolean> {
-        return remoteDataSource.fetchStateChanged().map {
-            subscriptionChecker.checkSubscriptionActivity()
-        }
+        return subscriptionChecker.getSubscriberStatusFlow()
     }
 
-    override suspend fun fetchExistRemoteDataStatus(uid: UID): Flow<Boolean> {
-        return remoteDataSource.fetchUserById(uid).map {
-            remoteDataSource.isExistRemoteData(uid)
-        }
+    override suspend fun fetchExistRemoteDataStatus(): Flow<Boolean> {
+        val currentUser = userSessionProvider.getCurrentUserId()
+        return remoteDataSource.fetchUserDetailsById(currentUser).map {
+            remoteDataSource.isExistRemoteData(currentUser)
+        }.distinctUntilChanged()
     }
 
-    override suspend fun fetchUserById(uid: UID): Flow<AppUser?> {
-        return remoteDataSource.fetchUserById(uid).map { userPojo -> userPojo?.mapToDomain() }
+    override suspend fun fetchUserProfileById(targetUser: UID): Flow<AppUser?> {
+        return remoteDataSource.fetchUserDetailsById(targetUser).map { user -> user?.mapToDomain() }
     }
 
-    override suspend fun fetchRealtimeUserById(uid: UID): AppUser? {
-        return remoteDataSource.fetchRealtimeUserById(uid)?.mapToDomain()
-    }
-
-    override suspend fun fetchUserFriends(uid: UID): Flow<List<AppUser>> {
-        return remoteDataSource.fetchUserFriends(uid).map { users ->
-            users.map { userPojo -> userPojo.mapToDomain() }
-        }
+    override suspend fun fetchRealtimeUserById(targetUser: UID): AppUser? {
+        return remoteDataSource.fetchRealtimeUserById(targetUser)?.mapToDomain()
     }
 
     override suspend fun findUsersByCode(code: String): Flow<List<AppUser>> {
@@ -88,15 +125,11 @@ class UsersRepositoryImpl(
         }
     }
 
-    override suspend fun uploadUserAvatar(oldAvatarUrl: String?, avatar: InputFile, targetUser: UID): String {
-        return remoteDataSource.uploadAvatar(oldAvatarUrl, avatar, targetUser)
-    }
-
     override suspend fun reloadUser(): AuthUser? {
         return remoteDataSource.reloadUser()?.mapToDomain()
     }
 
-    override suspend fun deleteUserAvatar(avatarUrl: String, targetUser: UID) {
-        return remoteDataSource.deleteAvatar(avatarUrl, targetUser)
+    override suspend fun deleteCurrentUserAvatar(avatarUrl: String) {
+        remoteDataSource.deleteAvatar(avatarUrl)
     }
 }

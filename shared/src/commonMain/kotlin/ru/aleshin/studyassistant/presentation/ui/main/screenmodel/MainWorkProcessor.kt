@@ -36,6 +36,7 @@ import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
 import ru.aleshin.studyassistant.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.domain.interactors.GeneralSettingsInteractor
 import ru.aleshin.studyassistant.domain.interactors.ReminderInteractor
+import ru.aleshin.studyassistant.domain.interactors.SyncInteractor
 import ru.aleshin.studyassistant.navigation.GlobalScreenProvider
 import ru.aleshin.studyassistant.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
@@ -52,6 +53,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
         private val userInteractor: AppUserInteractor,
         private val settingsInteractor: GeneralSettingsInteractor,
         private val reminderInteractor: ReminderInteractor,
+        private val syncInteractor: SyncInteractor,
         private val deviceInfoProvider: DeviceInfoProvider,
         private val screenProvider: GlobalScreenProvider,
     ) : MainWorkProcessor {
@@ -62,6 +64,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
             is MainWorkCommand.UpdatePushToken -> updatePushTokenWork()
             is MainWorkCommand.UpdateReminderServices -> updateReminderServicesWork()
             is MainWorkCommand.UpdateSubscriptionInfo -> updateUserSubscriptionInfoWork()
+            is MainWorkCommand.PushOfflineChanges -> pushOfflineChangesWork()
         }
 
         private fun loadThemeWork() = flow {
@@ -154,6 +157,12 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
                 onLeftAction = { emit(EffectResult(MainEffect.ShowError(it))) },
             )
         }
+
+        private fun pushOfflineChangesWork() = flow {
+            syncInteractor.cycleTwoDirectSync().handle(
+                onLeftAction = { emit(EffectResult(MainEffect.ShowError(it))) },
+            )
+        }
     }
 }
 
@@ -163,4 +172,5 @@ sealed class MainWorkCommand : WorkCommand {
     data object UpdatePushToken : MainWorkCommand()
     data object UpdateReminderServices : MainWorkCommand()
     data object UpdateSubscriptionInfo : MainWorkCommand()
+    data object PushOfflineChanges : MainWorkCommand()
 }

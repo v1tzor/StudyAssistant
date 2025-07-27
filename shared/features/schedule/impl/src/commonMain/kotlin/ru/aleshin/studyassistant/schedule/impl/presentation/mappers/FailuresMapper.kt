@@ -16,12 +16,17 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
+import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.tokens.ScheduleStrings
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-internal fun ScheduleFailures.mapToMessage(strings: ScheduleStrings) = when (this) {
+internal fun ScheduleFailures.mapToMessage(
+    strings: ScheduleStrings,
+    coreStrings: StudyAssistantStrings,
+) = when (this) {
+    is ScheduleFailures.InternetError -> coreStrings.networkErrorMessage
     is ScheduleFailures.OtherError -> strings.otherErrorMessage
 }

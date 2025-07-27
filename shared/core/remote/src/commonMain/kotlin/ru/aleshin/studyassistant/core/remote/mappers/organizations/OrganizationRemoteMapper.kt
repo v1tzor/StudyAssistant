@@ -29,7 +29,7 @@ import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
  * @author Stanislav Aleshin on 30.04.2024.
  */
 fun OrganizationDetailsPojo.mapToBase() = OrganizationPojo(
-    uid = uid,
+    id = uid,
     userId = userId,
     main = isMain,
     shortName = shortName,
@@ -43,13 +43,14 @@ fun OrganizationDetailsPojo.mapToBase() = OrganizationPojo(
     webs = webs.map { it.toJson() },
     offices = offices,
     hide = isHide,
+    updatedAt = updatedAt,
 )
 
 fun OrganizationPojo.mapToDetails(
     subjects: List<SubjectDetailsPojo>,
     employee: List<EmployeePojo>,
 ) = OrganizationDetailsPojo(
-    uid = uid,
+    uid = id,
     userId = userId,
     isMain = main,
     shortName = shortName,
@@ -65,4 +66,5 @@ fun OrganizationPojo.mapToDetails(
     webs = webs.map { it.fromJson() },
     offices = offices,
     isHide = hide,
+    updatedAt = updatedAt,
 )

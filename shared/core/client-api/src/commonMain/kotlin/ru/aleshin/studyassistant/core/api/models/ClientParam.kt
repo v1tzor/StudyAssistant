@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.core.api.models
 
+import kotlinx.serialization.json.JsonElement
+
 /**
  * @author Stanislav Aleshin on 09.07.2025.
  */
@@ -25,6 +27,8 @@ sealed class ClientParam {
     data class MapParam(val key: String, val value: Map<String, Any>) : ClientParam()
 
     data class ListParam(val key: String, val value: List<String>) : ClientParam()
+
+    data class JsonListParam(val key: String, val value: List<JsonElement>) : ClientParam()
 
     data class FileParam(val fileName: String, val data: ByteArray) : ClientParam() {
 

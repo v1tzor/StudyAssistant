@@ -25,13 +25,12 @@ import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
  * @author Stanislav Aleshin on 02.06.2024.
  */
 interface SubjectsRepository {
-    suspend fun addOrUpdateSubject(subject: Subject, targetUser: UID): UID
-    suspend fun addOrUpdateSubjectsGroup(subjects: List<Subject>, targetUser: UID)
-    suspend fun fetchAllSubjectsByOrganization(organizationId: UID, targetUser: UID): Flow<List<Subject>>
-    suspend fun fetchAllSubjectsByNames(names: List<UID>, targetUser: UID): List<Subject>
-    suspend fun fetchSubjectsByEmployee(employeeId: UID, targetUser: UID): Flow<List<Subject>>
-    suspend fun fetchSubjectById(uid: UID, targetUser: UID): Flow<Subject?>
-    suspend fun deleteSubject(targetId: UID, targetUser: UID)
-    suspend fun deleteAllSubjects(targetUser: UID)
-    suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
+    suspend fun addOrUpdateSubject(subject: Subject): UID
+    suspend fun addOrUpdateSubjectsGroup(subjects: List<Subject>)
+    suspend fun fetchAllSubjectsByOrganization(organizationId: UID): Flow<List<Subject>>
+    suspend fun fetchAllSubjectsByNames(names: List<UID>): List<Subject>
+    suspend fun fetchSubjectsByEmployee(employeeId: UID): Flow<List<Subject>>
+    suspend fun fetchSubjectById(uid: UID): Flow<Subject?>
+    suspend fun deleteSubject(targetId: UID)
+    suspend fun transferData(direction: DataTransferDirection)
 }

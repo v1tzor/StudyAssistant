@@ -28,12 +28,12 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSch
  * @author Stanislav Aleshin on 04.05.2024.
  */
 interface CustomScheduleRepository {
-    suspend fun addOrUpdateSchedule(schedule: CustomSchedule, targetUser: UID): UID
-    suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<CustomSchedule?>
-    suspend fun fetchScheduleByDate(date: Instant, targetUser: UID): Flow<CustomSchedule?>
-    suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID): Flow<List<CustomSchedule>>
-    suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<Class?>
-    suspend fun deleteScheduleById(scheduleId: UID, targetUser: UID)
-    suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID)
-    suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
+    suspend fun addOrUpdateSchedule(schedule: CustomSchedule): UID
+    suspend fun fetchScheduleById(uid: UID): Flow<CustomSchedule?>
+    suspend fun fetchScheduleByDate(date: Instant): Flow<CustomSchedule?>
+    suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange): Flow<List<CustomSchedule>>
+    suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<Class?>
+    suspend fun deleteScheduleById(scheduleId: UID)
+    suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange)
+    suspend fun transferData(direction: DataTransferDirection)
 }

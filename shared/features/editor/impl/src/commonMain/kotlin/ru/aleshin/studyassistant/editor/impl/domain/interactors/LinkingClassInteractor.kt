@@ -33,7 +33,6 @@ import ru.aleshin.studyassistant.core.domain.entities.classes.ClassesForLinkedMa
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 
@@ -51,7 +50,6 @@ internal interface LinkingClassInteractor {
         private val baseScheduleRepository: BaseScheduleRepository,
         private val customScheduleRepository: CustomScheduleRepository,
         private val calendarRepository: CalendarSettingsRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: EditorEitherWrapper,
     ) : LinkingClassInteractor {
 
@@ -60,8 +58,7 @@ internal interface LinkingClassInteractor {
             subject: UID,
             date: Instant,
         ) = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val maxNumberOfWeek = calendarRepository.fetchSettings(targetUser).first().numberOfWeek
+            val maxNumberOfWeek = calendarRepository.fetchSettings().first().numberOfWeek
 
             val searchedTimeRange = TimeRange(
                 from = date.shiftDay(-1),
@@ -70,12 +67,10 @@ internal interface LinkingClassInteractor {
 
             val customSchedulesFlow = customScheduleRepository.fetchSchedulesByTimeRange(
                 timeRange = searchedTimeRange,
-                targetUser = targetUser,
             )
             val baseSchedulesFlow = baseScheduleRepository.fetchSchedulesByTimeRange(
                 timeRange = searchedTimeRange,
                 maxNumberOfWeek = maxNumberOfWeek,
-                targetUser = targetUser,
             )
 
             return@wrapFlow customSchedulesFlow.flatMapLatest { customSchedules ->

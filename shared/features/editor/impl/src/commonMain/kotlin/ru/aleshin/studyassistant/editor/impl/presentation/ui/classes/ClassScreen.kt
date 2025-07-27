@@ -32,6 +32,7 @@ import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.navigation.nestedPop
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.api.presentation.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
@@ -68,6 +69,7 @@ internal class ClassScreen(
         ),
     ) { state ->
         val strings = EditorThemeRes.strings
+        val coreStrings = StudyAssistantRes.strings
         val navigator = LocalNavigator.currentOrThrow
         val snackbarState = remember { SnackbarHostState() }
 
@@ -118,7 +120,7 @@ internal class ClassScreen(
                 is ClassEffect.NavigateToBack -> navigator.nestedPop()
                 is ClassEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings, coreStrings),
                         withDismissAction = true,
                     )
                 }

@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.core.database.models.classes
 
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.database.models.employee.EmployeeBaseEntity
+import ru.aleshin.studyassistant.core.database.models.employee.BaseEmployeeEntity
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationShortEntity
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.users.ContactInfoEntity
@@ -34,7 +34,7 @@ data class ClassDetailsEntity(
     val eventType: String,
     val subject: SubjectDetailsEntity?,
     val customData: String? = null,
-    val teacher: EmployeeBaseEntity?,
+    val teacher: BaseEmployeeEntity?,
     val office: String,
     val location: ContactInfoEntity?,
     val startTime: Long,

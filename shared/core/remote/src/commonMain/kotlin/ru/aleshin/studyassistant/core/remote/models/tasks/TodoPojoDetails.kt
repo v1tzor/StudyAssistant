@@ -34,4 +34,5 @@ data class TodoPojoDetails(
     val notifications: TodoNotificationsPojo = TodoNotificationsPojo(),
     val done: Boolean = false,
     val completeDate: Long? = null,
+    val updatedAt: Long = 0L,
 )

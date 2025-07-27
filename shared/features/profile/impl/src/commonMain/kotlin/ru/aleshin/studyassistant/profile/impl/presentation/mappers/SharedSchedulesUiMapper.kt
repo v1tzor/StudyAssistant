@@ -31,6 +31,7 @@ import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.SharedS
 internal fun SharedSchedulesShort.mapToUi() = SharedSchedulesShortUi(
     sent = sent.mapValues { it.value.mapToUi() },
     received = received.mapValues { it.value.mapToUi() },
+    updatedAt = updatedAt,
 )
 
 internal fun ReceivedMediatedSchedulesShort.mapToUi() = ReceivedMediatedSchedulesShortUi(

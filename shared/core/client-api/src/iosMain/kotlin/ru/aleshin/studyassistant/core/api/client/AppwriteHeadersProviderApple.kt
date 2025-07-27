@@ -22,7 +22,7 @@ import platform.UIKit.UIDevice
 
 class AppwriteHeadersProviderApple : AppwriteHeadersProvider {
 
-    override fun fetchHeaders(): MutableMap<String, String> {
+    override fun fetchBaseClientHeaders(): MutableMap<String, String> {
         return mutableMapOf(
             "content-type" to "application/json",
             "user-agent" to getUserAgent(),
@@ -32,6 +32,19 @@ class AppwriteHeadersProviderApple : AppwriteHeadersProvider {
             "x-sdk-language" to "apple",
             "x-sdk-version" to "8.1.0",
             "x-appwrite-response-format" to "1.7.0",
+        )
+    }
+
+    override fun fetchBaseServerHeaders(): MutableMap<String, String> {
+        return mutableMapOf(
+            "content-type" to "application/json",
+            "user-agent" to getUserAgent(),
+            "origin" to "appwrite-${UIDevice.currentDevice.systemName}://${NSBundle.mainBundle.bundleIdentifier ?: ""}",
+            "x-sdk-name" to "Swift",
+            "x-sdk-platform" to "server",
+            "x-sdk-language" to "swift",
+            "x-sdk-version" to "10.1.0",
+            "x-appwrite-response-format" to "1.7.0"
         )
     }
 

@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.impl.di.holder
 
+import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
 import org.kodein.di.bindInstance
@@ -27,7 +28,7 @@ import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
-import ru.aleshin.studyassistant.core.domain.managers.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -74,6 +75,7 @@ public object TasksFeatureDIHolder : BaseFeatureDIHolder<TasksFeatureApi, TasksF
                 bindSingleton<TodoRepository> { dependencies.todoRepository }
                 bindSingleton<TodoReminderManager> { dependencies.todoReminderManager }
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
+                bindSingleton<Konnection> { dependencies.connectionManager }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }

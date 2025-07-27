@@ -34,4 +34,5 @@ data class SubjectDetailsPojo(
     val office: String,
     val color: Int,
     val location: ContactInfoPojo?,
+    val updatedAt: Long,
 )

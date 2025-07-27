@@ -16,10 +16,14 @@
 
 package ru.aleshin.studyassistant.profile.impl.domain.interactors
 
+import dev.tmapps.konnection.Konnection
 import kotlinx.coroutines.flow.first
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.domain.managers.sync.SourceSyncFacade
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -37,19 +41,25 @@ internal interface AuthInteractor {
         private val authRepository: AuthRepository,
         private val messageRepository: MessageRepository,
         private val usersRepository: UsersRepository,
+        private val sourceSyncFacade: SourceSyncFacade,
+        private val connectionManager: Konnection,
+        private val crashlyticsService: CrashlyticsService,
         private val eitherWrapper: ProfileEitherWrapper,
     ) : AuthInteractor {
 
         override suspend fun signOut(deviceId: UID) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val userInfo = usersRepository.fetchUserById(targetUser).first() ?: throw AppwriteUserException()
+            if (!connectionManager.isConnected()) throw InternetConnectionException()
+
+            val userInfo = usersRepository.fetchCurrentUserProfile().first() ?: throw AppwriteUserException()
 
             val updatedDevices = buildList {
                 addAll(userInfo.devices.filter { it.deviceId != deviceId })
             }
             val updatedUserInfo = userInfo.copy(devices = updatedDevices)
-            usersRepository.updateAppUser(updatedUserInfo)
+            usersRepository.updateCurrentUserProfile(updatedUserInfo)
 
+            crashlyticsService.setupUser(null)
+            sourceSyncFacade.clearAllSyncedData()
             authRepository.signOut()
             messageRepository.deleteToken()
         }

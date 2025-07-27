@@ -36,7 +36,6 @@ import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.common.extensions.shiftMillis
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.messages.LocalNotificationReceiver
 import ru.aleshin.studyassistant.core.data.di.coreDataModule
@@ -47,7 +46,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsReposi
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.core.ui.mappers.toLanguageString
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
@@ -72,7 +70,6 @@ class StartClassesReminderWorker(
 
     private val alarmManager by lazy { context.getSystemService(AlarmManager::class.java) }
     private val dateManager = instance<DateManager>()
-    private val usersRepository = instance<UsersRepository>()
     private val calendarSettingsRepository = instance<CalendarSettingsRepository>()
     private val notificationSettingRepository = instance<NotificationSettingsRepository>()
     private val baseScheduleRepository = instance<BaseScheduleRepository>()
@@ -80,13 +77,12 @@ class StartClassesReminderWorker(
     private val organizationsRepository = instance<OrganizationsRepository>()
 
     override suspend fun doWork(): Result {
-        val currentUser = usersRepository.fetchCurrentAuthUser()?.uid ?: return Result.failure()
-        val notificationSettings = notificationSettingRepository.fetchSettings(currentUser).first()
-        val holidays = calendarSettingsRepository.fetchSettings(currentUser).first().holidays
+        val notificationSettings = notificationSettingRepository.fetchSettings().first()
+        val holidays = calendarSettingsRepository.fetchSettings().first().holidays
         val beforeDelay = notificationSettings.beginningOfClasses ?: return Result.failure()
 
         val currentDate = dateManager.fetchBeginningCurrentInstant()
-        val schedule = fetchScheduleByDate(currentUser, currentDate)
+        val schedule = fetchScheduleByDate(currentDate)
         val groupedClasses = schedule.mapToValue(
             onBaseSchedule = { it?.classes?.groupBy { classModel -> classModel.organization } },
             onCustomSchedule = { it?.classes?.groupBy { classModel -> classModel.organization } },
@@ -103,7 +99,7 @@ class StartClassesReminderWorker(
                 classesEntry.value.isNotEmpty()
         }
 
-        clearOldNotifications(currentUser)
+        clearOldNotifications()
 
         groupedClasses?.forEach { classesEntry ->
             val currentTime = dateManager.fetchCurrentInstant()
@@ -130,12 +126,12 @@ class StartClassesReminderWorker(
         return Result.success()
     }
 
-    private suspend fun fetchScheduleByDate(currentUser: UID, date: Instant): Schedule {
-        val maxNumberOfWeek = calendarSettingsRepository.fetchSettings(currentUser).first().numberOfWeek
+    private suspend fun fetchScheduleByDate(date: Instant): Schedule {
+        val maxNumberOfWeek = calendarSettingsRepository.fetchSettings().first().numberOfWeek
         val currentNumberOfWeek = date.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
 
-        val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek, currentUser).first()
-        val customSchedule = customScheduleRepository.fetchScheduleByDate(date, currentUser).first()
+        val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek).first()
+        val customSchedule = customScheduleRepository.fetchScheduleByDate(date).first()
 
         return if (customSchedule != null) {
             val schedule = customSchedule.copy(
@@ -150,8 +146,8 @@ class StartClassesReminderWorker(
         }
     }
 
-    private suspend fun clearOldNotifications(currentUser: UID) {
-        val organizations = organizationsRepository.fetchAllShortOrganization(currentUser).first()
+    private suspend fun clearOldNotifications() {
+        val organizations = organizationsRepository.fetchAllShortOrganization().first()
         organizations.forEach { organization ->
             val id = organization.uid.hashCode() + NOTIFICATION_ID_APPEND
             val intent = LocalNotificationReceiver.createCancelIntent(applicationContext)

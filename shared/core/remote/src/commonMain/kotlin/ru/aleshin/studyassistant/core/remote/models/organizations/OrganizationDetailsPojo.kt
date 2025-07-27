@@ -43,4 +43,5 @@ data class OrganizationDetailsPojo(
     val webs: List<ContactInfoPojo> = emptyList(),
     val offices: List<String> = emptyList(),
     val isHide: Boolean = false,
+    val updatedAt: Long = 0L,
 )

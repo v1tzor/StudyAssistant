@@ -32,4 +32,5 @@ internal data class FriendRequestsDetailsUi(
     @TypeParceler<Instant, InstantParceler>
     val send: Map<AppUserUi, Instant> = emptyMap(),
     val lastActions: Map<AppUserUi, Boolean> = emptyMap(),
+    val updatedAt: Long = 0L,
 ) : Parcelable

@@ -19,17 +19,17 @@ package ru.aleshin.studyassistant.core.data.repositories
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
-import ru.aleshin.studyassistant.core.remote.datasources.billing.ProductsRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.api.billing.ProductsRemoteApi
 
 /**
  * @author Stanislav Aleshin on 18.06.2025.
  */
 class ProductsRepositoryImpl(
-    private val productsRemoteDataSource: ProductsRemoteDataSource,
+    private val productsApi: ProductsRemoteApi,
 ) : ProductsRepository {
 
     override suspend fun fetchProducts(): Flow<List<String>> {
-        return productsRemoteDataSource.fetchProducts().map { productsList ->
+        return productsApi.fetchProducts().map { productsList ->
             productsList.map { product -> product.id }
         }
     }

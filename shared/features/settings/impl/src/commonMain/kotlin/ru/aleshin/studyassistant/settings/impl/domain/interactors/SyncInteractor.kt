@@ -27,7 +27,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.settings.impl.domain.common.SettingsEitherWrapper
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
 
@@ -50,7 +49,6 @@ internal interface SyncInteractor {
         private val goalsRepository: DailyGoalsRepository,
         private val customScheduleRepository: CustomScheduleRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
-        private val usersRepository: UsersRepository,
         private val eitherWrapper: SettingsEitherWrapper,
     ) : SyncInteractor {
 
@@ -63,16 +61,15 @@ internal interface SyncInteractor {
         }
 
         private suspend fun transferData(direction: DataTransferDirection) {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            subjectsRepository.transferData(direction, targetUser)
-            employeeRepository.transferData(direction, targetUser)
-            homeworksRepository.transferData(direction, targetUser)
-            todosRepository.transferData(direction, targetUser)
-            baseScheduleRepository.transferData(direction, targetUser)
-            customScheduleRepository.transferData(direction, targetUser)
-            calendarSettingsRepository.transferData(direction, targetUser)
-            organizationsRepository.transferData(direction, targetUser)
-            goalsRepository.transferData(direction, targetUser)
+            subjectsRepository.transferData(direction)
+            employeeRepository.transferData(direction)
+            homeworksRepository.transferData(direction)
+            todosRepository.transferData(direction)
+            baseScheduleRepository.transferData(direction)
+            customScheduleRepository.transferData(direction)
+            calendarSettingsRepository.transferData(direction)
+            organizationsRepository.transferData(direction)
+            goalsRepository.transferData(direction)
         }
     }
 }

@@ -23,7 +23,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsServic
 import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
 import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
-import ru.aleshin.studyassistant.core.remote.datasources.message.MessagingServiceImpl
+import ru.aleshin.studyassistant.core.remote.api.message.MessagingServiceImpl
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.

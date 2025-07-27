@@ -36,10 +36,10 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<ProfileErrorHandler> { ProfileErrorHandler.Base() }
     bindSingleton<ProfileEitherWrapper> { ProfileEitherWrapper.Base(instance(), instance()) }
 
-    bindProvider<AuthInteractor> { AuthInteractor.Base(instance(), instance(), instance(), instance()) }
+    bindProvider<AuthInteractor> { AuthInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindProvider<UserInteractor> { UserInteractor.Base(instance(), instance()) }
-    bindProvider<FriendRequestsInteractor> { FriendRequestsInteractor.Base(instance(), instance(), instance()) }
-    bindProvider<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance()) }
-    bindProvider<ShareSchedulesInteractor> { ShareSchedulesInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<ReminderInteractor> { ReminderInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<FriendRequestsInteractor> { FriendRequestsInteractor.Base(instance(), instance()) }
+    bindProvider<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance()) }
+    bindProvider<ShareSchedulesInteractor> { ShareSchedulesInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<ReminderInteractor> { ReminderInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
 }

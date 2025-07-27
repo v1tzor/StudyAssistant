@@ -20,14 +20,13 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.api.AppwriteApi.Client.ENDPOINT
-import ru.aleshin.studyassistant.core.api.AppwriteApi.Client.ENDPOINT_REALTIME
-import ru.aleshin.studyassistant.core.api.AppwriteApi.Client.PROJECT_ID
-import ru.aleshin.studyassistant.core.api.auth.AccountApi
+import ru.aleshin.studyassistant.core.api.auth.AccountService
+import ru.aleshin.studyassistant.core.api.auth.AuthUserStorage
 import ru.aleshin.studyassistant.core.api.client.AppwriteClient
-import ru.aleshin.studyassistant.core.api.databases.DatabaseApi
-import ru.aleshin.studyassistant.core.api.realtime.RealtimeApi
-import ru.aleshin.studyassistant.core.api.storage.StorageApi
+import ru.aleshin.studyassistant.core.api.cookies.PreferencesCookiesStorage
+import ru.aleshin.studyassistant.core.api.databases.DatabaseService
+import ru.aleshin.studyassistant.core.api.realtime.RealtimeService
+import ru.aleshin.studyassistant.core.api.storage.StorageService
 
 /**
  * @author Stanislav Aleshin on 01.08.2024.
@@ -36,19 +35,22 @@ import ru.aleshin.studyassistant.core.api.storage.StorageApi
 val coreClintApiModule = DI.Module("CoreClientApi") {
     import(coreApiPlatformModule)
 
+    bindSingleton<PreferencesCookiesStorage> { PreferencesCookiesStorage.Base(instance()) }
+
     bindSingleton<AppwriteClient> {
-        AppwriteClient(
+        val creator = AppwriteClient.Companion.Creator(
             headersProvider = instance(),
             coroutineManager = instance(),
             httpClientEngineFactory = instance(),
             cookiesStorage = instance(),
             connectionManager = instance(),
-        ).setEndpoint(ENDPOINT)
-            .setEndpointRealtime(ENDPOINT_REALTIME)
-            .setProject(PROJECT_ID)
+        )
+        return@bindSingleton creator.setup()
     }
-    bindSingleton<AccountApi> { AccountApi(instance()) }
-    bindSingleton<StorageApi> { StorageApi(instance()) }
-    bindSingleton<DatabaseApi> { DatabaseApi(instance(), instance()) }
-    bindSingleton<RealtimeApi> { RealtimeApi(instance(), instance()) }
+    bindSingleton<AccountService> { AccountService(instance(), instance(), instance(), instance()) }
+    bindSingleton<StorageService> { StorageService(instance()) }
+    bindSingleton<DatabaseService> { DatabaseService(instance(), instance()) }
+    bindSingleton<RealtimeService> { RealtimeService(instance(), instance()) }
+
+    bindSingleton<AuthUserStorage> { AuthUserStorage.Base(instance()) }
 }

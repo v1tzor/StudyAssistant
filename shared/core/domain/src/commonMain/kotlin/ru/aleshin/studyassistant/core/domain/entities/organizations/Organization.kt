@@ -40,4 +40,5 @@ data class Organization(
     val webs: List<ContactInfo> = emptyList(),
     val offices: List<String> = emptyList(),
     val isHide: Boolean = false,
+    val updatedAt: Long,
 )

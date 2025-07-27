@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.profile.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 
@@ -27,6 +28,7 @@ internal interface ProfileErrorHandler : ErrorHandler<ProfileFailures> {
     class Base : ProfileErrorHandler {
 
         override fun handle(throwable: Throwable) = when (throwable) {
+            is InternetConnectionException -> ProfileFailures.InternetError
             else -> ProfileFailures.OtherError(throwable)
         }
     }

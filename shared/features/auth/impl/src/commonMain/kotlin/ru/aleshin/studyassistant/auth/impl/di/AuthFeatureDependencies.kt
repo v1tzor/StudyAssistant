@@ -16,12 +16,14 @@
 
 package ru.aleshin.studyassistant.auth.impl.di
 
-import ru.aleshin.studyassistant.core.api.auth.AccountApi
+import ru.aleshin.studyassistant.core.api.auth.AccountService
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.domain.managers.sync.SourceSyncFacade
 import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
@@ -42,8 +44,10 @@ public interface AuthFeatureDependencies : BaseFeatureDependencies {
     public val generalSettingsRepository: GeneralSettingsRepository
     public val manageUserRepository: ManageUserRepository
     public val deviceInfoProvider: DeviceInfoProvider
-    public val accountService: AccountApi
+    public val accountService: AccountService
     public val coroutineManager: CoroutineManager
+    public val sourceSyncFacade: SourceSyncFacade
     public val appService: AppService
     public val crashlyticsService: CrashlyticsService
+    public val dateManager: DateManager
 }

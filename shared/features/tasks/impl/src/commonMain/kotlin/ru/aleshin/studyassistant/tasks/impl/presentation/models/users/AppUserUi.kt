@@ -39,4 +39,5 @@ internal data class AppUserUi(
     val subscriptionInfo: SubscribeInfoUi? = null,
     val socialNetworks: List<SocialNetworkUi> = emptyList(),
     val friends: List<UID> = emptyList(),
+    val updatedAt: Long,
 ) : Parcelable

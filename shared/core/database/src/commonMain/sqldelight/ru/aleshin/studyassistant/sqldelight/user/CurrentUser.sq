@@ -1,0 +1,38 @@
+import kotlin.String;
+import kotlin.collections.List;
+
+CREATE TABLE currentUserEntity (
+  id INTEGER PRIMARY KEY NOT NULL,
+  document_id TEXT NOT NULL,
+  devices TEXT AS List<String> NOT NULL,
+  username TEXT NOT NULL,
+  email TEXT NOT NULL,
+  code TEXT NOT NULL ,
+  avatar TEXT,
+  description TEXT,
+  city TEXT,
+  birthday TEXT,
+  sex TEXT,
+  friends TEXT AS List<String> NOT NULL,
+  subscription_info TEXT,
+  social_networks TEXT AS List<String> NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+addOrUpdateUser:
+INSERT OR REPLACE INTO currentUserEntity (id, document_id, devices, username, email, code, avatar, description, city, birthday, sex, friends, subscription_info, social_networks, updated_at)
+VALUES ?;
+
+fetchUser:
+SELECT *
+FROM currentUserEntity
+WHERE id = 1;
+
+deleteUser:
+DELETE FROM currentUserEntity
+WHERE id = 1;
+
+fetchMetadata:
+SELECT document_id, updated_at
+FROM currentUserEntity
+WHERE id = 1;

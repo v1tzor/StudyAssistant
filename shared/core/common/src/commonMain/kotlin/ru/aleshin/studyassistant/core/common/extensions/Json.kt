@@ -79,11 +79,11 @@ fun Any?.toJsonElement(): JsonElement = when (this) {
         val map = this as? Map<String, Any?> ?: error("Only Map<String, Any?> is supported")
         map.toJsonObject()
     }
-
     is List<*> -> buildJsonArray {
-        this@toJsonElement.forEach { add(it.toJsonElement()) }
+        this@toJsonElement.forEach {
+            add(it.toJsonElement())
+        }
     }
-
     is String -> JsonPrimitive(this)
     else -> {
         JsonPrimitive(this.toString())
@@ -155,6 +155,10 @@ fun JsonElement.getString(key: String): String {
     return jsonObject[key]?.jsonPrimitive?.contentOrNull ?: ""
 }
 
+fun JsonElement.getStringOrNull(key: String): String? {
+    return jsonObject[key]?.jsonPrimitive?.contentOrNull
+}
+
 fun JsonElement.getStringList(key: String): List<String> {
     return jsonObject[key]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
 }
@@ -170,4 +174,22 @@ fun JsonElement.getLocalDateTimeOrNUll(key: String): LocalDateTime? {
 fun JsonElement.getLocalDateTime(key: String): LocalDateTime {
     val time = getString(key)
     return DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET.parse(time).toLocalDateTime()
+}
+
+fun <T> T.toJsonElementWithAppendParams(
+    serializer: SerializationStrategy<T>,
+    params: List<Pair<String, Any>>
+): JsonElement {
+    val jsonElement = toJson(serializer).fromJson<JsonElement>()
+    val modifiedElement = params.fold(jsonElement) { element, param ->
+        element.addToBody(param.first, param.second)
+    }
+    return modifiedElement
+}
+
+fun JsonElement.addToBody(key: String, value: Any): JsonElement {
+    val jsonMap = jsonObject.toMutableMap().apply {
+        put(key, value.toJsonElement())
+    }
+    return JsonObject(jsonMap)
 }

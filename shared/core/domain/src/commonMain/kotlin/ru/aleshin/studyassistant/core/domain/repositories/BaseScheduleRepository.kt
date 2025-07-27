@@ -29,29 +29,13 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedul
  * @author Stanislav Aleshin on 04.05.2024.
  */
 interface BaseScheduleRepository {
-    suspend fun addOrUpdateSchedule(schedule: BaseSchedule, targetUser: UID): UID
-    suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseSchedule>, targetUser: UID)
-    suspend fun fetchScheduleById(uid: UID, targetUser: UID): Flow<BaseSchedule?>
-
-    suspend fun fetchScheduleByDate(
-        date: Instant,
-        numberOfWeek: NumberOfRepeatWeek,
-        targetUser: UID
-    ): Flow<BaseSchedule?>
-
-    suspend fun fetchSchedulesByVersion(
-        version: TimeRange,
-        numberOfWeek: NumberOfRepeatWeek?,
-        targetUser: UID
-    ): Flow<List<BaseSchedule>>
-
-    suspend fun fetchSchedulesByTimeRange(
-        timeRange: TimeRange,
-        maxNumberOfWeek: NumberOfRepeatWeek,
-        targetUser: UID
-    ): Flow<Map<Instant, BaseSchedule?>>
-
-    suspend fun fetchClassById(uid: UID, scheduleId: UID, targetUser: UID): Flow<Class?>
-    suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange, targetUser: UID)
-    suspend fun transferData(direction: DataTransferDirection, targetUser: UID)
+    suspend fun addOrUpdateSchedule(schedule: BaseSchedule): UID
+    suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseSchedule>)
+    suspend fun fetchScheduleById(uid: UID): Flow<BaseSchedule?>
+    suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek): Flow<BaseSchedule?>
+    suspend fun fetchSchedulesByVersion(version: TimeRange, numberOfWeek: NumberOfRepeatWeek?): Flow<List<BaseSchedule>>
+    suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, maxNumberOfWeek: NumberOfRepeatWeek): Flow<Map<Instant, BaseSchedule?>>
+    suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<Class?>
+    suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange)
+    suspend fun transferData(direction: DataTransferDirection)
 }

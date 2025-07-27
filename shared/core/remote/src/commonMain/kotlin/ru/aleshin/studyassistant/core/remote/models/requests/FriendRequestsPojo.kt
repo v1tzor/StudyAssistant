@@ -16,18 +16,23 @@
 
 package ru.aleshin.studyassistant.core.remote.models.requests
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.remote.utils.BaseRemotePojo
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
 @Serializable
 data class FriendRequestsPojo(
+    @SerialName("\$id")
+    override val id: String,
     val received: List<String> = emptyList(),
     val send: List<String> = emptyList(),
     val lastActions: List<String> = emptyList(),
-) {
+    override val updatedAt: Long = 0L,
+) : BaseRemotePojo() {
     companion object {
-        fun default() = FriendRequestsPojo()
+        fun default(id: String) = FriendRequestsPojo(id)
     }
 }

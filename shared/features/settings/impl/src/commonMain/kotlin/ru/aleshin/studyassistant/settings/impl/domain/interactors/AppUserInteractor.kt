@@ -39,8 +39,7 @@ internal interface AppUserInteractor {
         }
 
         override suspend fun fetchRemoteDataStatus() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError()
-            usersRepository.fetchExistRemoteDataStatus(targetUser.uid)
+            usersRepository.fetchExistRemoteDataStatus()
         }
     }
 }

@@ -23,7 +23,6 @@ import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoEitherWrapper
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
 import ru.aleshin.studyassistant.info.impl.domain.entities.OrganizationClassesInfo
@@ -37,15 +36,13 @@ internal interface ClassesInfoInteractor {
 
     class Base(
         private val scheduleRepository: BaseScheduleRepository,
-        private val usersRepository: UsersRepository,
         private val dateManager: DateManager,
         private val eitherWrapper: InfoEitherWrapper,
     ) : ClassesInfoInteractor {
 
         override suspend fun fetchClassesInfo(organizationId: UID) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
             val currentWeek = dateManager.fetchCurrentWeek()
-            val schedules = scheduleRepository.fetchSchedulesByVersion(currentWeek, null, targetUser)
+            val schedules = scheduleRepository.fetchSchedulesByVersion(currentWeek, null)
             val classes = schedules.first().groupBy { it.week }.mapValues { entry ->
                 val allClasses = entry.value.map { schedule -> schedule.classes }.extractAllItem()
                 return@mapValues allClasses.filter { classModel ->

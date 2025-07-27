@@ -37,8 +37,7 @@ internal interface UsersInteractor {
     ) : UsersInteractor {
 
         override suspend fun fetchAllFriends() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            usersRepository.fetchUserFriends(targetUser)
+            usersRepository.fetchCurrentUserFriends()
         }
 
         override suspend fun fetchAppUserPaidStatus() = eitherWrapper.wrapFlow {

@@ -21,15 +21,34 @@ import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.database.models.classes.ClassDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.classes.ClassEntity
 import ru.aleshin.studyassistant.core.database.models.schedule.CustomScheduleDetailsEntity
-import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleEntity
+import ru.aleshin.studyassistant.core.database.models.schedule.CustomScheduleEntity
+import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleEntity as LocalCustomScheduleEntity
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
+fun CustomScheduleEntity.mapToEntity() = LocalCustomScheduleEntity(
+    uid = uid,
+    date = date,
+    classes = classes,
+    updated_at = updatedAt,
+    is_cache_data = isCacheData,
+)
+
+fun LocalCustomScheduleEntity.mapToBase() = CustomScheduleEntity(
+    uid = uid,
+    date = date,
+    classes = classes,
+    updatedAt = updated_at,
+    isCacheData = is_cache_data,
+)
+
 fun CustomScheduleDetailsEntity.mapToBase() = CustomScheduleEntity(
     uid = uid,
     date = date,
     classes = classes.map { it.mapToBase().toJson<ClassEntity>() },
+    updatedAt = updatedAt,
+    isCacheData = 0L,
 )
 
 suspend fun CustomScheduleEntity.mapToDetails(
@@ -38,4 +57,5 @@ suspend fun CustomScheduleEntity.mapToDetails(
     uid = uid,
     date = date,
     classes = classes.map { classMapper(it.fromJson<ClassEntity>()) },
+    updatedAt = updatedAt,
 )

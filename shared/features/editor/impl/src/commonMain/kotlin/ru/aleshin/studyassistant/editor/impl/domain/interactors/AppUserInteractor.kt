@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.filterNotNull
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -47,10 +47,7 @@ internal interface AppUserInteractor {
     ) : AppUserInteractor {
 
         override suspend fun fetchAppUser() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            usersRepository.fetchUserById(targetUser).map { appUser ->
-                checkNotNull(appUser)
-            }
+            usersRepository.fetchCurrentUserProfile().filterNotNull()
         }
 
         override suspend fun fetchAppUserPaidStatus() = eitherWrapper.wrapFlow {
@@ -58,12 +55,11 @@ internal interface AppUserInteractor {
         }
 
         override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {
-            usersRepository.updateAppUser(user)
+            usersRepository.updateCurrentUserProfile(user)
         }
 
         override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            usersRepository.uploadUserAvatar(oldAvatarUrl, file, targetUser)
+            usersRepository.uploadCurrentUserAvatar(oldAvatarUrl, file)
         }
 
         override suspend fun updatePassword(oldPassword: String, newPassword: String) = eitherWrapper.wrap {
@@ -71,8 +67,7 @@ internal interface AppUserInteractor {
         }
 
         override suspend fun deleteAvatar(avatarUrl: UID) = eitherWrapper.wrap {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            usersRepository.deleteUserAvatar(avatarUrl, targetUser)
+            usersRepository.deleteCurrentUserAvatar(avatarUrl)
         }
     }
 }

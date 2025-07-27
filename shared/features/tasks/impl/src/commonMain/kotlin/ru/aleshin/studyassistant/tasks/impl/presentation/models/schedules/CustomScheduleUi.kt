@@ -32,4 +32,5 @@ internal data class CustomScheduleUi(
     @TypeParceler<Instant, InstantParceler>
     val date: Instant,
     val classes: List<ClassUi>,
+    val updatedAt: Long,
 ) : Parcelable

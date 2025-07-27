@@ -17,54 +17,37 @@
 package ru.aleshin.studyassistant.core.data.mappers.schedules
 
 import kotlinx.datetime.DayOfWeek
-import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.extensions.fromJson
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.data.utils.sync.MultipleSyncMapper
+import ru.aleshin.studyassistant.core.database.models.classes.ClassEntity
 import ru.aleshin.studyassistant.core.database.models.schedule.BaseScheduleDetailsEntity
+import ru.aleshin.studyassistant.core.database.models.schedule.BaseScheduleEntity
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.MediatedBaseSchedule
+import ru.aleshin.studyassistant.core.remote.models.classes.ClassPojo
 import ru.aleshin.studyassistant.core.remote.models.schedule.BaseScheduleDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.schedule.BaseSchedulePojo
 import ru.aleshin.studyassistant.core.remote.models.schedule.MediatedBaseSchedulePojo
-import ru.aleshin.studyassistant.sqldelight.schedules.BaseScheduleEntity
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
-fun BaseScheduleDetailsPojo.mapToDomain() = BaseSchedule(
-    uid = uid,
-    dateVersion = DateVersion(dateVersionFrom.mapEpochTimeToInstant(), dateVersionTo.mapEpochTimeToInstant()),
-    dayOfWeek = DayOfWeek.valueOf(weekDayOfWeek),
-    week = NumberOfRepeatWeek.valueOf(week),
-    classes = classes.map { it.mapToDomain() },
-)
-
-fun MediatedBaseSchedulePojo.mapToDomain() = MediatedBaseSchedule(
-    uid = uid,
-    dateVersion = DateVersion(dateVersionFrom.mapEpochTimeToInstant(), dateVersionTo.mapEpochTimeToInstant()),
-    dayOfWeek = DayOfWeek.valueOf(weekDayOfWeek),
-    week = NumberOfRepeatWeek.valueOf(week),
-    classes = classes.map { it.mapToDomain() },
-)
-
-fun BaseScheduleDetailsEntity.mapToDomain() = BaseSchedule(
-    uid = uid,
-    dateVersion = DateVersion(dateVersionFrom.mapEpochTimeToInstant(), dateVersionTo.mapEpochTimeToInstant()),
-    dayOfWeek = DayOfWeek.valueOf(weekDayOfWeek),
-    week = NumberOfRepeatWeek.valueOf(week),
-    classes = classes.map { it.mapToDomain() },
-)
+// Remote
 
 fun BaseSchedule.mapToRemoteData(userId: UID) = BaseSchedulePojo(
-    uid = uid,
+    id = uid,
     userId = userId,
     dateVersionFrom = dateVersion.from.toEpochMilliseconds(),
     dateVersionTo = dateVersion.to.toEpochMilliseconds(),
     weekDayOfWeek = dayOfWeek.name,
     week = week.name,
-    classes = classes.map { Json.encodeToString(it.mapToRemoteData()) }
+    classes = classes.map { it.mapToRemoteData().toJson() },
+    updatedAt = updatedAt,
 )
 
 fun MediatedBaseSchedule.mapToRemoteData() = MediatedBaseSchedulePojo(
@@ -76,11 +59,81 @@ fun MediatedBaseSchedule.mapToRemoteData() = MediatedBaseSchedulePojo(
     classes = classes.map { it.mapToRemoteData() },
 )
 
+fun BaseScheduleDetailsPojo.mapToDomain() = BaseSchedule(
+    uid = uid,
+    dateVersion = DateVersion(
+        from = dateVersionFrom.mapEpochTimeToInstant(),
+        to = dateVersionTo.mapEpochTimeToInstant(),
+    ),
+    dayOfWeek = DayOfWeek.valueOf(weekDayOfWeek),
+    week = NumberOfRepeatWeek.valueOf(week),
+    classes = classes.map { it.mapToDomain() },
+    updatedAt = updatedAt,
+)
+
+fun MediatedBaseSchedulePojo.mapToDomain() = MediatedBaseSchedule(
+    uid = uid,
+    dateVersion = DateVersion(
+        from = dateVersionFrom.mapEpochTimeToInstant(),
+        to = dateVersionTo.mapEpochTimeToInstant(),
+    ),
+    dayOfWeek = DayOfWeek.valueOf(weekDayOfWeek),
+    week = NumberOfRepeatWeek.valueOf(week),
+    classes = classes.map { it.mapToDomain() },
+)
+
+// Local
+
 fun BaseSchedule.mapToLocalData() = BaseScheduleEntity(
     uid = uid,
-    date_version_from = dateVersion.from.toEpochMilliseconds(),
-    date_version_to = dateVersion.to.toEpochMilliseconds(),
-    week_day_of_week = dayOfWeek.name,
+    dateVersionFrom = dateVersion.from.toEpochMilliseconds(),
+    dateVersionTo = dateVersion.to.toEpochMilliseconds(),
+    weekDayOfWeek = dayOfWeek.name,
     week = week.name,
-    classes = classes.map { Json.encodeToString(it.mapToLocalData()) },
+    classes = classes.map { it.mapToLocalData().toJson() },
+    updatedAt = updatedAt,
+    isCacheData = 0L,
+)
+
+fun BaseScheduleDetailsEntity.mapToDomain() = BaseSchedule(
+    uid = uid,
+    dateVersion = DateVersion(
+        from = dateVersionFrom.mapEpochTimeToInstant(),
+        to = dateVersionTo.mapEpochTimeToInstant(),
+    ),
+    dayOfWeek = DayOfWeek.valueOf(weekDayOfWeek),
+    week = NumberOfRepeatWeek.valueOf(week),
+    classes = classes.map { it.mapToDomain() },
+    updatedAt = updatedAt,
+)
+
+// Combined
+
+fun BaseScheduleEntity.convertToRemote(userId: UID) = BaseSchedulePojo(
+    id = uid,
+    userId = userId,
+    dateVersionFrom = dateVersionFrom,
+    dateVersionTo = dateVersionTo,
+    weekDayOfWeek = weekDayOfWeek,
+    week = week,
+    classes = classes.map { it.fromJson<ClassEntity>().mapToRemote().toJson() },
+    updatedAt = updatedAt,
+)
+
+fun BaseSchedulePojo.convertToLocal() = BaseScheduleEntity(
+    uid = id,
+    dateVersionFrom = dateVersionFrom,
+    dateVersionTo = dateVersionTo,
+    weekDayOfWeek = weekDayOfWeek,
+    week = week,
+    classes = classes.map { it.fromJson<ClassPojo>().mapToLocal().toJson() },
+    updatedAt = updatedAt,
+    isCacheData = 1L,
+)
+
+// SyncMapper
+
+class BaseScheduleSyncMapper : MultipleSyncMapper<BaseScheduleEntity, BaseSchedulePojo>(
+    localToRemote = { userId -> convertToRemote(userId) },
+    remoteToLocal = { convertToLocal() },
 )

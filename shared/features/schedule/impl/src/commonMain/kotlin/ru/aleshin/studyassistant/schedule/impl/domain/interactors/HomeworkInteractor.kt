@@ -17,9 +17,9 @@
 package ru.aleshin.studyassistant.schedule.impl.domain.interactors
 
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 
@@ -32,13 +32,14 @@ internal interface HomeworkInteractor {
 
     class Base(
         private val homeworksRepository: HomeworksRepository,
-        private val usersRepository: UsersRepository,
+        private val dateManager: DateManager,
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : HomeworkInteractor {
 
         override suspend fun updateHomework(homework: Homework) = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            homeworksRepository.addOrUpdateHomework(homework, targetUser)
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedHomework = homework.copy(updatedAt = updatedAt)
+            homeworksRepository.addOrUpdateHomework(updatedHomework)
         }
     }
 }

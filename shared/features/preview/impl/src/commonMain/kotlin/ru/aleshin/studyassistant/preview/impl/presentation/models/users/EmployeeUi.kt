@@ -45,4 +45,5 @@ internal data class EmployeeUi(
     val phones: List<ContactInfoUi> = emptyList(),
     val locations: List<ContactInfoUi> = emptyList(),
     val webs: List<ContactInfoUi> = emptyList(),
+    val updatedAt: Long,
 ) : Parcelable

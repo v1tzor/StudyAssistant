@@ -17,9 +17,9 @@
 package ru.aleshin.studyassistant.core.database.models.goals
 
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.database.models.tasks.BaseTodoEntity
 import ru.aleshin.studyassistant.core.database.models.tasks.HomeworkDetailsEntity
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
-import ru.aleshin.studyassistant.sqldelight.tasks.TodoEntity
 
 /**
  * @author Stanislav Aleshin on 18.04.2025.
@@ -28,7 +28,7 @@ data class GoalEntityDetails(
     val uid: UID,
     val contentType: String,
     val contentHomework: HomeworkDetailsEntity? = null,
-    val contentTodo: TodoEntity? = null,
+    val contentTodo: BaseTodoEntity? = null,
     val number: Int = 0,
     val targetDate: Long,
     val desiredTime: Millis?,
@@ -40,4 +40,5 @@ data class GoalEntityDetails(
     val completeAfterTimeElapsed: Boolean = false,
     val isDone: Boolean = false,
     val completeDate: Long?,
+    val updatedAt: Long,
 )

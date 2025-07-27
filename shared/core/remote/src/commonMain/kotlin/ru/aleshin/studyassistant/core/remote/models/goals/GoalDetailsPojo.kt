@@ -40,4 +40,5 @@ data class GoalDetailsPojo(
     val completeAfterTimeElapsed: Boolean = false,
     val isDone: Boolean = false,
     val completeDate: Long?,
+    val updatedAt: Long = 0L,
 )

@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.core.api.models
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import ru.aleshin.studyassistant.core.common.extensions.fromJson
@@ -26,19 +25,6 @@ import ru.aleshin.studyassistant.core.common.extensions.fromJson
 /**
  * @author Stanislav Aleshin on 30.06.2025.
  */
-data class RealtimeSubscription(
-    private val close: () -> Unit,
-) {
-    fun close() = close.invoke()
-}
-
-@Serializable
-data class RealtimeCallback<T>(
-    val channels: Collection<String>,
-    val payloadClass: KSerializer<T>,
-    val callback: (RealtimeResponseEvent<T>) -> Unit,
-)
-
 @Serializable
 open class RealtimeResponse<T>(
     val type: String,

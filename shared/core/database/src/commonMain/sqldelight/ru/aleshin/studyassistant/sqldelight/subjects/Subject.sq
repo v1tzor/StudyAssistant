@@ -6,45 +6,59 @@ CREATE TABLE subjectEntity (
     teacher_id TEXT,
     office TEXT NOT NULL,
     color INTEGER NOT NULL,
-    location TEXT
+    location TEXT,
+    updated_at INTEGER NOT NULL,
+    is_cache_data INTEGER NOT NULL
 );
 
 addOrUpdateSubject:
-INSERT OR REPLACE INTO subjectEntity (uid, organization_id, event_type, name, teacher_id, office, color, location)
+INSERT OR REPLACE INTO subjectEntity (uid, organization_id, event_type, name, teacher_id, office, color, location, updated_at, is_cache_data)
 VALUES ?;
-
-fetchSubjectsByOrganization:
-SELECT *
-FROM subjectEntity
-WHERE organization_id = ?;
-
-fetchSubjectsByOrganizations:
-SELECT *
-FROM subjectEntity
-WHERE organization_id IN ?;
-
-fetchSubjectsByEmployee:
-SELECT *
-FROM subjectEntity
-WHERE teacher_id = ?;
-
-fetchSubjectsByNames:
-SELECT *
-FROM subjectEntity
-WHERE name IN ?;
 
 fetchSubjectById:
 SELECT *
 FROM subjectEntity
-WHERE uid = ?;
+WHERE uid = ? AND is_cache_data = ?;
+
+fetchSubjectsById:
+SELECT *
+FROM subjectEntity
+WHERE uid IN ? AND is_cache_data = ?;
 
 fetchAllSubjects:
 SELECT *
-FROM subjectEntity;
+FROM subjectEntity
+WHERE is_cache_data = ?;
 
-deleteSubject:
+fetchSubjectsByOrganization:
+SELECT *
+FROM subjectEntity
+WHERE organization_id = ? AND is_cache_data = ?;
+
+fetchSubjectsByOrganizations:
+SELECT *
+FROM subjectEntity
+WHERE organization_id IN ? AND is_cache_data = ?;
+
+fetchSubjectsByEmployee:
+SELECT *
+FROM subjectEntity
+WHERE teacher_id = ? AND is_cache_data = ?;
+
+fetchSubjectsByNames:
+SELECT *
+FROM subjectEntity
+WHERE name IN ? AND is_cache_data = ?;
+
+fetchEmptySubjects:
+SELECT uid, updated_at
+FROM subjectEntity
+WHERE is_cache_data = 1;
+
+deleteSubjects:
 DELETE FROM subjectEntity
-WHERE uid = ?;
+WHERE uid IN ? AND is_cache_data = ?;
 
 deleteAllSubjects:
-DELETE FROM subjectEntity;
+DELETE FROM subjectEntity
+WHERE is_cache_data = ?;

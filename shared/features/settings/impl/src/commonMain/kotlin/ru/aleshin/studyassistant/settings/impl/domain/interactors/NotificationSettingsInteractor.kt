@@ -26,13 +26,12 @@ import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.settings.NotificationSettings
-import ru.aleshin.studyassistant.core.domain.managers.EndClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.HomeworksReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.StartClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.settings.impl.domain.common.SettingsEitherWrapper
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
 
@@ -46,7 +45,6 @@ internal interface NotificationSettingsInteractor {
 
     class Base(
         private val settingsRepository: NotificationSettingsRepository,
-        private val usersRepository: UsersRepository,
         private val startClassesReminderManager: StartClassesReminderManager,
         private val endClassesReminderManager: EndClassesReminderManager,
         private val homeworksReminderManager: HomeworksReminderManager,
@@ -57,16 +55,14 @@ internal interface NotificationSettingsInteractor {
     ) : NotificationSettingsInteractor {
 
         override suspend fun fetchSettings() = eitherWrapper.wrapFlow {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            settingsRepository.fetchSettings(targetUser)
+            settingsRepository.fetchSettings()
         }
 
         override suspend fun updateSettings(settings: NotificationSettings) = eitherWrapper.wrapUnit {
-            val targetUser = usersRepository.fetchCurrentUserOrError().uid
-            val allOrganizations = organizationsRepository.fetchAllShortOrganization(targetUser).first()
+            val allOrganizations = organizationsRepository.fetchAllShortOrganization().first()
             val organizationIds = allOrganizations.map { it.uid }
 
-            settingsRepository.updateSettings(settings, targetUser)
+            settingsRepository.updateSettings(settings)
 
             if (settings.beginningOfClasses != null) {
                 startClassesReminderManager.startOrRetryReminderService()
