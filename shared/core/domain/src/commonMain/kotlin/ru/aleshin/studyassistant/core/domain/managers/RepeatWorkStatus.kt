@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.domain.managers.reminders
+package ru.aleshin.studyassistant.core.domain.managers
 
 /**
  * @author Stanislav Aleshin on 25.08.2024.

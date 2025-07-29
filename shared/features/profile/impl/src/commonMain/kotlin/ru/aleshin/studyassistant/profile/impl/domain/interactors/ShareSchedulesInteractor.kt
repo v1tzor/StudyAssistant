@@ -56,7 +56,7 @@ internal interface ShareSchedulesInteractor {
         private val usersRepository: UsersRepository,
         private val messageRepository: MessageRepository,
         private val connectionManager: Konnection,
-        private val dataManager: DateManager,
+        private val dateManager: DateManager,
         private val eitherWrapper: ProfileEitherWrapper,
     ) : ShareSchedulesInteractor {
 
@@ -68,11 +68,11 @@ internal interface ShareSchedulesInteractor {
             if (!connectionManager.isConnected()) throw InternetConnectionException()
 
             val shareId = randomUUID()
+            val currentTime = dateManager.fetchCurrentInstant()
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentTime = dataManager.fetchCurrentInstant()
-            val targetUserInfo = usersRepository.fetchCurrentUserProfile().first()
+            val currentUserInfo = usersRepository.fetchCurrentUserProfile().first()
             val schedules = baseSchedulesRepository.fetchSchedulesByVersion(
-                version = dataManager.fetchCurrentWeek(),
+                version = dateManager.fetchCurrentWeek(),
                 numberOfWeek = null,
             ).let { schedulesFlow ->
                 val actualVersion = DateVersion.createNewVersion(currentTime)
@@ -124,7 +124,7 @@ internal interface ShareSchedulesInteractor {
             val receivedMediatedSchedules = ReceivedMediatedSchedules(
                 uid = shareId,
                 sendDate = currentTime,
-                sender = checkNotNull(targetUserInfo),
+                sender = checkNotNull(currentUserInfo),
                 schedules = schedules,
                 organizationsData = organizationsData,
             )
@@ -133,12 +133,14 @@ internal interface ShareSchedulesInteractor {
             val recipientSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(sendData.recipient.uid)
 
             val updatedCurrentSharedSchedules = currentSharedSchedules.copy(
+                updatedAt = currentTime.toEpochMilliseconds(),
                 sent = buildMap {
                     putAll(currentSharedSchedules.sent)
                     put(shareId, sentMediatedSchedules)
                 }
             )
             val updatedRecipientSharedSchedules = recipientSharedSchedules.copy(
+                updatedAt = currentTime.toEpochMilliseconds(),
                 received = buildMap {
                     putAll(recipientSharedSchedules.received)
                     put(shareId, receivedMediatedSchedules)
@@ -150,7 +152,7 @@ internal interface ShareSchedulesInteractor {
 
             val notifyContent = NotifyPushContent.ShareSchedule(
                 devices = sendData.recipient.devices,
-                senderUsername = targetUserInfo.username,
+                senderUsername = currentUserInfo.username,
                 senderUserId = currentUser,
             )
             messageRepository.sendMessage(notifyContent.toMessageBody())
@@ -159,20 +161,23 @@ internal interface ShareSchedulesInteractor {
         override suspend fun cancelSendSchedules(schedules: SentMediatedSchedules) = eitherWrapper.wrapUnit {
             if (!connectionManager.isConnected()) throw InternetConnectionException()
 
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
             val currentSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(currentUser)
             val updatedCurrentSharedSchedules = currentSharedSchedules.copy(
+                updatedAt = updatedAt,
                 sent = buildMap {
                     putAll(currentSharedSchedules.sent)
                     remove(schedules.uid)
                 }
             )
-            shareRepository.addOrUpdateSharedSchedulesForUser(updatedCurrentSharedSchedules, currentUser)
+            shareRepository.addOrUpdateCurrentSharedSchedules(updatedCurrentSharedSchedules)
 
             val recipientSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(
                 targetUser = schedules.recipient.uid,
             )
             val updatedRecipientSharedSchedules = recipientSharedSchedules.copy(
+                updatedAt = updatedAt,
                 received = buildMap {
                     putAll(recipientSharedSchedules.received)
                     remove(schedules.uid)

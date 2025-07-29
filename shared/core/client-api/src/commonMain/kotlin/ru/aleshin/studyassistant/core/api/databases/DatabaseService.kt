@@ -29,6 +29,7 @@ import ru.aleshin.studyassistant.core.api.models.DocumentPojo
 import ru.aleshin.studyassistant.core.api.models.asDocument
 import ru.aleshin.studyassistant.core.api.realtime.RealtimeService
 import ru.aleshin.studyassistant.core.api.utils.Channels
+import ru.aleshin.studyassistant.core.common.extensions.jsonCast
 import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.common.extensions.toJsonElementWithAppendParams
 
@@ -56,11 +57,13 @@ class DatabaseService(
         queries: List<String>? = null,
         nestedType: KSerializer<T>,
     ): DocumentListPojo<DocumentPojo<T>> {
-        val apiPath = "/databases/{databaseId}/collections/{collectionId}/documents"
-            .replace("{databaseId}", databaseId)
-            .replace("{collectionId}", collectionId)
+        val apiPath = "/databases/$databaseId/collections/$collectionId/documents"
 
-        val apiParams = listOf(ClientParam.ListParam("queries", queries ?: emptyList()))
+        val apiParams = buildList {
+            if (!queries.isNullOrEmpty()) {
+                add(ClientParam.ListParam("queries", queries))
+            }
+        }
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
         val documents = client.call(
@@ -70,6 +73,7 @@ class DatabaseService(
             headers = apiHeaders,
             params = apiParams,
         )
+
         return DocumentListPojo(
             total = documents.total,
             documents = documents.documents.map { it.asDocument(nestedType) },
@@ -151,15 +155,15 @@ class DatabaseService(
         permissions: List<String>? = null,
         nestedType: KSerializer<T>,
     ) {
-        val apiPath = "/databases/{databaseId}/collections/{collectionId}/documents"
-            .replace("{databaseId}", databaseId)
-            .replace("{collectionId}", collectionId)
+        val apiPath = "/databases/$databaseId/collections/$collectionId/documents"
 
-        val apiParams = listOf(
-            ClientParam.StringParam("documentId", documentId),
-            ClientParam.StringParam("data", data.toJson(nestedType)),
-            ClientParam.ListParam("permissions", permissions ?: emptyList()),
-        )
+        val apiParams = buildList {
+            add(ClientParam.StringParam("documentId", documentId))
+            add(ClientParam.StringParam("data", data.toJson(nestedType)))
+            if (!permissions.isNullOrEmpty()) {
+                add(ClientParam.ListParam("permissions", permissions))
+            }
+        }
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
         client.call(
@@ -185,15 +189,18 @@ class DatabaseService(
         nestedType: KSerializer<T>,
         permissions: List<String>? = null,
     ) {
-        val apiPath = "/databases/{databaseId}/collections/{collectionId}/documents"
-            .replace("{databaseId}", databaseId)
-            .replace("{collectionId}", collectionId)
+        val apiPath = "/databases/$databaseId/collections/$collectionId/documents"
 
-        val permissionsParams = Pair("\$permissions", permissions ?: emptyList())
-        val data = documents.map {
-            it.toJsonElementWithAppendParams(nestedType, listOf(permissionsParams))
+        val data = if (permissions.isNullOrEmpty()) {
+            documents.map { it.jsonCast(nestedType, JsonElement.serializer()) }
+        } else {
+            val permissionsParams = listOf(Pair("\$permissions", permissions))
+            documents.map { it.toJsonElementWithAppendParams(nestedType, permissionsParams) }
         }
-        val apiParams = listOf(ClientParam.JsonListParam("documents", data))
+
+        val apiParams = buildList {
+            add(ClientParam.JsonListParam("documents", data))
+        }
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
         client.call(
@@ -224,21 +231,24 @@ class DatabaseService(
         queries: List<String>? = null,
         nestedType: KSerializer<T>,
     ): DocumentPojo<T> {
-        val apiPath = "/databases/{databaseId}/collections/{collectionId}/documents/{documentId}"
-            .replace("{databaseId}", databaseId)
-            .replace("{collectionId}", collectionId)
-            .replace("{documentId}", documentId)
+        val apiPath = "/databases/$databaseId/collections/$collectionId/documents/$documentId"
 
-        val apiParams = listOf(ClientParam.ListParam("queries", queries ?: emptyList()))
+        val apiParams = buildList {
+            if (!queries.isNullOrEmpty()) {
+                add(ClientParam.ListParam("queries", queries))
+            }
+        }
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
-        return client.call(
+        val response = client.call(
             method = HttpMethod.Get,
             path = apiPath,
             deserializer = JsonElement.serializer(),
             headers = apiHeaders,
             params = apiParams,
-        ).asDocument(nestedType)
+        )
+
+        return response.asDocument(nestedType)
     }
 
     /**
@@ -310,10 +320,9 @@ class DatabaseService(
         send(document)
 
         realtime.subscribe(
-            channels = Channels.document(databaseId, collectionId, documentId),
-            payloadType = DocumentPojo.serializer(nestedType),
+            channels = Channels.document(databaseId, collectionId, documentId)
         ).collect { response ->
-            send(response.payload)
+            send(response.payload.asDocument(nestedType))
         }
     }
 
@@ -334,15 +343,14 @@ class DatabaseService(
         permissions: List<String>? = null,
         nestedType: KSerializer<T>,
     ) {
-        val apiPath = "/databases/{databaseId}/collections/{collectionId}/documents/{documentId}"
-            .replace("{databaseId}", databaseId)
-            .replace("{collectionId}", collectionId)
-            .replace("{documentId}", documentId)
+        val apiPath = "/databases/$databaseId/collections/$collectionId/documents/$documentId"
 
-        val apiParams = listOf(
-            ClientParam.StringParam("data", data.toJson(nestedType)),
-            ClientParam.ListParam("permissions", permissions ?: emptyList()),
-        )
+        val apiParams = buildList {
+            add(ClientParam.StringParam("data", data.toJson(nestedType)))
+            if (!permissions.isNullOrEmpty()) {
+                add(ClientParam.ListParam("permissions", permissions))
+            }
+        }
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
         client.call(
@@ -368,15 +376,18 @@ class DatabaseService(
         nestedType: KSerializer<T>,
         permissions: List<String>? = null,
     ) {
-        val apiPath = "/databases/{databaseId}/collections/{collectionId}/documents"
-            .replace("{databaseId}", databaseId)
-            .replace("{collectionId}", collectionId)
+        val apiPath = "/databases/$databaseId/collections/$collectionId/documents"
 
-        val permissionsParams = Pair("\$permissions", permissions ?: emptyList())
-        val data = documents.map {
-            it.toJsonElementWithAppendParams(nestedType, listOf(permissionsParams))
+        val data = if (permissions.isNullOrEmpty()) {
+            documents.map { it.jsonCast(nestedType, JsonElement.serializer()) }
+        } else {
+            val permissionsParams = listOf(Pair("\$permissions", permissions))
+            documents.map { it.toJsonElementWithAppendParams(nestedType, permissionsParams) }
         }
-        val apiParams = listOf(ClientParam.JsonListParam("documents", data))
+
+        val apiParams = buildList {
+            add(ClientParam.JsonListParam("documents", data))
+        }
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
         client.call(
@@ -407,15 +418,14 @@ class DatabaseService(
         permissions: List<String>? = null,
         nestedType: KSerializer<T>,
     ) {
-        val apiPath = "/databases/{databaseId}/collections/{collectionId}/documents/{documentId}"
-            .replace("{databaseId}", databaseId)
-            .replace("{collectionId}", collectionId)
-            .replace("{documentId}", documentId)
+        val apiPath = "/databases/$databaseId/collections/$collectionId/documents/$documentId"
 
-        val apiParams = listOf(
-            ClientParam.StringParam("data", data.toJson(nestedType)),
-            ClientParam.ListParam("permissions", permissions ?: emptyList()),
-        )
+        val apiParams = buildList {
+            add(ClientParam.StringParam("data", data.toJson(nestedType)))
+            if (!permissions.isNullOrEmpty()) {
+                add(ClientParam.ListParam("permissions", permissions))
+            }
+        }
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
         client.call(
@@ -431,29 +441,32 @@ class DatabaseService(
      *
      * @param databaseId Database ID.
      * @param collectionId Collection ID.
-     * @param data Document data as JSON object. Include only attribute and value pairs to be updated.
+     * @param documents Document data as JSON object. Include only attribute and value pairs to be updated.
      * @param queries Array of query strings generated using the Query class provided by the SDK. [Learn more about queries](https://appwrite.io/docs/queries). Maximum of 100 queries are allowed, each 4096 characters long.
      */
     suspend fun <T> updateDocuments(
         databaseId: String,
         collectionId: String,
-        data: List<T>,
+        documents: List<T>,
         queries: List<String>? = null,
         nestedType: KSerializer<T>,
         permissions: List<String>? = null,
     ) {
-        val apiPath = "/databases/{databaseId}/collections/{collectionId}/documents"
-            .replace("{databaseId}", databaseId)
-            .replace("{collectionId}", collectionId)
+        val apiPath = "/databases/$databaseId/collections/$collectionId/documents"
 
-        val permissionsParams = Pair("\$permissions", permissions ?: emptyList())
-        val data = data.map {
-            it.toJsonElementWithAppendParams(nestedType, listOf(permissionsParams))
+        val data = if (permissions.isNullOrEmpty()) {
+            documents.map { it.jsonCast(nestedType, JsonElement.serializer()) }
+        } else {
+            val permissionsParams = listOf(Pair("\$permissions", permissions))
+            documents.map { it.toJsonElementWithAppendParams(nestedType, permissionsParams) }
         }
-        val apiParams = listOf(
-            ClientParam.JsonListParam("documents", data),
-            ClientParam.ListParam("queries", queries ?: emptyList()),
-        )
+
+        val apiParams = buildList {
+            add(ClientParam.JsonListParam("documents", data))
+            if (!queries.isNullOrEmpty()) {
+                add(ClientParam.ListParam("queries", queries))
+            }
+        }
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
         client.call(
@@ -480,10 +493,7 @@ class DatabaseService(
         collectionId: String,
         documentId: String,
     ) {
-        val apiPath = "/databases/{databaseId}/collections/{collectionId}/documents/{documentId}"
-            .replace("{databaseId}", databaseId)
-            .replace("{collectionId}", collectionId)
-            .replace("{documentId}", documentId)
+        val apiPath = "/databases/$databaseId/collections/$collectionId/documents/$documentId"
 
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
@@ -507,11 +517,13 @@ class DatabaseService(
         collectionId: String,
         queries: List<String>? = null,
     ) {
-        val apiPath = "/databases/{databaseId}/collections/{collectionId}/documents"
-            .replace("{databaseId}", databaseId)
-            .replace("{collectionId}", collectionId)
+        val apiPath = "/databases/$databaseId/collections/$collectionId/documents"
 
-        val apiParams = listOf(ClientParam.ListParam("queries", queries ?: emptyList()))
+        val apiParams = buildList {
+            if (!queries.isNullOrEmpty()) {
+                add(ClientParam.ListParam("queries", queries))
+            }
+        }
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
         client.call(

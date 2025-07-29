@@ -25,7 +25,6 @@ import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 
@@ -41,7 +40,6 @@ internal interface HomeworkInteractor {
     class Base(
         private val homeworksRepository: HomeworksRepository,
         private val goalsRepository: DailyGoalsRepository,
-        private val usersRepository: UsersRepository,
         private val dateManager: DateManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : HomeworkInteractor {

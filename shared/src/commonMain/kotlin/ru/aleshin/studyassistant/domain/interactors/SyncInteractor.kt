@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.domain.interactors
 
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.onCompletion
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.managers.sync.SourceSyncFacade
@@ -40,7 +41,7 @@ interface SyncInteractor {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun cycleTwoDirectSync() = eitherWrapper.wrap {
-            usersRepository.fetchStateChanged().onCompletion {
+            usersRepository.fetchStateChanged().distinctUntilChangedBy { it?.uid }.onCompletion {
                 Logger.e("test2") { "XXX------------x awaitClose STOP ALL SYNC x----------------XXX" }
                 sourceSyncFacade.stopAllSourceSync()
             }.collect { targetUser ->

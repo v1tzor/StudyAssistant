@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.core.common.extensions.getString
 import ru.aleshin.studyassistant.core.common.extensions.getStringOrNull
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.remote.models.users.EmployeePojo
 import ru.aleshin.studyassistant.core.remote.utils.RemoteDataSource
@@ -49,16 +50,18 @@ interface EmployeeRemoteDataSource : RemoteDataSource.FullSynced.MultipleDocumen
         database: DatabaseService,
         userSessionProvider: UserSessionProvider,
         realtime: RealtimeService,
+        dateManager: DateManager,
         private val storage: StorageService,
     ) : EmployeeRemoteDataSource, RemoteDataSource.FullSynced.MultipleDocuments.BaseAppwrite<EmployeePojo>(
         database = database,
         realtime = realtime,
+        dateManager = dateManager,
         userSessionProvider = userSessionProvider,
     ) {
 
-        override val databaseId = Employee.DATABASE_ID
-
         override val collectionId = Employee.COLLECTION_ID
+
+        override val callbackCollectionId = Employee.CALLBACK_COLLECTION_ID
 
         override val nestedType = EmployeePojo.serializer()
 
@@ -101,7 +104,7 @@ interface EmployeeRemoteDataSource : RemoteDataSource.FullSynced.MultipleDocumen
             }
         }
 
-        override suspend fun deleteItemsByIds(ids: List<String>) {
+        override suspend fun deleteItemsByIds(ids: List<String>, sendBatchCallback: Boolean) {
             val avatarUrls = database.listDocuments(
                 databaseId = databaseId,
                 collectionId = collectionId,
@@ -122,6 +125,10 @@ interface EmployeeRemoteDataSource : RemoteDataSource.FullSynced.MultipleDocumen
 
             if (avatarUrls.isNotEmpty()) {
                 avatarUrls.forEach { deleteAvatar(it) }
+            }
+
+            if (sendBatchCallback) {
+                sendBatchCallback()
             }
         }
 

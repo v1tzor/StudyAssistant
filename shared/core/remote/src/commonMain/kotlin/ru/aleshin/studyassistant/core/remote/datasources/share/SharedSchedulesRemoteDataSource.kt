@@ -145,8 +145,8 @@ interface SharedSchedulesRemoteDataSource : RemoteDataSource.FullSynced.SingleDo
             }
 
             return sharedSchedulesPojoFlow.flatMapLatest { sharedSchedules ->
-                val sentSchedules = sharedSchedules.sent.decodeFromString<SentMediatedSchedulesPojo>()
-                val receivedSchedules = sharedSchedules.received.decodeFromString<ReceivedMediatedSchedulesPojo>()
+                val sentSchedules = sharedSchedules.sent.decodeFromString<UID, SentMediatedSchedulesPojo>()
+                val receivedSchedules = sharedSchedules.received.decodeFromString<UID, ReceivedMediatedSchedulesPojo>()
 
                 val users = buildList {
                     addAll(sentSchedules.map { it.value.recipient })
@@ -193,8 +193,8 @@ interface SharedSchedulesRemoteDataSource : RemoteDataSource.FullSynced.SingleDo
             }
 
             return sharedSchedulesShortPojoFlow.flatMapLatest { sharedSchedules ->
-                val sentSchedules = sharedSchedules.sent.decodeFromString<SentMediatedSchedulesPojo>()
-                val receivedSchedules = sharedSchedules.received.decodeFromString<ReceivedMediatedSchedulesShortPojo>()
+                val sentSchedules = sharedSchedules.sent.decodeFromString<UID, SentMediatedSchedulesPojo>()
+                val receivedSchedules = sharedSchedules.received.decodeFromString<UID, ReceivedMediatedSchedulesShortPojo>()
 
                 val users = buildList {
                     addAll(sentSchedules.map { it.value.recipient })
@@ -237,8 +237,8 @@ interface SharedSchedulesRemoteDataSource : RemoteDataSource.FullSynced.SingleDo
                 nestedType = SharedSchedulesPojo.serializer(),
             )?.data ?: SharedSchedulesPojo.default(targetUser)
 
-            val sentSchedules = sharedSchedules.sent.decodeFromString<SentMediatedSchedulesPojo>()
-            val receivedSchedules = sharedSchedules.received.decodeFromString<ReceivedMediatedSchedulesPojo>()
+            val sentSchedules = sharedSchedules.sent.decodeFromString<UID, SentMediatedSchedulesPojo>()
+            val receivedSchedules = sharedSchedules.received.decodeFromString<UID, ReceivedMediatedSchedulesPojo>()
 
             val users = buildList {
                 addAll(sentSchedules.map { it.value.recipient })

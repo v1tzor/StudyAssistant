@@ -28,6 +28,9 @@ object AppwriteApi {
     }
 
     object Common {
+        const val BASE_DATA_DATABASE_ID = "686052b2001b25f5a09f"
+        const val BASE_CALLBACK_DATABASE_ID = "688752e90030778ee723"
+
         const val UID = "\$id"
         const val USER_ID = "userId"
         const val UPDATED_AT = "updatedAt"
@@ -45,6 +48,9 @@ object AppwriteApi {
     object Organizations {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "68644e7f001f9d9f8bd2"
+
+        const val CALLBACK_DATABASE_ID = "688752e90030778ee723"
+        const val CALLBACK_COLLECTION_ID = "6887560c000c7cdc99bb"
 
         const val USER_ID = "userId"
         const val UID = "\$id"
@@ -66,6 +72,9 @@ object AppwriteApi {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "686a6c1200117f6ac3e4"
 
+        const val CALLBACK_DATABASE_ID = "688752e90030778ee723"
+        const val CALLBACK_COLLECTION_ID = "688752fa001599aa6bb0"
+
         const val USER_ID = "userId"
         const val DEADLINE = "deadline"
         const val DONE = "done"
@@ -75,6 +84,9 @@ object AppwriteApi {
     object Homeworks {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "686a6db40026eb4d93e1"
+
+        const val CALLBACK_DATABASE_ID = "688752e90030778ee723"
+        const val CALLBACK_COLLECTION_ID = "688754e500186b2dd2e5"
 
         const val UID = "\$id"
         const val USER_ID = "userId"
@@ -88,6 +100,9 @@ object AppwriteApi {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "686a77e3001569389b53"
 
+        const val CALLBACK_DATABASE_ID = "688752e90030778ee723"
+        const val CALLBACK_COLLECTION_ID = "688755020008214ba7ae"
+
         const val ORGANIZATION_ID = "organizationId"
         const val USER_ID = "userId"
         const val TEACHER_ID = "teacherId"
@@ -98,6 +113,9 @@ object AppwriteApi {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "686a76030033a69f0c63"
 
+        const val CALLBACK_DATABASE_ID = "688752e90030778ee723"
+        const val CALLBACK_COLLECTION_ID = "6887552b0022c0c49b0d"
+
         const val ORGANIZATION_ID = "organizationId"
         const val USER_ID = "userId"
         const val AVATAR_URL = "avatar"
@@ -106,6 +124,9 @@ object AppwriteApi {
     object Goals {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "686a72270018a02b7f87"
+
+        const val CALLBACK_DATABASE_ID = "688752e90030778ee723"
+        const val CALLBACK_COLLECTION_ID = "68875552001363d996fd"
 
         const val ORGANIZATION_ID = "organizationId"
         const val CONTENT_ID = "contentId"
@@ -124,6 +145,9 @@ object AppwriteApi {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "686a7916003790edf45b"
 
+        const val CALLBACK_DATABASE_ID = "688752e90030778ee723"
+        const val CALLBACK_COLLECTION_ID = "6887556d00354b8cfd45"
+
         const val USER_ID = "userId"
         const val VERSION_FROM = "dateVersionFrom"
         const val VERSION_TO = "dateVersionTo"
@@ -134,6 +158,9 @@ object AppwriteApi {
     object CustomSchedules {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "686a7a24002578efe97f"
+
+        const val CALLBACK_DATABASE_ID = "688752e90030778ee723"
+        const val CALLBACK_COLLECTION_ID = "6887559100005e0f2007"
 
         const val USER_ID = "userId"
         const val DATE = "date"

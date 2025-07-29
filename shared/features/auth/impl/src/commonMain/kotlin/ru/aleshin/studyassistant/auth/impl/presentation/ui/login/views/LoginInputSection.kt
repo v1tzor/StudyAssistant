@@ -45,7 +45,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.Passwo
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.EmailTextField
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.PasswordTextField
-import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.SpacerToKeyboard
+import ru.aleshin.studyassistant.core.ui.views.SpacerToKeyboard
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.

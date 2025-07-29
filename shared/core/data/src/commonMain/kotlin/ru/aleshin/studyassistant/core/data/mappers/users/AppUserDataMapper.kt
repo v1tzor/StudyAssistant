@@ -135,7 +135,7 @@ fun AppUser.mapToLocalData() = BaseAppUserEntity(
     birthday = birthday,
     sex = gender?.name,
     friends = friends,
-    subscriptionInfo = subscriptionInfo?.mapToLocalData().toJson(),
+    subscriptionInfo = subscriptionInfo?.mapToLocalData()?.toJson(),
     socialNetworks = socialNetworks.map { it.mapToLocalData().toJson() },
     updatedAt = updatedAt,
 )

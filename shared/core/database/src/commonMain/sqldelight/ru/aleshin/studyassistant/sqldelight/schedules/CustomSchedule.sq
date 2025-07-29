@@ -28,7 +28,8 @@ fetchSchedulesByDate:
 SELECT *
 FROM customScheduleEntity
 WHERE date = ? AND is_cache_data = ?
-ORDER BY date DESC;
+ORDER BY date DESC
+LIMIT 1;
 
 fetchSchedulesByTimeRange:
 SELECT *

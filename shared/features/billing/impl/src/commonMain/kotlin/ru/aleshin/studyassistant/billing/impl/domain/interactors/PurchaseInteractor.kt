@@ -56,6 +56,7 @@ internal interface PurchaseInteractor {
         private val dataManager: DateManager,
         private val deviceInfoProvider: DeviceInfoProvider,
         private val connectionManager: Konnection,
+        private val dateManager: DateManager,
         private val eitherWrapper: BillingEitherWrapper,
     ) : PurchaseInteractor {
 
@@ -69,6 +70,7 @@ internal interface PurchaseInteractor {
         override suspend fun purchaseSubscription(productId: String) = eitherWrapper.wrapUnit {
             if (!connectionManager.isConnected()) throw InternetConnectionException()
 
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val currentUser = usersRepository.fetchCurrentUserOrError()
             val appUserProfile = checkNotNull(usersRepository.fetchCurrentUserProfile().firstOrNull())
             val productInfo = checkNotNull(iapService.fetchProducts(listOf(productId)).firstOrNull())
@@ -94,7 +96,7 @@ internal interface PurchaseInteractor {
                         expiryTimeMillis = currentTime + periodTime,
                         store = iapService.fetchStore(),
                     )
-                    val updateAppUser = appUserProfile.copy(subscriptionInfo = subscriptionInfo)
+                    val updateAppUser = appUserProfile.copy(subscriptionInfo = subscriptionInfo, updatedAt = updatedAt)
                     usersRepository.updateCurrentUserProfile(updateAppUser)
                 }
 

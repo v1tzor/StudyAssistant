@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.data.mappers.requsts
 import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
 import ru.aleshin.studyassistant.core.common.extensions.encodeToString
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalDataDetails
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToRemoteDataDetails
@@ -39,16 +40,16 @@ class FriendRequestsSyncMapper : SingleSyncMapper<FriendRequestsDetailsEntity, F
 
 fun FriendRequests.mapToRemote(userId: String) = FriendRequestsPojo(
     id = userId,
-    received = received.mapValues { it.value.toEpochMilliseconds() }.encodeToString<Long>(),
-    send = send.mapValues { it.value.toEpochMilliseconds() }.encodeToString<Long>(),
-    lastActions = lastActions.encodeToString(),
+    received = received.mapValues { it.value.toEpochMilliseconds() }.encodeToString<UID, Long>(),
+    send = send.mapValues { it.value.toEpochMilliseconds() }.encodeToString<UID, Long>(),
+    lastActions = lastActions.encodeToString<UID, Boolean>(),
 )
 
 fun FriendRequestsDetails.mapToRemote(userId: String) = FriendRequestsPojo(
     id = userId,
-    received = received.mapKeys { it.key.uid }.mapValues { it.value.toEpochMilliseconds() }.encodeToString(),
-    send = received.mapKeys { it.key.uid }.mapValues { it.value.toEpochMilliseconds() }.encodeToString(),
-    lastActions = lastActions.mapKeys { it.key.uid }.encodeToString(),
+    received = received.mapKeys { it.key.uid }.mapValues { it.value.toEpochMilliseconds() }.encodeToString<UID, Long>(),
+    send = received.mapKeys { it.key.uid }.mapValues { it.value.toEpochMilliseconds() }.encodeToString<UID, Long>(),
+    lastActions = lastActions.mapKeys { it.key.uid }.encodeToString<UID, Boolean>(),
     updatedAt = updatedAt,
 )
 
@@ -61,9 +62,9 @@ fun FriendRequestsDetails.mapToRemoteDetails(userId: String) = FriendRequestsDet
 )
 
 fun FriendRequestsPojo.mapToDomain() = FriendRequests(
-    received = received.decodeFromString<Long>().mapValues { it.value.mapEpochTimeToInstant() },
-    send = send.decodeFromString<Long>().mapValues { it.value.mapEpochTimeToInstant() },
-    lastActions = lastActions.decodeFromString<Boolean>(),
+    received = received.decodeFromString<UID, Long>().mapValues { it.value.mapEpochTimeToInstant() },
+    send = send.decodeFromString<UID, Long>().mapValues { it.value.mapEpochTimeToInstant() },
+    lastActions = lastActions.decodeFromString<UID, Boolean>(),
     updatedAt = updatedAt,
 )
 

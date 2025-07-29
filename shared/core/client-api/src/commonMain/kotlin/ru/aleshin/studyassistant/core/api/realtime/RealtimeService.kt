@@ -219,7 +219,7 @@ class RealtimeService(
                         serializer = JsonElement.serializer(),
                         deserializer = RealtimeResponseEvent.serializer(JsonElement.serializer()),
                     )
-                    Logger.i("test2") { "Get frame event: $event" }
+                    Logger.i("test2") { "Get frame event:\nchannels: ${event.channels.joinToString(" | ")}\ndata:${event.payload}" }
                     responseFlow.emit(Result.success(event))
                 }
             }

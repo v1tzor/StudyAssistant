@@ -49,18 +49,19 @@ class FriendRequestsSourceSyncManagerImpl(
     coroutineManager = coroutineManager,
 ), FriendRequestsSourceSyncManager {
 
-    override suspend fun updateLocalDatabase() {
+    override suspend fun syncLocalDatabase() {
         val upsertRemoteModel = remoteDataSource.fetchItem().first() ?: return
         localDataSource.addOrUpdateItem(mappers.remoteToLocal(upsertRemoteModel))
         Logger.i("test2") { "$sourceSyncKey: updateLocalDatabase: upsertRemoteModel" }
     }
 
-    override suspend fun collectServerUpdates() {
+    override suspend fun collectOnlineChanges() {
         remoteDataSource.observeEvents().collect { event ->
             val localModel = localDataSource.fetchMetadata()
             when (event) {
                 is DatabaseEvent.Create<FriendRequestsDetailsPojo> -> {
                     if (localModel?.updatedAt == null || localModel.updatedAt <= event.data.updatedAt) {
+                        localDataSource.addOrUpdateItem(mappers.remoteToLocal(event.data))
                         Logger.i("test2") { "$sourceSyncKey: collectServerUpdates: event -> $event" }
                     }
                 }
@@ -76,6 +77,7 @@ class FriendRequestsSourceSyncManagerImpl(
                         Logger.i("test2") { "$sourceSyncKey: collectServerUpdates: event -> $event" }
                     }
                 }
+                is DatabaseEvent.BatchUpdate<*> -> syncLocalDatabase()
             }
         }
     }

@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.api.databases.DatabaseService
 import ru.aleshin.studyassistant.core.api.realtime.RealtimeService
 import ru.aleshin.studyassistant.core.api.utils.Permission
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.remote.models.goals.GoalPojo
 import ru.aleshin.studyassistant.core.remote.utils.RemoteDataSource
 
@@ -33,16 +34,18 @@ interface DailyGoalsRemoteDataSource : RemoteDataSource.FullSynced.MultipleDocum
     class Base(
         database: DatabaseService,
         realtime: RealtimeService,
+        dateManager: DateManager,
         userSessionProvider: UserSessionProvider
     ) : DailyGoalsRemoteDataSource, RemoteDataSource.FullSynced.MultipleDocuments.BaseAppwrite<GoalPojo>(
         database = database,
         realtime = realtime,
+        dateManager = dateManager,
         userSessionProvider = userSessionProvider,
     ) {
 
-        override val databaseId = Goals.DATABASE_ID
-
         override val collectionId = Goals.COLLECTION_ID
+
+        override val callbackCollectionId = Goals.CALLBACK_COLLECTION_ID
 
         override val nestedType = GoalPojo.serializer()
 

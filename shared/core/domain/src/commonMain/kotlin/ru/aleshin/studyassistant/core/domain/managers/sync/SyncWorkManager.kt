@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.domain.managers.reminders
+package ru.aleshin.studyassistant.core.domain.managers.sync
 
-import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 
 /**
  * @author Stanislav Aleshin on 22.08.2024.
  */
-interface EndClassesReminderManager {
+interface SyncWorkManager {
     suspend fun fetchWorkStatus(): RepeatWorkStatus
-    fun startOrRetryReminderService()
-    fun stopReminderService(allOrganizations: List<UID>)
+    fun startOrRetrySyncService()
+    fun stopSyncService()
 }

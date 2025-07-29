@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.domain.managers.reminders
+package ru.aleshin.studyassistant.core.remote.models.callback
 
-import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.remote.utils.BaseRemotePojo
 
 /**
- * @author Stanislav Aleshin on 22.08.2024.
+ * @author Stanislav Aleshin on 28.07.2025.
  */
-interface EndClassesReminderManager {
-    suspend fun fetchWorkStatus(): RepeatWorkStatus
-    fun startOrRetryReminderService()
-    fun stopReminderService(allOrganizations: List<UID>)
-}
+@Serializable
+data class UpdateCallback(
+    @SerialName("\$id") override val id: String,
+    @SerialName("updatedAt") override val updatedAt: Long,
+) : BaseRemotePojo()

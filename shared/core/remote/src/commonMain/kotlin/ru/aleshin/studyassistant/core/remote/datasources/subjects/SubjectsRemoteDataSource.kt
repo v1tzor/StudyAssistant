@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.api.databases.DatabaseService
 import ru.aleshin.studyassistant.core.api.realtime.RealtimeService
 import ru.aleshin.studyassistant.core.api.utils.Permission
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectPojo
 import ru.aleshin.studyassistant.core.remote.utils.RemoteDataSource
 
@@ -33,16 +34,18 @@ interface SubjectsRemoteDataSource : RemoteDataSource.FullSynced.MultipleDocumen
     class Base(
         database: DatabaseService,
         userSessionProvider: UserSessionProvider,
+        dateManager: DateManager,
         realtime: RealtimeService,
     ) : SubjectsRemoteDataSource, RemoteDataSource.FullSynced.MultipleDocuments.BaseAppwrite<SubjectPojo>(
         database = database,
         realtime = realtime,
+        dateManager = dateManager,
         userSessionProvider = userSessionProvider,
     ) {
 
-        override val databaseId = Subjects.DATABASE_ID
-
         override val collectionId = Subjects.COLLECTION_ID
+
+        override val callbackCollectionId = Subjects.CALLBACK_COLLECTION_ID
 
         override val nestedType = SubjectPojo.serializer()
 

@@ -32,7 +32,6 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
 import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 
@@ -43,6 +42,7 @@ val Json.Encode: Json
         encodeDefaults = true
         explicitNulls = true
         useAlternativeNames = false
+        allowStructuredMapKeys = true
     }
 
 val Json.Decode: Json
@@ -52,6 +52,7 @@ val Json.Decode: Json
         encodeDefaults = true
         explicitNulls = false
         useAlternativeNames = false
+        allowStructuredMapKeys = true
     }
 
 /**
@@ -90,23 +91,12 @@ fun Any?.toJsonElement(): JsonElement = when (this) {
     }
 }
 
-inline fun <reified T> Map<String, T>.encodeToString(): List<String> {
-    return map { entry ->
-        val jsonObject = buildJsonObject {
-            put(entry.key, entry.value.toJson())
-        }
-        jsonObject.toString()
-    }
+inline fun <reified K, reified V> Map<K, V>.encodeToString(): List<String> {
+    return map { entry -> Json.Encode.encodeToString(entry) }
 }
 
-inline fun <reified T> List<String>.decodeFromString(): Map<String, T> {
-    val json = Json.Decode
-    return associate { raw ->
-        json.decodeFromString<JsonObject>(raw).let { jsonObject ->
-            val (key, element) = jsonObject.entries.first()
-            key to json.decodeFromString<T>(element.jsonPrimitive.content)
-        }
-    }
+inline fun <reified K, reified V> List<String>.decodeFromString(): Map<K, V> {
+    return associate { Json.Decode.decodeFromString<Map.Entry<K, V>>(it).toPair() }
 }
 
 inline fun <reified T> String.fromJson(): T = Json.Decode.decodeFromString<T>(this)

@@ -120,8 +120,8 @@ interface SharedHomeworksRemoteDataSource : RemoteDataSource.FullSynced.SingleDo
             }
 
             return sharedHomeworksPojoFlow.flatMapLatest { sharedHomeworks ->
-                val sentHomeworks = sharedHomeworks.sent.decodeFromString<SentMediatedHomeworksPojo>()
-                val receivedHomeworks = sharedHomeworks.received.decodeFromString<ReceivedMediatedHomeworksPojo>()
+                val sentHomeworks = sharedHomeworks.sent.decodeFromString<UID, SentMediatedHomeworksPojo>()
+                val receivedHomeworks = sharedHomeworks.received.decodeFromString<UID, ReceivedMediatedHomeworksPojo>()
 
                 val users = buildList {
                     addAll(sentHomeworks.map { it.value.recipients }.extractAllItem())
@@ -138,16 +138,16 @@ interface SharedHomeworksRemoteDataSource : RemoteDataSource.FullSynced.SingleDo
                         usersList.map { it.data.convertToDetails() }
                     }
                 } else {
-                    flowOf(null)
+                    flowOf(emptyList())
                 }
 
                 senderAndRecipientsUsersFlow.map { senderAndRecipientsUsers ->
                     sharedHomeworks.convertToDetails(
                         recipientsMapper = { recipients ->
-                            checkNotNull(senderAndRecipientsUsers?.filter { recipients.contains(it.uid) })
+                            checkNotNull(senderAndRecipientsUsers.filter { recipients.contains(it.uid) })
                         },
                         sendersMapper = { sender ->
-                            checkNotNull(senderAndRecipientsUsers?.find { it.uid == sender })
+                            checkNotNull(senderAndRecipientsUsers.find { it.uid == sender })
                         },
                     )
                 }

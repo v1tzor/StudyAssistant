@@ -42,10 +42,10 @@ fun SharedHomeworksPojo.convertToDetails(
     sendersMapper: (UID) -> AppUserPojoDetails,
 ) = SharedHomeworksDetailsPojo(
     id = id,
-    received = received.decodeFromString<ReceivedMediatedHomeworksPojo>().mapValues {
+    received = received.decodeFromString<UID, ReceivedMediatedHomeworksPojo>().mapValues {
         it.value.convertToDetails(sendersMapper)
     },
-    sent = sent.decodeFromString<SentMediatedHomeworksPojo>().mapValues {
+    sent = sent.decodeFromString<UID, SentMediatedHomeworksPojo>().mapValues {
         it.value.convertToDetails(recipientsMapper)
     },
     updatedAt = updatedAt,

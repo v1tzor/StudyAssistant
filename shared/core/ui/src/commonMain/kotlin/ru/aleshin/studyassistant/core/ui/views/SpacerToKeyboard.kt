@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.auth.impl.presentation.ui.common
+package ru.aleshin.studyassistant.core.ui.views
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -40,7 +40,7 @@ import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
  * @author Stanislav Aleshin on 17.07.2025.
  */
 @Composable
-internal fun SpacerToKeyboard(
+fun SpacerToKeyboard(
     modifier: Modifier = Modifier,
     additionOffset: Dp = 12.dp
 ) {

@@ -75,7 +75,7 @@ internal interface BaseClassInteractor {
         ) = eitherWrapper.wrap {
             val createClassModel = classModel.copy(uid = randomUUID())
             val currentDate = dateManager.fetchBeginningCurrentInstant()
-            val currentTime = dateManager.fetchCurrentInstant()
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
             return@wrap if (schedule != null) {
@@ -83,11 +83,11 @@ internal interface BaseClassInteractor {
                     add(createClassModel)
                 }
                 if (mondayDate.equalsDay(schedule.dateVersion.from)) {
-                    val updatedSchedule = schedule.copy(classes = actualClasses)
+                    val updatedSchedule = schedule.copy(classes = actualClasses, updatedAt = updatedAt)
                     scheduleRepository.addOrUpdateSchedule(updatedSchedule)
                 } else {
                     val deprecatedVersion = schedule.dateVersion.makeDeprecated(currentDate)
-                    val deprecatedSchedule = schedule.copy(dateVersion = deprecatedVersion)
+                    val deprecatedSchedule = schedule.copy(dateVersion = deprecatedVersion, updatedAt = updatedAt)
                     scheduleRepository.addOrUpdateSchedule(deprecatedSchedule)
 
                     val actualVersion = DateVersion.createNewVersion(currentDate)
@@ -95,6 +95,7 @@ internal interface BaseClassInteractor {
                         uid = randomUUID(),
                         dateVersion = actualVersion,
                         classes = actualClasses,
+                        updatedAt = updatedAt,
                     )
                     scheduleRepository.addOrUpdateSchedule(actualSchedule).let {
                         return@let createClassModel.uid
@@ -105,7 +106,7 @@ internal interface BaseClassInteractor {
                     currentDate = currentDate,
                     dayOfNumberedWeek = targetDay,
                     classes = listOf(createClassModel),
-                    createdAt = currentTime.toEpochMilliseconds(),
+                    createdAt = updatedAt,
                 )
                 scheduleRepository.addOrUpdateSchedule(createSchedule).let {
                     createClassModel.uid
@@ -122,6 +123,7 @@ internal interface BaseClassInteractor {
         override suspend fun updateClassBySchedule(classModel: Class, schedule: BaseSchedule) = eitherWrapper.wrap {
             val classId = classModel.uid
             val currentDate = dateManager.fetchBeginningCurrentInstant()
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
             val updatedClassId: UID
@@ -140,11 +142,11 @@ internal interface BaseClassInteractor {
             }
 
             return@wrap if (mondayDate.equalsDay(schedule.dateVersion.from)) {
-                val updatedSchedule = schedule.copy(classes = actualClasses)
+                val updatedSchedule = schedule.copy(classes = actualClasses, updatedAt = updatedAt)
                 scheduleRepository.addOrUpdateSchedule(updatedSchedule)
             } else {
                 val deprecatedVersion = schedule.dateVersion.makeDeprecated(currentDate)
-                val deprecatedSchedule = schedule.copy(dateVersion = deprecatedVersion)
+                val deprecatedSchedule = schedule.copy(dateVersion = deprecatedVersion, updatedAt = updatedAt)
                 scheduleRepository.addOrUpdateSchedule(deprecatedSchedule)
 
                 val actualVersion = DateVersion.createNewVersion(currentDate)
@@ -152,6 +154,7 @@ internal interface BaseClassInteractor {
                     uid = randomUUID(),
                     dateVersion = actualVersion,
                     classes = actualClasses,
+                    updatedAt = updatedAt,
                 )
                 scheduleRepository.addOrUpdateSchedule(actualSchedule).let {
                     return@let updatedClassId
@@ -164,6 +167,7 @@ internal interface BaseClassInteractor {
 
         override suspend fun deleteClassBySchedule(uid: UID, schedule: BaseSchedule) = eitherWrapper.wrapUnit {
             val currentDate = dateManager.fetchBeginningCurrentInstant()
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
             val actualClasses = schedule.classes.toMutableList().apply {
@@ -171,11 +175,11 @@ internal interface BaseClassInteractor {
             }
 
             if (mondayDate.equalsDay(schedule.dateVersion.from)) {
-                val updatedSchedule = schedule.copy(classes = actualClasses)
+                val updatedSchedule = schedule.copy(classes = actualClasses, updatedAt = updatedAt)
                 scheduleRepository.addOrUpdateSchedule(updatedSchedule)
             } else {
                 val deprecatedVersion = schedule.dateVersion.makeDeprecated(currentDate)
-                val deprecatedSchedule = schedule.copy(dateVersion = deprecatedVersion)
+                val deprecatedSchedule = schedule.copy(dateVersion = deprecatedVersion, updatedAt = updatedAt)
                 scheduleRepository.addOrUpdateSchedule(deprecatedSchedule)
 
                 val actualVersion = DateVersion.createNewVersion(currentDate)
@@ -183,6 +187,7 @@ internal interface BaseClassInteractor {
                     uid = randomUUID(),
                     dateVersion = actualVersion,
                     classes = actualClasses,
+                    updatedAt = updatedAt,
                 )
                 scheduleRepository.addOrUpdateSchedule(actualSchedule)
             }.apply {

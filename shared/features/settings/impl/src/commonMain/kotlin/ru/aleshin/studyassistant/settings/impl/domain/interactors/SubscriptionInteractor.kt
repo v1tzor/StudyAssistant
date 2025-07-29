@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.first
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPurchaseStatus.CONFIRMED
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
@@ -45,6 +46,7 @@ internal interface SubscriptionInteractor {
         private val productsRepository: ProductsRepository,
         private val iapService: IapService,
         private val deviceInfoProvider: DeviceInfoProvider,
+        private val dateManager: DateManager,
         private val eitherWrapper: SettingsEitherWrapper,
     ) : SubscriptionInteractor {
 
@@ -89,6 +91,7 @@ internal interface SubscriptionInteractor {
 
         override suspend fun restoreSubscription() = eitherWrapper.wrap {
             val targetUser = usersRepository.fetchCurrentUserOrError().uid
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val allPurchases = iapService.fetchPurchases()
             val activePurchase = allPurchases.find { product ->
                 product.status == CONFIRMED && product.developerPayload == targetUser
@@ -117,7 +120,10 @@ internal interface SubscriptionInteractor {
                             startTimeMillis = startTime,
                             expiryTimeMillis = endTime.toEpochMilliseconds(),
                         )
-                        val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
+                        val updatedAppUser = appUserInfo.copy(
+                            subscriptionInfo = updatedSubscriptionInfo,
+                            updatedAt = updatedAt,
+                        )
                         usersRepository.updateCurrentUserProfile(updatedAppUser)
                     } else {
                         val updatedSubscriptionInfo = SubscribeInfo(
@@ -130,7 +136,10 @@ internal interface SubscriptionInteractor {
                             expiryTimeMillis = endTime.toEpochMilliseconds(),
                             store = iapService.fetchStore(),
                         )
-                        val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
+                        val updatedAppUser = appUserInfo.copy(
+                            subscriptionInfo = updatedSubscriptionInfo,
+                            updatedAt = updatedAt,
+                        )
                         usersRepository.updateCurrentUserProfile(updatedAppUser)
                     }
                     true

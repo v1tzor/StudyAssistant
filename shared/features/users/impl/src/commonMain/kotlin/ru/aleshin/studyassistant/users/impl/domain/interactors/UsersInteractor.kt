@@ -20,13 +20,13 @@ import dev.tmapps.konnection.Konnection
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.UserFriendStatus
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
@@ -53,12 +53,13 @@ internal interface UsersInteractor {
         private val shareSchedulesRepository: ShareSchedulesRepository,
         private val shareHomeworksRepository: ShareHomeworksRepository,
         private val requestsRepository: FriendRequestsRepository,
+        private val dateManager: DateManager,
         private val connectionManager: Konnection,
         private val eitherWrapper: UsersEitherWrapper,
     ) : UsersInteractor {
 
         override suspend fun fetchUserById(userId: UID) = eitherWrapper.wrapFlow {
-            usersRepository.fetchCurrentUserProfile().filterNotNull()
+            usersRepository.fetchUserProfileById(userId).filterNotNull()
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -99,40 +100,46 @@ internal interface UsersInteractor {
         override suspend fun addUserToFriends(userId: UID) = eitherWrapper.wrapUnit {
             if (!connectionManager.isConnected()) throw InternetConnectionException()
 
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentUserInfo = usersRepository.fetchCurrentUserProfile().first()
-            val targetUserInfo = usersRepository.fetchCurrentUserProfile().first()
+            val currentUserInfo = usersRepository.fetchRealtimeUserById(currentUser)
+            val targetUserInfo = usersRepository.fetchRealtimeUserById(userId)
 
             val updatedCurrentUser = checkNotNull(currentUserInfo).copy(
+                updatedAt = updatedAt,
                 friends = buildList {
                     addAll(currentUserInfo.friends)
                     add(userId)
                 }
             )
             val updatedTargetUser = checkNotNull(targetUserInfo).copy(
+                updatedAt = updatedAt,
                 friends = buildList {
                     addAll(targetUserInfo.friends)
                     add(currentUser)
                 }
             )
             usersRepository.updateCurrentUserProfile(updatedCurrentUser)
-            usersRepository.updateCurrentUserProfile(updatedTargetUser)
+            usersRepository.updateAnotherUserProfile(updatedTargetUser, userId)
         }
 
         override suspend fun removeUserFromFriends(userId: UID) = eitherWrapper.wrapUnit {
             if (!connectionManager.isConnected()) throw InternetConnectionException()
 
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
             shareSchedulesRepository.fetchRealtimeSharedSchedulesByUser(currentUser).apply {
                 val updatedCurrentSharedSchedules = copy(
+                    updatedAt = updatedAt,
                     received = received.filter { it.value.sender.uid != userId },
                     sent = sent.filter { it.value.recipient.uid != userId },
                 )
-                shareSchedulesRepository.addOrUpdateSharedSchedulesForUser(updatedCurrentSharedSchedules, currentUser)
+                shareSchedulesRepository.addOrUpdateCurrentSharedSchedules(updatedCurrentSharedSchedules)
             }
 
             shareSchedulesRepository.fetchRealtimeSharedSchedulesByUser(userId).apply {
                 val updatedSenderSharedSchedules = copy(
+                    updatedAt = updatedAt,
                     received = received.filter { it.value.sender.uid != currentUser },
                     sent = sent.filter { it.value.recipient.uid != currentUser },
                 )
@@ -141,6 +148,7 @@ internal interface UsersInteractor {
 
             shareHomeworksRepository.fetchRealtimeSharedHomeworksByUser(currentUser).apply {
                 val updatedCurrentSharedHomeworks = copy(
+                    updatedAt = updatedAt,
                     received = received.filter { it.value.sender != userId },
                     sent = sent.filter { entry ->
                         (entry.value.recipients.size == 1 && entry.value.recipients.contains(userId)).not()
@@ -148,11 +156,12 @@ internal interface UsersInteractor {
                         entry.value.copy(recipients = entry.value.recipients.filter { it != userId })
                     }
                 )
-                shareHomeworksRepository.addOrUpdateSharedHomeworkForUser(updatedCurrentSharedHomeworks, currentUser)
+                shareHomeworksRepository.addOrUpdateCurrentSharedHomework(updatedCurrentSharedHomeworks)
             }
 
             shareHomeworksRepository.fetchRealtimeSharedHomeworksByUser(userId).apply {
                 val updatedSenderSharedHomeworks = copy(
+                    updatedAt = updatedAt,
                     received = received.filter { it.value.sender != currentUser },
                     sent = sent.filter { entry ->
                         (entry.value.recipients.size == 1 && entry.value.recipients.contains(currentUser)).not()
@@ -163,23 +172,25 @@ internal interface UsersInteractor {
                 shareHomeworksRepository.addOrUpdateSharedHomeworkForUser(updatedSenderSharedHomeworks, userId)
             }
 
-            val currentUserInfo = usersRepository.fetchCurrentUserProfile().first()
-            val targetUserInfo = usersRepository.fetchCurrentUserProfile().first()
+            val currentUserInfo = usersRepository.fetchRealtimeUserById(currentUser)
+            val targetUserInfo = usersRepository.fetchRealtimeUserById(userId)
 
             val updatedCurrentUser = checkNotNull(currentUserInfo).copy(
+                updatedAt = updatedAt,
                 friends = buildList {
                     addAll(currentUserInfo.friends)
                     remove(userId)
                 }
             )
             val updatedTargetUser = checkNotNull(targetUserInfo).copy(
+                updatedAt = updatedAt,
                 friends = buildList {
                     addAll(targetUserInfo.friends)
                     remove(currentUser)
                 }
             )
             usersRepository.updateCurrentUserProfile(updatedCurrentUser)
-            usersRepository.updateCurrentUserProfile(updatedTargetUser)
+            usersRepository.updateAnotherUserProfile(updatedTargetUser, userId)
         }
     }
 }

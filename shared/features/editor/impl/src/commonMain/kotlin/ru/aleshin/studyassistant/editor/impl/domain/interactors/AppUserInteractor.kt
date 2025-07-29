@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
@@ -43,6 +44,7 @@ internal interface AppUserInteractor {
     class Base(
         private val usersRepository: UsersRepository,
         private val manageUserRepository: ManageUserRepository,
+        private val dateManager: DateManager,
         private val eitherWrapper: EditorEitherWrapper,
     ) : AppUserInteractor {
 
@@ -55,7 +57,9 @@ internal interface AppUserInteractor {
         }
 
         override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {
-            usersRepository.updateCurrentUserProfile(user)
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedUser = user.copy(updatedAt = updatedAt)
+            usersRepository.updateCurrentUserProfile(updatedUser)
         }
 
         override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) = eitherWrapper.wrap {

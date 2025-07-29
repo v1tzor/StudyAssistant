@@ -26,7 +26,7 @@ import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.data.workers.WorkloadWarningWorker
 import ru.aleshin.studyassistant.core.data.workers.WorkloadWarningWorker.Companion.WORK_KEY
-import ru.aleshin.studyassistant.core.domain.managers.reminders.RepeatWorkStatus
+import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
 import java.util.concurrent.TimeUnit
 

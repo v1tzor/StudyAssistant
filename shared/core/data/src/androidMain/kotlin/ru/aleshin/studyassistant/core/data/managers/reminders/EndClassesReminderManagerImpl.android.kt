@@ -37,8 +37,8 @@ import ru.aleshin.studyassistant.core.data.workers.EndClassesReminderWorker
 import ru.aleshin.studyassistant.core.data.workers.EndClassesReminderWorker.Companion.NOTIFICATION_ID_APPEND
 import ru.aleshin.studyassistant.core.data.workers.EndClassesReminderWorker.Companion.REPEAT_WORK_KEY
 import ru.aleshin.studyassistant.core.data.workers.EndClassesReminderWorker.Companion.WORK_KEY
+import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.reminders.RepeatWorkStatus
 import java.util.concurrent.TimeUnit
 
 /**

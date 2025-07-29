@@ -26,11 +26,12 @@ SELECT *
 FROM baseScheduleEntity
 WHERE uid IN ? AND is_cache_data = ?;
 
-fetchSchedulesByDate:
+fetchScheduleByDate:
 SELECT *
 FROM baseScheduleEntity
 WHERE (week = ? AND week_day_of_week = ? AND date_version_from <= ? AND date_version_to >= ?) AND is_cache_data = ?
-ORDER BY date_version_to DESC;
+ORDER BY date_version_to DESC
+LIMIT 1;
 
 fetchSchedulesByTimeRangeWithWeek:
 SELECT *

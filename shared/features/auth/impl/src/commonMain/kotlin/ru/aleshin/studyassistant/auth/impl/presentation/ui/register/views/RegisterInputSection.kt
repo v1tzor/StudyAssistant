@@ -32,8 +32,8 @@ import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.Passwo
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.UsernameValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.EmailTextField
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.PasswordTextField
-import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.SpacerToKeyboard
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.UsernameTextField
+import ru.aleshin.studyassistant.core.ui.views.SpacerToKeyboard
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.

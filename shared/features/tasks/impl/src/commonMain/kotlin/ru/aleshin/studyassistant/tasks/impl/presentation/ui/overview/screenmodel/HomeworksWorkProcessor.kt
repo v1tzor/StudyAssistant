@@ -99,7 +99,7 @@ internal interface HomeworksWorkProcessor : FlowWorkProcessor<HomeworksWorkComma
             val sharedHomeworksFlow = shareInteractor.fetchSharedHomeworksDetails()
             val friendsFlow = usersInteractor.fetchAllFriends()
 
-            sharedHomeworksFlow.flatMapLatestWithResult(
+            sharedHomeworksFlow.combineWithResult(
                 secondFlow = friendsFlow,
                 onError = { OverviewEffect.ShowError(it) },
                 onData = { homeworks, friends ->

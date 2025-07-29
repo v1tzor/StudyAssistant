@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionExcept
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.share.scheules.ReceivedMediatedSchedules
 import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -40,6 +41,7 @@ internal interface ShareSchedulesInteractor {
         private val shareRepository: ShareSchedulesRepository,
         private val usersRepository: UsersRepository,
         private val connectionManager: Konnection,
+        private val dateManager: DateManager,
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : ShareSchedulesInteractor {
 
@@ -52,17 +54,20 @@ internal interface ShareSchedulesInteractor {
         override suspend fun acceptOrRejectSchedules(schedules: ReceivedMediatedSchedules) = eitherWrapper.wrapUnit {
             if (!connectionManager.isConnected()) throw InternetConnectionException()
 
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
             val currentSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(currentUser)
             val senderSharedSchedules = shareRepository.fetchRealtimeSharedSchedulesByUser(schedules.sender.uid)
 
             val updatedCurrentSharedSchedules = currentSharedSchedules.copy(
+                updatedAt = updatedAt,
                 received = buildMap {
                     putAll(currentSharedSchedules.received)
                     remove(schedules.uid)
                 }
             )
             val updatedSenderSharedSchedules = senderSharedSchedules.copy(
+                updatedAt = updatedAt,
                 sent = buildMap {
                     putAll(senderSharedSchedules.sent)
                     remove(schedules.uid)

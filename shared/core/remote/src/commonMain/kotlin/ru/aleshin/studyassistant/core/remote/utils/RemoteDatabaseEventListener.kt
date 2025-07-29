@@ -75,4 +75,9 @@ sealed interface DatabaseEvent<T> {
      * Represents a document that was deleted remotely.
      */
     data class Delete<T>(override val documentId: String) : DatabaseEvent<T>
+
+    /**
+     * Notification of multiple collection updates
+     */
+    data class BatchUpdate<T>(override val documentId: String) : DatabaseEvent<T>
 }

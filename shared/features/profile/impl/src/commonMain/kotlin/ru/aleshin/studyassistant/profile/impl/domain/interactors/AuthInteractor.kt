@@ -56,7 +56,7 @@ internal interface AuthInteractor {
                 addAll(userInfo.devices.filter { it.deviceId != deviceId })
             }
             val updatedUserInfo = userInfo.copy(devices = updatedDevices)
-            usersRepository.updateCurrentUserProfile(updatedUserInfo)
+            usersRepository.updateAnotherUserProfile(updatedUserInfo, userInfo.uid)
 
             crashlyticsService.setupUser(null)
             sourceSyncFacade.clearAllSyncedData()

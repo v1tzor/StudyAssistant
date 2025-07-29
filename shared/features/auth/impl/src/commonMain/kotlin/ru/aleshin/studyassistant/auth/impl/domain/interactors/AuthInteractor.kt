@@ -45,7 +45,10 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 internal interface AuthInteractor {
 
     suspend fun loginWithEmail(credentials: AuthCredentials, device: UserDevice): DomainResult<AuthFailures, AuthUser>
-    suspend fun registerNewAccount(credentials: AuthCredentials, device: UserDevice): DomainResult<AuthFailures, AppUser>
+    suspend fun registerNewAccount(
+        credentials: AuthCredentials,
+        device: UserDevice
+    ): DomainResult<AuthFailures, AppUser>
     suspend fun resetPassword(credentials: ForgotCredentials): UnitDomainResult<AuthFailures>
     suspend fun confirmOAuthLogin(session: UserSession, device: UserDevice): DomainResult<AuthFailures, AuthResult>
     suspend fun sendEmailVerification(): UnitDomainResult<AuthFailures>
@@ -69,11 +72,15 @@ internal interface AuthInteractor {
             val userInfo = usersRepository.fetchRealtimeUserById(userSession.userId) ?: throw AppwriteUserException()
 
             if (userInfo.devices.find { it.deviceId == device.deviceId } == null) {
-                val updatedDevices = buildList {
-                    addAll(userInfo.devices)
-                    add(device)
-                }
-                usersRepository.updateCurrentUserProfile(userInfo.copy(devices = updatedDevices))
+                val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+                val updatedUserInfo = userInfo.copy(
+                    updatedAt = updatedAt,
+                    devices = buildList {
+                        addAll(userInfo.devices)
+                        add(device)
+                    },
+                )
+                usersRepository.updateCurrentUserProfile(updatedUserInfo)
             }
 
             crashlyticsService.setupUser(userSession.id)
@@ -137,11 +144,14 @@ internal interface AuthInteractor {
             val userInfo = usersRepository.fetchCurrentUserProfile().first() ?: throw AppwriteUserException()
             val deviceInfo = userInfo.devices.find { it.deviceId == deviceId }
             if (deviceInfo != null) {
-                val updatedDevices = buildList {
-                    addAll(userInfo.devices)
-                    remove(deviceInfo)
-                }
-                val updatedUserInfo = userInfo.copy(devices = updatedDevices)
+                val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+                val updatedUserInfo = userInfo.copy(
+                    updatedAt = updatedAt,
+                    devices = buildList {
+                        addAll(userInfo.devices)
+                        remove(deviceInfo)
+                    },
+                )
                 usersRepository.updateAnotherUserProfile(updatedUserInfo, userInfo.uid)
             }
             crashlyticsService.setupUser(null)

@@ -235,13 +235,15 @@ private fun UserProfileTopSheetHeader(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(
-                text = UsersThemeRes.strings.userProfileInfoLabel,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-                style = MaterialTheme.typography.labelLarge,
-            )
+            if (gender != null || birthday != null || city != null) {
+                Text(
+                    text = UsersThemeRes.strings.userProfileInfoLabel,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),

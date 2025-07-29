@@ -37,7 +37,6 @@ import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesRemind
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.impl.domain.common.EditorEitherWrapper
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.domain.entities.ShiftTimeError
@@ -71,7 +70,6 @@ internal interface CustomScheduleInteractor {
     class Base(
         private val scheduleRepository: CustomScheduleRepository,
         private val notificationSettingsRepository: NotificationSettingsRepository,
-        private val usersRepository: UsersRepository,
         private val startClassesReminderManager: StartClassesReminderManager,
         private val endClassesReminderManager: EndClassesReminderManager,
         private val dateManager: DateManager,

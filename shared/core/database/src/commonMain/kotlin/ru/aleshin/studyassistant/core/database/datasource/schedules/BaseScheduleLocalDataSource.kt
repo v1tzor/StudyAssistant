@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.database.datasource.schedules
 import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -93,6 +94,7 @@ interface BaseScheduleLocalDataSource : CombinedLocalDataSource<BaseScheduleEnti
             override suspend fun addOrUpdateItem(item: BaseScheduleEntity) {
                 val uid = item.uid.ifEmpty { randomUUID() }
                 val updatedItem = item.copy(uid = uid, isCacheData = isCacheData).mapToEntity()
+                Logger.i("test2") { "upsert item: $updatedItem" }
                 scheduleQueries.addOrUpdateSchedule(updatedItem).await()
             }
 
@@ -123,7 +125,7 @@ interface BaseScheduleLocalDataSource : CombinedLocalDataSource<BaseScheduleEnti
                 val dayOfWeek = dateTime.dayOfWeek.toString()
                 val week = numberOfWeek.toString()
 
-                val query = scheduleQueries.fetchSchedulesByDate(
+                val query = scheduleQueries.fetchScheduleByDate(
                     week = week,
                     week_day_of_week = dayOfWeek,
                     date_version_from = dateMillis,

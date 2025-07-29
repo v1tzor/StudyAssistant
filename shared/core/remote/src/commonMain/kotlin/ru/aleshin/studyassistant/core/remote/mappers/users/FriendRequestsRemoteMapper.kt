@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.remote.mappers.users
 
 import ru.aleshin.studyassistant.core.common.extensions.encodeToString
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.models.requests.FriendRequestsDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.requests.FriendRequestsPojo
 
@@ -25,7 +26,7 @@ import ru.aleshin.studyassistant.core.remote.models.requests.FriendRequestsPojo
  */
 fun FriendRequestsDetailsPojo.mapToBase() = FriendRequestsPojo(
     id = id,
-    received = received.mapKeys { it.key.uid }.encodeToString<Long>(),
-    send = send.mapKeys { it.key.uid }.encodeToString<Long>(),
-    lastActions = lastActions.mapKeys { it.key.uid }.encodeToString<Boolean>(),
+    received = received.mapKeys { it.key.uid }.encodeToString<UID, Long>(),
+    send = send.mapKeys { it.key.uid }.encodeToString<UID, Long>(),
+    lastActions = lastActions.mapKeys { it.key.uid }.encodeToString<UID, Boolean>(),
 )

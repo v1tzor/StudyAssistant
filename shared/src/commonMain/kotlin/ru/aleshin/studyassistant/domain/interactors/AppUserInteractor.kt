@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.domain.interactors
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
@@ -27,6 +28,7 @@ import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.messages.UniversalPushToken
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPurchaseStatus.CONFIRMED
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
@@ -56,6 +58,7 @@ interface AppUserInteractor {
         private val usersRepository: UsersRepository,
         private val messagingRepository: MessageRepository,
         private val deviceInfoProvider: DeviceInfoProvider,
+        private val dateManager: DateManager,
         private val eitherWrapper: MainEitherWrapper,
     ) : AppUserInteractor {
 
@@ -74,7 +77,7 @@ interface AppUserInteractor {
         }
 
         override suspend fun fetchAuthStateChanged() = eitherWrapper.wrapFlow {
-            usersRepository.fetchStateChanged()
+            usersRepository.fetchStateChanged().distinctUntilChangedBy { it?.uid }
         }
 
         override suspend fun fetchAppToken() = eitherWrapper.wrapFlow {
@@ -87,7 +90,12 @@ interface AppUserInteractor {
             val isAuth = iapService.isAuthorizedUser()
 
             val allPurchases = if (isAuth && isAvailability is IapServiceAvailability.Available) {
-                iapService.fetchPurchases()
+                try {
+                    iapService.fetchPurchases()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    return@wrap
+                }
             } else {
                 emptyList()
             }
@@ -100,6 +108,7 @@ interface AppUserInteractor {
                 val currentSubscriptionInfo = appUserInfo.subscriptionInfo
 
                 if (activePurchase != null) {
+                    val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
                     val productInfo = iapService.fetchProducts(ids = listOf(activePurchase.productId)).firstOrNull()
                     val subscriptionPeriod = productInfo?.subscription?.subscriptionPeriod
                     val startTime = activePurchase.purchaseTime
@@ -121,7 +130,10 @@ interface AppUserInteractor {
                                     startTimeMillis = startTime,
                                     expiryTimeMillis = endTime.toEpochMilliseconds(),
                                 )
-                                val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
+                                val updatedAppUser = appUserInfo.copy(
+                                    subscriptionInfo = updatedSubscriptionInfo,
+                                    updatedAt = updatedAt,
+                                )
                                 usersRepository.updateCurrentUserProfile(updatedAppUser)
                             }
                         } else {
@@ -135,7 +147,10 @@ interface AppUserInteractor {
                                 expiryTimeMillis = endTime.toEpochMilliseconds(),
                                 store = iapService.fetchStore(),
                             )
-                            val updatedAppUser = appUserInfo.copy(subscriptionInfo = updatedSubscriptionInfo)
+                            val updatedAppUser = appUserInfo.copy(
+                                subscriptionInfo = updatedSubscriptionInfo,
+                                updatedAt = updatedAt,
+                            )
                             usersRepository.updateCurrentUserProfile(updatedAppUser)
                         }
                     }
@@ -144,7 +159,9 @@ interface AppUserInteractor {
         }
 
         override suspend fun updateUser(user: AppUser) = eitherWrapper.wrapUnit {
-            usersRepository.updateCurrentUserProfile(user)
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedUser = user.copy(updatedAt = updatedAt)
+            usersRepository.updateCurrentUserProfile(updatedUser)
         }
     }
 }

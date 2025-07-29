@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.api.databases.DatabaseService
 import ru.aleshin.studyassistant.core.api.realtime.RealtimeService
 import ru.aleshin.studyassistant.core.api.utils.Permission
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.remote.models.tasks.HomeworkPojo
 import ru.aleshin.studyassistant.core.remote.utils.RemoteDataSource
 
@@ -33,16 +34,18 @@ interface HomeworksRemoteDataSource : RemoteDataSource.FullSynced.MultipleDocume
     class Base(
         database: DatabaseService,
         realtime: RealtimeService,
+        dateManager: DateManager,
         userSessionProvider: UserSessionProvider
     ) : HomeworksRemoteDataSource, RemoteDataSource.FullSynced.MultipleDocuments.BaseAppwrite<HomeworkPojo>(
         database = database,
         realtime = realtime,
+        dateManager = dateManager,
         userSessionProvider = userSessionProvider,
     ) {
 
-        override val databaseId = Homeworks.DATABASE_ID
-
         override val collectionId = Homeworks.COLLECTION_ID
+
+        override val callbackCollectionId = Homeworks.CALLBACK_COLLECTION_ID
 
         override val nestedType = HomeworkPojo.serializer()
 

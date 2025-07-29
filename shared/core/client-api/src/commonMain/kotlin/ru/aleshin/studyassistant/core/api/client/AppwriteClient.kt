@@ -168,7 +168,6 @@ class AppwriteClient private constructor(
 
             private fun createHttpClient(type: AppwriteClientType): HttpClient {
                 return HttpClient(httpClientEngineFactory) {
-                    // install(HttpCache)
                     if (type == AppwriteClientType.CLIENT) {
                         install(HttpCookies) { storage = cookiesStorage }
                     }

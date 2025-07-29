@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.core.data.managers.reminders
 
 import androidx.work.WorkInfo
-import ru.aleshin.studyassistant.core.domain.managers.reminders.RepeatWorkStatus
+import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 
 /**
  * @author Stanislav Aleshin on 25.08.2024.

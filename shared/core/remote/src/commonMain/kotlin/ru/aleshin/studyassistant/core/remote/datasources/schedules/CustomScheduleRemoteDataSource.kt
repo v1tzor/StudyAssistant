@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.api.databases.DatabaseService
 import ru.aleshin.studyassistant.core.api.realtime.RealtimeService
 import ru.aleshin.studyassistant.core.api.utils.Permission
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.remote.models.schedule.CustomSchedulePojo
 import ru.aleshin.studyassistant.core.remote.utils.RemoteDataSource
 
@@ -33,16 +34,18 @@ interface CustomScheduleRemoteDataSource : RemoteDataSource.FullSynced.MultipleD
     class Base(
         database: DatabaseService,
         realtime: RealtimeService,
+        dateManager: DateManager,
         userSessionProvider: UserSessionProvider
     ) : CustomScheduleRemoteDataSource, RemoteDataSource.FullSynced.MultipleDocuments.BaseAppwrite<CustomSchedulePojo>(
         database = database,
         realtime = realtime,
+        dateManager = dateManager,
         userSessionProvider = userSessionProvider,
     ) {
 
-        override val databaseId = CustomSchedules.DATABASE_ID
-
         override val collectionId = CustomSchedules.COLLECTION_ID
+
+        override val callbackCollectionId = CustomSchedules.CALLBACK_COLLECTION_ID
 
         override val nestedType = CustomSchedulePojo.serializer()
 

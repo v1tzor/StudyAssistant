@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.core.common.extensions.getString
 import ru.aleshin.studyassistant.core.common.extensions.getStringOrNull
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationPojo
 import ru.aleshin.studyassistant.core.remote.utils.RemoteDataSource
@@ -49,16 +50,18 @@ interface OrganizationsRemoteDataSource : RemoteDataSource.FullSynced.MultipleDo
         database: DatabaseService,
         userSessionProvider: UserSessionProvider,
         realtime: RealtimeService,
+        dateManager: DateManager,
         private val storage: StorageService,
     ) : OrganizationsRemoteDataSource, RemoteDataSource.FullSynced.MultipleDocuments.BaseAppwrite<OrganizationPojo>(
         database = database,
         realtime = realtime,
+        dateManager = dateManager,
         userSessionProvider = userSessionProvider,
     ) {
 
-        override val databaseId = Organizations.DATABASE_ID
-
         override val collectionId = Organizations.COLLECTION_ID
+
+        override val callbackCollectionId = Organizations.CALLBACK_COLLECTION_ID
 
         override val nestedType = OrganizationPojo.serializer()
 
@@ -101,7 +104,7 @@ interface OrganizationsRemoteDataSource : RemoteDataSource.FullSynced.MultipleDo
             }
         }
 
-        override suspend fun deleteItemsByIds(ids: List<String>) {
+        override suspend fun deleteItemsByIds(ids: List<String>, sendBatchCallback: Boolean) {
             val avatarUrls = database.listDocuments(
                 databaseId = databaseId,
                 collectionId = collectionId,
@@ -122,6 +125,10 @@ interface OrganizationsRemoteDataSource : RemoteDataSource.FullSynced.MultipleDo
 
             if (avatarUrls.isNotEmpty()) {
                 avatarUrls.forEach { deleteAvatar(it) }
+            }
+
+            if (sendBatchCallback) {
+                sendBatchCallback()
             }
         }
 

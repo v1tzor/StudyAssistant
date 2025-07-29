@@ -18,8 +18,7 @@ package ru.aleshin.studyassistant.core.database.mappers.shared
 
 import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
 import ru.aleshin.studyassistant.core.common.extensions.encodeToString
-import ru.aleshin.studyassistant.core.common.extensions.fromJson
-import ru.aleshin.studyassistant.core.common.extensions.toJson
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.database.models.shared.schedules.ReceivedMediatedSchedulesShortDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.shared.schedules.SentMediatedSchedulesShortDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.shared.schedules.SharedSchedulesShortDetailsEntity
@@ -30,15 +29,15 @@ import ru.aleshin.studyassistant.sqldelight.shared.CurrentSharedSchedulesEntity
  */
 fun CurrentSharedSchedulesEntity.mapToBase() = SharedSchedulesShortDetailsEntity(
     uid = document_id,
-    received = received.decodeFromString<String>().mapValues { it.value.fromJson<ReceivedMediatedSchedulesShortDetailsEntity>() },
-    sent = sent.decodeFromString<String>().mapValues { it.value.fromJson<SentMediatedSchedulesShortDetailsEntity>() },
+    received = received.decodeFromString<UID, ReceivedMediatedSchedulesShortDetailsEntity>(),
+    sent = sent.decodeFromString<UID, SentMediatedSchedulesShortDetailsEntity>(),
     updatedAt = updated_at
 )
 
 fun SharedSchedulesShortDetailsEntity.mapToEntity() = CurrentSharedSchedulesEntity(
     id = 1,
     document_id = uid,
-    received = received.mapValues { it.value.toJson<ReceivedMediatedSchedulesShortDetailsEntity>() }.encodeToString(),
-    sent = sent.mapValues { it.value.toJson<SentMediatedSchedulesShortDetailsEntity>() }.encodeToString(),
+    received = received.encodeToString(),
+    sent = sent.encodeToString(),
     updated_at = updatedAt
 )

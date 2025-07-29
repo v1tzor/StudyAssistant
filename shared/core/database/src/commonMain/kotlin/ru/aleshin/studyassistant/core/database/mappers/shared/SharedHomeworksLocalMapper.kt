@@ -18,8 +18,7 @@ package ru.aleshin.studyassistant.core.database.mappers.shared
 
 import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
 import ru.aleshin.studyassistant.core.common.extensions.encodeToString
-import ru.aleshin.studyassistant.core.common.extensions.fromJson
-import ru.aleshin.studyassistant.core.common.extensions.toJson
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.database.models.shared.homeworks.ReceivedMediatedHomeworksDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.shared.homeworks.SentMediatedHomeworksDetailsEntity
 import ru.aleshin.studyassistant.core.database.models.shared.homeworks.SharedHomeworksDetailsEntity
@@ -30,15 +29,15 @@ import ru.aleshin.studyassistant.sqldelight.shared.CurrentSharedHomeworksEntity
  */
 fun CurrentSharedHomeworksEntity.mapToBase() = SharedHomeworksDetailsEntity(
     uid = document_id,
-    received = received.decodeFromString<String>().mapValues { it.value.fromJson<ReceivedMediatedHomeworksDetailsEntity>() },
-    sent = sent.decodeFromString<String>().mapValues { it.value.fromJson<SentMediatedHomeworksDetailsEntity>() },
+    received = received.decodeFromString<UID, ReceivedMediatedHomeworksDetailsEntity>(),
+    sent = sent.decodeFromString<UID, SentMediatedHomeworksDetailsEntity>(),
     updatedAt = updated_at
 )
 
 fun SharedHomeworksDetailsEntity.mapToEntity() = CurrentSharedHomeworksEntity(
     id = 1,
     document_id = uid,
-    received = received.mapValues { it.value.toJson<ReceivedMediatedHomeworksDetailsEntity>() }.encodeToString(),
-    sent = sent.mapValues { it.value.toJson<SentMediatedHomeworksDetailsEntity>() }.encodeToString(),
+    received = received.encodeToString(),
+    sent = sent.encodeToString(),
     updated_at = updatedAt
 )

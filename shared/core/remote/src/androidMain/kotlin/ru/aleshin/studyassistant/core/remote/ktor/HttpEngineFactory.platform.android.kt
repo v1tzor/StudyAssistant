@@ -15,13 +15,28 @@
  */
 package ru.aleshin.studyassistant.core.remote.ktor
 
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.HttpClientEngineConfig
 import io.ktor.client.engine.HttpClientEngineFactory
-import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.engine.okhttp.OkHttpConfig
+import io.ktor.client.engine.okhttp.OkHttpEngine
+import java.util.concurrent.TimeUnit
 
 /**
  * @author Stanislav Aleshin on 01.08.2024.
  */
 actual class HttpEngineFactory actual constructor() {
-    actual fun createEngine(): HttpClientEngineFactory<HttpClientEngineConfig> = OkHttp
+    actual fun createEngine(): HttpClientEngineFactory<HttpClientEngineConfig> {
+        return object : HttpClientEngineFactory<OkHttpConfig> {
+            override fun create(block: OkHttpConfig.() -> Unit): HttpClientEngine {
+                val config = OkHttpConfig().apply {
+                    block()
+                    config {
+                        pingInterval(20, TimeUnit.SECONDS)
+                    }
+                }
+                return OkHttpEngine(config)
+            }
+        }
+    }
 }

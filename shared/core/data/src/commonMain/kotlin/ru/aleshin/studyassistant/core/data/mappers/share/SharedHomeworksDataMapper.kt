@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.data.mappers.share
 import ru.aleshin.studyassistant.core.common.extensions.decodeFromString
 import ru.aleshin.studyassistant.core.common.extensions.encodeToString
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToRemoteData
@@ -46,54 +47,8 @@ import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomew
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
-class ShareHomeworksSyncMapper : SingleSyncMapper<SharedHomeworksDetailsEntity, SharedHomeworksDetailsPojo>(
-    localToRemote = { mapToDomain().mapToRemoteData("") },
-    remoteToLocal = { mapToDomain().mapToLocalData() }
-)
 
-fun SharedHomeworksPojo.mapToDomain() = SharedHomeworks(
-    received = received.decodeFromString<ReceivedMediatedHomeworksPojo>().mapValues { it.value.mapToDomain() },
-    sent = sent.decodeFromString<SentMediatedHomeworksPojo>().mapValues { it.value.mapToDomain() },
-    updatedAt = updatedAt,
-)
-
-fun SharedHomeworksDetailsPojo.mapToDomain() = SharedHomeworksDetails(
-    received = received.mapValues { it.value.mapToDomain() },
-    sent = sent.mapValues { it.value.mapToDomain() },
-    updatedAt = updatedAt,
-)
-
-fun ReceivedMediatedHomeworksPojo.mapToDomain() = ReceivedMediatedHomeworks(
-    uid = uid,
-    date = date.mapEpochTimeToInstant(),
-    sendDate = sendDate.mapEpochTimeToInstant(),
-    sender = sender,
-    homeworks = homeworks.map { it.mapToDomain() }
-)
-
-fun ReceivedMediatedHomeworksDetailsPojo.mapToDomain() = ReceivedMediatedHomeworksDetails(
-    uid = uid,
-    date = date.mapEpochTimeToInstant(),
-    sendDate = sendDate.mapEpochTimeToInstant(),
-    sender = sender.mapToDomain(),
-    homeworks = homeworks.map { it.mapToDomain() }
-)
-
-fun SentMediatedHomeworksPojo.mapToDomain() = SentMediatedHomeworks(
-    uid = uid,
-    date = date.mapEpochTimeToInstant(),
-    sendDate = sendDate.mapEpochTimeToInstant(),
-    recipients = recipients,
-    homeworks = homeworks.map { it.mapToDomain() }
-)
-
-fun SentMediatedHomeworksDetailsPojo.mapToDomain() = SentMediatedHomeworksDetails(
-    uid = uid,
-    date = date.mapEpochTimeToInstant(),
-    sendDate = sendDate.mapEpochTimeToInstant(),
-    recipients = recipients.map { it.mapToDomain() },
-    homeworks = homeworks.map { it.mapToDomain() }
-)
+// Remote
 
 fun SharedHomeworks.mapToRemoteData(userId: String) = SharedHomeworksPojo(
     id = userId,
@@ -125,13 +80,6 @@ fun SentMediatedHomeworks.mapToRemoteData() = SentMediatedHomeworksPojo(
     homeworks = homeworks.map { it.mapToRemoteData() }
 )
 
-fun SharedHomeworksDetails.mapToLocalData() = SharedHomeworksDetailsEntity(
-    uid = "1",
-    received = received.mapValues { it.value.mapToLocalData() },
-    sent = sent.mapValues { it.value.mapToLocalData() },
-    updatedAt = updatedAt,
-)
-
 fun ReceivedMediatedHomeworksDetails.mapToRemoteData() = ReceivedMediatedHomeworksDetailsPojo(
     uid = uid,
     date = date.toEpochMilliseconds(),
@@ -146,6 +94,59 @@ fun SentMediatedHomeworksDetails.mapToRemoteData() = SentMediatedHomeworksDetail
     sendDate = sendDate.toEpochMilliseconds(),
     recipients = recipients.map { it.mapToRemoteDataDetails() },
     homeworks = homeworks.map { it.mapToRemoteData() }
+)
+
+fun SharedHomeworksPojo.mapToDomain() = SharedHomeworks(
+    received = received.decodeFromString<UID, ReceivedMediatedHomeworksPojo>().mapValues { it.value.mapToDomain() },
+    sent = sent.decodeFromString<UID, SentMediatedHomeworksPojo>().mapValues { it.value.mapToDomain() },
+    updatedAt = updatedAt,
+)
+
+fun SharedHomeworksDetailsPojo.mapToDomain() = SharedHomeworksDetails(
+    received = received.mapValues { it.value.mapToDomain() },
+    sent = sent.mapValues { it.value.mapToDomain() },
+    updatedAt = updatedAt,
+)
+
+fun ReceivedMediatedHomeworksPojo.mapToDomain() = ReceivedMediatedHomeworks(
+    uid = uid,
+    date = date.mapEpochTimeToInstant(),
+    sendDate = sendDate.mapEpochTimeToInstant(),
+    sender = sender,
+    homeworks = homeworks.map { it.mapToDomain() }
+)
+
+fun SentMediatedHomeworksPojo.mapToDomain() = SentMediatedHomeworks(
+    uid = uid,
+    date = date.mapEpochTimeToInstant(),
+    sendDate = sendDate.mapEpochTimeToInstant(),
+    recipients = recipients,
+    homeworks = homeworks.map { it.mapToDomain() }
+)
+
+fun ReceivedMediatedHomeworksDetailsPojo.mapToDomain() = ReceivedMediatedHomeworksDetails(
+    uid = uid,
+    date = date.mapEpochTimeToInstant(),
+    sendDate = sendDate.mapEpochTimeToInstant(),
+    sender = sender.mapToDomain(),
+    homeworks = homeworks.map { it.mapToDomain() }
+)
+
+fun SentMediatedHomeworksDetailsPojo.mapToDomain() = SentMediatedHomeworksDetails(
+    uid = uid,
+    date = date.mapEpochTimeToInstant(),
+    sendDate = sendDate.mapEpochTimeToInstant(),
+    recipients = recipients.map { it.mapToDomain() },
+    homeworks = homeworks.map { it.mapToDomain() }
+)
+
+// Local
+
+fun SharedHomeworksDetails.mapToLocalData() = SharedHomeworksDetailsEntity(
+    uid = "1",
+    received = received.mapValues { it.value.mapToLocalData() },
+    sent = sent.mapValues { it.value.mapToLocalData() },
+    updatedAt = updatedAt,
 )
 
 fun ReceivedMediatedHomeworksDetails.mapToLocalData() = ReceivedMediatedHomeworksDetailsEntity(
@@ -184,4 +185,11 @@ fun SentMediatedHomeworksDetailsEntity.mapToDomain() = SentMediatedHomeworksDeta
     sendDate = sendDate.mapEpochTimeToInstant(),
     recipients = recipients.map { it.mapToDomain() },
     homeworks = homeworks.map { it.mapToDomain() }
+)
+
+// Mapper
+
+class ShareHomeworksSyncMapper : SingleSyncMapper<SharedHomeworksDetailsEntity, SharedHomeworksDetailsPojo>(
+    localToRemote = { mapToDomain().mapToRemoteData("") },
+    remoteToLocal = { mapToDomain().mapToLocalData() },
 )

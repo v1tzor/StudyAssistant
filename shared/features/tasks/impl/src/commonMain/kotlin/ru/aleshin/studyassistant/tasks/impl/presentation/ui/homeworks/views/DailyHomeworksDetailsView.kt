@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -523,9 +522,10 @@ private fun ShortHomeworkViewContent(
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(2.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
         ) {
             Text(
+                modifier = Modifier.weight(1f),
                 text = subject ?: StudyAssistantRes.strings.noneTitle,
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis,
@@ -533,7 +533,6 @@ private fun ShortHomeworkViewContent(
                 style = MaterialTheme.typography.titleSmall,
                 lineHeight = 18.sp,
             )
-            Spacer(modifier = Modifier.weight(1f))
             when (status) {
                 HomeworkStatus.COMPLETE -> Icon(
                     modifier = Modifier.size(18.dp),

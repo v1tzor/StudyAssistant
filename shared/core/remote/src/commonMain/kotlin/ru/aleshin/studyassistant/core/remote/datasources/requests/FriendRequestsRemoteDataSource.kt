@@ -209,9 +209,9 @@ interface FriendRequestsRemoteDataSource : RemoteDataSource.FullSynced.SingleDoc
 
         @ExperimentalCoroutinesApi
         private fun Flow<FriendRequestsPojo>.flatMapToDetails() = flatMapLatest { rawRequest ->
-            val receivedMap = rawRequest.received.decodeFromString<Long>()
-            val sendMap = rawRequest.send.decodeFromString<Long>()
-            val lastActionsMap = rawRequest.lastActions.decodeFromString<Boolean>()
+            val receivedMap = rawRequest.received.decodeFromString<UID, Long>()
+            val sendMap = rawRequest.send.decodeFromString<UID, Long>()
+            val lastActionsMap = rawRequest.lastActions.decodeFromString<UID, Boolean>()
             val users = buildSet {
                 addAll(receivedMap.keys.toList())
                 addAll(sendMap.keys.toList())

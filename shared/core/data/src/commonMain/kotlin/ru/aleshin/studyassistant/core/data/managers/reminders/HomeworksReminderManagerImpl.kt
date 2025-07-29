@@ -17,8 +17,8 @@
 package ru.aleshin.studyassistant.core.data.managers.reminders
 
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.reminders.RepeatWorkStatus
 
 /**
  * @author Stanislav Aleshin on 22.08.2024.

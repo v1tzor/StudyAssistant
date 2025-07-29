@@ -29,8 +29,7 @@ FROM currentUserEntity
 WHERE id = 1;
 
 deleteUser:
-DELETE FROM currentUserEntity
-WHERE id = 1;
+DELETE FROM currentUserEntity;
 
 fetchMetadata:
 SELECT document_id, updated_at

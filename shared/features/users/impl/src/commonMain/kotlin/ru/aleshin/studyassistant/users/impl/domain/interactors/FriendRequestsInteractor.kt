@@ -67,12 +67,14 @@ internal interface FriendRequestsInteractor {
             val targetUserInfo = usersRepository.fetchRealtimeUserById(userId)
 
             val updatedCurrentRequests = currentUserRequests.copy(
+                updatedAt = currentInstant.toEpochMilliseconds(),
                 send = buildMap {
                     putAll(currentUserRequests.send)
                     put(userId, currentInstant)
                 },
             )
             val updatedTargetRequests = targetUserRequests.copy(
+                updatedAt = currentInstant.toEpochMilliseconds(),
                 received = buildMap {
                     putAll(targetUserRequests.received)
                     put(currentUser, currentInstant)
@@ -93,17 +95,20 @@ internal interface FriendRequestsInteractor {
         override suspend fun cancelSendRequest(userId: UID) = eitherWrapper.wrapUnit {
             if (!connectionManager.isConnected()) throw InternetConnectionException()
 
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
             val currentUserRequests = requestsRepository.fetchRealtimeRequestsByUser(currentUser)
             val targetUserRequests = requestsRepository.fetchRealtimeRequestsByUser(userId)
 
             val updatedCurrentRequests = currentUserRequests.copy(
+                updatedAt = updatedAt,
                 send = buildMap {
                     putAll(currentUserRequests.send)
                     remove(userId)
                 },
             )
             val updatedTargetRequests = targetUserRequests.copy(
+                updatedAt = updatedAt,
                 received = buildMap {
                     putAll(targetUserRequests.received)
                     remove(currentUser)
@@ -122,8 +127,10 @@ internal interface FriendRequestsInteractor {
             val targetUserRequests = requestsRepository.fetchRealtimeRequestsByUser(userId)
             val currentUserInfo = usersRepository.fetchRealtimeUserById(currentUser)
             val targetUserInfo = usersRepository.fetchRealtimeUserById(userId)
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
 
             val updatedCurrentRequests = currentUserRequests.copy(
+                updatedAt = updatedAt,
                 received = buildMap {
                     putAll(currentUserRequests.received)
                     remove(userId)
@@ -134,6 +141,7 @@ internal interface FriendRequestsInteractor {
                 }
             )
             val updatedTargetRequests = targetUserRequests.copy(
+                updatedAt = updatedAt,
                 send = buildMap {
                     putAll(targetUserRequests.send)
                     remove(currentUser)
@@ -164,8 +172,10 @@ internal interface FriendRequestsInteractor {
             val targetUserRequests = requestsRepository.fetchRealtimeRequestsByUser(userId)
             val currentUserInfo = usersRepository.fetchRealtimeUserById(currentUser)
             val targetUserInfo = usersRepository.fetchRealtimeUserById(userId)
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
 
             val updatedCurrentRequests = currentUserRequests.copy(
+                updatedAt = updatedAt,
                 received = buildMap {
                     putAll(currentUserRequests.received)
                     remove(userId)
@@ -176,6 +186,7 @@ internal interface FriendRequestsInteractor {
                 }
             )
             val updatedTargetRequests = targetUserRequests.copy(
+                updatedAt = updatedAt,
                 send = buildMap {
                     putAll(targetUserRequests.send)
                     remove(currentUser)
@@ -200,8 +211,10 @@ internal interface FriendRequestsInteractor {
 
         override suspend fun deleteHistoryRequestByUser(userId: UID) = eitherWrapper.wrapUnit {
             val currentUser = usersRepository.fetchCurrentUserOrError().uid
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val userRequests = requestsRepository.fetchRealtimeRequestsByUser(currentUser)
             val updatedUserRequests = userRequests.copy(
+                updatedAt = updatedAt,
                 lastActions = buildMap {
                     putAll(userRequests.lastActions)
                     remove(userId)

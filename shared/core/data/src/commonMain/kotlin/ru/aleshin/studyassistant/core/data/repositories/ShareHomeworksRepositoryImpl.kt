@@ -19,12 +19,10 @@ package ru.aleshin.studyassistant.core.data.repositories
 import dev.tmapps.konnection.Konnection
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
-import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.share.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.share.mapToRemoteData
@@ -59,14 +57,12 @@ internal class ShareHomeworksRepositoryImpl(
     override suspend fun fetchCurrentSharedHomeworksDetails(): Flow<SharedHomeworksDetails> {
         return connectionManager.observeHasConnection().flatMapLatest { hasConnection ->
             if (hasConnection) {
-                remoteDataSource.fetchItem().catch { exception ->
-                    if (exception is InternetConnectionException) emit(null) else throw exception
-                }.map { sharedHomeworks ->
+                remoteDataSource.fetchItem().map { sharedHomeworks ->
                     sharedHomeworks?.mapToDomain()
                 }
             } else {
-                localDataSource.fetchItem().map { friendRequests ->
-                    friendRequests?.mapToDomain()
+                localDataSource.fetchItem().map { sharedHomeworks ->
+                    sharedHomeworks?.mapToDomain()
                 }
             }
         }.filterNotNull()

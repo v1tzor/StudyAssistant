@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.remote.utils
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.format.DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET
 import kotlinx.serialization.KSerializer
@@ -32,7 +33,10 @@ import ru.aleshin.studyassistant.core.api.utils.Channels
 import ru.aleshin.studyassistant.core.api.utils.Query
 import ru.aleshin.studyassistant.core.common.architecture.data.MetadataModel
 import ru.aleshin.studyassistant.core.common.extensions.getStringOrNull
+import ru.aleshin.studyassistant.core.common.extensions.tryFromJson
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.remote.models.callback.UpdateCallback
 
 /**
  * Root abstraction for all Appwrite-based remote data sources in the application.
@@ -220,11 +224,16 @@ sealed interface RemoteDataSource {
             abstract class BaseAppwrite<T : BaseMultipleRemotePojo>(
                 protected val database: DatabaseService,
                 protected val realtime: RealtimeService,
+                protected val dateManager: DateManager,
                 protected val userSessionProvider: UserSessionProvider,
             ) : MultipleDocuments<T> {
 
-                abstract val databaseId: String
+                open val databaseId: String = Common.BASE_DATA_DATABASE_ID
+                open val callbackDatabaseId: String = Common.BASE_CALLBACK_DATABASE_ID
+
                 abstract val collectionId: String
+                abstract val callbackCollectionId: String
+
                 abstract val nestedType: KSerializer<T>
 
                 abstract fun permissions(currentUser: UID): List<String>
@@ -242,7 +251,7 @@ sealed interface RemoteDataSource {
                     )
                 }
 
-                override suspend fun addOrUpdateItems(items: List<T>) {
+                override suspend fun addOrUpdateItems(items: List<T>, sendBatchCallback: Boolean) {
                     val currentUser = userSessionProvider.getCurrentUserId()
 
                     database.upsertDocuments(
@@ -252,6 +261,10 @@ sealed interface RemoteDataSource {
                         nestedType = nestedType,
                         permissions = permissions(currentUser),
                     )
+
+                    if (sendBatchCallback) {
+                        sendBatchCallback()
+                    }
                 }
 
                 override suspend fun fetchItemById(id: String): Flow<T?> {
@@ -287,11 +300,15 @@ sealed interface RemoteDataSource {
                     }
                 }
 
-                override suspend fun fetchAllMetadata(targetUser: String): List<MetadataModel> {
+                override suspend fun fetchAllMetadata(targetUser: String, ids: List<String>?): List<MetadataModel> {
                     return database.listDocuments(
                         databaseId = databaseId,
                         collectionId = collectionId,
-                        queries = listOf(Query.equal(USER_ID, targetUser)),
+                        queries = if (ids.isNullOrEmpty()) {
+                            listOf(Query.equal(USER_ID, targetUser))
+                        } else {
+                            listOf(Query.equal(Common.UID, ids))
+                        },
                         nestedType = JsonElement.serializer(),
                     ).documents.map { document ->
                         val id = document.data.getStringOrNull(Common.UID) ?: document.id
@@ -319,35 +336,61 @@ sealed interface RemoteDataSource {
                     )
                 }
 
-                override suspend fun deleteItemsByIds(ids: List<String>) {
+                override suspend fun deleteItemsByIds(ids: List<String>, sendBatchCallback: Boolean) {
                     database.deleteDocuments(
                         databaseId = databaseId,
                         collectionId = collectionId,
                         queries = listOf(Query.equal(Common.UID, ids)),
                     )
+
+                    if (sendBatchCallback) {
+                        sendBatchCallback()
+                    }
+                }
+
+                override suspend fun sendBatchCallback() {
+                    val currentUser = userSessionProvider.getCurrentUserId()
+                    val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+
+                    database.upsertDocument(
+                        databaseId = callbackDatabaseId,
+                        collectionId = callbackCollectionId,
+                        documentId = currentUser,
+                        data = UpdateCallback(currentUser, updatedAt),
+                        nestedType = UpdateCallback.serializer(),
+                        permissions = permissions(currentUser),
+                    )
                 }
 
                 override suspend fun observeEvents(): Flow<DatabaseEvent<T>> {
+                    val currentUser = userSessionProvider.getCurrentUserId()
                     return realtime.subscribe(
-                        channels = Channels.documents(databaseId, collectionId),
-                        payloadType = nestedType,
+                        channels = buildList {
+                            addAll(Channels.documents(databaseId, collectionId))
+                            addAll(Channels.document(callbackDatabaseId, callbackCollectionId, currentUser))
+                        },
                     ).map { response ->
-                        response.copy(
-                            events = response.events.filter {
-                                it.contains(databaseId) && it.contains(collectionId)
-                            }
-                        )
-                    }.filter { response ->
-                        response.events.isNotEmpty()
-                    }.map { response ->
-                        if (response.events.any { it.contains("create") }) {
-                            DatabaseEvent.Create(data = response.payload, documentId = response.payload.id)
-                        } else if (response.events.any { it.contains("delete") }) {
-                            DatabaseEvent.Delete(documentId = response.payload.id)
-                        } else {
-                            DatabaseEvent.Update(data = response.payload, documentId = response.payload.id)
+                        val dataEvents = response.events.filter {
+                            it.contains(databaseId) && it.contains(collectionId)
                         }
-                    }
+                        val callbackEvents = response.events.filter {
+                            it.contains(callbackDatabaseId) && it.contains(callbackCollectionId) && it.contains(currentUser)
+                        }
+                        if (callbackEvents.isNotEmpty()) {
+                            DatabaseEvent.BatchUpdate(currentUser)
+                        } else if (dataEvents.isNotEmpty()) {
+                            val payload = response.payload.tryFromJson(nestedType) ?: return@map null
+                            if (dataEvents.any { it.contains("create") }) {
+                                DatabaseEvent.Create(data = payload, documentId = payload.id)
+                            } else if (dataEvents.any { it.contains("delete") }) {
+                                DatabaseEvent.Delete(documentId = payload.id)
+                            } else {
+                                DatabaseEvent.Update(data = payload, documentId = payload.id)
+                            }
+                        } else {
+                            null
+                        }
+                    }.filterNotNull()
                 }
             }
         }
@@ -365,7 +408,7 @@ interface RemoteMultipleDocumentsCommands<T : BaseMultipleRemotePojo> {
     suspend fun addOrUpdateItem(item: T)
 
     /** Upload or overwrite multiple documents in a single batch */
-    suspend fun addOrUpdateItems(items: List<T>)
+    suspend fun addOrUpdateItems(items: List<T>, sendBatchCallback: Boolean = true)
 
     /** Observe changes of a document by its ID */
     suspend fun fetchItemById(id: String): Flow<T?>
@@ -377,7 +420,7 @@ interface RemoteMultipleDocumentsCommands<T : BaseMultipleRemotePojo> {
     suspend fun fetchAllItems(targetUser: String): Flow<List<T>>
 
     /** Fetch metadata for conflict resolution */
-    suspend fun fetchAllMetadata(targetUser: String): List<MetadataModel>
+    suspend fun fetchAllMetadata(targetUser: String, ids: List<String>? = null): List<MetadataModel>
 
     /** Remove all documents owned by a specific user */
     suspend fun deleteAllItems(targetUser: String)
@@ -385,8 +428,11 @@ interface RemoteMultipleDocumentsCommands<T : BaseMultipleRemotePojo> {
     /** Remove a single document by ID */
     suspend fun deleteItemById(id: String)
 
-    /** Remove multiple documents by their IDs */
-    suspend fun deleteItemsByIds(ids: List<String>)
+    /** Remove multiple documents by their IDs in a single batch */
+    suspend fun deleteItemsByIds(ids: List<String>, sendBatchCallback: Boolean = true)
+
+    /** Allows to notify Realtime subscribers about multiple changes in a collection */
+    suspend fun sendBatchCallback()
 }
 
 /**

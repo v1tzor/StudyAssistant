@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.core.data.managers.reminders
 
-import ru.aleshin.studyassistant.core.domain.managers.reminders.RepeatWorkStatus
+import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
 
 /**

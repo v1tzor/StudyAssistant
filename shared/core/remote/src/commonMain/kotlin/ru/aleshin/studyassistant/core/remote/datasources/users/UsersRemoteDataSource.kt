@@ -90,7 +90,6 @@ interface UsersRemoteDataSource : RemoteDataSource.FullSynced.SingleDocument<App
                 collectionId = Users.COLLECTION_ID,
                 documentId = targetUser,
                 data = user,
-                permissions = permissions(targetUser),
                 nestedType = AppUserPojo.serializer(),
             )
         }

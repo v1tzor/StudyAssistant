@@ -34,7 +34,7 @@ val domainModule = DI.Module("DomainModule") {
     bindSingleton<MainErrorHandler> { MainErrorHandler.Base() }
     bindSingleton<MainEitherWrapper> { MainEitherWrapper.Base(instance(), instance()) }
 
-    bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<GeneralSettingsInteractor> { GeneralSettingsInteractor.Base(instance(), instance()) }
     bindSingleton<ReminderInteractor> { ReminderInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<SyncInteractor> { SyncInteractor.Base(instance(), instance(), instance()) }

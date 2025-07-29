@@ -47,10 +47,10 @@ fun SharedSchedulesPojo.convertToDetails(
     senderMapper: (UID) -> AppUserPojoDetails,
 ) = SharedSchedulesDetailsPojo(
     id = id,
-    sent = sent.decodeFromString<SentMediatedSchedulesPojo>().mapValues {
+    sent = sent.decodeFromString<UID, SentMediatedSchedulesPojo>().mapValues {
         it.value.convertToDetails(recipientMapper)
     },
-    received = received.decodeFromString<ReceivedMediatedSchedulesPojo>().mapValues {
+    received = received.decodeFromString<UID, ReceivedMediatedSchedulesPojo>().mapValues {
         it.value.convertToDetails(senderMapper(it.value.sender))
     },
     updatedAt = updatedAt,
@@ -61,10 +61,10 @@ fun SharedSchedulesShortPojo.convertToShortDetails(
     senderMapper: (UID) -> AppUserPojoDetails,
 ) = SharedSchedulesShortDetailsPojo(
     id = id,
-    sent = sent.decodeFromString<SentMediatedSchedulesPojo>().mapValues {
+    sent = sent.decodeFromString<UID, SentMediatedSchedulesPojo>().mapValues {
         it.value.convertToShortDetails(recipientMapper)
     },
-    received = received.decodeFromString<ReceivedMediatedSchedulesShortPojo>().mapValues {
+    received = received.decodeFromString<UID, ReceivedMediatedSchedulesShortPojo>().mapValues {
         it.value.convertToShortDetails(senderMapper(it.value.sender))
     },
     updatedAt = updatedAt,

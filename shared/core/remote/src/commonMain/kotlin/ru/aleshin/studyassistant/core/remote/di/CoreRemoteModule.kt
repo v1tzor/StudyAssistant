@@ -183,14 +183,14 @@ val coreRemoteModule = DI.Module("CoreRemote") {
     bindSingleton<FriendRequestsRemoteDataSource> { FriendRequestsRemoteDataSource.Base(instance(), instance(), instance()) }
     bindSingleton<SharedHomeworksRemoteDataSource> { SharedHomeworksRemoteDataSource.Base(instance(), instance(), instance()) }
     bindSingleton<SharedSchedulesRemoteDataSource> { SharedSchedulesRemoteDataSource.Base(instance(), instance(), instance()) }
-    bindSingleton<BaseScheduleRemoteDataSource> { BaseScheduleRemoteDataSource.Base(instance(), instance(), instance()) }
-    bindSingleton<CustomScheduleRemoteDataSource> { CustomScheduleRemoteDataSource.Base(instance(), instance(), instance()) }
-    bindSingleton<SubjectsRemoteDataSource> { SubjectsRemoteDataSource.Base(instance(), instance(), instance()) }
-    bindSingleton<EmployeeRemoteDataSource> { EmployeeRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
-    bindSingleton<HomeworksRemoteDataSource> { HomeworksRemoteDataSource.Base(instance(), instance(), instance()) }
-    bindSingleton<DailyGoalsRemoteDataSource> { DailyGoalsRemoteDataSource.Base(instance(), instance(), instance()) }
-    bindSingleton<TodoRemoteDataSource> { TodoRemoteDataSource.Base(instance(), instance(), instance()) }
-    bindSingleton<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<BaseScheduleRemoteDataSource> { BaseScheduleRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<CustomScheduleRemoteDataSource> { CustomScheduleRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<SubjectsRemoteDataSource> { SubjectsRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<EmployeeRemoteDataSource> { EmployeeRemoteDataSource.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<HomeworksRemoteDataSource> { HomeworksRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<DailyGoalsRemoteDataSource> { DailyGoalsRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<TodoRemoteDataSource> { TodoRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance(), instance(), instance(), instance(), instance()) }
 
     bindProvider<PushServiceAuthTokenFactory> { PushServiceAuthTokenFactory.Base(instance(), instance(), instance()) }
     bindProvider<PushServiceAuthTokenProvider.Firebase> { PushServiceAuthTokenProvider.Firebase(instance()) }
