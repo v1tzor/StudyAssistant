@@ -23,6 +23,8 @@ import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.parameter
 import io.ktor.client.request.url
 import io.ktor.http.HttpMethod
+import io.ktor.utils.io.CancellationException
+import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readReason
@@ -50,11 +52,11 @@ import ru.aleshin.studyassistant.core.api.models.RealtimeResponseEvent
 import ru.aleshin.studyassistant.core.api.models.mapData
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteException
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItemToSet
-import ru.aleshin.studyassistant.core.common.extensions.fromJson
 import ru.aleshin.studyassistant.core.common.extensions.jsonCast
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.tryFromJson
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -63,33 +65,35 @@ import kotlin.coroutines.CoroutineContext
 class RealtimeService(
     client: AppwriteClient,
     private val connectionManager: Konnection,
+    private val crashlyticsService: CrashlyticsService,
 ) : BaseAppwriteService(client), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = client.coroutineManager.backgroundDispatcher + mainJob
 
-    private val endpoint: String
-        get() = AppwriteClient.endpointRealtime ?: ""
+    internal val endpoint: String
+        get() = client.endpointRealtime ?: ""
 
-    private val realtimeEndpoint: String
+    internal val realtimeEndpoint: String
         get() = if (endpoint.endsWith("/")) "${endpoint}realtime" else "$endpoint/realtime"
 
     private val mutex = Mutex()
     private val mainJob = Job()
     private var sessionJob: Job? = null
 
+    private var session: DefaultClientWebSocketSession? = null
+    private val activeChannels = mutableMapOf<String, List<String>>()
+    private var reconnectAttempts = 0
+
+    private val responseFlow = MutableSharedFlow<RealtimeResponseEvent<JsonElement>>()
+
     private companion object Companion {
         private const val TYPE_ERROR = "error"
         private const val TYPE_EVENT = "event"
+        private const val ERROR_TAG = "RealtimeServiceError"
 
         private const val CLEAN_UP_DELAY = 25L
-
-        private var session: DefaultClientWebSocketSession? = null
-        private val activeChannels = mutableMapOf<String, List<String>>()
-        private var reconnectAttempts = 0
-        private var reconnect = true
-
-        private val responseFlow = MutableSharedFlow<Result<RealtimeResponseEvent<JsonElement>>>()
+        private const val MAX_RECONNECT_ATTEMPTS = 100
     }
 
     suspend fun subscribe(channels: List<String>): Flow<RealtimeResponseEvent<JsonElement>> {
@@ -97,9 +101,7 @@ class RealtimeService(
 
         updateSession(subscribeKey, channels)
 
-        return responseFlow.map { response ->
-            response.getOrThrow()
-        }.filter { event ->
+        return responseFlow.filter { event ->
             event.channels.any { channels.contains(it) }
         }.onCompletion {
             cleanUpSession(subscribeKey)
@@ -115,12 +117,9 @@ class RealtimeService(
         updateSession(subscribeKey, channels)
 
         return responseFlow.filter { event ->
-            val eventFilter = event.getOrNull()?.channels?.any { channels.contains(it) } == true
-            if (!eventFilter) return@filter false
-            val payloadFilter = event.getOrNull()?.payload?.tryFromJson(payloadType) != null
-            return@filter eventFilter && payloadFilter
+            event.channels.any { channels.contains(it) } && event.payload.tryFromJson(payloadType) != null
         }.map { response ->
-            response.getOrThrow().mapData(payloadType)
+            response.mapData(payloadType)
         }.onCompletion {
             cleanUpSession(subscribeKey)
         }
@@ -154,16 +153,9 @@ class RealtimeService(
         sessionJob?.cancel()
 
         sessionJob = launch {
-            if (session != null) {
-                reconnect = false
-                closeSession()
-            }
+            if (session != null) closeSession()
 
-            if (channels.isEmpty()) {
-                reconnect = false
-                closeSession()
-                return@launch
-            }
+            if (channels.isEmpty()) return@launch closeSession()
 
             if (!connectionManager.isConnected()) {
                 connectionManager.observeHasConnection().filter { it }.first()
@@ -173,7 +165,7 @@ class RealtimeService(
                 client.httpClient().webSocketSession {
                     method = HttpMethod.Get
                     url(realtimeEndpoint)
-                    parameter("project", AppwriteClient.config["project"])
+                    parameter("project", client.projectId)
                     channels.forEach { channel -> parameter("channels[]", channel) }
                 }
             } catch (e: Exception) {
@@ -181,68 +173,44 @@ class RealtimeService(
                 null
             }
             try {
-                Logger.e("test2") { "Start session: ${channels.joinToString()}" }
-                sessionWork(channels)
-            } catch (ioException: IOException) {
-                delay(getTimeout())
-                refreshSession()
-                Logger.e("test2", ioException) { "SESSION IO Exception" }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Logger.e("test2", e) { "OTHER ERROR" }
-            }
-        }.apply {
-            invokeOnCompletion {
-                Logger.e("test2") { "Close session" }
+                startSessionListener(channels)
+            } catch (_: IOException) {
+                reconnectWithBackoff(channels)
+            } catch (_: CancellationException) {
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+                crashlyticsService.recordException(ERROR_TAG, "", exception)
+                closeSession()
             }
         }
     }
 
-    private suspend fun sessionWork(
-        channels: Set<String>
-    ) = session?.incoming?.receiveAsFlow()?.collect { frame ->
-        if (frame is Frame.Text) {
-            if (reconnectAttempts > 0) reconnectAttempts = 0
-            val rawData = frame.readText()
-            val response = rawData.fromJson(RealtimeResponse.serializer(JsonElement.serializer()))
-            when (response.type) {
-                TYPE_ERROR -> {
-                    val exception = response.data.jsonCast(
-                        serializer = JsonElement.serializer(),
-                        deserializer = AppwriteException.serializer()
-                    )
-                    Logger.i("test2") { "Get frame exception: $exception" }
-                    responseFlow.emit(Result.failure(exception))
+    private suspend fun startSessionListener(channels: Set<String>) {
+        session?.incoming?.receiveAsFlow()?.collect { frame ->
+            if (frame is Frame.Text) {
+                if (reconnectAttempts > 0) reconnectAttempts = 0
+                val rawData = frame.readText()
+                val response = rawData.tryFromJson(RealtimeResponse.serializer(JsonElement.serializer()))
+                when (response?.type) {
+                    TYPE_ERROR -> {
+                        val exception = response.data.jsonCast(
+                            serializer = JsonElement.serializer(),
+                            deserializer = AppwriteException.serializer()
+                        )
+                        crashlyticsService.recordException(ERROR_TAG, response.data.toString(), exception)
+                    }
+                    TYPE_EVENT -> {
+                        val event = response.data.jsonCast(
+                            serializer = JsonElement.serializer(),
+                            deserializer = RealtimeResponseEvent.serializer(JsonElement.serializer()),
+                        )
+                        responseFlow.emit(event)
+                    }
                 }
-                TYPE_EVENT -> {
-                    val event = response.data.jsonCast(
-                        serializer = JsonElement.serializer(),
-                        deserializer = RealtimeResponseEvent.serializer(JsonElement.serializer()),
-                    )
-                    Logger.i("test2") { "Get frame event:\nchannels: ${event.channels.joinToString(" | ")}\ndata:${event.payload}" }
-                    responseFlow.emit(Result.success(event))
-                }
-            }
-        } else if (frame is Frame.Close) {
-            Logger.i("test2") { "Get frame close: ${frame.readReason()}" }
-            if (!reconnect) {
-                reconnect = true
-            } else {
-                val timeout = getTimeout()
+            } else if (frame is Frame.Close) {
                 val reason = frame.readReason()
-                val exception = AppwriteException(
-                    message = reason?.message ?: "Realtime disconnected.",
-                    code = reason?.code?.toInt(),
-                )
-                Logger.e(LOGGER_TAG, exception) {
-                    "Realtime disconnected. Re-connecting in ${timeout / 1000} seconds."
-                }
-                delay(timeout)
-                reconnectAttempts++
-                launchOrRefreshSession(channels)
+                reconnectWithBackoff(channels, reason)
             }
-        } else {
-            Logger.i("test2") { "Get frame : ${frame.frameType}" }
         }
     }
 
@@ -251,10 +219,28 @@ class RealtimeService(
         session = null
     }
 
+    private suspend fun reconnectWithBackoff(channels: Set<String>, reason: CloseReason? = null) {
+        val timeout = getTimeout()
+        val exception = AppwriteException(
+            message = reason?.message ?: "Realtime disconnected.",
+            code = reason?.code?.toInt(),
+        )
+        Logger.e(LOGGER_TAG, exception) {
+            "Realtime disconnected. Re-connecting in ${timeout / 1000} seconds."
+        }
+        delay(timeout)
+        reconnectAttempts++
+        if (reconnectAttempts <= MAX_RECONNECT_ATTEMPTS) {
+            launchOrRefreshSession(channels)
+        } else {
+            closeSession()
+        }
+    }
+
     private fun getTimeout() = when {
-        reconnectAttempts < 5 -> 1000L
-        reconnectAttempts < 15 -> 5000L
-        reconnectAttempts < 100 -> 10000L
-        else -> 60000L
+        reconnectAttempts < 5 -> 1_000L
+        reconnectAttempts < 15 -> 5_000L
+        reconnectAttempts < 40 -> 10_000L
+        else -> 60_000L
     }
 }

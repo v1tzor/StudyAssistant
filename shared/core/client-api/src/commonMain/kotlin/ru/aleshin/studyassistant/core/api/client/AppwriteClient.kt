@@ -81,60 +81,62 @@ import kotlin.time.Duration.Companion.seconds
  * @author Stanislav Aleshin on 30.06.2025.
  */
 class AppwriteClient private constructor(
+    internal val endpoint: String,
+    internal val endpointRealtime: String?,
     internal val coroutineManager: CoroutineManager,
     private val cookiesStorage: PreferencesCookiesStorage,
     private val connectionManager: Konnection,
+    private val baseHttpClient: HttpClient,
+    private val serverHttpClient: HttpClient,
+    private val serverHeaders: Map<String, String>,
+    private val clientHeaders: Map<String, String>,
 ) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = coroutineManager.backgroundDispatcher + job
 
+    internal val projectId: String?
+        get() = clientHeaders["x-appwrite-project"]
+
     private val job = Job()
 
     companion object {
 
-        public var config: MutableMap<String, String> = mutableMapOf()
-        public var endpoint: String = "https://cloud.appwrite.io/v1"
-        public var endpointRealtime: String? = ENDPOINT_REALTIME
-
-        private lateinit var baseHttpClient: HttpClient
-        private lateinit var serverHttpClient: HttpClient
-
-        private val clientHeaders: MutableMap<String, String> = mutableMapOf()
-        private val serverHeaders: MutableMap<String, String> = mutableMapOf()
-
         private const val CHUNK_SIZE = 5 * 1024 * 1024 // 5MB
-        private const val CACHE_CONTROL_TYPE = "private, max-age=3600"
 
         class Creator(
+            headersProvider: AppwriteHeadersProvider,
             internal val coroutineManager: CoroutineManager,
             private val httpClientEngineFactory: HttpClientEngineFactory<HttpClientEngineConfig>,
             private val cookiesStorage: PreferencesCookiesStorage,
             private val connectionManager: Konnection,
-            private val headersProvider: AppwriteHeadersProvider,
         ) {
+            private val clientHeaders = headersProvider.fetchBaseClientHeaders()
+
+            private val serverHeaders = headersProvider.fetchBaseServerHeaders()
+
             fun setup(
                 endpoint: String = ENDPOINT,
                 endpointRealtime: String = ENDPOINT_REALTIME,
                 projectId: String = PROJECT_ID,
                 serverKey: String = APPWRITE_SERVER_KEY,
             ): AppwriteClient {
-                clientHeaders.putAll(headersProvider.fetchBaseClientHeaders())
-                serverHeaders.putAll(headersProvider.fetchBaseServerHeaders())
-
-                setEndpoint(endpoint)
-                setEndpointRealtime(endpointRealtime)
                 setProject(projectId)
                 setKey(serverKey)
-                // addHeader(CacheControl, CACHE_CONTROL_TYPE)
 
-                baseHttpClient = createHttpClient(AppwriteClientType.CLIENT)
-                serverHttpClient = createHttpClient(AppwriteClientType.SERVER)
+                val baseHttpClient = createHttpClient(AppwriteClientType.CLIENT, endpoint)
+                val serverHttpClient = createHttpClient(AppwriteClientType.SERVER, endpoint)
 
                 return AppwriteClient(
                     coroutineManager = coroutineManager,
                     connectionManager = connectionManager,
                     cookiesStorage = cookiesStorage,
+                    baseHttpClient = baseHttpClient,
+                    serverHttpClient = serverHttpClient,
+                    clientHeaders = clientHeaders,
+                    serverHeaders = serverHeaders,
+                    endpoint = endpoint,
+                    endpointRealtime = endpointRealtime,
                 )
             }
 
@@ -145,35 +147,19 @@ class AppwriteClient private constructor(
 
             private fun setProject(value: String) {
                 addHeader("x-appwrite-project", value)
-                config["project"] = value
             }
 
             private fun setKey(value: String) {
                 if (value.isEmpty()) return
-                config["key"] = value
                 serverHeaders["x-appwrite-key"] = value
             }
 
-            private fun setEndpoint(endpoint: String) {
-                this@Companion.endpoint = endpoint
-
-                if (this@Companion.endpointRealtime == null && endpoint.startsWith("http")) {
-                    this@Companion.endpointRealtime = endpoint.replaceFirst("http", "ws")
-                }
-            }
-
-            private fun setEndpointRealtime(endpoint: String) {
-                this@Companion.endpointRealtime = endpoint
-            }
-
-            private fun createHttpClient(type: AppwriteClientType): HttpClient {
+            private fun createHttpClient(type: AppwriteClientType, endpoint: String): HttpClient {
                 return HttpClient(httpClientEngineFactory) {
                     if (type == AppwriteClientType.CLIENT) {
                         install(HttpCookies) { storage = cookiesStorage }
                     }
-                    install(WebSockets) {
-                        pingInterval = 20.seconds
-                    }
+                    install(WebSockets) { pingInterval = 20.seconds }
                     install(ContentNegotiation) { json(Json.Decode) }
                     install(Logging) {
                         level = if (IS_DEBUG) LogLevel.ALL else LogLevel.NONE

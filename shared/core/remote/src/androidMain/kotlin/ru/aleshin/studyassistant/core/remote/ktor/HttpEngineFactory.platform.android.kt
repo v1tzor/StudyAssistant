@@ -32,7 +32,7 @@ actual class HttpEngineFactory actual constructor() {
                 val config = OkHttpConfig().apply {
                     block()
                     config {
-                        pingInterval(20, TimeUnit.SECONDS)
+                        this.pingInterval(20, TimeUnit.SECONDS)
                     }
                 }
                 return OkHttpEngine(config)

@@ -51,8 +51,7 @@ class StorageService(
         queries: List<String>? = null,
         search: String? = null,
     ): FileListPojo {
-        val apiPath = "/storage/buckets/{bucketId}/files"
-            .replace("{bucketId}", bucketId)
+        val apiPath = "/storage/buckets/$bucketId/files"
 
         val apiParams = listOf(
             ClientParam.ListParam("queries", queries ?: emptyList()),
@@ -88,8 +87,7 @@ class StorageService(
         permissions: List<String>? = null,
         onProgress: ((UploadProgressPojo) -> Unit)? = null,
     ): FilePojo {
-        val apiPath = "/storage/buckets/{bucketId}/files"
-            .replace("{bucketId}", bucketId)
+        val apiPath = "/storage/buckets/$bucketId/files"
 
         val apiParams = listOf(
             ClientParam.StringParam("fileId", fileId),
@@ -114,8 +112,7 @@ class StorageService(
         permissions: List<String>? = null,
         onProgress: ((UploadProgressPojo) -> Unit)? = null,
     ): FilePojo? {
-        val apiPath = "/storage/buckets/{bucketId}/files"
-            .replace("{bucketId}", bucketId)
+        val apiPath = "/storage/buckets/$bucketId/files"
 
         val apiParams = listOf(
             ClientParam.StringParam("fileId", fileId),
@@ -146,9 +143,7 @@ class StorageService(
         bucketId: String,
         fileId: String,
     ): FilePojo {
-        val apiPath = "/storage/buckets/{bucketId}/files/{fileId}"
-            .replace("{bucketId}", bucketId)
-            .replace("{fileId}", fileId)
+        val apiPath = "/storage/buckets/$bucketId/files/$fileId"
 
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
@@ -177,9 +172,7 @@ class StorageService(
         name: String? = null,
         permissions: List<String>? = null,
     ): FilePojo {
-        val apiPath = "/storage/buckets/{bucketId}/files/{fileId}"
-            .replace("{bucketId}", bucketId)
-            .replace("{fileId}", fileId)
+        val apiPath = "/storage/buckets/$bucketId/files/$fileId"
 
         val apiParams = listOf(
             ClientParam.StringParam("name", name),
@@ -209,9 +202,7 @@ class StorageService(
         bucketId: String,
         fileId: String,
     ) {
-        val apiPath = "/storage/buckets/{bucketId}/files/{fileId}"
-            .replace("{bucketId}", bucketId)
-            .replace("{fileId}", fileId)
+        val apiPath = "/storage/buckets/$bucketId/files/$fileId"
 
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
@@ -236,11 +227,9 @@ class StorageService(
         fileId: String,
         onProgress: ((ProgressPojo) -> Unit)? = null,
     ): ByteArray {
-        val apiPath = "/storage/buckets/{bucketId}/files/{fileId}/download"
-            .replace("{bucketId}", bucketId)
-            .replace("{fileId}", fileId)
+        val apiPath = "/storage/buckets/$bucketId/files/$fileId/download"
 
-        val apiParams = listOf(ClientParam.StringParam("project", AppwriteClient.config["project"]))
+        val apiParams = listOf(ClientParam.StringParam("project", client.projectId))
 
         return client.call(
             method = HttpMethod.Get,
@@ -287,9 +276,7 @@ class StorageService(
         output: ImageFormat? = null,
         onProgress: ((ProgressPojo) -> Unit)? = null,
     ): ByteArray {
-        val apiPath = "/storage/buckets/{bucketId}/files/{fileId}/preview"
-            .replace("{bucketId}", bucketId)
-            .replace("{fileId}", fileId)
+        val apiPath = "/storage/buckets/$bucketId/files/$fileId/preview"
 
         val apiParams = listOf(
             ClientParam.StringParam("width", width?.toString()),
@@ -303,7 +290,7 @@ class StorageService(
             ClientParam.StringParam("rotation", rotation?.toString()),
             ClientParam.StringParam("background", background),
             ClientParam.StringParam("output", output?.value),
-            ClientParam.StringParam("project", AppwriteClient.config["project"]),
+            ClientParam.StringParam("project", client.projectId),
         )
         return client.call(
             method = HttpMethod.Get,
@@ -328,11 +315,9 @@ class StorageService(
         fileId: String,
         onProgress: ((ProgressPojo) -> Unit)? = null,
     ): ByteArray {
-        val apiPath = "/storage/buckets/{bucketId}/files/{fileId}/view"
-            .replace("{bucketId}", bucketId)
-            .replace("{fileId}", fileId)
+        val apiPath = "/storage/buckets/$bucketId/files/$fileId/view"
 
-        val apiParams = listOf(ClientParam.StringParam("project", AppwriteClient.config["project"]))
+        val apiParams = listOf(ClientParam.StringParam("project", client.projectId))
 
         return client.call(
             method = HttpMethod.Get,

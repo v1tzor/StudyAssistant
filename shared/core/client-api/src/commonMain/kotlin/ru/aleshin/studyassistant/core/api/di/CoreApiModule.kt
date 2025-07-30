@@ -50,7 +50,7 @@ val coreClintApiModule = DI.Module("CoreClientApi") {
     bindSingleton<AccountService> { AccountService(instance(), instance(), instance(), instance()) }
     bindSingleton<StorageService> { StorageService(instance()) }
     bindSingleton<DatabaseService> { DatabaseService(instance(), instance()) }
-    bindSingleton<RealtimeService> { RealtimeService(instance(), instance()) }
+    bindSingleton<RealtimeService> { RealtimeService(instance(), instance(), instance()) }
 
     bindSingleton<AuthUserStorage> { AuthUserStorage.Base(instance()) }
 }
