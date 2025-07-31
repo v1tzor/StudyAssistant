@@ -47,10 +47,14 @@ kotlin {
 
             api(libs.networkcheker)
 
+            api(libs.ktor.client.core)
+
             api(libs.kodein.core)
             implementation(libs.kodein.compose)
 
             implementation(libs.filekit.core)
+
+            api(libs.androidx.paging.common)
 
             implementation(libs.bundles.voyager)
             implementation(compose.ui)

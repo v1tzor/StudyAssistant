@@ -21,6 +21,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngineConfig
 import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.logging.LogLevel
@@ -123,6 +124,7 @@ class AppwriteClient private constructor(
             ): AppwriteClient {
                 setProject(projectId)
                 setKey(serverKey)
+                addHeader("X-Appwrite-Dev-Key", "b613d52e6e989fb42bf900d6c83d061ccb43c464954e1aca193332a2b4831e951ff5aa40c3ce6028c405da17c8534f746ea5f3651b86eda5bdaeffd6af67d270d259c517375144ee72910ddd8ec0c26ba9d13214c634b5bf09f57086ae62875852b746efc2dd1c65ba9311e18388355a28eda9dab7b6c1a82376e023063edcd0")
 
                 val baseHttpClient = createHttpClient(AppwriteClientType.CLIENT, endpoint)
                 val serverHttpClient = createHttpClient(AppwriteClientType.SERVER, endpoint)
@@ -168,6 +170,11 @@ class AppwriteClient private constructor(
                                 co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }
                             }
                         }
+                    }
+                    install(HttpTimeout) {
+                        socketTimeoutMillis = 10_000
+                        requestTimeoutMillis = 15_000
+                        connectTimeoutMillis = 10_000
                     }
                     install(DefaultRequest) {
                         if (endpoint.endsWith("/")) url(endpoint) else url("$endpoint/")

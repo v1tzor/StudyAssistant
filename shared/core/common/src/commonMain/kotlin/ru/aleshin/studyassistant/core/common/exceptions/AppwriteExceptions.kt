@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.common.exceptions
 
+import kotlinx.io.IOException
 import kotlinx.serialization.Serializable
 
 /**
@@ -33,4 +34,4 @@ class AppwriteDataAuthException : Exception()
 
 class AppwriteUserException : Exception()
 
-class InternetConnectionException : Exception()
+class InternetConnectionException : IOException()
