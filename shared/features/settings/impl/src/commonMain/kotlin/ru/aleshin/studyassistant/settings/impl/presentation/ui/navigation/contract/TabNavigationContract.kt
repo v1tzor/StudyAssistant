@@ -36,6 +36,7 @@ internal sealed class TabNavigationEvent : BaseEvent {
     data object NavigateToNotification : TabNavigationEvent()
     data object NavigateToCalendar : TabNavigationEvent()
     data object NavigateToSubscription : TabNavigationEvent()
+    data object NavigateToAboutApp : TabNavigationEvent()
     data object NavigateToBack : TabNavigationEvent()
 }
 

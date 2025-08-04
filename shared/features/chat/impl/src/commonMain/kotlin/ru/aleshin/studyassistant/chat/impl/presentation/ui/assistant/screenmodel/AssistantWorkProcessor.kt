@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.screenmodel
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import ru.aleshin.studyassistant.chat.impl.domain.interactors.AiAssistantInteractor
 import ru.aleshin.studyassistant.chat.impl.presentation.mappers.mapToUi
+import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ResponseStatus
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantAction
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEffect
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
@@ -32,8 +34,10 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowW
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.functional.handleAndGet
+import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage
 
 /**
  * @author Stanislav Aleshin on 20.06.2025.
@@ -47,13 +51,17 @@ internal interface AssistantWorkProcessor :
 
         override suspend fun work(command: AssistantWorkCommand) = when (command) {
             is AssistantWorkCommand.LoadMessages -> loadMessagesWork()
-            is AssistantWorkCommand.ClearChatHistory -> cleatChatHistoryWork(command.chatId)
+            is AssistantWorkCommand.LoadQuotaExpiredStatus -> loadQuotaExpiredStatusWork()
+            is AssistantWorkCommand.ClearChatHistory -> clearChatHistoryWork(command.chatId)
             is AssistantWorkCommand.SendMessage -> sendMessageWork(command.chatId, command.message)
+            is AssistantWorkCommand.RetryAttempt -> retryAttemptWork(command.chatId)
+            is AssistantWorkCommand.ClearUnsendMessage -> clearUnsendMessageWork(command.chatId)
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
-        private fun loadMessagesWork() = flow<AssistantWorkResult> {
+        private fun loadMessagesWork() = channelFlow<AssistantWorkResult> {
             var isChatCreate = false
+            var isInit = false
             aiAssistantInteractor.fetchChats().flatMapLatest { chatsEither ->
                 chatsEither.handleAndGet(
                     onLeftAction = { flowOf(EffectResult(AssistantEffect.ShowError(it))) },
@@ -64,6 +72,13 @@ internal interface AssistantWorkProcessor :
                                 chatHistoryEither.handleAndGet(
                                     onLeftAction = { EffectResult(AssistantEffect.ShowError(it)) },
                                     onRightAction = { chatHistory ->
+                                        if (!isInit) {
+                                            if (chatHistory.messages.firstOrNull() is AiAssistantMessage.UserMessage) {
+                                                val action = AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE)
+                                                send(ActionResult(action))
+                                            }
+                                            isInit = true
+                                        }
                                         ActionResult(AssistantAction.UpdateChatHistory(chatHistory.mapToUi()))
                                     }
                                 )
@@ -71,7 +86,7 @@ internal interface AssistantWorkProcessor :
                         } else {
                             if (!isChatCreate) {
                                 aiAssistantInteractor.addChat().handle(
-                                    onLeftAction = { emit(EffectResult(AssistantEffect.ShowError(it))) },
+                                    onLeftAction = { send(EffectResult(AssistantEffect.ShowError(it))) },
                                     onRightAction = { isChatCreate = true },
                                 )
                             }
@@ -80,13 +95,20 @@ internal interface AssistantWorkProcessor :
                     },
                 )
             }.collect { result ->
-                emit(result)
+                send(result)
             }
         }.onStart {
             emit(ActionResult(AssistantAction.UpdateLoadingChat(true)))
         }
 
-        private fun cleatChatHistoryWork(chatId: UID) = flow {
+        private fun loadQuotaExpiredStatusWork() = flow {
+            aiAssistantInteractor.quotaIsExpired().collectAndHandle(
+                onLeftAction = { emit(EffectResult(AssistantEffect.ShowError(it))) },
+                onRightAction = { emit(ActionResult(AssistantAction.UpdateQuotaExpiredStatus(it))) },
+            )
+        }
+
+        private fun clearChatHistoryWork(chatId: UID) = flow {
             aiAssistantInteractor.clearHistory(chatId).handle(
                 onLeftAction = { emit(EffectResult(AssistantEffect.ShowError(it))) },
             )
@@ -95,22 +117,58 @@ internal interface AssistantWorkProcessor :
         private fun sendMessageWork(chatId: UID?, message: String) = flow<AssistantWorkResult> {
             if (chatId != null) {
                 aiAssistantInteractor.sendMessage(chatId, message).handle(
-                    onLeftAction = { emit(EffectResult(AssistantEffect.ShowError(it))) },
+                    onLeftAction = {
+                        val action = AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE)
+                        emit(ActionResult(action))
+                    },
                     onRightAction = {
-                        emit(ActionResult(AssistantAction.UpdateLoadingResponse(false)))
+                        val action = AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)
+                        emit(ActionResult(action))
                     }
                 )
             }
         }.onStart {
-            emit(ActionResult(AssistantAction.UpdateLoadingResponse(true)))
+            emit(ActionResult(AssistantAction.UpdateResponseStatus(ResponseStatus.LOADING)))
+        }
+
+        private fun retryAttemptWork(chatId: String?) = flow<AssistantWorkResult> {
+            if (chatId != null) {
+                aiAssistantInteractor.retryAttempt(chatId).handle(
+                    onLeftAction = {
+                        val action = AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE)
+                        emit(ActionResult(action))
+                    },
+                    onRightAction = {
+                        val action = AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)
+                        emit(ActionResult(action))
+                    }
+                )
+            }
+        }.onStart {
+            emit(ActionResult(AssistantAction.UpdateResponseStatus(ResponseStatus.LOADING)))
+        }
+
+        private fun clearUnsendMessageWork(chatId: String?) = flow<AssistantWorkResult> {
+            if (chatId != null) {
+                aiAssistantInteractor.clearUnsendMessage(chatId).handle(
+                    onLeftAction = { emit(EffectResult(AssistantEffect.ShowError(it))) },
+                    onRightAction = {
+                        val action = AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)
+                        emit(ActionResult(action))
+                    }
+                )
+            }
         }
     }
 }
 
 internal sealed class AssistantWorkCommand : WorkCommand {
     data object LoadMessages : AssistantWorkCommand()
+    data object LoadQuotaExpiredStatus : AssistantWorkCommand()
     data class ClearChatHistory(val chatId: UID) : AssistantWorkCommand()
     data class SendMessage(val chatId: UID?, val message: String) : AssistantWorkCommand()
+    data class RetryAttempt(val chatId: UID?) : AssistantWorkCommand()
+    data class ClearUnsendMessage(val chatId: UID?) : AssistantWorkCommand()
 }
 
 internal typealias AssistantWorkResult = WorkResult<AssistantAction, AssistantEffect>

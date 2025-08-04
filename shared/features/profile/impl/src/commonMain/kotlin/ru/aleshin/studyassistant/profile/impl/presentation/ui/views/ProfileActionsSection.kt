@@ -35,6 +35,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -52,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -85,7 +88,7 @@ internal fun ProfileActionsSection(
     allOrganizations: List<OrganizationShortUi>,
     allFriends: List<AppUserUi>,
     onFriendsClick: () -> Unit,
-    onPrivacySettingsClick: () -> Unit,
+    onAboutAppClick: () -> Unit,
     onGeneralSettingsClick: () -> Unit,
     onNotifySettingsClick: () -> Unit,
     onCalendarSettingsClick: () -> Unit,
@@ -140,14 +143,6 @@ internal fun ProfileActionsSection(
                 }
             )
         }
-        item(key = "PrivacySettings") {
-            ProfileActionViewItem(
-                modifier = Modifier,
-                onClick = onPrivacySettingsClick,
-                icon = painterResource(ProfileThemeRes.icons.privacySettings),
-                title = ProfileThemeRes.strings.privacySettingsTitle,
-            )
-        }
         item(key = "GeneralSettings") {
             ProfileActionViewItem(
                 onClick = onGeneralSettingsClick,
@@ -174,6 +169,14 @@ internal fun ProfileActionsSection(
                 onClick = onPaymentsSettingsClick,
                 icon = painterResource(ProfileThemeRes.icons.paymentsSettings),
                 title = ProfileThemeRes.strings.paymentsSettingsTitle,
+            )
+        }
+        item(key = "AboutApp") {
+            ProfileActionViewItem(
+                modifier = Modifier,
+                onClick = onAboutAppClick,
+                icon = Icons.Outlined.Info,
+                title = ProfileThemeRes.strings.aboutAppTitle,
             )
         }
         item(key = "SharedSchedules", span = { GridItemSpan(2) }) {
@@ -220,6 +223,58 @@ internal fun ProfileActionViewItem(
                 Icon(
                     modifier = Modifier.size(24.dp),
                     painter = icon,
+                    contentDescription = title,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                badge?.invoke()
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+                    Text(
+                        text = title,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = if (value != null) 1 else 2,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
+                value?.invoke()
+            }
+        }
+    }
+}
+
+@Composable
+internal fun ProfileActionViewItem(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    icon: ImageVector,
+    title: String,
+    value: (@Composable () -> Unit)? = null,
+    badge: (@Composable () -> Unit)? = null,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
+    shape: Shape = MaterialTheme.shapes.large,
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.height(110.dp),
+        shape = shape,
+        color = backgroundColor,
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = icon,
                     contentDescription = title,
                     tint = MaterialTheme.colorScheme.primary,
                 )

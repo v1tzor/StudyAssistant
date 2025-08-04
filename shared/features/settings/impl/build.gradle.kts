@@ -1,3 +1,4 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 
 plugins {
@@ -6,6 +7,7 @@ plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.konfig)
 }
 
 kotlin {
@@ -58,5 +60,17 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+buildkonfig {
+    packageName = "ru.aleshin.studyassistant.settings.impl"
+
+    val versionName = libs.versions.version.name.get()
+    val versionCode = libs.versions.version.code.get()
+
+    defaultConfigs {
+        buildConfigField(FieldSpec.Type.STRING, "VERSION_NAME", versionName)
+        buildConfigField(FieldSpec.Type.STRING, "VERSION_CODE", versionCode)
     }
 }

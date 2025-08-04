@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package ru.aleshin.studyassistant.core.data.repositories
 
 import dev.tmapps.konnection.Konnection
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
-import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
+import ru.aleshin.studyassistant.core.common.extensions.catchIOException
+import ru.aleshin.studyassistant.core.common.extensions.retryOnReconnect
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.share.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.share.mapToDomainShort
@@ -57,22 +59,20 @@ class ShareSchedulesRepositoryImpl(
     }
 
     override suspend fun fetchCurrentSharedSchedules(): Flow<SharedSchedules> {
-        return remoteDataSource.fetchItem().map { it?.mapToDomain() }.filterNotNull()
+        return remoteDataSource.fetchItem()
+            .map { it?.mapToDomain() }
+            .filterNotNull()
+            .retryOnReconnect(connectionManager)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun fetchCurrentShortSharedSchedules(): Flow<SharedSchedulesShort> {
         return connectionManager.observeHasConnection().flatMapLatest { hasConnection ->
             if (hasConnection) {
-                remoteDataSource.fetchItem().catch { exception ->
-                    if (exception is InternetConnectionException) emit(null) else throw exception
-                }.map { sharedHomeworks ->
-                    sharedHomeworks?.mapToDomainShort()
-                }
+                remoteDataSource.fetchItem()
+                    .map { sharedHomeworks -> sharedHomeworks?.mapToDomainShort() }
+                    .catchIOException()
             } else {
-                localDataSource.fetchItem().map { friendRequests ->
-                    friendRequests?.mapToDomain()
-                }
+                localDataSource.fetchItem().map { friendRequests -> friendRequests?.mapToDomain() }
             }
         }.filterNotNull()
     }

@@ -186,7 +186,7 @@ interface HomeworksLocalDataSource : CombinedLocalDataSource<BaseHomeworkEntity,
                     ) { homeworksList, organizationsMap, subjectsMap, employeesMap ->
                         homeworksList.map { homework ->
                             homework.mapToDetails(
-                                organization = checkNotNull(organizationsMap[homework.organizationId]),
+                                organization = organizationsMap[homework.organizationId],
                                 subject = subjectsMap[homework.subjectId]?.mapToDetails(
                                     employee = employeesMap[subjectsMap[homework.subjectId]?.teacherId]
                                 ),

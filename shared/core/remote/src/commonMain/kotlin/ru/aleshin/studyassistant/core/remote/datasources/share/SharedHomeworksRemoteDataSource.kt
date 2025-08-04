@@ -106,6 +106,47 @@ interface SharedHomeworksRemoteDataSource : RemoteDataSource.FullSynced.SingleDo
             return fetchSharedHomeworksDetailsByUser(currentUser)
         }
 
+        override suspend fun fetchOnceItem(): SharedHomeworksDetailsPojo? {
+            val currentUser = userSessionProvider.getCurrentUserId()
+
+            val sharedHomeworks = database.getDocumentOrNull(
+                databaseId = SharedHomeworks.DATABASE_ID,
+                collectionId = SharedHomeworks.COLLECTION_ID,
+                documentId = currentUser,
+                nestedType = SharedHomeworksPojo.serializer(),
+            )?.data ?: SharedHomeworksPojo.default(currentUser)
+
+            val sentHomeworks = sharedHomeworks.sent.decodeFromString<UID, SentMediatedHomeworksPojo>()
+            val receivedHomeworks = sharedHomeworks.received.decodeFromString<UID, ReceivedMediatedHomeworksPojo>()
+
+            val users = buildList {
+                addAll(sentHomeworks.map { it.value.recipients }.extractAllItem())
+                addAll(receivedHomeworks.map { it.value.sender })
+            }
+
+            val senderAndRecipientsUsers = if (users.isNotEmpty()) {
+                database.listDocuments(
+                    databaseId = Users.DATABASE_ID,
+                    collectionId = Users.COLLECTION_ID,
+                    queries = listOf(Query.equal(Users.UID, users)),
+                    nestedType = AppUserPojo.serializer(),
+                ).documents.map {
+                    it.data.convertToDetails()
+                }
+            } else {
+                emptyList()
+            }
+
+            return sharedHomeworks.convertToDetails(
+                recipientsMapper = { recipients ->
+                    checkNotNull(senderAndRecipientsUsers.filter { recipients.contains(it.uid) })
+                },
+                sendersMapper = { sender ->
+                    checkNotNull(senderAndRecipientsUsers.find { it.uid == sender })
+                },
+            )
+        }
+
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchSharedHomeworksDetailsByUser(targetUser: UID): Flow<SharedHomeworksDetailsPojo> {
             require(targetUser.isNotBlank())

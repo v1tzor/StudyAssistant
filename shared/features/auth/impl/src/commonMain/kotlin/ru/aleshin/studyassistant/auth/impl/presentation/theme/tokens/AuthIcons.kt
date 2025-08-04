@@ -25,6 +25,7 @@ import studyassistant.shared.features.auth.impl.generated.resources.ic_password_
 import studyassistant.shared.features.auth.impl.generated.resources.ic_person_outline
 import studyassistant.shared.features.auth.impl.generated.resources.ic_visibility
 import studyassistant.shared.features.auth.impl.generated.resources.ic_visibility_off
+import studyassistant.shared.features.auth.impl.generated.resources.ic_yandex
 import studyassistant.shared.features.auth.impl.generated.resources.il_forgot
 import studyassistant.shared.features.auth.impl.generated.resources.il_forgot_dark
 import studyassistant.shared.features.auth.impl.generated.resources.il_login
@@ -48,6 +49,7 @@ internal data class AuthIcons(
     val visibility: DrawableResource,
     val visibilityOff: DrawableResource,
     val google: DrawableResource,
+    val yandex: DrawableResource,
 ) {
 
     companion object {
@@ -62,6 +64,7 @@ internal data class AuthIcons(
             visibility = Res.drawable.ic_visibility,
             visibilityOff = Res.drawable.ic_visibility_off,
             google = Res.drawable.ic_google,
+            yandex = Res.drawable.ic_yandex,
         )
         val DARK = AuthIcons(
             loginIllustration = Res.drawable.il_login_dark,
@@ -74,6 +77,7 @@ internal data class AuthIcons(
             visibility = Res.drawable.ic_visibility,
             visibilityOff = Res.drawable.ic_visibility_off,
             google = Res.drawable.ic_google,
+            yandex = Res.drawable.ic_yandex,
         )
     }
 }

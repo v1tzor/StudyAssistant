@@ -86,7 +86,7 @@ internal fun ClassTimeRangeChooser(
             item {
                 Text(
                     modifier = Modifier.fillParentMaxWidth(),
-                    text = EditorThemeRes.strings.notCollectedTimeData,
+                    text = EditorThemeRes.strings.standardTimeValuesWarningData,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelSmall.copy(

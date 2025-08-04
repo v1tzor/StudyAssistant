@@ -41,13 +41,13 @@ fun ClassDetailsEntity.mapToBase() = ClassEntity(
 
 fun ClassEntity.mapToDetails(
     scheduleId: UID,
-    organization: OrganizationShortEntity,
+    organization: OrganizationShortEntity?,
     subject: SubjectDetailsEntity?,
     employee: BaseEmployeeEntity?,
 ) = ClassDetailsEntity(
     uid = uid,
     scheduleId = scheduleId,
-    organization = organization,
+    organization = organization ?: OrganizationShortEntity(),
     eventType = eventType,
     subject = subject,
     customData = customData,

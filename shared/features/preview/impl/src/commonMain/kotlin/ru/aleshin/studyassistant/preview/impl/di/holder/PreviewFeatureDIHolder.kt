@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDIHolder
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
@@ -62,6 +63,7 @@ public object PreviewFeatureDIHolder : BaseFeatureDIHolder<PreviewFeatureApi, Pr
                 bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
+                bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
                 bindSingleton<PreviewFeatureApi> {
                     object : PreviewFeatureApi {

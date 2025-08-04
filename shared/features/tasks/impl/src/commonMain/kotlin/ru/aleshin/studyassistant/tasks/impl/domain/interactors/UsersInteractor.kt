@@ -16,8 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.impl.domain.interactors
 
-import kotlinx.coroutines.flow.catch
-import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
+import ru.aleshin.studyassistant.core.common.extensions.catchIOException
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -39,13 +38,7 @@ internal interface UsersInteractor {
     ) : UsersInteractor {
 
         override suspend fun fetchAllFriends() = eitherWrapper.wrapFlow {
-            usersRepository.fetchCurrentUserFriends().catch { exception ->
-                if (exception is InternetConnectionException) {
-                    emit(emptyList())
-                } else {
-                    throw exception
-                }
-            }
+            usersRepository.fetchCurrentUserFriends().catchIOException { emit(emptyList()) }
         }
 
         override suspend fun fetchAppUserPaidStatus() = eitherWrapper.wrapFlow {

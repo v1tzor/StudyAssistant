@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
@@ -49,8 +50,15 @@ internal fun DetailsClassHomeworkBadge(
                 )
             },
             containerColor = StudyAssistantRes.colors.accents.greenContainer,
-            content = { Text(text = ScheduleThemeRes.strings.homeworkIsCompleteShortTitle) }
+            content = {
+                Text(
+                    text = ScheduleThemeRes.strings.homeworkIsCompleteShortTitle,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                )
+            }
         )
+
         HomeworkStatus.WAIT -> InfoBadge(
             modifier = modifier,
             leadingIcon = {
@@ -62,8 +70,15 @@ internal fun DetailsClassHomeworkBadge(
                 )
             },
             containerColor = StudyAssistantRes.colors.accents.orangeContainer,
-            content = { Text(text = ScheduleThemeRes.strings.homeworkInProgressShortTitle) }
+            content = {
+                Text(
+                    text = ScheduleThemeRes.strings.homeworkInProgressShortTitle,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                )
+            }
         )
+
         HomeworkStatus.IN_FUTURE -> InfoBadge(
             modifier = modifier,
             leadingIcon = {
@@ -75,8 +90,15 @@ internal fun DetailsClassHomeworkBadge(
                 )
             },
             containerColor = StudyAssistantRes.colors.accents.yellowContainer,
-            content = { Text(text = ScheduleThemeRes.strings.homeworkIsSetShortTitle) }
+            content = {
+                Text(
+                    text = ScheduleThemeRes.strings.homeworkIsSetShortTitle,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                )
+            }
         )
+
         HomeworkStatus.NOT_COMPLETE -> InfoBadge(
             modifier = modifier,
             leadingIcon = {
@@ -88,8 +110,15 @@ internal fun DetailsClassHomeworkBadge(
                 )
             },
             containerColor = StudyAssistantRes.colors.accents.redContainer,
-            content = { Text(text = ScheduleThemeRes.strings.homeworkIsNotCompleteShortTitle) }
+            content = {
+                Text(
+                    text = ScheduleThemeRes.strings.homeworkIsNotCompleteShortTitle,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                )
+            }
         )
+
         HomeworkStatus.SKIPPED -> InfoBadge(
             modifier = modifier,
             leadingIcon = {
@@ -101,7 +130,13 @@ internal fun DetailsClassHomeworkBadge(
                 )
             },
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            content = { Text(text = ScheduleThemeRes.strings.homeworkIsSkippedShortTitle) }
+            content = {
+                Text(
+                    text = ScheduleThemeRes.strings.homeworkIsSkippedShortTitle,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                )
+            }
         )
     }
 }
@@ -121,6 +156,13 @@ internal fun DetailsClassTestBadge(
             )
         },
         containerColor = MaterialTheme.colorScheme.errorContainer,
-        content = { Text(text = ScheduleThemeRes.strings.testLabel) }
+        content = {
+            Text(
+                text = ScheduleThemeRes.strings.testLabel,
+                softWrap = false,
+                overflow = TextOverflow.Visible,
+                maxLines = 1,
+            )
+        }
     )
 }

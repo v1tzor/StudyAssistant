@@ -41,6 +41,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.DailyAiStatisticsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
@@ -64,6 +65,7 @@ public object ChatFeatureDIHolder : BaseFeatureDIHolder<ChatFeatureApi, ChatFeat
                 importAll(navigationModule, presentationModule, domainModule)
                 bindInstance<() -> BillingFeatureStarter> { dependencies.billingFeatureStarter }
                 bindSingleton<AiAssistantRepository> { dependencies.aiAssistantRepository }
+                bindSingleton<DailyAiStatisticsRepository> { dependencies.dailyAiStatisticsRepository }
                 bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
                 bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
                 bindSingleton<EmployeeRepository> { dependencies.employeeRepository }

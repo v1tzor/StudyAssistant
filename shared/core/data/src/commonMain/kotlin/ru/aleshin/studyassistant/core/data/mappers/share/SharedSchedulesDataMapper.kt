@@ -113,13 +113,6 @@ fun SharedSchedules.mapToRemoteData(userId: String) = SharedSchedulesPojo(
     updatedAt = updatedAt,
 )
 
-//fun SharedSchedules.mapToRemoteData(userId: String) = SharedSchedulesDetailsPojo(
-//    id = userId,
-//    sent = sent.mapValues { it.value.mapToRemoteData() }.encodeToString(),
-//    received = received.mapValues { it.value.mapToRemoteData() }.encodeToString(),
-//    updatedAt = updatedAt,
-//)
-
 fun ReceivedMediatedSchedules.mapToRemoteData() = ReceivedMediatedSchedulesPojo(
     uid = uid,
     sendDate = sendDate.toEpochMilliseconds(),

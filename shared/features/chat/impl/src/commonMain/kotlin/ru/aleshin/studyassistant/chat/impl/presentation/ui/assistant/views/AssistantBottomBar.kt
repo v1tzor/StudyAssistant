@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ResponseStatus
 import ru.aleshin.studyassistant.chat.impl.presentation.theme.ChatThemeRes
 import ru.aleshin.studyassistant.core.common.extensions.pxToDp
 import ru.aleshin.studyassistant.core.ui.theme.material.full
@@ -60,7 +61,8 @@ import ru.aleshin.studyassistant.core.ui.views.VoiceInputButton
 internal fun AssistantBottomBar(
     modifier: Modifier = Modifier,
     isLoadingChat: Boolean,
-    isLoadingResponse: Boolean,
+    responseStatus: ResponseStatus,
+    isQuotaExpired: Boolean,
     userQuery: String,
     onUpdateUserQuery: (String) -> Unit,
     onSendMessage: (String) -> Unit,
@@ -90,7 +92,10 @@ internal fun AssistantBottomBar(
                 },
                 shape = MaterialTheme.shapes.full,
                 placeholder = {
-                    Text(text = ChatThemeRes.strings.assistantChatTextFieldPlaceholder)
+                    Text(
+                        text = ChatThemeRes.strings.assistantChatTextFieldPlaceholder,
+                        maxLines = 1,
+                    )
                 },
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -104,7 +109,10 @@ internal fun AssistantBottomBar(
             )
             IconButton(
                 modifier = Modifier.size(32.dp),
-                enabled = !isLoadingChat && !isLoadingResponse && textFieldState.text.isNotBlank(),
+                enabled = !isLoadingChat &&
+                    responseStatus == ResponseStatus.SUCCESS &&
+                    !isQuotaExpired &&
+                    textFieldState.text.isNotBlank(),
                 onClick = {
                     onSendMessage(textFieldState.text)
                     textFieldState = TextFieldValue()

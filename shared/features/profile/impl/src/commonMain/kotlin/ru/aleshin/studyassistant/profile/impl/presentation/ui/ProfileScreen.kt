@@ -65,7 +65,7 @@ internal class ProfileScreen : ProfileRootScreen() {
                         state = state,
                         modifier = Modifier.padding(paddingValues),
                         onFriendsClick = { dispatchEvent(ProfileEvent.NavigateToFriends) },
-                        onPrivacySettingsClick = { dispatchEvent(ProfileEvent.NavigateToPrivacySettings) },
+                        onAboutAppClick = { dispatchEvent(ProfileEvent.NavigateToAboutApp) },
                         onGeneralSettingsClick = { dispatchEvent(ProfileEvent.NavigateToGeneralSettings) },
                         onNotifySettingsClick = { dispatchEvent(ProfileEvent.NavigateToNotifySettings) },
                         onCalendarSettingsClick = { dispatchEvent(ProfileEvent.NavigateToCalendarSettings) },

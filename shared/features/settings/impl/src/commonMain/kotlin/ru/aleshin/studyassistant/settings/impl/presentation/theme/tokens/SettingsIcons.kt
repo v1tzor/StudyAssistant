@@ -20,6 +20,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import studyassistant.shared.features.settings.impl.generated.resources.Res
 import studyassistant.shared.features.settings.impl.generated.resources.ic_calendar_week
+import studyassistant.shared.features.settings.impl.generated.resources.ic_github
 import studyassistant.shared.features.settings.impl.generated.resources.ic_language
 import studyassistant.shared.features.settings.impl.generated.resources.ic_palette
 
@@ -30,17 +31,20 @@ internal data class SettingsIcons(
     val theme: DrawableResource,
     val language: DrawableResource,
     val numberOfWeek: DrawableResource,
+    val git: DrawableResource,
 ) {
     companion object {
         val LIGHT = SettingsIcons(
             theme = Res.drawable.ic_palette,
             language = Res.drawable.ic_language,
             numberOfWeek = Res.drawable.ic_calendar_week,
+            git = Res.drawable.ic_github,
         )
         val DARK = SettingsIcons(
             theme = Res.drawable.ic_palette,
             language = Res.drawable.ic_language,
             numberOfWeek = Res.drawable.ic_calendar_week,
+            git = Res.drawable.ic_github,
         )
     }
 }

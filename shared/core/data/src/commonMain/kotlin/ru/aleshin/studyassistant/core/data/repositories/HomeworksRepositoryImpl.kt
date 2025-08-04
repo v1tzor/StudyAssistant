@@ -207,21 +207,25 @@ class HomeworksRepositoryImpl(
         }
     }
 
-    override suspend fun transferData(direction: DataTransferDirection) {
+    override suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean) {
         val currentUser = userSessionProvider.getCurrentUserId()
         when (direction) {
             DataTransferDirection.REMOTE_TO_LOCAL -> {
                 val allHomeworksFlow = remoteDataSource.fetchAllItems(currentUser)
                 val homeworks = allHomeworksFlow.first().map { it.convertToLocal() }
 
-                localDataSource.offline().deleteAllItems()
+                if (!mergeData) {
+                    localDataSource.offline().deleteAllItems()
+                }
                 localDataSource.offline().addOrUpdateItems(homeworks)
             }
             DataTransferDirection.LOCAL_TO_REMOTE -> {
                 val allHomeworks = localDataSource.offline().fetchAllHomeworks().first()
                 val homeworksRemote = allHomeworks.map { it.convertToRemote(currentUser) }
 
-                remoteDataSource.deleteAllItems(currentUser)
+                if (!mergeData) {
+                    remoteDataSource.deleteAllItems(currentUser)
+                }
                 remoteDataSource.addOrUpdateItems(homeworksRemote)
 
                 localDataSource.sync().deleteAllItems()

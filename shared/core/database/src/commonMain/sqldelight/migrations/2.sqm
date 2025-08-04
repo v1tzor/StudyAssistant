@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS `dailyAiResponsesEntity` (
+    id TEXT PRIMARY KEY NOT NULL,
+    total_responses INTEGER NOT NULL,
+    date INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);

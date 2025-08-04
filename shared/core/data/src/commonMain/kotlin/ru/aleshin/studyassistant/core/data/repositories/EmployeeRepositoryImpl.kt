@@ -143,21 +143,25 @@ class EmployeeRepositoryImpl(
         remoteDataSource.deleteAvatar(avatarUrl)
     }
 
-    override suspend fun transferData(direction: DataTransferDirection) {
+    override suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean) {
         val currentUser = userSessionProvider.getCurrentUserId()
         when (direction) {
             DataTransferDirection.REMOTE_TO_LOCAL -> {
                 val allEmployeesFlow = remoteDataSource.fetchAllItems(currentUser)
                 val employees = allEmployeesFlow.first().map { it.convertToLocal() }
 
-                localDataSource.offline().deleteAllItems()
+                if (!mergeData) {
+                    localDataSource.offline().deleteAllItems()
+                }
                 localDataSource.offline().addOrUpdateItems(employees)
             }
             DataTransferDirection.LOCAL_TO_REMOTE -> {
                 val allEmployees = localDataSource.offline().fetchAllEmployees().first()
                 val employeesRemote = allEmployees.map { it.convertToRemote(currentUser) }
 
-                remoteDataSource.deleteAllItems(currentUser)
+                if (!mergeData) {
+                    remoteDataSource.deleteAllItems(currentUser)
+                }
                 remoteDataSource.addOrUpdateItems(employeesRemote)
 
                 localDataSource.sync().deleteAllItems()

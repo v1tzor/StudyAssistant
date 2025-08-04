@@ -61,27 +61,3 @@ data class ToolMessagePojo(
     override val content: String,
     val toolCallId: String
 ) : ChatMessagePojo
-
-fun List<ChatMessagePojo>.optimisedMessagesForSend(
-    defaultMaxMessages: Int = 15
-): List<ChatMessagePojo> {
-    val messages = this
-    return if (size <= 15) {
-        messages
-    } else {
-        val lastMessages = takeLast(defaultMaxMessages)
-        val firstLastMessageIndex = size - defaultMaxMessages
-        val requiredMessages = buildList {
-            var isUserMessageAdded = false
-            for (i in (firstLastMessageIndex - 1) downTo 0 step 1) {
-                if (messages[i] is SystemMessagePojo) {
-                    add(messages[i])
-                } else if (!isUserMessageAdded) {
-                    add(messages[i])
-                    if (messages[i] is UserMessagePojo) isUserMessageAdded = true
-                }
-            }
-        }
-        return requiredMessages.reversed() + lastMessages
-    }
-}

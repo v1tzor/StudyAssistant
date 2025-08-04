@@ -102,6 +102,51 @@ interface FriendRequestsRemoteDataSource : RemoteDataSource.FullSynced.SingleDoc
             return fetchRequestsDetailsByUser(currentUser)
         }
 
+        override suspend fun fetchOnceItem(): FriendRequestsDetailsPojo? {
+            val currentUser = userSessionProvider.getCurrentUserId()
+
+            val rawRequest = database.getDocumentOrNull(
+                databaseId = Requests.DATABASE_ID,
+                collectionId = Requests.COLLECTION_ID,
+                documentId = currentUser,
+                nestedType = FriendRequestsPojo.serializer(),
+            )?.data ?: FriendRequestsPojo.default(currentUser)
+
+            val receivedMap = rawRequest.received.decodeFromString<UID, Long>()
+            val sendMap = rawRequest.send.decodeFromString<UID, Long>()
+            val lastActionsMap = rawRequest.lastActions.decodeFromString<UID, Boolean>()
+            val users = buildSet {
+                addAll(receivedMap.keys.toList())
+                addAll(sendMap.keys.toList())
+                addAll(lastActionsMap.keys.toList())
+            }
+
+            val targetUsers = users.toList().takeIf { it.isNotEmpty() }?.let { users ->
+                database.listDocuments(
+                    databaseId = Users.DATABASE_ID,
+                    collectionId = Users.COLLECTION_ID,
+                    queries = listOf(Query.equal(Users.UID, users)),
+                    nestedType = AppUserPojo.serializer(),
+                ).documents.map { user ->
+                    user.data.convertToDetails()
+                }
+            } ?: emptyList()
+
+            return FriendRequestsDetailsPojo(
+                id = rawRequest.id,
+                received = targetUsers.filter { user ->
+                    receivedMap.containsKey(user.uid)
+                }.associateWith { user -> receivedMap[user.uid] ?: 0L },
+                send = targetUsers.filter { user ->
+                    sendMap.containsKey(user.uid)
+                }.associateWith { user -> sendMap[user.uid] ?: 0L },
+                lastActions = targetUsers.filter { user ->
+                    lastActionsMap.containsKey(user.uid)
+                }.associateWith { user -> lastActionsMap[user.uid] ?: false },
+                updatedAt = rawRequest.updatedAt,
+            )
+        }
+
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchRequestsDetailsByUser(targetUser: UID): Flow<FriendRequestsDetailsPojo> {
             require(targetUser.isNotBlank())

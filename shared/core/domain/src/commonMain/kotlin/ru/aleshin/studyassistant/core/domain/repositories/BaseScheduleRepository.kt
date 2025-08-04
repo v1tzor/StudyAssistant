@@ -37,5 +37,5 @@ interface BaseScheduleRepository {
     suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, maxNumberOfWeek: NumberOfRepeatWeek): Flow<Map<Instant, BaseSchedule?>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<Class?>
     suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange)
-    suspend fun transferData(direction: DataTransferDirection)
+    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

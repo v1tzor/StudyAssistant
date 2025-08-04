@@ -72,7 +72,7 @@ internal fun EmployeeContent(
     onUpdateLocations: (List<ContactInfoUi>) -> Unit,
 ) = with(state) {
     Column(
-        modifier = modifier.fillMaxSize().padding(top = 24.dp).verticalScroll(scrollState),
+        modifier = modifier.fillMaxSize().verticalScroll(scrollState).padding(top = 24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         EmployeeAvatarSection(

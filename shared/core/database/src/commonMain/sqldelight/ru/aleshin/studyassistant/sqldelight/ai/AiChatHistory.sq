@@ -17,4 +17,4 @@ FROM aiChatHistoryEntity;
 
 deleteChatById:
 DELETE FROM aiChatHistoryEntity
-WHERE uid >= ?;
+WHERE uid = ?;

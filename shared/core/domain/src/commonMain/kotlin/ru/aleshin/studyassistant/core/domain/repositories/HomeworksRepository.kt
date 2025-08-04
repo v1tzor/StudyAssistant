@@ -36,5 +36,5 @@ interface HomeworksRepository {
     suspend fun fetchHomeworksByDate(date: Instant): Flow<List<Homework>>
     suspend fun fetchCompletedHomeworksCount(): Flow<Int>
     suspend fun deleteHomework(uid: UID)
-    suspend fun transferData(direction: DataTransferDirection)
+    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

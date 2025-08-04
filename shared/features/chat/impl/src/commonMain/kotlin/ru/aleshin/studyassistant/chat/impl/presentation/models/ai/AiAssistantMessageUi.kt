@@ -32,6 +32,8 @@ internal sealed interface AiAssistantMessageUi : Parcelable {
     val id: String
     val content: String?
     val type: AiAssistantMessage.Type
+
+    @TypeParceler<Instant, InstantParceler>
     val time: Instant
 }
 

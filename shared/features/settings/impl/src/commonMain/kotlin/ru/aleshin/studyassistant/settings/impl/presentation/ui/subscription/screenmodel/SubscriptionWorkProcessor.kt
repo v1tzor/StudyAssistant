@@ -51,8 +51,8 @@ internal interface SubscriptionWorkProcessor :
             is SubscriptionWorkCommand.LoadSubscriptions -> loadSubscriptionsWork()
             is SubscriptionWorkCommand.LoadRemoteDataStatus -> loadRemoteDataStatusWork()
             is SubscriptionWorkCommand.LoadUserPaidStatus -> loadUserPaidStatusWork()
-            is SubscriptionWorkCommand.TransferRemoteData -> transferRemoteDataWork()
-            is SubscriptionWorkCommand.TransferLocalData -> transferLocalDataWork()
+            is SubscriptionWorkCommand.TransferRemoteData -> transferRemoteDataWork(command.mergeData)
+            is SubscriptionWorkCommand.TransferLocalData -> transferLocalDataWork(command.mergeData)
             is SubscriptionWorkCommand.RestoreSubscription -> restoreSubscriptionWork()
         }
 
@@ -87,8 +87,8 @@ internal interface SubscriptionWorkProcessor :
             )
         }
 
-        private fun transferRemoteDataWork() = flow<SubscriptionWorkResult> {
-            syncInteractor.transferRemoteData().handle(
+        private fun transferRemoteDataWork(mergeData: Boolean) = flow<SubscriptionWorkResult> {
+            syncInteractor.transferRemoteData(mergeData).handle(
                 onLeftAction = { emit(EffectResult(SubscriptionEffect.ShowError(it))) }
             )
         }.onStart {
@@ -97,8 +97,8 @@ internal interface SubscriptionWorkProcessor :
             emit(ActionResult(SubscriptionAction.UpdateLoadingSync(false)))
         }
 
-        private fun transferLocalDataWork() = flow<SubscriptionWorkResult> {
-            syncInteractor.transferLocalData().handle(
+        private fun transferLocalDataWork(mergeData: Boolean) = flow<SubscriptionWorkResult> {
+            syncInteractor.transferLocalData(mergeData).handle(
                 onLeftAction = { emit(EffectResult(SubscriptionEffect.ShowError(it))) }
             )
         }.onStart {
@@ -127,8 +127,8 @@ internal sealed class SubscriptionWorkCommand : WorkCommand {
     data object LoadSubscriptions : SubscriptionWorkCommand()
     data object LoadUserPaidStatus : SubscriptionWorkCommand()
     data object LoadRemoteDataStatus : SubscriptionWorkCommand()
-    data object TransferRemoteData : SubscriptionWorkCommand()
-    data object TransferLocalData : SubscriptionWorkCommand()
+    data class TransferRemoteData(val mergeData: Boolean) : SubscriptionWorkCommand()
+    data class TransferLocalData(val mergeData: Boolean) : SubscriptionWorkCommand()
     data object RestoreSubscription : SubscriptionWorkCommand()
 }
 

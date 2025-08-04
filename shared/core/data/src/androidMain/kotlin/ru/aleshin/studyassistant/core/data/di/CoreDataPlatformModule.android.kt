@@ -28,10 +28,12 @@ import ru.aleshin.studyassistant.core.data.managers.reminders.HomeworksReminderM
 import ru.aleshin.studyassistant.core.data.managers.reminders.NotificationScheduler
 import ru.aleshin.studyassistant.core.data.managers.reminders.StartClassesReminderManagerImpl
 import ru.aleshin.studyassistant.core.data.managers.reminders.WorkloadWarningManagerImpl
+import ru.aleshin.studyassistant.core.data.managers.sync.SyncWorkManagerImpl
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.domain.managers.sync.SyncWorkManager
 
 /**
  * @author Stanislav Aleshin on 22.08.2024.
@@ -44,4 +46,6 @@ actual val coreDataPlatformModule = DI.Module("CoreDataPlatform") {
     bindProvider<StartClassesReminderManager> { StartClassesReminderManagerImpl(instance(), instance(), instance(), instance()) }
     bindProvider<EndClassesReminderManager> { EndClassesReminderManagerImpl(instance(), instance(), instance(), instance()) }
     bindSingleton<NotificationScheduler> { NotificationScheduler(instance(), instance()) }
+
+    bindProvider<SyncWorkManager> { SyncWorkManagerImpl(instance()) }
 }

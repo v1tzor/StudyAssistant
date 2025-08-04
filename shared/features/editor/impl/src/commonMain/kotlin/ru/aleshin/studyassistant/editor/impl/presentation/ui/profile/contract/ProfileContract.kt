@@ -50,7 +50,7 @@ internal sealed class ProfileEvent : BaseEvent {
     data class UpdateGender(val gender: Gender?) : ProfileEvent()
     data class UpdateCity(val city: String?) : ProfileEvent()
     data class UpdateSocialNetworks(val socialNetworks: List<SocialNetworkUi>) : ProfileEvent()
-    data class UpdatePassword(val oldPassword: String, val newPassword: String) : ProfileEvent()
+    data class UpdatePassword(val oldPassword: String?, val newPassword: String) : ProfileEvent()
     data object NavigateToBillingScreen : ProfileEvent()
     data object NavigateToBack : ProfileEvent()
 }

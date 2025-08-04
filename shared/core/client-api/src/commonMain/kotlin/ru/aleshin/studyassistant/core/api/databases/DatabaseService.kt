@@ -29,6 +29,7 @@ import ru.aleshin.studyassistant.core.api.models.DocumentPojo
 import ru.aleshin.studyassistant.core.api.models.asDocument
 import ru.aleshin.studyassistant.core.api.realtime.RealtimeService
 import ru.aleshin.studyassistant.core.api.utils.Channels
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.extensions.jsonCast
 import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.common.extensions.toJsonElementWithAppendParams
@@ -497,12 +498,18 @@ class DatabaseService(
 
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
-        return client.call(
-            method = HttpMethod.Delete,
-            path = apiPath,
-            headers = apiHeaders,
-            params = emptyList(),
-        )
+        try {
+            client.call(
+                method = HttpMethod.Delete,
+                path = apiPath,
+                headers = apiHeaders,
+                params = emptyList(),
+            )
+        } catch (e: InternetConnectionException) {
+            throw e
+        } catch (_ : Exception) {
+
+        }
     }
 
     /**
@@ -526,13 +533,18 @@ class DatabaseService(
         }
         val apiHeaders = mutableMapOf("content-type" to "application/json")
 
-        client.call(
-            method = HttpMethod.Delete,
-            path = apiPath,
-            clientType = AppwriteClientType.SERVER,
-            headers = apiHeaders,
-            params = apiParams,
-        )
+        try {
+            client.call(
+                method = HttpMethod.Delete,
+                path = apiPath,
+                clientType = AppwriteClientType.SERVER,
+                headers = apiHeaders,
+                params = apiParams,
+            )
+        } catch (e: InternetConnectionException) {
+            throw e
+        } catch (_: Exception) {
+        }
     }
 
     private suspend fun <T> handleResult(block: suspend () -> T): T? {

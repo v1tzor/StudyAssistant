@@ -93,7 +93,7 @@ interface AiRemoteApi {
                                     "deadline" to JsonObject(
                                         mapOf(
                                             "type" to JsonPrimitive("string"),
-                                            "description" to JsonPrimitive("Дедлайн ISO 8601 (н.п: 2025-07-29T00:00)")
+                                            "description" to JsonPrimitive("Дедлайн ISO 8601 (н.п: 2025-07-29T00:00:00)")
                                         )
                                     )
                                 )

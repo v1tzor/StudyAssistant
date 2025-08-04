@@ -43,6 +43,7 @@ fun FriendRequests.mapToRemote(userId: String) = FriendRequestsPojo(
     received = received.mapValues { it.value.toEpochMilliseconds() }.encodeToString<UID, Long>(),
     send = send.mapValues { it.value.toEpochMilliseconds() }.encodeToString<UID, Long>(),
     lastActions = lastActions.encodeToString<UID, Boolean>(),
+    updatedAt = updatedAt,
 )
 
 fun FriendRequestsDetails.mapToRemote(userId: String) = FriendRequestsPojo(

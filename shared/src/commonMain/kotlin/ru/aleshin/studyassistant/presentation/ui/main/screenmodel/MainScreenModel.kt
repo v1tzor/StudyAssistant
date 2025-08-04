@@ -70,8 +70,8 @@ class MainScreenModel(
                     val command = MainWorkCommand.UpdateSubscriptionInfo
                     workProcessor.work(command).collectAndHandleWork()
                 }
-                launchBackgroundWork(MainWorkCommand.PushOfflineChanges) {
-                    val command = MainWorkCommand.PushOfflineChanges
+                launchBackgroundWork(MainWorkCommand.PerformSourceSync) {
+                    val command = MainWorkCommand.PerformSourceSync
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }

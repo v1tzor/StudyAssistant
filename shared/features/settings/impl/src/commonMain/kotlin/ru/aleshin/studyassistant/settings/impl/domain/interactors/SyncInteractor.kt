@@ -35,9 +35,9 @@ import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
  */
 internal interface SyncInteractor {
 
-    suspend fun transferRemoteData(): UnitDomainResult<SettingsFailures>
+    suspend fun transferRemoteData(mergeData: Boolean): UnitDomainResult<SettingsFailures>
 
-    suspend fun transferLocalData(): UnitDomainResult<SettingsFailures>
+    suspend fun transferLocalData(mergeData: Boolean): UnitDomainResult<SettingsFailures>
 
     class Base(
         private val organizationsRepository: OrganizationsRepository,
@@ -52,24 +52,24 @@ internal interface SyncInteractor {
         private val eitherWrapper: SettingsEitherWrapper,
     ) : SyncInteractor {
 
-        override suspend fun transferRemoteData() = eitherWrapper.wrapUnit {
-            transferData(DataTransferDirection.REMOTE_TO_LOCAL)
+        override suspend fun transferRemoteData(mergeData: Boolean) = eitherWrapper.wrapUnit {
+            transferData(DataTransferDirection.REMOTE_TO_LOCAL, mergeData)
         }
 
-        override suspend fun transferLocalData() = eitherWrapper.wrapUnit {
-            transferData(DataTransferDirection.LOCAL_TO_REMOTE)
+        override suspend fun transferLocalData(mergeData: Boolean) = eitherWrapper.wrapUnit {
+            transferData(DataTransferDirection.LOCAL_TO_REMOTE, mergeData)
         }
 
-        private suspend fun transferData(direction: DataTransferDirection) {
-            subjectsRepository.transferData(direction)
-            employeeRepository.transferData(direction)
-            homeworksRepository.transferData(direction)
-            todosRepository.transferData(direction)
-            baseScheduleRepository.transferData(direction)
-            customScheduleRepository.transferData(direction)
+        private suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean) {
+            subjectsRepository.transferData(direction, mergeData)
+            employeeRepository.transferData(direction, mergeData)
+            homeworksRepository.transferData(direction, mergeData)
+            todosRepository.transferData(direction, mergeData)
+            baseScheduleRepository.transferData(direction, mergeData)
+            customScheduleRepository.transferData(direction, mergeData)
             calendarSettingsRepository.transferData(direction)
-            organizationsRepository.transferData(direction)
-            goalsRepository.transferData(direction)
+            organizationsRepository.transferData(direction, mergeData)
+            goalsRepository.transferData(direction, mergeData)
         }
     }
 }

@@ -136,6 +136,14 @@ object AppwriteApi {
         const val COMPLETE_DATE = "completeDate"
     }
 
+    object DailyAiResponses {
+        const val DATABASE_ID = "686052b2001b25f5a09f"
+        const val COLLECTION_ID = "688d369e0006b908c503"
+
+        const val CALLBACK_DATABASE_ID = "688752e90030778ee723"
+        const val CALLBACK_COLLECTION_ID = "688d3c550015330a3b38"
+    }
+
     object CalendarSettings {
         const val DATABASE_ID = "686052b2001b25f5a09f"
         const val COLLECTION_ID = "686bba840027eb8155c1"

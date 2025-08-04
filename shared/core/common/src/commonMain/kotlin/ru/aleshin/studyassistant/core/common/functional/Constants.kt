@@ -138,6 +138,7 @@ object Constants {
         const val MILLIS_IN_HOUR = 3600000L
         const val MILLIS_IN_DAY = 86400000L
         const val SECONDS_IN_MINUTE = 60L
+        const val SECONDS_IN_YEAR = 31_536_000
         const val MINUTES_IN_MILLIS = 60000L
         const val MINUTES_IN_HOUR = 60L
         const val HOURS_IN_DAY = 24L

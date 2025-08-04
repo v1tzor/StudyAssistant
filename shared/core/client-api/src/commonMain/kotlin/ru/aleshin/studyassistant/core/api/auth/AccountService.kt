@@ -17,8 +17,11 @@
 package ru.aleshin.studyassistant.core.api.auth
 
 import dev.tmapps.konnection.Konnection
+import io.ktor.http.Cookie
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
+import io.ktor.http.encodeURLParameter
+import io.ktor.http.parseUrl
 import io.ktor.util.PlatformUtils
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -50,6 +53,7 @@ import ru.aleshin.studyassistant.core.common.exceptions.AppwriteException
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.tryFromJson
 import ru.aleshin.studyassistant.core.common.functional.AnyNullSerializer
+import ru.aleshin.studyassistant.core.common.functional.Constants.Date.SECONDS_IN_YEAR
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.PlatformActivity
 import kotlin.jvm.JvmOverloads
@@ -948,41 +952,36 @@ class AccountService(
     ): SessionPojo? {
         val apiPath = "/account/sessions/oauth2/${provider.value}"
 
-        val apiParams = mutableMapOf(
-            "success" to success,
-            "failure" to failure,
-            "scopes" to scopes,
-            "project" to client.projectId,
-        )
-
-        val apiQuery = mutableListOf<String>()
-        apiParams.forEach {
-            when (it.value) {
-                null -> {
-                    return@forEach
-                }
-
-                is List<*> -> {
-                    apiQuery.add("${it.key}[]=${it.value}")
-                }
-
-                else -> {
-                    apiQuery.add("${it.key}=${it.value}")
-                }
-            }
+        val query = buildList {
+            if (success != null) { add("success=${success.encodeURLParameter()}") }
+            if (failure != null) { add("failure=${failure.encodeURLParameter()}") }
+            scopes?.forEach { add("scopes[]=${it.encodeURLParameter()}") }
+            add("project=${client.projectId?.encodeURLParameter()}")
         }
 
-        val apiUrl = "${client.endpoint}$apiPath?${apiQuery.joinToString("&")}"
+        val apiUrl = "${client.endpoint}$apiPath?${query.joinToString("&")}"
+
         val callbackUrlScheme = "appwrite-callback-${client.projectId}"
         val callbackUrl = launchOAuth2Url(activity, apiUrl, callbackUrlScheme)
         if (callbackUrl.isEmpty() && PlatformUtils.IS_BROWSER) return null
         val url = Url(callbackUrl)
+
+        val key = url.parameters["key"]
+            ?: throw AppwriteException("OAuth2 response missing 'userId' parameter.")
         val secret = url.parameters["secret"]
             ?: throw AppwriteException("OAuth2 response missing 'secret' parameter.")
-        val userId = url.parameters["userId"]
-            ?: throw AppwriteException("OAuth2 response missing 'userId' parameter.")
 
-        return createSession(userId, secret)
+        val cookie = Cookie(
+            name = key,
+            value = secret,
+            domain = parseUrl(client.endpoint)?.host,
+            maxAge = SECONDS_IN_YEAR,
+            httpOnly = true,
+        )
+
+        client.addCookie(Url(client.endpoint), cookie)
+
+        return getSession("current")
     }
 
     /**
@@ -1005,12 +1004,11 @@ class AccountService(
         provider: OAuthProvider,
         scopes: List<String>? = null,
     ): SessionPojo? {
-        val url = Url(client.endpoint)
         return createOAuth2Session(
             activity = activity,
             provider = provider,
-            success = "appwrite-callback-${client.projectId}://${url.host}/auth/oauth2/success",
-            failure = "appwrite-callback-${client.projectId}://${url.host}/auth/oauth2/failure",
+            success = null,
+            failure = null,
             scopes = scopes,
         )
     }
@@ -1356,86 +1354,6 @@ class AccountService(
             deserializer = TokenPojo.serializer(),
             headers = apiHeaders,
             params = apiParams,
-        )
-    }
-
-    /**
-     * Create OAuth2 token
-     *
-     * Allow the user to login to their account using the OAuth2 provider of their choice. Each OAuth2 provider should be enabled from the Appwrite console first.
-     * Use the success and failure arguments to provide a redirect URL's back to your app when login is completed.
-     * If authentication succeeds, `userId` and `secret` of a token will be appended to the success URL as query parameters.
-     * These can be used to create a new session using the [Create session](https://appwrite.io/docs/references/cloud/client-web/account#createSession) endpoint.
-     * A user is limited to 10 active sessions at a time by default. [Learn more about session limits](https://appwrite.io/docs/authentication-security#limits).
-     *
-     * @param provider OAuth2 Provider. Currently, supported providers are: amazon, apple, auth0, authentik, autodesk, bitbucket, bitly, box, dailymotion, discord, disqus, dropbox, etsy, facebook, github, gitlab, google, linkedin, microsoft, notion, oidc, okta, paypal, paypalSandbox, podio, salesforce, slack, spotify, stripe, tradeshift, tradeshiftBox, twitch, wordpress, yahoo, yammer, yandex, zoho, zoom.
-     * @param success URL to redirect back to your app after a successful login attempt.  Only URLs from hostnames in your project's platform list are allowed. This requirement helps to prevent an [open redirect](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html) attack against your project API.
-     * @param failure URL to redirect back to your app after a failed login attempt.  Only URLs from hostnames in your project's platform list are allowed. This requirement helps to prevent an [open redirect](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html) attack against your project API.
-     * @param scopes A list of custom OAuth2 scopes. Check each provider internal docs for a list of supported scopes. Maximum of 100 scopes are allowed, each 4096 characters long.
-     */
-    suspend fun createOAuth2Token(
-        activity: PlatformActivity,
-        provider: OAuthProvider,
-        success: String? = null,
-        failure: String? = null,
-        scopes: List<String>? = null,
-    ): SessionPojo? {
-        val apiPath = "/account/tokens/oauth2/${provider.value}"
-
-        val apiParams = mutableMapOf(
-            "success" to success,
-            "failure" to failure,
-            "scopes" to scopes,
-            "project" to client.projectId,
-        )
-
-        val apiQuery = mutableListOf<String>()
-        apiParams.forEach {
-            when (it.value) {
-                null -> return@forEach
-                is List<*> -> apiQuery.add("${it.key}[]=${it.value}")
-                else -> apiQuery.add("${it.key}=${it.value}")
-            }
-        }
-        val apiUrl = "${client.endpoint}$apiPath?${apiQuery.joinToString("&")}"
-        val callbackUrlScheme = "appwrite-callback-${client.projectId}"
-        val callbackUrl = launchOAuth2Url(activity, apiUrl, callbackUrlScheme)
-        if (callbackUrl.isEmpty() && PlatformUtils.IS_BROWSER) return null
-        val url = Url(callbackUrl)
-        val secret = url.parameters["secret"]
-            ?: throw AppwriteException("OAuth2 response missing 'secret' parameter.")
-        val userId = url.parameters["userId"]
-            ?: throw AppwriteException("OAuth2 response missing 'userId' parameter.")
-
-        return createSession(userId, secret)
-    }
-
-    /**
-     * Create OAuth2 token
-     *
-     * Allow the user to login to their account using the OAuth2 provider of their choice.
-     * Each OAuth2 provider should be enabled from the Appwrite console first.
-     * Use the success and failure arguments to provide a redirect URL's back to your app when login is completed.
-     * If authentication succeeds, `userId` and `secret` of a token will be appended to the success URL as query parameters.
-     * These can be used to create a new session using the [Create session](https://appwrite.io/docs/references/cloud/client-web/account#createSession) endpoint.
-     * A user is limited to 10 active sessions at a time by default. [Learn more about session limits](https://appwrite.io/docs/authentication-security#limits).
-     *
-     * @param provider OAuth2 Provider. Currently, supported providers are: amazon, apple, auth0, authentik, autodesk, bitbucket, bitly, box, dailymotion, discord, disqus, dropbox, etsy, facebook, github, gitlab, google, linkedin, microsoft, notion, oidc, okta, paypal, paypalSandbox, podio, salesforce, slack, spotify, stripe, tradeshift, tradeshiftBox, twitch, wordpress, yahoo, yammer, yandex, zoho, zoom.
-     * @param scopes A list of custom OAuth2 scopes. Check each provider internal docs for a list of supported scopes. Maximum of 100 scopes are allowed, each 4096 characters long.
-     */
-    @JvmOverloads
-    suspend fun createOAuth2Token(
-        activity: PlatformActivity,
-        provider: OAuthProvider,
-        scopes: List<String>? = null,
-    ): SessionPojo? {
-        val url = Url(client.endpoint)
-        return createOAuth2Token(
-            activity = activity,
-            provider = provider,
-            success = "appwrite-callback-${client.projectId}://${url.host}/auth/oauth2/success",
-            failure = "appwrite-callback-${client.projectId}://${url.host}/auth/oauth2/failure",
-            scopes = scopes,
         )
     }
 

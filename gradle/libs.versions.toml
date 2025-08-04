@@ -46,6 +46,7 @@ androidx-activity-compose = "1.10.1"
 androidx-browser = "1.8.0"
 androidx-core-ktx = "1.13.1"
 androidx-workmanager = "2.10.0"
+anroidx-paging = "3.4.0-alpha02"
 
 # Google & Firebase
 google-gms = "4.4.3"
@@ -129,6 +130,9 @@ androidx-workmanager = { module = "androidx.work:work-runtime", version.ref = "a
 androidx-workmanager-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-workmanager" }
 androidx-guava = { module = "com.google.guava:guava", version.ref = "guava" }
 androidx-tools = { module = "com.android.tools.build:gradle", version.ref="agp" }
+androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref="anroidx-paging" }
+androidx-paging-common = { module = "androidx.paging:paging-common", version.ref="anroidx-paging" }
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref="anroidx-paging" }
 
 # Google
 google-gms-services = { module = "com.google.android.gms:play-services-auth", version.ref = "google-gms-auth" }

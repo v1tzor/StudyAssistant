@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
@@ -43,5 +44,6 @@ public interface PreviewFeatureDependencies : BaseFeatureDependencies {
     public val calendarSettingsRepository: CalendarSettingsRepository
     public val deviceInfoProvider: DeviceInfoProvider
     public val coroutineManager: CoroutineManager
+    public val dateManager: DateManager
     public val crashlyticsService: CrashlyticsService
 }

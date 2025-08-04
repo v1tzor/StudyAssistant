@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.architecture.data.MetadataModel
 import ru.aleshin.studyassistant.core.common.extensions.mapToListFlow
-import ru.aleshin.studyassistant.core.common.extensions.mapToOneFlow
 import ru.aleshin.studyassistant.core.common.extensions.mapToOneOrNullFlow
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -100,7 +99,7 @@ interface OrganizationsLocalDataSource : CombinedLocalDataSource<BaseOrganizatio
             override suspend fun fetchOrganizationDetailsById(uid: UID): Flow<OrganizationDetailsEntity?> {
                 if (uid.isEmpty()) return flowOf(null)
                 val query = organizationQueries.fetchOrganizationById(uid, isCacheData)
-                return query.mapToOneFlow(coroutineContext) { it.mapToBase() }.flatMapToDetails()
+                return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }.flatMapToDetails()
             }
 
             override suspend fun fetchOrganizationsDetailsById(uid: List<UID>): Flow<List<OrganizationDetailsEntity>> {

@@ -117,13 +117,6 @@ interface UsersRemoteDataSource : RemoteDataSource.FullSynced.SingleDocument<App
 
         override suspend fun fetchStateChanged(): Flow<AuthUserPojo?> {
             return account.fetchStateChanged()
-//            return realtime.subscribe(channels = Channels.account()).map { event ->
-//                event.payload.tryFromJson(AuthUserPojo.serializer()).apply {
-//                    Logger.i("test2") { "account update: ${this}" }
-//                }
-//            }.onStart {
-//                emit(account.getCurrentUser())
-//            }
         }
 
         override suspend fun isExistRemoteData(uid: UID): Boolean {

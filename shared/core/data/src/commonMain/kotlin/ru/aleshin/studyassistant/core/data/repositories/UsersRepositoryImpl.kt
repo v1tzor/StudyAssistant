@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package ru.aleshin.studyassistant.core.data.repositories
 
+import dev.tmapps.konnection.Konnection
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.extensions.retryOnReconnect
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
@@ -45,6 +50,7 @@ class UsersRepositoryImpl(
     private val subscriptionChecker: SubscriptionChecker,
     private val userSessionProvider: UserSessionProvider,
     private val resultSyncHandler: RemoteResultSyncHandler,
+    private val connectionManager: Konnection,
 ) : UsersRepository {
 
     override suspend fun createNewUserProfile(user: AppUser): UID {
@@ -85,7 +91,7 @@ class UsersRepositoryImpl(
         val currentUser = userSessionProvider.getCurrentUserId()
         return remoteDataSource.fetchUserFriends(targetUser = currentUser).map { users ->
             users.map { userPojo -> userPojo.mapToDomain() }
-        }
+        }.retryOnReconnect(connectionManager)
     }
 
     override suspend fun fetchCurrentAuthUser(): AuthUser? {
@@ -108,11 +114,13 @@ class UsersRepositoryImpl(
         val currentUser = userSessionProvider.getCurrentUserId()
         return remoteDataSource.fetchUserDetailsById(currentUser).map {
             remoteDataSource.isExistRemoteData(currentUser)
-        }.distinctUntilChanged()
+        }.distinctUntilChanged().retryOnReconnect(connectionManager)
     }
 
     override suspend fun fetchUserProfileById(targetUser: UID): Flow<AppUser?> {
-        return remoteDataSource.fetchUserDetailsById(targetUser).map { user -> user?.mapToDomain() }
+        return remoteDataSource.fetchUserDetailsById(targetUser).map { user ->
+            user?.mapToDomain()
+        }.retryOnReconnect(connectionManager)
     }
 
     override suspend fun fetchRealtimeUserById(targetUser: UID): AppUser? {
@@ -122,7 +130,7 @@ class UsersRepositoryImpl(
     override suspend fun findUsersByCode(code: String): Flow<List<AppUser>> {
         return remoteDataSource.findUsersByCode(code).map { users ->
             users.map { userPojo -> userPojo.mapToDomain() }
-        }
+        }.retryOnReconnect(connectionManager)
     }
 
     override suspend fun reloadUser(): AuthUser? {

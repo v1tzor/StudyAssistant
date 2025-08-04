@@ -44,8 +44,8 @@ ORDER BY time;
 
 deleteMessagesByChatId:
 DELETE FROM aiChatMessageEntity
-WHERE chat_id >= ?;
+WHERE chat_id = ?;
 
 deleteMessageById:
 DELETE FROM aiChatMessageEntity
-WHERE uid >= ?;
+WHERE uid = ?;

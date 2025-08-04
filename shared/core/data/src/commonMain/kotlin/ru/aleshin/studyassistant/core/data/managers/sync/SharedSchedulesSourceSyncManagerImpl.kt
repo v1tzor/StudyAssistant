@@ -16,9 +16,7 @@
 
 package ru.aleshin.studyassistant.core.data.managers.sync
 
-import co.touchlab.kermit.Logger
 import dev.tmapps.konnection.Konnection
-import kotlinx.coroutines.flow.first
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.data.mappers.share.SharedSchedulesSyncMapper
 import ru.aleshin.studyassistant.core.data.utils.sync.BaseSourceSyncManager
@@ -50,9 +48,8 @@ class SharedSchedulesSourceSyncManagerImpl(
 ), SharedSchedulesSourceSyncManager {
 
     override suspend fun syncLocalDatabase() {
-        val upsertRemoteModel = remoteDataSource.fetchItem().first() ?: return
+        val upsertRemoteModel = remoteDataSource.fetchOnceItem() ?: return
         localDataSource.addOrUpdateItem(mappers.remoteToLocal(upsertRemoteModel))
-        Logger.i("test2") { "$sourceSyncKey: updateLocalDatabase: upsertRemoteModel" }
     }
 
     override suspend fun collectOnlineChanges() {
@@ -62,19 +59,16 @@ class SharedSchedulesSourceSyncManagerImpl(
                 is DatabaseEvent.Create<SharedSchedulesDetailsPojo> -> {
                     if (localModel?.updatedAt == null || localModel.updatedAt <= event.data.updatedAt) {
                         localDataSource.addOrUpdateItem(mappers.remoteToLocal(event.data))
-                        Logger.i("test2") { "$sourceSyncKey: collectServerUpdates: event -> $event" }
                     }
                 }
                 is DatabaseEvent.Delete<SharedSchedulesDetailsPojo> -> {
                     if (localModel != null) {
                         localDataSource.deleteItem()
-                        Logger.i("test2") { "$sourceSyncKey: collectServerUpdates: event -> $event" }
                     }
                 }
                 is DatabaseEvent.Update<SharedSchedulesDetailsPojo> -> {
                     if (localModel?.updatedAt == null || localModel.updatedAt <= event.data.updatedAt) {
                         localDataSource.addOrUpdateItem(mappers.remoteToLocal(event.data))
-                        Logger.i("test2") { "$sourceSyncKey: collectServerUpdates: event -> $event" }
                     }
                 }
                 is DatabaseEvent.BatchUpdate<*> -> syncLocalDatabase()

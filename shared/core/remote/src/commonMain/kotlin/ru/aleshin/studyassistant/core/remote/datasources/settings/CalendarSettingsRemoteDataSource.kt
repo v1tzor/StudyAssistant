@@ -68,6 +68,17 @@ interface CalendarSettingsRemoteDataSource : RemoteDataSource.FullSynced.SingleD
             }
         }
 
+        override suspend fun fetchOnceItem(): CalendarSettingsPojo? {
+            val currentUser = userSessionProvider.getCurrentUserId()
+
+            return database.getDocumentOrNull(
+                databaseId = databaseId,
+                collectionId = collectionId,
+                documentId = currentUser,
+                nestedType = nestedType,
+            )?.data ?: CalendarSettingsPojo.default(currentUser)
+        }
+
         override suspend fun fetchMetadata(): MetadataModel? {
             val currentUser = userSessionProvider.getCurrentUserId()
 

@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.core.data.utils.sync
 
-import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -183,12 +182,10 @@ interface RemoteResultSyncHandler {
         }
 
         override suspend fun addChangesToQueue(changes: List<OfflineChange>) {
-            Logger.i("test2") { "${this@Base::class.simpleName}: addChangeToQueue -> $changes" }
             changeQueueStorage.addChangesToQueue(changes)
         }
 
         override suspend fun clearAllChanges(sourceKey: SourceSyncKey) {
-            Logger.e("test2") { "source: $sourceKey -> clearAllChanges $sourceKey" }
             changeQueueStorage.deleteAllSourceChanges(sourceKey)
         }
     }

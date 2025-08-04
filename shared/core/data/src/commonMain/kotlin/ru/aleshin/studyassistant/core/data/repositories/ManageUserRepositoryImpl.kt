@@ -34,7 +34,7 @@ class ManageUserRepositoryImpl(
         authApi.sendVerifyEmail()
     }
 
-    override suspend fun updatePassword(oldPassword: String, newPassword: String) {
+    override suspend fun updatePassword(oldPassword: String?, newPassword: String) {
         authApi.updatePassword(oldPassword, newPassword)
     }
 }

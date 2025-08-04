@@ -33,5 +33,5 @@ interface EmployeeRepository {
     suspend fun fetchEmployeeById(uid: UID): Flow<Employee?>
     suspend fun deleteEmployee(targetId: UID)
     suspend fun deleteAvatar(avatarUrl: String)
-    suspend fun transferData(direction: DataTransferDirection)
+    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

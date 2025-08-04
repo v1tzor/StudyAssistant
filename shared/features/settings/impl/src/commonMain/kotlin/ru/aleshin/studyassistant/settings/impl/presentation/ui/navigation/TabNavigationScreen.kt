@@ -43,6 +43,7 @@ import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsTheme
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.CalendarScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.GeneralScreen
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.AboutAppScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.contract.TabNavigationEffect
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.contract.TabNavigationEvent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.contract.TabNavigationViewState
@@ -77,6 +78,7 @@ internal class TabNavigationScreen : SettingsRootScreen() {
                         is CalendarScreen -> SettingsTabItem.CALENDAR
                         is NotificationScreen -> SettingsTabItem.NOTIFICATION
                         is SubscriptionScreen -> SettingsTabItem.SUBSCRIPTION
+                        is AboutAppScreen -> SettingsTabItem.ABOUT_APP
                         else -> SettingsTabItem.GENERAL
                     }
 
@@ -107,6 +109,9 @@ internal class TabNavigationScreen : SettingsRootScreen() {
                                             }
                                             SettingsTabItem.SUBSCRIPTION -> {
                                                 dispatchEvent(TabNavigationEvent.NavigateToSubscription)
+                                            }
+                                            SettingsTabItem.ABOUT_APP -> {
+                                                dispatchEvent(TabNavigationEvent.NavigateToAboutApp)
                                             }
                                         }
                                     },
@@ -147,6 +152,11 @@ internal enum class SettingsTabItem : TabItem {
     SUBSCRIPTION {
         override val index = 3
         override val title @Composable get() = SettingsThemeRes.strings.subscriptionTabHeader
+        override val icon @Composable get() = null
+    },
+    ABOUT_APP {
+        override val index = 4
+        override val title @Composable get() = SettingsThemeRes.strings.aboutAppTabHeader
         override val icon @Composable get() = null
     },
 }

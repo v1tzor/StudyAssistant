@@ -20,6 +20,7 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.common.functional.DomainFailures
 import ru.aleshin.studyassistant.core.common.functional.Either
@@ -38,17 +39,20 @@ interface EitherWrapper<F : DomainFailures> {
     abstract class Abstract<F : DomainFailures>(
         private val errorHandler: ErrorHandler<F>,
         private val crashlyticsService: CrashlyticsService,
+        private val ignoreExceptions: (Throwable) -> Boolean = { it is InternetConnectionException },
     ) : EitherWrapper<F> {
 
         override suspend fun <O> wrap(block: suspend () -> O) = try {
             Either.Right(data = block.invoke())
         } catch (error: Throwable) {
             val failure = errorHandler.handle(error)
-            crashlyticsService.recordException(
-                tag = ERROR_TAG,
-                message = failure::class.multiplatformName.toString(),
-                exception = error,
-            )
+            if (!ignoreExceptions(error)) {
+                crashlyticsService.recordException(
+                    tag = ERROR_TAG,
+                    message = failure::class.multiplatformName.toString(),
+                    exception = error,
+                )
+            }
             Logger.e(LOGGER_TAG, error) { "Domain error: $failure" }
             Either.Left(data = failure)
         }
@@ -68,16 +72,19 @@ interface FlowEitherWrapper<F : DomainFailures> : EitherWrapper<F> {
     abstract class Abstract<F : DomainFailures>(
         private val errorHandler: ErrorHandler<F>,
         private val crashlyticsService: CrashlyticsService,
+        private val ignoreExceptions: (Throwable) -> Boolean = { it is InternetConnectionException },
     ) : FlowEitherWrapper<F>, EitherWrapper.Abstract<F>(errorHandler, crashlyticsService) {
 
         override suspend fun <O> wrapFlow(block: suspend () -> Flow<O>) = flow {
             block.invoke().catch { error ->
                 val failure = errorHandler.handle(error)
-                crashlyticsService.recordException(
-                    tag = ERROR_TAG,
-                    message = failure::class.multiplatformName.toString(),
-                    exception = error,
-                )
+                if (!ignoreExceptions(error)) {
+                    crashlyticsService.recordException(
+                        tag = ERROR_TAG,
+                        message = failure::class.multiplatformName.toString(),
+                        exception = error,
+                    )
+                }
                 Logger.e(LOGGER_TAG, error) { "Domain error: $failure" }
                 this@flow.emit(Either.Left(data = failure))
             }.collect { data ->

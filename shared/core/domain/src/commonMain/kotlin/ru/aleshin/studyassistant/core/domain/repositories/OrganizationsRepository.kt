@@ -36,5 +36,5 @@ interface OrganizationsRepository {
     suspend fun fetchAllOrganization(): Flow<List<Organization>>
     suspend fun fetchAllShortOrganization(): Flow<List<OrganizationShort>>
     suspend fun deleteAvatar(avatarUrl: String)
-    suspend fun transferData(direction: DataTransferDirection)
+    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

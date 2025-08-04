@@ -41,8 +41,8 @@ internal data class SubscriptionViewState(
 
 internal sealed class SubscriptionEvent : BaseEvent {
     data object Init : SubscriptionEvent()
-    data object TransferRemoteData : SubscriptionEvent()
-    data object TransferLocalData : SubscriptionEvent()
+    data class TransferRemoteData(val mergeData: Boolean) : SubscriptionEvent()
+    data class TransferLocalData(val mergeData: Boolean) : SubscriptionEvent()
     data object RestoreSubscription : SubscriptionEvent()
     data object ControlSubscription : SubscriptionEvent()
     data object NavigateToBilling : SubscriptionEvent()

@@ -78,14 +78,14 @@ fun HomeworkDetailsEntity.mapToBase() = HomeworkEntity(
 )
 
 fun BaseHomeworkEntity.mapToDetails(
-    organization: OrganizationShortEntity,
+    organization: OrganizationShortEntity?,
     subject: SubjectDetailsEntity?,
 ) = HomeworkDetailsEntity(
     uid = uid,
     classId = classId,
     deadline = deadline,
     subject = subject,
-    organization = organization,
+    organization = organization ?: OrganizationShortEntity(),
     theoreticalTasks = theoreticalTasks,
     practicalTasks = practicalTasks,
     presentations = presentations,

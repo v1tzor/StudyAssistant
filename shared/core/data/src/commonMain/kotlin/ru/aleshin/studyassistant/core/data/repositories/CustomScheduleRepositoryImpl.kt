@@ -112,7 +112,10 @@ class CustomScheduleRepositoryImpl(
                     schedules.map { scheduleEntity -> scheduleEntity.mapToDomain() }
                 }
             } else {
-                localDataSource.offline().fetchSchedulesDetailsByTimeRange(timeRange.from, timeRange.to).map { schedules ->
+                localDataSource.offline().fetchSchedulesDetailsByTimeRange(
+                    timeRange.from,
+                    timeRange.to
+                ).map { schedules ->
                     schedules.map { scheduleEntity -> scheduleEntity.mapToDomain() }
                 }
             }
@@ -169,20 +172,25 @@ class CustomScheduleRepositoryImpl(
         }
     }
 
-    override suspend fun transferData(direction: DataTransferDirection) {
+    override suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean) {
         val currentUser = userSessionProvider.getCurrentUserId()
         when (direction) {
             DataTransferDirection.REMOTE_TO_LOCAL -> {
                 val allSchedulesFlow = remoteDataSource.fetchAllItems(currentUser)
                 val schedules = allSchedulesFlow.first().map { it.convertToLocal() }
-                localDataSource.offline().deleteAllItems()
+
+                if (!mergeData) {
+                    localDataSource.offline().deleteAllItems()
+                }
                 localDataSource.offline().addOrUpdateItems(schedules)
             }
             DataTransferDirection.LOCAL_TO_REMOTE -> {
                 val allSchedules = localDataSource.offline().fetchAllSchedules().first()
                 val schedulesRemote = allSchedules.map { it.convertToRemote(currentUser) }
 
-                remoteDataSource.deleteAllItems(currentUser)
+                if (!mergeData) {
+                    remoteDataSource.deleteAllItems(currentUser)
+                }
                 remoteDataSource.addOrUpdateItems(schedulesRemote)
 
                 localDataSource.sync().deleteAllItems()

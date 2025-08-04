@@ -1,0 +1,32 @@
+CREATE TABLE dailyAiResponsesEntity (
+    id TEXT PRIMARY KEY NOT NULL,
+    total_responses INTEGER NOT NULL,
+    date INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+addOrUpdateStatistics:
+INSERT OR REPLACE INTO dailyAiResponsesEntity (id, total_responses, date, updated_at)
+VALUES ?;
+
+fetchStatisticsById:
+SELECT * FROM dailyAiResponsesEntity
+WHERE id = ?;
+
+fetchStatisticsByIds:
+SELECT * FROM dailyAiResponsesEntity
+WHERE id IN ?;
+
+fetchStatisticsByDate:
+SELECT * FROM dailyAiResponsesEntity
+WHERE date = ?;
+
+fetchStatisticsMetadata:
+SELECT id, updated_at FROM dailyAiResponsesEntity;
+
+deleteStatisticsByIds:
+DELETE FROM dailyAiResponsesEntity
+WHERE id IN ?;
+
+deleteAllStatistics:
+DELETE FROM dailyAiResponsesEntity;

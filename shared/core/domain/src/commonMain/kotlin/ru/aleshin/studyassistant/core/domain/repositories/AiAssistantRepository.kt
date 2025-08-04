@@ -31,9 +31,11 @@ interface AiAssistantRepository {
     suspend fun fetchAllChats(): Flow<List<AiChat>>
     suspend fun fetchChatHistoryById(uid: UID): Flow<AiChatHistory?>
     suspend fun fetchChatHistoryLastMessage(chatId: UID): Flow<AiAssistantMessage?>
+    suspend fun retrySendLastMessage(chatId: UID): AiAssistantMessage.AssistantMessage?
     suspend fun sendUserMessage(chatId: UID, message: AiAssistantMessage.UserMessage?): AiAssistantResponse
     suspend fun sendToolResponse(chatId: UID, messages: List<AiAssistantMessage.ToolMessage>): AiAssistantResponse
     suspend fun saveAssistantMessage(chatId: UID, message: AiAssistantMessage.AssistantMessage)
     suspend fun updateSystemPromt(chatId: UID, message: AiAssistantMessage.SystemMessage)
+    suspend fun deleteUnconfirmedMessages(chatId: UID)
     suspend fun deleteChat(chatId: UID)
 }

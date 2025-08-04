@@ -60,7 +60,7 @@ internal fun HomeworkContent(
     onChangePriority: (TaskPriority) -> Unit,
 ) = with(state) {
     Column(
-        modifier = modifier.padding(top = 16.dp).verticalScroll(scrollState),
+        modifier = modifier.verticalScroll(scrollState).padding(top = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         OrganizationInfoField(

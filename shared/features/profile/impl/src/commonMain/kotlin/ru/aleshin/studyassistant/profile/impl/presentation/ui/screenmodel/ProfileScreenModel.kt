@@ -101,8 +101,6 @@ internal class ProfileScreenModel(
                 val screen = screenProvider.provideScheduleScreen(ScheduleScreen.Share(event.shareId))
                 sendEffect(ProfileEffect.PushGlobalScreen(screen))
             }
-            is ProfileEvent.NavigateToPrivacySettings -> {
-            }
             is ProfileEvent.NavigateToFriends -> {
                 val screen = screenProvider.provideUsersScreen(UsersScreen.Friends)
                 sendEffect(ProfileEffect.PushGlobalScreen(screen))
@@ -121,6 +119,10 @@ internal class ProfileScreenModel(
             }
             is ProfileEvent.NavigateToPaymentsSettings -> {
                 val screen = screenProvider.provideSettingsScreen(SettingsScreen.Subscription)
+                sendEffect(ProfileEffect.PushGlobalScreen(screen))
+            }
+            is ProfileEvent.NavigateToAboutApp -> {
+                val screen = screenProvider.provideSettingsScreen(SettingsScreen.AboutApp)
                 sendEffect(ProfileEffect.PushGlobalScreen(screen))
             }
             is ProfileEvent.NavigateToProfileEditor -> {

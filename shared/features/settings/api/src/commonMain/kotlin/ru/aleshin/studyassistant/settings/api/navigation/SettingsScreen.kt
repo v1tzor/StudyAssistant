@@ -27,4 +27,5 @@ sealed class SettingsScreen : FeatureScreen<SettingsRootScreen> {
     data object Notification : SettingsScreen()
     data object Calendar : SettingsScreen()
     data object Subscription : SettingsScreen()
+    data object AboutApp : SettingsScreen()
 }

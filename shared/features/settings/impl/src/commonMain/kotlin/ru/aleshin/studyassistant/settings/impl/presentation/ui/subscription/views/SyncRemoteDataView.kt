@@ -25,14 +25,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,6 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,9 +53,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.ui.theme.material.full
+import ru.aleshin.studyassistant.core.ui.views.DialogAlertButtons
 import ru.aleshin.studyassistant.core.ui.views.FreeOrPaidContent
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.core.ui.views.dialog.WarningAlertDialog
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
 
 /**
@@ -63,8 +68,8 @@ internal fun SyncRemoteDataView(
     isLoadingSync: Boolean,
     isPaidUser: Boolean?,
     haveRemoteData: Boolean?,
-    onTransferRemoteData: () -> Unit,
-    onTransferLocalData: () -> Unit,
+    onTransferRemoteData: (Boolean) -> Unit,
+    onTransferLocalData: (Boolean) -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -169,42 +174,98 @@ internal fun SyncRemoteDataView(
             )
 
             if (remoteDataTransferWarningDialogState) {
-                WarningAlertDialog(
-                    icon = {
-                        Icon(imageVector = Icons.Default.Warning, contentDescription = null)
-                    },
-                    title = {
-                        Text(text = SettingsThemeRes.strings.transferDataWarningTitle)
-                    },
-                    text = {
-                        Text(text = SettingsThemeRes.strings.transferRemoteDataWarningText)
-                    },
+                SyncWarningAlertDialog(
+                    title = SettingsThemeRes.strings.transferDataWarningTitle,
+                    text = SettingsThemeRes.strings.transferRemoteDataWarningText,
                     confirmTitle = SettingsThemeRes.strings.transferConfirmTitle,
+                    mergeDataText = SettingsThemeRes.strings.mergeRemoteDataText,
                     onDismiss = { remoteDataTransferWarningDialogState = false },
                     onConfirm = {
-                        onTransferRemoteData()
+                        onTransferRemoteData(it)
                         remoteDataTransferWarningDialogState = false
                     },
                 )
             }
 
             if (localDataTransferWarningDialogState) {
-                WarningAlertDialog(
-                    icon = {
-                        Icon(imageVector = Icons.Default.Warning, contentDescription = null)
-                    },
-                    title = {
-                        Text(text = SettingsThemeRes.strings.transferDataWarningTitle)
-                    },
-                    text = {
-                        Text(text = SettingsThemeRes.strings.transferLocalDataWarningText)
-                    },
+                SyncWarningAlertDialog(
+                    title = SettingsThemeRes.strings.transferDataWarningTitle,
+                    text = SettingsThemeRes.strings.transferLocalDataWarningText,
+                    mergeDataText = SettingsThemeRes.strings.mergeLocalDataText,
                     confirmTitle = SettingsThemeRes.strings.transferConfirmTitle,
                     onDismiss = { localDataTransferWarningDialogState = false },
                     onConfirm = {
-                        onTransferLocalData()
+                        onTransferLocalData(it)
                         localDataTransferWarningDialogState = false
                     },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+internal fun SyncWarningAlertDialog(
+    modifier: Modifier = Modifier,
+    title: String,
+    text: String,
+    mergeDataText: String,
+    confirmTitle: String,
+    onDismiss: () -> Unit,
+    onConfirm: (Boolean) -> Unit,
+) {
+    BasicAlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = modifier
+    ) {
+        Surface(
+            modifier = Modifier.widthIn(280.dp, 560.dp).wrapContentHeight(),
+            shape = MaterialTheme.shapes.extraLarge,
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            shadowElevation = 4.dp,
+        ) {
+            var mergeData by rememberSaveable { mutableStateOf(false) }
+            Column {
+                Column(
+                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.secondary,
+                    )
+                    Text(
+                        text = title,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                    Text(
+                        text = text,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Checkbox(
+                            checked = mergeData,
+                            onCheckedChange = { mergeData = it },
+                        )
+                        Text(
+                            text = mergeDataText,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
+                DialogAlertButtons(
+                    confirmTitle = confirmTitle,
+                    onCancelClick = onDismiss,
+                    onConfirmClick = { onConfirm(mergeData) },
                 )
             }
         }

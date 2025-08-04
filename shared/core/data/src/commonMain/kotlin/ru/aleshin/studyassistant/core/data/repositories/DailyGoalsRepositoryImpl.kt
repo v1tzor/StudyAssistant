@@ -222,20 +222,25 @@ class DailyGoalsRepositoryImpl(
         }
     }
 
-    override suspend fun transferData(direction: DataTransferDirection) {
+    override suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean) {
         val currentUser = userSessionProvider.getCurrentUserId()
         when (direction) {
             DataTransferDirection.REMOTE_TO_LOCAL -> {
                 val allGoalsFlow = remoteDataSource.fetchAllItems(currentUser)
                 val goals = allGoalsFlow.first().map { it.convertToLocal() }
-                localDataSource.offline().deleteAllItems()
+
+                if (!mergeData) {
+                    localDataSource.offline().deleteAllItems()
+                }
                 localDataSource.offline().addOrUpdateItems(goals)
             }
             DataTransferDirection.LOCAL_TO_REMOTE -> {
                 val allGoals = localDataSource.offline().fetchAllGoals().first()
                 val goalsRemote = allGoals.map { it.convertToRemote(currentUser) }
 
-                remoteDataSource.deleteAllItems(currentUser)
+                if (!mergeData) {
+                    remoteDataSource.deleteAllItems(currentUser)
+                }
                 remoteDataSource.addOrUpdateItems(goalsRemote)
 
                 localDataSource.sync().deleteAllItems()

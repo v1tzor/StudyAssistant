@@ -19,6 +19,8 @@
 -dontwarn java.lang.reflect.AnnotatedType
 -dontwarn org.slf4j.impl.StaticMDCBinder
 -dontwarn org.slf4j.impl.StaticMarkerBinder
+-dontwarn kotlin.native.HiddenFromObjC
+-dontwarn kotlin.native.ObjCName
 
 -keep class com.hianalytics.android.**{*;}
 -keep class com.huawei.updatesdk.**{*;}

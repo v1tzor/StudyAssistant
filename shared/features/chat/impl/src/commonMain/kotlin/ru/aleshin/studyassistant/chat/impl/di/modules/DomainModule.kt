@@ -30,5 +30,5 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<ChatErrorHandler> { ChatErrorHandler.Base() }
     bindSingleton<ChatEitherWrapper> { ChatEitherWrapper.Base(instance(), instance()) }
 
-    bindSingleton<AiAssistantInteractor> { AiAssistantInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<AiAssistantInteractor> { AiAssistantInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 }

@@ -35,5 +35,5 @@ interface CustomScheduleRepository {
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<Class?>
     suspend fun deleteScheduleById(scheduleId: UID)
     suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange)
-    suspend fun transferData(direction: DataTransferDirection)
+    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

@@ -39,9 +39,11 @@ import io.ktor.client.request.request
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.Cookie
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.Url
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
@@ -124,7 +126,6 @@ class AppwriteClient private constructor(
             ): AppwriteClient {
                 setProject(projectId)
                 setKey(serverKey)
-                addHeader("X-Appwrite-Dev-Key", "b613d52e6e989fb42bf900d6c83d061ccb43c464954e1aca193332a2b4831e951ff5aa40c3ce6028c405da17c8534f746ea5f3651b86eda5bdaeffd6af67d270d259c517375144ee72910ddd8ec0c26ba9d13214c634b5bf09f57086ae62875852b746efc2dd1c65ba9311e18388355a28eda9dab7b6c1a82376e023063edcd0")
 
                 val baseHttpClient = createHttpClient(AppwriteClientType.CLIENT, endpoint)
                 val serverHttpClient = createHttpClient(AppwriteClientType.SERVER, endpoint)
@@ -405,6 +406,10 @@ class AppwriteClient private constructor(
     fun httpClient(type: AppwriteClientType = AppwriteClientType.CLIENT) = when (type) {
         AppwriteClientType.CLIENT -> baseHttpClient
         AppwriteClientType.SERVER -> serverHttpClient
+    }
+
+    suspend fun addCookie(request: Url, cookie: Cookie) {
+        cookiesStorage.addCookie(request, cookie)
     }
 
     fun clearCookies() {

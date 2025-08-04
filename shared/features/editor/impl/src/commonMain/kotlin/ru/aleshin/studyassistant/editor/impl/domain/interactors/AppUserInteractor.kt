@@ -38,7 +38,7 @@ internal interface AppUserInteractor {
     suspend fun fetchAppUserPaidStatus(): FlowDomainResult<EditorFailures, Boolean>
     suspend fun updateUser(user: AppUser): UnitDomainResult<EditorFailures>
     suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile): DomainResult<EditorFailures, String>
-    suspend fun updatePassword(oldPassword: String, newPassword: String): UnitDomainResult<EditorFailures>
+    suspend fun updatePassword(oldPassword: String?, newPassword: String): UnitDomainResult<EditorFailures>
     suspend fun deleteAvatar(avatarUrl: String): UnitDomainResult<EditorFailures>
 
     class Base(
@@ -66,7 +66,7 @@ internal interface AppUserInteractor {
             usersRepository.uploadCurrentUserAvatar(oldAvatarUrl, file)
         }
 
-        override suspend fun updatePassword(oldPassword: String, newPassword: String) = eitherWrapper.wrap {
+        override suspend fun updatePassword(oldPassword: String?, newPassword: String) = eitherWrapper.wrap {
             manageUserRepository.updatePassword(oldPassword, newPassword)
         }
 

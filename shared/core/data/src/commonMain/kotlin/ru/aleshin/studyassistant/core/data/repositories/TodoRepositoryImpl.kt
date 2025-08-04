@@ -186,21 +186,25 @@ class TodoRepositoryImpl(
         }
     }
 
-    override suspend fun transferData(direction: DataTransferDirection) {
+    override suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean) {
         val currentUser = userSessionProvider.getCurrentUserId()
         when (direction) {
             DataTransferDirection.REMOTE_TO_LOCAL -> {
                 val allTodosFlow = remoteDataSource.fetchAllItems(currentUser)
                 val todos = allTodosFlow.first().map { it.convertToLocal() }
 
-                localDataSource.offline().deleteAllItems()
+                if (!mergeData) {
+                    localDataSource.offline().deleteAllItems()
+                }
                 localDataSource.offline().addOrUpdateItems(todos)
             }
             DataTransferDirection.LOCAL_TO_REMOTE -> {
                 val allTodos = localDataSource.offline().fetchAllTodos().first()
                 val remoteTodos = allTodos.map { it.convertToRemote(currentUser) }
 
-                remoteDataSource.deleteAllItems(currentUser)
+                if (!mergeData) {
+                    remoteDataSource.deleteAllItems(currentUser)
+                }
                 remoteDataSource.addOrUpdateItems(remoteTodos)
 
                 localDataSource.sync().deleteAllItems()

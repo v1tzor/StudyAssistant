@@ -401,10 +401,7 @@ private fun TimerStopwatchView(
                 trackColor = MaterialTheme.colorScheme.primaryContainer,
                 strokeWidth = 4.dp,
             )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = when (goalTime.type) {

@@ -211,7 +211,7 @@ interface CustomScheduleLocalDataSource : CombinedLocalDataSource<CustomSchedule
                             schedule.mapToDetails { classPojo ->
                                 classPojo.mapToDetails(
                                     scheduleId = schedule.uid,
-                                    organization = checkNotNull(organizationsMap[classPojo.organizationId]),
+                                    organization = organizationsMap[classPojo.organizationId],
                                     employee = employeesMap[classPojo.teacherId],
                                     subject = subjectsMap[classPojo.subjectId]?.mapToDetails(
                                         employee = employeesMap[subjectsMap[classPojo.subjectId]?.teacherId]

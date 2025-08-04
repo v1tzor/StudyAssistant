@@ -22,6 +22,7 @@ import dev.icerock.moko.parcelize.Parcelize
 import ru.aleshin.studyassistant.chat.impl.domain.entities.ChatFailures
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.AiChatHistoryUi
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ChatQueryUi
+import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ResponseStatus
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
@@ -34,7 +35,8 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.B
 @Parcelize
 internal data class AssistantViewState(
     val isLoadingChat: Boolean = true,
-    val isLoadingResponse: Boolean = false,
+    val isQuotaExpired: Boolean = false,
+    val responseStatus: ResponseStatus = ResponseStatus.SUCCESS,
     val userQuery: ChatQueryUi = ChatQueryUi(),
     val chatHistory: AiChatHistoryUi? = null,
 ) : BaseViewState
@@ -44,6 +46,8 @@ internal sealed class AssistantEvent : BaseEvent {
     data class SendMessage(val message: String) : AssistantEvent()
     data class UpdateUserQuery(val query: String) : AssistantEvent()
     data object StopResponseLoading : AssistantEvent()
+    data object RetryAttempt : AssistantEvent()
+    data object ClearUnsendMessage : AssistantEvent()
     data object ClearHistory : AssistantEvent()
     data object NavigateToBilling : AssistantEvent()
 }
@@ -57,5 +61,6 @@ internal sealed class AssistantAction : BaseAction {
     data class UpdateUserQuery(val query: ChatQueryUi) : AssistantAction()
     data class UpdateChatHistory(val chatHistory: AiChatHistoryUi?) : AssistantAction()
     data class UpdateLoadingChat(val isLoading: Boolean) : AssistantAction()
-    data class UpdateLoadingResponse(val isLoading: Boolean) : AssistantAction()
+    data class UpdateResponseStatus(val responseStatus: ResponseStatus) : AssistantAction()
+    data class UpdateQuotaExpiredStatus(val isQuotaExpired: Boolean) : AssistantAction()
 }

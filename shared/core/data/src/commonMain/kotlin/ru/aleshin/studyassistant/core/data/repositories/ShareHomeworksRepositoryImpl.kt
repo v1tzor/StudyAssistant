@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package ru.aleshin.studyassistant.core.data.repositories
 
 import dev.tmapps.konnection.Konnection
@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
+import ru.aleshin.studyassistant.core.common.extensions.catchIOException
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.data.mappers.share.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.share.mapToRemoteData
@@ -53,17 +56,14 @@ internal class ShareHomeworksRepositoryImpl(
         remoteDataSource.addOrUpdateSharedHomeworksForUser(upsertModel, targetUser)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun fetchCurrentSharedHomeworksDetails(): Flow<SharedHomeworksDetails> {
         return connectionManager.observeHasConnection().flatMapLatest { hasConnection ->
             if (hasConnection) {
-                remoteDataSource.fetchItem().map { sharedHomeworks ->
-                    sharedHomeworks?.mapToDomain()
-                }
+                remoteDataSource.fetchItem()
+                    .map { sharedHomeworks -> sharedHomeworks?.mapToDomain() }
+                    .catchIOException()
             } else {
-                localDataSource.fetchItem().map { sharedHomeworks ->
-                    sharedHomeworks?.mapToDomain()
-                }
+                localDataSource.fetchItem().map { sharedHomeworks -> sharedHomeworks?.mapToDomain() }
             }
         }.filterNotNull()
     }

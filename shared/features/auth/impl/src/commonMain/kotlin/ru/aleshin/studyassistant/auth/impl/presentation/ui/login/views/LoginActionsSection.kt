@@ -42,10 +42,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
@@ -148,16 +146,10 @@ internal fun LoginActionsSection(
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             ) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-//                    Image(
-//                        modifier = Modifier.size(24.dp),
-//                        painter = painterResource(AuthThemeRes.icons.google),
-//                        contentDescription = AuthThemeRes.strings.loginViaGoogleLabel,
-//                    )
-                    Text(
-                        text = "Y",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Color.Red,
-                        fontWeight = FontWeight.Black
+                    Image(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(AuthThemeRes.icons.yandex),
+                        contentDescription = AuthThemeRes.strings.loginViaGoogleLabel,
                     )
                 }
             }

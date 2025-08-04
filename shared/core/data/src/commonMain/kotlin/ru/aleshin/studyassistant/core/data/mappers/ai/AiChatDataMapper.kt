@@ -223,7 +223,6 @@ fun ToolCallPojo.mapToDomain() = ToolCall(
     function = function.mapToDomain()
 )
 
-
 fun FunctionResponse.mapToRemote() = FunctionResponsePojo(
     name = name,
     arguments = try {

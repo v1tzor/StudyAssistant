@@ -38,5 +38,5 @@ interface DailyGoalsRepository {
     suspend fun fetchOverdueDailyGoals(currentDate: Instant): Flow<List<Goal>>
     suspend fun fetchDailyGoalsByDate(date: Instant): Flow<List<Goal>>
     suspend fun deleteGoal(uid: UID)
-    suspend fun transferData(direction: DataTransferDirection)
+    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

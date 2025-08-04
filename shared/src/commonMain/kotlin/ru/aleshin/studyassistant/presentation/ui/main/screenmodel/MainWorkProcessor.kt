@@ -64,7 +64,7 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
             is MainWorkCommand.UpdatePushToken -> updatePushTokenWork()
             is MainWorkCommand.UpdateReminderServices -> updateReminderServicesWork()
             is MainWorkCommand.UpdateSubscriptionInfo -> updateUserSubscriptionInfoWork()
-            is MainWorkCommand.PushOfflineChanges -> pushOfflineChangesWork()
+            is MainWorkCommand.PerformSourceSync -> performSourceSyncWork()
         }
 
         private fun loadThemeWork() = flow {
@@ -158,8 +158,8 @@ interface MainWorkProcessor : FlowWorkProcessor<MainWorkCommand, MainAction, Mai
             )
         }
 
-        private fun pushOfflineChangesWork() = flow {
-            syncInteractor.cycleTwoDirectSync().handle(
+        private fun performSourceSyncWork() = flow {
+            syncInteractor.performSourceSync().handle(
                 onLeftAction = { emit(EffectResult(MainEffect.ShowError(it))) },
             )
         }
@@ -172,5 +172,5 @@ sealed class MainWorkCommand : WorkCommand {
     data object UpdatePushToken : MainWorkCommand()
     data object UpdateReminderServices : MainWorkCommand()
     data object UpdateSubscriptionInfo : MainWorkCommand()
-    data object PushOfflineChanges : MainWorkCommand()
+    data object PerformSourceSync : MainWorkCommand()
 }

@@ -35,5 +35,5 @@ interface TodoRepository {
     suspend fun fetchOverdueTodos(currentDate: Instant): Flow<List<Todo>>
     suspend fun fetchTodosByDate(date: Instant): Flow<List<Todo>>
     suspend fun deleteTodo(uid: UID)
-    suspend fun transferData(direction: DataTransferDirection)
+    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

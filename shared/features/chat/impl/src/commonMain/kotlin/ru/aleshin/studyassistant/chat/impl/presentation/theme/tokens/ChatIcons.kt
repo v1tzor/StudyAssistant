@@ -17,19 +17,22 @@
 package ru.aleshin.studyassistant.chat.impl.presentation.theme.tokens
 
 import androidx.compose.runtime.staticCompositionLocalOf
+import org.jetbrains.compose.resources.DrawableResource
+import studyassistant.shared.features.chat.impl.generated.resources.Res
+import studyassistant.shared.features.chat.impl.generated.resources.ic_ai_sender
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal data class ChatIcons(
-    val icon: Int,
+    val aiAssistant: DrawableResource,
 ) {
     companion object Companion {
         val LIGHT = ChatIcons(
-            icon = 0,
+            aiAssistant = Res.drawable.ic_ai_sender,
         )
         val DARK = ChatIcons(
-            icon = 0,
+            aiAssistant = Res.drawable.ic_ai_sender,
         )
     }
 }

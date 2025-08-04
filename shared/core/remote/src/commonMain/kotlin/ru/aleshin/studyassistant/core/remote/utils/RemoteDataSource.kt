@@ -24,6 +24,7 @@ import kotlinx.datetime.format.DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonElement
 import ru.aleshin.studyassistant.core.api.AppwriteApi.Common
+import ru.aleshin.studyassistant.core.api.AppwriteApi.Common.UID
 import ru.aleshin.studyassistant.core.api.AppwriteApi.Common.UPDATED_AT
 import ru.aleshin.studyassistant.core.api.AppwriteApi.Common.USER_ID
 import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
@@ -141,6 +142,17 @@ sealed interface RemoteDataSource {
                     }
                 }
 
+                override suspend fun fetchOnceItem(): T? {
+                    val currentUser = userSessionProvider.getCurrentUserId()
+
+                    return database.getDocumentOrNull(
+                        databaseId = databaseId,
+                        collectionId = collectionId,
+                        documentId = currentUser,
+                        nestedType = nestedType,
+                    )?.data
+                }
+
                 override suspend fun fetchMetadata(): MetadataModel? {
                     val currentUser = userSessionProvider.getCurrentUserId()
 
@@ -152,11 +164,11 @@ sealed interface RemoteDataSource {
                     )
 
                     return if (document != null) {
-                        val documentUpdatedAt = ISO_DATE_TIME_OFFSET.parse(document.updatedAt)
+                        val documentUpdatedAt = ISO_DATE_TIME_OFFSET.parseOrNull(document.updatedAt)
                         val updatedAt = document.data.getStringOrNull(UPDATED_AT).let {
-                            it?.toLongOrNull() ?: documentUpdatedAt.toInstantUsingOffset().toEpochMilliseconds()
+                            it?.toLongOrNull() ?: documentUpdatedAt?.toInstantUsingOffset()?.toEpochMilliseconds()
                         }
-                        MetadataModel(id = currentUser, updatedAt = updatedAt)
+                        MetadataModel(id = currentUser, updatedAt = updatedAt ?: 0L)
                     } else {
                         null
                     }
@@ -282,10 +294,21 @@ sealed interface RemoteDataSource {
                     return database.listDocumentsFlow(
                         databaseId = databaseId,
                         collectionId = collectionId,
-                        queries = listOf(Query.equal(Common.UID, ids)),
+                        queries = listOf(Query.equal(UID, ids)),
                         nestedType = nestedType,
                     ).map { items ->
                         items.map { it.data }
+                    }
+                }
+
+                override suspend fun fetchOnceItemsByIds(ids: List<String>): List<T> {
+                    return database.listDocuments(
+                        databaseId = databaseId,
+                        collectionId = collectionId,
+                        queries = listOf(Query.equal(UID, ids)),
+                        nestedType = nestedType,
+                    ).documents.map { document ->
+                        document.data
                     }
                 }
 
@@ -305,18 +328,24 @@ sealed interface RemoteDataSource {
                         databaseId = databaseId,
                         collectionId = collectionId,
                         queries = if (ids.isNullOrEmpty()) {
-                            listOf(Query.equal(USER_ID, targetUser))
+                            listOf(
+                                Query.select(listOf(UID, UPDATED_AT)),
+                                Query.equal(USER_ID, targetUser),
+                            )
                         } else {
-                            listOf(Query.equal(Common.UID, ids))
+                            listOf(
+                                Query.select(listOf(UID, UPDATED_AT)),
+                                Query.equal(UID, ids)
+                            )
                         },
                         nestedType = JsonElement.serializer(),
                     ).documents.map { document ->
-                        val id = document.data.getStringOrNull(Common.UID) ?: document.id
-                        val documentUpdatedAt = ISO_DATE_TIME_OFFSET.parse(document.updatedAt)
+                        val id = document.data.getStringOrNull(UID) ?: document.id
+                        val documentUpdatedAt = ISO_DATE_TIME_OFFSET.parseOrNull(document.updatedAt)
                         val updatedAt = document.data.getStringOrNull(UPDATED_AT).let {
-                            it?.toLongOrNull() ?: documentUpdatedAt.toInstantUsingOffset().toEpochMilliseconds()
+                            it?.toLongOrNull() ?: documentUpdatedAt?.toInstantUsingOffset()?.toEpochMilliseconds()
                         }
-                        MetadataModel(id = id, updatedAt = updatedAt)
+                        MetadataModel(id = id, updatedAt = updatedAt ?: 0L)
                     }
                 }
 
@@ -340,7 +369,7 @@ sealed interface RemoteDataSource {
                     database.deleteDocuments(
                         databaseId = databaseId,
                         collectionId = collectionId,
-                        queries = listOf(Query.equal(Common.UID, ids)),
+                        queries = listOf(Query.equal(UID, ids)),
                     )
 
                     if (sendBatchCallback) {
@@ -416,6 +445,9 @@ interface RemoteMultipleDocumentsCommands<T : BaseMultipleRemotePojo> {
     /** Observe changes of multiple documents by their IDs */
     suspend fun fetchItemsByIds(ids: List<String>): Flow<List<T>>
 
+    /** Get once documents by their IDs */
+    suspend fun fetchOnceItemsByIds(ids: List<String>): List<T>
+
     /** Observe all user-owned documents */
     suspend fun fetchAllItems(targetUser: String): Flow<List<T>>
 
@@ -447,6 +479,9 @@ interface RemoteSingleDocumentCommands<T : BaseRemotePojo> {
 
     /** Observe changes to the document */
     suspend fun fetchItem(): Flow<T?>
+
+    /** Get once document */
+    suspend fun fetchOnceItem(): T?
 
     /** Fetch minimal metadata for conflict resolution */
     suspend fun fetchMetadata(): MetadataModel?

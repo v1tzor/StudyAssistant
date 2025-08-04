@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import ru.aleshin.studyassistant.chat.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ResponseStatus
 import ru.aleshin.studyassistant.chat.impl.presentation.theme.ChatThemeRes
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEffect
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEvent
@@ -59,18 +60,23 @@ internal class AssistantScreen : Screen {
                     state = state,
                     modifier = Modifier.padding(paddingValues),
                     onSendMessageSuggestion = { dispatchEvent(AssistantEvent.SendMessage(it)) },
+                    onTryAgain = { dispatchEvent(AssistantEvent.RetryAttempt) },
+                    onDeleteMessage = { dispatchEvent(AssistantEvent.ClearUnsendMessage) },
+                    navigateToBilling = { dispatchEvent(AssistantEvent.NavigateToBilling) },
                 )
             },
             topBar = {
                 AssistantTopBar(
-                    isVisibleClearButton = !state.isLoadingResponse && !state.chatHistory?.messages.isNullOrEmpty(),
+                    isVisibleClearButton = state.responseStatus != ResponseStatus.LOADING &&
+                        !state.chatHistory?.messages.isNullOrEmpty(),
                     onClearChatHistory = { dispatchEvent(AssistantEvent.ClearHistory) },
                 )
             },
             bottomBar = {
                 AssistantBottomBar(
                     isLoadingChat = state.isLoadingChat,
-                    isLoadingResponse = state.isLoadingResponse,
+                    responseStatus = state.responseStatus,
+                    isQuotaExpired = state.isQuotaExpired,
                     userQuery = state.userQuery.query,
                     onUpdateUserQuery = { dispatchEvent(AssistantEvent.UpdateUserQuery(it)) },
                     onSendMessage = { dispatchEvent(AssistantEvent.SendMessage(it)) },

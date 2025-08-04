@@ -43,7 +43,6 @@ import ru.aleshin.studyassistant.core.remote.mappers.share.convertToBase
 import ru.aleshin.studyassistant.core.remote.mappers.share.convertToDetails
 import ru.aleshin.studyassistant.core.remote.mappers.share.convertToShortDetails
 import ru.aleshin.studyassistant.core.remote.mappers.users.convertToDetails
-import ru.aleshin.studyassistant.core.remote.models.shared.homeworks.SharedHomeworksPojo
 import ru.aleshin.studyassistant.core.remote.models.shared.schedules.ReceivedMediatedSchedulesPojo
 import ru.aleshin.studyassistant.core.remote.models.shared.schedules.ReceivedMediatedSchedulesShortPojo
 import ru.aleshin.studyassistant.core.remote.models.shared.schedules.SentMediatedSchedulesPojo
@@ -108,6 +107,11 @@ interface SharedSchedulesRemoteDataSource : RemoteDataSource.FullSynced.SingleDo
         override suspend fun fetchItem(): Flow<SharedSchedulesDetailsPojo?> {
             val currentUser = userSessionProvider.getCurrentUserId()
             return fetchSharedSchedulesDetailsByUser(currentUser)
+        }
+
+        override suspend fun fetchOnceItem(): SharedSchedulesDetailsPojo? {
+            val currentUser = userSessionProvider.getCurrentUserId()
+            return fetchRealtimeSharedSchedulesByUser(currentUser)
         }
 
         override suspend fun fetchMetadata(): MetadataModel? {
@@ -281,7 +285,7 @@ interface SharedSchedulesRemoteDataSource : RemoteDataSource.FullSynced.SingleDo
 
             return realtime.subscribe(
                 channels = Channels.document(databaseId, collectionId, currentUser),
-                payloadType = SharedHomeworksPojo.serializer(),
+                payloadType = SharedSchedulesPojo.serializer(),
             ).map { response ->
                 response.copy(
                     events = response.events.filter {

@@ -75,7 +75,7 @@ internal interface ProfileWorkProcessor :
             )
         }
 
-        private fun updatePasswordWork(oldPassword: String, newPassword: String) = flow {
+        private fun updatePasswordWork(oldPassword: String?, newPassword: String) = flow {
             appUserInteractor.updatePassword(oldPassword, newPassword).handle(
                 onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
             )
@@ -113,5 +113,5 @@ internal sealed class ProfileWorkCommand : WorkCommand {
     data class UpdateAppUser(val user: AppUserUi) : ProfileWorkCommand()
     data class UpdateAvatar(val user: AppUserUi, val file: InputFileUi) : ProfileWorkCommand()
     data class DeleteAvatar(val user: AppUserUi) : ProfileWorkCommand()
-    data class UpdatePassword(val oldPassword: String, val newPassword: String) : ProfileWorkCommand()
+    data class UpdatePassword(val oldPassword: String?, val newPassword: String) : ProfileWorkCommand()
 }

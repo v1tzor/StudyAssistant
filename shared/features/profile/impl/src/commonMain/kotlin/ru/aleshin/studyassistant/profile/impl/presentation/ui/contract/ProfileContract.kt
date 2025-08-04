@@ -58,7 +58,7 @@ internal sealed class ProfileEvent : BaseEvent {
     data class SendSharedSchedule(val sendData: ShareSchedulesSendDataUi) : ProfileEvent()
     data class CancelSentSchedule(val schedule: SentMediatedSchedulesUi) : ProfileEvent()
     data class NavigateToShareScheduleViewer(val shareId: UID) : ProfileEvent()
-    data object NavigateToPrivacySettings : ProfileEvent()
+    data object NavigateToAboutApp : ProfileEvent()
     data object NavigateToGeneralSettings : ProfileEvent()
     data object NavigateToNotifySettings : ProfileEvent()
     data object NavigateToCalendarSettings : ProfileEvent()

@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import co.touchlab.kermit.Logger
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.RegisterCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
@@ -83,7 +82,7 @@ internal class RegisterScreen : Screen {
                 is RegisterEffect.ReplaceScreen -> navigator.replaceAll(effect.screen)
                 is RegisterEffect.ShowError -> {
                     snackbarState.showSnackbar(
-                        message = effect.failures.apply { Logger.i("test") { this.toString() } }.mapToMessage(strings),
+                        message = effect.failures.mapToMessage(strings),
                         withDismissAction = true,
                     )
                 }

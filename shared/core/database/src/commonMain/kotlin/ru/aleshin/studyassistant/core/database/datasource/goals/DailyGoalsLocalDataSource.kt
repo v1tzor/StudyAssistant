@@ -214,7 +214,7 @@ interface DailyGoalsLocalDataSource : CombinedLocalDataSource<BaseGoalEntity, Of
                     ) { homeworksMap, organizationsMap, subjectsMap, employeesMap ->
                         homeworksMap.mapValues { homework ->
                             homework.value.mapToDetails(
-                                organization = checkNotNull(organizationsMap[homework.value.organizationId]),
+                                organization = organizationsMap[homework.value.organizationId],
                                 subject = subjectsMap[homework.value.subjectId]?.mapToDetails(
                                     employee = employeesMap[subjectsMap[homework.value.subjectId]?.teacherId]
                                 ),

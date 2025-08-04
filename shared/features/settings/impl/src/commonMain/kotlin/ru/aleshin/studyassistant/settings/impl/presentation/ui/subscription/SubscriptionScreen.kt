@@ -63,8 +63,8 @@ internal class SubscriptionScreen : Screen {
                 SubscriptionContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
-                    onTransferRemoteData = { dispatchEvent(SubscriptionEvent.TransferRemoteData) },
-                    onTransferLocalData = { dispatchEvent(SubscriptionEvent.TransferLocalData) },
+                    onTransferRemoteData = { dispatchEvent(SubscriptionEvent.TransferRemoteData(it)) },
+                    onTransferLocalData = { dispatchEvent(SubscriptionEvent.TransferLocalData(it)) },
                     onOpenBilling = { dispatchEvent(SubscriptionEvent.NavigateToBilling) },
                     onControlSubscription = { dispatchEvent(SubscriptionEvent.ControlSubscription) },
                     onRestoreSubscription = { dispatchEvent(SubscriptionEvent.RestoreSubscription) },

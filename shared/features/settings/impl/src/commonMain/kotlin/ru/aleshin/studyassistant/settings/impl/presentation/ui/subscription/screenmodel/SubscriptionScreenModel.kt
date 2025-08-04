@@ -75,15 +75,15 @@ internal class SubscriptionScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is SubscriptionEvent.TransferRemoteData -> {
+            is SubscriptionEvent.TransferRemoteData -> with(event) {
                 launchBackgroundWork(BackgroundKey.TRANSFER_DATA) {
-                    val command = SubscriptionWorkCommand.TransferRemoteData
+                    val command = SubscriptionWorkCommand.TransferRemoteData(mergeData)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is SubscriptionEvent.TransferLocalData -> {
+            is SubscriptionEvent.TransferLocalData -> with(event) {
                 launchBackgroundWork(BackgroundKey.TRANSFER_DATA) {
-                    val command = SubscriptionWorkCommand.TransferLocalData
+                    val command = SubscriptionWorkCommand.TransferLocalData(mergeData)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }

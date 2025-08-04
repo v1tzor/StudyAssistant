@@ -152,7 +152,7 @@ internal fun OrganizationPageInfo(
             )
         }
         Column(
-            modifier = Modifier.verticalScroll(scrollState),
+            modifier = Modifier.verticalScroll(state = scrollState, overscrollEffect = null),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             var isExpandedTypeMenu by remember { mutableStateOf(false) }

@@ -32,5 +32,5 @@ interface SubjectsRepository {
     suspend fun fetchSubjectsByEmployee(employeeId: UID): Flow<List<Subject>>
     suspend fun fetchSubjectById(uid: UID): Flow<Subject?>
     suspend fun deleteSubject(targetId: UID)
-    suspend fun transferData(direction: DataTransferDirection)
+    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

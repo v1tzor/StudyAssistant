@@ -51,6 +51,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.DailyAiStatisticsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
@@ -128,6 +129,7 @@ val featureModule = DI.Module("Feature") {
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val dateManager = instance<DateManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
@@ -394,6 +396,7 @@ val featureModule = DI.Module("Feature") {
         object : ChatFeatureDependencies {
             override val billingFeatureStarter = provider<BillingFeatureStarter>()
             override val aiAssistantRepository = instance<AiAssistantRepository>()
+            override val dailyAiStatisticsRepository = instance<DailyAiStatisticsRepository>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()

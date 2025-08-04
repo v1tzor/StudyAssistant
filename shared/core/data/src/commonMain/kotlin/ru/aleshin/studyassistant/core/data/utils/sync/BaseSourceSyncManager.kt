@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.core.data.utils.sync
 
-import co.touchlab.kermit.Logger
 import dev.tmapps.konnection.Konnection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -24,8 +23,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.io.IOException
 import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
-import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.database.storages.ChangeQueueStorage
 import ru.aleshin.studyassistant.core.database.utils.BaseLocalEntity
@@ -82,40 +81,82 @@ abstract class BaseSourceSyncManager(
     abstract suspend fun collectOnlineChanges()
 
     /**
-     * Starts two-directional synchronization between local and remote sources.
-     * Local changes are pushed first, then local data is updated with remote state,
-     * and finally live remote updates are collected and applied.
+     * Starts two-directional synchronization between the local and remote data sources.
+     *
+     * This function performs synchronization in three phases:
+     * 1. Attempts to upload any offline changes to the remote source.
+     * 2. Pulls the current remote state and updates the local database.
+     * 3. Subscribes to live remote updates and applies them locally in real time.
+     *
+     * If the initial sync (upload + download) fails due to network issues or other exceptions,
+     * the process will resume when connectivity is restored.
+     *
+     * The function monitors network connectivity via [connectionManger] and automatically restarts
+     * sync attempts when the device goes back online.
+     *
+     * This method is safe to call multiple times — it will cancel any ongoing sync before restarting.
      */
-    override fun startSourceSync() {
-        connectJob?.cancel()
-        connectJob = scope.launch {
-            Logger.d("test2") { "$sourceSyncKey: startTwoDirectSync" }
-            connectionManger.observeHasConnection().collect { hasConnection ->
-                Logger.d("test2") { "$sourceSyncKey: startTwoDirectSync -> collect" }
-                taskJob?.cancel()
 
-                if (!hasConnection) return@collect
+    override suspend fun startSourceSync() {
+        var isFirstSync: Boolean
+        try {
+            uploadOfflineChanges()
+            syncLocalDatabase()
+            isFirstSync = true
+        } catch (_: Exception) {
+            isFirstSync = false
+        }
+
+        connectJob?.cancel()
+        connectJob = scope.launch(SupervisorJob()) {
+            connectionManger.observeHasConnection().collect { hasConnection ->
+                taskJob?.cancel()
+                taskJob = null
+
+                if (!hasConnection) {
+                    isFirstSync = false
+                    return@collect
+                }
 
                 taskJob = scope.launch {
-                    uploadOfflineChanges()
-                    syncLocalDatabase()
-                    collectOnlineChanges()
+                    try {
+                        if (!isFirstSync) {
+                            uploadOfflineChanges()
+                            syncLocalDatabase()
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    } finally {
+                        collectOnlineChanges()
+                    }
                 }
-            }
-        }.apply {
-            invokeOnCompletion {
-                Logger.e("test2") { "$sourceSyncKey: end startTwoDirectSync" }
             }
         }
     }
 
-//    suspend fun performSyncSources()
+    /**
+     * Single two-directional synchronization between local and remote sources.
+     * Local changes are pushed first, then local data is updated with remote state
+     *
+     * @return [Boolean] Success sync status
+     */
+    override suspend fun singleSyncRound(): Boolean {
+        try {
+            uploadOfflineChanges()
+            syncLocalDatabase()
+        } catch (_: Exception) {
+            return false
+        }
+        return true
+    }
 
     /**
      * Stops all currently running sync operations.
      */
     override fun stopSourceSync() {
         mainJob.cancelChildren()
+        taskJob = null
+        connectJob = null
     }
 
     /**
@@ -133,7 +174,7 @@ abstract class BaseSourceSyncManager(
         try {
             work.invoke(changes)
             changeQueueStorage.deleteChangesByIds(changes.map { it.id })
-        } catch (_: InternetConnectionException) {
+        } catch (_: IOException) {
             return
         } catch (exception: Exception) {
             exception.printStackTrace()
@@ -164,9 +205,9 @@ abstract class BaseSourceSyncManager(
     ) {
 
         override suspend fun clearSourceData() {
+            stopSourceSync()
             changeQueueStorage.deleteAllSourceChanges(sourceSyncKey)
             localDataSource.deleteAllItems()
-            mainJob.cancelChildren()
         }
 
         override suspend fun uploadOfflineChanges() {
@@ -181,7 +222,6 @@ abstract class BaseSourceSyncManager(
             ).associate { model ->
                 Pair(model.id, model.updatedAt)
             }
-            Logger.i("test2") { "$sourceSyncKey: pushOfflineChanges: changeQueue -> $changeQueue" }
 
             val deleteChanges = changeQueue.filter { localChange ->
                 val typeFilter = localChange.type == DELETE
@@ -205,7 +245,6 @@ abstract class BaseSourceSyncManager(
                 handleRemoteSyncResult(deleteChanges) { changes ->
                     remoteDataSource.deleteItemsByIds(changes.map { it.documentId }, false)
                 }
-                Logger.i("test2") { "$sourceSyncKey: pushOfflineChanges: deleteChanges -> $deleteChanges" }
             }
 
             if (upsertChanges.isNotEmpty()) {
@@ -216,7 +255,6 @@ abstract class BaseSourceSyncManager(
                     }
                     remoteDataSource.addOrUpdateItems(upsertRemoteModels, false)
                 }
-                Logger.i("test2") { "$sourceSyncKey: pushOfflineChanges: upsertChanges -> $upsertChanges" }
             }
             remoteDataSource.sendBatchCallback()
         }
@@ -241,13 +279,11 @@ abstract class BaseSourceSyncManager(
 
             if (deletedModels.isNotEmpty()) {
                 localDataSource.deleteItemsById(deletedModels.map { it.id })
-                Logger.i("test2") { "$sourceSyncKey: updateLocalDatabase: deleteModels -> $deletedModels" }
             }
 
             if (upsertIds.isNotEmpty()) {
-                val upsertRemoteModels = remoteDataSource.fetchItemsByIds(upsertIds.toList()).first()
+                val upsertRemoteModels = remoteDataSource.fetchOnceItemsByIds(upsertIds.toList())
                 localDataSource.addOrUpdateItems(upsertRemoteModels.map { mappers.remoteToLocal(it) })
-                Logger.i("test2") { "$sourceSyncKey: updateLocalDatabase: upsertRemoteModels -> $upsertRemoteModels" }
             }
         }
 
@@ -258,23 +294,19 @@ abstract class BaseSourceSyncManager(
                     is DatabaseEvent.Create<P> -> {
                         if (localModel?.updatedAt == null || localModel.updatedAt < event.data.updatedAt) {
                             localDataSource.addOrUpdateItems(listOf(mappers.remoteToLocal(event.data)))
-                            Logger.i("test2") { "$sourceSyncKey: collectServerUpdates: event -> $event" }
                         }
                     }
                     is DatabaseEvent.Delete<P> -> {
                         if (localModel != null) {
                             localDataSource.deleteItemsById(listOf(event.documentId))
-                            Logger.i("test2") { "$sourceSyncKey: collectServerUpdates: event -> $event" }
                         }
                     }
                     is DatabaseEvent.Update<P> -> {
                         if (localModel?.updatedAt == null || localModel.updatedAt < event.data.updatedAt) {
                             localDataSource.addOrUpdateItems(listOf(mappers.remoteToLocal(event.data)))
-                            Logger.i("test2") { "$sourceSyncKey: collectServerUpdates: event -> $event" }
                         }
                     }
                     is DatabaseEvent.BatchUpdate<*> -> {
-                        Logger.i("test2") { "$sourceSyncKey: collectServerUpdates: BATCH UPDATED" }
                         syncLocalDatabase()
                     }
                 }
@@ -303,9 +335,9 @@ abstract class BaseSourceSyncManager(
     ) {
 
         override suspend fun clearSourceData() {
+            stopSourceSync()
             changeQueueStorage.deleteAllSourceChanges(sourceSyncKey)
             localDataSource.deleteItem()
-            mainJob.cancelChildren()
         }
 
         override suspend fun uploadOfflineChanges() {
@@ -313,7 +345,6 @@ abstract class BaseSourceSyncManager(
             if (changeQueue.isEmpty()) return
 
             val actualRemoteModel = remoteDataSource.fetchMetadata()
-            Logger.i("test2") { "$sourceSyncKey: pushOfflineChanges: changeQueue -> $changeQueue" }
 
             val isDeleted = changeQueue.any { localChange ->
                 val typeFilter = localChange.type == DELETE
@@ -330,14 +361,12 @@ abstract class BaseSourceSyncManager(
                 handleRemoteSyncResult(changeQueue) {
                     remoteDataSource.deleteItem()
                 }
-                Logger.i("test2") { "$sourceSyncKey: pushOfflineChanges: deleteChange" }
             } else if (isUpserted) {
                 handleRemoteSyncResult(changeQueue) {
                     val localModel = localDataSource.fetchItem().first()
                     val upsertRemoteModels = mappers.localToRemote.invoke(checkNotNull(localModel))
                     remoteDataSource.addOrUpdateItem(upsertRemoteModels)
                 }
-                Logger.i("test2") { "$sourceSyncKey: pushOfflineChanges: upsertChange" }
             }
         }
 
@@ -347,12 +376,10 @@ abstract class BaseSourceSyncManager(
 
             if (actualRemoteModel == null && currentLocalModel != null) {
                 localDataSource.deleteItem()
-                Logger.i("test2") { "$sourceSyncKey: updateLocalDatabase: deleteModel" }
             } else if (actualRemoteModel != null) {
                 if (currentLocalModel == null || actualRemoteModel.updatedAt > currentLocalModel.updatedAt) {
-                    val upsertRemoteModel = remoteDataSource.fetchItem().first() ?: return
+                    val upsertRemoteModel = remoteDataSource.fetchOnceItem() ?: return
                     localDataSource.addOrUpdateItem(mappers.remoteToLocal(upsertRemoteModel))
-                    Logger.i("test2") { "$sourceSyncKey: updateLocalDatabase: upsertRemoteModel" }
                 }
             }
         }
@@ -364,19 +391,16 @@ abstract class BaseSourceSyncManager(
                     is DatabaseEvent.Create<P> -> {
                         if (localModel?.updatedAt == null || localModel.updatedAt < event.data.updatedAt) {
                             localDataSource.addOrUpdateItem(mappers.remoteToLocal(event.data))
-                            Logger.i("test2") { "$sourceSyncKey: collectServerUpdates: event -> $event" }
                         }
                     }
                     is DatabaseEvent.Delete<P> -> {
                         if (localModel != null) {
                             localDataSource.deleteItem()
-                            Logger.i("test2") { "$sourceSyncKey: collectServerUpdates: event -> $event" }
                         }
                     }
                     is DatabaseEvent.Update<P> -> {
                         if (localModel?.updatedAt == null || localModel.updatedAt < event.data.updatedAt) {
                             localDataSource.addOrUpdateItem(mappers.remoteToLocal(event.data))
-                            Logger.i("test2") { "$sourceSyncKey: collectServerUpdates: event -> ${event.data}" }
                         }
                     }
                     is DatabaseEvent.BatchUpdate<*> -> syncLocalDatabase()

@@ -69,21 +69,37 @@ internal interface AuthInteractor {
         override suspend fun loginWithEmail(credentials: AuthCredentials, device: UserDevice) = eitherWrapper.wrap {
             val userSession = authRepository.signInWithEmail(credentials)
             val authUser = usersRepository.fetchCurrentAuthUser() ?: throw AppwriteUserException()
-            val userInfo = usersRepository.fetchRealtimeUserById(userSession.userId) ?: throw AppwriteUserException()
+            val userInfo = usersRepository.fetchRealtimeUserById(userSession.userId)
 
-            if (userInfo.devices.find { it.deviceId == device.deviceId } == null) {
-                val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-                val updatedUserInfo = userInfo.copy(
-                    updatedAt = updatedAt,
-                    devices = buildList {
-                        addAll(userInfo.devices)
-                        add(device)
-                    },
+            if (userInfo == null) {
+                val newUserInfo = AppUser.createNewUser(
+                    uid = authUser.uid,
+                    device = device,
+                    username = credentials.username ?: credentials.email,
+                    email = credentials.email,
+                    createdAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
                 )
-                usersRepository.updateCurrentUserProfile(updatedUserInfo)
-            }
+                usersRepository.createNewUserProfile(newUserInfo)
+                if (!authUser.emailVerification) manageUserRepository.sendVerifyEmail()
 
-            crashlyticsService.setupUser(userSession.id)
+                crashlyticsService.setupUser(userSession.id)
+                sourceSyncFacade.syncAllSource()
+            } else {
+                crashlyticsService.setupUser(userSession.id)
+                sourceSyncFacade.syncAllSource()
+
+                if (userInfo.devices.find { it.deviceId == device.deviceId } == null) {
+                    val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+                    val updatedUserInfo = userInfo.copy(
+                        updatedAt = updatedAt,
+                        devices = buildList {
+                            addAll(userInfo.devices)
+                            add(device)
+                        },
+                    )
+                    usersRepository.updateCurrentUserProfile(updatedUserInfo)
+                }
+            }
 
             return@wrap authUser
         }
@@ -95,6 +111,7 @@ internal interface AuthInteractor {
             crashlyticsService.setupUser(authUser.uid)
 
             return@wrap if (userInfo != null) {
+                sourceSyncFacade.syncAllSource()
                 AuthResult(authUser = authUser, isNewUser = false)
             } else {
                 val newUserInfo = AppUser.createNewUser(
@@ -105,7 +122,12 @@ internal interface AuthInteractor {
                     createdAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
                 )
                 usersRepository.createNewUserProfile(newUserInfo)
-                manageUserRepository.sendVerifyEmail()
+
+                if (!authUser.emailVerification) {
+                    manageUserRepository.sendVerifyEmail()
+                }
+
+                sourceSyncFacade.syncAllSource()
 
                 AuthResult(authUser = authUser, isNewUser = true)
             }
@@ -121,11 +143,16 @@ internal interface AuthInteractor {
                 createdAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
             )
             usersRepository.createNewUserProfile(newUserInfo)
-            manageUserRepository.sendVerifyEmail()
+
+            if (!authUser.emailVerification) {
+                manageUserRepository.sendVerifyEmail()
+            }
 
             val settings = generalSettingsRepository.fetchSettings().first()
             val updatedSettings = settings.copy(isUnfinishedSetup = authUser.uid)
             generalSettingsRepository.updateSettings(updatedSettings)
+
+            sourceSyncFacade.syncAllSource()
 
             crashlyticsService.setupUser(authUser.uid)
 
@@ -143,6 +170,7 @@ internal interface AuthInteractor {
         override suspend fun signOut(deviceId: UID) = eitherWrapper.wrap {
             val userInfo = usersRepository.fetchCurrentUserProfile().first() ?: throw AppwriteUserException()
             val deviceInfo = userInfo.devices.find { it.deviceId == deviceId }
+            sourceSyncFacade.clearAllSyncedData()
             if (deviceInfo != null) {
                 val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
                 val updatedUserInfo = userInfo.copy(
@@ -155,7 +183,6 @@ internal interface AuthInteractor {
                 usersRepository.updateAnotherUserProfile(updatedUserInfo, userInfo.uid)
             }
             crashlyticsService.setupUser(null)
-            sourceSyncFacade.stopAllSourceSync()
             authRepository.signOut()
             messageRepository.deleteToken()
         }

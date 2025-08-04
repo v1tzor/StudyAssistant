@@ -16,12 +16,10 @@
 
 package ru.aleshin.studyassistant.domain.interactors
 
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.onCompletion
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.managers.sync.SourceSyncFacade
+import ru.aleshin.studyassistant.core.domain.managers.sync.SyncWorkManager
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.domain.common.MainEitherWrapper
 import ru.aleshin.studyassistant.domain.entities.MainFailures
@@ -31,27 +29,21 @@ import ru.aleshin.studyassistant.domain.entities.MainFailures
  */
 interface SyncInteractor {
 
-    suspend fun cycleTwoDirectSync(): UnitDomainResult<MainFailures>
+    suspend fun performSourceSync(): UnitDomainResult<MainFailures>
 
     class Base(
-        private val usersRepository: UsersRepository,
         private val sourceSyncFacade: SourceSyncFacade,
+        private val syncWorkManager: SyncWorkManager,
+        private val usersRepository: UsersRepository,
         private val eitherWrapper: MainEitherWrapper,
     ) : SyncInteractor {
 
         @OptIn(ExperimentalCoroutinesApi::class)
-        override suspend fun cycleTwoDirectSync() = eitherWrapper.wrap {
-            usersRepository.fetchStateChanged().distinctUntilChangedBy { it?.uid }.onCompletion {
-                Logger.e("test2") { "XXX------------x awaitClose STOP ALL SYNC x----------------XXX" }
-                sourceSyncFacade.stopAllSourceSync()
-            }.collect { targetUser ->
-                Logger.i("test2") { "INTERACTOR FLOW COLLECT | targetUser: ${targetUser?.uid}" }
-                sourceSyncFacade.stopAllSourceSync()
-                if (targetUser != null) {
-                    Logger.e("test2") { "----------------- START ALL SYNC -----------------" }
-                    sourceSyncFacade.startAllSourceSync()
-                }
+        override suspend fun performSourceSync() = eitherWrapper.wrap {
+            if (usersRepository.fetchCurrentAuthUser() != null) {
+                sourceSyncFacade.syncAllSource()
             }
+            syncWorkManager.startOrRetrySyncService()
         }
     }
 }

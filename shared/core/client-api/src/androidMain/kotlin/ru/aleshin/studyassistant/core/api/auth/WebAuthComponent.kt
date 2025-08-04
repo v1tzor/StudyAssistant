@@ -29,7 +29,7 @@ import ru.aleshin.studyassistant.core.api.auth.WebAuthComponent.Companion.authen
  * Used to authenticate with external OAuth2 providers. Launches browser windows and handles
  * suspension until the user completes the process or otherwise returns to the app.
  */
-internal class WebAuthComponent {
+class WebAuthComponent {
 
     companion object : DefaultLifecycleObserver {
         private var suspended = false

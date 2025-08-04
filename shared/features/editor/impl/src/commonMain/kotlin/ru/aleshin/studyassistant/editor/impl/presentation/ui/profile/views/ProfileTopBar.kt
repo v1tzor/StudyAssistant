@@ -62,7 +62,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 internal fun ProfileTopBar(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
-    onChangePassword: (old: String, new: String) -> Unit,
+    onChangePassword: (old: String?, new: String) -> Unit,
 ) {
     var passwordChangerDialogState by remember { mutableStateOf(false) }
     var isExpandMoreDropdownMenu by remember { mutableStateOf(false) }
@@ -137,7 +137,7 @@ private fun ProfileMoreDropdownMenu(
 private fun PasswordChangerDialog(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
-    onChangePassword: (old: String, new: String) -> Unit,
+    onChangePassword: (old: String?, new: String) -> Unit,
 ) {
     var editableOldPassword by remember { mutableStateOf("") }
     var editableNewPassword by remember { mutableStateOf("") }
@@ -188,12 +188,17 @@ private fun PasswordChangerDialog(
                     )
                 }
                 DialogButtons(
-                    enabledConfirm = editableNewPassword.isNotBlank() && editableOldPassword.isNotBlank()
-                            && editableNewPassword.length >= Constants.Text.MIN_PASSWORD_LENGTH
-                            && editableNewPassword.matches(Regex(Constants.Regex.PASSWORD)),
+                    enabledConfirm = editableNewPassword.isNotBlank() &&
+                        editableNewPassword.length >= Constants.Text.MIN_PASSWORD_LENGTH &&
+                        editableNewPassword.matches(Regex(Constants.Regex.PASSWORD)),
                     confirmTitle = StudyAssistantRes.strings.saveConfirmTitle,
                     onCancelClick = onDismiss,
-                    onConfirmClick = { onChangePassword(editableOldPassword, editableNewPassword) },
+                    onConfirmClick = {
+                        onChangePassword(
+                            editableOldPassword.takeIf { it.isNotBlank() },
+                            editableNewPassword
+                        )
+                    },
                 )
             }
         }

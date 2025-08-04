@@ -23,12 +23,11 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.billing.api.navigation.BillingScreen
 import ru.aleshin.studyassistant.chat.impl.di.holder.ChatFeatureDIHolder
 import ru.aleshin.studyassistant.chat.impl.navigation.ChatScreenProvider
+import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ResponseStatus
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantAction
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEffect
-import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEffect.NavigateToGlobal
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEvent
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantViewState
-import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.screenmodel.AssistantWorkCommand.ClearChatHistory
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.BaseScreenModel
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.EmptyDeps
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.BackgroundWorkKey
@@ -66,6 +65,10 @@ internal class AssistantScreenModel(
                     val command = AssistantWorkCommand.LoadMessages
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_QUOTA_EXPIRED_STATUS) {
+                    val command = AssistantWorkCommand.LoadQuotaExpiredStatus
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is AssistantEvent.SendMessage -> with(event) {
                 launchBackgroundWork(BackgroundKey.SEND_MESSAGE) {
@@ -73,25 +76,37 @@ internal class AssistantScreenModel(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is AssistantEvent.ClearHistory -> {
-                val chatId = state().chatHistory?.uid
+            is AssistantEvent.RetryAttempt -> with(state()) {
+                launchBackgroundWork(BackgroundKey.SEND_MESSAGE) {
+                    val command = AssistantWorkCommand.RetryAttempt(chatHistory?.uid)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is AssistantEvent.ClearUnsendMessage -> with(state()) {
+                launchBackgroundWork(BackgroundKey.MESSAGE_ACTION) {
+                    val command = AssistantWorkCommand.ClearUnsendMessage(chatHistory?.uid)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is AssistantEvent.ClearHistory -> with(state()) {
+                val chatId = chatHistory?.uid
                 if (chatId != null) {
                     launchBackgroundWork(BackgroundKey.MESSAGE_ACTION) {
-                        val command = ClearChatHistory(chatId)
+                        val command = AssistantWorkCommand.ClearChatHistory(chatId)
                         workProcessor.work(command).collectAndHandleWork()
                     }
                 }
             }
-            is AssistantEvent.UpdateUserQuery -> {
-                val query = state().userQuery.copy(event.query)
+            is AssistantEvent.UpdateUserQuery -> with(event) {
+                val query = state().userQuery.copy(query)
                 sendAction(AssistantAction.UpdateUserQuery(query))
             }
             is AssistantEvent.NavigateToBilling -> {
                 val screen = screenProvider.provideBillingScreen(BillingScreen.Subscription)
-                sendEffect(NavigateToGlobal(screen))
+                sendEffect(AssistantEffect.NavigateToGlobal(screen))
             }
             is AssistantEvent.StopResponseLoading -> {
-                sendAction(AssistantAction.UpdateLoadingResponse(false))
+                sendAction(AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE))
             }
         }
     }
@@ -106,17 +121,20 @@ internal class AssistantScreenModel(
         is AssistantAction.UpdateUserQuery -> currentState.copy(
             userQuery = action.query,
         )
-        is AssistantAction.UpdateLoadingResponse -> currentState.copy(
-            isLoadingResponse = action.isLoading,
+        is AssistantAction.UpdateResponseStatus -> currentState.copy(
+            responseStatus = action.responseStatus,
         )
         is AssistantAction.UpdateChatHistory -> currentState.copy(
             chatHistory = action.chatHistory,
             isLoadingChat = false,
         )
+        is AssistantAction.UpdateQuotaExpiredStatus -> currentState.copy(
+            isQuotaExpired = action.isQuotaExpired,
+        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_MESSAGES, SEND_MESSAGE, MESSAGE_ACTION
+        LOAD_MESSAGES, LOAD_QUOTA_EXPIRED_STATUS, SEND_MESSAGE, MESSAGE_ACTION
     }
 }
 

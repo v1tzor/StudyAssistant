@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.settings.api.navigation.SettingsScreen
 import ru.aleshin.studyassistant.settings.api.presentation.SettingsRootScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.CalendarScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.GeneralScreen
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.AboutAppScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.NotificationScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.SubscriptionScreen
 
@@ -43,6 +44,7 @@ internal interface SettingsScreenProvider : FeatureScreenProvider<SettingsScreen
             is SettingsScreen.Notification -> NotificationScreen()
             is SettingsScreen.Calendar -> CalendarScreen()
             is SettingsScreen.Subscription -> SubscriptionScreen()
+            is SettingsScreen.AboutApp -> AboutAppScreen()
         }
 
         override fun provideBillingScreen(screen: BillingScreen): Screen {

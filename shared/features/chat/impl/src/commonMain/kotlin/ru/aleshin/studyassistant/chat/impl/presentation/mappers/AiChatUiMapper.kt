@@ -25,23 +25,25 @@ import ru.aleshin.studyassistant.core.domain.entities.ai.AiChatHistory
 /**
  * @author Stanislav Aleshin on 22.06.2025.
  */
-internal fun AiChatHistory.mapToUi() = AiChatHistoryUi(
+internal suspend fun AiChatHistory.mapToUi() = AiChatHistoryUi(
     uid = uid,
     messages = messages.map { it.mapToUi() },
     lastMessage = lastMessage?.mapToUi()
 )
 
-internal fun AiAssistantMessage.mapToUi() = when (this) {
+internal suspend fun AiAssistantMessage.mapToUi() = when (this) {
     is AiAssistantMessage.UserMessage -> UserMessageUi(
         id = id,
         content = content,
         time = time,
         name = name,
     )
-    is AiAssistantMessage.AssistantMessage -> AssistantMessageUi(
-        id = id,
-        content = content,
-        time = time,
-    )
+    is AiAssistantMessage.AssistantMessage -> {
+        AssistantMessageUi(
+            id = id,
+            content = content,
+            time = time,
+        )
+    }
     else -> throw IllegalArgumentException("Not supported message type $this")
 }

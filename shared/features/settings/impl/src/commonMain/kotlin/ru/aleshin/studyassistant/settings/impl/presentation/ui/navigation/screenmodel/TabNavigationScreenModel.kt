@@ -66,6 +66,10 @@ internal class TabNavigationScreenModel(
             val screen = screenProvider.provideFeatureScreen(SettingsScreen.Subscription)
             sendEffect(TabNavigationEffect.ReplaceScreen(screen))
         }
+        is TabNavigationEvent.NavigateToAboutApp -> {
+            val screen = screenProvider.provideFeatureScreen(SettingsScreen.AboutApp)
+            sendEffect(TabNavigationEffect.ReplaceScreen(screen))
+        }
         is TabNavigationEvent.NavigateToBack -> {
             sendEffect(TabNavigationEffect.NavigateToBack)
         }

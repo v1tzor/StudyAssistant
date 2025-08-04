@@ -32,6 +32,8 @@ import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmod
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel.GeneralScreenModel
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel.GeneralStateCommunicator
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel.GeneralWorkProcessor
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.screenmodel.AboutAppScreenModel
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.screenmodel.AboutAppStateCommunicator
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.TabNavigationScreen
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.screenmodel.TabNavigationEffectCommunicator
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.screenmodel.TabNavigationScreenModel
@@ -77,4 +79,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<SubscriptionEffectCommunicator> { SubscriptionEffectCommunicator.Base() }
     bindSingleton<SubscriptionWorkProcessor> { SubscriptionWorkProcessor.Base(instance(), instance(), instance()) }
     bindSingleton<SubscriptionScreenModel> { SubscriptionScreenModel(instance(), instance(), instance(), instance(), instance()) }
+
+    bindSingleton<AboutAppStateCommunicator> { AboutAppStateCommunicator.Base() }
+    bindSingleton<AboutAppScreenModel> { AboutAppScreenModel(instance(), instance()) }
 }

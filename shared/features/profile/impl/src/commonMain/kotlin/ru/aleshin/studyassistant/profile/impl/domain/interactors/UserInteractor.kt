@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.profile.impl.domain.interactors
 
 import kotlinx.coroutines.flow.filterNotNull
+import ru.aleshin.studyassistant.core.common.extensions.catchIOException
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -42,7 +43,7 @@ internal interface UserInteractor {
         }
 
         override suspend fun fetchAllFriends() = eitherWrapper.wrapFlow {
-            usersRepository.fetchCurrentUserFriends()
+            usersRepository.fetchCurrentUserFriends().catchIOException { emit(emptyList()) }
         }
     }
 }

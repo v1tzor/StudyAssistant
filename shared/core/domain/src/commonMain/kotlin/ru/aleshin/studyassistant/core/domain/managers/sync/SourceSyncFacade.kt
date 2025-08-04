@@ -16,75 +16,79 @@
 
 package ru.aleshin.studyassistant.core.domain.managers.sync
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import ru.aleshin.studyassistant.core.common.managers.CoroutineFlow.BACKGROUND
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+
 /**
  * @author Stanislav Aleshin on 25.07.2025.
  */
 interface SourceSyncFacade {
 
-    suspend fun startAllSourceSync()
+    suspend fun syncAllSource()
 
-    fun stopAllSourceSync()
+    suspend fun singleSyncAllSources(): Boolean
+
+    suspend fun stopAllSourceSync()
 
     suspend fun clearAllSyncedData()
 
     class Base(
-        private val currentUserSourceSyncManager: CurrentUserSourceSyncManager,
-        private val baseScheduleSourceSyncManager: BaseScheduleSourceSyncManager,
-        private val customScheduleSourceSyncManager: CustomScheduleSourceSyncManager,
-        private val todoSourceSyncManager: TodoSourceSyncManager,
-        private val homeworkSourceSyncManager: HomeworkSourceSyncManager,
-        private val goalsSourceSyncManager: DailyGoalsSourceSyncManager,
-        private val employeeSourceSyncManager: EmployeeSourceSyncManager,
-        private val organizationsSourceSyncManager: OrganizationsSourceSyncManager,
-        private val subjectsSourceSyncManager: SubjectsSourceSyncManager,
-        private val sharedSchedulesSourceSyncManager: SharedSchedulesSourceSyncManager,
-        private val sharedHomeworksSourceSyncManager: SharedHomeworksSourceSyncManager,
-        private val friendRequestsSourceSyncManager: FriendRequestsSourceSyncManager,
+        currentUserSourceSyncManager: CurrentUserSourceSyncManager,
+        baseScheduleSourceSyncManager: BaseScheduleSourceSyncManager,
+        customScheduleSourceSyncManager: CustomScheduleSourceSyncManager,
+        todoSourceSyncManager: TodoSourceSyncManager,
+        homeworkSourceSyncManager: HomeworkSourceSyncManager,
+        goalsSourceSyncManager: DailyGoalsSourceSyncManager,
+        employeeSourceSyncManager: EmployeeSourceSyncManager,
+        organizationsSourceSyncManager: OrganizationsSourceSyncManager,
+        subjectsSourceSyncManager: SubjectsSourceSyncManager,
+        sharedSchedulesSourceSyncManager: SharedSchedulesSourceSyncManager,
+        sharedHomeworksSourceSyncManager: SharedHomeworksSourceSyncManager,
+        friendRequestsSourceSyncManager: FriendRequestsSourceSyncManager,
+        dailyAiStatisticsSourceSyncManager: DailyAiStatisticsSourceSyncManager,
+        private val coroutineManager: CoroutineManager,
     ) : SourceSyncFacade {
 
-        override suspend fun startAllSourceSync() {
-            currentUserSourceSyncManager.startSourceSync()
-            baseScheduleSourceSyncManager.startSourceSync()
-            customScheduleSourceSyncManager.startSourceSync()
-            todoSourceSyncManager.startSourceSync()
-            homeworkSourceSyncManager.startSourceSync()
-            goalsSourceSyncManager.startSourceSync()
-            employeeSourceSyncManager.startSourceSync()
-            organizationsSourceSyncManager.startSourceSync()
-            subjectsSourceSyncManager.startSourceSync()
-            sharedSchedulesSourceSyncManager.startSourceSync()
-            sharedHomeworksSourceSyncManager.startSourceSync()
-            friendRequestsSourceSyncManager.startSourceSync()
+        private val allSyncManagers = listOf(
+            currentUserSourceSyncManager,
+            baseScheduleSourceSyncManager,
+            customScheduleSourceSyncManager,
+            todoSourceSyncManager,
+            homeworkSourceSyncManager,
+            goalsSourceSyncManager,
+            employeeSourceSyncManager,
+            organizationsSourceSyncManager,
+            subjectsSourceSyncManager,
+            sharedSchedulesSourceSyncManager,
+            sharedHomeworksSourceSyncManager,
+            friendRequestsSourceSyncManager,
+            dailyAiStatisticsSourceSyncManager,
+        )
+
+        override suspend fun syncAllSource() {
+            coroutineManager.changeFlow(BACKGROUND) {
+                allSyncManagers.map { async { it.startSourceSync() } }.awaitAll()
+            }
         }
 
-        override fun stopAllSourceSync() {
-            currentUserSourceSyncManager.stopSourceSync()
-            baseScheduleSourceSyncManager.stopSourceSync()
-            customScheduleSourceSyncManager.stopSourceSync()
-            todoSourceSyncManager.stopSourceSync()
-            homeworkSourceSyncManager.stopSourceSync()
-            goalsSourceSyncManager.stopSourceSync()
-            employeeSourceSyncManager.stopSourceSync()
-            organizationsSourceSyncManager.stopSourceSync()
-            subjectsSourceSyncManager.stopSourceSync()
-            sharedSchedulesSourceSyncManager.stopSourceSync()
-            sharedHomeworksSourceSyncManager.stopSourceSync()
-            friendRequestsSourceSyncManager.stopSourceSync()
+        override suspend fun singleSyncAllSources(): Boolean {
+            return coroutineManager.changeFlow(BACKGROUND) {
+                allSyncManagers.map { async { it.singleSyncRound() } }.awaitAll().all { it }
+            }
+        }
+
+        override suspend fun stopAllSourceSync() {
+            coroutineManager.changeFlow(BACKGROUND) {
+                allSyncManagers.forEach { it.stopSourceSync() }
+            }
         }
 
         override suspend fun clearAllSyncedData() {
-            currentUserSourceSyncManager.clearSourceData()
-            baseScheduleSourceSyncManager.clearSourceData()
-            customScheduleSourceSyncManager.clearSourceData()
-            todoSourceSyncManager.clearSourceData()
-            homeworkSourceSyncManager.clearSourceData()
-            goalsSourceSyncManager.clearSourceData()
-            employeeSourceSyncManager.clearSourceData()
-            organizationsSourceSyncManager.clearSourceData()
-            subjectsSourceSyncManager.clearSourceData()
-            sharedSchedulesSourceSyncManager.clearSourceData()
-            sharedHomeworksSourceSyncManager.clearSourceData()
-            friendRequestsSourceSyncManager.clearSourceData()
+            coroutineManager.changeFlow(BACKGROUND) {
+                allSyncManagers.forEach { it.clearSourceData() }
+            }
         }
     }
 }

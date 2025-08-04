@@ -35,6 +35,8 @@ kotlin {
 
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
+
+            api(libs.androidx.paging.common)
         }
     }
 

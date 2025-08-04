@@ -100,7 +100,7 @@ fun TimePickerDialog(
                 second = 0,
                 nanosecond = 0,
             )
-            val dateTime = time.atDate(Clock.System.now().dateTime().date)
+            val dateTime = time.atDate((initTime ?: Clock.System.now()).dateTime().date)
             onConfirmTime.invoke(dateTime.toInstant(TimeZone.currentSystemDefault()))
         },
         onCurrentTimeChoose = {

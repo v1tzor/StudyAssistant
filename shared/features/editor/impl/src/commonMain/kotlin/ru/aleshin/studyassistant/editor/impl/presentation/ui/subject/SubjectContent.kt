@@ -55,7 +55,7 @@ internal fun SubjectContent(
     onSelectLocation: (ContactInfoUi?, String?) -> Unit,
 ) = with(state) {
     Column(
-        modifier = modifier.fillMaxSize().padding(top = 20.dp).verticalScroll(scrollState),
+        modifier = modifier.fillMaxSize().verticalScroll(scrollState).padding(top = 20.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {

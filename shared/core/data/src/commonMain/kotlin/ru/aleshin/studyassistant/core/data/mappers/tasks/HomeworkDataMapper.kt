@@ -178,6 +178,7 @@ fun BaseHomeworkEntity.convertToRemote(userId: UID) = HomeworkPojo(
     priority = priority,
     done = isDone == 1L,
     completeDate = completeDate,
+    updatedAt = updatedAt,
 )
 
 class HomeworkSyncMapper : MultipleSyncMapper<BaseHomeworkEntity, HomeworkPojo>(
