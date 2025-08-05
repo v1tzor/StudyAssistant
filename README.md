@@ -28,10 +28,19 @@ StudyAssistant
 
 <div align="center">
 </br>
-<img src="https://i.imgur.com/NPR9yeO.png"/>
+<img src="config/images/banner_en.png"/>
 <div align="start">
 
-## Your Ultimate Academic Organizer
+## 🎓 Your Ultimate Academic Organizer
+
+### 🤖 AI-Powered Study Assistant
+Talk directly to your personal neural network assistant — a smart AI that not only chats but also creates tasks, schedules homework, analyzes your calendar, and even helps you solve academic problems. Whether you're planning your day or tackling tough assignments, the assistant is always by your side.
+
+### 🎯 Daily Goals with Timer & Stopwatch
+Set clear daily goals and stay on track with built-in timers and a stopwatch. Organize your homework, track your focus sessions, and never miss a task again — ideal for maintaining momentum and beating procrastination.
+
+### 🌐 Offline-First with Seamless Sync
+No internet? No problem! The app is fully functional offline, and when you’re back online, everything syncs automatically across all your devices. Enjoy full freedom and reliability, wherever and whenever you study.
 
 ### 📚 Convenient Organization of Classes
 Divide all classes, subjects and assignments by educational organizations – colleges, schools, courses, universities, etc. Work comfortably with each of them and get the most out of your learning processes.
@@ -65,129 +74,41 @@ Start today with the Study Assistant app—a powerful tool to make your learning
 >   <img alt="Info" src="https://raw.githubusercontent.com/Mqxx/GitHub-Markdown/main/blockquotes/badge/dark-theme/info.svg">
 > </picture><br>
 >
-> We do not share your account data with third parties without your consent. All information is securely stored on our Firestore servers (Data of schedules, tasks, etc. are currently stored only in your phone's memory).
+> We do not share your account data with third parties without your consent. All information is securely stored on our Appwrite servers (Data of schedules, tasks, etc. in free version stored only in your phone's memory).
 
 # Screenshots
 
-<div style="overflow-x:auto;">
-  <table>
-    <thead>
-      <tr>
-        <th>Login Screen</th>
-        <th>Register Screen</th>
-        <th>Forgot Screen</th>
-        <th>Verification Screen</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><img src="config/images/screenshots/Login_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Register_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Forgot_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/ConfirmEmail_dark_en.png" width="400"></td>
-      </tr>
-    </tbody>
-    <thead>
-      <tr>
-        <th>Schedule Overview</th>
-        <th>Class Bottom Sheet</th>
-        <th>Schedule Details</th>
-        <th>Vertical Details</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><img src="config/images/screenshots/Schedule_Overview_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Schedule_Overview_Class_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Schedule_Details_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Schedule_Details_Vertical_dark_en.png" width="400"></td>
-      </tr>
-    </tbody>
-    <thead>
-      <tr>
-        <th>Tasks Overview</th>
-        <th>Tasks Overview 2</th>
-        <th>Homeworks</th>
-        <th>Todos</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><img src="config/images/screenshots/Tasks_Overview_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Tasks_Overview_2_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Homeworks_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Tasks_Todo_dark_en.png" width="400"></td>
-      </tr>
-    </tbody>
-    <thead>
-      <tr>
-        <th>Organizations</th>
-        <th>Organizations 2</th>
-        <th>Subjects</th>
-        <th>Employee</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><img src="config/images/screenshots/Organizations_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Organizations_2_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Subjects_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Employee_dark_en.png" width="400"></td>
-      </tr>
-    </tbody>
-    <thead>
-      <tr>
-        <th>Profile</th>
-        <th>Friends</th>
-        <th>Share Schedule</th>
-        <th>Share Tasks</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><img src="config/images/screenshots/Profile_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Friends_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Shrare_Schedule_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Tasks_Share_dark_en.png" width="400"></td>
-      </tr>
-    </tbody>
-    <thead>
-      <tr>
-        <th>Daily Schedule Editor</th>
-        <th>Week Schedule Editor</th>
-        <th>Class Editor</th>
-        <th>Homeworks Editor</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><img src="config/images/screenshots/Editor_Daily_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Editor_Week_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Editor_Class_dark_en.png" width="400"></td>
-        <td><img src="config/images/screenshots/Editor_Homework_dark_en.png" width="400"></td>
-      </tr>
-    </tbody>
-  </table>
+<div style="overflow-x:auto; white-space: nowrap;">
+  <img src="config/images/store-screenshots/en/1.png" width="240" alt="Screen 1" />
+  <img src="config/images/store-screenshots/en/2.png" width="240" alt="Screen 2" />
+  <img src="config/images/store-screenshots/en/3.png" width="240" alt="Screen 3" />
+  <img src="config/images/store-screenshots/en/4.png" width="240" alt="Screen 4" />
+</div>
+ 
+###  
+
+<div style="overflow-x:auto; white-space: nowrap;">
+  <img src="config/images/store-screenshots/en/5.png" width="240" alt="Screen 5" />
+  <img src="config/images/store-screenshots/en/6.png" width="240" alt="Screen 6" />
+  <img src="config/images/store-screenshots/en/7.png" width="240" alt="Screen 7" />
+  <img src="config/images/store-screenshots/en/8.png" width="240" alt="Screen 8" />
 </div>
 
 ## Markets
 | Service        | Free version   | Subscription version |
 | -------------- | -------------- | -------------------- |
 | Github         | &check;        | &cross;              |
-| Fdoroid        | In progress    | &cross;              |
-| RuStore        | In planned     | In planned           |
+| RuStore        | &check;        | &check;              |
+| App gallery    | &check;        | &check;              |
 | Play Market    | In planned     | In planned           |
-| App gallery    | In planned     | In planned           |
 | App Store      | In planned     | In planned           |
 
 ## Technical capabilities
-| Flavor         | Crashlytics    | Firestore         | Messaging      | Reminders |
-| -------------- | -------------- | ----------------- | -------------- | --------- |
-| Github         | &check;        | &check; (GMS)     | FMS            | &check; |
-| Fdoroid        | &cross;        | Only Network      | &cross;        | &check; |
-| RuStore        | &check;        | &check; (GMS)     | FCM, RUSTORE   | &check; |
-| Google         | &check;        | &check; (GMS)     | FCM            | &check; |
-| Huawei         | In planned     | In planned        | In planned (HCM, FMS) | &check; |
+| Flavor         | Crashlytics    | Offline-Support   | Messaging         | Reminders  |
+| -------------- | -------------- | ----------------- | ----------------- | ---------- |
+| Github         | &check;        | &check;           | FMS, HMS, RUSTORE | &check;    |
+| RuStore        | &check;        | &check;           | RUSTORE, HMS, FMS | &check;    |
+| Huawei         | &check;        | &check;           | HMS, RUSTORE      | &check;    |
 | Apple          | In progress    | &check;           | In planned (APNS) | In planned |
 
 # Project Dependencies
@@ -208,12 +129,12 @@ This project utilizes the following technologies and libraries:
 ## 🌐 Networking & API
 - **[Ktor](https://ktor.io/)**: Asynchronous HTTP client and server framework for Kotlin.
 - **[Google OAuth 2.0](https://developers.google.com/identity/protocols/oauth2)**: Secure authorization for Google APIs.
-- **[Firebase Firestore](https://firebase.google.com/docs/firestore)**: NoSQL cloud database for mobile and web apps.
-- **[Firebase Authorization](https://firebase.google.com/docs/auth)**: Authentication services for your app.
-- **[Firebase Messaging](https://firebase.google.com/docs/cloud-messaging)**: Messaging and notifications.
-- **[Firebase Storage](https://firebase.google.com/docs/storage)**: File storage for your app.
-- **[Firebase Crashlytics](https://firebase.google.com/docs/crashlytics)**: Real-time crash reporting.
+- **[Appwrite REST API](https://appwrite.io/docs)**: Authorization, Database, Storage, Realtime service
 - **[Rustore UniversalPush](https://www.rustore.ru/help/sdk/general-push-notifications)**: Push notifications for alternative app stores.
+- **[Rustore Billing](https://www.rustore.ru/help/sdk/payments/kotlin-java)**: Rustore billing service for purchases.
+- **[Huawei IAP](https://developer.huawei.com/consumer/en/codelab/HMSInAppPurchase-Kotlin/)**: Huawei billing service for purchases.
+- **[Tracer](https://apptracer.ru/)**: Alternative crashlytics sevice.
+- **[MyTracker](https://tracker.my.com/ru/)**: Analytics serivce
 
 ## 🎨 UI & Navigation
 - **[Compose Material 3](https://developer.android.com/jetpack/compose/material)**: Material Design components for Jetpack Compose.
@@ -250,7 +171,9 @@ graph LR;
     subgraph one [Core]
     direction LR;
     core --> common & ui & domain & data
-    data --> remote & database
+    data --> remote & database & client-api
+    remote --> client-api
+    database --> client-api
     end
 
     shared --> features
@@ -267,13 +190,15 @@ graph LR;
     features --> settings-impl --> settings-api
     features --> users-impl --> users-api
     features --> editor-impl --> editor-api
+    features --> chat-impl --> chat-api
+    features --> bliing-impl --> bliing-api
     end
 ```
 
 # License
 
 ```
-Copyright 2024 Stanislav Aleshin
+Copyright 2025 Stanislav Aleshin
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
