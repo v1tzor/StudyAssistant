@@ -78,21 +78,28 @@ Start today with the Study Assistant app—a powerful tool to make your learning
 
 # Screenshots
 
-<div style="overflow-x:auto; white-space: nowrap;">
-  <img src="config/images/store-screenshots/en/1.png" width="200" alt="Screen 1" />
-  <img src="config/images/store-screenshots/en/2.png" width="200" alt="Screen 2" />
-  <img src="config/images/store-screenshots/en/3.png" width="200" alt="Screen 3" />
-  <img src="config/images/store-screenshots/en/4.png" width="200" alt="Screen 4" />
+<div style="overflow-x:auto;">
+  <table>
+    <tbody>
+      <tr>
+        <td><img src="config/images/store-screenshots/en/1.png" width="200" alt="Screen 1"></td>
+        <td><img src="config/images/store-screenshots/en/2.png" width="200" alt="Screen 2"></td>
+        <td><img src="config/images/store-screenshots/en/3.png" width="200" alt="Screen 3"></td>
+        <td><img src="config/images/store-screenshots/en/4.png" width="200" alt="Screen 4"></td>
+      </tr>
+      </tbody>
+      <tbody>
+      <tr>
+        <td><img src="config/images/store-screenshots/en/5.png" width="200" alt="Screen 5"></td>
+        <td><img src="config/images/store-screenshots/en/6.png" width="200" alt="Screen 6"></td>
+        <td><img src="config/images/store-screenshots/en/7.png" width="200" alt="Screen 7"></td>
+        <td><img src="config/images/store-screenshots/en/8.png" width="200" alt="Screen 8"></td>
+      </tr>
+      </tbody>
+  </table>
 </div>
  
 ###  
-
-<div style="overflow-x:auto; white-space: nowrap;">
-  <img src="config/images/store-screenshots/en/5.png" width="200" alt="Screen 5" />
-  <img src="config/images/store-screenshots/en/6.png" width="200" alt="Screen 6" />
-  <img src="config/images/store-screenshots/en/7.png" width="200" alt="Screen 7" />
-  <img src="config/images/store-screenshots/en/8.png" width="200" alt="Screen 8" />
-</div>
 
 ## Markets
 | Service        | Free version   | Subscription version |
