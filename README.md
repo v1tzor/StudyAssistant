@@ -79,19 +79,19 @@ Start today with the Study Assistant app—a powerful tool to make your learning
 # Screenshots
 
 <div style="overflow-x:auto; white-space: nowrap;">
-  <img src="config/images/store-screenshots/en/1.png" width="240" alt="Screen 1" />
-  <img src="config/images/store-screenshots/en/2.png" width="240" alt="Screen 2" />
-  <img src="config/images/store-screenshots/en/3.png" width="240" alt="Screen 3" />
-  <img src="config/images/store-screenshots/en/4.png" width="240" alt="Screen 4" />
+  <img src="config/images/store-screenshots/en/1.png" width="220" alt="Screen 1" />
+  <img src="config/images/store-screenshots/en/2.png" width="220" alt="Screen 2" />
+  <img src="config/images/store-screenshots/en/3.png" width="220" alt="Screen 3" />
+  <img src="config/images/store-screenshots/en/4.png" width="220" alt="Screen 4" />
 </div>
  
 ###  
 
 <div style="overflow-x:auto; white-space: nowrap;">
-  <img src="config/images/store-screenshots/en/5.png" width="240" alt="Screen 5" />
-  <img src="config/images/store-screenshots/en/6.png" width="240" alt="Screen 6" />
-  <img src="config/images/store-screenshots/en/7.png" width="240" alt="Screen 7" />
-  <img src="config/images/store-screenshots/en/8.png" width="240" alt="Screen 8" />
+  <img src="config/images/store-screenshots/en/5.png" width="220" alt="Screen 5" />
+  <img src="config/images/store-screenshots/en/6.png" width="220" alt="Screen 6" />
+  <img src="config/images/store-screenshots/en/7.png" width="220" alt="Screen 7" />
+  <img src="config/images/store-screenshots/en/8.png" width="220" alt="Screen 8" />
 </div>
 
 ## Markets
