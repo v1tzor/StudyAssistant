@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkR
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.firstRightOrNull
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.TodoInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
@@ -44,6 +45,7 @@ internal interface TodoWorkProcessor : FlowWorkProcessor<TodoWorkCommand, TodoAc
     class Base(
         private val todoInteractor: TodoInteractor,
         private val usersInteractor: AppUserInteractor,
+        private val dateManager: DateManager,
     ) : TodoWorkProcessor {
 
         override suspend fun work(command: TodoWorkCommand) = when (command) {
@@ -63,6 +65,7 @@ internal interface TodoWorkProcessor : FlowWorkProcessor<TodoWorkCommand, TodoAc
             val editModel = todoModel?.mapToUi()?.convertToEdit() ?: EditTodoUi.createEditModel(
                 uid = todoId,
                 enableNotifications = isPaidUser,
+                createdAt = dateManager.fetchCurrentInstant(),
             )
 
             emit(ActionResult(TodoAction.SetupEditModel(editModel, isPaidUser)))

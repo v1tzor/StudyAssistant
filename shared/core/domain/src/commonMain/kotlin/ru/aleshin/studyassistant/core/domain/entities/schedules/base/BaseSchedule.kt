@@ -34,7 +34,7 @@ data class BaseSchedule(
     val dayOfWeek: DayOfWeek,
     val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val classes: List<Class>,
-    val updatedAt: Long,
+    val updatedAt: Long = 0L,
 ) {
     companion object {
         fun createActual(

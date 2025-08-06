@@ -78,7 +78,7 @@ internal interface AnalysisInteractor {
 
             val baseSchedulesFlow = baseScheduleRepository.fetchSchedulesByVersion(weekTimeRange, week)
             val customSchedulesFlow = customScheduleRepository.fetchSchedulesByTimeRange(weekTimeRange)
-            val todosFlow = todoRepository.fetchActiveTodos()
+            val todosFlow = todoRepository.fetchTodosByTimeRange(weekTimeRange)
             val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(weekTimeRange)
 
             combine(

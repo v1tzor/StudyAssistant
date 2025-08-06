@@ -52,7 +52,7 @@ interface CalendarSettingsLocalDataSource : CombinedLocalDataSource<BaseCalendar
             private val isCacheData = if (isCacheSource) 1L else 0L
 
             override suspend fun addOrUpdateItem(item: BaseCalendarSettingsEntity) {
-                val updatedModel = item.mapToEntity().copy(id = isCacheData + 1L, is_cache_data = isCacheData)
+                val updatedModel = item.mapToEntity(id = isCacheData + 1L).copy(is_cache_data = isCacheData)
                 calendarQueries.addOrUpdateSettings(updatedModel).await()
             }
 

@@ -30,6 +30,7 @@ data class Todo(
     val priority: TaskPriority,
     val notifications: TodoNotifications = TodoNotifications(),
     val isDone: Boolean = false,
+    val createdAt: Instant,
     val completeDate: Instant? = null,
     val updatedAt: Long
 )

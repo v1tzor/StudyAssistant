@@ -155,7 +155,7 @@ val coreDataModule = DI.Module("CoreData") {
 
     bindSingleton<CalendarSettingsSyncMapper> { CalendarSettingsSyncMapper() }
     bindSingleton<CalendarSettingsSourceSyncManager> { CalendarSettingsSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance(), instance(), instance()) }
+    bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
 
     bindSingleton<FriendRequestsSyncMapper> { FriendRequestsSyncMapper() }
     bindSingleton<FriendRequestsSourceSyncManager> { FriendRequestsSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance()) }

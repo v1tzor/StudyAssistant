@@ -198,7 +198,7 @@ private fun CommonScheduleViewContent(
                         {
                             SmallInfoBadge(
                                 containerColor = StudyAssistantRes.colors.accents.redContainer,
-                                contentColor = StudyAssistantRes.colors.accents.red,
+                                contentColor = StudyAssistantRes.colors.accents.onRedContainer,
                                 content = {
                                     Text(
                                         text = ScheduleThemeRes.strings.testLabel,

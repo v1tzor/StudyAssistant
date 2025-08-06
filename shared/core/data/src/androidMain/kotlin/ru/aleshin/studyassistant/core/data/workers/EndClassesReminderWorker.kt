@@ -37,6 +37,7 @@ import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.messages.LocalNotificationReceiver
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.data.di.coreDataModule
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
@@ -59,6 +60,7 @@ class EndClassesReminderWorker(
 
     override val directDI = DI.direct {
         bindProvider<Context> { applicationContext }
+        bindProvider<CrashlyticsService> { CrashlyticsService.Empty() }
         importAll(coreCommonModule, coreDataModule)
     }
     private val coreStrings: StudyAssistantStrings

@@ -55,8 +55,8 @@ internal interface OrganizationsInteractor {
             val employees = organizations.map { it.employee }.extractAllItem().map { it.copy(updatedAt = updatedAt) }
 
             organizationsRepository.addOrUpdateOrganizationsGroup(organizations)
-            subjectsRepository.addOrUpdateSubjectsGroup(subjects)
             employeeRepository.addOrUpdateEmployeeGroup(employees)
+            subjectsRepository.addOrUpdateSubjectsGroup(subjects)
         }
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {

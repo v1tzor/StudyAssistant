@@ -106,7 +106,11 @@ android {
         create("rustore") {
             dimension = "production"
             val rustoreProjectId = localProperties.getProperty("rustoreProjectId")
+            val rustoreApiKeyId = localProperties.getProperty("rustoreApiKeyId")
+            val rustoreApiKeyPrivate = localProperties.getProperty("rustoreApiKeyPrivate")
             buildConfigField("String", "PROJECT_ID", "\"$rustoreProjectId\"")
+            buildConfigField("String", "RU_STORE_API_KEY_ID", "\"$rustoreApiKeyId\"")
+            buildConfigField("String", "RU_STORE_API_KEY_PRIVATE", "\"$rustoreApiKeyPrivate\"")
         }
     }
 
@@ -149,6 +153,8 @@ dependencies {
     implementation(libs.sqldelight.android)
 
     implementation(libs.kodein.android)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.core)
 
     implementation(platform(libs.tracer.bom))
     implementation(libs.bundles.tracer)

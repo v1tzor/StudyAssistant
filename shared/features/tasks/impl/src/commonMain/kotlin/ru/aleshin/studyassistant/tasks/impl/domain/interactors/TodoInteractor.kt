@@ -57,7 +57,6 @@ internal interface TodoInteractor {
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchWeekGroupedTodosByTimeRange(timeRange: TimeRange) = eitherWrapper.wrapFlow {
             val ticker = dateManager.secondTicker()
-            val currentTime = dateManager.fetchCurrentInstant()
             val shortGoalsFlow = goalsRepository.fetchShortActiveDailyGoals()
             val weekCompletedTodosFlow = todoRepository.fetchCompletedTodos(timeRange).map { todos ->
                 todos.sortedBy { it.deadline }
@@ -72,6 +71,7 @@ internal interface TodoInteractor {
                 shortGoalsFlow,
                 ticker,
             ) { completedTodos, activeTodos, goals, _ ->
+                val currentTime = dateManager.fetchCurrentInstant()
                 val runningTodos = mutableListOf<Todo>()
                 val errorTodos = mutableListOf<Todo>()
                 activeTodos.forEach { todo ->
@@ -93,12 +93,18 @@ internal interface TodoInteractor {
                         )
                     },
                     runningTodos = runningTodos.map { todo ->
-                        val leftTime = todo.deadline?.let { deadline ->
-                            deadline.toEpochMilliseconds() - currentTime.toEpochMilliseconds()
+                        val createdAt = todo.createdAt.toEpochMilliseconds()
+                        val currentTime = currentTime.toEpochMilliseconds()
+                        val deadline = todo.deadline?.toEpochMilliseconds()
+
+                        val leftTime = if (deadline != null) deadline - currentTime else null
+
+                        val progress = if (deadline != null) {
+                            ((currentTime - createdAt).toFloat() / (deadline - createdAt).toFloat()).coerceIn(0f, 1f)
+                        } else {
+                            0f
                         }
-                        val progress = todo.deadline?.let { deadline ->
-                            currentTime.toEpochMilliseconds() / deadline.toEpochMilliseconds().toFloat()
-                        }?.coerceIn(0f, 1f) ?: 0f
+
                         todo.convertToDetails(
                             deadlineTimeLeft = leftTime,
                             status = TodoStatus.IN_PROGRESS,
@@ -149,7 +155,12 @@ internal interface TodoInteractor {
                 if (linkedGoal != null && !linkedGoal.isDone) completeLinkedGoal(linkedGoal)
 
                 todoRepository.addOrUpdateTodo(completedTodo)
-                todoReminderManager.scheduleReminders(todo.uid, todo.name, todo.deadline, todo.notifications)
+                todoReminderManager.scheduleReminders(
+                    todo.uid,
+                    todo.name,
+                    todo.deadline,
+                    todo.notifications
+                )
             }
         }
 

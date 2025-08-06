@@ -32,7 +32,7 @@ object Constants {
         const val ISSUES_URI = "https://github.com/v1tzor/StudyAssistant/issues"
         const val PERMISSION_TAG = "Notification_Permission"
         const val PAY_DEEPLINK_SCHEME = "ru.aleshin.studyassistant.pay"
-        const val OPEN_APP_DEEPLINK = "https://studyassistant-app.ru/"
+        const val OPEN_APP_DEEPLINK = "studyassistant://openMain"
         const val RECOVERY_PASSWORD_URL = "https://studyassistant-app.ru/recovery"
         const val VERIFY_EMAIL_URL = "https://studyassistant-app.ru/verify"
     }

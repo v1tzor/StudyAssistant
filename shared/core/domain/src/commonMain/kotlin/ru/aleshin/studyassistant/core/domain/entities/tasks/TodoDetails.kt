@@ -36,6 +36,7 @@ data class TodoDetails(
     val notifications: TodoNotifications,
     val linkedGoal: GoalShort?,
     val isDone: Boolean = false,
+    val createdAt: Instant,
     val completeDate: Instant? = null,
     val updatedAt: Long,
 )
@@ -58,5 +59,6 @@ fun Todo.convertToDetails(
     isDone = isDone,
     linkedGoal = linkedGoal,
     completeDate = completeDate,
+    createdAt = createdAt,
     updatedAt = updatedAt,
 )

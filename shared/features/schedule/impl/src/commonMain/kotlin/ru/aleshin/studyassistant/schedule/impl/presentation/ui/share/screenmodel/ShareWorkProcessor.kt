@@ -25,10 +25,13 @@ import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.Effec
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkResult
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.firstHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.domain.entities.organizations.convertToShort
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.OrganizationsInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ShareSchedulesInteractor
@@ -236,21 +239,45 @@ internal interface ShareWorkProcessor :
             organizationsLinkData: List<OrganizationLinkData>,
             linkedSchedules: List<BaseScheduleUi>
         ) = flow<ShareWorkResult> {
-            val schedules = linkedSchedules.map { it.mapToDomain() }
+            val updatedSubjectIds = mutableMapOf<UID, UID>()
+            val updatedTeacherIds = mutableMapOf<UID, UID>()
+            val updatedOrganizationsIds = mutableMapOf<UID, UID>()
+
             val organizations = organizationsLinkData.map { linkData ->
                 val baseSharedOrganization = linkData.sharedOrganization.covertToBase()
                 val linkedOrganization = linkData.linkedOrganization
+
                 if (linkedOrganization != null) {
-                    val newSubjects = baseSharedOrganization.subjects.filter { subject ->
-                        linkData.linkedSubjects.containsKey(subject.uid).not()
-                    }.map { subject ->
-                        subject.copy(organizationId = linkedOrganization.uid)
-                    }
-                    val newTeachers = baseSharedOrganization.employee.filter { teacher ->
-                        linkData.linkedTeachers.containsKey(teacher.uid).not()
-                    }.map { employee ->
-                        employee.copy(organizationId = linkedOrganization.uid)
-                    }
+                    val newTeachers = baseSharedOrganization.employee
+                        .filter { teacher -> linkData.linkedTeachers.containsKey(teacher.uid).not() }
+                        .map { employee ->
+                            val newEmployeeId = randomUUID().apply {
+                                updatedTeacherIds[employee.uid] = this
+                            }
+                            employee.copy(
+                                uid = newEmployeeId,
+                                organizationId = linkedOrganization.uid,
+                            )
+                        }
+
+                    val newSubjects = baseSharedOrganization.subjects
+                        .filter { subject -> linkData.linkedSubjects.containsKey(subject.uid).not() }
+                        .map { subject ->
+                            val updatedSubjectId = randomUUID().apply {
+                                updatedSubjectIds[subject.uid] = this
+                            }
+                            subject.copy(
+                                uid = updatedSubjectId,
+                                organizationId = linkedOrganization.uid,
+                                teacher = subject.teacher?.let { teacher ->
+                                    teacher.copy(
+                                        uid = updatedTeacherIds[teacher.uid] ?: teacher.uid,
+                                        organizationId = linkedOrganization.uid,
+                                    )
+                                }
+                            )
+                        }
+
                     val newOffices = baseSharedOrganization.offices.filter { office ->
                         linkedOrganization.offices.contains(office).not()
                     }
@@ -265,9 +292,103 @@ internal interface ShareWorkProcessor :
                     )
                     return@map updatedLinkedOrganization.mapToDomain()
                 } else {
-                    return@map baseSharedOrganization.mapToDomain()
+                    val newOrganizationId = randomUUID().apply {
+                        updatedOrganizationsIds[baseSharedOrganization.uid] = this
+                    }
+                    val updatedEmployees = baseSharedOrganization.employee.map { employee ->
+                        val newEmployeeId = randomUUID().apply {
+                            updatedTeacherIds[employee.uid] = this
+                        }
+                        employee.copy(
+                            uid = newEmployeeId,
+                            organizationId = newOrganizationId,
+                        )
+                    }
+                    val updatedSubjects = baseSharedOrganization.subjects.map { subject ->
+                        val updatedSubjectId = randomUUID().apply {
+                            updatedSubjectIds[subject.uid] = this
+                        }
+                        subject.copy(
+                            uid = updatedSubjectId,
+                            organizationId = newOrganizationId,
+                            teacher = subject.teacher?.let { teacher ->
+                                teacher.copy(
+                                    uid = updatedTeacherIds[teacher.uid] ?: teacher.uid,
+                                    organizationId = newOrganizationId,
+                                )
+                            }
+                        )
+                    }
+                    val updatedOrganization = baseSharedOrganization.copy(
+                        uid = newOrganizationId,
+                        subjects = updatedSubjects,
+                        employee = updatedEmployees,
+                    )
+                    return@map updatedOrganization.mapToDomain()
                 }
             }
+            val schedules = linkedSchedules.map { schedule ->
+                val newScheduleId = randomUUID()
+                val updatedClasses = schedule.classes.mapNotNull { clazz ->
+                    val organization = organizations.find { organization ->
+                        organization.uid == (updatedOrganizationsIds[clazz.organization.uid] ?: clazz.organization.uid)
+                    }
+                    clazz.mapToDomain().copy(
+                        uid = randomUUID(),
+                        scheduleId = newScheduleId,
+                        organization = organization?.convertToShort() ?: return@mapNotNull null,
+                        teacher = clazz.teacher?.let { teacher ->
+                            organization.employee.find { organizationTeacher ->
+                                organizationTeacher.uid == (updatedTeacherIds[teacher.uid] ?: teacher.uid)
+                            }
+                        },
+                        subject = clazz.subject?.let { subject ->
+                            organization.subjects.find { organizationSubject ->
+                                organizationSubject.uid == (updatedSubjectIds[subject.uid] ?: subject.uid)
+                            }
+                        },
+                    )
+                }
+                BaseSchedule(
+                    uid = newScheduleId,
+                    dateVersion = schedule.dateVersion.mapToDomain(),
+                    dayOfWeek = schedule.dayOfWeek,
+                    week = schedule.week,
+                    classes = updatedClasses,
+                )
+            }
+//            val schedules = linkedSchedules.map { it.mapToDomain() }
+//            val organizations = organizationsLinkData.map { linkData ->
+//                val baseSharedOrganization = linkData.sharedOrganization.covertToBase()
+//                val linkedOrganization = linkData.linkedOrganization
+//                if (linkedOrganization != null) {
+//                    val newSubjects = baseSharedOrganization.subjects.filter { subject ->
+//                        linkData.linkedSubjects.containsKey(subject.uid).not()
+//                    }.map { subject ->
+//                        subject.copy(organizationId = linkedOrganization.uid)
+//                    }
+//                    val newTeachers = baseSharedOrganization.employee.filter { teacher ->
+//                        linkData.linkedTeachers.containsKey(teacher.uid).not()
+//                    }.map { employee ->
+//                        employee.copy(organizationId = linkedOrganization.uid)
+//                    }
+//                    val newOffices = baseSharedOrganization.offices.filter { office ->
+//                        linkedOrganization.offices.contains(office).not()
+//                    }
+//                    val newLocations = baseSharedOrganization.locations.filter { location ->
+//                        linkedOrganization.locations.find { it.value == location.value } == null
+//                    }
+//                    val updatedLinkedOrganization = linkedOrganization.copy(
+//                        subjects = linkedOrganization.subjects + newSubjects,
+//                        employee = linkedOrganization.employee + newTeachers,
+//                        offices = linkedOrganization.offices + newOffices,
+//                        locations = linkedOrganization.locations + newLocations,
+//                    )
+//                    return@map updatedLinkedOrganization.mapToDomain()
+//                } else {
+//                    return@map baseSharedOrganization.mapToDomain()
+//                }
+//            }
             organizationsInteractor.addOrUpdateOrganizationsData(organizations).handle(
                 onLeftAction = { emit(EffectResult(ShareEffect.ShowError(it))) },
                 onRightAction = {

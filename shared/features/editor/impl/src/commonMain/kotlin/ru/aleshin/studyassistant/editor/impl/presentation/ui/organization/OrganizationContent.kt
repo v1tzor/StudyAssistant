@@ -98,6 +98,11 @@ internal fun OrganizationContent(
             onUpdateShortName = { onUpdateName(it, editableOrganization?.fullName) },
             onUpdateFullName = { onUpdateName(editableOrganization?.shortName, it) },
         )
+        OrganizationStatusChooser(
+            isLoading = isLoading,
+            isMain = editableOrganization?.isMain ?: false,
+            onStatusChange = onStatusChange,
+        )
         Column(
             modifier = Modifier.animateContentSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -135,11 +140,7 @@ internal fun OrganizationContent(
                 onUpdate = onUpdateLocations,
             )
         }
-        OrganizationStatusChooser(
-            isLoading = isLoading,
-            isMain = editableOrganization?.isMain ?: false,
-            onStatusChange = onStatusChange,
-        )
+
         if (editableOrganization?.uid?.isNotBlank() == true) {
             HideButton(
                 onHide = onHideOrganization,

@@ -21,6 +21,7 @@ import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 
@@ -39,5 +40,7 @@ internal data class TodoUi(
     val isDone: Boolean = false,
     @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant? = null,
+    @TypeParceler<Instant, InstantParceler>
+    val createdAt: Instant,
     val updatedAt: Long,
 ) : Parcelable

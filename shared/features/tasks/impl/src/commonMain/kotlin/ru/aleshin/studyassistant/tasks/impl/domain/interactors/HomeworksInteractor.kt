@@ -57,9 +57,7 @@ import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 internal interface HomeworksInteractor {
 
     suspend fun addHomeworksGroup(homeworks: List<Homework>): UnitDomainResult<TasksFailures>
-    suspend fun fetchHomeworksByTimeRange(
-        timeRange: TimeRange
-    ): FlowDomainResult<TasksFailures, Map<Instant, DailyHomeworks>>
+    suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange): FlowDomainResult<TasksFailures, Map<Instant, DailyHomeworks>>
     suspend fun fetchHomeworksProgress(targetDate: Instant): FlowDomainResult<TasksFailures, HomeworksCompleteProgress>
     suspend fun updateHomework(homework: Homework): UnitDomainResult<TasksFailures>
     suspend fun doHomework(homework: Homework): UnitDomainResult<TasksFailures>

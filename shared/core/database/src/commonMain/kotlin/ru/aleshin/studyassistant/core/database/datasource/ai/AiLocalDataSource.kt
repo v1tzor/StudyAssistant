@@ -52,6 +52,7 @@ interface AiLocalDataSource : LocalDataSource.OnlyOffline {
     suspend fun addChatMessages(messages: List<AiChatMessageEntity>)
     suspend fun deleteChat(chatId: UID)
     suspend fun deleteChatMessage(messageId: UID)
+    suspend fun deleteAllChats()
 
     class Base(
         private val chatQueries: AiChatHistoryQueries,
@@ -113,6 +114,11 @@ interface AiLocalDataSource : LocalDataSource.OnlyOffline {
 
         override suspend fun deleteChatMessage(messageId: UID) {
             messagesQueries.deleteMessageById(messageId).await()
+        }
+
+        override suspend fun deleteAllChats() {
+            chatQueries.deleteAllChats().await()
+            messagesQueries.deleteAllMessages().await()
         }
     }
 }

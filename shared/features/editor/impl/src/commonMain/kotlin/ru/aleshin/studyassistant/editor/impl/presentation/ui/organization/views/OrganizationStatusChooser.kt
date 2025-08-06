@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.views
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -51,12 +52,18 @@ internal fun OrganizationStatusChooser(
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Text(
-            modifier = Modifier.weight(1f),
-            text = EditorThemeRes.strings.organizationStatusTitle,
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.titleMedium,
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = EditorThemeRes.strings.organizationStatusTitle,
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = EditorThemeRes.strings.organizationStatusBody,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.labelMedium,
+            )
+        }
         Switch(
             enabled = !isLoading,
             checked = isMain,

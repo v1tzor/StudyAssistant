@@ -127,6 +127,10 @@ internal interface AuthInteractor {
                     manageUserRepository.sendVerifyEmail()
                 }
 
+                val settings = generalSettingsRepository.fetchSettings().first()
+                val updatedSettings = settings.copy(isUnfinishedSetup = authUser.uid)
+                generalSettingsRepository.updateSettings(updatedSettings)
+
                 sourceSyncFacade.syncAllSource()
 
                 AuthResult(authUser = authUser, isNewUser = true)
@@ -171,6 +175,11 @@ internal interface AuthInteractor {
             val userInfo = usersRepository.fetchCurrentUserProfile().first() ?: throw AppwriteUserException()
             val deviceInfo = userInfo.devices.find { it.deviceId == deviceId }
             sourceSyncFacade.clearAllSyncedData()
+
+            val settings = generalSettingsRepository.fetchSettings().first()
+            val updatedSettings = settings.copy(isUnfinishedSetup = null)
+            generalSettingsRepository.updateSettings(updatedSettings)
+
             if (deviceInfo != null) {
                 val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
                 val updatedUserInfo = userInfo.copy(

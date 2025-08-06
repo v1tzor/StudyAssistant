@@ -190,7 +190,11 @@ class AiAssistantRepositoryImpl(
         }
     }
 
-    override suspend fun deleteChat(chatId: UID) {
-        localDataSource.deleteChat(chatId)
+    override suspend fun deleteChat(chatId: UID?) {
+        if (chatId == null) {
+            localDataSource.deleteAllChats()
+        } else {
+            localDataSource.deleteChat(chatId)
+        }
     }
 }

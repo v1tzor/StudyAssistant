@@ -21,6 +21,7 @@ import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 
@@ -37,6 +38,8 @@ internal data class EditTodoUi(
     val priority: TaskPriority = TaskPriority.STANDARD,
     val notifications: TodoNotificationsUi = TodoNotificationsUi(),
     val isDone: Boolean = false,
+    @TypeParceler<Instant, InstantParceler>
+    val createdAt: Instant,
     @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant? = null,
 ) : Parcelable {
@@ -47,11 +50,11 @@ internal data class EditTodoUi(
         fun createEditModel(
             uid: UID?,
             enableNotifications: Boolean = true,
+            createdAt: Instant,
         ) = EditTodoUi(
             uid = uid ?: "",
-            notifications = TodoNotificationsUi(
-                beforeStart = enableNotifications,
-            )
+            createdAt = createdAt,
+            notifications = TodoNotificationsUi(beforeStart = enableNotifications),
         )
     }
 }
@@ -65,6 +68,7 @@ internal fun TodoUi.convertToEdit() = EditTodoUi(
     notifications = notifications,
     isDone = isDone,
     completeDate = completeDate,
+    createdAt = createdAt,
 )
 
 internal fun EditTodoUi.convertToBase() = TodoUi(
@@ -76,4 +80,5 @@ internal fun EditTodoUi.convertToBase() = TodoUi(
     notifications = notifications,
     isDone = isDone,
     completeDate = completeDate,
+    createdAt = createdAt,
 )

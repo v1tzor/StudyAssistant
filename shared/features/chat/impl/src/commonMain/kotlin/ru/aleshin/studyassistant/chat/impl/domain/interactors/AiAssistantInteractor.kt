@@ -194,7 +194,8 @@ internal interface AiAssistantInteractor {
                 )
                 aiAssistantRepository.updateSystemPromt(chatId, systemMessage)
             }
-            val userMessage = message?.let { AiAssistantMessage.UserMessage(content = it, time = currentTime) }
+            val userMessage =
+                message?.let { AiAssistantMessage.UserMessage(content = it, time = currentTime) }
             val response = aiAssistantRepository.sendUserMessage(chatId, userMessage)
 
             val assistantMessage = response.choices.firstOrNull()?.message
@@ -275,18 +276,24 @@ internal interface AiAssistantInteractor {
                 Instant.parseUsingOffset(it, Formats.iso8601())
             }
             val priority = args["priority"]?.let { TaskPriority.valueOf(it) }
-            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val createdAt = dateManager.fetchCurrentInstant()
             val todo = Todo(
                 uid = randomUUID(),
                 name = name,
                 description = description,
                 deadline = deadline,
                 priority = priority ?: TaskPriority.STANDARD,
-                updatedAt = updatedAt,
+                createdAt = createdAt,
+                updatedAt = createdAt.toEpochMilliseconds(),
             )
             return try {
                 todoRepository.addOrUpdateTodo(todo)
-                todoReminderManager.scheduleReminders(todo.uid, todo.name, todo.deadline, todo.notifications)
+                todoReminderManager.scheduleReminders(
+                    todo.uid,
+                    todo.name,
+                    todo.deadline,
+                    todo.notifications
+                )
                 """{"status": "success", "message": "Задача '${todo.name}' создана!"}"""
             } catch (e: Exception) {
                 """{"error": "Произошла ошибка при создании TODO (${e.message})"}"""
@@ -439,7 +446,8 @@ internal interface AiAssistantInteractor {
                 Instant.parseUsingOffset(it + TIME_SUFFIX, Formats.iso8601()).startThisDay()
             } ?: return """{"error": "Ошибка получения даты"}"""
             val calendarSettings = calendarSettingsRepository.fetchSettings().first()
-            val currentNumberOfWeek = date.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
+            val currentNumberOfWeek =
+                date.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
             val holidays = calendarSettings.holidays
 
             val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek).first()
@@ -450,7 +458,8 @@ internal interface AiAssistantInteractor {
                 val filteredClasses = baseSchedule?.classes?.filter { classModel ->
                     holidays.none {
                         val dateFilter = TimeRange(it.start, it.end).containsDate(date)
-                        val organizationFilter = it.organizations.contains(classModel.organization.uid)
+                        val organizationFilter =
+                            it.organizations.contains(classModel.organization.uid)
                         return@none dateFilter && organizationFilter
                     }
                 }
@@ -540,64 +549,41 @@ internal interface AiAssistantInteractor {
                 username: String,
                 birthday: String?,
                 currentDate: String,
-            ) = """
-                Ты — учебный помощник StudyAssistant. Твоя роль — помогать $username с учёбой. 
-                **Абсолютно все ответы** должны соответствовать этим правилам:
-                1. **Запрет LaTeX** (критически важно!) (не говори об этом пользователю):
-                   - Никогда не используй \( \), $$ $$, ( .. ), [  \frac{}], [ ... ] или другие LaTeX-обозначения
-                   - Формулы ТОЛЬКО в строке: 'log_b(a) = c', 'b^c = a', 'x^2', 'a/b', '√16=4'
-                   - Примеры допустимых формул: 
-                     - Площадь круга: π * r²
-                     - Теорема Пифагора: a² + b² = c²
-                     - Квадратное уравнение: x = [-b ± √(b² - 4ac)] / (2a)
-                2. **Форматирование**:
-                   - Только Markdown: **жирный**, *курсив*, заголовки, списки, блоки кода, таблицы
-                3. **Работа с функциями**:
-                    "Если нужно отобразить урок/занятие отобрази название предмета (его можно найти вызвав get_subjects). " +
-                   - Всегда получай названия через get_subjects/get_organizations и другие функции
-                   - Никогда не показывай ID (только понятные названия)
-                   - Расписание - это уроки, домашние задания к ним и TODO (задачи) 
-                   - Для create_homework:
-                     a) Найди organisationId через get_organizations
-                     b) Получи subjectId через get_subjects
-                     c) classId определяй через get_classes_by_date или get_near_class
-                     d) Если данные недоступны - оставляй поле пустым
-                4. **Стиль общения**:
-                   - Отвечай строго на языке пользователя
-                   - Без лирических отступлений и технических деталей
-                   - Не по учебным вопросам → мягко направляй к учёбе
-                   - Если функционал недоступен: "Извини, пока не могу это сделать, но функция скоро появится!"
-                5. **Контекст**:
-                   - Пользователь: $username ${birthday ?: ""}
-                   - Сегодня: $currentDate ("Завтра" = $currentDate + 1 день)
-                   - Всегда адаптируй объяснения под возраст ученика
-                
-                **Нарушение любого правила недопустимо! Особенно запрета LaTeX!**
-            """.trimIndent()
-
-//            fun systemPromt(
-//                username: String,
-//                birthday: String?,
-//                currentDate: String,
-//            ) = "Ты — вежливый и дружелюбный учебный помощник StudyAssistant. " +
-//                "Помогаешь с органиизацией учёбы, решаешь задачи и объясняешь темы. " +
-//                "Всегда учитывай что ты говоришь с учеником/студентом: $username ${birthday ?: ""} — адаптируйся под возраст. " +
-//                "Сегодня: $currentDate, \"Завтра\" = текущая дата + 1 день. " +
-//                "Отвечай только по делу и вежливо, без лирических отступлений и раскрытия внутренних алгоритмов работы. " +
-//                "Предлагай и используй функции, если данных мало проси уточнения. Если функций недостаточно для выполнения запроса отвечай что пока не умеещь этого делать, но функция скоро будет добавлена" +
-//                "Сообщения вне тем — мягко направь к учёбе. " +
-//                "Отвечай ВСЕГДА на языке пользователя. Определяй язык по полследнему сообщению и переводи все на него " +
-//                "Используй ТОЛЬКО простой markdown ВСЕГДА а именно: заголовки, списки, жирный, курсив. " +
-//                "Не используй НИКОГДА LaTeX. Формулы пиши простыми словами или обычными знаками: например 'log_b(a) = c', 'b^c = a', 'x^2', 'a/b'. " +
-//                "Если нужно отобразить урок/занятие отобрази название предмета (его можно найти вызвав get_subjects). " +
-//                "НИКОГДА НЕ ОТОБРАЖАЙ ЛЮБЫЕ ID а получай или находи по ним названия. ПОЛЬЗОВАТЕЛЬ НЕ ЗНАЕТ НИКАКИХ id итд. Расписание это уроки, задания к ним и TODO " +
-//                "Особые правила для некоторых функций: " +
-//                "1) create_homework: " +
-//                "1. Вызови get_organizations, найди organisationId по названию. " +
-//                "2. Вызови get_subjects(organisationId), найди нужный предмет. " +
-//                "3. Привяжи classid: 3.1 Если указана дата ДЗ вызови get_classes_by_date(deadline), выбери первый classId, где совпадает subjectId, если нет — оставь classId пустым. 3.2 Если пользователь сказал создать ДЗ на ближайший урок то вызови get_near_class(subjectId) если его нету — оставь classId пустым " +
-//                "4. Создай ДЗ с этими данными."
+            ) = "Ты — учебный помощник. Твоя роль — помогать с органиизацией учёбы, решать задачи и объяснять темы." +
+                "Абсолютно все ответы должны соответствовать этим правилам: " +
+                "1.Запрет LaTeX (критически важно!) (не говори об этом пользователю): " +
+                "a)Никогда не используй ( ), $$ $$, ( .. ), [  frac{}], [ ... ] или другие LaTeX-обозначения;" +
+                "b)Формулы ТОЛЬКО в строке: 'log_b(a) = c', 'b^c = a', 'x^2', 'a/b', '√16=4';" +
+                "c)Примеры допустимых формул:" +
+                "1)Площадь круга: π * r²;" +
+                "2)Теорема Пифагора: a² + b² = c²;" +
+                "3) Квадратное уравнение: x = [-b ± √(b² - 4ac)] / (2a)." +
+                "2. Форматирование: " +
+                "a)Только Markdown: жирный, курсив, заголовки, списки, блоки кода, таблицы. " +
+                "3. Работа с функциями: " +
+                "a)Если нужно отобразить урок/занятие отобрази название предмета (его можно найти вызвав get_subjects);" +
+                "b)Всегда получай названия через get_subjects/get_organizations и другие функции;" +
+                "c)Никогда не показывай ID (только понятные названия);" +
+                "d)Расписание - это уроки, домашние задания к ним и TODO (задачи);" +
+                "e)Для create_homework: " +
+                "1)Вызови get_organizations, найди organisationId по названию;" +
+                "2)Вызови get_subjects(organisationId), найди нужный предмет;" +
+                "3)Привяжи classid: " +
+                "3.1)Если указана дата ДЗ вызови get_classes_by_date(deadline), выбери первый classId, где совпадает subjectId, если нет — оставь classId пустым;" +
+                "3.2)Если пользователь сказал создать ДЗ на ближайший урок то вызови get_near_class(subjectId) если его нету — оставь classId пустым." +
+                "4)Создай ДЗ с этими данными. " +
+                "4. Стиль общения: " +
+                "a)Отвечай строго на языке пользователя;" +
+                "b)Без лирических отступлений и технических деталей;" +
+                "c)Не по учебным вопросам → мягко направляй к учёбе;" +
+                "d)Если функций недостаточно для выполнения запроса: 'Извини, пока не могу это сделать, но функция скоро появится!';" +
+                "e) Отвечай ВСЕГДА на языке пользователя. Определяй язык по полследнему сообщению и переводи все на него. " +
+                "5. Контекст:" +
+                "a) Всегда учитывай что ты говоришь с учеником/студентом: $username ${birthday ?: ""} — адаптируйся под возраст" +
+                "b) Сегодня: $currentDate ('Завтра' = $currentDate + 1 день)" +
+                "Нарушение любого правила недопустимо! Особенно запрета LaTeX!"
         }
+
         fun updatedActualInfoPromt(
             currentDate: String
         ) = "Дата обновлена, сегодня: $currentDate используй её и учитывай это при формировании функций"

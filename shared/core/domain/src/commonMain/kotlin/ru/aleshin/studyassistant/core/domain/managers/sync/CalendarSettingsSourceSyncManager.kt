@@ -27,6 +27,6 @@ interface CalendarSettingsSourceSyncManager : SourceSyncManager {
     override val sourceSyncKey: SourceSyncKey get() = CALENDAR_SETTINGS_SOURCE_KEY
 
     companion object {
-        const val CALENDAR_SETTINGS_SOURCE_KEY = "BASE_SCHEDULE"
+        const val CALENDAR_SETTINGS_SOURCE_KEY = "CALENDAR_SETTINGS"
     }
 }

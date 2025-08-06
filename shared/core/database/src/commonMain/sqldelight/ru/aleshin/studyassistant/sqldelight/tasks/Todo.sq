@@ -11,13 +11,14 @@ CREATE TABLE todoEntity (
     notify_one_day_before INTEGER NOT NULL,
     notify_one_week_before INTEGER NOT NULL,
     is_done INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
     complete_date INTEGER,
     updated_at INTEGER NOT NULL,
     is_cache_data INTEGER NOT NULL
 );
 
 addOrUpdateTodo:
-INSERT OR REPLACE INTO todoEntity (uid, deadline, name, description, priority, notify_before_start, notify_fifteen_minutes_before, notify_one_hour_before, notify_three_hour_before, notify_one_day_before, notify_one_week_before, is_done, complete_date, updated_at, is_cache_data)
+INSERT OR REPLACE INTO todoEntity (uid, deadline, name, description, priority, notify_before_start, notify_fifteen_minutes_before, notify_one_hour_before, notify_three_hour_before, notify_one_day_before, notify_one_week_before, is_done, created_at, complete_date, updated_at, is_cache_data)
 VALUES ?;
 
 fetchTodoById:

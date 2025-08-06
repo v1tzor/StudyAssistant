@@ -25,5 +25,5 @@ import ru.aleshin.studyassistant.core.domain.managers.sync.SourceSyncFacade
  * @author Stanislav Aleshin on 02.08.2025.
  */
 val coreDomainModule = DI.Module("CoreDomainModule") {
-    bindSingleton<SourceSyncFacade> { SourceSyncFacade.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<SourceSyncFacade> { SourceSyncFacade.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 }

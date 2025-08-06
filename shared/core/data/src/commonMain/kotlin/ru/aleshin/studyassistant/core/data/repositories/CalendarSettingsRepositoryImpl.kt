@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
 import ru.aleshin.studyassistant.core.data.mappers.settings.convertToLocal
 import ru.aleshin.studyassistant.core.data.mappers.settings.convertToRemote
 import ru.aleshin.studyassistant.core.data.mappers.settings.mapToDomain
@@ -42,6 +43,7 @@ import ru.aleshin.studyassistant.core.remote.datasources.settings.CalendarSettin
 class CalendarSettingsRepositoryImpl(
     private val localDataSource: CalendarSettingsLocalDataSource,
     private val remoteDataSource: CalendarSettingsRemoteDataSource,
+    private val userSessionProvider: UserSessionProvider,
     private val subscriptionChecker: SubscriptionChecker,
     private val resultSyncHandler: RemoteResultSyncHandler,
 ) : CalendarSettingsRepository {
@@ -63,18 +65,19 @@ class CalendarSettingsRepositoryImpl(
 
     override suspend fun updateSettings(settings: CalendarSettings) {
         val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val currentUser = userSessionProvider.getCurrentUserId()
 
         if (isSubscriber) {
-            localDataSource.sync().addOrUpdateItem(settings.mapToLocalData())
+            localDataSource.sync().addOrUpdateItem(settings.mapToLocalData(currentUser))
             resultSyncHandler.executeOrAddToQueue(
-                data = settings.mapToRemoteData(),
+                data = settings.mapToRemoteData(currentUser),
                 type = OfflineChangeType.UPSERT,
                 sourceKey = CALENDAR_SETTINGS_SOURCE_KEY,
             ) {
                 remoteDataSource.addOrUpdateItem(it)
             }
         } else {
-            localDataSource.offline().addOrUpdateItem(settings.mapToLocalData())
+            localDataSource.offline().addOrUpdateItem(settings.mapToLocalData(currentUser))
         }
     }
 

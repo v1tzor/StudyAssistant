@@ -20,6 +20,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import ru.aleshin.studyassistant.core.common.managers.CoroutineFlow.BACKGROUND
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 
 /**
  * @author Stanislav Aleshin on 25.07.2025.
@@ -48,6 +49,8 @@ interface SourceSyncFacade {
         sharedHomeworksSourceSyncManager: SharedHomeworksSourceSyncManager,
         friendRequestsSourceSyncManager: FriendRequestsSourceSyncManager,
         dailyAiStatisticsSourceSyncManager: DailyAiStatisticsSourceSyncManager,
+        calendarSettingsSourceSyncManager: CalendarSettingsSourceSyncManager,
+        private val aiAssistantRepository: AiAssistantRepository,
         private val coroutineManager: CoroutineManager,
     ) : SourceSyncFacade {
 
@@ -65,6 +68,7 @@ interface SourceSyncFacade {
             sharedHomeworksSourceSyncManager,
             friendRequestsSourceSyncManager,
             dailyAiStatisticsSourceSyncManager,
+            calendarSettingsSourceSyncManager,
         )
 
         override suspend fun syncAllSource() {
@@ -88,6 +92,7 @@ interface SourceSyncFacade {
         override suspend fun clearAllSyncedData() {
             coroutineManager.changeFlow(BACKGROUND) {
                 allSyncManagers.forEach { it.clearSourceData() }
+                aiAssistantRepository.deleteChat(null)
             }
         }
     }

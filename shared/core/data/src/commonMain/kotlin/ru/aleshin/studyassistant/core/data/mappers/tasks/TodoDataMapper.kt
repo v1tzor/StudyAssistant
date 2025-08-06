@@ -45,6 +45,7 @@ fun Todo.mapToRemoteData(userId: UID) = TodoPojo(
     notifications = notifications.mapToRemote().toJson(),
     done = isDone,
     completeDate = completeDate?.toEpochMilliseconds(),
+    createdAt = createdAt.toEpochMilliseconds(),
     updatedAt = updatedAt,
 )
 
@@ -66,6 +67,7 @@ fun TodoPojoDetails.mapToDomain() = Todo(
     notifications = notifications.mapToDomain(),
     isDone = done,
     completeDate = completeDate?.mapEpochTimeToInstant(),
+    createdAt = createdAt.mapEpochTimeToInstant(),
     updatedAt = updatedAt,
 )
 
@@ -93,6 +95,7 @@ fun Todo.mapToLocalData() = BaseTodoEntity(
     notifyOneWeekBefore = if (notifications.oneWeekBefore) 1L else 0L,
     priority = priority.name,
     isDone = if (isDone) 1L else 0L,
+    createdAt = createdAt.toEpochMilliseconds(),
     completeDate = completeDate?.toEpochMilliseconds(),
     updatedAt = updatedAt,
     isCacheData = 0L,
@@ -113,6 +116,7 @@ fun BaseTodoEntity.mapToDomain() = Todo(
         oneWeekBefore = notifyOneWeekBefore == 1L,
     ),
     isDone = isDone == 1L,
+    createdAt = createdAt.mapEpochTimeToInstant(),
     completeDate = completeDate?.mapEpochTimeToInstant(),
     updatedAt = updatedAt,
 )
@@ -135,6 +139,7 @@ fun BaseTodoEntity.convertToRemote(userId: UID) = TodoPojo(
         oneWeekBefore = notifyOneWeekBefore == 1L,
     ).toJson(),
     done = isDone == 1L,
+    createdAt = createdAt,
     completeDate = completeDate,
     updatedAt = updatedAt,
 )
@@ -156,6 +161,7 @@ fun TodoPojo.convertToLocal(): BaseTodoEntity {
         isDone = if (done) 1L else 0L,
         completeDate = completeDate,
         updatedAt = updatedAt,
+        createdAt = createdAt,
         isCacheData = 1L,
     )
 }

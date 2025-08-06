@@ -36,6 +36,7 @@ data class TodoPojo(
     val priority: String = TaskPriority.STANDARD.name,
     val notifications: String = "",
     val done: Boolean = false,
+    val createdAt: Long = 0L,
     val completeDate: Long? = null,
     override val updatedAt: Long = 0L,
 ) : BaseMultipleRemotePojo()

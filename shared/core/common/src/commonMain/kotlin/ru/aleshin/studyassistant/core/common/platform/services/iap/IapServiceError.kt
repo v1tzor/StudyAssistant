@@ -19,4 +19,10 @@ package ru.aleshin.studyassistant.core.common.platform.services.iap
 /**
  * @author Stanislav Aleshin on 18.06.2025.
  */
-class IapServiceError(val type: IapFailure) : Exception(type.toString(), null)
+class IapServiceError(
+    val type: IapFailure,
+    override val message: String? = null,
+) : Exception(
+    message ?: type.toString(),
+    null
+)

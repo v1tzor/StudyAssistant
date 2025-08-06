@@ -18,6 +18,11 @@ package ru.aleshin.studyassistant.data
 
 import android.app.Activity
 import android.content.Context
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.request.get
+import io.ktor.client.request.url
+import io.ktor.http.isSuccess
 import ru.aleshin.studyassistant.core.common.platform.PlatformActivity
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapFailure
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPaymentResult
@@ -56,6 +61,18 @@ class IapServiceImpl(
 ) : IapService {
 
     private var activity: WeakReference<Activity?> = WeakReference(null)
+
+    private var httpClient: HttpClient? = null
+
+    private val jweTokenProvider: RuStoreJweTokenProvider by lazy {
+        RuStoreJweTokenProvider.Base(createOrGetHttpClient())
+    }
+
+    private companion object {
+        const val PACKAGE_NAME = "ru.aleshin.studyassistant"
+        const val CONFIRM_SUB_BASE_URL = "https://public-api.rustore.ru/public/glike/subscription"
+        const val JWE_TOKEN_HEADER = "Public-Token"
+    }
 
     override fun init(activity: PlatformActivity) {
         this.activity = WeakReference(activity)
@@ -114,6 +131,17 @@ class IapServiceImpl(
         purchaseInteractor.confirmPurchase(purchaseId, developerPayload).handledAwait()
     }
 
+    override suspend fun confirmSubscribe(subscriptionId: String, subscriptionToken: String) {
+        val jweToken = jweTokenProvider.getJweToken()
+        val response = createOrGetHttpClient().get {
+            url("/$CONFIRM_SUB_BASE_URL/$PACKAGE_NAME/$subscriptionId/$subscriptionToken:acknowledge")
+            headers.append(JWE_TOKEN_HEADER, jweToken)
+        }
+        if (!response.status.isSuccess()) {
+            throw IapServiceError(IapFailure.UnknownError)
+        }
+    }
+
     override suspend fun deletePurchase(purchaseId: String) {
         purchaseInteractor.deletePurchase(purchaseId).handledAwait()
     }
@@ -122,6 +150,7 @@ class IapServiceImpl(
         return try {
             await()
         } catch (exception: Exception) {
+            exception.printStackTrace()
             val type = when (exception) {
                 is RuStoreNotInstalledException -> IapFailure.RuStoreNotInstalled
                 is RuStoreOutdatedException -> IapFailure.RuStoreOutdated
@@ -133,5 +162,9 @@ class IapServiceImpl(
             }
             throw IapServiceError(type)
         }
+    }
+
+    private fun createOrGetHttpClient(): HttpClient {
+        return httpClient ?: HttpClient(engineFactory = OkHttp).apply { httpClient = this }
     }
 }

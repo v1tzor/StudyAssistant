@@ -39,6 +39,7 @@ import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.notifications.NotificationCreator
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationCategory
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationPriority
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.data.R
 import ru.aleshin.studyassistant.core.data.di.coreDataModule
 import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.CLASS_MINUTE_DURATION_RATE
@@ -74,6 +75,7 @@ class WorkloadWarningWorker(
 
     override val directDI = DI.direct {
         bindProvider<Context> { applicationContext }
+        bindProvider<CrashlyticsService> { CrashlyticsService.Empty() }
         importAll(coreCommonModule, coreDataModule)
     }
     private val coreStrings: StudyAssistantStrings

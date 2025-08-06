@@ -32,5 +32,6 @@ interface IapService {
     suspend fun fetchPurchases(): List<IapPurchase>
     suspend fun fetchPurchaseInfo(purchaseId: String): IapPurchase?
     suspend fun confirmPurchase(purchaseId: String, developerPayload: String?)
+    suspend fun confirmSubscribe(subscriptionId: String, subscriptionToken: String) = Unit
     suspend fun deletePurchase(purchaseId: String)
 }

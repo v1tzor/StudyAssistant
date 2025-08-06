@@ -37,6 +37,7 @@ data class BaseTodoEntity(
     val notifyOneWeekBefore: Long,
     val isDone: Long,
     val completeDate: Long?,
+    val createdAt: Long,
     override val updatedAt: Long,
     val isCacheData: Long,
 ) : BaseLocalEntity()

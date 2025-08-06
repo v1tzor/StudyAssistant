@@ -37,5 +37,5 @@ interface AiAssistantRepository {
     suspend fun saveAssistantMessage(chatId: UID, message: AiAssistantMessage.AssistantMessage)
     suspend fun updateSystemPromt(chatId: UID, message: AiAssistantMessage.SystemMessage)
     suspend fun deleteUnconfirmedMessages(chatId: UID)
-    suspend fun deleteChat(chatId: UID)
+    suspend fun deleteChat(chatId: UID?)
 }

@@ -35,7 +35,8 @@ import ru.aleshin.studyassistant.core.remote.models.settings.HolidaysPojo
 
 // Remote
 
-fun CalendarSettings.mapToRemoteData() = CalendarSettingsPojo(
+fun CalendarSettings.mapToRemoteData(userId: String) = CalendarSettingsPojo(
+    id = userId,
     numberOfWeek = numberOfWeek.name,
     weekScheduleViewType = weekScheduleViewType.name,
     holidays = holidays.map { it.mapToRemoteData().toJson() },
@@ -63,7 +64,8 @@ fun HolidaysPojo.mapToDomain() = Holidays(
 
 // Local
 
-fun CalendarSettings.mapToLocalData() = BaseCalendarSettingsEntity(
+fun CalendarSettings.mapToLocalData(userId: String) = BaseCalendarSettingsEntity(
+    uid = userId,
     numberOfWeek = numberOfWeek.name,
     weekScheduleViewType = weekScheduleViewType.name,
     holidays = holidays.map { it.mapToLocalData().toJson() },

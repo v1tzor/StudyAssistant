@@ -574,7 +574,7 @@ private fun ShortHomeworkViewContent(
                 )
             }
         }
-        if (status == HomeworkStatus.COMPLETE || status == HomeworkStatus.NOT_COMPLETE) {
+        if (status == HomeworkStatus.COMPLETE || status == HomeworkStatus.SKIPPED) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 ShortHomeworkTaskCountView(
                     painter = painterResource(StudyAssistantRes.icons.theoreticalTasks),

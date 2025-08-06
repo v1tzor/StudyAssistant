@@ -42,6 +42,8 @@ interface SyncInteractor {
         override suspend fun performSourceSync() = eitherWrapper.wrap {
             if (usersRepository.fetchCurrentAuthUser() != null) {
                 sourceSyncFacade.syncAllSource()
+            } else {
+                sourceSyncFacade.clearAllSyncedData()
             }
             syncWorkManager.startOrRetrySyncService()
         }

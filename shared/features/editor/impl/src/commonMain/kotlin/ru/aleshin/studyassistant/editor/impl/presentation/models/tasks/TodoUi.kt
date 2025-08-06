@@ -21,6 +21,7 @@ import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 
@@ -37,6 +38,8 @@ internal data class TodoUi(
     val priority: TaskPriority,
     val notifications: TodoNotificationsUi = TodoNotificationsUi(),
     val isDone: Boolean = false,
+    @TypeParceler<Instant, InstantParceler>
+    val createdAt: Instant,
     @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant? = null,
     val updatedAt: Long = 0L,

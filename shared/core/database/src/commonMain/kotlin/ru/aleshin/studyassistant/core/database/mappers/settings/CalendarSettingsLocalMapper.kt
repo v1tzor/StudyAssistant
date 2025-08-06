@@ -31,8 +31,8 @@ fun CalendarSettingsEntity.mapToBase() = BaseCalendarSettingsEntity(
     isCacheData = is_cache_data,
 )
 
-fun BaseCalendarSettingsEntity.mapToEntity() = CalendarSettingsEntity(
-    id = uid.toLong(),
+fun BaseCalendarSettingsEntity.mapToEntity(id: Long) = CalendarSettingsEntity(
+    id = id,
     document_id = uid,
     number_of_week = numberOfWeek,
     week_schedule_view_type = weekScheduleViewType,

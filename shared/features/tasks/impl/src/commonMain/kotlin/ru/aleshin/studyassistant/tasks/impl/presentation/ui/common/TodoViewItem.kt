@@ -225,17 +225,26 @@ private fun TodoViewFooter(
                             modifier = Modifier.size(18.dp),
                             painter = painterResource(TasksThemeRes.icons.deadline),
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error,
+                            tint = if (deadline != null) {
+                                MaterialTheme.colorScheme.error
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                         )
                         Text(
                             text = buildString {
-                                append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
-                                append(
-                                    deadline?.formatByTimeZone(deadlineDateFormat)
-                                        ?: TasksThemeRes.strings.noneDeadlineTitle
-                                )
+                                if (deadline != null) {
+                                    append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
+                                    append(deadline.formatByTimeZone(deadlineDateFormat))
+                                } else {
+                                    append(TasksThemeRes.strings.noneDeadlineTitle)
+                                }
                             },
-                            color = MaterialTheme.colorScheme.error,
+                            color = if (deadline != null) {
+                                MaterialTheme.colorScheme.error
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.labelSmall,
@@ -262,10 +271,12 @@ private fun TodoViewFooter(
                         )
                         Text(
                             text = buildString {
-                                append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
-                                append(
-                                    deadline?.formatByTimeZone(deadlineDateFormat) ?: TasksThemeRes.strings.noneDeadlineTitle
-                                )
+                                if (deadline != null) {
+                                    append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
+                                    append(deadline.formatByTimeZone(deadlineDateFormat))
+                                } else {
+                                    append(TasksThemeRes.strings.noneDeadlineTitle)
+                                }
                             },
                             color = StudyAssistantRes.colors.accents.green,
                             maxLines = 1,
@@ -296,9 +307,7 @@ private fun TodoViewFooter(
                             color = MaterialTheme.colorScheme.error,
                             text = buildString {
                                 append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
-                                append(
-                                    deadline?.formatByTimeZone(deadlineDateFormat) ?: TasksThemeRes.strings.noneDeadlineTitle
-                                )
+                                append(deadline?.formatByTimeZone(deadlineDateFormat) ?: TasksThemeRes.strings.noneDeadlineTitle)
                             },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,

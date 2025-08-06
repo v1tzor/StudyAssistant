@@ -33,6 +33,7 @@ data class TodoPojoDetails(
     val priority: String = TaskPriority.STANDARD.name,
     val notifications: TodoNotificationsPojo = TodoNotificationsPojo(),
     val done: Boolean = false,
+    val createdAt: Long,
     val completeDate: Long? = null,
     val updatedAt: Long = 0L,
 )

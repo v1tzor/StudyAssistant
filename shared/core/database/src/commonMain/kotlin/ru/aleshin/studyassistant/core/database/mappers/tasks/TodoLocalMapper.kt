@@ -38,6 +38,7 @@ internal fun FetchCompletedTodos.mapToBase() = BaseTodoEntity(
     notifyOneWeekBefore = notify_one_week_before,
     isDone = is_done,
     completeDate = complete_date,
+    createdAt = created_at,
     updatedAt = updated_at,
     isCacheData = is_cache_data,
 )
@@ -57,6 +58,7 @@ internal fun FetchCompletedTodosByTimeRange.mapToBase() = BaseTodoEntity(
     isDone = is_done,
     completeDate = complete_date,
     updatedAt = updated_at,
+    createdAt = created_at,
     isCacheData = is_cache_data,
 )
 
@@ -73,6 +75,7 @@ internal fun TodoEntity.mapToBase() = BaseTodoEntity(
     notifyOneDayBefore = notify_one_day_before,
     notifyOneWeekBefore = notify_one_week_before,
     isDone = is_done,
+    createdAt = created_at,
     completeDate = complete_date,
     updatedAt = updated_at,
     isCacheData = is_cache_data,
@@ -91,6 +94,7 @@ internal fun BaseTodoEntity.mapToEntity() = TodoEntity(
     notify_one_day_before = notifyOneDayBefore,
     notify_one_week_before = notifyOneWeekBefore,
     is_done = isDone,
+    created_at = createdAt,
     complete_date = completeDate,
     updated_at = updatedAt,
     is_cache_data = isCacheData,

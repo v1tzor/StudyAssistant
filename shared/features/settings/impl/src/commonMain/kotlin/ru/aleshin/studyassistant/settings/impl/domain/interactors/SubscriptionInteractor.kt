@@ -21,9 +21,11 @@ import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPurchaseStatus.CONFIRMED
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
+import ru.aleshin.studyassistant.core.common.wrappers.EitherWrapper.Abstract.Companion.ERROR_TAG
 import ru.aleshin.studyassistant.core.domain.entities.users.SubscribeInfo
 import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
@@ -47,6 +49,7 @@ internal interface SubscriptionInteractor {
         private val iapService: IapService,
         private val deviceInfoProvider: DeviceInfoProvider,
         private val dateManager: DateManager,
+        private val crashlyticsService: CrashlyticsService,
         private val eitherWrapper: SettingsEitherWrapper,
     ) : SubscriptionInteractor {
 
@@ -109,6 +112,16 @@ internal interface SubscriptionInteractor {
                     val endTime = (startTime + subscriptionPeriod.inMillis()).mapEpochTimeToInstant()
 
                     if (currentSubscriptionInfo != null) {
+                        try {
+                            iapService.confirmSubscribe(
+                                subscriptionId = activePurchase.productId,
+                                subscriptionToken = checkNotNull(activePurchase.subscriptionToken) {
+                                    "For confirm subscribe subscriptionToken required not null"
+                                },
+                            )
+                        } catch (e: Exception) {
+                            crashlyticsService.recordException(ERROR_TAG, e.message ?: "", e)
+                        }
                         val updatedSubscriptionInfo = currentSubscriptionInfo.copy(
                             purchaseId = activePurchase.purchaseId
                                 ?: currentSubscriptionInfo.purchaseId,

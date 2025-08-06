@@ -52,6 +52,7 @@ internal fun HomeworkDetailsUi.convertToMediated(
 )
 
 internal fun MediatedHomeworkUi.createHomework(
+    uid: String = randomUUID(),
     date: Instant,
     organization: OrganizationShortUi,
     linkData: MediatedHomeworkLinkData,

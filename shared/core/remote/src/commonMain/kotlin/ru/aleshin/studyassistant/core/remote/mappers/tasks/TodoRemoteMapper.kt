@@ -34,6 +34,7 @@ fun TodoPojo.convertToDetails() = TodoPojoDetails(
     priority = priority,
     notifications = notifications.fromJson<TodoNotificationsPojo>(),
     done = done,
+    createdAt = createdAt,
     completeDate = completeDate,
     updatedAt = updatedAt,
 )
@@ -47,6 +48,7 @@ fun TodoPojoDetails.convertToBase() = TodoPojo(
     priority = priority,
     notifications = notifications.toJson<TodoNotificationsPojo>(),
     done = done,
+    createdAt = createdAt,
     completeDate = completeDate,
     updatedAt = updatedAt,
 )

@@ -191,10 +191,10 @@ abstract class BaseSourceSyncManager(
      * - Sync schedules
      */
     abstract class MultipleDocuments<E : BaseLocalEntity, P : BaseMultipleRemotePojo>(
-        private val localDataSource: LocalDataSource.FullSynced.MultipleDocuments<E>,
-        private val remoteDataSource: RemoteDataSource.FullSynced.MultipleDocuments<P>,
-        private val userSessionProvider: UserSessionProvider,
-        private val mappers: MultipleSyncMapper<E, P>,
+        protected val localDataSource: LocalDataSource.FullSynced.MultipleDocuments<E>,
+        protected val remoteDataSource: RemoteDataSource.FullSynced.MultipleDocuments<P>,
+        protected val userSessionProvider: UserSessionProvider,
+        protected val mappers: MultipleSyncMapper<E, P>,
         changeQueueStorage: ChangeQueueStorage,
         connectionManger: Konnection,
         coroutineManager: CoroutineManager,

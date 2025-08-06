@@ -111,7 +111,7 @@ internal interface PurchaseInteractor {
                 }
 
                 is IapPaymentResultInvalidPaymentState -> {
-                    throw IapServiceError(IapFailure.UnknownError)
+                    throw IapServiceError(IapFailure.UnknownError, "IapPaymentResultInvalidPaymentState")
                 }
             }
         }
