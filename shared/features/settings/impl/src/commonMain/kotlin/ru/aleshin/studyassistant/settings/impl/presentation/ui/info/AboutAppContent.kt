@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Web
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -71,6 +73,7 @@ internal fun AboutAppContent(
         AboutAppSectionDevelopment(
             onOpenGit = { uriHandler.openUri(Constants.App.GITHUB_URI) },
             onOpenIssues = { uriHandler.openUri(Constants.App.ISSUES_URI) },
+            onOpenWebsite = { uriHandler.openUri(Constants.App.WEBSITE_URI) },
         )
     }
 }
@@ -106,6 +109,7 @@ private fun AboutAppSectionDevelopment(
     modifier: Modifier = Modifier,
     onOpenGit: () -> Unit,
     onOpenIssues: () -> Unit,
+    onOpenWebsite: () -> Unit,
 ) {
     Surface(
         modifier = modifier,
@@ -130,6 +134,25 @@ private fun AboutAppSectionDevelopment(
                     text = Constants.App.LICENCE,
                 )
             }
+            FilterChip(
+                modifier = Modifier.fillMaxWidth(),
+                selected = true,
+                onClick = onOpenWebsite,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Web,
+                        contentDescription = SettingsThemeRes.strings.websiteTitle,
+                    )
+                },
+                label = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = SettingsThemeRes.strings.websiteTitle,
+                        textAlign = TextAlign.Center,
+                    )
+                },
+                colors = FilterChipDefaults.filterChipSurfaceVariantColors(),
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(
                     modifier = Modifier.weight(1f),

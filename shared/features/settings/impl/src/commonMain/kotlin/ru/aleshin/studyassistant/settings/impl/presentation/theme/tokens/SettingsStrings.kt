@@ -81,6 +81,7 @@ internal data class SettingsStrings(
     val licenseTitle: String,
     val githubTitle: String,
     val askQuestionTitle: String,
+    val websiteTitle: String,
     val otherErrorMessage: String,
 ) {
     companion object {
@@ -142,6 +143,7 @@ internal data class SettingsStrings(
             licenseTitle = "Лицензия",
             githubTitle = "Github",
             askQuestionTitle = "Задать вопрос",
+            websiteTitle = "Веб-сайт приложения",
             aboutAppHeader = "О приложении",
             otherErrorMessage = "Ошибка! Обратитесь к разработчику!",
         )
@@ -204,6 +206,7 @@ internal data class SettingsStrings(
             licenseTitle = "License",
             githubTitle = "Github",
             askQuestionTitle = "Ask a question",
+            websiteTitle = "App website",
             otherErrorMessage = "Error! Contact the developer!",
         )
     }

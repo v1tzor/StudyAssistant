@@ -54,6 +54,7 @@ interface AiRemoteApi {
                 }
                 return response.bodyOrAiError<ChatCompletionResponsePojo>()
             } catch (e: IOException) {
+                e.printStackTrace()
                 throw InternetConnectionException()
             }
         }

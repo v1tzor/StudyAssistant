@@ -70,12 +70,13 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
             authInteractor.loginWithEmail(credentials.mapToDomain(), device).handle(
                 onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
                 onRightAction = { authUser ->
-                    val targetScreen = if (authUser.emailVerification) {
-                        screenProvider.provideTabNavigationScreen()
+                    if (authUser.emailVerification) {
+                        val screen = screenProvider.provideTabNavigationScreen()
+                        emit(EffectResult(LoginEffect.ReplaceGlobalScreen(screen)))
                     } else {
-                        screenProvider.provideFeatureScreen(AuthScreen.Verification)
+                        val screen = screenProvider.provideFeatureScreen(AuthScreen.Verification)
+                        emit(EffectResult(LoginEffect.NavigateToLocal(screen)))
                     }
-                    emit(EffectResult(LoginEffect.ReplaceGlobalScreen(targetScreen)))
                 }
             )
         }.onStart {
