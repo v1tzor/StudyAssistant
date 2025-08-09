@@ -16,16 +16,16 @@
 
 package ru.aleshin.studyassistant.application
 
+import ReviewServiceImpl
 import com.google.android.gms.common.GoogleApiAvailability
 import com.huawei.hms.api.HuaweiApiAvailability
 import ru.aleshin.studyassistant.PlatformSDK
 import ru.aleshin.studyassistant.android.BuildConfig
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.platform.BaseApplication
-import ru.aleshin.studyassistant.core.remote.datasources.message.MessagingServiceImpl
+import ru.aleshin.studyassistant.core.remote.api.message.MessagingServiceImpl
 import ru.aleshin.studyassistant.data.AnalyticsServiceImpl
 import ru.aleshin.studyassistant.data.AppServiceImpl
-import ru.aleshin.studyassistant.data.ReviewServiceImpl
 import ru.aleshin.studyassistant.data.CrashlyticsServiceImpl
 import ru.aleshin.studyassistant.data.IapServiceImpl
 import ru.aleshin.studyassistant.di.PlatformConfiguration

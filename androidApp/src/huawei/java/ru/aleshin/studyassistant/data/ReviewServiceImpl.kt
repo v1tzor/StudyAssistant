@@ -17,8 +17,6 @@
 package ru.aleshin.studyassistant.data
 
 import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
-import ru.rustore.sdk.core.util.toSuspendResult
-import ru.rustore.sdk.review.RuStoreReviewManager
 
 /**
  * @author Stanislav Aleshin on 18.07.2025.

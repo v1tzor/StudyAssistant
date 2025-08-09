@@ -1,3 +1,5 @@
+import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
+
 /*
  * Copyright 2024 Stanislav Aleshin
  *
@@ -14,10 +16,9 @@
  * limitations under the License.
  */
 
-class ReviewServiceImpl() : ReviewService {
+class ReviewServiceImpl : ReviewService {
 
     override suspend fun requestReview(): Boolean {
-
         return false
     }
 }
