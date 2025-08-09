@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.domain.entities.users
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
+import ru.aleshin.studyassistant.core.domain.entities.billing.SubscriptionIdentifier
 
 /**
  * @author Stanislav Aleshin on 30.08.2024.
@@ -33,4 +34,24 @@ data class SubscribeInfo(
     val startTimeMillis: Long,
     val expiryTimeMillis: Long,
     val store: Store,
-)
+) {
+    fun fetchIdentifier(): SubscriptionIdentifier? = when (store) {
+        Store.RU_STORE -> if (subscriptionToken != null) {
+            SubscriptionIdentifier.RuStore(productId, subscriptionToken)
+        } else {
+            null
+        }
+        Store.APP_GALLERY -> if (orderId != null) {
+            SubscriptionIdentifier.AppGallery(purchaseId, orderId)
+        } else {
+            null
+        }
+        Store.GOOGLE_PLAY -> if (subscriptionToken != null) {
+            SubscriptionIdentifier.GooglePlay(productId, subscriptionToken)
+        } else {
+            null
+        }
+        Store.APP_STORE -> SubscriptionIdentifier.AppStore
+        else -> null
+    }
+}

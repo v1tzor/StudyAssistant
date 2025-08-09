@@ -16,13 +16,13 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.mappers
 
-import ru.aleshin.studyassistant.settings.impl.domain.entities.Subscription
+import ru.aleshin.studyassistant.settings.impl.domain.entities.PurchasedSubscription
 import ru.aleshin.studyassistant.settings.impl.presentation.models.billing.SubscriptionUi
 
 /**
  * @author Stanislav Aleshin on 19.06.2025.
  */
-internal fun Subscription.mapToUi() = SubscriptionUi(
+internal fun PurchasedSubscription.mapToUi() = SubscriptionUi(
     purchaseId = purchaseId,
     productId = productId,
     purchaseTime = purchaseTime,
@@ -31,6 +31,7 @@ internal fun Subscription.mapToUi() = SubscriptionUi(
     title = title,
     description = description,
     subscriptionPeriod = subscriptionPeriod,
-    status = status,
+    expiryTime = expiryTime,
+    isActive = isActive,
     subscriptionToken = subscriptionToken,
 )

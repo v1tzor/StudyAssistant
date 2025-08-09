@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.core.remote.mappers.subjects
 
-import ru.aleshin.studyassistant.core.common.extensions.fromJson
-import ru.aleshin.studyassistant.core.common.extensions.toJson
+import ru.aleshin.studyassistant.core.common.extensions.tryFromJson
+import ru.aleshin.studyassistant.core.common.extensions.tryToJson
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectDetailsPojo
 import ru.aleshin.studyassistant.core.remote.models.subjects.SubjectPojo
@@ -35,7 +35,7 @@ fun SubjectDetailsPojo.mapToBase(userId: UID) = SubjectPojo(
     teacherId = teacher?.id,
     office = office,
     color = color,
-    location = location?.toJson(),
+    location = location?.tryToJson(),
     updatedAt = updatedAt,
 )
 
@@ -49,6 +49,6 @@ fun SubjectPojo.mapToDetails(
     teacher = employee,
     office = office,
     color = color,
-    location = location?.fromJson(),
+    location = location?.tryFromJson(),
     updatedAt = updatedAt,
 )

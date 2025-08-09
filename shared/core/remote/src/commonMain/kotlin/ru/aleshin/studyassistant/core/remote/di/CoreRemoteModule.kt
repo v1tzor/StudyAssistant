@@ -46,7 +46,12 @@ import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.remote.BuildKonfig
 import ru.aleshin.studyassistant.core.remote.api.ai.AiRemoteApi
 import ru.aleshin.studyassistant.core.remote.api.auth.AuthRemoteApi
-import ru.aleshin.studyassistant.core.remote.api.billing.ProductsRemoteApi
+import ru.aleshin.studyassistant.core.remote.api.billing.AppGallerySubscriptionStatusProvider
+import ru.aleshin.studyassistant.core.remote.api.billing.AppStoreSubscriptionStatusProvider
+import ru.aleshin.studyassistant.core.remote.api.billing.GooglePlaySubscriptionStatusProvider
+import ru.aleshin.studyassistant.core.remote.api.billing.RuStoreSubscriptionStatusProvider
+import ru.aleshin.studyassistant.core.remote.api.billing.SubscriptionStatusProviderFactory
+import ru.aleshin.studyassistant.core.remote.api.billing.SubscriptionsRemoteApi
 import ru.aleshin.studyassistant.core.remote.api.message.HmsAuthTokenProvider
 import ru.aleshin.studyassistant.core.remote.api.message.MessageRemoteApi
 import ru.aleshin.studyassistant.core.remote.api.message.PushServiceAuthTokenFactory
@@ -173,11 +178,37 @@ val coreRemoteModule = DI.Module("CoreRemote") {
             }
         }
     }
+    bindSingleton<HttpClient>(tag = "Iap") {
+        HttpClient(instance<HttpEngineFactory>().createEngine()) {
+            install(Logging) {
+                level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }
+                    }
+                }
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 15000
+                socketTimeoutMillis = 15000
+                connectTimeoutMillis = 15000
+            }
+            install(ContentNegotiation) {
+                json(instance<Json>())
+            }
+        }
+    }
 
     bindSingleton<AiRemoteApi> { AiRemoteApi.Base(instance(tag = "DeepSeek"), instance()) }
     bindSingleton<AuthRemoteApi> { AuthRemoteApi.Base(instance()) }
-    bindSingleton<ProductsRemoteApi> { ProductsRemoteApi.Base(instance()) }
+    bindSingleton<SubscriptionsRemoteApi> { SubscriptionsRemoteApi.Base(instance(), instance(), instance()) }
     bindSingleton<MessageRemoteApi> { MessageRemoteApi.Base(instance(tag = "Messages"), instance(), instance(), instance(), instance()) }
+    bindSingleton<SubscriptionStatusProviderFactory> { SubscriptionStatusProviderFactory.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<HmsAuthTokenProvider> { HmsAuthTokenProvider.Base(instance<HttpClient>(tag = "HmsToken")) }
+    bindSingleton<RuStoreSubscriptionStatusProvider> { RuStoreSubscriptionStatusProvider.Base(instance(tag = "Iap"), instance()) }
+    bindSingleton<AppGallerySubscriptionStatusProvider> { AppGallerySubscriptionStatusProvider.Base(instance(tag = "Iap")) }
+    bindSingleton<GooglePlaySubscriptionStatusProvider> { GooglePlaySubscriptionStatusProvider.Base(instance(tag = "Iap")) }
+    bindSingleton<AppStoreSubscriptionStatusProvider> { AppStoreSubscriptionStatusProvider.Base(instance(tag = "Iap")) }
 
     bindProvider<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindProvider<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance(), instance(), instance()) }

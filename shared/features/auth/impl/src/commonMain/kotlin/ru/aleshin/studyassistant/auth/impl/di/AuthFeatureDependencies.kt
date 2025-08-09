@@ -28,6 +28,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
@@ -39,6 +40,7 @@ public interface AuthFeatureDependencies : BaseFeatureDependencies {
     public val navigationFeatureStarter: () -> NavigationFeatureStarter
     public val previewFeatureStarter: () -> PreviewFeatureStarter
     public val authRepository: AuthRepository
+    public val subscriptionsRepository: SubscriptionsRepository
     public val messageRepository: MessageRepository
     public val usersRepository: UsersRepository
     public val generalSettingsRepository: GeneralSettingsRepository

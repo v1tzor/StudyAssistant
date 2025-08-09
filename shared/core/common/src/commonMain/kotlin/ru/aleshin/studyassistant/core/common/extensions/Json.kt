@@ -116,8 +116,22 @@ fun <T> String.tryFromJson(deserializer: DeserializationStrategy<T>): T? = try {
     null
 }
 
+inline fun <reified T> String.tryFromJson(): T? = try {
+    fromJson()
+} catch (e: Exception) {
+    e.printStackTrace()
+    null
+}
+
 fun <T> JsonElement.tryFromJson(deserializer: DeserializationStrategy<T>): T? = try {
     fromJson(deserializer)
+} catch (e: Exception) {
+    e.printStackTrace()
+    null
+}
+
+inline fun <reified T> T.tryToJson(): String? = try {
+    toJson()
 } catch (e: Exception) {
     e.printStackTrace()
     null

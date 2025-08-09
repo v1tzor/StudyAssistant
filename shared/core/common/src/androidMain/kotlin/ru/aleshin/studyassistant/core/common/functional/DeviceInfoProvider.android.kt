@@ -26,7 +26,7 @@ import ru.aleshin.studyassistant.core.common.platform.Platform
 /**
  * @author Stanislav Aleshin on 07.09.2024.
  */
-actual class DeviceInfoProvider(
+actual open class DeviceInfoProvider(
     private val applicationContext: Context,
 ) {
 

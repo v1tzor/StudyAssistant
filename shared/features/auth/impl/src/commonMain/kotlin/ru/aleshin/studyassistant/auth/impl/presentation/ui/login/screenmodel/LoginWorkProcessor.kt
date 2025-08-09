@@ -94,14 +94,16 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
             authInteractor.confirmOAuthLogin(session, device).handle(
                 onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
                 onRightAction = { result ->
-                    val targetScreen = if (result.isNewUser) {
-                        screenProvider.providePreviewScreen(PreviewScreen.Setup)
+                    if (result.isNewUser) {
+                        val screen = screenProvider.providePreviewScreen(PreviewScreen.Setup)
+                        emit(EffectResult(LoginEffect.ReplaceGlobalScreen(screen)))
                     } else if (!result.authUser.emailVerification) {
-                        screenProvider.provideFeatureScreen(AuthScreen.Verification)
+                        val screen = screenProvider.provideFeatureScreen(AuthScreen.Verification)
+                        emit(EffectResult(LoginEffect.NavigateToLocal(screen)))
                     } else {
-                        screenProvider.provideTabNavigationScreen()
+                        val screen = screenProvider.provideTabNavigationScreen()
+                        emit(EffectResult(LoginEffect.ReplaceGlobalScreen(screen)))
                     }
-                    emit(EffectResult(LoginEffect.ReplaceGlobalScreen(targetScreen)))
                 }
             )
         }.onStart {

@@ -37,7 +37,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.iap.IapProductTyp
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapServiceError
 import ru.aleshin.studyassistant.core.domain.entities.users.SubscribeInfo
-import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
@@ -51,40 +51,47 @@ internal interface PurchaseInteractor {
 
     class Base(
         private val iapService: IapService,
-        private val productsRepository: ProductsRepository,
+        private val subscriptionsRepository: SubscriptionsRepository,
         private val usersRepository: UsersRepository,
-        private val dataManager: DateManager,
+        private val dateManager: DateManager,
         private val deviceInfoProvider: DeviceInfoProvider,
         private val connectionManager: Konnection,
-        private val dateManager: DateManager,
         private val eitherWrapper: BillingEitherWrapper,
     ) : PurchaseInteractor {
 
         override suspend fun fetchProducts() = eitherWrapper.wrap {
             if (!connectionManager.isConnected()) throw InternetConnectionException()
 
-            val products = productsRepository.fetchProducts().first()
+            val products = subscriptionsRepository.fetchSubscriptionsIds().first()
+
             iapService.fetchProducts(products)
         }
 
         override suspend fun purchaseSubscription(productId: String) = eitherWrapper.wrapUnit {
             if (!connectionManager.isConnected()) throw InternetConnectionException()
 
-            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val currentUser = usersRepository.fetchCurrentUserOrError()
             val appUserProfile = checkNotNull(usersRepository.fetchCurrentUserProfile().firstOrNull())
+
+            if (appUserProfile.subscriptionInfo != null) {
+                val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+                val updateAppUser = appUserProfile.copy(subscriptionInfo = null, updatedAt = updatedAt)
+                usersRepository.updateCurrentUserProfile(updateAppUser)
+            }
+
             val productInfo = checkNotNull(iapService.fetchProducts(listOf(productId)).firstOrNull())
-            val params = IapProductPurchaseParams(
+            val purchaseParams = IapProductPurchaseParams(
                 productId = productId,
                 productType = IapProductType.SUBSCRIPTION,
                 developerPayload = currentUser.uid,
                 appUserId = currentUser.uid,
                 appUserEmail = appUserProfile.email,
             )
-            val purchaseResult = iapService.purchaseProduct(params)
+            val purchaseResult = iapService.purchaseProduct(purchaseParams)
+
             when (purchaseResult) {
                 is IapPaymentResultSuccess -> with(purchaseResult) {
-                    val currentTime = dataManager.fetchCurrentInstant().toEpochMilliseconds()
+                    val currentTime = dateManager.fetchCurrentInstant().toEpochMilliseconds()
                     val periodTime = productInfo.subscription?.subscriptionPeriod?.inMillis() ?: 0L
                     val subscriptionInfo = SubscribeInfo(
                         deviceId = deviceInfoProvider.fetchDeviceId(),
@@ -96,17 +103,24 @@ internal interface PurchaseInteractor {
                         expiryTimeMillis = currentTime + periodTime,
                         store = iapService.fetchStore(),
                     )
-                    val updateAppUser = appUserProfile.copy(subscriptionInfo = subscriptionInfo, updatedAt = updatedAt)
+                    val updateAppUser = appUserProfile.copy(
+                        subscriptionInfo = subscriptionInfo,
+                        updatedAt = currentTime
+                    )
                     usersRepository.updateCurrentUserProfile(updateAppUser)
                 }
 
                 is IapPaymentResultCancelled -> {
-                    purchaseResult.purchaseId?.let { iapService.deletePurchase(it) }
+                    purchaseResult.purchaseId?.let {
+                        try { iapService.deletePurchase(it) } catch (_: Exception) {}
+                    }
                     throw IapServiceError(IapFailure.UserCancelled)
                 }
 
                 is IapPaymentResultFailure -> {
-                    purchaseResult.purchaseId?.let { iapService.deletePurchase(it) }
+                    purchaseResult.purchaseId?.let {
+                        try { iapService.deletePurchase(it) } catch (_: Exception) {}
+                    }
                     throw IapServiceError(purchaseResult.failure)
                 }
 

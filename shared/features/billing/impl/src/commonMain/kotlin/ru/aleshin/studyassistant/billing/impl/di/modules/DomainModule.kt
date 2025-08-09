@@ -31,6 +31,6 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<BillingErrorHandler> { BillingErrorHandler.Base() }
     bindSingleton<BillingEitherWrapper> { BillingEitherWrapper.Base(instance(), instance()) }
 
-    bindSingleton<PurchaseInteractor> { PurchaseInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<PurchaseInteractor> { PurchaseInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance()) }
 }

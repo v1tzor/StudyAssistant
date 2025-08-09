@@ -55,7 +55,7 @@ class EmployeeRepositoryImpl(
 
     override suspend fun addOrUpdateEmployee(employee: Employee): UID {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModel = employee.copy(uid = employee.uid.ifBlank { randomUUID() })
 
@@ -77,7 +77,7 @@ class EmployeeRepositoryImpl(
 
     override suspend fun addOrUpdateEmployeeGroup(employees: List<Employee>) {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModels = employees.map { it.copy(uid = it.uid.ifBlank { randomUUID() }) }
 
@@ -100,7 +100,7 @@ class EmployeeRepositoryImpl(
     }
 
     override suspend fun fetchEmployeeById(uid: UID): Flow<Employee?> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchItemById(uid).map { it?.mapToDomain() }
             } else {
@@ -109,7 +109,7 @@ class EmployeeRepositoryImpl(
         }
     }
     override suspend fun fetchAllEmployeeByOrganization(organizationId: UID): Flow<List<Employee>> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchAllEmployeeByOrganization(organizationId).map { employees ->
                     employees.map { employeeEntity -> employeeEntity.mapToDomain() }
@@ -123,7 +123,7 @@ class EmployeeRepositoryImpl(
     }
 
     override suspend fun deleteEmployee(targetId: UID) {
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         return if (isSubscriber) {
             localDataSource.sync().deleteItemsById(listOf(targetId))

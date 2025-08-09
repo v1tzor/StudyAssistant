@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.settings.impl.presentation.models.billing
+package ru.aleshin.studyassistant.core.remote.api.billing
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-
-/**
- * @author Stanislav Aleshin on 19.06.2025.
- */
-@Parcelize
-internal data class SubscriptionUi(
-    val purchaseId: String?,
-    val productId: String,
-    val purchaseTime: Long?,
-    val amountLabel: String?,
-    val currency: String?,
-    val title: String?,
-    val description: String?,
-    val subscriptionPeriod: Long?,
-    val expiryTime: Long,
-    val isActive: Boolean,
-    val subscriptionToken: String?,
-) : Parcelable
+actual class SignatureGenerator {
+    actual companion object {
+        actual fun generateSignature(
+            keyId: String,
+            privateKeyContent: String
+        ): String {
+            TODO("Not yet implemented")
+        }
+    }
+}

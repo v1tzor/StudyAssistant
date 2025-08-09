@@ -57,7 +57,7 @@ class DailyGoalsRepositoryImpl(
 
     override suspend fun addOrUpdateGoal(goal: Goal): UID {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModel = goal.copy(uid = goal.uid.ifBlank { randomUUID() })
 
@@ -79,7 +79,7 @@ class DailyGoalsRepositoryImpl(
 
     override suspend fun addDailyDailyGoals(dailyGoals: List<Goal>) {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModels = dailyGoals.map { goal -> goal.copy(uid = goal.uid.ifBlank { randomUUID() }) }
 
@@ -98,7 +98,7 @@ class DailyGoalsRepositoryImpl(
     }
 
     override suspend fun fetchGoalById(uid: UID): Flow<Goal?> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchGoalDetailsById(uid).map { goal ->
                     goal?.mapToDomain()
@@ -112,7 +112,7 @@ class DailyGoalsRepositoryImpl(
     }
 
     override suspend fun fetchGoalByContentId(contentId: UID): Flow<Goal?> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchGoalDetailsByContentId(contentId).map { goal ->
                     goal?.mapToDomain()
@@ -129,7 +129,7 @@ class DailyGoalsRepositoryImpl(
         val from = timeRange.from.toEpochMilliseconds()
         val to = timeRange.to.toEpochMilliseconds()
 
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchGoalsDetailsByTimeRange(from, to).map { goals ->
                     goals.map { goal -> goal.mapToDomain() }
@@ -146,7 +146,7 @@ class DailyGoalsRepositoryImpl(
         val from = timeRange.from.toEpochMilliseconds()
         val to = timeRange.to.toEpochMilliseconds()
 
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchShortGoalsByTimeRange(from, to).map { goals ->
                     goals.map { it.mapToDomain() }
@@ -160,7 +160,7 @@ class DailyGoalsRepositoryImpl(
     }
 
     override suspend fun fetchShortActiveDailyGoals(): Flow<List<GoalShort>> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchShortActiveDailyGoals().map { goals ->
                     goals.map { it.mapToDomain() }
@@ -176,7 +176,7 @@ class DailyGoalsRepositoryImpl(
     override suspend fun fetchOverdueDailyGoals(currentDate: Instant): Flow<List<Goal>> {
         val date = currentDate.toEpochMilliseconds()
 
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchOverdueGoalsDetails(date).map { goals ->
                     goals.map { it.mapToDomain() }
@@ -192,7 +192,7 @@ class DailyGoalsRepositoryImpl(
     override suspend fun fetchDailyGoalsByDate(date: Instant): Flow<List<Goal>> {
         val targetDate = date.toEpochMilliseconds()
 
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchGoalDetailsByDate(targetDate).map { goals ->
                     goals.map { it.mapToDomain() }
@@ -206,7 +206,7 @@ class DailyGoalsRepositoryImpl(
     }
 
     override suspend fun deleteGoal(uid: UID) {
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         return if (isSubscriber) {
             localDataSource.sync().deleteItemsById(listOf(uid))

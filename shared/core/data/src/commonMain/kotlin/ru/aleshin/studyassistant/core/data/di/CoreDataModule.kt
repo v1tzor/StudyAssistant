@@ -65,10 +65,10 @@ import ru.aleshin.studyassistant.core.data.repositories.ManageUserRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.MessageRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.NotificationSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.OrganizationsRepositoryImpl
-import ru.aleshin.studyassistant.core.data.repositories.ProductsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ShareHomeworksRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ShareSchedulesRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.SubjectsRepositoryImpl
+import ru.aleshin.studyassistant.core.data.repositories.SubscriptionsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.TodoRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.UsersRepositoryImpl
 import ru.aleshin.studyassistant.core.data.utils.SubscriptionChecker
@@ -104,10 +104,10 @@ import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.core.remote.di.coreRemoteModule
@@ -119,7 +119,7 @@ val coreDataModule = DI.Module("CoreData") {
     importAll(coreDataPlatformModule, coreDatabaseModule, coreRemoteModule, coreClintApiModule)
 
     bindSingleton<RemoteResultSyncHandler> { RemoteResultSyncHandler.Base(instance(), instance()) }
-    bindSingleton<SubscriptionChecker> { SubscriptionChecker.Base(instance(), instance(), instance()) }
+    bindSingleton<SubscriptionChecker> { SubscriptionChecker.Base(instance(), instance()) }
 
     bindSingleton<TodoSyncMapper> { TodoSyncMapper() }
     bindSingleton<TodoSourceSyncManager> { TodoSourceSyncManagerImpl(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
@@ -185,7 +185,7 @@ val coreDataModule = DI.Module("CoreData") {
 
     bindSingleton<AuthRepository> { AuthRepositoryImpl(instance()) }
     bindSingleton<ManageUserRepository> { ManageUserRepositoryImpl(instance()) }
-    bindSingleton<ProductsRepository> { ProductsRepositoryImpl(instance()) }
+    bindSingleton<SubscriptionsRepository> { SubscriptionsRepositoryImpl(instance()) }
     bindSingleton<MessageRepository> { MessageRepositoryImpl(instance()) }
 
     bindProvider<TodoReminderManager> { TodoReminderManagerImpl(instance(), instance(), instance()) }

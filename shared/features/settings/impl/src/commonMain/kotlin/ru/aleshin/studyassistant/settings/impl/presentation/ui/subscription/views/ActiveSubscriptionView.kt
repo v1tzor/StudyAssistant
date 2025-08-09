@@ -100,8 +100,8 @@ internal fun ActiveSubscriptionView(
                                     SubscriptionView(
                                         title = subscription.title,
                                         description = subscription.description,
-                                        status = subscription.status,
-                                        purchaseTime = subscription.purchaseTime,
+                                        isActive = subscription.isActive,
+                                        expiryTime = subscription.expiryTime,
                                         price = subscription.amountLabel,
                                     )
                                 }
@@ -216,10 +216,10 @@ internal fun NoneSubscriptionView(
 @Composable
 internal fun SubscriptionView(
     modifier: Modifier = Modifier,
-    title: String,
+    title: String?,
     description: String?,
-    status: IapPurchaseStatus?,
-    purchaseTime: Long?,
+    isActive: Boolean,
+    expiryTime: Long?,
     price: String?,
 ) {
     Surface(
@@ -236,7 +236,7 @@ internal fun SubscriptionView(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = title,
+                        text = title ?: SettingsThemeRes.strings.undefinedSubscriptionTitle,
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.titleMedium,
                     )
@@ -272,7 +272,11 @@ internal fun SubscriptionView(
                                 color = MaterialTheme.colorScheme.primary
                             ).toSpanStyle()
                         ) {
-                            append(status?.mapToString(coreStrings) ?: "-")
+                            if (isActive) {
+                                append(IapPurchaseStatus.CONFIRMED.mapToString(coreStrings))
+                            } else {
+                                append(IapPurchaseStatus.EXPIRED.mapToString(coreStrings))
+                            }
                         }
                     },
                     color = MaterialTheme.colorScheme.onSurface,
@@ -283,13 +287,13 @@ internal fun SubscriptionView(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = buildAnnotatedString {
-                        append(SettingsThemeRes.strings.subscriptionPurchaseTimeSuffix)
+                        append(SettingsThemeRes.strings.subscriptionExpiryTimeSuffix)
                         withStyle(
                             style = MaterialTheme.typography.labelLarge.copy(
                                 color = MaterialTheme.colorScheme.primary
                             ).toSpanStyle()
                         ) {
-                            val date = purchaseTime?.mapEpochTimeToInstant()?.formatByTimeZone(
+                            val date = expiryTime?.mapEpochTimeToInstant()?.formatByTimeZone(
                                 format = DateTimeComponents.Formats.dayMonthYearFormat()
                             )
                             append(date ?: "-")

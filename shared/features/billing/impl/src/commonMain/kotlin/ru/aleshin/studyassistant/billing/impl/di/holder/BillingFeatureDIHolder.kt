@@ -36,7 +36,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
@@ -51,7 +51,7 @@ public object BillingFeatureDIHolder : BaseFeatureDIHolder<BillingFeatureApi, Bi
             val di = DI {
                 importAll(navigationModule, presentationModule, domainModule)
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
-                bindSingleton<ProductsRepository> { dependencies.productsRepository }
+                bindSingleton<SubscriptionsRepository> { dependencies.subscriptionsRepository }
                 bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }

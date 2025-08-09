@@ -16,53 +16,41 @@
 
 package ru.aleshin.studyassistant.core.data.utils
 
-import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.Constants
-import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.database.mappers.user.convertToDetails
-import ru.aleshin.studyassistant.core.database.mappers.user.mapToBase
-import ru.aleshin.studyassistant.core.database.models.users.BaseAppUserEntity
-import ru.aleshin.studyassistant.sqldelight.user.CurrentUserQueries
-import kotlin.coroutines.CoroutineContext
+import ru.aleshin.studyassistant.core.database.datasource.user.UserLocalDataSource
+import ru.aleshin.studyassistant.core.database.models.users.AppUserDetailsEntity
 
 /**
  * @author Stanislav Aleshin on 30.04.2024.
  */
 interface SubscriptionChecker {
 
-    suspend fun getSubscriberStatus(): Boolean
+    suspend fun getSubscriptionActive(): Boolean
 
-    suspend fun getSubscriberStatusFlow(): Flow<Boolean>
+    suspend fun getSubscriptionActiveFlow(): Flow<Boolean>
 
     class Base(
-        private val currentUserStorage: CurrentUserQueries,
-        private val coroutineManager: CoroutineManager,
+        private val currentUserStorage: UserLocalDataSource,
         private val dateManager: DateManager,
     ) : SubscriptionChecker {
 
-        private val coroutineContext: CoroutineContext
-            get() = coroutineManager.backgroundDispatcher
-
-        override suspend fun getSubscriberStatus(): Boolean {
-            val currentUser = currentUserStorage.fetchUser().awaitAsOneOrNull()
-            return isActiveSubscription(currentUser?.mapToBase())
+        override suspend fun getSubscriptionActive(): Boolean {
+            val currentUser = currentUserStorage.fetchCurrentUserDetails().first()
+            return isActiveSubscription(currentUser)
         }
 
-        override suspend fun getSubscriberStatusFlow(): Flow<Boolean> {
-            val currentUserFlow = currentUserStorage.fetchUser().asFlow().mapToOneOrNull(coroutineContext)
-            return currentUserFlow.map { currentUser ->
-                isActiveSubscription(currentUser?.mapToBase())
-            }.distinctUntilChanged()
+        override suspend fun getSubscriptionActiveFlow(): Flow<Boolean> {
+            val currentUserFlow = currentUserStorage.fetchCurrentUserDetails()
+            return currentUserFlow.map { currentUser -> isActiveSubscription(currentUser) }.distinctUntilChanged()
         }
 
-        private fun isActiveSubscription(currentUser: BaseAppUserEntity?): Boolean {
-            val subscriptionInfo = currentUser?.convertToDetails()?.subscriptionInfo
+        private fun isActiveSubscription(currentUser: AppUserDetailsEntity?): Boolean {
+            val subscriptionInfo = currentUser?.subscriptionInfo
             return if (subscriptionInfo != null) {
                 val gracePeriod = Constants.Date.MILLIS_IN_DAY * Constants.Date.DAYS_IN_WEEK
                 val endTime = subscriptionInfo.expiryTimeMillis + gracePeriod

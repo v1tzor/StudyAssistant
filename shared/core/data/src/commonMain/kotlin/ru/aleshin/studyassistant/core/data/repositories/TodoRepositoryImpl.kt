@@ -58,7 +58,7 @@ class TodoRepositoryImpl(
 
     override suspend fun addOrUpdateTodo(todo: Todo): UID {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModel = todo.copy(uid = todo.uid.ifBlank { randomUUID() })
 
@@ -79,7 +79,7 @@ class TodoRepositoryImpl(
     }
 
     override suspend fun fetchTodoById(uid: UID): Flow<Todo?> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchItemById(uid).map { it?.mapToDomain() }
             } else {
@@ -92,7 +92,7 @@ class TodoRepositoryImpl(
         val timeStart = date.startThisDay().toEpochMilliseconds()
         val timeEnd = date.endThisDay().toEpochMilliseconds()
 
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchTodosByTimeRange(timeStart, timeEnd).map { todos ->
                     todos.map { todoEntity -> todoEntity.mapToDomain() }
@@ -109,7 +109,7 @@ class TodoRepositoryImpl(
         val timeStart = timeRange.from.toEpochMilliseconds()
         val timeEnd = timeRange.to.toEpochMilliseconds()
 
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchTodosByTimeRange(timeStart, timeEnd).map { todos ->
                     todos.map { todoEntity -> todoEntity.mapToDomain() }
@@ -123,7 +123,7 @@ class TodoRepositoryImpl(
     }
 
     override suspend fun fetchActiveTodos(): Flow<List<Todo>> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchActiveTodos().map { todos ->
                     todos.map { todoEntity -> todoEntity.mapToDomain() }
@@ -140,7 +140,7 @@ class TodoRepositoryImpl(
         val timeStart = completeTimeRange?.from?.toEpochMilliseconds()
         val timeEnd = completeTimeRange?.to?.toEpochMilliseconds()
 
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchCompletedTodos(timeStart, timeEnd).map { todos ->
                     todos.map { todoEntity -> todoEntity.mapToDomain() }
@@ -156,7 +156,7 @@ class TodoRepositoryImpl(
     override suspend fun fetchOverdueTodos(currentDate: Instant): Flow<List<Todo>> {
         val date = currentDate.endThisDay().toEpochMilliseconds()
 
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchOverdueTodos(date).map { todos ->
                     todos.map { todoEntity -> todoEntity.mapToDomain() }
@@ -170,7 +170,7 @@ class TodoRepositoryImpl(
     }
 
     override suspend fun deleteTodo(uid: UID) {
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         return if (isSubscriber) {
             localDataSource.sync().deleteItemsById(listOf(uid))

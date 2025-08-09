@@ -14,25 +14,14 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.settings.impl.presentation.models.billing
+package ru.aleshin.studyassistant.core.remote.api.billing
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import ru.aleshin.studyassistant.core.domain.entities.billing.SubscriptionIdentifier
+import ru.aleshin.studyassistant.core.remote.models.billing.SubscriptionStatusPojo
 
 /**
- * @author Stanislav Aleshin on 19.06.2025.
+ * @author Stanislav Aleshin on 08.08.2025.
  */
-@Parcelize
-internal data class SubscriptionUi(
-    val purchaseId: String?,
-    val productId: String,
-    val purchaseTime: Long?,
-    val amountLabel: String?,
-    val currency: String?,
-    val title: String?,
-    val description: String?,
-    val subscriptionPeriod: Long?,
-    val expiryTime: Long,
-    val isActive: Boolean,
-    val subscriptionToken: String?,
-) : Parcelable
+interface SubscriptionStatusProvider<I : SubscriptionIdentifier> {
+    suspend fun fetchStatus(identifier: I): SubscriptionStatusPojo
+}

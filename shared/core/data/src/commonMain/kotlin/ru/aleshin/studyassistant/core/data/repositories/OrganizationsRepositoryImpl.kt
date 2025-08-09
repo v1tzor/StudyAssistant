@@ -56,7 +56,7 @@ class OrganizationsRepositoryImpl(
 
     override suspend fun addOrUpdateOrganization(organization: Organization): UID {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModel = organization.copy(uid = organization.uid.ifBlank { randomUUID() })
 
@@ -78,7 +78,7 @@ class OrganizationsRepositoryImpl(
 
     override suspend fun addOrUpdateOrganizationsGroup(organizations: List<Organization>) {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModels = organizations.map { subject ->
             subject.copy(uid = subject.uid.ifBlank { randomUUID() })
@@ -103,7 +103,7 @@ class OrganizationsRepositoryImpl(
     }
 
     override suspend fun fetchOrganizationById(uid: UID): Flow<Organization?> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchOrganizationDetailsById(uid).map { organizationEntity ->
                     organizationEntity?.mapToDomain()
@@ -117,7 +117,7 @@ class OrganizationsRepositoryImpl(
     }
 
     override suspend fun fetchOrganizationsById(uid: List<UID>): Flow<List<Organization>> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchOrganizationsDetailsById(uid).map { organizations ->
                     organizations.map { organizationEntity -> organizationEntity.mapToDomain() }
@@ -131,7 +131,7 @@ class OrganizationsRepositoryImpl(
     }
 
     override suspend fun fetchShortOrganizationById(uid: UID): Flow<OrganizationShort?> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchShortOrganizationById(uid).map { organizationEntity ->
                     organizationEntity?.mapToDomain()
@@ -145,7 +145,7 @@ class OrganizationsRepositoryImpl(
     }
 
     override suspend fun fetchAllOrganization(): Flow<List<Organization>> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchAllOrganizationDetails().map { organizations ->
                     organizations.map { organizationEntity -> organizationEntity.mapToDomain() }
@@ -159,7 +159,7 @@ class OrganizationsRepositoryImpl(
     }
 
     override suspend fun fetchAllShortOrganization(): Flow<List<OrganizationShort>> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchAllShortOrganization().map { organizations ->
                     organizations.map { organizationEntity -> organizationEntity.mapToDomain() }

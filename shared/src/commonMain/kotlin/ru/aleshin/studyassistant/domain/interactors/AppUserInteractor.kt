@@ -22,8 +22,6 @@ import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
-import ru.aleshin.studyassistant.core.common.extensions.equalsDay
-import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
@@ -36,10 +34,12 @@ import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPurchaseSt
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapServiceAvailability
 import ru.aleshin.studyassistant.core.common.wrappers.EitherWrapper.Abstract.Companion.ERROR_TAG
+import ru.aleshin.studyassistant.core.domain.entities.billing.fetchIdentifier
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.AuthUser
 import ru.aleshin.studyassistant.core.domain.entities.users.SubscribeInfo
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.domain.common.MainEitherWrapper
 import ru.aleshin.studyassistant.domain.entities.MainFailures
@@ -58,6 +58,7 @@ interface AppUserInteractor {
 
     class Base(
         private val iapService: IapService,
+        private val subscriptionsRepository: SubscriptionsRepository,
         private val usersRepository: UsersRepository,
         private val messagingRepository: MessageRepository,
         private val deviceInfoProvider: DeviceInfoProvider,
@@ -89,92 +90,97 @@ interface AppUserInteractor {
         }
 
         override suspend fun updateUserSubscriptionInfo() = eitherWrapper.wrap {
+            val currentTime = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val currentUser = usersRepository.fetchCurrentAuthUser()
-            val isAvailability = iapService.fetchServiceAvailability()
-            val isAuth = iapService.isAuthorizedUser()
-
-            val allPurchases = if (isAuth && isAvailability is IapServiceAvailability.Available) {
-                try {
-                    iapService.fetchPurchases()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    return@wrap
-                }
-            } else {
-                emptyList()
-            }
 
             if (currentUser != null) {
                 val appUserInfo = usersRepository.fetchCurrentUserProfile().first() ?: return@wrap
-                val currentSubscriptionInfo = appUserInfo.subscriptionInfo
+                val subscriptionInfo = appUserInfo.subscriptionInfo
 
-                val activePurchase = allPurchases.find { product ->
-                    val statusFilter = product.status == CONFIRMED || product.status == PAID
-                    val payloadFilter = product.developerPayload == currentUser.uid
-                    val purchaseIdFilter = product.purchaseId == currentSubscriptionInfo?.purchaseId
-                    return@find statusFilter && (payloadFilter || purchaseIdFilter)
+                val isAvailability = iapService.fetchServiceAvailability()
+                val isAuth = iapService.isAuthorizedUser()
+
+                val allPurchases = if (isAuth && isAvailability is IapServiceAvailability.Available) {
+                    try {
+                        iapService.fetchPurchases().filter { it.developerPayload == currentUser.uid }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        return@wrap
+                    }
+                } else {
+                    emptyList()
                 }
 
-                if (activePurchase != null) {
-                    val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-                    val productInfo = try {
-                        iapService.fetchProducts(ids = listOf(activePurchase.productId)).firstOrNull()
-                    } catch (_: Exception) {
-                        null
-                    }
-                    val subscriptionPeriod = productInfo?.subscription?.subscriptionPeriod
-                    val startTime = activePurchase.purchaseTime
-
-                    if (subscriptionPeriod != null && startTime != null) {
-                        val endTime = (startTime + subscriptionPeriod.inMillis()).mapEpochTimeToInstant()
-
-                        if (currentSubscriptionInfo != null) {
-                            val currentExpiryTime = currentSubscriptionInfo.expiryTimeMillis.mapEpochTimeToInstant()
-                            if (!currentExpiryTime.equalsDay(endTime) && endTime > currentExpiryTime) {
-                                try {
-                                    iapService.confirmSubscribe(
-                                        subscriptionId = activePurchase.productId,
-                                        subscriptionToken = checkNotNull(activePurchase.subscriptionToken) {
-                                            "For confirm subscribe subscriptionToken required not null"
-                                        },
-                                    )
-                                } catch (e: Exception) {
-                                    crashlyticsService.recordException(ERROR_TAG, e.message ?: "", e)
-                                }
-                                val updatedSubscriptionInfo = currentSubscriptionInfo.copy(
-                                    purchaseId = activePurchase.purchaseId
-                                        ?: currentSubscriptionInfo.purchaseId,
-                                    productId = activePurchase.productId,
-                                    subscriptionToken = activePurchase.subscriptionToken
-                                        ?: currentSubscriptionInfo.subscriptionToken,
-                                    orderId = activePurchase.orderId
-                                        ?: currentSubscriptionInfo.orderId,
-                                    startTimeMillis = startTime,
-                                    expiryTimeMillis = endTime.toEpochMilliseconds(),
-                                )
-                                val updatedAppUser = appUserInfo.copy(
-                                    subscriptionInfo = updatedSubscriptionInfo,
-                                    updatedAt = updatedAt,
-                                )
-                                usersRepository.updateCurrentUserProfile(updatedAppUser)
-                            }
-                        } else {
-                            val updatedSubscriptionInfo = SubscribeInfo(
-                                deviceId = deviceInfoProvider.fetchDeviceId(),
-                                purchaseId = checkNotNull(activePurchase.purchaseId),
-                                productId = activePurchase.productId,
-                                subscriptionToken = activePurchase.subscriptionToken,
-                                orderId = activePurchase.orderId,
-                                startTimeMillis = startTime,
-                                expiryTimeMillis = endTime.toEpochMilliseconds(),
-                                store = iapService.fetchStore(),
-                            )
-                            val updatedAppUser = appUserInfo.copy(
-                                subscriptionInfo = updatedSubscriptionInfo,
-                                updatedAt = updatedAt,
-                            )
-                            usersRepository.updateCurrentUserProfile(updatedAppUser)
+                if (subscriptionInfo != null) {
+                    val identifier = subscriptionInfo.fetchIdentifier() ?: return@wrap
+                    val actualStatus = subscriptionsRepository.fetchSubscriptionStatus(identifier) ?: return@wrap
+                    if (actualStatus.expiryTimeMillis > subscriptionInfo.expiryTimeMillis) {
+                        val activePurchase = allPurchases.find { product ->
+                            product.subscriptionToken == subscriptionInfo.subscriptionToken
                         }
+                        val updatedSubscriptionInfo = subscriptionInfo.copy(
+                            expiryTimeMillis = actualStatus.expiryTimeMillis,
+                            orderId = activePurchase?.orderId ?: subscriptionInfo.orderId
+                        )
+                        val updatedAppUser = appUserInfo.copy(
+                            subscriptionInfo = updatedSubscriptionInfo,
+                            updatedAt = currentTime,
+                        )
+                        usersRepository.updateCurrentUserProfile(updatedAppUser)
+                    }
+                } else {
+                    val activePurchase = allPurchases.find { product ->
+                        product.status == CONFIRMED || product.status == PAID
+                    }
+                    if (activePurchase != null) {
+                        val identifier = activePurchase.fetchIdentifier(iapService.fetchStore())
+                        val actualStatus = identifier?.let { subscriptionsRepository.fetchSubscriptionStatus(it) }
+
+                        val startTime = activePurchase.purchaseTime ?: currentTime
+                        val expiryTime = if (actualStatus != null) {
+                            actualStatus.expiryTimeMillis
+                        } else {
+                            val productInfo = try {
+                                iapService.fetchProducts(ids = listOf(activePurchase.productId)).firstOrNull()
+                            } catch (_: Exception) {
+                                null
+                            }
+                            val subscriptionPeriod = productInfo?.subscription?.subscriptionPeriod
+                            if (subscriptionPeriod != null) {
+                                startTime + subscriptionPeriod.inMillis()
+                            } else {
+                                null
+                            }
+                        }
+
+                        if (activePurchase.purchaseId == null) {
+                            val message = "PurchaseId time must be not null for purchase: $activePurchase"
+                            val error = NullPointerException(message)
+                            crashlyticsService.recordException(ERROR_TAG, message, error)
+                            return@wrap
+                        }
+                        if (expiryTime == null) {
+                            val message = "Expiry time must be not null for purchase: $activePurchase"
+                            val error = NullPointerException(message)
+                            crashlyticsService.recordException(ERROR_TAG, message, error)
+                            return@wrap
+                        }
+
+                        val updatedSubscriptionInfo = SubscribeInfo(
+                            deviceId = deviceInfoProvider.fetchDeviceId(),
+                            purchaseId = checkNotNull(activePurchase.purchaseId),
+                            productId = activePurchase.productId,
+                            subscriptionToken = activePurchase.subscriptionToken,
+                            orderId = activePurchase.orderId,
+                            startTimeMillis = startTime,
+                            expiryTimeMillis = expiryTime,
+                            store = iapService.fetchStore(),
+                        )
+                        val updatedAppUser = appUserInfo.copy(
+                            subscriptionInfo = updatedSubscriptionInfo,
+                            updatedAt = currentTime,
+                        )
+                        usersRepository.updateCurrentUserProfile(updatedAppUser)
                     }
                 }
             }

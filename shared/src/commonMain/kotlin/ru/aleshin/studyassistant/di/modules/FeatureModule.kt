@@ -61,10 +61,10 @@ import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
@@ -149,6 +149,7 @@ val featureModule = DI.Module("Feature") {
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val messageRepository = instance<MessageRepository>()
             override val manageUserRepository = instance<ManageUserRepository>()
+            override val subscriptionsRepository = instance<SubscriptionsRepository>()
             override val accountService = instance<AccountService>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
@@ -338,7 +339,7 @@ val featureModule = DI.Module("Feature") {
     bindEagerSingleton<SettingsFeatureDependencies> {
         object : SettingsFeatureDependencies {
             override val billingFeatureStarter = provider<BillingFeatureStarter>()
-            override val productsRepository = instance<ProductsRepository>()
+            override val subscriptionsRepository = instance<SubscriptionsRepository>()
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
@@ -373,7 +374,7 @@ val featureModule = DI.Module("Feature") {
     bindEagerSingleton<BillingFeatureDependencies> {
         object : BillingFeatureDependencies {
             override val usersRepository = instance<UsersRepository>()
-            override val productsRepository = instance<ProductsRepository>()
+            override val subscriptionsRepository = instance<SubscriptionsRepository>()
             override val manageUserRepository = instance<ManageUserRepository>()
             override val dateManager = instance<DateManager>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()

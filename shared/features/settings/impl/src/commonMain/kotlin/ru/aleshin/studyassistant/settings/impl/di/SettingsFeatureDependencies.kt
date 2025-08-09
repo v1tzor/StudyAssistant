@@ -36,8 +36,8 @@ import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsReposit
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
@@ -46,7 +46,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
  */
 public interface SettingsFeatureDependencies : BaseFeatureDependencies {
     public val billingFeatureStarter: () -> BillingFeatureStarter
-    public val productsRepository: ProductsRepository
+    public val subscriptionsRepository: SubscriptionsRepository
     public val generalSettingsRepository: GeneralSettingsRepository
     public val calendarSettingsRepository: CalendarSettingsRepository
     public val notificationSettingsRepository: NotificationSettingsRepository

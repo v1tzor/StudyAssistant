@@ -17,53 +17,38 @@
 package ru.aleshin.studyassistant.settings.impl.domain.entities
 
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapProduct
-import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPurchase
-import ru.aleshin.studyassistant.core.common.platform.services.iap.IapPurchaseStatus
 import ru.aleshin.studyassistant.core.domain.entities.users.SubscribeInfo
 
 /**
  * @author Stanislav Aleshin on 19.06.2025.
  */
-internal data class Subscription(
+internal data class PurchasedSubscription(
     val purchaseId: String?,
     val productId: String,
+    val subscriptionToken: String?,
+    val expiryTime: Long,
     val purchaseTime: Long?,
-    val amountLabel: String?,
+    val isActive: Boolean,
     val currency: String?,
-    val title: String,
+    val amountLabel: String?,
+    val title: String?,
     val description: String?,
     val subscriptionPeriod: Long?,
-    val status: IapPurchaseStatus?,
-    val subscriptionToken: String?,
 )
 
 internal fun SubscribeInfo.convertToDetails(
-    purchase: IapPurchase?,
+    isActive: Boolean,
     product: IapProduct?,
-) = Subscription(
+) = PurchasedSubscription(
     purchaseId = purchaseId,
     productId = productId,
+    subscriptionToken = subscriptionToken,
     purchaseTime = startTimeMillis,
+    expiryTime = expiryTimeMillis,
+    isActive = isActive,
     amountLabel = product?.amountLabel,
     currency = product?.currency,
-    title = product?.title ?: "Subscribe",
+    title = product?.title,
     description = product?.description,
     subscriptionPeriod = product?.subscription?.subscriptionPeriod?.inMillis(),
-    status = purchase?.status,
-    subscriptionToken = subscriptionToken,
-)
-
-internal fun IapPurchase.convertToDetails(
-    product: IapProduct?,
-) = Subscription(
-    purchaseId = purchaseId,
-    productId = productId,
-    purchaseTime = purchaseTime,
-    amountLabel = amountLabel ?: product?.amountLabel,
-    currency = currency ?: product?.currency,
-    title = product?.title ?: "Subscribe",
-    description = product?.description ?: description,
-    subscriptionPeriod = product?.subscription?.subscriptionPeriod?.inMillis(),
-    status = status,
-    subscriptionToken = subscriptionToken,
 )

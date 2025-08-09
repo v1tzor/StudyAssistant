@@ -107,7 +107,7 @@ class UsersRepositoryImpl(
     }
 
     override suspend fun fetchCurrentUserPaidStatus(): Flow<Boolean> {
-        return subscriptionChecker.getSubscriberStatusFlow()
+        return subscriptionChecker.getSubscriptionActiveFlow()
     }
 
     override suspend fun fetchExistRemoteDataStatus(): Flow<Boolean> {

@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.core.domain.entities.auth.AuthCredentials
 import ru.aleshin.studyassistant.core.domain.entities.auth.ForgotCredentials
 import ru.aleshin.studyassistant.core.domain.entities.users.AppUser
 import ru.aleshin.studyassistant.core.domain.entities.users.AuthUser
+import ru.aleshin.studyassistant.core.domain.entities.users.SubscribeInfo
 import ru.aleshin.studyassistant.core.domain.entities.users.UserDevice
 import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
 import ru.aleshin.studyassistant.core.domain.managers.sync.SourceSyncFacade
@@ -37,6 +38,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
@@ -56,6 +58,7 @@ internal interface AuthInteractor {
 
     class Base(
         private val authRepository: AuthRepository,
+        private val subscriptionsRepository: SubscriptionsRepository,
         private val usersRepository: UsersRepository,
         private val messageRepository: MessageRepository,
         private val manageUserRepository: ManageUserRepository,
@@ -88,17 +91,23 @@ internal interface AuthInteractor {
                 crashlyticsService.setupUser(userSession.id)
                 sourceSyncFacade.syncAllSource()
 
-                if (userInfo.devices.find { it.deviceId == device.deviceId } == null) {
-                    val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-                    val updatedUserInfo = userInfo.copy(
-                        updatedAt = updatedAt,
-                        devices = buildList {
-                            addAll(userInfo.devices)
+                val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+                val subscriptionInfo = userInfo.subscriptionInfo
+                val updatedUserInfo = userInfo.copy(
+                    updatedAt = updatedAt,
+                    subscriptionInfo = if (subscriptionInfo != null) {
+                        refreshSubscriptionInfo(subscriptionInfo)
+                    } else {
+                        null
+                    },
+                    devices = buildList {
+                        addAll(userInfo.devices)
+                        if (userInfo.devices.find { it.deviceId == device.deviceId } == null) {
                             add(device)
-                        },
-                    )
-                    usersRepository.updateCurrentUserProfile(updatedUserInfo)
-                }
+                        }
+                    },
+                )
+                usersRepository.updateCurrentUserProfile(updatedUserInfo)
             }
 
             return@wrap authUser
@@ -112,6 +121,25 @@ internal interface AuthInteractor {
 
             return@wrap if (userInfo != null) {
                 sourceSyncFacade.syncAllSource()
+
+                val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+                val subscriptionInfo = userInfo.subscriptionInfo
+                val updatedUserInfo = userInfo.copy(
+                    updatedAt = updatedAt,
+                    subscriptionInfo = if (subscriptionInfo != null) {
+                        refreshSubscriptionInfo(subscriptionInfo)
+                    } else {
+                        null
+                    },
+                    devices = buildList {
+                        addAll(userInfo.devices)
+                        if (userInfo.devices.find { it.deviceId == device.deviceId } == null) {
+                            add(device)
+                        }
+                    },
+                )
+                usersRepository.updateCurrentUserProfile(updatedUserInfo)
+
                 AuthResult(authUser = authUser, isNewUser = false)
             } else {
                 val newUserInfo = AppUser.createNewUser(
@@ -194,6 +222,19 @@ internal interface AuthInteractor {
             crashlyticsService.setupUser(null)
             authRepository.signOut()
             messageRepository.deleteToken()
+        }
+
+        private suspend fun refreshSubscriptionInfo(subscribeInfo: SubscribeInfo): SubscribeInfo {
+            val identifier = subscribeInfo.fetchIdentifier() ?: return subscribeInfo
+            val actualStatus = subscriptionsRepository.fetchSubscriptionStatus(identifier) ?: return subscribeInfo
+
+            return subscribeInfo.copy(
+                expiryTimeMillis = if (actualStatus.expiryTimeMillis > subscribeInfo.expiryTimeMillis) {
+                    actualStatus.expiryTimeMillis
+                } else {
+                    subscribeInfo.expiryTimeMillis
+                },
+            )
         }
     }
 }

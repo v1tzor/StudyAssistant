@@ -54,7 +54,7 @@ class SubjectsRepositoryImpl(
 
     override suspend fun addOrUpdateSubject(subject: Subject): UID {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModel = subject.copy(uid = subject.uid.ifBlank { randomUUID() })
 
@@ -76,7 +76,7 @@ class SubjectsRepositoryImpl(
 
     override suspend fun addOrUpdateSubjectsGroup(subjects: List<Subject>) {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModels = subjects.map { subject ->
             subject.copy(uid = subject.uid.ifBlank { randomUUID() })
@@ -97,7 +97,7 @@ class SubjectsRepositoryImpl(
     }
 
     override suspend fun fetchSubjectById(uid: UID): Flow<Subject?> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchSubjectDetailsById(uid).map { subjectEntity ->
                     subjectEntity?.mapToDomain()
@@ -110,7 +110,7 @@ class SubjectsRepositoryImpl(
         }
     }
     override suspend fun fetchAllSubjectsByOrganization(organizationId: UID): Flow<List<Subject>> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchAllSubjectsDetailsByOrg(organizationId).map { subjects ->
                     subjects.map { subjectEntity -> subjectEntity.mapToDomain() }
@@ -124,7 +124,7 @@ class SubjectsRepositoryImpl(
     }
 
     override suspend fun fetchSubjectsByEmployee(employeeId: UID): Flow<List<Subject>> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchSubjectsDetailsByEmployee(employeeId).map { subjects ->
                     subjects.map { subjectEntity -> subjectEntity.mapToDomain() }
@@ -138,7 +138,7 @@ class SubjectsRepositoryImpl(
     }
 
     override suspend fun fetchAllSubjectsByNames(names: List<UID>): List<Subject> {
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         return if (isSubscriber) {
             localDataSource.sync().fetchAllSubjectsDetailsByNames(names).map { subjectEntity ->
@@ -152,7 +152,7 @@ class SubjectsRepositoryImpl(
     }
 
     override suspend fun deleteSubject(targetId: UID) {
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         return if (isSubscriber) {
             localDataSource.sync().deleteItemsById(listOf(targetId))

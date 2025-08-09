@@ -95,6 +95,8 @@ buildkonfig {
     val hmsProjectId = gradleLocalProperties(rootDir, providers).getProperty("hmsProjectId")
     val hmsClientSecret = gradleLocalProperties(rootDir, providers).getProperty("hmsClientSecret")
     val deepSeekKey = gradleLocalProperties(rootDir, providers).getProperty("deepSeekKey")
+    val rustoreApiKeyId = gradleLocalProperties(rootDir, providers).getProperty("rustoreApiKeyId")
+    val rustoreApiKeyPrivate = gradleLocalProperties(rootDir, providers).getProperty("rustoreApiKeyPrivate")
 
     defaultConfigs {
         buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", isDebug.toString())
@@ -105,5 +107,7 @@ buildkonfig {
         buildConfigField(FieldSpec.Type.STRING, "HMS_APP_ID", hmsAppId)
         buildConfigField(FieldSpec.Type.STRING, "HMS_CLIENT_SECRET", hmsClientSecret)
         buildConfigField(FieldSpec.Type.STRING, "DEEP_SEEK_KEY", deepSeekKey)
+        buildConfigField(FieldSpec.Type.STRING, "RU_STORE_API_KEY_ID", rustoreApiKeyId)
+        buildConfigField(FieldSpec.Type.STRING, "RU_STORE_API_KEY_PRIVATE", rustoreApiKeyPrivate)
     }
 }

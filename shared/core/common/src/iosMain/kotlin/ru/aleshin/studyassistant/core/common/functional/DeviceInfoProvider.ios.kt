@@ -24,7 +24,7 @@ import ru.aleshin.studyassistant.core.common.platform.Platform
 /**
  * @author Stanislav Aleshin on 07.09.2024.
  */
-actual class DeviceInfoProvider(private val uuidProvider: IosUUIDProvider) {
+actual open class DeviceInfoProvider(private val uuidProvider: IosUUIDProvider) {
 
     actual fun fetchDevicePlatform(): Platform {
         return Platform.IOS

@@ -1,37 +1,6 @@
 import kotlin.String;
 import kotlin.collections.List;
 
-ALTER TABLE `todoEntity` ADD COLUMN description TEXT DEFAULT '';
-ALTER TABLE `todoEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE `todoEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
-
-ALTER TABLE `homeworkEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE `homeworkEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
-
-ALTER TABLE `employeeEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE `employeeEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
-
-ALTER TABLE `goalEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE `goalEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
-
-ALTER TABLE `organizationEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE `organizationEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
-
-ALTER TABLE `baseScheduleEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE `baseScheduleEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
-
-ALTER TABLE `customScheduleEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE `customScheduleEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
-
-ALTER TABLE `subjectEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE `subjectEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
-
-ALTER TABLE `calendarSettingsEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE `calendarSettingsEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE `calendarSettingsEntity` ADD COLUMN document_id TEXT NOT NULL DEFAULT NULL;
-
-ALTER TABLE `generalSettingsEntity` ADD COLUMN is_unfinished_setup TEXT DEFAULT NULL;
-
 CREATE TABLE IF NOT EXISTS `goalEntity` (
     uid TEXT PRIMARY KEY NOT NULL,
     type TEXT NOT NULL,
@@ -114,7 +83,38 @@ CREATE TABLE IF NOT EXISTS `currentUserEntity` (
   birthday TEXT,
   sex TEXT,
   friends TEXT AS List<String> NOT NULL,
-  subscriptionInfo TEXT,
-  socialNetworks TEXT AS List<String> NOT NULL,
+  subscription_info TEXT,
+  social_networks TEXT AS List<String> NOT NULL,
   updated_at INTEGER NOT NULL
 );
+
+ALTER TABLE `todoEntity` ADD COLUMN description TEXT DEFAULT '';
+ALTER TABLE `todoEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `todoEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `homeworkEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `homeworkEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `employeeEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `employeeEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `goalEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `goalEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `organizationEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `organizationEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `baseScheduleEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `baseScheduleEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `customScheduleEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `customScheduleEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `subjectEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `subjectEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE `calendarSettingsEntity` ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `calendarSettingsEntity` ADD COLUMN is_cache_data INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE `calendarSettingsEntity` ADD COLUMN document_id TEXT DEFAULT NULL;
+
+ALTER TABLE `generalSettingsEntity` ADD COLUMN is_unfinished_setup TEXT DEFAULT NULL;

@@ -66,7 +66,7 @@ class BaseScheduleRepositoryImpl(
 
     override suspend fun addOrUpdateSchedule(schedule: BaseSchedule): UID {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModel = schedule.copy(uid = schedule.uid.ifBlank { randomUUID() })
 
@@ -88,7 +88,7 @@ class BaseScheduleRepositoryImpl(
 
     override suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseSchedule>) {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModels = schedules.map { schedule ->
             schedule.copy(uid = schedule.uid.ifBlank { randomUUID() })
@@ -109,7 +109,7 @@ class BaseScheduleRepositoryImpl(
     }
 
     override suspend fun fetchScheduleById(uid: UID): Flow<BaseSchedule?> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchScheduleDetailsById(uid).map { scheduleEntity ->
                     scheduleEntity?.mapToDomain()
@@ -123,7 +123,7 @@ class BaseScheduleRepositoryImpl(
     }
 
     override suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek): Flow<BaseSchedule?> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchScheduleDetailsByDate(date, numberOfWeek).map { scheduleEntity ->
                     scheduleEntity?.mapToDomain()
@@ -140,7 +140,7 @@ class BaseScheduleRepositoryImpl(
         version: TimeRange,
         numberOfWeek: NumberOfRepeatWeek?,
     ): Flow<List<BaseSchedule>> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchSchedulesByVersion(
                     version.from,
@@ -192,7 +192,7 @@ class BaseScheduleRepositoryImpl(
     }
 
     override suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<Class?> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchClassById(uid, scheduleId).map { classEntity ->
                     classEntity?.mapToDomain()
@@ -206,7 +206,7 @@ class BaseScheduleRepositoryImpl(
     }
 
     override suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange) {
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         return if (isSubscriber) {
             val deletableItems = localDataSource.sync().fetchSchedulesByTimeRangeEmpty(timeRange.from, timeRange.to)

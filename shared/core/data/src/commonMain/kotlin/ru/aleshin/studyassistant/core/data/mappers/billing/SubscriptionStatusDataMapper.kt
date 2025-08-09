@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.domain.repositories
+package ru.aleshin.studyassistant.core.data.mappers.billing
 
-import kotlinx.coroutines.flow.Flow
+import ru.aleshin.studyassistant.core.domain.entities.billing.SubscriptionStatus
+import ru.aleshin.studyassistant.core.remote.models.billing.SubscriptionStatusPojo
 
-/**
- * @author Stanislav Aleshin on 18.06.2025.
- */
-interface ProductsRepository {
-    suspend fun fetchProducts(): Flow<List<String>>
-}
+
+fun SubscriptionStatusPojo.mapToDomain() = SubscriptionStatus(
+    subscriptionId = subscriptionId,
+    subscriptionToken = subscriptionToken,
+    isActive = isActive,
+    expiryTimeMillis = expiryTimeMillis,
+    lastInvoiceId = lastInvoiceId,
+)

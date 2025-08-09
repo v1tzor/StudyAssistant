@@ -58,7 +58,7 @@ class HomeworksRepositoryImpl(
 
     override suspend fun addOrUpdateHomework(homework: Homework): UID {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModel = homework.copy(uid = homework.uid.ifBlank { randomUUID() })
 
@@ -80,7 +80,7 @@ class HomeworksRepositoryImpl(
 
     override suspend fun addHomeworksGroup(homeworks: List<Homework>) {
         val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         val upsertModels = homeworks.map { homework ->
             homework.copy(uid = homework.uid.ifBlank { randomUUID() })
@@ -101,7 +101,7 @@ class HomeworksRepositoryImpl(
     }
 
     override suspend fun fetchHomeworkById(uid: UID): Flow<Homework?> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchHomeworkDetailsById(uid).map { homeworkEntity ->
                     homeworkEntity?.mapToDomain()
@@ -118,7 +118,7 @@ class HomeworksRepositoryImpl(
         val timeStart = date.startThisDay().toEpochMilliseconds()
         val timeEnd = date.endThisDay().toEpochMilliseconds()
 
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchHomeworksDetailsByTimeRange(timeStart, timeEnd).map { homeworks ->
                     homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
@@ -135,7 +135,7 @@ class HomeworksRepositoryImpl(
         val timeStart = timeRange.from.toEpochMilliseconds()
         val timeEnd = timeRange.to.toEpochMilliseconds()
 
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchHomeworksDetailsByTimeRange(timeStart, timeEnd).map { homeworks ->
                     homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
@@ -151,7 +151,7 @@ class HomeworksRepositoryImpl(
     override suspend fun fetchOverdueHomeworks(currentDate: Instant): Flow<List<Homework>> {
         val date = currentDate.endThisDay().toEpochMilliseconds()
 
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchOverdueHomeworksDetails(date).map { homeworks ->
                     homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
@@ -167,7 +167,7 @@ class HomeworksRepositoryImpl(
     override suspend fun fetchActiveLinkedHomeworks(currentDate: Instant): Flow<List<Homework>> {
         val date = currentDate.toEpochMilliseconds()
 
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchActiveLinkedHomeworksDetails(date).map { homeworks ->
                     homeworks.map { homeworkEntity -> homeworkEntity.mapToDomain() }
@@ -181,7 +181,7 @@ class HomeworksRepositoryImpl(
     }
 
     override suspend fun fetchCompletedHomeworksCount(): Flow<Int> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchCompletedHomeworksCount()
             } else {
@@ -191,7 +191,7 @@ class HomeworksRepositoryImpl(
     }
 
     override suspend fun deleteHomework(uid: UID) {
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
 
         return if (isSubscriber) {
             localDataSource.sync().deleteItemsById(listOf(uid))

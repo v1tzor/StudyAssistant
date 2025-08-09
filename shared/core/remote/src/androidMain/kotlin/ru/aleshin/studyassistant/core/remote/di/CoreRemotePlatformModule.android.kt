@@ -18,20 +18,18 @@ package ru.aleshin.studyassistant.core.remote.di
 
 import android.content.Context
 import dev.tmapps.konnection.Konnection
-import io.ktor.client.HttpClient
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.remote.api.billing.RuStoreJweTokenProvider
 import ru.aleshin.studyassistant.core.remote.api.message.GoogleAuthTokenProvider
 import ru.aleshin.studyassistant.core.remote.api.message.GoogleAuthTokenProviderImpl
-import ru.aleshin.studyassistant.core.remote.api.message.HmsAuthTokenProvider
-import ru.aleshin.studyassistant.core.remote.api.message.HmsAuthTokenProviderImpl
 
 /**
  * @author Stanislav Aleshin on 08.08.2024.
  */
 actual val coreRemotePlatformModule = DI.Module("CoreRemotePlatform") {
-    bindSingleton<HmsAuthTokenProvider> { HmsAuthTokenProviderImpl(instance<HttpClient>(tag = "HmsToken")) }
+    bindSingleton<RuStoreJweTokenProvider> { RuStoreJweTokenProvider.Base(instance(tag = "Iap")) }
     bindSingleton<GoogleAuthTokenProvider> { GoogleAuthTokenProviderImpl(instance()) }
     bindSingleton<Konnection> { Konnection.createInstance(instance<Context>()) }
 }

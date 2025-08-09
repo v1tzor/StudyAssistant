@@ -21,7 +21,7 @@ import ru.aleshin.studyassistant.core.common.platform.Platform
 /**
  * @author Stanislav Aleshin on 07.09.2024.
  */
-expect class DeviceInfoProvider {
+expect open class DeviceInfoProvider {
     fun fetchDevicePlatform(): Platform
     fun fetchDeviceName(): String
     fun fetchDeviceId(): String

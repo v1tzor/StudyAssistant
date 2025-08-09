@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.core.database.mappers.subjects
 
-import ru.aleshin.studyassistant.core.common.extensions.fromJson
-import ru.aleshin.studyassistant.core.common.extensions.toJson
+import ru.aleshin.studyassistant.core.common.extensions.tryFromJson
+import ru.aleshin.studyassistant.core.common.extensions.tryToJson
 import ru.aleshin.studyassistant.core.database.models.employee.BaseEmployeeEntity
 import ru.aleshin.studyassistant.core.database.models.subjects.BaseSubjectEntity
 import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEntity
@@ -61,7 +61,7 @@ fun SubjectDetailsEntity.mapToBase() = BaseSubjectEntity(
     teacherId = teacher?.uid,
     office = office,
     color = color.toLong(),
-    location = location?.toJson<ContactInfoEntity>(),
+    location = location?.tryToJson<ContactInfoEntity>(),
     updatedAt = updatedAt,
     isCacheData = 0L,
 )
@@ -76,6 +76,6 @@ fun BaseSubjectEntity.mapToDetails(
     teacher = employee,
     office = office,
     color = color.toInt(),
-    location = location?.fromJson<ContactInfoEntity>(),
+    location = location?.tryFromJson<ContactInfoEntity>(),
     updatedAt = updatedAt,
 )

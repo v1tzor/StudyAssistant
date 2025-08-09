@@ -18,28 +18,52 @@ package ru.aleshin.studyassistant.core.remote.api.billing
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.io.IOException
 import ru.aleshin.studyassistant.core.api.AppwriteApi.Products
 import ru.aleshin.studyassistant.core.api.databases.DatabaseService
+import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.domain.entities.billing.SubscriptionIdentifier
 import ru.aleshin.studyassistant.core.remote.models.billing.ProductPojo
+import ru.aleshin.studyassistant.core.remote.models.billing.SubscriptionStatusPojo
 
 /**
  * @author Stanislav Aleshin on 18.06.2025.
  */
-interface ProductsRemoteApi {
+interface SubscriptionsRemoteApi {
 
-    suspend fun fetchProducts(): Flow<List<ProductPojo>>
+    suspend fun fetchSubscriptionsIds(): Flow<List<ProductPojo>>
+
+    suspend fun fetchSubscriptionStatus(identifier: SubscriptionIdentifier): SubscriptionStatusPojo?
 
     class Base(
         private val database: DatabaseService,
-    ) : ProductsRemoteApi {
+        private val subscriptionStatusProviderFactory: SubscriptionStatusProviderFactory,
+        private val crashlyticsService: CrashlyticsService,
+    ) : SubscriptionsRemoteApi {
 
-        override suspend fun fetchProducts(): Flow<List<ProductPojo>> {
+        private companion object {
+            const val TAG = "SUBSCRIPTION_CHECKER"
+        }
+
+        override suspend fun fetchSubscriptionsIds(): Flow<List<ProductPojo>> {
             return database.listDocumentsFlow(
                 databaseId = Products.DATABASE_ID,
                 collectionId = Products.COLLECTION_ID,
                 nestedType = ProductPojo.serializer(),
             ).map { documents ->
                 documents.map { it.data }
+            }
+        }
+
+        override suspend fun fetchSubscriptionStatus(identifier: SubscriptionIdentifier): SubscriptionStatusPojo? {
+            return try {
+                val statusProvider = subscriptionStatusProviderFactory.createProvider(identifier)
+                statusProvider.fetchStatus(identifier)
+            } catch (_: IOException) {
+                null
+            } catch (e: Exception) {
+                crashlyticsService.recordException(TAG, e.message ?: "", e)
+                null
             }
         }
     }

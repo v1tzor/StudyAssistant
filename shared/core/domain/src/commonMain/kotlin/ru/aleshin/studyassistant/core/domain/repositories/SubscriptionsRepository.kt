@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.data.repositories
+package ru.aleshin.studyassistant.core.domain.repositories
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
-import ru.aleshin.studyassistant.core.remote.api.billing.ProductsRemoteApi
+import ru.aleshin.studyassistant.core.domain.entities.billing.SubscriptionIdentifier
+import ru.aleshin.studyassistant.core.domain.entities.billing.SubscriptionStatus
 
 /**
  * @author Stanislav Aleshin on 18.06.2025.
  */
-class ProductsRepositoryImpl(
-    private val productsApi: ProductsRemoteApi,
-) : ProductsRepository {
-
-    override suspend fun fetchProducts(): Flow<List<String>> {
-        return productsApi.fetchProducts().map { productsList ->
-            productsList.map { product -> product.id }
-        }
-    }
+interface SubscriptionsRepository {
+    suspend fun fetchSubscriptionsIds(): Flow<List<String>>
+    suspend fun fetchSubscriptionStatus(identifier: SubscriptionIdentifier): SubscriptionStatus?
 }

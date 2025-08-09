@@ -50,7 +50,7 @@ class CalendarSettingsRepositoryImpl(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun fetchSettings(): Flow<CalendarSettings> {
-        return subscriptionChecker.getSubscriberStatusFlow().flatMapLatest { isSubscriber ->
+        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
             if (isSubscriber) {
                 localDataSource.sync().fetchItem().mapNotNull { settingsEntity ->
                     settingsEntity?.mapToDomain()
@@ -64,7 +64,7 @@ class CalendarSettingsRepositoryImpl(
     }
 
     override suspend fun updateSettings(settings: CalendarSettings) {
-        val isSubscriber = subscriptionChecker.getSubscriberStatus()
+        val isSubscriber = subscriptionChecker.getSubscriptionActive()
         val currentUser = userSessionProvider.getCurrentUserId()
 
         if (isSubscriber) {

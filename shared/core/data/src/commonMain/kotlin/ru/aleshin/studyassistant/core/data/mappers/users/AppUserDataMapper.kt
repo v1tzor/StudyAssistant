@@ -58,7 +58,8 @@ class AppUserSyncMapper : SingleSyncMapper<BaseAppUserEntity, AppUserPojo>(
             birthday = birthday,
             sex = sex,
             friends = friends,
-            subscriptionInfo = subscriptionInfo?.fromJson<SubscribeInfoEntity>()?.mapToDomain()?.mapToRemoteData()?.toJson(),
+            subscriptionInfo = subscriptionInfo?.fromJson<SubscribeInfoEntity>()?.mapToDomain()
+                ?.mapToRemoteData()?.toJson(),
             socialNetworks = socialNetworks.map {
                 it.fromJson<SocialNetworkEntity>().mapToDomain().mapToRemoteData().toJson()
             },
@@ -80,7 +81,8 @@ class AppUserSyncMapper : SingleSyncMapper<BaseAppUserEntity, AppUserPojo>(
             birthday = birthday,
             sex = sex,
             friends = friends,
-            subscriptionInfo = subscriptionInfo?.fromJson<SubscribeInfoPojo>()?.mapToDomain()?.mapToLocalData()?.toJson(),
+            subscriptionInfo = subscriptionInfo?.fromJson<SubscribeInfoPojo>()?.mapToDomain()
+                ?.mapToLocalData()?.toJson(),
             socialNetworks = socialNetworks.map {
                 it.fromJson<SocialNetworkPojo>().mapToDomain().mapToLocalData().toJson()
             },

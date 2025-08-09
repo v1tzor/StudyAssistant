@@ -25,7 +25,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ProductsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
@@ -33,7 +33,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
  */
 public interface BillingFeatureDependencies : BaseFeatureDependencies {
     public val usersRepository: UsersRepository
-    public val productsRepository: ProductsRepository
+    public val subscriptionsRepository: SubscriptionsRepository
     public val manageUserRepository: ManageUserRepository
     public val dateManager: DateManager
     public val coroutineManager: CoroutineManager

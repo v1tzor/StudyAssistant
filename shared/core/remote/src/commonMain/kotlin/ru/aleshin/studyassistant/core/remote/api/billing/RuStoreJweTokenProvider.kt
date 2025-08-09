@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.data
+package ru.aleshin.studyassistant.core.remote.api.billing
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.request
@@ -28,9 +28,9 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import ru.aleshin.studyassistant.android.BuildConfig.RU_STORE_API_KEY_ID
-import ru.aleshin.studyassistant.android.BuildConfig.RU_STORE_API_KEY_PRIVATE
 import ru.aleshin.studyassistant.core.common.extensions.fromJson
+import ru.aleshin.studyassistant.core.remote.BuildKonfig.RU_STORE_API_KEY_ID
+import ru.aleshin.studyassistant.core.remote.BuildKonfig.RU_STORE_API_KEY_PRIVATE
 
 /**
  * @author Stanislav Aleshin on 06.08.2025.
@@ -40,6 +40,10 @@ interface RuStoreJweTokenProvider {
     suspend fun getJweToken(): String
 
     class Base(private val httpClient: HttpClient) : RuStoreJweTokenProvider {
+
+        companion object {
+            const val ENDPOINT = "https://public-api.rustore.ru/public/auth/"
+        }
 
         override suspend fun getJweToken(): String {
             val signature = SignatureGenerator.generateSignature(
@@ -54,14 +58,12 @@ interface RuStoreJweTokenProvider {
                 setBody(signature)
             }.bodyAsText()
 
-            val jweKey = response.fromJson<JsonElement>().jsonObject["body"]?.jsonObject["jwe"]?.jsonPrimitive?.contentOrNull
+            val responseBody = response.fromJson<JsonElement>().jsonObject["body"]
+
+            val jweKey = responseBody?.jsonObject["jwe"]?.jsonPrimitive?.contentOrNull
 
             return jweKey ?: throw RuStoreJweTokenException(response)
         }
-    }
-
-    companion object {
-        const val ENDPOINT = "https://public-api.rustore.ru/public/auth/"
     }
 }
 

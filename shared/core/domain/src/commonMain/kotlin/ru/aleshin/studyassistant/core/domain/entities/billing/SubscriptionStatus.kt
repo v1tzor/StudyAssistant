@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.settings.impl.presentation.models.billing
-
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+package ru.aleshin.studyassistant.core.domain.entities.billing
 
 /**
- * @author Stanislav Aleshin on 19.06.2025.
+ * @author Stanislav Aleshin on 09.08.2025.
  */
-@Parcelize
-internal data class SubscriptionUi(
-    val purchaseId: String?,
-    val productId: String,
-    val purchaseTime: Long?,
-    val amountLabel: String?,
-    val currency: String?,
-    val title: String?,
-    val description: String?,
-    val subscriptionPeriod: Long?,
-    val expiryTime: Long,
+data class SubscriptionStatus(
+    val subscriptionId: String,
+    val subscriptionToken: String,
     val isActive: Boolean,
-    val subscriptionToken: String?,
-) : Parcelable
+    val expiryTimeMillis: Long,
+    val lastInvoiceId: String,
+)

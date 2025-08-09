@@ -40,6 +40,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
@@ -62,6 +63,7 @@ public object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeat
                 bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
                 bindSingleton<MessageRepository> { dependencies.messageRepository }
                 bindSingleton<GeneralSettingsRepository> { dependencies.generalSettingsRepository }
+                bindSingleton<SubscriptionsRepository> { dependencies.subscriptionsRepository }
                 bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
                 bindSingleton<CoroutineManager> { dependencies.coroutineManager }
                 bindSingleton<AccountService> { dependencies.accountService }
