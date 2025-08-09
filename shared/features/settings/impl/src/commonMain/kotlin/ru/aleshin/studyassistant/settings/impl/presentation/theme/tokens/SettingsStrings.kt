@@ -193,7 +193,7 @@ internal data class SettingsStrings(
             activeSubscriptionsTitle = "Active Subscriptions",
             showSubscriptionPlansTitle = "View Plans",
             undefinedSubscriptionTitle = "Premium subscription",
-            noneSubscriptionsTitle = "No Subscriptions Available",
+            noneSubscriptionsTitle = "Subscriptions are unavailable",
             subscriptionStatusSuffix = "Status: ",
             subscriptionExpiryTimeSuffix = "Expiry: ",
             controlSubscriptionInStoreSuffix = "Manage in ",
