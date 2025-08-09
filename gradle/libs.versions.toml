@@ -16,9 +16,9 @@ ksp = "2.1.20-2.0.0"
 kotlin = "2.1.0"
 kotlin-coroutines = "1.10.2"
 kotlin-datetime = "0.6.1"
-kotlin-serialization = "1.9.0"
-kotlin-io = "0.8.0"
-kotlin-atomic = "0.29.0"
+kotlin-serialization = "1.8.0"
+kotlin-io = "0.7.0"
+kotlin-atomic = "0.28.0"
 
 # Swift
 skie = "0.10.4"

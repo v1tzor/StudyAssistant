@@ -20,6 +20,8 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.api.auth.AccountService
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
 import ru.aleshin.studyassistant.core.api.di.coreClintApiModule
 import ru.aleshin.studyassistant.core.data.managers.reminders.TodoReminderManagerImpl
 import ru.aleshin.studyassistant.core.data.managers.sync.BaseScheduleSourceSyncManagerImpl
@@ -118,6 +120,7 @@ import ru.aleshin.studyassistant.core.remote.di.coreRemoteModule
 val coreDataModule = DI.Module("CoreData") {
     importAll(coreDataPlatformModule, coreDatabaseModule, coreRemoteModule, coreClintApiModule)
 
+    bindProvider<UserSessionProvider> { instance<AccountService>() }
     bindSingleton<RemoteResultSyncHandler> { RemoteResultSyncHandler.Base(instance(), instance()) }
     bindSingleton<SubscriptionChecker> { SubscriptionChecker.Base(instance(), instance()) }
 

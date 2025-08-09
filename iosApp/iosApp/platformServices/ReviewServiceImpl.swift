@@ -12,7 +12,7 @@ import shared
 public class ReviewServiceImpl : CommonReviewService {
     
     @nonobjc
-    public func __requestReview(completionHandler: @escaping (Bool, (any Error)?) -> Void) {
+    public func __requestReview(completionHandler: @escaping (KotlinBoolean?, (any Error)?) -> Void) {
         Task {
             do {
                 let result = try await __requestReview()
@@ -23,7 +23,7 @@ public class ReviewServiceImpl : CommonReviewService {
         }
     }
     
-    public func __requestReview() async throws -> Bool {
+    public func __requestReview() async throws -> KotlinBoolean {
         return false
     }
 }

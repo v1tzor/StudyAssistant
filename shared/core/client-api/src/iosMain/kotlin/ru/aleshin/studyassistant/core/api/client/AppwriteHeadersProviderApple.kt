@@ -26,7 +26,7 @@ class AppwriteHeadersProviderApple : AppwriteHeadersProvider {
         return mutableMapOf(
             "content-type" to "application/json",
             "user-agent" to getUserAgent(),
-            "origin" to "appwrite-${UIDevice.currentDevice.systemName}://${NSBundle.mainBundle.bundleIdentifier ?: ""}",
+            "origin" to "appwrite-${getOperatingSystem()}://${NSBundle.mainBundle.bundleIdentifier ?: ""}",
             "x-sdk-name" to "Apple",
             "x-sdk-platform" to "client",
             "x-sdk-language" to "apple",
@@ -39,7 +39,7 @@ class AppwriteHeadersProviderApple : AppwriteHeadersProvider {
         return mutableMapOf(
             "content-type" to "application/json",
             "user-agent" to getUserAgent(),
-            "origin" to "appwrite-${UIDevice.currentDevice.systemName}://${NSBundle.mainBundle.bundleIdentifier ?: ""}",
+            "origin" to "appwrite-${getOperatingSystem()}://${NSBundle.mainBundle.bundleIdentifier ?: ""}",
             "x-sdk-name" to "Swift",
             "x-sdk-platform" to "server",
             "x-sdk-language" to "swift",
@@ -57,5 +57,17 @@ class AppwriteHeadersProviderApple : AppwriteHeadersProvider {
         val version = bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String ?: ""
         val device = "$model; $systemName/$systemVersion ($osVersion)"
         return "${bundle.bundleIdentifier ?: ""}/$version $device"
+    }
+
+    fun getOperatingSystem(): String {
+        val systemName = UIDevice.currentDevice.systemName.lowercase()
+        return when {
+            systemName.contains("ios") -> "ios"
+            systemName.contains("watchos") -> "watchos"
+            systemName.contains("tvos") -> "tvos"
+            systemName.contains("macos") -> "macos"
+            systemName.contains("visionos") -> "visionos"
+            else -> systemName // fallback
+        }
     }
 }

@@ -56,7 +56,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		74F0857D2E0DAB3D00B3B01A /* appwrite */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = appwrite; sourceTree = "<group>"; };
 		74F0857E2E0DAB5200B3B01A /* platformServices */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = platformServices; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -112,7 +111,6 @@
 			isa = PBXGroup;
 			children = (
 				74F0857E2E0DAB5200B3B01A /* platformServices */,
-				74F0857D2E0DAB3D00B3B01A /* appwrite */,
 				7475453B2C6293660032B546 /* service-account-file.json */,
 				74C67ECE2BDC149A001D880F /* GoogleService-Info.plist */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
@@ -151,7 +149,6 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				74F0857D2E0DAB3D00B3B01A /* appwrite */,
 				74F0857E2E0DAB5200B3B01A /* platformServices */,
 			);
 			name = iosApp;

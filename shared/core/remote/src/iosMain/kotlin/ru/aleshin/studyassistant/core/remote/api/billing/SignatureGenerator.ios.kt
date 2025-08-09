@@ -22,7 +22,8 @@ actual class SignatureGenerator {
             keyId: String,
             privateKeyContent: String
         ): String {
-            TODO("Not yet implemented")
+            // TODO: Not yet implemented
+            return ""
         }
     }
 }

@@ -1,7 +1,7 @@
 CREATE TABLE generalSettingsEntity (
   id INTEGER PRIMARY KEY NOT NULL,
   is_first_start INTEGER NOT NULL,
-  is_unfinished_setup TEXT,
+  is_unfinished_setup TEXT DEFAULT NULL,
   theme TEXT NOT NULL,
   language TEXT NOT NULL
 );

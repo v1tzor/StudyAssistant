@@ -10,6 +10,10 @@ import Foundation
 import shared
 
 public class AnalyticsServiceImpl : CommonAnalyticsService {
+   
+    public func setupUserId(id: String) {
+    }
+    
     public func initializeService() {
     }
     

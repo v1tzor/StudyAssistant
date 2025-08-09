@@ -1,6 +1,6 @@
 import SwiftUI
-import Appwrite
 import Firebase
+import Appwrite
 import FirebaseCore
 import FirebaseAuth
 import FirebaseMessaging
