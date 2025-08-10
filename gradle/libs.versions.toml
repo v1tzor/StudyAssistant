@@ -4,8 +4,8 @@ minSdk = "24"
 targetSdk = "35"
 compileSdk = "35"
 jvmTarget = "17"
-version-name = "0.0.3"
-version-code = "3"
+version-name = "1.0.0"
+version-code = "4"
 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
 # Gradle
