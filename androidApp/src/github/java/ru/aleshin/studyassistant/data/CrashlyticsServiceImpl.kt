@@ -16,6 +16,7 @@
 package ru.aleshin.studyassistant.data
 
 import ru.aleshin.studyassistant.android.BuildConfig
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.ok.tracer.CoreTracerConfiguration
 import ru.ok.tracer.Tracer

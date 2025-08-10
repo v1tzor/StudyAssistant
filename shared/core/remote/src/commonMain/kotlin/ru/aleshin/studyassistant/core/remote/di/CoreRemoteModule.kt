@@ -43,7 +43,6 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
-import ru.aleshin.studyassistant.core.domain.entities.billing.SubscriptionIdentifier
 import ru.aleshin.studyassistant.core.remote.BuildKonfig
 import ru.aleshin.studyassistant.core.remote.api.ai.AiRemoteApi
 import ru.aleshin.studyassistant.core.remote.api.auth.AuthRemoteApi
@@ -52,7 +51,6 @@ import ru.aleshin.studyassistant.core.remote.api.billing.AppStoreSubscriptionSta
 import ru.aleshin.studyassistant.core.remote.api.billing.GooglePlaySubscriptionStatusProvider
 import ru.aleshin.studyassistant.core.remote.api.billing.RuStoreJweTokenProvider
 import ru.aleshin.studyassistant.core.remote.api.billing.RuStoreSubscriptionStatusProvider
-import ru.aleshin.studyassistant.core.remote.api.billing.SubscriptionStatusProvider
 import ru.aleshin.studyassistant.core.remote.api.billing.SubscriptionStatusProviderFactory
 import ru.aleshin.studyassistant.core.remote.api.billing.SubscriptionsRemoteApi
 import ru.aleshin.studyassistant.core.remote.api.message.HmsAuthTokenProvider
@@ -206,13 +204,13 @@ val coreRemoteModule = DI.Module("CoreRemote") {
     bindSingleton<AuthRemoteApi> { AuthRemoteApi.Base(instance()) }
     bindSingleton<SubscriptionsRemoteApi> { SubscriptionsRemoteApi.Base(instance(), instance(), instance()) }
     bindSingleton<MessageRemoteApi> { MessageRemoteApi.Base(instance(tag = "Messages"), instance(), instance(), instance(), instance()) }
-    bindSingleton<SubscriptionStatusProviderFactory> { SubscriptionStatusProviderFactory.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<HmsAuthTokenProvider> { HmsAuthTokenProvider.Base(instance<HttpClient>(tag = "HmsToken")) }
-    bindSingleton<SubscriptionStatusProvider<SubscriptionIdentifier.RuStore>> { RuStoreSubscriptionStatusProvider.Base(instance(tag = "Iap"), instance()) }
+    bindSingleton<SubscriptionStatusProviderFactory> { SubscriptionStatusProviderFactory.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<RuStoreSubscriptionStatusProvider> { RuStoreSubscriptionStatusProvider.Base(instance(tag = "Iap"), instance()) }
+    bindSingleton<AppGallerySubscriptionStatusProvider> { AppGallerySubscriptionStatusProvider.Base(instance(tag = "Iap")) }
+    bindSingleton<GooglePlaySubscriptionStatusProvider> { GooglePlaySubscriptionStatusProvider.Base(instance(tag = "Iap")) }
+    bindSingleton<AppStoreSubscriptionStatusProvider> { AppStoreSubscriptionStatusProvider.Base(instance(tag = "Iap")) }
     bindSingleton<RuStoreJweTokenProvider> { RuStoreJweTokenProvider.Base(instance(tag = "Iap")) }
-    bindSingleton<SubscriptionStatusProvider<SubscriptionIdentifier.AppGallery>> { AppGallerySubscriptionStatusProvider.Base(instance(tag = "Iap")) }
-    bindSingleton<SubscriptionStatusProvider<SubscriptionIdentifier.GooglePlay>> { GooglePlaySubscriptionStatusProvider.Base(instance(tag = "Iap")) }
-    bindSingleton<SubscriptionStatusProvider<SubscriptionIdentifier.AppStore>> { AppStoreSubscriptionStatusProvider.Base(instance(tag = "Iap")) }
 
     bindProvider<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindProvider<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance(), instance(), instance()) }

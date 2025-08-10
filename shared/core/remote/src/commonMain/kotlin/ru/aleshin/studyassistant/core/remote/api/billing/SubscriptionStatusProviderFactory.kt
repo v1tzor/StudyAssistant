@@ -26,10 +26,10 @@ interface SubscriptionStatusProviderFactory {
     fun <I : SubscriptionIdentifier> createProvider(identifier: I): SubscriptionStatusProvider<I>
 
     class Base(
-        private val rustore: SubscriptionStatusProvider<SubscriptionIdentifier.RuStore>,
-        private val appGallery: SubscriptionStatusProvider<SubscriptionIdentifier.AppGallery>,
-        private val googlePlay: SubscriptionStatusProvider<SubscriptionIdentifier.GooglePlay>,
-        private val appStore: SubscriptionStatusProvider<SubscriptionIdentifier.AppStore>,
+        private val rustore: RuStoreSubscriptionStatusProvider,
+        private val appGallery: AppGallerySubscriptionStatusProvider,
+        private val googlePlay: GooglePlaySubscriptionStatusProvider,
+        private val appStore: AppStoreSubscriptionStatusProvider,
     ) : SubscriptionStatusProviderFactory {
 
         @Suppress("UNCHECKED_CAST")
