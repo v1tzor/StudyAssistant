@@ -4,6 +4,13 @@
 -keep class com.google.api.client.** { *; }
 -keep class com.google.auth.** { *; }
 
+-keep class ru.aleshin.studyassistant.core.api.auth.** { *; }
+-keep class ru.aleshin.studyassistant.core.api.auth.WebAuthComponent$Companion { *; }
+-keep class ru.aleshin.studyassistant.core.api.auth.KeepAliveService { *; }
+-keep class * implements java.util.concurrent.Flow { *; }
+-keep class android.net.Uri { *; }
+-keep class java.net.URL { *; }
+
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
 -keep public class * extends java.lang.Exception

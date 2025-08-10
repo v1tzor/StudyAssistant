@@ -78,6 +78,8 @@
             </intent-filter>
         </receiver>
 
+        <service android:name="ru.aleshin.studyassistant.core.api.auth.KeepAliveService"/>
+
         <meta-data
             android:name="console_app_id_value"
             android:value="@string/CONSOLE_APPLICATION_ID" />

@@ -20,7 +20,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 
-internal class KeepAliveService : Service() {
+class KeepAliveService : Service() {
     companion object {
         val binder = Binder()
     }
