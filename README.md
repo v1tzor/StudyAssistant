@@ -31,6 +31,11 @@ StudyAssistant
 <img src="config/images/banner_en.png"/>
 <div align="start">
 
+---
+
+[<img src="https://www.rustore.ru/help/icons/logo-color-dark.png" height="63" alt="Download on the RuStore">](https://www.rustore.ru/catalog/app/ru.aleshin.studyassistant)[<img src="https://user-images.githubusercontent.com/663460/26973090-f8fdc986-4d14-11e7-995a-e7c5e79ed925.png" height="70" alt="Download APK from Github">](https://github.com/v1tzor/StudyAssistant/releases/latest/download/1.0.0-studyassistant-github-release.apk)
+
+
 ## 🎓 Your Ultimate Academic Organizer
 
 ### 🤖 AI-Powered Study Assistant
