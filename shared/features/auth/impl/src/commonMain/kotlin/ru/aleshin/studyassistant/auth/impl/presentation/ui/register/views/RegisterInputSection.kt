@@ -51,7 +51,7 @@ internal fun RegisterInputSection(
     onUsernameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
-    onCompleteEnter: () -> Unit,
+    onEnterClick: () -> Unit,
 ) {
     Column(modifier = modifier.padding(horizontal = 24.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -87,7 +87,7 @@ internal fun RegisterInputSection(
                 isError = passwordValidError != null,
                 errorText = passwordValidError?.mapToMessage(),
                 keyboardActions = KeyboardActions(
-                    onDone = { onCompleteEnter() },
+                    onDone = { onEnterClick() },
                 )
             )
         }

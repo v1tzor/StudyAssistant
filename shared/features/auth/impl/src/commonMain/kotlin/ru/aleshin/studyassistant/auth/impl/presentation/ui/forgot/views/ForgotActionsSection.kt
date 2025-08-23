@@ -51,15 +51,15 @@ internal fun ForgotActionsSection(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isLoading: Boolean,
-    onSendEmailClick: () -> Unit,
-    onAlreadyHavePasswordClick: () -> Unit,
+    onResetPasswordClick: () -> Unit,
+    onLoginClick: () -> Unit,
 ) {
     Column(
         modifier = modifier.padding(start = 24.dp, end = 24.dp, top = 8.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Button(
-            onClick = onSendEmailClick,
+            onClick = onResetPasswordClick,
             modifier = Modifier.fillMaxWidth().height(44.dp),
             enabled = enabled,
             shape = MaterialTheme.shapes.large,
@@ -80,7 +80,7 @@ internal fun ForgotActionsSection(
         }
         AlreadyHavePasswordButton(
             enabled = !isLoading,
-            onClick = onAlreadyHavePasswordClick,
+            onClick = onLoginClick,
         )
     }
 }

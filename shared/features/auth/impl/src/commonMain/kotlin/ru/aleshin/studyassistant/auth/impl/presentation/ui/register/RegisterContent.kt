@@ -18,31 +18,91 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.register
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.RegisterCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.AuthHeaderSection
-import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterViewState
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEffect
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterEvent
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.RegisterState
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.store.RegisterComponent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.views.RegisterActionsSection
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.views.RegisterInputSection
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsMutable
+import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 
 /**
  * @author Stanislav Aleshin on 17.04.2024
  */
 @Composable
 internal fun RegisterContent(
+    registerComponent: RegisterComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = registerComponent.store
+    val strings = AuthThemeRes.strings
+    val windowSize = LocalWindowSize.current
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            when (windowSize.heightWindowType) {
+                else -> BaseRegisterContent(
+                    state = store.stateAsMutable().value,
+                    modifier = Modifier.padding(paddingValues),
+                    onLoginClick = {
+                        store.dispatchEvent(RegisterEvent.ClickLogin)
+                    },
+                    onRegisterClick = { name, email, password ->
+                        val credentials = RegisterCredentialsUi(name, email, password)
+                        store.dispatchEvent(RegisterEvent.SubmitCredentials(credentials))
+                    },
+                )
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is RegisterEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BaseRegisterContent(
     modifier: Modifier,
-    state: RegisterViewState,
+    state: RegisterState,
     onRegisterClick: (name: String, email: String, password: String) -> Unit,
-    onAlreadyHaveAccountClick: () -> Unit,
+    onLoginClick: () -> Unit,
 ) {
     Column(
         modifier = modifier.padding(bottom = 16.dp, top = 6.dp),
@@ -56,7 +116,7 @@ internal fun RegisterContent(
         AuthHeaderSection(
             modifier = Modifier.weight(1f),
             header = AuthThemeRes.strings.registerHeadline,
-            illustration = painterResource(AuthThemeRes.icons.registerIllustration),
+            illustration = AuthThemeRes.icons.registerIllustration,
             contentDescription = AuthThemeRes.strings.registerDesc,
         )
         RegisterInputSection(
@@ -70,7 +130,7 @@ internal fun RegisterContent(
             onUsernameChange = { username = it },
             onEmailChange = { email = it },
             onPasswordChange = { password = it },
-            onCompleteEnter = {
+            onEnterClick = {
                 if (username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
                     onRegisterClick(username, email, password)
                 }
@@ -81,7 +141,7 @@ internal fun RegisterContent(
             enabled = !state.isLoading && username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty(),
             isLoading = state.isLoading,
             onRegisterClick = { onRegisterClick(username, email, password) },
-            onAlreadyHaveAccountClick = onAlreadyHaveAccountClick,
+            onLogin = onLoginClick,
         )
     }
 }

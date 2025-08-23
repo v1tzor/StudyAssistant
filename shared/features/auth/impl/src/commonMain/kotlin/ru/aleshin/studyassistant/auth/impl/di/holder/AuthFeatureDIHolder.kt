@@ -18,15 +18,13 @@ package ru.aleshin.studyassistant.auth.impl.di.holder
 
 import org.kodein.di.DI
 import org.kodein.di.DirectDI
-import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
 import org.kodein.di.direct
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.auth.api.di.AuthFeatureApi
-import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.auth.api.navigation.AuthComponentProvider
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
 import ru.aleshin.studyassistant.auth.impl.di.modules.domainModule
-import ru.aleshin.studyassistant.auth.impl.di.modules.navigationModule
 import ru.aleshin.studyassistant.auth.impl.di.modules.presentationModule
 import ru.aleshin.studyassistant.core.api.auth.AccountService
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
@@ -42,8 +40,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
-import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
@@ -55,9 +51,7 @@ public object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeat
     override fun init(dependencies: AuthFeatureDependencies) {
         if (directDI == null) {
             val di = DI {
-                importAll(navigationModule, presentationModule, domainModule)
-                bindInstance<() -> NavigationFeatureStarter> { dependencies.navigationFeatureStarter }
-                bindInstance<() -> PreviewFeatureStarter> { dependencies.previewFeatureStarter }
+                importAll(presentationModule, domainModule)
                 bindSingleton<AuthRepository> { dependencies.authRepository }
                 bindSingleton<UsersRepository> { dependencies.usersRepository }
                 bindSingleton<ManageUserRepository> { dependencies.manageUserRepository }
@@ -73,7 +67,7 @@ public object AuthFeatureDIHolder : BaseFeatureDIHolder<AuthFeatureApi, AuthFeat
                 bindSingleton<DateManager> { dependencies.dateManager }
                 bindSingleton<AuthFeatureApi> {
                     object : AuthFeatureApi {
-                        override fun fetchStarter() = instance<AuthFeatureStarter>()
+                        override fun fetchComponentProvider() = instance<AuthComponentProvider>()
                     }
                 }
             }

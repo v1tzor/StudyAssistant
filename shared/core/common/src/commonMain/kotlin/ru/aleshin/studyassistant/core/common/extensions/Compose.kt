@@ -33,6 +33,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.TextStyle
@@ -117,9 +118,11 @@ suspend fun handleLazyListScroll(
         }
     }
 
-    val lastVisibleItemIndex = lazyListState.firstVisibleItemIndex + lazyListState.layoutInfo.visibleItemsInfo.lastIndex
+    val lastVisibleItemIndex =
+        lazyListState.firstVisibleItemIndex + lazyListState.layoutInfo.visibleItemsInfo.lastIndex
 
-    val firstVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull() ?: return@coroutineScope
+    val firstVisibleItem =
+        lazyListState.layoutInfo.visibleItemsInfo.firstOrNull() ?: return@coroutineScope
     val scrollAmount = firstVisibleItem.size * 2f
 
     if (dropIndex <= firstVisibleItemIndex + 1) {
@@ -131,4 +134,39 @@ suspend fun handleLazyListScroll(
             lazyListState.animateScrollBy(scrollAmount)
         }
     }
+}
+
+@Composable
+fun rememberLambda(
+    lambda: () -> Unit
+): (() -> Unit) {
+    return remember { lambda }
+}
+
+@Composable
+fun <T1 : Any> rememberLambda(
+    lambda: (T1) -> Unit
+): ((T1) -> Unit) {
+    return remember { lambda }
+}
+
+@Composable
+fun <T1 : Any, T2 : Any> rememberLambda(
+    lambda: (T1, T2) -> Unit
+): ((T1, T2) -> Unit) {
+    return remember { lambda }
+}
+
+@Composable
+fun <T1 : Any, T2 : Any, T3 : Any> rememberLambda(
+    lambda: (T1, T2, T3) -> Unit
+): ((T1, T2, T3) -> Unit) {
+    return remember { lambda }
+}
+
+@Composable
+fun <T1 : Any, T2 : Any, T3 : Any, T4 : Any> rememberLambda(
+    lambda: (T1, T2, T3, T4) -> Unit
+): ((T1, T2, T3, T4) -> Unit) {
+    return remember { lambda }
 }

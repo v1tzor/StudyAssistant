@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.auth.api.di
 
-import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.auth.api.navigation.AuthComponentProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureApi
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
 interface AuthFeatureApi : BaseFeatureApi {
-    fun fetchStarter(): AuthFeatureStarter
+    fun fetchComponentProvider(): AuthComponentProvider
 }

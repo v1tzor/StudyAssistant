@@ -35,16 +35,16 @@ interface CoroutineManager : WorkDispatchersProvider {
     suspend fun <T> changeFlow(coroutineFlow: CoroutineFlow, block: suspend CoroutineScope.() -> T): T
 
     abstract class Abstract(
-        override val backgroundDispatcher: CoroutineDispatcher,
-        override val uiDispatcher: CoroutineDispatcher,
+        override val ioDispatcher: CoroutineDispatcher,
+        override val mainDispatcher: CoroutineDispatcher,
     ) : CoroutineManager {
 
         override fun runOnBackground(scope: CoroutineScope, block: CoroutineBlock): Job {
-            return scope.launch(context = backgroundDispatcher, block = block)
+            return scope.launch(context = ioDispatcher, block = block)
         }
 
         override fun runOnUi(scope: CoroutineScope, block: CoroutineBlock): Job {
-            return scope.launch(context = uiDispatcher, block = block)
+            return scope.launch(context = mainDispatcher, block = block)
         }
 
         override suspend fun <T> changeFlow(
@@ -52,26 +52,26 @@ interface CoroutineManager : WorkDispatchersProvider {
             block: suspend CoroutineScope.() -> T
         ): T {
             val dispatcher = when (coroutineFlow) {
-                CoroutineFlow.BACKGROUND -> backgroundDispatcher
-                CoroutineFlow.UI -> uiDispatcher
+                CoroutineFlow.IO -> ioDispatcher
+                CoroutineFlow.MAIN -> mainDispatcher
             }
             return withContext(context = dispatcher, block = block)
         }
     }
 
     class Base : Abstract(
-        backgroundDispatcher = Dispatchers.IO,
-        uiDispatcher = Dispatchers.Main,
+        ioDispatcher = Dispatchers.IO,
+        mainDispatcher = Dispatchers.Main,
     )
 }
 
 interface WorkDispatchersProvider {
-    val backgroundDispatcher: CoroutineDispatcher
-    val uiDispatcher: CoroutineDispatcher
+    val ioDispatcher: CoroutineDispatcher
+    val mainDispatcher: CoroutineDispatcher
 }
 
 typealias CoroutineBlock = suspend CoroutineScope.() -> Unit
 
 enum class CoroutineFlow {
-    BACKGROUND, UI
+    IO, MAIN
 }

@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.atomic)
 }
 
 kotlin {
@@ -37,6 +38,7 @@ kotlin {
             implementation(libs.rustore.universalpush.core)
         }
         commonMain.dependencies {
+            api(libs.kotlin.atomicfu)
             api(libs.kotlin.coroutines)
             api(libs.kotlin.datetime)
             api(libs.kotlin.serialization)
@@ -57,6 +59,8 @@ kotlin {
             api(libs.androidx.paging.common)
 
             implementation(libs.bundles.voyager)
+            implementation(libs.bundles.decompose)
+
             implementation(compose.ui)
             implementation(compose.material3)
             implementation(compose.foundation)

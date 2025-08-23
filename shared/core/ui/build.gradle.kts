@@ -28,6 +28,7 @@ kotlin {
             implementation(project(":shared:core:domain"))
 
             api(libs.bundles.voyager)
+            api(libs.bundles.decompose)
 
             api(libs.kodein.compose)
 

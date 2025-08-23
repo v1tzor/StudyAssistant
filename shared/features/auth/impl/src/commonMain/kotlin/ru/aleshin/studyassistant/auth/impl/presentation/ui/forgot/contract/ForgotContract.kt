@@ -16,38 +16,39 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.ForgotCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.EmailValidError
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.
  */
-@Immutable
-@Parcelize
-internal data class ForgotViewState(
+@Serializable
+internal data class ForgotState(
     val isLoading: Boolean = false,
     val emailValidError: EmailValidError? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class ForgotEvent : BaseEvent {
-    data class SendResetPasswordEmail(val credentials: ForgotCredentialsUi) : ForgotEvent()
-    data object NavigateToLogin : ForgotEvent()
+internal sealed class ForgotEvent : StoreEvent {
+    data class ClickResetPassword(val credentials: ForgotCredentialsUi) : ForgotEvent()
+    data object ClickLogin : ForgotEvent()
 }
 
-internal sealed class ForgotEffect : BaseUiEffect {
+internal sealed class ForgotEffect : StoreEffect {
     data class ShowError(val failures: AuthFailures) : ForgotEffect()
-    data class NavigateToLocal(val pushScreen: Screen) : ForgotEffect()
 }
 
-internal sealed class ForgotAction : BaseAction {
-    data class UpdateValidError(val email: EmailValidError?) : ForgotAction()
+internal sealed class ForgotAction : StoreAction {
     data class UpdateLoading(val isLoading: Boolean) : ForgotAction()
+    data class UpdateValidError(val email: EmailValidError?) : ForgotAction()
+}
+
+internal sealed class ForgotOutput : BaseOutput {
+    data object NavigateToLogin : ForgotOutput()
 }

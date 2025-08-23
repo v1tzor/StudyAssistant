@@ -18,7 +18,7 @@ package ru.aleshin.studyassistant.core.domain.managers.sync
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import ru.aleshin.studyassistant.core.common.managers.CoroutineFlow.BACKGROUND
+import ru.aleshin.studyassistant.core.common.managers.CoroutineFlow.IO
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 
@@ -72,25 +72,25 @@ interface SourceSyncFacade {
         )
 
         override suspend fun syncAllSource() {
-            coroutineManager.changeFlow(BACKGROUND) {
+            coroutineManager.changeFlow(IO) {
                 allSyncManagers.map { async { it.startSourceSync() } }.awaitAll()
             }
         }
 
         override suspend fun singleSyncAllSources(): Boolean {
-            return coroutineManager.changeFlow(BACKGROUND) {
+            return coroutineManager.changeFlow(IO) {
                 allSyncManagers.map { async { it.singleSyncRound() } }.awaitAll().all { it }
             }
         }
 
         override suspend fun stopAllSourceSync() {
-            coroutineManager.changeFlow(BACKGROUND) {
+            coroutineManager.changeFlow(IO) {
                 allSyncManagers.forEach { it.stopSourceSync() }
             }
         }
 
         override suspend fun clearAllSyncedData() {
-            coroutineManager.changeFlow(BACKGROUND) {
+            coroutineManager.changeFlow(IO) {
                 allSyncManagers.forEach { it.clearSourceData() }
                 aiAssistantRepository.deleteChat(null)
             }

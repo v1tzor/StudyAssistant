@@ -16,50 +16,54 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.LoginCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.EmailValidError
 import ru.aleshin.studyassistant.auth.impl.presentation.models.validation.PasswordValidError
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
 
 /**
  * @author Stanislav Aleshin on 16.04.2024
  */
-@Immutable
-@Parcelize
-internal data class LoginViewState(
+@Serializable
+internal data class LoginState(
     val isLoading: Boolean = false,
     val isAvailableGoogle: Boolean = false,
     val emailValidError: EmailValidError? = null,
     val passwordValidError: PasswordValidError? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class LoginEvent : BaseEvent {
-    data object Init : LoginEvent()
-    data class LoginWithEmail(val credentials: LoginCredentialsUi) : LoginEvent()
-    data class SuccessOAuthLogin(val session: UserSession) : LoginEvent()
-    data object NavigateToRegister : LoginEvent()
-    data object NavigateToForgot : LoginEvent()
+internal sealed class LoginEvent : StoreEvent {
+    data object Started : LoginEvent()
+    data class SubmitCredentials(val credentials: LoginCredentialsUi) : LoginEvent()
+    data class SocialNetworkAuthSucceeded(val session: UserSession) : LoginEvent()
+    data object ClickSignUp : LoginEvent()
+    data object ClickForgotPassword : LoginEvent()
 }
 
-internal sealed class LoginEffect : BaseUiEffect {
+internal sealed class LoginEffect : StoreEffect {
     data class ShowError(val failure: AuthFailures) : LoginEffect()
-    data class NavigateToLocal(val pushScreen: Screen) : LoginEffect()
-    data class ReplaceGlobalScreen(val screen: Screen) : LoginEffect()
 }
 
-internal sealed class LoginAction : BaseAction {
+internal sealed class LoginAction : StoreAction {
+    data class UpdateLoading(val isLoading: Boolean) : LoginAction()
+    data class UpdateGoogleAvailability(val isAvailable: Boolean) : LoginAction()
     data class UpdateValidErrors(
         val email: EmailValidError?,
         val password: PasswordValidError?
     ) : LoginAction()
-    data class UpdateGoogleAvailable(val isAvailable: Boolean) : LoginAction()
-    data class UpdateLoading(val isLoading: Boolean) : LoginAction()
+}
+
+internal sealed class LoginOutput : BaseOutput {
+    data object NavigateToSignUp : LoginOutput()
+    data object NavigateToRecovery : LoginOutput()
+    data object NavigateToVerification : LoginOutput()
+    data object NavigateToFirstSetup : LoginOutput()
+    data object NavigateToApp : LoginOutput()
 }

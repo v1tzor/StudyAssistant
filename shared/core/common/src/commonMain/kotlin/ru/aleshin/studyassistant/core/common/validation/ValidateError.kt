@@ -15,9 +15,10 @@
 */
 package ru.aleshin.studyassistant.core.common.validation
 
-import dev.icerock.moko.parcelize.Parcelable
+import androidx.compose.runtime.Immutable
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
-interface ValidateError : Parcelable
+@Immutable
+interface ValidateError
