@@ -15,28 +15,27 @@
  */
 package ru.aleshin.studyassistant.core.common.functional
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.periodUntil
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.epochTimeDuration
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
-@Parcelize
+@Immutable
+@Serializable
 data class TimeRange(
-    @TypeParceler<Instant, InstantParceler> val from: Instant,
-    @TypeParceler<Instant, InstantParceler> val to: Instant
-) : Parcelable {
+    val from: Instant,
+    val to: Instant
+) {
 
     fun containsDate(instant: Instant) = instant in from..to
 

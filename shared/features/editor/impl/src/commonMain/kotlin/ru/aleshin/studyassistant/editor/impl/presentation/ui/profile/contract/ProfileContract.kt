@@ -16,14 +16,13 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
 import io.github.vinceglb.filekit.core.PlatformFile
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.AppUserUi
@@ -32,16 +31,15 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.users.SocialNet
 /**
  * @author Stanislav Aleshin on 26.07.2024
  */
-@Immutable
-@Parcelize
-internal data class ProfileViewState(
+@Serializable
+internal data class ProfileState(
     val isLoading: Boolean = true,
     val isPaidUser: Boolean? = false,
     val appUser: AppUserUi? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class ProfileEvent : BaseEvent {
-    data object Init : ProfileEvent()
+internal sealed class ProfileEvent : StoreEvent {
+    data object Started : ProfileEvent()
     data class UpdateAvatar(val file: PlatformFile) : ProfileEvent()
     data object DeleteAvatar : ProfileEvent()
     data class UpdateUsername(val name: String) : ProfileEvent()
@@ -55,14 +53,17 @@ internal sealed class ProfileEvent : BaseEvent {
     data object NavigateToBack : ProfileEvent()
 }
 
-internal sealed class ProfileEffect : BaseUiEffect {
+internal sealed class ProfileEffect : StoreEffect {
     data class ShowError(val failures: EditorFailures) : ProfileEffect()
-    data class NavigateToGlobal(val pushScreen: Screen) : ProfileEffect()
-    data object NavigateToBack : ProfileEffect()
 }
 
-internal sealed class ProfileAction : BaseAction {
+internal sealed class ProfileAction : StoreAction {
     data class SetupAppUser(val user: AppUserUi) : ProfileAction()
     data class UpdateLoading(val isLoading: Boolean) : ProfileAction()
     data class UpdatePaidUserStatus(val isPaidUser: Boolean) : ProfileAction()
+}
+
+internal sealed class ProfileOutput : BaseOutput {
+    data object NavigateToBack : ProfileOutput()
+    data object NavigateToBilling : ProfileOutput()
 }

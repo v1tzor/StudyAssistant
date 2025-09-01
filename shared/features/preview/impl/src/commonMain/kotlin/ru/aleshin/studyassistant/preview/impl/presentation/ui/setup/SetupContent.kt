@@ -30,8 +30,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
@@ -39,25 +45,107 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.launch
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
 import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
 import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupViewState
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEffect
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEvent
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupState
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.store.SetupComponent
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.CalendarPageInfo
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.NavigationPageButton
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.OrganizationPageInfo
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.ProfilePageInfo
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SchedulePageInfo
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupPage
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupTopBar
 
 /**
  * @author Stanislav Aleshin on 17.04.2024
  */
 @Composable
 internal fun SetupContent(
-    state: SetupViewState,
+    setupComponent: SetupComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = setupComponent.store
+    val state by store.stateAsState()
+    val strings = PreviewThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val windowSize = LocalWindowSize.current
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            when (windowSize.heightWindowType) {
+                else -> BaseSetupContent(
+                    state = state,
+                    modifier = Modifier.padding(paddingValues),
+                    onUpdateProfile = { store.dispatchEvent(SetupEvent.UpdateProfile(it)) },
+                    onUpdateOrganization = { store.dispatchEvent(SetupEvent.UpdateOrganization(it)) },
+                    onUpdateCalendarSettings = { store.dispatchEvent(SetupEvent.UpdateCalendarSettings(it)) },
+                    onSaveProfile = { store.dispatchEvent(SetupEvent.ClickSaveProfileInfo) },
+                    onUpdateProfileAvatar = { store.dispatchEvent(SetupEvent.UpdateProfileAvatar(it)) },
+                    onDeleteProfileAvatar = { store.dispatchEvent(SetupEvent.DeleteProfileAvatar) },
+                    onSaveOrganization = { store.dispatchEvent(SetupEvent.ClickSaveOrganizationInfo) },
+                    onUpdateOrganizationAvatar = { store.dispatchEvent(SetupEvent.UpdateOrganizationAvatar(it)) },
+                    onDeleteOrganizationAvatar = { store.dispatchEvent(SetupEvent.DeleteOrganizationAvatar) },
+                    onSaveCalendar = { store.dispatchEvent(SetupEvent.ClickSaveCalendarInfo) },
+                    onFillOutSchedule = { store.dispatchEvent(SetupEvent.ClickEditWeekSchedule) },
+                    onStartUsing = { store.dispatchEvent(SetupEvent.ClickGoToApp) },
+                    onPaidFunctionClick = { store.dispatchEvent(SetupEvent.ClickPaidFunction) },
+                    onExceedingAvatarSizeLimit = {
+                        coroutineScope.launch {
+                            snackbarState.showSnackbar(
+                                message = coreStrings.exceedingLimitImageSizeMessage,
+                                withDismissAction = true,
+                            )
+                        }
+                    }
+                )
+            }
+        },
+        topBar = {
+            SetupTopBar(
+                enabled = state.currentPage.id != 0,
+                onBackPressed = { store.dispatchEvent(SetupEvent.ClickBackPage) },
+                stepProgress = state.currentPage.progress(),
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is SetupEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BaseSetupContent(
+    state: SetupState,
     modifier: Modifier,
     onUpdateProfile: (AppUserUi) -> Unit,
     onUpdateOrganization: (OrganizationUi) -> Unit,
@@ -72,21 +160,21 @@ internal fun SetupContent(
     onExceedingAvatarSizeLimit: (Int) -> Unit,
     onFillOutSchedule: () -> Unit,
     onStartUsing: () -> Unit,
-    onOpenBillingScreen: () -> Unit,
-) = with(state) {
+    onPaidFunctionClick: () -> Unit,
+) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         SetupPageInfoSection(
             modifier = Modifier.weight(1f),
-            currentPage = currentPage,
-            profile = profile,
-            isPaidUser = isPaidUser,
-            actionWithProfileAvatar = actionWithProfileAvatar,
-            organization = organization,
-            actionWithOrganizationAvatar = actionWithOrganizationAvatar,
-            calendarSettings = calendarSettings,
+            currentPage = state.currentPage,
+            profile = state.profile,
+            isPaidUser = state.isPaidUser,
+            actionWithProfileAvatar = state.actionWithProfileAvatar,
+            organization = state.organization,
+            actionWithOrganizationAvatar = state.actionWithOrganizationAvatar,
+            calendarSettings = state.calendarSettings,
             onUpdateProfile = onUpdateProfile,
             onUpdateProfileAvatar = onUpdateProfileAvatar,
             onDeleteProfileAvatar = onDeleteProfileAvatar,
@@ -95,12 +183,12 @@ internal fun SetupContent(
             onDeleteOrganizationAvatar = onDeleteOrganizationAvatar,
             onUpdateCalendarSettings = onUpdateCalendarSettings,
             onExceedingAvatarSizeLimit = onExceedingAvatarSizeLimit,
-            onOpenBillingScreen = onOpenBillingScreen,
+            onOpenBillingScreen = onPaidFunctionClick,
         )
         SetupPageNavigationSection(
-            enabledSaveProfile = profile?.username?.isNotBlank() == true,
-            enabledSaveOrganization = organization?.shortName?.isNotBlank() == true,
-            currentPage = currentPage,
+            enabledSaveProfile = state.profile?.username?.isNotBlank() == true,
+            enabledSaveOrganization = state.organization?.shortName?.isNotBlank() == true,
+            currentPage = state.currentPage,
             onSaveProfile = onSaveProfile,
             onSaveOrganization = onSaveOrganization,
             onSaveCalendar = onSaveCalendar,

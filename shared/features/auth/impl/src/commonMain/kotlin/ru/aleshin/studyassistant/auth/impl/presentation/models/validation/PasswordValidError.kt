@@ -16,13 +16,13 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.models.validation
 
-import dev.icerock.moko.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.validation.ValidateError
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.
  */
-@Parcelize
+@Serializable
 internal sealed class PasswordValidError : ValidateError {
     data object FormatError : PasswordValidError()
 }

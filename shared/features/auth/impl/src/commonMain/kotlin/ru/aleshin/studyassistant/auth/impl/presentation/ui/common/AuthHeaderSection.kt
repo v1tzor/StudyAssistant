@@ -32,13 +32,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 /**
  * @author Stanislav Aleshin on 20.04.2024.
@@ -48,7 +49,7 @@ internal fun AuthHeaderSection(
     modifier: Modifier = Modifier,
     header: String,
     title: String? = null,
-    illustration: Painter,
+    illustration: DrawableResource,
     contentDescription: String?,
 ) {
     Column(
@@ -68,7 +69,7 @@ internal fun AuthHeaderSection(
                 .onGloballyPositioned { coordinates ->
                     imageHeight = with(density) { coordinates.size.height.toDp() }
                 },
-            painter = illustration,
+            painter = painterResource(illustration),
             contentDescription = contentDescription,
             contentScale = ContentScale.Fit,
             alignment = Alignment.Center,

@@ -98,10 +98,16 @@ internal fun ClassesDurationEditorDialog(
     onDismiss: () -> Unit,
     onConfirm: (Millis, List<NumberedDurationUi>) -> Unit,
 ) {
-    val classesDurationsMap = classesDurations.groupBy { it.second }
-    val baseDuration = classesDurationsMap.maxBy { it.value.size }.key
-    val specificDurations = classesDurations.filter { it.second != baseDuration }.map {
-        NumberedDurationUi(it.first, it.second)
+    val classesDurationsMap = remember(classesDurations) {
+        classesDurations.groupBy { it.second }
+    }
+    val baseDuration = remember(classesDurationsMap) {
+        classesDurationsMap.maxBy { it.value.size }.key
+    }
+    val specificDurations = remember(classesDurations, baseDuration) {
+        classesDurations.filter { it.second != baseDuration }.map {
+            NumberedDurationUi(it.first, it.second)
+        }
     }
 
     var editableBaseDuration by remember { mutableStateOf<Millis?>(baseDuration) }
@@ -153,10 +159,16 @@ internal fun BreaksDurationEditorDialog(
     onDismiss: () -> Unit,
     onConfirm: (Millis, List<NumberedDurationUi>) -> Unit,
 ) {
-    val breaksDurationsMap = breaksDurations.groupBy { it.second }
-    val baseDuration = breaksDurationsMap.maxBy { it.value.size }.key
-    val specificDurations = breaksDurations.filter { it.second != baseDuration }.map {
-        NumberedDurationUi(it.first, it.second)
+    val breaksDurationsMap = remember(breaksDurations) {
+        breaksDurations.groupBy { it.second }
+    }
+    val baseDuration = remember(breaksDurationsMap) {
+        breaksDurationsMap.maxBy { it.value.size }.key
+    }
+    val specificDurations = remember(breaksDurations, baseDuration) {
+        breaksDurations.filter { it.second != baseDuration }.map {
+            NumberedDurationUi(it.first, it.second)
+        }
     }
 
     var editableBaseDuration by remember { mutableStateOf<Millis?>(baseDuration) }

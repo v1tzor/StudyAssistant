@@ -18,36 +18,95 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.auth.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.auth.impl.presentation.models.credentials.ForgotCredentialsUi
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.AuthHeaderSection
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.EmailTextField
-import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotViewState
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEffect
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotEvent
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotState
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.store.ForgotComponent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.views.ForgotActionsSection
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
+import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.SpacerToKeyboard
 
 /**
  * @author Stanislav Aleshin on 16.04.2024
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class)
 internal fun ForgotContent(
-    state: ForgotViewState,
+    forgotComponent: ForgotComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = forgotComponent.store
+    val strings = AuthThemeRes.strings
+    val windowSize = LocalWindowSize.current
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            when (windowSize.heightWindowType) {
+                else -> BaseForgotContent(
+                    state = store.stateAsState().value,
+                    modifier = Modifier.padding(paddingValues),
+                    onLoginClick = {
+                        store.dispatchEvent(ForgotEvent.ClickLogin)
+                    },
+                    onResetPasswordClick = { email ->
+                        val credentials = ForgotCredentialsUi(email)
+                        store.dispatchEvent(ForgotEvent.ClickResetPassword(credentials))
+                    }
+                )
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is ForgotEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalResourceApi::class)
+private fun BaseForgotContent(
+    state: ForgotState,
     modifier: Modifier,
-    onSendEmailClick: (email: String) -> Unit,
-    onAlreadyHavePasswordClick: () -> Unit,
+    onResetPasswordClick: (email: String) -> Unit,
+    onLoginClick: () -> Unit,
 ) {
     Column(
         modifier = modifier.padding(bottom = 16.dp, top = 6.dp),
@@ -56,7 +115,7 @@ internal fun ForgotContent(
         AuthHeaderSection(
             modifier = Modifier.weight(1f),
             header = AuthThemeRes.strings.forgotHeadline,
-            illustration = painterResource(AuthThemeRes.icons.forgotIllustration),
+            illustration = AuthThemeRes.icons.forgotIllustration,
             contentDescription = AuthThemeRes.strings.forgotDesc,
         )
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -73,7 +132,7 @@ internal fun ForgotContent(
                     errorText = state.emailValidError?.mapToMessage(),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            if (email.isNotEmpty()) onSendEmailClick(email)
+                            if (email.isNotEmpty()) onResetPasswordClick(email)
                             focusManager.clearFocus()
                         },
                     )
@@ -84,8 +143,8 @@ internal fun ForgotContent(
             ForgotActionsSection(
                 enabled = !state.isLoading && email.isNotEmpty(),
                 isLoading = state.isLoading,
-                onSendEmailClick = { onSendEmailClick(email) },
-                onAlreadyHavePasswordClick = onAlreadyHavePasswordClick,
+                onResetPasswordClick = { onResetPasswordClick(email) },
+                onLoginClick = onLoginClick,
             )
         }
     }

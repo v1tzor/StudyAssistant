@@ -16,15 +16,16 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 
 /**
  * @author Stanislav Aleshin on 20.06.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class TasksAnalysis(
     val tomorrowHomeworks: List<UID>,
     val weekHomeworks: List<UID>,
-) : Parcelable
+)

@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import studyassistant.shared.features.schedule.impl.generated.resources.Res
@@ -31,6 +32,7 @@ import studyassistant.shared.features.schedule.impl.generated.resources.il_free_
 /**
  * @author Stanislav Aleshin on 21.06.2023.
  */
+@Immutable
 internal data class ScheduleIcons(
     val emptyClassesIllustration: DrawableResource,
     val openTable: DrawableResource,

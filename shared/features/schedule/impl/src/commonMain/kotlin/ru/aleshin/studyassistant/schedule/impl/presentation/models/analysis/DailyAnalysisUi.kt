@@ -16,18 +16,16 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.analysis
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 12.06.2024
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class DailyAnalysisUi(
-    @TypeParceler<Instant, InstantParceler>
     val date: Instant,
     val generalAssessment: Float,
     val numberOfClasses: Int = 0,
@@ -35,4 +33,4 @@ internal data class DailyAnalysisUi(
     val numberOfMovements: Int = 0,
     val numberOfHomeworks: List<Boolean> = emptyList(),
     val numberOfTasks: List<Boolean> = emptyList(),
-) : Parcelable
+)

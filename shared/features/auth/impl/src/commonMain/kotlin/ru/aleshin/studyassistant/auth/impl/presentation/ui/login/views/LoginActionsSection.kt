@@ -48,8 +48,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthThemeRes
-import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.OAuthSignInRowContainer
-import ru.aleshin.studyassistant.core.api.utils.OAuthProvider
+import ru.aleshin.studyassistant.auth.impl.presentation.ui.common.SocialNetworkSignInRowContainer
+import ru.aleshin.studyassistant.core.api.utils.SocialNetworkProvider
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
 
@@ -63,8 +63,8 @@ internal fun LoginActionsSection(
     enabledGoogle: Boolean,
     isLoading: Boolean,
     onLoginClick: () -> Unit,
-    onSuccessOAuthLogin: (UserSession) -> Unit,
-    onFailureOAuthLogin: () -> Unit,
+    onSuccessSocialNetworkLogin: (UserSession) -> Unit,
+    onFailureSocialNetworkLogin: () -> Unit,
 ) {
     Column(
         modifier = modifier.padding(horizontal = 24.dp),
@@ -108,15 +108,15 @@ internal fun LoginActionsSection(
                 color = MaterialTheme.colorScheme.outlineVariant
             )
         }
-        OAuthSignInRowContainer(
-            onCreateSession = onSuccessOAuthLogin,
+        SocialNetworkSignInRowContainer(
+            onSuccess = onSuccessSocialNetworkLogin,
             onError = { exception ->
                 exception?.printStackTrace()
-                onFailureOAuthLogin()
+                onFailureSocialNetworkLogin()
             },
         ) { callback ->
             OutlinedButton(
-                onClick = { callback(OAuthProvider.GOOGLE) },
+                onClick = { callback(SocialNetworkProvider.GOOGLE) },
                 modifier = Modifier.alphaByEnabled(enabledGoogle).size(48.dp),
                 enabled = !isLoading && enabledGoogle,
                 shape = MaterialTheme.shapes.large,
@@ -135,7 +135,7 @@ internal fun LoginActionsSection(
                 }
             }
             OutlinedButton(
-                onClick = { callback(OAuthProvider.YANDEX) },
+                onClick = { callback(SocialNetworkProvider.YANDEX) },
                 modifier = Modifier.alphaByEnabled(enabledGoogle).size(48.dp),
                 enabled = !isLoading && enabledGoogle,
                 shape = MaterialTheme.shapes.large,
@@ -158,7 +158,7 @@ internal fun LoginActionsSection(
 }
 
 @Composable
-internal fun NotAccountButton(
+internal fun SignUpButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -181,10 +181,10 @@ internal fun NotAccountButton(
                 .padding(contentPadding),
             text = buildAnnotatedString {
                 withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
-                    append(AuthThemeRes.strings.notAccountLabelFirst)
+                    append(AuthThemeRes.strings.signUpLabelFirst)
                 }
                 withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                    append(AuthThemeRes.strings.notAccountLabelSecond)
+                    append(AuthThemeRes.strings.signUpLabelSecond)
                 }
             },
             style = MaterialTheme.typography.labelMedium,

@@ -78,7 +78,7 @@ class RealtimeService(
 ) : BaseAppwriteService(client), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
-        get() = client.coroutineManager.backgroundDispatcher + mainJob
+        get() = client.coroutineManager.ioDispatcher + mainJob
 
     internal val endpoint: String
         get() = client.endpointRealtime ?: ""

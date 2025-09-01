@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.presentation.models
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
@@ -25,10 +25,11 @@ import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 /**
  * @author Stanislav Aleshin on 27.01.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 data class GeneralSettingsUi(
     val isFirstStart: Boolean = true,
     val isUnfinishedSetup: UID? = null,
     val themeType: ThemeUiType = ThemeUiType.DEFAULT,
     val languageType: LanguageUiType = LanguageUiType.DEFAULT,
-) : Parcelable
+)

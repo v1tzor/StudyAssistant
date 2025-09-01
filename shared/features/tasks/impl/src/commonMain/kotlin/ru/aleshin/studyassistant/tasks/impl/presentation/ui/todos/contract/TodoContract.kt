@@ -16,40 +16,42 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
+import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
 
 /**
  * @author Stanislav Aleshin on 28.07.2024
  */
-@Parcelize
-@Immutable
-internal data class TodoViewState(
+@Serializable
+internal data class TodoState(
     val isLoading: Boolean = true,
     val completedTodos: List<TodoUi> = emptyList(),
-) : BaseViewState
+) : StoreState
 
-internal sealed class TodoEvent : BaseEvent {
-    data object Init : TodoEvent()
+internal sealed class TodoEvent : StoreEvent {
+    data object Started : TodoEvent()
     data class UpdateTodoDone(val todo: TodoUi, val isDone: Boolean) : TodoEvent()
-    data class NavigateToTodoEditor(val todo: TodoUi?) : TodoEvent()
-    data object NavigateToBack : TodoEvent()
+    data class ClickTodoTask(val todo: TodoUi?) : TodoEvent()
+    data object ClickBack : TodoEvent()
 }
 
-internal sealed class TodoEffect : BaseUiEffect {
+internal sealed class TodoEffect : StoreEffect {
     data class ShowError(val failures: TasksFailures) : TodoEffect()
-    data class NavigateToGlobal(val pushScreen: Screen) : TodoEffect()
-    data object NavigateToBack : TodoEffect()
 }
 
-internal sealed class TodoAction : BaseAction {
+internal sealed class TodoAction : StoreAction {
     data class UpdateTodos(val todos: List<TodoUi>) : TodoAction()
     data class UpdateLoading(val isLoading: Boolean) : TodoAction()
+}
+
+internal sealed class TodoOutput : BaseOutput {
+    data object NavigateToBack : TodoOutput()
+    data class NavigateToTodoEditor(val config: EditorConfig.Todo) : TodoOutput()
 }

@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.models.settings
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.settings.NotificationSettings.Companion.BEFORE_BEGINNING_CLASSES_NOTIFY_TIME
 import ru.aleshin.studyassistant.core.domain.entities.settings.NotificationSettings.Companion.UNFINISHED_HOMEWORKS_NOTIFY_TIME
@@ -26,7 +26,8 @@ import ru.aleshin.studyassistant.core.domain.entities.settings.NotificationSetti
 /**
  * @author Stanislav Aleshin on 25.08.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class NotificationSettingsUi(
     val beginningOfClasses: Long? = BEFORE_BEGINNING_CLASSES_NOTIFY_TIME,
     val exceptionsForBeginningOfClasses: List<UID> = emptyList(),
@@ -34,4 +35,4 @@ internal data class NotificationSettingsUi(
     val exceptionsForEndOfClasses: List<UID> = emptyList(),
     val unfinishedHomeworks: Long? = UNFINISHED_HOMEWORKS_NOTIFY_TIME,
     val highWorkload: Int? = WORKLOAD_HIGH_VALUE,
-) : Parcelable
+)

@@ -16,9 +16,14 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.models.subjects
 
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
+
 /**
  * @author Stanislav Aleshin on 18.06.2024.
  */
+@Immutable
+@Serializable
 internal enum class SubjectSortedType {
     ALPHABETIC, TEACHER, EVENT_TYPE, OFFICE, LOCATION,
 }

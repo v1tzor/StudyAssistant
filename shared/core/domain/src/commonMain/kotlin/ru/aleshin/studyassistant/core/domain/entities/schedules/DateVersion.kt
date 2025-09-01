@@ -16,27 +16,26 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.schedules
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.extensions.dateOfWeekDay
 import ru.aleshin.studyassistant.core.common.extensions.endThisDay
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date.MAX_DAYS_SHIFT
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 data class DateVersion(
-    @TypeParceler<Instant, InstantParceler> val from: Instant,
-    @TypeParceler<Instant, InstantParceler> val to: Instant,
-) : Parcelable {
+    val from: Instant,
+    val to: Instant,
+) {
 
     fun duration() = to - from
 

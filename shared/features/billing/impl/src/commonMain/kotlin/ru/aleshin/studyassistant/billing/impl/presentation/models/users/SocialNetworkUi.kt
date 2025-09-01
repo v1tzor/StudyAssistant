@@ -16,18 +16,19 @@
 
 package ru.aleshin.studyassistant.billing.impl.presentation.models.users
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-@Parcelize
+@Serializable
+@Immutable
 internal data class SocialNetworkUi(
     val uid: UID,
     val type: SocialNetworkType,
     val otherType: String?,
     val data: String,
-) : Parcelable
+)

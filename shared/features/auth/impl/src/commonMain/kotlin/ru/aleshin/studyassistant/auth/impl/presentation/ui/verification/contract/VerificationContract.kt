@@ -16,37 +16,40 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.contract
 
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.auth.impl.domain.entites.AuthFailures
 import ru.aleshin.studyassistant.auth.impl.presentation.models.user.AppUserUi
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 
 /**
  * @author Stanislav Aleshin on 29.08.2024
  */
-@Parcelize
-internal data class VerificationViewState(
+@Serializable
+internal data class VerificationState(
     val appUser: AppUserUi? = null,
     val retryAvailableTime: Long? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class VerificationEvent : BaseEvent {
-    data object Init : VerificationEvent()
-    data object SendEmailVerification : VerificationEvent()
-    data object SignOut : VerificationEvent()
+internal sealed class VerificationEvent : StoreEvent {
+    data object Started : VerificationEvent()
+    data object ClickSendEmail : VerificationEvent()
+    data object ClickSignOut : VerificationEvent()
 }
 
-internal sealed class VerificationEffect : BaseUiEffect {
+internal sealed class VerificationEffect : StoreEffect {
     data class ShowError(val failures: AuthFailures) : VerificationEffect()
-    data class ReplaceScreen(val screen: Screen) : VerificationEffect()
-    data class ReplaceGlobalScreen(val screen: Screen) : VerificationEffect()
 }
 
-internal sealed class VerificationAction : BaseAction {
+internal sealed class VerificationAction : StoreAction {
     data class UpdateAppUser(val appUser: AppUserUi) : VerificationAction()
     data class UpdateRetryAvailableTime(val retryAvailableTime: Long?) : VerificationAction()
+}
+
+internal sealed class VerificationOutput : BaseOutput {
+    data object NavigateToLogin : VerificationOutput()
+    data object NavigateToFirstSetup : VerificationOutput()
 }

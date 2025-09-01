@@ -16,20 +16,19 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
-import ru.aleshin.studyassistant.editor.api.presentation.DayOfNumberedWeekUi
+import ru.aleshin.studyassistant.editor.api.DayOfNumberedWeekUi
+import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.EditClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
@@ -41,28 +40,20 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeD
 /**
  * @author Stanislav Aleshin on 01.06.2024
  */
-@Immutable
-@Parcelize
-internal data class ClassViewState(
+@Serializable
+internal data class ClassState(
     val isLoading: Boolean = true,
     val editableClass: EditClassUi? = null,
     val weekDay: DayOfNumberedWeekUi? = null,
     val schedule: ScheduleUi? = null,
-    @TypeParceler<Instant, InstantParceler>
     val freeClassTimeRanges: Map<TimeRange, Boolean>? = null,
     val organizations: List<OrganizationShortUi> = emptyList(),
     val subjects: List<SubjectUi> = emptyList(),
     val employees: List<EmployeeDetailsUi> = emptyList(),
-) : BaseViewState
+) : StoreState
 
-internal sealed class ClassEvent : BaseEvent {
-    data class Init(
-        val classId: UID?,
-        val scheduleId: UID?,
-        val organizationId: UID?,
-        val isCustomSchedule: Boolean,
-        val weekDay: DayOfNumberedWeekUi
-    ) : ClassEvent()
+internal sealed class ClassEvent : StoreEvent {
+    data class Started(val inputData: ClassInput, val isRestore: Boolean) : ClassEvent()
     data class UpdateOrganization(val organization: OrganizationShortUi?) : ClassEvent()
     data class UpdateSubject(val type: EventType?, val subject: SubjectUi?) : ClassEvent()
     data class UpdateTeacher(val teacher: EmployeeDetailsUi?) : ClassEvent()
@@ -77,13 +68,11 @@ internal sealed class ClassEvent : BaseEvent {
     data object NavigateToBack : ClassEvent()
 }
 
-internal sealed class ClassEffect : BaseUiEffect {
+internal sealed class ClassEffect : StoreEffect {
     data class ShowError(val failures: EditorFailures) : ClassEffect()
-    data class NavigateToLocal(val pushScreen: Screen) : ClassEffect()
-    data object NavigateToBack : ClassEffect()
 }
 
-internal sealed class ClassAction : BaseAction {
+internal sealed class ClassAction : StoreAction {
     data class SetupEditModel(
         val editModel: EditClassUi,
         val schedule: ScheduleUi,
@@ -96,4 +85,19 @@ internal sealed class ClassAction : BaseAction {
     data class UpdateSubjects(val subjects: List<SubjectUi>) : ClassAction()
     data class UpdateEmployees(val employees: List<EmployeeDetailsUi>) : ClassAction()
     data class UpdateLoading(val isLoading: Boolean) : ClassAction()
+}
+
+internal data class ClassInput(
+    val classId: UID?,
+    val scheduleId: UID?,
+    val organizationId: UID?,
+    val customSchedule: Boolean,
+    val weekDay: DayOfNumberedWeekUi,
+) : BaseInput
+
+internal sealed class ClassOutput : BaseOutput {
+    data object NavigateToBack : ClassOutput()
+    data class NavigateToEmployeeEditor(val config: EditorConfig.Employee) : ClassOutput()
+    data class NavigateToSubjectEditor(val config: EditorConfig.Subject) : ClassOutput()
+    data class NavigateToOrganizationEditor(val config: EditorConfig.Organization) : ClassOutput()
 }

@@ -49,9 +49,7 @@ import ru.aleshin.studyassistant.core.ui.theme.material.splash
  * @author Stanislav Aleshin on 09.02.2024.
  */
 @Composable
-fun SplashContent(
-    modifier: Modifier = Modifier,
-) {
+fun SplashContent(modifier: Modifier = Modifier) {
     var isVisibleText by remember { mutableStateOf(false) }
     var isVisibleLogo by remember { mutableStateOf(false) }
 

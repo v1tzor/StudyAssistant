@@ -234,8 +234,10 @@ private fun DailyScheduleBottomSheetContent(
     }
 
     if (classesDurationEditorDialogState && customSchedule != null) {
-        val classesDurations = customSchedule.classes.map {
-            Pair(customSchedule.classes.indexOf(it).inc(), epochTimeDuration(it.timeRange))
+        val classesDurations = remember(customSchedule.classes) {
+            customSchedule.classes.map {
+                Pair(customSchedule.classes.indexOf(it).inc(), epochTimeDuration(it.timeRange))
+            }
         }
 
         ClassesDurationEditorDialog(
@@ -250,11 +252,13 @@ private fun DailyScheduleBottomSheetContent(
     }
 
     if (breaksDurationEditorDialogState && customSchedule != null) {
-        val breaksDurations = buildList {
-            customSchedule.classes.forEachIndexed { index, classModel ->
-                if (index != customSchedule.classes.lastIndex) {
-                    val nextClassModel = customSchedule.classes[index + 1]
-                    add(Pair(index.inc(), epochTimeDuration(classModel.timeRange.to, nextClassModel.timeRange.from)))
+        val breaksDurations = remember(customSchedule.classes) {
+            buildList {
+                customSchedule.classes.forEachIndexed { index, classModel ->
+                    if (index != customSchedule.classes.lastIndex) {
+                        val nextClassModel = customSchedule.classes[index + 1]
+                        add(Pair(index.inc(), epochTimeDuration(classModel.timeRange.to, nextClassModel.timeRange.from)))
+                    }
                 }
             }
         }

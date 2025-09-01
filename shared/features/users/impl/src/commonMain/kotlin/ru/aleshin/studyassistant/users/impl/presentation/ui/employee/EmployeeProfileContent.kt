@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,51 +42,118 @@ import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.MediumInfoBadge
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
+import ru.aleshin.studyassistant.users.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.users.impl.presentation.models.ContactInfoUi
 import ru.aleshin.studyassistant.users.impl.presentation.models.SubjectUi
 import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
-import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileViewState
+import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileEffect
+import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileEvent
+import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileState
+import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.screenmodel.EmployeeProfileComponent
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeContactInfoNoneView
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeContactInfoView
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeContactInfoViewPlaceholder
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeProfileSubjectsNoneView
+import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeProfileTopBar
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeSubjectViewItem
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeSubjectViewPlaceholder
+import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeTopSheet
 
 /**
  * @author Stanislav Aleshin on 10.07.2024.
  */
 @Composable
 internal fun EmployeeProfileContent(
-    state: EmployeeProfileViewState,
+    employeeProfileComponent: EmployeeProfileComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = employeeProfileComponent.store
+    val state by store.stateAsState()
+    val strings = UsersThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseEmployeeProfileContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+            )
+        },
+        topBar = {
+            Column {
+                EmployeeProfileTopBar(
+                    enabledEdit = !state.employee?.uid.isNullOrBlank(),
+                    onBackClick = { store.dispatchEvent(EmployeeProfileEvent.ClickBack) },
+                    onEditClick = { store.dispatchEvent(EmployeeProfileEvent.ClickEdit) },
+                )
+                EmployeeTopSheet(
+                    isLoading = state.isLoading,
+                    employee = state.employee,
+                )
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is EmployeeProfileEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BaseEmployeeProfileContent(
+    state: EmployeeProfileState,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
-) = with(state) {
+) {
     Column(
         modifier = modifier.padding(top = 24.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         EmployeeProfileSubjectsSection(
-            isLoading = isLoading,
-            subjects = employee?.subjects ?: emptyList(),
+            isLoading = state.isLoading,
+            subjects = state.employee?.subjects ?: emptyList(),
         )
         EmployeeProfileContactInfoSection(
-            isLoading = isLoading,
-            emails = employee?.emails ?: emptyList(),
-            phones = employee?.phones ?: emptyList(),
-            webs = employee?.webs ?: emptyList(),
-            locations = employee?.locations ?: emptyList(),
+            isLoading = state.isLoading,
+            emails = state.employee?.emails ?: emptyList(),
+            phones = state.employee?.phones ?: emptyList(),
+            webs = state.employee?.webs ?: emptyList(),
+            locations = state.employee?.locations ?: emptyList(),
         )
         Spacer(modifier = Modifier.height(40.dp))
     }

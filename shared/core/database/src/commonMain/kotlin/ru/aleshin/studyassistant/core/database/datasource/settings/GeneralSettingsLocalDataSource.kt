@@ -40,7 +40,7 @@ interface GeneralSettingsLocalDataSource : LocalDataSource.OnlyOffline {
     ) : GeneralSettingsLocalDataSource {
 
         private val coroutineContext: CoroutineContext
-            get() = coroutineManager.backgroundDispatcher
+            get() = coroutineManager.ioDispatcher
 
         override fun fetchSettings(): Flow<GeneralSettingsEntity> {
             return generalQueries.fetchSettings().asFlow().mapToOne(coroutineContext)

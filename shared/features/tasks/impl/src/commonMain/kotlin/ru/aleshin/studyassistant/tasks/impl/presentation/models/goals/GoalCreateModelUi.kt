@@ -16,11 +16,9 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.goals
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalType
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
@@ -29,11 +27,12 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetail
 /**
  * @author Stanislav Aleshin on 04.06.2025.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class GoalCreateModelUi(
-    @TypeParceler<Instant, InstantParceler> val date: Instant,
+    val date: Instant,
     val contentType: GoalType,
     val contentHomework: HomeworkUi? = null,
     val contentTodo: TodoDetailsUi? = null,
     val desiredTime: Millis? = null,
-) : Parcelable
+)

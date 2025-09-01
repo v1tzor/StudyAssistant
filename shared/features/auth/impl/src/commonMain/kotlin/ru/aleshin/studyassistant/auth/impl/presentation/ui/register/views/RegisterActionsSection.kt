@@ -57,7 +57,7 @@ internal fun RegisterActionsSection(
     enabled: Boolean = true,
     isLoading: Boolean,
     onRegisterClick: () -> Unit,
-    onAlreadyHaveAccountClick: () -> Unit,
+    onLogin: () -> Unit,
 ) {
     Column(
         modifier = modifier.padding(start = 24.dp, end = 24.dp, top = 8.dp),
@@ -103,7 +103,7 @@ internal fun RegisterActionsSection(
         }
         AlreadyHaveAccountButton(
             enabled = !isLoading,
-            onClick = onAlreadyHaveAccountClick,
+            onClick = onLogin,
         )
     }
 }

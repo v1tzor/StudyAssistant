@@ -59,8 +59,8 @@ internal fun DetailsBottomBar(
     currentWeek: TimeRange?,
     selectedWeek: TimeRange?,
     viewType: WeekScheduleViewType,
-    onNextWeek: () -> Unit,
-    onPreviousWeek: () -> Unit,
+    onNextWeekSelected: () -> Unit,
+    onPreviousWeekSelected: () -> Unit,
     onViewTypeSelected: (WeekScheduleViewType) -> Unit,
 ) {
     Surface(
@@ -76,8 +76,8 @@ internal fun DetailsBottomBar(
             WeekPickerView(
                 currentWeek = currentWeek,
                 selectedWeek = selectedWeek,
-                onPreviousWeek = onPreviousWeek,
-                onNextWeek = onNextWeek,
+                onPreviousWeekSelected = onPreviousWeekSelected,
+                onNextWeekSelected = onNextWeekSelected,
             )
             Spacer(modifier = Modifier.weight(1f))
             ScheduleViewTypePicker(
@@ -94,8 +94,8 @@ internal fun WeekPickerView(
     enabled: Boolean = true,
     currentWeek: TimeRange?,
     selectedWeek: TimeRange?,
-    onPreviousWeek: () -> Unit,
-    onNextWeek: () -> Unit,
+    onPreviousWeekSelected: () -> Unit,
+    onNextWeekSelected: () -> Unit,
 ) {
     val currentWeekNumber = currentWeek?.from?.dateTime()?.date?.isoWeekNumber() ?: Int.MIN_VALUE
     val selectedWeekNumber = selectedWeek?.from?.dateTime()?.date?.isoWeekNumber() ?: Int.MAX_VALUE
@@ -110,7 +110,7 @@ internal fun WeekPickerView(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(
-                onClick = onPreviousWeek,
+                onClick = onPreviousWeekSelected,
                 modifier = Modifier.size(36.dp),
                 enabled = enabled,
             ) {
@@ -137,7 +137,7 @@ internal fun WeekPickerView(
                 style = MaterialTheme.typography.titleSmall,
             )
             IconButton(
-                onClick = onNextWeek,
+                onClick = onNextWeekSelected,
                 modifier = Modifier.size(36.dp),
                 enabled = enabled,
             ) {

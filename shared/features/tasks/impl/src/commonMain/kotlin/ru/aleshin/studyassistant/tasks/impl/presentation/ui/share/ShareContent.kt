@@ -28,8 +28,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -37,20 +40,28 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.MediumInfoBadge
+import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.ScheduleUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.ReceivedMediatedHomeworksDetailsUi
@@ -59,7 +70,10 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.Subject
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.MediatedHomeworkLinkData
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareViewState
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareEffect
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareEvent
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareState
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.store.ShareComponent
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.views.MediatedHomeworksLinkerBottomSheet
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.views.NoneReceivedSharedHomeworksView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.views.NoneSentSharedHomeworksView
@@ -67,13 +81,86 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.views.Received
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.views.ReceivedSharedHomeworksView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.views.SentSharedHomeworksPlaceholder
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.views.SentSharedHomeworksView
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.views.ShareTopBar
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
 @Composable
 internal fun ShareContent(
-    state: ShareViewState,
+    shareComponent: ShareComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = shareComponent.store
+    val state by store.stateAsState()
+    val strings = TasksThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            ShareContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+                onOpenUserProfile = {
+                    store.dispatchEvent(ShareEvent.ClickUserProfile(it.uid))
+                },
+                onLoadSubjects = {
+                    store.dispatchEvent(ShareEvent.LoadLinkSubjects(it))
+                },
+                onLoadLinkData = {
+                    store.dispatchEvent(ShareEvent.LoadLinkData(it))
+                },
+                onUpdateLinkData = {
+                    store.dispatchEvent(ShareEvent.UpdateLinkData(it))
+                },
+                onAddSubject = {
+                    store.dispatchEvent(ShareEvent.ClickEditSubject(null, it))
+                },
+                onAcceptHomework = { receivedHomeworks, linkDataList ->
+                    store.dispatchEvent(ShareEvent.AcceptHomework(receivedHomeworks, linkDataList))
+                },
+                onRejectHomework = { receivedHomeworks ->
+                    store.dispatchEvent(ShareEvent.RejectHomework(receivedHomeworks))
+                },
+                onCancelSend = { sentHomeworks ->
+                    store.dispatchEvent(ShareEvent.CancelSendHomework(sentHomeworks))
+                },
+                onPaidFunctionClick = {
+                    store.dispatchEvent(ShareEvent.ClickPaidFunction)
+                },
+            )
+        },
+        topBar = {
+            ShareTopBar(
+                onBackClick = { store.dispatchEvent(ShareEvent.BackClick) },
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+        contentWindowInsets = WindowInsets.statusBars
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is ShareEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShareContent(
+    state: ShareState,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     onOpenUserProfile: (AppUserUi) -> Unit,
@@ -84,22 +171,22 @@ internal fun ShareContent(
     onAcceptHomework: (ReceivedMediatedHomeworksDetailsUi, List<MediatedHomeworkLinkData>) -> Unit,
     onRejectHomework: (ReceivedMediatedHomeworksDetailsUi) -> Unit,
     onCancelSend: (SentMediatedHomeworksDetailsUi) -> Unit,
-    onOpenBillingScreen: () -> Unit,
-) = with(state) {
+    onPaidFunctionClick: () -> Unit,
+) {
     Column(
         modifier = modifier.padding(top = 8.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         ReceivedTasksSection(
-            isLoading = isLoading,
-            isLoadingLink = isLoadingLink,
-            isPaidUser = isPaidUser,
-            currentTime = currentTime,
-            organizations = organizations,
-            receivedMediatedHomeworks = sharedHomeworks?.received?.values?.toList() ?: emptyList(),
-            linkDataList = linkDataList,
-            linkSchedule = linkSchedule,
-            linkSubjects = linkSubjects,
+            isLoading = state.isLoading,
+            isLoadingLink = state.isLoadingLink,
+            isPaidUser = state.isPaidUser,
+            currentTime = state.currentTime,
+            organizations = state.organizations,
+            receivedMediatedHomeworks = state.sharedHomeworks?.received?.values?.toList() ?: emptyList(),
+            linkDataList = state.linkDataList,
+            linkSchedule = state.linkSchedule,
+            linkSubjects = state.linkSubjects,
             onOpenUserProfile = onOpenUserProfile,
             onLoadSubjects = onLoadSubjects,
             onAddSubject = onAddSubject,
@@ -107,13 +194,13 @@ internal fun ShareContent(
             onAcceptHomework = onAcceptHomework,
             onUpdateLinkData = onUpdateLinkData,
             onRejectHomework = onRejectHomework,
-            onOpenBillingScreen = onOpenBillingScreen,
+            onPaidFunctionClick = onPaidFunctionClick,
         )
         HorizontalDivider()
         SentTasksSection(
-            isLoading = isLoading,
-            currentTime = currentTime,
-            sentMediatedHomeworks = sharedHomeworks?.sent?.values?.toList() ?: emptyList(),
+            isLoading = state.isLoading,
+            currentTime = state.currentTime,
+            sentMediatedHomeworks = state.sharedHomeworks?.sent?.values?.toList() ?: emptyList(),
             onCancelSend = onCancelSend,
         )
     }
@@ -139,7 +226,7 @@ private fun ReceivedTasksSection(
     onUpdateLinkData: (MediatedHomeworkLinkData) -> Unit,
     onAcceptHomework: (ReceivedMediatedHomeworksDetailsUi, List<MediatedHomeworkLinkData>) -> Unit,
     onRejectHomework: (ReceivedMediatedHomeworksDetailsUi) -> Unit,
-    onOpenBillingScreen: () -> Unit,
+    onPaidFunctionClick: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -184,7 +271,10 @@ private fun ReceivedTasksSection(
                     state = pagerState,
                     pageSpacing = 8.dp,
                 ) { homeworkIndex ->
-                    receivedMediatedHomeworks[homeworkIndex].apply {
+                    val homework = remember(receivedMediatedHomeworks, homeworkIndex) {
+                        receivedMediatedHomeworks[homeworkIndex]
+                    }
+                    homework.apply {
                         var isOpenMediatedHomeworksLinker by rememberSaveable { mutableStateOf(false) }
 
                         ReceivedSharedHomeworksView(
@@ -195,7 +285,7 @@ private fun ReceivedTasksSection(
                             sender = sender,
                             onOpenProfile = { onOpenUserProfile(sender) },
                             onAccept = {
-                                if (isPaidUser) isOpenMediatedHomeworksLinker = true else onOpenBillingScreen()
+                                if (isPaidUser) isOpenMediatedHomeworksLinker = true else onPaidFunctionClick()
                             },
                             onReject = { onRejectHomework(this) },
                         )

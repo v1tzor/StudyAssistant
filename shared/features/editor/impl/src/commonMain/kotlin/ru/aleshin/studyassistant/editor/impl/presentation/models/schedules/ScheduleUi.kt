@@ -16,17 +16,22 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.models.schedules
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 04.06.2024.
  */
-@Parcelize
-internal sealed class ScheduleUi : Parcelable {
+@Immutable
+@Serializable
+internal sealed class ScheduleUi {
 
+    @Immutable
+    @Serializable
     data class Base(val data: BaseScheduleUi?) : ScheduleUi()
 
+    @Immutable
+    @Serializable
     data class Custom(val data: CustomScheduleUi?) : ScheduleUi()
 
     fun <T> mapToValue(

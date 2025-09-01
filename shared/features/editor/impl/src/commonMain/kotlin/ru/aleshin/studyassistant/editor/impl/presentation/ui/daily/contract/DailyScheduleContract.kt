@@ -16,17 +16,16 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
+import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.FastEditDurations
@@ -37,19 +36,17 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.settings.Calend
 /**
  * @author Stanislav Aleshin on 14.07.2024
  */
-@Immutable
-@Parcelize
-internal data class DailyScheduleViewState(
+@Serializable
+internal data class DailyScheduleState(
     val isLoading: Boolean = true,
-    @TypeParceler<Instant?, NullInstantParceler>
     val targetDate: Instant? = null,
     val customSchedule: CustomScheduleUi? = null,
     val baseSchedule: BaseScheduleUi? = null,
     val calendarSettings: CalendarSettingsUi? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class DailyScheduleEvent : BaseEvent {
-    data class Init(val date: Long, val baseScheduleId: UID?, val customScheduleId: UID?) : DailyScheduleEvent()
+internal sealed class DailyScheduleEvent : StoreEvent {
+    data class Started(val inputData: DailyScheduleInput) : DailyScheduleEvent()
     data object CreateCustomSchedule : DailyScheduleEvent()
     data object DeleteCustomSchedule : DailyScheduleEvent()
     data class DeleteClass(val targetId: UID) : DailyScheduleEvent()
@@ -62,13 +59,11 @@ internal sealed class DailyScheduleEvent : BaseEvent {
     data object NavigateToBack : DailyScheduleEvent()
 }
 
-internal sealed class DailyScheduleEffect : BaseUiEffect {
+internal sealed class DailyScheduleEffect : StoreEffect {
     data class ShowError(val failures: EditorFailures) : DailyScheduleEffect()
-    data class NavigateToLocal(val pushScreen: Screen) : DailyScheduleEffect()
-    data object NavigateToBack : DailyScheduleEffect()
 }
 
-internal sealed class DailyScheduleAction : BaseAction {
+internal sealed class DailyScheduleAction : StoreAction {
 
     data class UpdateSchedules(
         val baseSchedule: BaseScheduleUi?,
@@ -78,4 +73,16 @@ internal sealed class DailyScheduleAction : BaseAction {
     data class UpdateTargetDate(val date: Instant) : DailyScheduleAction()
     data class UpdateCalendarSettings(val settings: CalendarSettingsUi) : DailyScheduleAction()
     data class UpdateLoading(val isLoading: Boolean) : DailyScheduleAction()
+}
+
+internal data class DailyScheduleInput(
+    val date: Long,
+    val baseScheduleId: UID?,
+    val customScheduleId: UID?,
+) : BaseInput
+
+internal sealed class DailyScheduleOutput : BaseOutput {
+    data object NavigateToBack : DailyScheduleOutput()
+    data class NavigateToClassEditor(val config: EditorConfig.Class) : DailyScheduleOutput()
+    data class NavigateToOrganizationEditor(val config: EditorConfig.Organization) : DailyScheduleOutput()
 }

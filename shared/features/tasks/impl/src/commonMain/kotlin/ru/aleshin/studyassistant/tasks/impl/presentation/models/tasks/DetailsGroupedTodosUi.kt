@@ -16,15 +16,16 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 12.06.2025.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class DetailsGroupedTodosUi(
     val completedTodos: List<TodoDetailsUi>,
     val runningTodos: List<TodoDetailsUi>,
     val errorTodos: List<TodoDetailsUi>,
-) : Parcelable
+)

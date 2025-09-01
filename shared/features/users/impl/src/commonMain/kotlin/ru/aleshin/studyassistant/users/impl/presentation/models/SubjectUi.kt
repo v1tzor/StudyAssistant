@@ -16,15 +16,16 @@
 
 package ru.aleshin.studyassistant.users.impl.presentation.models
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class SubjectUi(
     val uid: UID,
     val organizationId: UID,
@@ -35,4 +36,4 @@ internal data class SubjectUi(
     val color: Int,
     val location: ContactInfoUi?,
     val updatedAt: Long,
-) : Parcelable
+)

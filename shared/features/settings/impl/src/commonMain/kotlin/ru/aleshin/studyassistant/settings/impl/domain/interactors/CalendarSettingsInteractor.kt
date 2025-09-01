@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.settings.impl.domain.interactors
 
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkResult
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
@@ -29,7 +29,7 @@ import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
  */
 internal interface CalendarSettingsInteractor {
 
-    suspend fun fetchSettings(): FlowWorkResult<SettingsFailures, CalendarSettings>
+    suspend fun fetchSettings(): FlowDomainResult<SettingsFailures, CalendarSettings>
     suspend fun updateSettings(settings: CalendarSettings): UnitDomainResult<SettingsFailures>
 
     class Base(

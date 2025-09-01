@@ -16,15 +16,14 @@
 
 package ru.aleshin.studyassistant.chat.impl.presentation.models.ai
 
-import androidx.compose.runtime.Stable
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 24.06.2025.
  */
-@Parcelize
-@Stable
+@Immutable
+@Serializable
 internal data class ChatQueryUi(
     val query: String = "",
-) : Parcelable
+)

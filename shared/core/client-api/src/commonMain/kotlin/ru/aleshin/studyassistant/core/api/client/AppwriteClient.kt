@@ -96,7 +96,7 @@ class AppwriteClient private constructor(
 ) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext
-        get() = coroutineManager.backgroundDispatcher + job
+        get() = coroutineManager.ioDispatcher + job
 
     internal val projectId: String?
         get() = clientHeaders["x-appwrite-project"]

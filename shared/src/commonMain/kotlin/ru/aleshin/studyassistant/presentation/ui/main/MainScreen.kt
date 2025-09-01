@@ -27,36 +27,42 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
-import cafe.adriel.voyager.transitions.CrossfadeTransition
-import ru.aleshin.studyassistant.core.common.architecture.screen.ScreenContent
+import com.arkivanov.decompose.ExperimentalDecomposeApi
+import com.arkivanov.decompose.extensions.compose.stack.Children
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
+import ru.aleshin.studyassistant.core.common.navigation.backAnimation
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantTheme
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEvent
-import ru.aleshin.studyassistant.presentation.ui.main.contract.MainViewState
-import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.rememberMainScreenModel
-import ru.aleshin.studyassistant.presentation.ui.splash.SplashScreen
+import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent
+import ru.aleshin.studyassistant.presentation.ui.splash.SplashContent
+import ru.aleshin.studyassistant.presentation.ui.tabnavigation.TabsContent
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
  */
 @Composable
-fun MainScreen() = ScreenContent(
-    screenModel = rememberMainScreenModel(),
-    initialState = MainViewState(),
-) { state ->
+@OptIn(ExperimentalDecomposeApi::class)
+fun MainScreen(
+    mainComponent: MainComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = mainComponent.store
+    val state = store.stateAsState()
+
     StudyAssistantTheme(
-        themeType = state.generalSettings.themeType,
-        languageType = state.generalSettings.languageType,
+        themeType = state.value.generalSettings.themeType,
+        languageType = state.value.generalSettings.languageType,
     ) {
         val coreStrings = StudyAssistantRes.strings
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
+            modifier = modifier,
             contentWindowInsets = WindowInsets(0.dp),
             snackbarHost = {
                 SnackbarHost(
@@ -65,27 +71,49 @@ fun MainScreen() = ScreenContent(
                 )
             },
         ) { paddingValues ->
-            Navigator(
-                screen = SplashScreen(),
-                disposeBehavior = NavigatorDisposeBehavior(
-                    disposeNestedNavigators = false,
-                    disposeSteps = true,
+            Children(
+                modifier = Modifier.padding(paddingValues),
+                stack = mainComponent.stack,
+                animation = backAnimation(
+                    backHandler = mainComponent.backHandler,
+                    onBack = mainComponent::navigateToBack,
                 ),
-            ) { navigator ->
-                LaunchedEffect(navigator.lastItemOrNull) {
-                    if (navigator.lastItemOrNull is SplashScreen) {
-                        dispatchEvent(MainEvent.InitNavigation)
+            ) { child ->
+                when (val instance = child.instance) {
+                    is MainComponent.Child.SplashChild -> {
+                        SplashContent()
+                        LaunchedEffect(child.configuration) {
+                            store.dispatchEvent(MainEvent.ExecuteNavigation)
+                        }
+                    }
+                    is MainComponent.Child.TabNavigationChild -> {
+                        TabsContent(instance.component)
+                    }
+                    is MainComponent.Child.AuthChild -> {
+                        instance.component.contentProvider.invoke(Modifier)
+                    }
+                    is MainComponent.Child.EditorChild -> {
+                        instance.component.contentProvider.invoke(Modifier)
+                    }
+                    is MainComponent.Child.PreviewChild -> {
+                        instance.component.contentProvider.invoke(Modifier)
+                    }
+                    is MainComponent.Child.ScheduleChild -> {
+                        instance.component.contentProvider.invoke(Modifier)
+                    }
+                    is MainComponent.Child.BillingChild -> {
+                        instance.component.contentProvider.invoke(Modifier)
+                    }
+                    is MainComponent.Child.SettingsChild -> {
+                        instance.component.contentProvider.invoke(Modifier)
+                    }
+                    is MainComponent.Child.UsersChild -> {
+                        instance.component.contentProvider.invoke(Modifier)
                     }
                 }
 
-                CrossfadeTransition(
-                    modifier = Modifier.padding(paddingValues),
-                    navigator = navigator,
-                )
-
-                handleEffect { effect ->
+                store.handleEffects { effect ->
                     when (effect) {
-                        is MainEffect.ReplaceGlobalScreen -> navigator.replaceAll(effect.screen)
                         is MainEffect.ShowError -> snackbarState.showSnackbar(
                             message = effect.failures.mapToMessage(coreStrings),
                             duration = SnackbarDuration.Indefinite,

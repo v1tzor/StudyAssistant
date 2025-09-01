@@ -83,10 +83,10 @@ internal fun ClassBottomSheet(
     activeClass: ActiveClassUi?,
     classModel: ClassDetailsUi,
     classDate: Instant,
-    onAddHomework: (ClassDetailsUi, Instant) -> Unit,
-    onEditHomework: (HomeworkDetailsUi) -> Unit,
-    onAgainHomework: (HomeworkDetailsUi) -> Unit,
-    onCompleteHomework: (HomeworkDetailsUi) -> Unit,
+    onAddHomeworkClick: (ClassDetailsUi, Instant) -> Unit,
+    onEditHomeworkClick: (HomeworkDetailsUi) -> Unit,
+    onAgainHomeworkClick: (HomeworkDetailsUi) -> Unit,
+    onCompleteHomeworkClick: (HomeworkDetailsUi) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     ModalBottomSheet(
@@ -121,16 +121,16 @@ internal fun ClassBottomSheet(
             val coroutineScope = rememberCoroutineScope()
             ClassBottomSheetFooter(
                 homework = classModel.homework,
-                onAddHomework = {
+                onAddHomeworkClick = {
                     coroutineScope.launch { sheetState.hide() }
-                    onAddHomework(classModel, classDate)
+                    onAddHomeworkClick(classModel, classDate)
                 },
-                onEditHomework = {
+                onEditHomeworkClick = {
                     coroutineScope.launch { sheetState.hide() }
-                    onEditHomework(it)
+                    onEditHomeworkClick(it)
                 },
-                onCompleteHomework = onCompleteHomework,
-                onAgainHomework = onAgainHomework,
+                onCompleteHomeworkClick = onCompleteHomeworkClick,
+                onAgainHomeworkClick = onAgainHomeworkClick,
             )
         }
     }
@@ -206,10 +206,10 @@ private fun ClassBottomSheetHeader(
 private fun ClassBottomSheetFooter(
     modifier: Modifier = Modifier,
     homework: HomeworkDetailsUi?,
-    onAddHomework: () -> Unit,
-    onEditHomework: (HomeworkDetailsUi) -> Unit,
-    onAgainHomework: (HomeworkDetailsUi) -> Unit,
-    onCompleteHomework: (HomeworkDetailsUi) -> Unit,
+    onAddHomeworkClick: () -> Unit,
+    onEditHomeworkClick: (HomeworkDetailsUi) -> Unit,
+    onAgainHomeworkClick: (HomeworkDetailsUi) -> Unit,
+    onCompleteHomeworkClick: (HomeworkDetailsUi) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
@@ -229,16 +229,16 @@ private fun ClassBottomSheetFooter(
             }
             ClassBottomSheetActions(
                 homeworkStatus = homework.status,
-                onEditHomework = { onEditHomework(homework) },
-                onAddHomework = onAddHomework,
-                onCompleteHomework = { onCompleteHomework(homework) },
-                onAgainHomework = { onAgainHomework(homework) }
+                onEditHomeworkClick = { onEditHomeworkClick(homework) },
+                onAddHomeworkClick = onAddHomeworkClick,
+                onCompleteHomeworkClick = { onCompleteHomeworkClick(homework) },
+                onAgainHomeworkClick = { onAgainHomeworkClick(homework) }
             )
         } else {
             NoneHomeworkView()
             ClassBottomSheetActions(
                 homeworkStatus = null,
-                onAddHomework = onAddHomework,
+                onAddHomeworkClick = onAddHomeworkClick,
             )
         }
     }
@@ -248,10 +248,10 @@ private fun ClassBottomSheetFooter(
 private fun ClassBottomSheetActions(
     modifier: Modifier = Modifier,
     homeworkStatus: HomeworkStatus?,
-    onAddHomework: () -> Unit,
-    onEditHomework: () -> Unit = {},
-    onAgainHomework: () -> Unit = {},
-    onCompleteHomework: () -> Unit = {},
+    onAddHomeworkClick: () -> Unit,
+    onEditHomeworkClick: () -> Unit = {},
+    onAgainHomeworkClick: () -> Unit = {},
+    onCompleteHomeworkClick: () -> Unit = {},
 ) {
     Row(
         modifier = modifier,
@@ -261,7 +261,7 @@ private fun ClassBottomSheetActions(
         if (homeworkStatus != null) {
             FilledTonalIconButton(
                 modifier = Modifier.size(40.dp),
-                onClick = onEditHomework,
+                onClick = onEditHomeworkClick,
             ) {
                 Icon(imageVector = Icons.Default.Edit, contentDescription = null)
             }
@@ -273,7 +273,7 @@ private fun ClassBottomSheetActions(
                         color = StudyAssistantRes.colors.accents.green,
                     )
                     ClassBottomSheetActionButton(
-                        onClick = onAgainHomework,
+                        onClick = onAgainHomeworkClick,
                         text = ScheduleThemeRes.strings.againHomeworkTitle,
                     )
                 }
@@ -285,7 +285,7 @@ private fun ClassBottomSheetActions(
                     )
                     ClassBottomSheetActionButton(
                         modifier = Modifier.weight(1f),
-                        onClick = onCompleteHomework,
+                        onClick = onCompleteHomeworkClick,
                         text = ScheduleThemeRes.strings.completeHomeworkTitle,
                     )
                 }
@@ -296,7 +296,7 @@ private fun ClassBottomSheetActions(
                         color = StudyAssistantRes.colors.accents.yellow,
                     )
                     ClassBottomSheetActionButton(
-                        onClick = onCompleteHomework,
+                        onClick = onCompleteHomeworkClick,
                         text = ScheduleThemeRes.strings.completeHomeworkTitle,
                     )
                 }
@@ -307,7 +307,7 @@ private fun ClassBottomSheetActions(
                         color = StudyAssistantRes.colors.accents.red,
                     )
                     ClassBottomSheetActionButton(
-                        onClick = onCompleteHomework,
+                        onClick = onCompleteHomeworkClick,
                         text = ScheduleThemeRes.strings.completeHomeworkTitle,
                     )
                 }
@@ -319,7 +319,7 @@ private fun ClassBottomSheetActions(
                         contentColor = MaterialTheme.colorScheme.onSurface,
                     )
                     ClassBottomSheetActionButton(
-                        onClick = onCompleteHomework,
+                        onClick = onCompleteHomeworkClick,
                         text = ScheduleThemeRes.strings.completeHomeworkTitle,
                     )
                 }
@@ -327,7 +327,7 @@ private fun ClassBottomSheetActions(
         } else {
             ClassBottomSheetActionButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = onAddHomework,
+                onClick = onAddHomeworkClick,
                 text = ScheduleThemeRes.strings.addHomeworkTitle,
             )
         }

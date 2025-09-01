@@ -16,12 +16,14 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantLanguage
 
 /**
  * @author Stanislav Aleshin on 14.06.2023.
  */
+@Immutable
 internal data class AuthStrings(
     val otherSignInWayTitle: String,
     val emailLabel: String,
@@ -36,8 +38,8 @@ internal data class AuthStrings(
     val loginLabel: String,
     val loginViaGoogleLabel: String,
     val loginViaYandexLabel: String,
-    val notAccountLabelFirst: String,
-    val notAccountLabelSecond: String,
+    val signUpLabelFirst: String,
+    val signUpLabelSecond: String,
     val alreadyHaveAccountLabelFirst: String,
     val alreadyHaveAccountLabelSecond: String,
     val alreadyHavePasswordLabelFirst: String,
@@ -114,8 +116,8 @@ internal data class AuthStrings(
             loginLabel = "Войти",
             loginViaGoogleLabel = "Google",
             loginViaYandexLabel = "Yandex",
-            notAccountLabelFirst = "Нет аккаунта? ",
-            notAccountLabelSecond = "Зарегистрируйтесь",
+            signUpLabelFirst = "Нет аккаунта? ",
+            signUpLabelSecond = "Зарегистрируйтесь",
             alreadyHaveAccountLabelFirst = "Уже есть аккаунт? ",
             alreadyHaveAccountLabelSecond = "Войдите",
             alreadyHavePasswordLabelFirst = "Уже нашли пароль? ",
@@ -190,8 +192,8 @@ internal data class AuthStrings(
             loginLabel = "Sign in",
             loginViaGoogleLabel = "Google",
             loginViaYandexLabel = "Yandex",
-            notAccountLabelFirst = "No account? ",
-            notAccountLabelSecond = "Create one",
+            signUpLabelFirst = "No account? ",
+            signUpLabelSecond = "Create one",
             alreadyHaveAccountLabelFirst = "Already have an account? ",
             alreadyHaveAccountLabelSecond = "Log in",
             alreadyHavePasswordLabelFirst = "Have you found the password yet? ",

@@ -16,12 +16,14 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantLanguage
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
+@Immutable
 internal data class TasksStrings(
     val overviewHeader: String,
     val homeworksHeader: String,

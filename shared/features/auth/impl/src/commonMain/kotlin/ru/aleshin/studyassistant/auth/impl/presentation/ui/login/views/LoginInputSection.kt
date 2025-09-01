@@ -60,8 +60,8 @@ internal fun LoginInputSection(
     passwordValidError: PasswordValidError?,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
-    onForgotPassword: () -> Unit,
-    onCompleteEnter: () -> Unit,
+    onForgotPasswordClick: () -> Unit,
+    onEnterClick: () -> Unit,
 ) {
     Column(
         modifier = modifier.padding(horizontal = 24.dp),
@@ -88,14 +88,14 @@ internal fun LoginInputSection(
                 isError = passwordValidError != null,
                 errorText = passwordValidError?.mapToMessage(),
                 keyboardActions = KeyboardActions(
-                    onDone = { onCompleteEnter() },
+                    onDone = { onEnterClick() },
                 )
             )
             SpacerToKeyboard()
         }
         ForgotButton(
             enabled = enabled,
-            onClick = onForgotPassword
+            onClick = onForgotPasswordClick
         )
     }
 }

@@ -16,13 +16,14 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 27.06.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class HomeworksCompleteProgressUi(
     val comingHomeworksExecution: List<Boolean>,
     val comingHomeworksProgress: Float,
@@ -31,4 +32,4 @@ internal data class HomeworksCompleteProgressUi(
     val overdueTasks: List<HomeworkUi>,
     val detachedActiveTasks: List<HomeworkUi>,
     val completedHomeworksCount: Int,
-) : Parcelable
+)

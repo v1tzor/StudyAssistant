@@ -16,14 +16,15 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectSortedType
@@ -32,33 +33,30 @@ import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectU
 /**
  * @author Stanislav Aleshin on 17.06.2024
  */
-@Immutable
-@Parcelize
-internal data class SubjectsViewState(
+@Serializable
+internal data class SubjectsState(
     val isLoading: Boolean = true,
     val organizations: List<OrganizationShortUi> = emptyList(),
     val selectedOrganization: UID? = null,
     val subjects: List<SubjectUi> = emptyList(),
     val sortedType: SubjectSortedType = SubjectSortedType.ALPHABETIC,
-) : BaseViewState
+) : StoreState
 
-internal sealed class SubjectsEvent : BaseEvent {
-    data class Init(val organizationId: UID) : SubjectsEvent()
+internal sealed class SubjectsEvent : StoreEvent {
+    data class Started(val inputData: SubjectsInput) : SubjectsEvent()
     data class SearchSubjects(val query: String) : SubjectsEvent()
     data class SelectedOrganization(val organization: UID) : SubjectsEvent()
     data class SelectedSortedType(val sortedType: SubjectSortedType) : SubjectsEvent()
-    data class DeleteSubject(val subjectId: UID) : SubjectsEvent()
-    data class NavigateToEditor(val subjectId: UID?) : SubjectsEvent()
-    data object NavigateToBack : SubjectsEvent()
+    data class ClickDeleteSubject(val subjectId: UID) : SubjectsEvent()
+    data class ClickEditSubject(val subjectId: UID?) : SubjectsEvent()
+    data object ClickBack : SubjectsEvent()
 }
 
-internal sealed class SubjectsEffect : BaseUiEffect {
+internal sealed class SubjectsEffect : StoreEffect {
     data class ShowError(val failures: InfoFailures) : SubjectsEffect()
-    data object NavigateToBack : SubjectsEffect()
-    data class NavigateToGlobal(val pushScreen: Screen) : SubjectsEffect()
 }
 
-internal sealed class SubjectsAction : BaseAction {
+internal sealed class SubjectsAction : StoreAction {
     data class UpdateSubjects(
         val subjects: List<SubjectUi>,
         val sortedType: SubjectSortedType
@@ -71,4 +69,13 @@ internal sealed class SubjectsAction : BaseAction {
 
     data class UpdateSelectedOrganization(val organization: UID) : SubjectsAction()
     data class UpdateLoading(val isLoading: Boolean) : SubjectsAction()
+}
+
+internal data class SubjectsInput(
+    val organizationId: UID
+) : BaseInput
+
+internal sealed class SubjectsOutput : BaseOutput {
+    data object NavigateToBack : SubjectsOutput()
+    data class NavigateToSubjectEditor(val config: EditorConfig.Subject) : SubjectsOutput()
 }

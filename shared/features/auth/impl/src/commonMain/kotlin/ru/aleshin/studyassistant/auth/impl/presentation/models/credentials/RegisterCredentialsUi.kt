@@ -16,15 +16,16 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.models.credentials
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 17.04.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class RegisterCredentialsUi(
     val username: String = "",
     val email: String = "",
     val password: String = "",
-) : Parcelable
+)

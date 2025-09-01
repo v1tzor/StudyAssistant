@@ -25,9 +25,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -37,7 +42,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
+import ru.aleshin.studyassistant.core.ui.theme.tokens.WindowSize
 import ru.aleshin.studyassistant.core.ui.views.CircularStepsRow
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroEffect
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroEvent
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.store.IntroComponent
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.AuthActionsSection
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.IntroPage
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.NavActionsSection
@@ -46,8 +61,79 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.NavAct
  * @author Stanislav Aleshin on 14.04.2024.
  */
 @Composable
-@OptIn(ExperimentalResourceApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 internal fun IntroContent(
+    introComponent: IntroComponent
+) {
+    val store = introComponent.store
+    val strings = PreviewThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val windowSize = LocalWindowSize.current
+    val pagerState = rememberPagerState { IntroPage.entries.size }
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        content = { paddingValues ->
+            when (windowSize.heightWindowType) {
+                WindowSize.WindowType.COMPACT -> BaseIntroContentCompact(
+                    modifier = Modifier.padding(paddingValues),
+                    pagerState = pagerState,
+                    onBackClick = {
+                        store.dispatchEvent(IntroEvent.SelectedPreviousPage(pagerState.currentPage))
+                    },
+                    onContinueClick = {
+                        store.dispatchEvent(IntroEvent.SelectedNextPage(pagerState.currentPage))
+                    },
+                    onLoginClick = {
+                        store.dispatchEvent(IntroEvent.ClickLogin)
+                    },
+                    onRegisterClick = {
+                        store.dispatchEvent(IntroEvent.ClickRegister)
+                    },
+                )
+                else -> BaseIntroContent(
+                    modifier = Modifier.padding(paddingValues),
+                    pagerState = pagerState,
+                    onBackClick = {
+                        store.dispatchEvent(IntroEvent.SelectedPreviousPage(pagerState.currentPage))
+                    },
+                    onContinueClick = {
+                        store.dispatchEvent(IntroEvent.SelectedNextPage(pagerState.currentPage))
+                    },
+                    onLoginClick = {
+                        store.dispatchEvent(IntroEvent.ClickLogin)
+                    },
+                    onRegisterClick = {
+                        store.dispatchEvent(IntroEvent.ClickRegister)
+                    },
+                )
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is IntroEffect.ScrollToPage -> pagerState.animateScrollToPage(effect.pageIndex)
+            is IntroEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalResourceApi::class, ExperimentalFoundationApi::class)
+private fun BaseIntroContent(
     modifier: Modifier,
     pagerState: PagerState,
     onContinueClick: () -> Unit,

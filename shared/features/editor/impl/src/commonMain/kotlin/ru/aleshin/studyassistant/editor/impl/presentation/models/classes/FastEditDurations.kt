@@ -16,16 +16,17 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.models.classes
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
 
 /**
  * @author Stanislav Aleshin on 14.07.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class FastEditDurations(
     val baseDuration: Millis,
     val specificDurations: List<NumberedDurationUi> = emptyList(),
-) : Parcelable
+)

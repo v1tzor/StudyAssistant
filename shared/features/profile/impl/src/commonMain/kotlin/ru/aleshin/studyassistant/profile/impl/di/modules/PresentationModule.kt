@@ -17,42 +17,19 @@
 package ru.aleshin.studyassistant.profile.impl.di.modules
 
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
-import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
-import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
-import ru.aleshin.studyassistant.profile.impl.navigation.ProfileFeatureStarterImpl
-import ru.aleshin.studyassistant.profile.impl.navigation.ProfileScreenProvider
-import ru.aleshin.studyassistant.profile.impl.presentation.ui.ProfileScreen
-import ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel.ProfileEffectCommunicator
-import ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel.ProfileScreenModel
-import ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel.ProfileStateCommunicator
-import ru.aleshin.studyassistant.profile.impl.presentation.ui.screenmodel.ProfileWorkProcessor
-import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
-import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
-import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
+import ru.aleshin.studyassistant.profile.api.ProfileFeatureComponentFactory
+import ru.aleshin.studyassistant.profile.impl.navigation.DefaultProfileComponentFactory
+import ru.aleshin.studyassistant.profile.impl.presentation.ui.store.ProfileComposeStore
+import ru.aleshin.studyassistant.profile.impl.presentation.ui.store.ProfileWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<ProfileScreen> { ProfileScreen() }
+    bindSingleton<ProfileFeatureComponentFactory> { DefaultProfileComponentFactory(instance()) }
 
-    bindProvider<ProfileFeatureStarter> { ProfileFeatureStarterImpl(instance()) }
-    bindProvider<ProfileScreenProvider> {
-        ProfileScreenProvider.Base(
-            instance<() -> AuthFeatureStarter>(),
-            instance<() -> UsersFeatureStarter>(),
-            instance<() -> SettingsFeatureStarter>(),
-            instance<() -> EditorFeatureStarter>(),
-            instance<() -> ScheduleFeatureStarter>()
-        )
-    }
-
-    bindSingleton<ProfileStateCommunicator> { ProfileStateCommunicator.Base() }
-    bindSingleton<ProfileEffectCommunicator> { ProfileEffectCommunicator.Base() }
-    bindSingleton<ProfileWorkProcessor> { ProfileWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<ProfileScreenModel> { ProfileScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ProfileWorkProcessor> { ProfileWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ProfileComposeStore.Factory> { ProfileComposeStore.Factory(instance(), instance(), instance()) }
 }

@@ -16,29 +16,23 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
-import ru.aleshin.studyassistant.core.common.platform.NullDurationParceler
-import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
-import kotlin.time.Duration
 
 /**
  * @author Stanislav Aleshin on 27.06.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class TodoDetailsUi(
     val uid: UID,
-    @TypeParceler<Instant?, NullInstantParceler>
     val deadline: Instant?,
-    @TypeParceler<Duration?, NullDurationParceler>
     val deadlineTimeLeft: Millis?,
     val progress: Float,
     val name: String,
@@ -48,12 +42,10 @@ internal data class TodoDetailsUi(
     val notifications: TodoNotificationsUi = TodoNotificationsUi(),
     val linkedGoal: GoalShortUi?,
     val isDone: Boolean = false,
-    @TypeParceler<Instant, InstantParceler>
     val createdAt: Instant,
-    @TypeParceler<Instant?, NullInstantParceler>
     val completeDate: Instant? = null,
     val updatedAt: Long,
-) : Parcelable
+)
 
 internal fun TodoDetailsUi.convertToBase() = TodoUi(
     uid = uid,

@@ -17,31 +17,19 @@
 package ru.aleshin.studyassistant.chat.impl.di.modules
 
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.chat.api.navigation.ChatFeatureStarter
-import ru.aleshin.studyassistant.chat.impl.navigation.ChatFeatureStarterImpl
-import ru.aleshin.studyassistant.chat.impl.navigation.ChatScreenProvider
-import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.screenmodel.AssistantEffectCommunicator
-import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.screenmodel.AssistantScreenModel
-import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.screenmodel.AssistantStateCommunicator
-import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.screenmodel.AssistantWorkProcessor
-import ru.aleshin.studyassistant.chat.impl.presentation.ui.navigation.NavigationScreen
-import ru.aleshin.studyassistant.chat.impl.presentation.ui.navigation.NavigationScreenModel
+import ru.aleshin.studyassistant.chat.api.ChatFeatureComponentFactory
+import ru.aleshin.studyassistant.chat.impl.navigation.DefaultChatComponentFactory
+import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.store.AssistantComposeStore
+import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.store.AssistantWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<NavigationScreenModel> { NavigationScreenModel() }
-    bindSingleton<NavigationScreen> { NavigationScreen() }
+    bindSingleton<ChatFeatureComponentFactory> { DefaultChatComponentFactory(instance()) }
 
-    bindProvider<ChatFeatureStarter> { ChatFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<ChatScreenProvider> { ChatScreenProvider.Base(instance()) }
-
-    bindProvider<AssistantStateCommunicator> { AssistantStateCommunicator.Base() }
-    bindProvider<AssistantEffectCommunicator> { AssistantEffectCommunicator.Base() }
-    bindProvider<AssistantWorkProcessor> { AssistantWorkProcessor.Base(instance()) }
-    bindProvider<AssistantScreenModel> { AssistantScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<AssistantWorkProcessor> { AssistantWorkProcessor.Base(instance()) }
+    bindSingleton<AssistantComposeStore.Factory> { AssistantComposeStore.Factory(instance(), instance()) }
 }

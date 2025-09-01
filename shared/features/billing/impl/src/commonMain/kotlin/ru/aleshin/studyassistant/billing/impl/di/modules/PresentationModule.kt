@@ -17,31 +17,19 @@
 package ru.aleshin.studyassistant.billing.impl.di.modules
 
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
-import ru.aleshin.studyassistant.billing.impl.navigation.BillingFeatureStarterImpl
-import ru.aleshin.studyassistant.billing.impl.navigation.BillingScreenProvider
-import ru.aleshin.studyassistant.billing.impl.presentation.ui.navigation.NavigationScreen
-import ru.aleshin.studyassistant.billing.impl.presentation.ui.navigation.NavigationScreenModel
-import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.screenmodel.SubscriptionEffectCommunicator
-import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.screenmodel.SubscriptionScreenModel
-import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.screenmodel.SubscriptionStateCommunicator
-import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.screenmodel.SubscriptionWorkProcessor
+import ru.aleshin.studyassistant.billing.api.BillingFeatureComponentFactory
+import ru.aleshin.studyassistant.billing.impl.navigation.DefaultBillingComponentFactory
+import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.store.SubscriptionComposeStore
+import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.store.SubscriptionWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<NavigationScreenModel> { NavigationScreenModel() }
-    bindSingleton<NavigationScreen> { NavigationScreen() }
+    bindSingleton<BillingFeatureComponentFactory> { DefaultBillingComponentFactory(instance()) }
 
-    bindProvider<BillingFeatureStarter> { BillingFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<BillingScreenProvider> { BillingScreenProvider.Base() }
-
-    bindProvider<SubscriptionStateCommunicator> { SubscriptionStateCommunicator.Base() }
-    bindProvider<SubscriptionEffectCommunicator> { SubscriptionEffectCommunicator.Base() }
-    bindProvider<SubscriptionWorkProcessor> { SubscriptionWorkProcessor.Base(instance(), instance()) }
-    bindProvider<SubscriptionScreenModel> { SubscriptionScreenModel(instance(), instance(), instance(), instance()) }
+    bindSingleton<SubscriptionWorkProcessor> { SubscriptionWorkProcessor.Base(instance(), instance()) }
+    bindSingleton<SubscriptionComposeStore.Factory> { SubscriptionComposeStore.Factory(instance(), instance()) }
 }

@@ -33,6 +33,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,57 +46,150 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.dateTimeByWeek
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
+import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.WeekScheduleDetailsUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.ClassBottomSheet
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsViewState
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEvent
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsState
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.store.DetailsComponent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.CommonScheduleView
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.CommonScheduleViewPlaceholder
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.DetailsBottomBar
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.DetailsTopBar
 
 /**
  * @author Stanislav Aleshin on 09.06.2024
  */
 @Composable
 internal fun DetailsContent(
-    state: DetailsViewState,
+    detailsComponent: DetailsComponent,
     modifier: Modifier = Modifier,
-    onAddHomework: (ClassDetailsUi, Instant) -> Unit,
-    onEditHomework: (HomeworkDetailsUi) -> Unit,
-    onAgainHomework: (HomeworkDetailsUi) -> Unit,
+) {
+    val store = detailsComponent.store
+    val state by store.stateAsState()
+    val strings = ScheduleThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseDetailsContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+                onEditHomeworkClick = {
+                    store.dispatchEvent(DetailsEvent.ClickEditHomework(it))
+                },
+                onAddHomeworkClick = { homework, date ->
+                    store.dispatchEvent(DetailsEvent.ClickAddHomework(homework, date))
+                },
+                onAgainHomeworkClick = {
+                    store.dispatchEvent(DetailsEvent.ClickAgainHomework(it))
+                },
+                onCompleteHomework = {
+                    store.dispatchEvent(DetailsEvent.CompleteHomework(it))
+                },
+            )
+        },
+        topBar = {
+            DetailsTopBar(
+                onEditClick = {
+                    store.dispatchEvent(DetailsEvent.ClickEdit)
+                },
+                onCurrentWeekSelected = {
+                    store.dispatchEvent(DetailsEvent.SelectedCurrentWeek)
+                },
+                onOverviewClick = {
+                    store.dispatchEvent(DetailsEvent.ClickOverview)
+                },
+            )
+        },
+        bottomBar = {
+            DetailsBottomBar(
+                currentWeek = state.currentDate.dateTime().weekTimeRange(),
+                selectedWeek = state.selectedWeek,
+                viewType = state.scheduleView,
+                onNextWeekSelected = {
+                    store.dispatchEvent(DetailsEvent.SelectedNextWeek)
+                },
+                onPreviousWeekSelected = {
+                    store.dispatchEvent(DetailsEvent.SelectedPreviousWeek)
+                },
+                onViewTypeSelected = {
+                    store.dispatchEvent(DetailsEvent.SelectedViewType(it))
+                },
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is DetailsEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BaseDetailsContent(
+    state: DetailsState,
+    modifier: Modifier = Modifier,
+    onAddHomeworkClick: (ClassDetailsUi, Instant) -> Unit,
+    onEditHomeworkClick: (HomeworkDetailsUi) -> Unit,
+    onAgainHomeworkClick: (HomeworkDetailsUi) -> Unit,
     onCompleteHomework: (HomeworkDetailsUi) -> Unit,
-) = with(state) {
+) {
     Crossfade(
         modifier = modifier,
-        targetState = scheduleView,
+        targetState = state.scheduleView,
         animationSpec = tween(),
     ) { scheduleViewType ->
         when (scheduleViewType) {
             WeekScheduleViewType.COMMON -> DetailsCommonSchedulesSection(
-                isLoading = isLoading,
-                currentDate = currentDate,
-                weekSchedule = weekSchedule,
-                activeClass = activeClass,
-                onAddHomework = onAddHomework,
-                onEditHomework = onEditHomework,
-                onAgainHomework = onAgainHomework,
-                onCompleteHomework = onCompleteHomework,
+                isLoading = state.isLoading,
+                currentDate = state.currentDate,
+                weekSchedule = state.weekSchedule,
+                activeClass = state.activeClass,
+                onAddHomeworkClick = onAddHomeworkClick,
+                onEditHomeworkClick = onEditHomeworkClick,
+                onAgainHomeworkClick = onAgainHomeworkClick,
+                onCompleteHomeworkClick = onCompleteHomework,
             )
+
             WeekScheduleViewType.VERTICAL -> DetailsVerticalSchedulesSection(
-                isLoading = isLoading,
-                currentDate = currentDate,
-                weekSchedule = weekSchedule,
-                activeClass = activeClass,
-                onAddHomework = onAddHomework,
-                onEditHomework = onEditHomework,
-                onAgainHomework = onAgainHomework,
+                isLoading = state.isLoading,
+                currentDate = state.currentDate,
+                weekSchedule = state.weekSchedule,
+                activeClass = state.activeClass,
+                onAddHomeworkClick = onAddHomeworkClick,
+                onEditHomeworkClick = onEditHomeworkClick,
+                onAgainHomeworkClick = onAgainHomeworkClick,
                 onCompleteHomework = onCompleteHomework,
             )
         }
@@ -108,10 +204,10 @@ private fun DetailsCommonSchedulesSection(
     currentDate: Instant,
     weekSchedule: WeekScheduleDetailsUi?,
     activeClass: ActiveClassUi?,
-    onAddHomework: (ClassDetailsUi, Instant) -> Unit,
-    onEditHomework: (HomeworkDetailsUi) -> Unit,
-    onAgainHomework: (HomeworkDetailsUi) -> Unit,
-    onCompleteHomework: (HomeworkDetailsUi) -> Unit,
+    onAddHomeworkClick: (ClassDetailsUi, Instant) -> Unit,
+    onEditHomeworkClick: (HomeworkDetailsUi) -> Unit,
+    onAgainHomeworkClick: (HomeworkDetailsUi) -> Unit,
+    onCompleteHomeworkClick: (HomeworkDetailsUi) -> Unit,
 ) {
     Crossfade(
         modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
@@ -130,16 +226,22 @@ private fun DetailsCommonSchedulesSection(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         daysOfWeek.forEach { dayOfWeek ->
-                            var openClassBottomSheet by remember { mutableStateOf(false) }
                             val classSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
                             var selectedSheetClass by remember { mutableStateOf<UID?>(null) }
+                            var openClassBottomSheet by remember { mutableStateOf(false) }
 
-                            val schedule = weekSchedule.weekDaySchedules[dayOfWeek]
-                            val scheduleDate = dayOfWeek.dateTimeByWeek(weekSchedule.from)
-                            val classes = schedule?.mapToValue(
-                                onBaseSchedule = { it?.classes },
-                                onCustomSchedule = { it?.classes },
-                            )
+                            val schedule = remember(weekSchedule, dayOfWeek) {
+                                weekSchedule.weekDaySchedules[dayOfWeek]
+                            }
+                            val scheduleDate = remember(dayOfWeek, weekSchedule) {
+                                dayOfWeek.dateTimeByWeek(weekSchedule.from)
+                            }
+                            val classes = remember(schedule) {
+                                schedule?.mapToValue(
+                                    onBaseSchedule = { it?.classes },
+                                    onCustomSchedule = { it?.classes },
+                                )
+                            }
 
                             CommonScheduleView(
                                 date = scheduleDate.dateTime().date,
@@ -152,17 +254,19 @@ private fun DetailsCommonSchedulesSection(
                                 },
                             )
 
-                            val classModel = classes?.find { it.uid == selectedSheetClass }
+                            val classModel = remember(classes, selectedSheetClass) {
+                                classes?.find { it.uid == selectedSheetClass }
+                            }
                             if (openClassBottomSheet && classModel != null) {
                                 ClassBottomSheet(
                                     sheetState = classSheetState,
                                     activeClass = activeClass,
                                     classModel = classModel,
                                     classDate = scheduleDate,
-                                    onEditHomework = onEditHomework,
-                                    onAddHomework = onAddHomework,
-                                    onAgainHomework = onAgainHomework,
-                                    onCompleteHomework = onCompleteHomework,
+                                    onEditHomeworkClick = onEditHomeworkClick,
+                                    onAddHomeworkClick = onAddHomeworkClick,
+                                    onAgainHomeworkClick = onAgainHomeworkClick,
+                                    onCompleteHomeworkClick = onCompleteHomeworkClick,
                                     onDismissRequest = {
                                         openClassBottomSheet = false
                                         selectedSheetClass = null
@@ -197,9 +301,9 @@ private fun DetailsVerticalSchedulesSection(
     currentDate: Instant,
     weekSchedule: WeekScheduleDetailsUi?,
     activeClass: ActiveClassUi?,
-    onAddHomework: (ClassDetailsUi, Instant) -> Unit,
-    onEditHomework: (HomeworkDetailsUi) -> Unit,
-    onAgainHomework: (HomeworkDetailsUi) -> Unit,
+    onAddHomeworkClick: (ClassDetailsUi, Instant) -> Unit,
+    onEditHomeworkClick: (HomeworkDetailsUi) -> Unit,
+    onAgainHomeworkClick: (HomeworkDetailsUi) -> Unit,
     onCompleteHomework: (HomeworkDetailsUi) -> Unit,
 ) {
     Crossfade(
@@ -215,16 +319,22 @@ private fun DetailsVerticalSchedulesSection(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(DayOfWeek.entries.toTypedArray(), key = { it.name }) { dayOfWeek ->
-                    var openClassBottomSheet by remember { mutableStateOf(false) }
                     val classSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
                     var selectedSheetClass by remember { mutableStateOf<UID?>(null) }
+                    var openClassBottomSheet by remember { mutableStateOf(false) }
 
-                    val schedule = weekSchedule.weekDaySchedules[dayOfWeek]
-                    val scheduleDate = dayOfWeek.dateTimeByWeek(weekSchedule.from)
-                    val classes = schedule?.mapToValue(
-                        onBaseSchedule = { it?.classes },
-                        onCustomSchedule = { it?.classes },
-                    )
+                    val schedule = remember(weekSchedule, dayOfWeek) {
+                        weekSchedule.weekDaySchedules[dayOfWeek]
+                    }
+                    val scheduleDate = remember(weekSchedule, dayOfWeek) {
+                        dayOfWeek.dateTimeByWeek(weekSchedule.from)
+                    }
+                    val classes = remember(schedule) {
+                        schedule?.mapToValue(
+                            onBaseSchedule = { it?.classes },
+                            onCustomSchedule = { it?.classes },
+                        )
+                    }
 
                     CommonScheduleView(
                         date = scheduleDate.dateTime().date,
@@ -237,17 +347,19 @@ private fun DetailsVerticalSchedulesSection(
                         },
                     )
 
-                    val classModel = classes?.find { it.uid == selectedSheetClass }
+                    val classModel = remember(classes, selectedSheetClass) {
+                        classes?.find { it.uid == selectedSheetClass }
+                    }
                     if (openClassBottomSheet && classModel != null) {
                         ClassBottomSheet(
                             sheetState = classSheetState,
                             activeClass = activeClass,
                             classModel = classModel,
                             classDate = scheduleDate,
-                            onEditHomework = onEditHomework,
-                            onAddHomework = onAddHomework,
-                            onAgainHomework = onAgainHomework,
-                            onCompleteHomework = onCompleteHomework,
+                            onEditHomeworkClick = onEditHomeworkClick,
+                            onAddHomeworkClick = onAddHomeworkClick,
+                            onAgainHomeworkClick = onAgainHomeworkClick,
+                            onCompleteHomeworkClick = onCompleteHomework,
                             onDismissRequest = {
                                 openClassBottomSheet = false
                                 selectedSheetClass = null

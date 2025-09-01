@@ -16,12 +16,14 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantLanguage
 
 /**
  * @author Stanislav Aleshin on 14.06.2023.
  */
+@Immutable
 internal data class PreviewStrings(
     val continueLabel: String,
     val backLabel: String,
@@ -69,7 +71,7 @@ internal data class PreviewStrings(
             studyIntroBody = "На главном экране вы сможете увидеть расписание на текущий день, его ход выполнения, недельную загруженность, а также все привязанные задания к занятиям",
             analyticsIntroTitle = "Более эффективно выполняйте заданные задания",
             analyticsIntroBody = "Удобная система управления заданиями поможет вам более лучше визуализировать заданные задания, распределить всю нагрузку по дням недели и многое другое",
-            organizationIntroTitle = "Создавайте разные организациями и вносите дневные изменения",
+            organizationIntroTitle = "Создавайте разные организации и вносите дневные изменения",
             organizationIntroBody = "Приложение поддерживает работу с несколькими учебными заведениями, а также возможность быстрого внесения дневных корректировок в постоянное расписание",
             friendsIntroTitle = "Находите друзей, делитесь заданиями и расписаниями",
             friendsIntroBody = "Войдите в аккаунт, чтобы начать взаимодействовать с другими людьми, а также обмениваться расписаниями и заданиями",

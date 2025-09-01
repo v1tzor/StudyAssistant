@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import studyassistant.shared.features.tasks.impl.generated.resources.Res
@@ -37,6 +38,7 @@ import studyassistant.shared.features.tasks.impl.generated.resources.ic_view_day
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
+@Immutable
 internal data class TasksIcons(
     val tomorrowTime: DrawableResource,
     val weekTime: DrawableResource,

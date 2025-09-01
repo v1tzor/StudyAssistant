@@ -16,23 +16,26 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.homework
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.
  */
-internal sealed interface HomeworkTaskComponentUi : Parcelable {
+@Immutable
+@Serializable
+internal sealed interface HomeworkTaskComponentUi {
 
-    @Parcelize
+    @Serializable
     data class Label(val text: String) : HomeworkTaskComponentUi
 
-    @Parcelize
+    @Serializable
     data class Tasks(val taskList: List<String>) : HomeworkTaskComponentUi
 }
 
-@Parcelize
+@Immutable
+@Serializable
 internal data class HomeworkTasksUi(
     val origin: String,
     val components: List<HomeworkTaskComponentUi>,
-) : Parcelable
+)

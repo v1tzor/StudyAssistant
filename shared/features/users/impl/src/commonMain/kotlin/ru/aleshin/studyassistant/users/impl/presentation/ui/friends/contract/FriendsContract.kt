@@ -16,18 +16,16 @@
 
 package ru.aleshin.studyassistant.users.impl.presentation.ui.friends.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
 import ru.aleshin.studyassistant.users.impl.domain.entities.UsersFailures
 import ru.aleshin.studyassistant.users.impl.presentation.models.AppUserUi
 import ru.aleshin.studyassistant.users.impl.presentation.models.FriendRequestsDetailsUi
@@ -35,38 +33,34 @@ import ru.aleshin.studyassistant.users.impl.presentation.models.FriendRequestsDe
 /**
  * @author Stanislav Aleshin on 12.07.2024
  */
-@Immutable
-@Parcelize
-internal data class FriendsViewState(
+@Serializable
+internal data class FriendsState(
     val isLoading: Boolean = true,
     val isLoadingSearch: Boolean = false,
-    @TypeParceler<Instant, InstantParceler>
     val currentTime: Instant = Clock.System.now(),
     val friends: Map<Char, List<AppUserUi>> = emptyMap(),
     val requests: FriendRequestsDetailsUi? = null,
     val searchedUsers: List<AppUserUi> = emptyList(),
-) : BaseViewState
+) : StoreState
 
-internal sealed class FriendsEvent : BaseEvent {
-    data object Init : FriendsEvent()
+internal sealed class FriendsEvent : StoreEvent {
+    data object Started : FriendsEvent()
     data class SearchUsers(val code: String) : FriendsEvent()
     data class AcceptFriendRequest(val userId: UID) : FriendsEvent()
     data class RejectFriendRequest(val userId: UID) : FriendsEvent()
     data class SendFriendRequest(val userId: UID) : FriendsEvent()
     data class CancelSendFriendRequest(val userId: UID) : FriendsEvent()
     data class DeleteFriend(val userId: UID) : FriendsEvent()
-    data class NavigateToFriendProfile(val userId: UID) : FriendsEvent()
-    data object NavigateToRequests : FriendsEvent()
-    data object NavigateToBack : FriendsEvent()
+    data class ClickUserProfile(val userId: UID) : FriendsEvent()
+    data object ClickShowRequests : FriendsEvent()
+    data object ClickBack : FriendsEvent()
 }
 
-internal sealed class FriendsEffect : BaseUiEffect {
+internal sealed class FriendsEffect : StoreEffect {
     data class ShowError(val failures: UsersFailures) : FriendsEffect()
-    data class NavigateToLocal(val pushScreen: Screen) : FriendsEffect()
-    data object NavigateToBack : FriendsEffect()
 }
 
-internal sealed class FriendsAction : BaseAction {
+internal sealed class FriendsAction : StoreAction {
     data class UpdateFriends(
         val friends: Map<Char, List<AppUserUi>>,
         val requests: FriendRequestsDetailsUi?
@@ -76,4 +70,10 @@ internal sealed class FriendsAction : BaseAction {
     data class UpdateCurrentTime(val time: Instant) : FriendsAction()
     data class UpdateLoading(val isLoading: Boolean) : FriendsAction()
     data class UpdateSearchLoading(val isLoading: Boolean) : FriendsAction()
+}
+
+internal sealed class FriendsOutput : BaseOutput {
+    data object NavigateToBack : FriendsOutput()
+    data object NavigateToRequests : FriendsOutput()
+    data class NavigateToUserProfile(val config: UsersConfig.UserProfile) : FriendsOutput()
 }

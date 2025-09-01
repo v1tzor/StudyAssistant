@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.share
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.MediatedOrganizationUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationUi
@@ -27,10 +27,11 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.Employe
 /**
  * @author Stanislav Aleshin on 15.08.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class OrganizationLinkData(
     val sharedOrganization: MediatedOrganizationUi,
     val linkedOrganization: OrganizationUi? = null,
     val linkedSubjects: Map<UID, SubjectUi> = emptyMap(),
     val linkedTeachers: Map<UID, EmployeeUi> = emptyMap(),
-) : Parcelable
+)

@@ -17,65 +17,38 @@
 package ru.aleshin.studyassistant.tasks.impl.di.modules
 
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
-import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
-import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
-import ru.aleshin.studyassistant.tasks.impl.navigation.TasksFeatureStarterImpl
-import ru.aleshin.studyassistant.tasks.impl.navigation.TasksScreenProvider
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksDetailsWorkProcessor
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksEffectCommunicator
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksScreenModel
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.screenmodel.HomeworksStateCommunicator
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.navigation.NavigationScreen
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.navigation.NavigationScreenModel
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.GoalWorkProcessor
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.HomeworksWorkProcessor
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewEffectCommunicator
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewScreenModel
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.OverviewStateCommunicator
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.screenmodel.TodoWorkProcessor
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareEffectCommunicator
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareScreenModel
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareStateCommunicator
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.screenmodel.ShareWorkProcessor
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoDetailsWorkProcessor
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoEffectCommunicator
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoScreenModel
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.screenmodel.TodoStateCommunicator
-import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
+import ru.aleshin.studyassistant.tasks.api.TasksFeatureComponentFactory
+import ru.aleshin.studyassistant.tasks.impl.navigation.DefaultTasksComponentFactory
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.store.HomeworksComposeStore
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.store.HomeworksDetailsWorkProcessor
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.store.GoalWorkProcessor
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.store.HomeworksWorkProcessor
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.store.OverviewComposeStore
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.store.TodoWorkProcessor
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.store.ShareComposeStore
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.store.ShareWorkProcessor
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.store.TodoComposeStore
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.store.TodoDetailsWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<NavigationScreenModel> { NavigationScreenModel() }
-    bindSingleton<NavigationScreen> { NavigationScreen() }
+    bindSingleton<TasksFeatureComponentFactory> { DefaultTasksComponentFactory(instance(), instance(), instance(), instance()) }
 
-    bindProvider<TasksFeatureStarter> { TasksFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<TasksScreenProvider> { TasksScreenProvider.Base(instance<() -> EditorFeatureStarter>(), instance<() -> UsersFeatureStarter>(), instance<() -> BillingFeatureStarter>()) }
+    bindSingleton<HomeworksWorkProcessor> { HomeworksWorkProcessor.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<TodoWorkProcessor> { TodoWorkProcessor.Base(instance()) }
+    bindSingleton<GoalWorkProcessor> { GoalWorkProcessor.Base(instance(), instance()) }
+    bindSingleton<OverviewComposeStore.Factory> { OverviewComposeStore.Factory(instance(), instance(), instance(), instance(), instance()) }
 
-    bindProvider<OverviewStateCommunicator> { OverviewStateCommunicator.Base() }
-    bindProvider<OverviewEffectCommunicator> { OverviewEffectCommunicator.Base() }
-    bindProvider<HomeworksWorkProcessor> { HomeworksWorkProcessor.Base(instance(), instance(), instance(), instance()) }
-    bindProvider<TodoWorkProcessor> { TodoWorkProcessor.Base(instance()) }
-    bindProvider<GoalWorkProcessor> { GoalWorkProcessor.Base(instance(), instance()) }
-    bindProvider<OverviewScreenModel> { OverviewScreenModel(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<HomeworksDetailsWorkProcessor> { HomeworksDetailsWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<HomeworksComposeStore.Factory> { HomeworksComposeStore.Factory(instance(), instance(), instance()) }
 
-    bindProvider<HomeworksStateCommunicator> { HomeworksStateCommunicator.Base() }
-    bindProvider<HomeworksEffectCommunicator> { HomeworksEffectCommunicator.Base() }
-    bindProvider<HomeworksDetailsWorkProcessor> { HomeworksDetailsWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<HomeworksScreenModel> { HomeworksScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ShareWorkProcessor> { ShareWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ShareComposeStore.Factory> { ShareComposeStore.Factory(instance(), instance()) }
 
-    bindProvider<ShareStateCommunicator> { ShareStateCommunicator.Base() }
-    bindProvider<ShareEffectCommunicator> { ShareEffectCommunicator.Base() }
-    bindProvider<ShareWorkProcessor> { ShareWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<ShareScreenModel> { ShareScreenModel(instance(), instance(), instance(), instance(), instance()) }
-
-    bindProvider<TodoStateCommunicator> { TodoStateCommunicator.Base() }
-    bindProvider<TodoEffectCommunicator> { TodoEffectCommunicator.Base() }
-    bindProvider<TodoDetailsWorkProcessor> { TodoDetailsWorkProcessor.Base(instance()) }
-    bindProvider<TodoScreenModel> { TodoScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<TodoDetailsWorkProcessor> { TodoDetailsWorkProcessor.Base(instance()) }
+    bindSingleton<TodoComposeStore.Factory> { TodoComposeStore.Factory(instance(), instance()) }
 }

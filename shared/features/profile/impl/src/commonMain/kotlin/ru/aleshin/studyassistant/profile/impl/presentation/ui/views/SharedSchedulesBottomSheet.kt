@@ -73,8 +73,8 @@ internal fun SharedSchedulesBottomSheet(
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     onDismissRequest: () -> Unit,
     sharedSchedules: SharedSchedulesShortUi,
-    onShowSchedule: (ReceivedMediatedSchedulesShortUi) -> Unit,
-    onCancelSentSchedule: (SentMediatedSchedulesUi) -> Unit,
+    onShowScheduleClick: (ReceivedMediatedSchedulesShortUi) -> Unit,
+    onCancelSentScheduleClick: (SentMediatedSchedulesUi) -> Unit,
 ) {
     ModalBottomSheet(
         modifier = modifier,
@@ -91,12 +91,12 @@ internal fun SharedSchedulesBottomSheet(
             ReceivedSchedulesSection(
                 currentTime = currentTime,
                 receivedSharedSchedules = sharedSchedules.received.values.toList(),
-                onShowSchedule = onShowSchedule
+                onShowScheduleClick = onShowScheduleClick
             )
             HorizontalDivider()
             SentSchedulesSection(
                 sentSharedSchedules = sharedSchedules.sent.values.toList(),
-                onCancelSentSchedule = onCancelSentSchedule,
+                onCancelSentScheduleClick = onCancelSentScheduleClick,
             )
         }
     }
@@ -107,7 +107,7 @@ private fun ReceivedSchedulesSection(
     modifier: Modifier = Modifier,
     currentTime: Instant,
     receivedSharedSchedules: List<ReceivedMediatedSchedulesShortUi>,
-    onShowSchedule: (ReceivedMediatedSchedulesShortUi) -> Unit,
+    onShowScheduleClick: (ReceivedMediatedSchedulesShortUi) -> Unit,
 ) {
     Column(
         modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -143,7 +143,7 @@ private fun ReceivedSchedulesSection(
                         leftTime = currentTime - receivedSchedule.sendDate,
                         sender = receivedSchedule.sender,
                         organizationNames = receivedSchedule.organizationNames,
-                        onShowSchedule = { onShowSchedule(receivedSchedule) },
+                        onShowScheduleClick = { onShowScheduleClick(receivedSchedule) },
                     )
                 }
             } else {
@@ -159,7 +159,7 @@ private fun ReceivedScheduleView(
     leftTime: Duration,
     sender: AppUserUi,
     organizationNames: List<String>,
-    onShowSchedule: () -> Unit,
+    onShowScheduleClick: () -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -248,7 +248,7 @@ private fun ReceivedScheduleView(
                 )
             ) {
                 Button(
-                    onClick = onShowSchedule,
+                    onClick = onShowScheduleClick,
                     modifier = Modifier.fillMaxWidth().height(32.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                 ) {
@@ -267,7 +267,7 @@ private fun ReceivedScheduleView(
 private fun SentSchedulesSection(
     modifier: Modifier = Modifier,
     sentSharedSchedules: List<SentMediatedSchedulesUi>,
-    onCancelSentSchedule: (SentMediatedSchedulesUi) -> Unit,
+    onCancelSentScheduleClick: (SentMediatedSchedulesUi) -> Unit,
 ) {
     Column(
         modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -302,7 +302,7 @@ private fun SentSchedulesSection(
                     SentScheduleView(
                         recipient = sharedSchedule.recipient,
                         organizationNames = sharedSchedule.organizationNames,
-                        onCancelSentSchedule = { onCancelSentSchedule(sharedSchedule) },
+                        onCancelSentScheduleClick = { onCancelSentScheduleClick(sharedSchedule) },
                     )
                 }
             } else {
@@ -317,7 +317,7 @@ private fun SentScheduleView(
     modifier: Modifier = Modifier,
     recipient: AppUserUi,
     organizationNames: List<String>,
-    onCancelSentSchedule: () -> Unit,
+    onCancelSentScheduleClick: () -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -396,7 +396,7 @@ private fun SentScheduleView(
                 )
             ) {
                 FilledTonalButton(
-                    onClick = onCancelSentSchedule,
+                    onClick = onCancelSentScheduleClick,
                     modifier = Modifier.fillMaxWidth().height(32.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                 ) {

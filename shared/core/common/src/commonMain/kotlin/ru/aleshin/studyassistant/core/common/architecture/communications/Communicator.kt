@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -34,18 +35,18 @@ interface Communicator<T> {
 
     abstract class AbstractStateFlow<T>(defaultValue: T) : Communicator<T> {
 
-        private val flow = MutableStateFlow(value = defaultValue)
+        protected val flow = MutableStateFlow(value = defaultValue)
 
         override suspend fun collect(collector: FlowCollector<T>) {
             flow.collect(collector)
         }
 
-        override suspend fun read(): T {
-            return flow.value
-        }
+        fun getValue() = flow.value
+
+        override suspend fun read(): T = getValue()
 
         override fun update(data: T) {
-            flow.value = data
+            flow.update { data }
         }
     }
 
@@ -55,7 +56,7 @@ interface Communicator<T> {
         flowBufferOverflow: BufferOverflow = BufferOverflow.SUSPEND,
     ) : Communicator<T> {
 
-        private val flow = MutableSharedFlow<T>(
+        protected val flow = MutableSharedFlow<T>(
             replay = flowReplay,
             extraBufferCapacity = flowBufferCapacity,
             onBufferOverflow = flowBufferOverflow,

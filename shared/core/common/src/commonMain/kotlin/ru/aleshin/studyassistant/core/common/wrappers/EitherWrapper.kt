@@ -15,7 +15,6 @@
  */
 package ru.aleshin.studyassistant.core.common.wrappers
 
-import cafe.adriel.voyager.core.platform.multiplatformName
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -49,7 +48,7 @@ interface EitherWrapper<F : DomainFailures> {
             if (!ignoreExceptions(error)) {
                 crashlyticsService.recordException(
                     tag = ERROR_TAG,
-                    message = failure::class.multiplatformName.toString(),
+                    message = failure::class.simpleName.toString(),
                     exception = error,
                 )
             }
@@ -81,7 +80,7 @@ interface FlowEitherWrapper<F : DomainFailures> : EitherWrapper<F> {
                 if (!ignoreExceptions(error)) {
                     crashlyticsService.recordException(
                         tag = ERROR_TAG,
-                        message = failure::class.multiplatformName.toString(),
+                        message = failure::class.simpleName.toString(),
                         exception = error,
                     )
                 }

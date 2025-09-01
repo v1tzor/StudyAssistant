@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.info.impl.presentation.ui.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.tokens.LocalInfoIcons
 import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.tokens.LocalInfoStrings
@@ -31,8 +32,11 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.tokens.fetchInf
 internal fun InfoTheme(
     content: @Composable () -> Unit,
 ) {
-    val icons = fetchInfoIcons(StudyAssistantRes.colors.isDark)
-    val strings = fetchInfoStrings(StudyAssistantRes.language)
+    val isDark = StudyAssistantRes.colors.isDark
+    val language = StudyAssistantRes.language
+
+    val icons = remember(isDark) { fetchInfoIcons(isDark) }
+    val strings = remember(language) { fetchInfoStrings(language) }
 
     CompositionLocalProvider(
         LocalInfoIcons provides icons,

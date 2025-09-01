@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.konfig)
     alias(libs.plugins.skie)
 }
@@ -33,8 +33,6 @@ kotlin {
             implementation(libs.rustore.universalpush.core)
         }
         commonMain.dependencies {
-            implementation(project(":shared:features:navigation:api"))
-            implementation(project(":shared:features:navigation:impl"))
             implementation(project(":shared:features:preview:api"))
             implementation(project(":shared:features:preview:impl"))
             implementation(project(":shared:features:auth:api"))

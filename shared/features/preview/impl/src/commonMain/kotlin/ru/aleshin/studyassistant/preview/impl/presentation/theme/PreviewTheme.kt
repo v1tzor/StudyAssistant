@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.preview.impl.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens.LocalPreviewIcons
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens.LocalPreviewStrings
@@ -29,8 +30,11 @@ import ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens.fetchPre
  */
 @Composable
 internal fun PreviewTheme(content: @Composable () -> Unit) {
-    val icons = fetchPreviewIcons(StudyAssistantRes.colors.isDark)
-    val strings = fetchPreviewStrings(StudyAssistantRes.language)
+    val isDark = StudyAssistantRes.colors.isDark
+    val language = StudyAssistantRes.language
+
+    val icons = remember(isDark) { fetchPreviewIcons(isDark) }
+    val strings = remember { fetchPreviewStrings(language) }
 
     CompositionLocalProvider(
         LocalPreviewIcons provides icons,

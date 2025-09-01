@@ -58,7 +58,7 @@ abstract class BaseSourceSyncManager(
     protected var taskJob: Job? = null
     protected val mainJob = SupervisorJob()
 
-    protected val scope = CoroutineScope(mainJob + coroutineManager.backgroundDispatcher)
+    protected val scope = CoroutineScope(mainJob + coroutineManager.ioDispatcher)
 
     /**
      * Pushes queued offline changes to the remote database.

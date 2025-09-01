@@ -16,12 +16,13 @@
 
 package ru.aleshin.studyassistant.users.impl.presentation.ui.user.contract
 
-import androidx.compose.runtime.Immutable
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.users.UserFriendStatus
 import ru.aleshin.studyassistant.users.impl.domain.entities.UsersFailures
@@ -30,29 +31,35 @@ import ru.aleshin.studyassistant.users.impl.presentation.models.AppUserUi
 /**
  * @author Stanislav Aleshin on 15.07.2024
  */
-@Immutable
-@Parcelize
-internal data class UserProfileViewState(
+@Serializable
+internal data class UserProfileState(
     val isLoading: Boolean = true,
     val user: AppUserUi? = null,
     val friendStatus: UserFriendStatus? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class UserProfileEvent : BaseEvent {
-    data class Init(val userId: UID) : UserProfileEvent()
+internal sealed class UserProfileEvent : StoreEvent {
+    data class Started(val userId: UID) : UserProfileEvent()
     data object SendFriendRequest : UserProfileEvent()
     data object AcceptFriendRequest : UserProfileEvent()
     data object CancelSendFriendRequest : UserProfileEvent()
     data object DeleteFromFriends : UserProfileEvent()
-    data object NavigateToBack : UserProfileEvent()
+    data object ClickBack : UserProfileEvent()
 }
 
-internal sealed class UserProfileEffect : BaseUiEffect {
+internal sealed class UserProfileEffect : StoreEffect {
     data class ShowError(val failures: UsersFailures) : UserProfileEffect()
-    data object NavigateToBack : UserProfileEffect()
 }
 
-internal sealed class UserProfileAction : BaseAction {
+internal sealed class UserProfileAction : StoreAction {
     data class UpdateUser(val user: AppUserUi, val status: UserFriendStatus) : UserProfileAction()
     data class UpdateLoading(val isLoading: Boolean) : UserProfileAction()
+}
+
+internal data class UserProfileInput(
+    val userId: UID
+) : BaseInput
+
+internal sealed class UserProfileOutput : BaseOutput {
+    data object NavigateToBack : UserProfileOutput()
 }

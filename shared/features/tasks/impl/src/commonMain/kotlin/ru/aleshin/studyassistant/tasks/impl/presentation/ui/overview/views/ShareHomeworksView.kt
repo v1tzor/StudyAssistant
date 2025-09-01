@@ -68,7 +68,7 @@ internal fun ShareHomeworksView(
     modifier: Modifier = Modifier,
     isLoadingShare: Boolean,
     sharedHomeworks: SharedHomeworksDetailsUi?,
-    onOpenSharedHomeworks: () -> Unit,
+    onSharedHomeworkClick: () -> Unit,
 ) {
     Surface(
         modifier = modifier.height(248.dp),
@@ -84,12 +84,12 @@ internal fun ShareHomeworksView(
                 lastActivity = remember(sharedHomeworks) {
                     sharedHomeworks?.received?.values?.maxOfOrNull { it.sendDate }
                 },
-                onOpenSharedHomeworks = onOpenSharedHomeworks,
+                onAllSharedHomeworksClick = onSharedHomeworkClick,
             )
             ShareHomeworksViewContent(
                 isLoading = isLoadingShare,
                 sharedHomeworks = sharedHomeworks,
-                onOpenSharedHomeworks = onOpenSharedHomeworks,
+                onSharedHomeworkClick = onSharedHomeworkClick,
             )
         }
     }
@@ -100,7 +100,7 @@ private fun ShareHomeworksViewHeader(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     lastActivity: Instant?,
-    onOpenSharedHomeworks: () -> Unit,
+    onAllSharedHomeworksClick: () -> Unit,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -134,7 +134,7 @@ private fun ShareHomeworksViewHeader(
             )
         }
         OutlinedButton(
-            onClick = onOpenSharedHomeworks,
+            onClick = onAllSharedHomeworksClick,
             modifier = Modifier.height(32.dp),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         ) {
@@ -151,7 +151,7 @@ private fun ShareHomeworksViewContent(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     sharedHomeworks: SharedHomeworksDetailsUi?,
-    onOpenSharedHomeworks: () -> Unit,
+    onSharedHomeworkClick: () -> Unit,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -161,13 +161,13 @@ private fun ShareHomeworksViewContent(
             modifier = Modifier.weight(1f),
             isLoading = isLoading,
             receivedHomeworks = sharedHomeworks?.received ?: emptyMap(),
-            onOpenSharedHomeworks = { onOpenSharedHomeworks() },
+            onSharedHomeworkClick = { onSharedHomeworkClick() },
         )
         SentHomeworksSection(
             modifier = Modifier.weight(1f),
             isLoading = isLoading,
             sentHomeworks = sharedHomeworks?.sent ?: emptyMap(),
-            onOpenSharedHomeworks = { onOpenSharedHomeworks() },
+            onSharedHomeworkClick = { onSharedHomeworkClick() },
         )
     }
 }
@@ -177,7 +177,7 @@ private fun ReceivedHomeworksSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     receivedHomeworks: Map<UID, ReceivedMediatedHomeworksDetailsUi> = emptyMap(),
-    onOpenSharedHomeworks: (ReceivedMediatedHomeworksDetailsUi) -> Unit,
+    onSharedHomeworkClick: (ReceivedMediatedHomeworksDetailsUi) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -225,7 +225,7 @@ private fun ReceivedHomeworksSection(
                         items(homeworks, key = { it.uid }) { mediatedHomework ->
                             SharedHomeworkItem(
                                 modifier = Modifier.fillParentMaxWidth().animateItem(),
-                                onClick = { onOpenSharedHomeworks(mediatedHomework) },
+                                onClick = { onSharedHomeworkClick(mediatedHomework) },
                                 isSender = false,
                                 avatar = mediatedHomework.sender.avatar,
                                 userName = mediatedHomework.sender.username,
@@ -258,7 +258,7 @@ private fun SentHomeworksSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     sentHomeworks: Map<UID, SentMediatedHomeworksDetailsUi> = emptyMap(),
-    onOpenSharedHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
+    onSharedHomeworkClick: (SentMediatedHomeworksDetailsUi) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -308,7 +308,7 @@ private fun SentHomeworksSection(
                                 ?: StudyAssistantRes.strings.noneTitle
                             SharedHomeworkItem(
                                 modifier = Modifier.fillParentMaxWidth().animateItem(),
-                                onClick = { onOpenSharedHomeworks(mediatedHomework) },
+                                onClick = { onSharedHomeworkClick(mediatedHomework) },
                                 isSender = true,
                                 avatar = mediatedHomework.recipients.getOrNull(0)?.avatar,
                                 userName = if (mediatedHomework.recipients.size > 1) {

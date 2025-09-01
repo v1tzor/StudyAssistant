@@ -106,7 +106,7 @@ internal interface TodoInteractor {
                         }
 
                         todo.convertToDetails(
-                            deadlineTimeLeft = leftTime,
+                            deadlineTimeLeft = leftTime?.let { it - it % 10000 },
                             status = TodoStatus.IN_PROGRESS,
                             progress = progress,
                             linkedGoal = goals.find { it.contentId == todo.uid },
@@ -117,7 +117,7 @@ internal interface TodoInteractor {
                             deadline.toEpochMilliseconds() - currentTime.toEpochMilliseconds()
                         }
                         todo.convertToDetails(
-                            deadlineTimeLeft = expiredTime,
+                            deadlineTimeLeft = expiredTime?.let { it - it % 10000 },
                             status = TodoStatus.NOT_COMPLETE,
                             progress = 0f,
                             linkedGoal = goals.find { it.contentId == todo.uid },

@@ -48,7 +48,7 @@ import ru.aleshin.studyassistant.core.api.realtime.RealtimeService
 import ru.aleshin.studyassistant.core.api.utils.AuthenticationFactor
 import ru.aleshin.studyassistant.core.api.utils.AuthenticatorType
 import ru.aleshin.studyassistant.core.api.utils.Channels
-import ru.aleshin.studyassistant.core.api.utils.OAuthProvider
+import ru.aleshin.studyassistant.core.api.utils.SocialNetworkProvider
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteException
 import ru.aleshin.studyassistant.core.common.exceptions.AppwriteUserException
 import ru.aleshin.studyassistant.core.common.extensions.tryFromJson
@@ -945,7 +945,7 @@ class AccountService(
      */
     suspend fun createOAuth2Session(
         activity: PlatformActivity,
-        provider: OAuthProvider,
+        provider: SocialNetworkProvider,
         success: String? = null,
         failure: String? = null,
         scopes: List<String>? = null,
@@ -1001,7 +1001,7 @@ class AccountService(
     @JvmOverloads
     suspend fun createOAuth2Session(
         activity: PlatformActivity,
-        provider: OAuthProvider,
+        provider: SocialNetworkProvider,
         scopes: List<String>? = null,
     ): SessionPojo? {
         return createOAuth2Session(

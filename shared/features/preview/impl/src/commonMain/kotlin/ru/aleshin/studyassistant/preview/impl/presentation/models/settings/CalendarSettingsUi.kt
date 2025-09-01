@@ -16,21 +16,22 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.models.settings
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class CalendarSettingsUi(
     val numberOfWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val weekScheduleViewType: WeekScheduleViewType = WeekScheduleViewType.COMMON,
     val holidays: List<HolidaysUi> = emptyList(),
     val updatedAt: Long = 0L,
-) : Parcelable {
+) {
     companion object {
         fun createEmpty() = CalendarSettingsUi()
     }

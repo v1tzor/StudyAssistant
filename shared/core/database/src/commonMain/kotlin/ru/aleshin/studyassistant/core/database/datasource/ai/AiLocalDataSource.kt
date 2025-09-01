@@ -61,7 +61,7 @@ interface AiLocalDataSource : LocalDataSource.OnlyOffline {
     ) : AiLocalDataSource {
 
         private val coroutineContext: CoroutineContext
-            get() = coroutineManager.backgroundDispatcher
+            get() = coroutineManager.ioDispatcher
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchAllChats(): Flow<List<AiChatEntity>> {

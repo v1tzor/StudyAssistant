@@ -40,7 +40,7 @@ internal fun DetailsTopBar(
     modifier: Modifier = Modifier,
     onEditClick: () -> Unit,
     onOverviewClick: () -> Unit,
-    onCurrentWeek: () -> Unit,
+    onCurrentWeekSelected: () -> Unit,
 ) {
     TopAppBar(
         modifier = modifier,
@@ -65,7 +65,7 @@ internal fun DetailsTopBar(
                 TopAppBarButton(
                     imagePainter = painterResource(StudyAssistantRes.icons.calendarToday),
                     imageDescription = null,
-                    onButtonClick = onCurrentWeek,
+                    onButtonClick = onCurrentWeekSelected,
                 )
                 TopAppBarButton(
                     imagePainter = painterResource(ScheduleThemeRes.icons.openOverview),

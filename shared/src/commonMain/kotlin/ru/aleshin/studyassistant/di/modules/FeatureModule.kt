@@ -19,18 +19,17 @@ package ru.aleshin.studyassistant.di.modules
 import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.bindEagerSingleton
-import org.kodein.di.bindProvider
+import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import org.kodein.di.provider
-import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
+import ru.aleshin.studyassistant.auth.api.AuthFeatureStarter
 import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
-import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureDIHolder
-import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
+import ru.aleshin.studyassistant.auth.impl.navigation.DefaultAuthFeatureStarter
+import ru.aleshin.studyassistant.billing.api.BillingFeatureStarter
 import ru.aleshin.studyassistant.billing.impl.di.BillingFeatureDependencies
-import ru.aleshin.studyassistant.billing.impl.di.holder.BillingFeatureDIHolder
-import ru.aleshin.studyassistant.chat.api.navigation.ChatFeatureStarter
+import ru.aleshin.studyassistant.billing.impl.navigation.DefaultBillingFeatureStarter
+import ru.aleshin.studyassistant.chat.api.ChatFeatureStarter
 import ru.aleshin.studyassistant.chat.impl.di.ChatFeatureDependencies
-import ru.aleshin.studyassistant.chat.impl.di.holder.ChatFeatureDIHolder
+import ru.aleshin.studyassistant.chat.impl.navigation.DefaultChatFeatureStarter
 import ru.aleshin.studyassistant.core.api.auth.AccountService
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
@@ -67,62 +66,37 @@ import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
+import ru.aleshin.studyassistant.editor.api.EditorFeatureStarter
 import ru.aleshin.studyassistant.editor.impl.di.EditorFeatureDependencies
-import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureDIHolder
-import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
+import ru.aleshin.studyassistant.editor.impl.navigation.DefaultEditorFeatureStarter
+import ru.aleshin.studyassistant.info.api.InfoFeatureStarter
 import ru.aleshin.studyassistant.info.impl.di.InfoFeatureDependencies
-import ru.aleshin.studyassistant.info.impl.di.holder.InfoFeatureDIHolder
-import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
-import ru.aleshin.studyassistant.navigation.impl.di.NavigationFeatureDependencies
-import ru.aleshin.studyassistant.navigation.impl.di.holder.NavigationFeatureDIHolder
-import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
+import ru.aleshin.studyassistant.info.impl.navigation.DefaultInfoFeatureStarter
+import ru.aleshin.studyassistant.preview.api.PreviewFeatureStarter
 import ru.aleshin.studyassistant.preview.impl.di.PreviewFeatureDependencies
-import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureDIHolder
-import ru.aleshin.studyassistant.profile.api.navigation.ProfileFeatureStarter
+import ru.aleshin.studyassistant.preview.impl.navigation.DefaultPreviewFeatureStarter
+import ru.aleshin.studyassistant.profile.api.ProfileFeatureStarter
 import ru.aleshin.studyassistant.profile.impl.di.ProfileFeatureDependencies
-import ru.aleshin.studyassistant.profile.impl.di.holder.ProfileFeatureDIHolder
-import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
+import ru.aleshin.studyassistant.profile.impl.navigation.DefaultProfileFeatureStarter
+import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureStarter
 import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
-import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureDIHolder
-import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
+import ru.aleshin.studyassistant.schedule.impl.navigation.DefaultScheduleFeatureStarter
+import ru.aleshin.studyassistant.settings.api.SettingsFeatureStarter
 import ru.aleshin.studyassistant.settings.impl.di.SettingsFeatureDependencies
-import ru.aleshin.studyassistant.settings.impl.di.holder.SettingsFeatureDIHolder
-import ru.aleshin.studyassistant.tasks.api.navigation.TasksFeatureStarter
+import ru.aleshin.studyassistant.settings.impl.navigation.DefaultSettingsFeatureStarter
+import ru.aleshin.studyassistant.tasks.api.TasksFeatureStarter
 import ru.aleshin.studyassistant.tasks.impl.di.TasksFeatureDependencies
-import ru.aleshin.studyassistant.tasks.impl.di.holder.TasksFeatureDIHolder
-import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
+import ru.aleshin.studyassistant.tasks.impl.navigation.DefaultTasksFeatureStarter
+import ru.aleshin.studyassistant.users.api.UsersFeatureStarter
 import ru.aleshin.studyassistant.users.impl.di.UsersFeatureDependencies
-import ru.aleshin.studyassistant.users.impl.di.holder.UsersFeatureDIHolder
+import ru.aleshin.studyassistant.users.impl.navigation.DefaultUsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 val featureModule = DI.Module("Feature") {
-    bindEagerSingleton<NavigationFeatureDependencies> {
-        object : NavigationFeatureDependencies {
-            override val scheduleFeatureStarter = provider<ScheduleFeatureStarter>()
-            override val tasksFeatureStarter = provider<TasksFeatureStarter>()
-            override val chatFeatureStarter = provider<ChatFeatureStarter>()
-            override val infoFeatureStarter = provider<InfoFeatureStarter>()
-            override val profileFeatureStarter = provider<ProfileFeatureStarter>()
-            override val coroutineManager = instance<CoroutineManager>()
-            override val crashlyticsService = instance<CrashlyticsService>()
-        }
-    }
-    bindProvider<NavigationFeatureStarter> {
-        with(NavigationFeatureDIHolder) {
-            init(instance())
-            fetchApi().fetchStarter()
-        }
-    }
-
     bindEagerSingleton<PreviewFeatureDependencies> {
         object : PreviewFeatureDependencies {
-            override val authFeatureStarter = provider<AuthFeatureStarter>()
-            override val editorFeatureStarter = provider<EditorFeatureStarter>()
-            override val navigationFeatureStarter = provider<NavigationFeatureStarter>()
-            override val billingFeatureStarter = provider<BillingFeatureStarter>()
             override val usersRepository = instance<UsersRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
@@ -133,17 +107,12 @@ val featureModule = DI.Module("Feature") {
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindProvider<PreviewFeatureStarter> {
-        with(PreviewFeatureDIHolder) {
-            init(instance())
-            fetchApi().fetchStarter()
-        }
+    bindSingleton<PreviewFeatureStarter> {
+        DefaultPreviewFeatureStarter { instance<PreviewFeatureDependencies>() }
     }
 
     bindEagerSingleton<AuthFeatureDependencies> {
         object : AuthFeatureDependencies {
-            override val navigationFeatureStarter = provider<NavigationFeatureStarter>()
-            override val previewFeatureStarter = provider<PreviewFeatureStarter>()
             override val authRepository = instance<AuthRepository>()
             override val usersRepository = instance<UsersRepository>()
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
@@ -159,17 +128,12 @@ val featureModule = DI.Module("Feature") {
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindProvider<AuthFeatureStarter> {
-        with(AuthFeatureDIHolder) {
-            init(instance())
-            fetchApi().fetchStarter()
-        }
+    bindSingleton<AuthFeatureStarter> {
+        DefaultAuthFeatureStarter { instance<AuthFeatureDependencies>() }
     }
 
     bindEagerSingleton<ScheduleFeatureDependencies> {
         object : ScheduleFeatureDependencies {
-            override val editorFeatureStarter = provider<EditorFeatureStarter>()
-            override val usersFeatureStarter = provider<UsersFeatureStarter>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val shareSchedulesRepository = instance<ShareSchedulesRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
@@ -189,18 +153,12 @@ val featureModule = DI.Module("Feature") {
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindProvider<ScheduleFeatureStarter> {
-        with(ScheduleFeatureDIHolder) {
-            init(instance())
-            fetchApi().fetchStarter()
-        }
+    bindSingleton<ScheduleFeatureStarter> {
+        DefaultScheduleFeatureStarter { instance<ScheduleFeatureDependencies>() }
     }
 
     bindEagerSingleton<TasksFeatureDependencies> {
         object : TasksFeatureDependencies {
-            override val editorFeatureStarter = provider<EditorFeatureStarter>()
-            override val usersFeatureStarter = provider<UsersFeatureStarter>()
-            override val billingFeatureStarter = provider<BillingFeatureStarter>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
@@ -219,18 +177,12 @@ val featureModule = DI.Module("Feature") {
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindProvider<TasksFeatureStarter> {
-        with(TasksFeatureDIHolder) {
-            init(instance())
-            fetchApi().fetchStarter()
-        }
+    bindSingleton<TasksFeatureStarter> {
+        DefaultTasksFeatureStarter { instance<TasksFeatureDependencies>() }
     }
 
     bindEagerSingleton<InfoFeatureDependencies> {
         object : InfoFeatureDependencies {
-            override val editorFeatureStarter = provider<EditorFeatureStarter>()
-            override val usersFeatureStarter = provider<UsersFeatureStarter>()
-            override val billingFeatureStarter = provider<BillingFeatureStarter>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
@@ -242,20 +194,12 @@ val featureModule = DI.Module("Feature") {
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindProvider<InfoFeatureStarter> {
-        with(InfoFeatureDIHolder) {
-            init(instance())
-            fetchApi().fetchStarter()
-        }
+    bindSingleton<InfoFeatureStarter> {
+        DefaultInfoFeatureStarter { instance<InfoFeatureDependencies>() }
     }
 
     bindEagerSingleton<ProfileFeatureDependencies> {
         object : ProfileFeatureDependencies {
-            override val authFeatureStarter = provider<AuthFeatureStarter>()
-            override val usersFeatureStarter = provider<UsersFeatureStarter>()
-            override val settingsFeatureStarter = provider<SettingsFeatureStarter>()
-            override val editorFeatureStarter = provider<EditorFeatureStarter>()
-            override val scheduleFeatureStarter = provider<ScheduleFeatureStarter>()
             override val authRepository = instance<AuthRepository>()
             override val shareSchedulesRepository = instance<ShareSchedulesRepository>()
             override val usersRepository = instance<UsersRepository>()
@@ -275,16 +219,12 @@ val featureModule = DI.Module("Feature") {
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindProvider<ProfileFeatureStarter> {
-        with(ProfileFeatureDIHolder) {
-            init(instance())
-            fetchApi().fetchStarter()
-        }
+    bindSingleton<ProfileFeatureStarter> {
+        DefaultProfileFeatureStarter { instance<ProfileFeatureDependencies>() }
     }
 
     bindEagerSingleton<UsersFeatureDependencies> {
         object : UsersFeatureDependencies {
-            override val editorFeatureStarter = provider<EditorFeatureStarter>()
             override val employeeRepository = instance<EmployeeRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
             override val friendRequestsRepository = instance<FriendRequestsRepository>()
@@ -298,16 +238,12 @@ val featureModule = DI.Module("Feature") {
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindProvider<UsersFeatureStarter> {
-        with(UsersFeatureDIHolder) {
-            init(instance())
-            fetchApi().fetchStarter()
-        }
+    bindSingleton<UsersFeatureStarter> {
+        DefaultUsersFeatureStarter { instance<UsersFeatureDependencies>() }
     }
 
     bindEagerSingleton<EditorFeatureDependencies> {
         object : EditorFeatureDependencies {
-            override val billingFeatureStarter = provider<BillingFeatureStarter>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
@@ -329,16 +265,12 @@ val featureModule = DI.Module("Feature") {
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindProvider<EditorFeatureStarter> {
-        with(EditorFeatureDIHolder) {
-            init(instance())
-            fetchApi().fetchStarter()
-        }
+    bindSingleton<EditorFeatureStarter> {
+        DefaultEditorFeatureStarter { instance<EditorFeatureDependencies>() }
     }
 
     bindEagerSingleton<SettingsFeatureDependencies> {
         object : SettingsFeatureDependencies {
-            override val billingFeatureStarter = provider<BillingFeatureStarter>()
             override val subscriptionsRepository = instance<SubscriptionsRepository>()
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
@@ -363,12 +295,8 @@ val featureModule = DI.Module("Feature") {
             override val iapService = instance<IapService>()
         }
     }
-
-    bindProvider<SettingsFeatureStarter> {
-        with(SettingsFeatureDIHolder) {
-            init(instance())
-            fetchApi().fetchStarter()
-        }
+    bindSingleton<SettingsFeatureStarter> {
+        DefaultSettingsFeatureStarter { instance<SettingsFeatureDependencies>() }
     }
 
     bindEagerSingleton<BillingFeatureDependencies> {
@@ -385,17 +313,12 @@ val featureModule = DI.Module("Feature") {
             override val analyticsService = instance<AnalyticsService>()
         }
     }
-
-    bindProvider<BillingFeatureStarter> {
-        with(BillingFeatureDIHolder) {
-            init(instance())
-            fetchApi().fetchStarter()
-        }
+    bindSingleton<BillingFeatureStarter> {
+        DefaultBillingFeatureStarter { instance<BillingFeatureDependencies>() }
     }
 
     bindEagerSingleton<ChatFeatureDependencies> {
         object : ChatFeatureDependencies {
-            override val billingFeatureStarter = provider<BillingFeatureStarter>()
             override val aiAssistantRepository = instance<AiAssistantRepository>()
             override val dailyAiStatisticsRepository = instance<DailyAiStatisticsRepository>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
@@ -419,10 +342,7 @@ val featureModule = DI.Module("Feature") {
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindProvider<ChatFeatureStarter> {
-        with(ChatFeatureDIHolder) {
-            init(instance())
-            fetchApi().fetchStarter()
-        }
+    bindSingleton<ChatFeatureStarter> {
+        DefaultChatFeatureStarter { instance<ChatFeatureDependencies>() }
     }
 }

@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.auth.impl.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.tokens.LocalAuthIcons
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.tokens.LocalAuthStrings
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.tokens.fetchAuthIcons
@@ -29,8 +30,11 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
  */
 @Composable
 internal fun AuthTheme(content: @Composable () -> Unit) {
-    val icons = fetchAuthIcons(StudyAssistantRes.colors.isDark)
-    val strings = fetchAuthStrings(StudyAssistantRes.language)
+    val isDark = StudyAssistantRes.colors.isDark
+    val language = StudyAssistantRes.language
+
+    val icons = remember(isDark) { fetchAuthIcons(isDark) }
+    val strings = remember(language) { fetchAuthStrings(language) }
 
     CompositionLocalProvider(
         LocalAuthIcons provides icons,

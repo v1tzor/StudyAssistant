@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.classes
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.Progress
@@ -25,10 +25,11 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.Pr
 /**
  * @author Stanislav Aleshin on 13.06.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class ActiveClassUi(
     val uid: UID,
     val isStarted: Boolean,
     val progress: Progress,
     val duration: Millis,
-) : Parcelable
+)

@@ -16,16 +16,17 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.models.shared
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 
 /**
  * @author Stanislav Aleshin on 14.08.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class SharedSchedulesShortUi(
     val sent: Map<UID, SentMediatedSchedulesUi> = emptyMap(),
     val received: Map<UID, ReceivedMediatedSchedulesShortUi> = emptyMap(),
     val updatedAt: Long,
-) : Parcelable
+)

@@ -66,8 +66,8 @@ internal fun HomeworksTopSheet(
     isLoading: Boolean,
     selectedTimeRange: TimeRange?,
     progressList: List<Boolean>,
-    onNextTimeRange: () -> Unit,
-    onPreviousTimeRange: () -> Unit,
+    onNextTimeRangeClick: () -> Unit,
+    onPreviousTimeRangeClick: () -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -82,8 +82,8 @@ internal fun HomeworksTopSheet(
             HomeworksTimeRangeSelector(
                 enabled = !isLoading,
                 selectedTimeRange = selectedTimeRange,
-                onNext = onNextTimeRange,
-                onPrevious = onPreviousTimeRange,
+                onNext = onNextTimeRangeClick,
+                onPrevious = onPreviousTimeRangeClick,
             )
             HomeworksProgressView(
                 modifier = Modifier.weight(1f),

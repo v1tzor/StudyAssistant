@@ -128,10 +128,7 @@ internal fun ActiveSubscriptionView(
                         Text(
                             text = buildString {
                                 append(SettingsThemeRes.strings.controlSubscriptionInStoreSuffix)
-                                append(
-                                    currentStore?.mapToString()
-                                        ?: StudyAssistantRes.strings.storeTitle
-                                )
+                                append(currentStore?.mapToString() ?: StudyAssistantRes.strings.storeTitle)
                             }
                         )
                     }
@@ -144,10 +141,7 @@ internal fun ActiveSubscriptionView(
                         Text(
                             text = buildString {
                                 append(SettingsThemeRes.strings.restoreSubscriptionInStoreSuffix)
-                                append(
-                                    currentStore?.mapToString()
-                                        ?: StudyAssistantRes.strings.storeTitle
-                                )
+                                append(currentStore?.mapToString() ?: StudyAssistantRes.strings.storeTitle)
                             }
                         )
                     }

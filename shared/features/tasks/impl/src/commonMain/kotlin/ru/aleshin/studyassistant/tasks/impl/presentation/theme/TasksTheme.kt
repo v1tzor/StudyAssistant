@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.tokens.LocalTasksIcons
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.tokens.LocalTasksStrings
@@ -31,8 +32,11 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.tokens.fetchTasks
 internal fun TasksTheme(
     content: @Composable () -> Unit,
 ) {
-    val icons = fetchTasksIcons(StudyAssistantRes.colors.isDark)
-    val strings = fetchTasksStrings(StudyAssistantRes.language)
+    val isDark = StudyAssistantRes.colors.isDark
+    val language = StudyAssistantRes.language
+
+    val icons = remember(isDark) { fetchTasksIcons(isDark) }
+    val strings = remember(language) { fetchTasksStrings(language) }
 
     CompositionLocalProvider(
         LocalTasksIcons provides icons,

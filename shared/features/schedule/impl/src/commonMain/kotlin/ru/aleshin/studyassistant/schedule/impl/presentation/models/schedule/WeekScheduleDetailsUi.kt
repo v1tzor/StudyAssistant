@@ -16,23 +16,20 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 
 /**
  * @author Stanislav Aleshin on 30.05.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class WeekScheduleDetailsUi(
-    @TypeParceler<Instant, InstantParceler>
     val from: Instant,
-    @TypeParceler<Instant, InstantParceler>
     val to: Instant,
     val numberOfWeek: NumberOfRepeatWeek,
     val weekDaySchedules: Map<DayOfWeek, ScheduleDetailsUi>,
-) : Parcelable
+)

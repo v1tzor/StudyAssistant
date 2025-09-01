@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.domain.entities.tasks.fetchAllTasks
 import ru.aleshin.studyassistant.core.domain.entities.tasks.toHomeworkComponents
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
@@ -26,20 +26,23 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
 /**
  * @author Stanislav Aleshin on 01.07.2024.
  */
-internal sealed interface HomeworkTaskComponentUi : Parcelable {
+@Immutable
+@Serializable
+internal sealed interface HomeworkTaskComponentUi {
 
-    @Parcelize
+    @Serializable
     data class Label(val text: String) : HomeworkTaskComponentUi
 
-    @Parcelize
+    @Serializable
     data class Tasks(val taskList: List<String>) : HomeworkTaskComponentUi
 }
 
-@Parcelize
+@Immutable
+@Serializable
 internal data class HomeworkTasksDetailsUi(
     val origin: String,
     val components: List<HomeworkTaskComponentUi>,
-) : Parcelable
+)
 
 internal fun String.mapToHomeworkTasks() = HomeworkTasksDetailsUi(
     origin = this,

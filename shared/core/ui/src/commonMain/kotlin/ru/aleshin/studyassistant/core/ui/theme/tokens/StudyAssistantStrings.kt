@@ -15,6 +15,7 @@
  */
 package ru.aleshin.studyassistant.core.ui.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
@@ -22,6 +23,7 @@ import kotlinx.datetime.format.MonthNames
 /**
  * @author Stanislav Aleshin on 27.01.2024.
  */
+@Immutable
 data class StudyAssistantStrings(
     val appName: String,
     val cancelTitle: String,

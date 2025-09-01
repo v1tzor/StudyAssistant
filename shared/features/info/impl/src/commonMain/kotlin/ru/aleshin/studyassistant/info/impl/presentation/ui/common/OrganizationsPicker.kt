@@ -28,7 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,7 +59,9 @@ internal fun OrganizationPicker(
     onSelectOrganization: (OrganizationShortUi) -> Unit,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
-    val organization by derivedStateOf { allOrganizations.find { it.uid == selectedOrganization } }
+    val organization = remember(allOrganizations, selectedOrganization) {
+        allOrganizations.find { it.uid == selectedOrganization }
+    }
     var openOrganizationSelector by remember { mutableStateOf(false) }
 
     Row(

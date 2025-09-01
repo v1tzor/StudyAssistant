@@ -43,7 +43,7 @@ interface UserLocalDataSource : LocalDataSource.FullSynced.SingleDocument<BaseAp
     ) : UserLocalDataSource {
 
         private val coroutineContext: CoroutineContext
-            get() = coroutineManager.backgroundDispatcher
+            get() = coroutineManager.ioDispatcher
 
         override suspend fun addOrUpdateItem(item: BaseAppUserEntity) {
             userQuery.addOrUpdateUser(item.mapToEntity()).await()

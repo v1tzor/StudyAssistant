@@ -16,15 +16,16 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.models.users
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class AppUserUi(
     val uid: UID,
     val devices: List<UserDeviceUi>,
@@ -40,4 +41,4 @@ internal data class AppUserUi(
     val socialNetworks: List<SocialNetworkUi> = emptyList(),
     val friends: List<UID> = emptyList(),
     val updatedAt: Long,
-) : Parcelable
+)

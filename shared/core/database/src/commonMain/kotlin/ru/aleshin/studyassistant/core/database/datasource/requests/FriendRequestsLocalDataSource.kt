@@ -39,7 +39,7 @@ interface FriendRequestsLocalDataSource : LocalDataSource.FullSynced.SingleDocum
     ) : FriendRequestsLocalDataSource {
 
         private val coroutineContext: CoroutineContext
-            get() = coroutineManager.backgroundDispatcher
+            get() = coroutineManager.ioDispatcher
 
         override suspend fun addOrUpdateItem(item: FriendRequestsDetailsEntity) {
             friendRequestsQueries.addOrUpdateFriendRequsts(item.mapToEntity()).await()

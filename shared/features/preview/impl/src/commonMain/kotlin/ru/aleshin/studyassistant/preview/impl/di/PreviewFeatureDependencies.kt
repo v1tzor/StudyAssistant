@@ -16,8 +16,6 @@
 
 package ru.aleshin.studyassistant.preview.impl.di
 
-import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
-import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
@@ -27,17 +25,11 @@ import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsReposi
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
-import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 public interface PreviewFeatureDependencies : BaseFeatureDependencies {
-    public val editorFeatureStarter: () -> EditorFeatureStarter
-    public val navigationFeatureStarter: () -> NavigationFeatureStarter
-    public val authFeatureStarter: () -> AuthFeatureStarter
-    public val billingFeatureStarter: () -> BillingFeatureStarter
     public val usersRepository: UsersRepository
     public val organizationsRepository: OrganizationsRepository
     public val generalSettingsRepository: GeneralSettingsRepository

@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.organization
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.ContactInfoType
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
@@ -31,7 +31,8 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.convert
 /**
  * @author Stanislav Aleshin on 27.04.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class MediatedOrganizationUi(
     val uid: UID,
     val isMain: Boolean,
@@ -46,7 +47,7 @@ internal data class MediatedOrganizationUi(
     val locations: List<ContactInfoUi> = emptyList(),
     val webs: List<ContactInfoUi> = emptyList(),
     val offices: List<String> = emptyList(),
-) : Parcelable {
+) {
 
     fun groupedContactInfo(): Map<ContactInfoUi, ContactInfoType> = buildMap {
         putAll(emails.sortedBy { it.label }.map { Pair(it, ContactInfoType.EMAIL) })

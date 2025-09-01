@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.chat.impl.di
 
-import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -44,7 +43,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
  * @author Stanislav Aleshin on 21.04.2024.
  */
 public interface ChatFeatureDependencies : BaseFeatureDependencies {
-    public val billingFeatureStarter: () -> BillingFeatureStarter
     public val baseScheduleRepository: BaseScheduleRepository
     public val aiAssistantRepository: AiAssistantRepository
     public val dailyAiStatisticsRepository: DailyAiStatisticsRepository

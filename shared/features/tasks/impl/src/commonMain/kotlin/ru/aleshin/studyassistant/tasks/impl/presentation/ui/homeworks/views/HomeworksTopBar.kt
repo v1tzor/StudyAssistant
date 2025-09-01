@@ -38,7 +38,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun HomeworksTopBar(
     modifier: Modifier = Modifier,
-    onCurrentTimeRange: () -> Unit,
+    onCurrentTimeRangeClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     CenterAlignedTopAppBar(
@@ -55,7 +55,7 @@ internal fun HomeworksTopBar(
             }
         },
         actions = {
-            IconButton(onClick = onCurrentTimeRange) {
+            IconButton(onClick = onCurrentTimeRangeClick) {
                 Icon(
                     painter = painterResource(StudyAssistantRes.icons.calendarToday),
                     contentDescription = TasksThemeRes.strings.currentTimeRangeDesc,

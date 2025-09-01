@@ -16,24 +16,24 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.info.contract
 
-import androidx.compose.runtime.Immutable
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.EmptyUiEffect
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 
 /**
  * @author Stanislav Aleshin on 04.08.2025
  */
-@Immutable
-@Parcelize
-internal sealed class AboutAppViewState : BaseViewState {
-    data object Base : AboutAppViewState()
+@Serializable
+internal sealed class AboutAppState : StoreState {
+
+    @Serializable
+    data object Default : AboutAppState()
 }
 
-internal sealed class AboutAppEvent : BaseEvent
+internal sealed class AboutAppEvent : StoreEvent
 
-internal sealed class AboutAppEffect : EmptyUiEffect
+internal sealed class AboutAppEffect : StoreEffect
 
-internal sealed class AboutAppAction : BaseAction
+internal sealed class AboutAppAction : StoreAction

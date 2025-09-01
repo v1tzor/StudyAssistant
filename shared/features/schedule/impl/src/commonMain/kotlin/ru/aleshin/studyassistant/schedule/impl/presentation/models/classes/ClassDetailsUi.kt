@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.classes
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
@@ -30,7 +30,8 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.Employe
 /**
  * @author Stanislav Aleshin on 05.05.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class ClassDetailsUi(
     val uid: UID,
     val scheduleId: UID,
@@ -44,4 +45,4 @@ internal data class ClassDetailsUi(
     val timeRange: TimeRange,
     val number: Int,
     val homework: HomeworkDetailsUi?,
-) : Parcelable
+)

@@ -16,19 +16,17 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
+import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
@@ -38,42 +36,44 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.Week
 /**
  * @author Stanislav Aleshin on 09.06.2024
  */
-@Immutable
-@Parcelize
-internal data class DetailsViewState(
+@Serializable
+internal data class DetailsState(
     val isLoading: Boolean = true,
-    @TypeParceler<Instant, InstantParceler>
     val currentDate: Instant = Clock.System.now(),
     val weekSchedule: WeekScheduleDetailsUi? = null,
     val selectedWeek: TimeRange? = null,
     val activeClass: ActiveClassUi? = null,
     val scheduleView: WeekScheduleViewType = WeekScheduleViewType.COMMON,
-) : BaseViewState
+) : StoreState
 
-internal sealed class DetailsEvent : BaseEvent {
-    data object Init : DetailsEvent()
+internal sealed class DetailsEvent : StoreEvent {
+    data object Started : DetailsEvent()
     data object SelectedNextWeek : DetailsEvent()
     data object SelectedCurrentWeek : DetailsEvent()
     data object SelectedPreviousWeek : DetailsEvent()
     data class SelectedViewType(val scheduleView: WeekScheduleViewType) : DetailsEvent()
     data class CompleteHomework(val homework: HomeworkDetailsUi) : DetailsEvent()
-    data class CancelCompleteHomework(val homework: HomeworkDetailsUi) : DetailsEvent()
-    data class EditHomeworkInEditor(val homework: HomeworkDetailsUi) : DetailsEvent()
-    data class AddHomeworkInEditor(val classModel: ClassDetailsUi, val date: Instant) : DetailsEvent()
-    data object NavigateToOverview : DetailsEvent()
-    data object NavigateToEditor : DetailsEvent()
+    data class ClickAgainHomework(val homework: HomeworkDetailsUi) : DetailsEvent()
+    data class ClickEditHomework(val homework: HomeworkDetailsUi) : DetailsEvent()
+    data class ClickAddHomework(val classModel: ClassDetailsUi, val date: Instant) : DetailsEvent()
+    data object ClickOverview : DetailsEvent()
+    data object ClickEdit : DetailsEvent()
 }
 
-internal sealed class DetailsEffect : BaseUiEffect {
+internal sealed class DetailsEffect : StoreEffect {
     data class ShowError(val failures: ScheduleFailures) : DetailsEffect()
-    data class NavigateToLocal(val pushScreen: Screen) : DetailsEffect()
-    data class NavigateToGlobal(val pushScreen: Screen) : DetailsEffect()
 }
 
-internal sealed class DetailsAction : BaseAction {
+internal sealed class DetailsAction : StoreAction {
     data class UpdateWeekSchedule(val schedule: WeekScheduleDetailsUi) : DetailsAction()
     data class UpdateSelectedWeek(val week: TimeRange?) : DetailsAction()
     data class UpdateActiveClass(val activeClass: ActiveClassUi?) : DetailsAction()
     data class UpdateViewType(val scheduleView: WeekScheduleViewType) : DetailsAction()
     data class UpdateLoading(val isLoading: Boolean) : DetailsAction()
+}
+
+internal sealed class DetailsOutput : BaseOutput {
+    data object NavigateToOverview : DetailsOutput()
+    data class NavigateToWeekScheduleEditor(val config: EditorConfig.WeekSchedule) : DetailsOutput()
+    data class NavigateToHomeworkEditor(val config: EditorConfig.Homework) : DetailsOutput()
 }

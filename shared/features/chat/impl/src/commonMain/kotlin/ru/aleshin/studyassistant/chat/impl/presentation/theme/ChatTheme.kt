@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.chat.impl.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import ru.aleshin.studyassistant.chat.impl.presentation.theme.tokens.LocalChatIcons
 import ru.aleshin.studyassistant.chat.impl.presentation.theme.tokens.LocalChatStrings
 import ru.aleshin.studyassistant.chat.impl.presentation.theme.tokens.fetchChatIcons
@@ -29,8 +30,11 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
  */
 @Composable
 internal fun ChatTheme(content: @Composable () -> Unit) {
-    val icons = fetchChatIcons(StudyAssistantRes.colors.isDark)
-    val strings = fetchChatStrings(StudyAssistantRes.language)
+    val isDark = StudyAssistantRes.colors.isDark
+    val language = StudyAssistantRes.language
+
+    val icons = remember(isDark) { fetchChatIcons(isDark) }
+    val strings = remember(language) { fetchChatStrings(language) }
 
     CompositionLocalProvider(
         LocalChatIcons provides icons,

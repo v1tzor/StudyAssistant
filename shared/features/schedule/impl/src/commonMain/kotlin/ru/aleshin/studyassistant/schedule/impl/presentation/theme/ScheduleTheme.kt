@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.tokens.LocalScheduleIcons
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.tokens.LocalScheduleStrings
@@ -29,8 +30,11 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.theme.tokens.fetchSc
  */
 @Composable
 internal fun ScheduleTheme(content: @Composable () -> Unit) {
-    val icons = fetchScheduleIcons(StudyAssistantRes.colors.isDark)
-    val strings = fetchScheduleStrings(StudyAssistantRes.language)
+    val isDark = StudyAssistantRes.colors.isDark
+    val language = StudyAssistantRes.language
+
+    val icons = remember(isDark) { fetchScheduleIcons(isDark) }
+    val strings = remember(language) { fetchScheduleStrings(language) }
 
     CompositionLocalProvider(
         LocalScheduleIcons provides icons,

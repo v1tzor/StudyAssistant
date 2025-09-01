@@ -23,18 +23,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassViewState
+import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEffect
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEvent
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassState
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.store.ClassComponent
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.ClassTopBar
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.TimeInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.OrganizationInfoField
@@ -46,7 +59,89 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.TeacherInfoF
  */
 @Composable
 internal fun ClassContent(
-    state: ClassViewState,
+    classComponent: ClassComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = classComponent.store
+    val state by store.stateAsState()
+    val strings = EditorThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseClassContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+                onAddOrganization = {
+                    store.dispatchEvent(ClassEvent.NavigateToOrganizationEditor(null))
+                },
+                onAddSubject = {
+                    store.dispatchEvent(ClassEvent.NavigateToSubjectEditor(null))
+                },
+                onAddTeacher = {
+                    store.dispatchEvent(ClassEvent.NavigateToEmployeeEditor(null))
+                },
+                onEditSubject = {
+                    store.dispatchEvent(ClassEvent.NavigateToSubjectEditor(it.uid))
+                },
+                onEditEmployee = {
+                    store.dispatchEvent(ClassEvent.NavigateToEmployeeEditor(it.uid))
+                },
+                onUpdateLocations = {
+                    store.dispatchEvent(ClassEvent.UpdateOrganizationLocations(it))
+                },
+                onUpdateOffices = {
+                    store.dispatchEvent(ClassEvent.UpdateOrganizationOffices(it))
+                },
+                onSelectOrganization = {
+                    store.dispatchEvent(ClassEvent.UpdateOrganization(it))
+                },
+                onSelectTeacher = {
+                    store.dispatchEvent(ClassEvent.UpdateTeacher(it))
+                },
+                onSelectSubject = { type, subject ->
+                    store.dispatchEvent(ClassEvent.UpdateSubject(type, subject))
+                },
+                onSelectLocation = { location, office ->
+                    store.dispatchEvent(ClassEvent.UpdateLocation(location, office))
+                },
+                onSelectTime = { start, end ->
+                    store.dispatchEvent(ClassEvent.UpdateTime(start, end))
+                },
+            )
+        },
+        topBar = {
+            ClassTopBar(
+                enabledSave = state.editableClass?.isValid() ?: false,
+                onSaveClick = { store.dispatchEvent(ClassEvent.SaveClass) },
+                onBackClick = { store.dispatchEvent(ClassEvent.NavigateToBack) },
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is ClassEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BaseClassContent(
+    state: ClassState,
     modifier: Modifier,
     scrollState: ScrollState = rememberScrollState(),
     onAddOrganization: () -> Unit,
@@ -61,58 +156,58 @@ internal fun ClassContent(
     onSelectTeacher: (EmployeeDetailsUi?) -> Unit,
     onSelectLocation: (ContactInfoUi?, String?) -> Unit,
     onSelectTime: (Instant?, Instant?) -> Unit,
-) = with(state) {
+) {
     Column(
         modifier = modifier.fillMaxSize().padding(top = 20.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        val selectedOrganization by derivedStateOf {
-            organizations.find { it.uid == editableClass?.organization?.uid }
+        val selectedOrganization = remember(state.organizations, state.editableClass?.organization) {
+            state.organizations.find { it.uid == state.editableClass?.organization?.uid }
         }
         OrganizationInfoField(
-            isLoading = isLoading,
+            isLoading = state.isLoading,
             organization = selectedOrganization,
-            allOrganization = organizations,
+            allOrganization = state.organizations,
             onAddOrganization = onAddOrganization,
             onSelected = onSelectOrganization,
         )
         SubjectAndEventTypeInfoField(
-            enabledAddSubject = editableClass?.organization != null,
-            isLoading = isLoading,
-            subject = editableClass?.subject,
-            eventType = editableClass?.eventType,
-            allSubjects = subjects,
+            enabledAddSubject = state.editableClass?.organization != null,
+            isLoading = state.isLoading,
+            subject = state.editableClass?.subject,
+            eventType = state.editableClass?.eventType,
+            allSubjects = state.subjects,
             onAddSubject = onAddSubject,
             onEditSubject = onEditSubject,
-            onSelectedEventType = { onSelectSubject(it, editableClass?.subject) },
+            onSelectedEventType = { onSelectSubject(it, state.editableClass?.subject) },
             onSelectedSubject = { onSelectSubject(it?.eventType, it) },
         )
         TeacherInfoField(
-            enabledAddTeacher = editableClass?.organization != null,
-            isLoading = isLoading,
-            teacher = editableClass?.teacher,
-            allEmployee = employees,
+            enabledAddTeacher = state.editableClass?.organization != null,
+            isLoading = state.isLoading,
+            teacher = state.editableClass?.teacher,
+            allEmployee = state.employees,
             onAddTeacher = onAddTeacher,
             onEditTeacher = onEditEmployee,
             onSelected = onSelectTeacher,
         )
         LocationInfoField(
-            enabledAdd = editableClass?.organization != null,
-            isLoading = isLoading,
-            location = editableClass?.location,
-            office = editableClass?.office,
+            enabledAdd = state.editableClass?.organization != null,
+            isLoading = state.isLoading,
+            location = state.editableClass?.location,
+            office = state.editableClass?.office,
             allLocations = selectedOrganization?.locations ?: emptyList(),
             allOffices = selectedOrganization?.offices ?: emptyList(),
             onUpdateOffices = onUpdateOffices,
             onUpdateLocations = onUpdateLocations,
-            onSelectedLocation = { onSelectLocation(it, editableClass?.office) },
-            onSelectedOffice = { onSelectLocation(editableClass?.location, it) }
+            onSelectedLocation = { onSelectLocation(it, state.editableClass?.office) },
+            onSelectedOffice = { onSelectLocation(state.editableClass?.location, it) }
         )
         TimeInfoField(
-            isLoading = isLoading,
-            startTime = editableClass?.startTime,
-            endTime = editableClass?.endTime,
-            freeClassTimeRanges = freeClassTimeRanges,
+            isLoading = state.isLoading,
+            startTime = state.editableClass?.startTime,
+            endTime = state.editableClass?.endTime,
+            freeClassTimeRanges = state.freeClassTimeRanges,
             onSelectedTime = onSelectTime,
         )
     }

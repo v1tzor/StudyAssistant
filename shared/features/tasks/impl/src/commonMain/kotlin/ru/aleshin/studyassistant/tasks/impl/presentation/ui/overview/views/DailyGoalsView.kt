@@ -107,8 +107,8 @@ internal fun DailyGoalsView(
     goalsProgress: Map<Instant, DailyGoalsProgressUi>,
     onSelectDate: (Instant) -> Unit,
     onChangeGoalNumbers: (List<GoalDetailsUi>) -> Unit,
-    onOpenHomeworkEditor: (HomeworkUi) -> Unit,
-    onOpenTodoEditor: (TodoUi) -> Unit,
+    onEditHomeworkClick: (HomeworkUi) -> Unit,
+    onEditTodoClick: (TodoUi) -> Unit,
     onCompleteGoal: (GoalDetailsUi) -> Unit,
     onDeleteGoal: (GoalDetailsUi) -> Unit,
     onStartGoalTime: (GoalDetailsUi) -> Unit,
@@ -150,8 +150,8 @@ internal fun DailyGoalsView(
                     modifier = Modifier.weight(1f),
                     isLoading = isLoadingGoals,
                     dailyGoals = dailyGoals,
-                    onOpenHomeworkEditor = onOpenHomeworkEditor,
-                    onOpenTodoEditor = onOpenTodoEditor,
+                    onEditHomeworkClick = onEditHomeworkClick,
+                    onEditTodoClick = onEditTodoClick,
                     onCompleteGoal = onCompleteGoal,
                     onDeleteGoal = onDeleteGoal,
                     onChangeGoalNumbers = onChangeGoalNumbers,
@@ -514,8 +514,8 @@ internal fun DailyGoalsViewContent(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     dailyGoals: List<GoalDetailsUi>,
-    onOpenHomeworkEditor: (HomeworkUi) -> Unit,
-    onOpenTodoEditor: (TodoUi) -> Unit,
+    onEditHomeworkClick: (HomeworkUi) -> Unit,
+    onEditTodoClick: (TodoUi) -> Unit,
     onCompleteGoal: (GoalDetailsUi) -> Unit,
     onDeleteGoal: (GoalDetailsUi) -> Unit,
     onStartTime: (GoalDetailsUi) -> Unit,
@@ -524,7 +524,6 @@ internal fun DailyGoalsViewContent(
     onChangeTimeType: (GoalTime.Type, GoalDetailsUi) -> Unit,
     onChangeDesiredTime: (Millis?, GoalDetailsUi) -> Unit,
     onChangeGoalNumbers: (List<GoalDetailsUi>) -> Unit,
-
 ) {
     val scope = rememberCoroutineScope()
     val reorderState = rememberReorderState<GoalDetailsUi>()
@@ -598,8 +597,8 @@ internal fun DailyGoalsViewContent(
                             if (goalBottomSheetViewerStatus) {
                                 GoalBottomSheet(
                                     goal = goal,
-                                    onOpenTodoEditor = onOpenTodoEditor,
-                                    onOpenHomeworkEditor = onOpenHomeworkEditor,
+                                    onEditTodoClick = onEditTodoClick,
+                                    onEditHomeworkClick = onEditHomeworkClick,
                                     onStartTime = { onStartTime(goal) },
                                     onPauseTime = { onPauseTime(goal) },
                                     onResetTime = { onResetTime(goal) },

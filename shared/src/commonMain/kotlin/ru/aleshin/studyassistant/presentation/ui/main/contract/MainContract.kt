@@ -16,33 +16,46 @@
 
 package ru.aleshin.studyassistant.presentation.ui.main.contract
 
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
+import ru.aleshin.studyassistant.core.common.navigation.DeepLinkUrl
 import ru.aleshin.studyassistant.domain.entities.MainFailures
 import ru.aleshin.studyassistant.presentation.models.GeneralSettingsUi
 
 /**
  * @author Stanislav Aleshin on 27.01.2024
  */
-@Parcelize
-data class MainViewState(
+@Serializable
+data class MainState(
     val generalSettings: GeneralSettingsUi = GeneralSettingsUi(),
-) : BaseViewState
+) : StoreState
 
-sealed class MainEvent : BaseEvent {
-    data object InitSettings : MainEvent()
-    data object InitNavigation : MainEvent()
+sealed class MainEvent : StoreEvent {
+    data object StartBackgroundWork : MainEvent()
+    data object ExecuteNavigation : MainEvent()
 }
 
-sealed class MainEffect : BaseUiEffect {
+sealed class MainEffect : StoreEffect {
     data class ShowError(val failures: MainFailures) : MainEffect()
-    data class ReplaceGlobalScreen(val screen: Screen) : MainEffect()
 }
 
-sealed class MainAction : BaseAction {
+sealed class MainAction : StoreAction {
     data class UpdateSettings(val settings: GeneralSettingsUi) : MainAction()
+}
+
+data class MainInput(
+    val deepLinkUrl: DeepLinkUrl?,
+) : BaseInput
+
+sealed class MainOutput : BaseOutput {
+    data object NavigateToIntro : MainOutput()
+    data object NavigateToAuth : MainOutput()
+    data object NavigateToVerification : MainOutput()
+    data object NavigateToSetup : MainOutput()
+    data object NavigateToApp : MainOutput()
 }

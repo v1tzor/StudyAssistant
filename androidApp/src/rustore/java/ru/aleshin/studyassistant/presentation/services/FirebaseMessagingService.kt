@@ -77,7 +77,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         RuStoreUniversalPushManager.processDeletedMessages(UNIVERSAL_FCM_PROVIDER)
     }
 
-    private fun updatePushTokenWork(token: String) = coroutineManager.runOnBackground(serviceScope) {
+    private fun updatePushTokenWork(token: String) = coroutineManager.runOnIOBackground(serviceScope) {
         appUserInteractor.fetchAppUserInfo().first().handle(
             onLeftAction = { error("Error get AppUser for update FCM token") },
             onRightAction = { appUser ->

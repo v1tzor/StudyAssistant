@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,6 +42,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -53,16 +55,28 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.DISABLED_ALPHA
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.common.extensions.limitSize
@@ -71,16 +85,23 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
+import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationClassesInfoUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsViewState
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEffect
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEvent
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsState
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.store.OrganizationsComponent
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.NoneOrganizationInfoView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.NoneOrganizationView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.OrganizationContactInfoItem
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.OrganizationView
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.OrganizationsBottomBar
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.OrganizationsTopBar
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.ShortEmployeeView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.ShortSubjectView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.ShowAllItemView
@@ -92,7 +113,91 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun OrganizationsContent(
-    state: OrganizationsViewState,
+    organizationsComponent: OrganizationsComponent,
+    modifier: Modifier = Modifier
+) {
+    val store = organizationsComponent.store
+    val state by store.stateAsState()
+    val strings = InfoThemeRes.strings
+    val clipboardManager = LocalClipboardManager.current
+    val snackbarState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState { (state.shortOrganizations?.size ?: 0) + 1 }
+    val organizationId by derivedStateOf { state.shortOrganizations?.getOrNull(pagerState.currentPage)?.uid }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseOrganizationsContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+                onRefresh = {
+                    store.dispatchEvent(OrganizationsEvent.Refresh(organizationId))
+                },
+                onAddOrganization = {
+                    store.dispatchEvent(OrganizationsEvent.ClickEditOrganization(null))
+                },
+                onEditOrganization = {
+                    store.dispatchEvent(OrganizationsEvent.ClickEditOrganization(organizationId))
+                },
+                onCopyContactInfo = {
+                    clipboardManager.setText(AnnotatedString(it.value))
+                    coroutineScope.launch { snackbarState.showSnackbar(strings.copyMessage) }
+                },
+                onShowAllEmployee = {
+                    store.dispatchEvent(OrganizationsEvent.ClickShowAllEmployees(checkNotNull(organizationId)))
+                },
+                onShowEmployeeProfile = {
+                    store.dispatchEvent(OrganizationsEvent.ClickEmployee(it))
+                },
+                onShowAllSubjects = {
+                    store.dispatchEvent(OrganizationsEvent.ClickShowAllSubjects(checkNotNull(organizationId)))
+                },
+                onShowSubjectEditor = {
+                    store.dispatchEvent(OrganizationsEvent.ClickEditSubject(it, checkNotNull(organizationId)))
+                },
+                onPaidFunctionClick = {
+                    store.dispatchEvent(OrganizationsEvent.ClickPaidFunction)
+                }
+            )
+        },
+        topBar = {
+            OrganizationsTopBar()
+        },
+        bottomBar = {
+            OrganizationsBottomBar(
+                pagerState = pagerState,
+                allOrganizations = state.shortOrganizations,
+                organizationData = state.organizationData,
+                onChangeOrganization = {
+                    store.dispatchEvent(OrganizationsEvent.ChangeOrganization(it?.uid))
+                }
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is OrganizationsEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun BaseOrganizationsContent(
+    state: OrganizationsState,
     modifier: Modifier = Modifier,
     refreshState: PullToRefreshState = rememberPullToRefreshState(),
     scrollState: ScrollState = rememberScrollState(),
@@ -104,11 +209,11 @@ internal fun OrganizationsContent(
     onShowEmployeeProfile: (UID) -> Unit,
     onShowAllSubjects: () -> Unit,
     onShowSubjectEditor: (UID) -> Unit,
-    onOpenBillingScreen: () -> Unit,
-) = with(state) {
+    onPaidFunctionClick: () -> Unit,
+) {
     PullToRefreshBox(
         modifier = modifier,
-        isRefreshing = isLoading,
+        isRefreshing = state.isLoading,
         onRefresh = onRefresh,
         state = refreshState,
     ) {
@@ -117,29 +222,29 @@ internal fun OrganizationsContent(
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             OrganizationsInfoSection(
-                isLoading = isLoading,
-                isPaidUser = isPaidUser,
-                organizationData = organizationData,
-                organizations = shortOrganizations,
-                classesInfo = classesInfo,
+                isLoading = state.isLoading,
+                isPaidUser = state.isPaidUser,
+                organizationData = state.organizationData,
+                organizations = state.shortOrganizations,
+                classesInfo = state.classesInfo,
                 onAddOrganization = onAddOrganization,
                 onEditOrganization = onEditOrganization,
-                onOpenBillingScreen = onOpenBillingScreen,
+                onOpenBillingScreen = onPaidFunctionClick,
             )
             OrganizationsContactSection(
-                isLoading = isLoading,
-                organizationData = organizationData,
+                isLoading = state.isLoading,
+                organizationData = state.organizationData,
                 onCopyContactInfo = onCopyContactInfo,
             )
             OrganizationsEmployeesSection(
-                isLoading = isLoading,
-                organizationData = organizationData,
+                isLoading = state.isLoading,
+                organizationData = state.organizationData,
                 onShowAllEmployee = onShowAllEmployee,
                 onShowEmployeeProfile = onShowEmployeeProfile,
             )
             OrganizationsSubjectsSection(
-                isLoading = isLoading,
-                organizationData = organizationData,
+                isLoading = state.isLoading,
+                organizationData = state.organizationData,
                 onShowAllSubjects = onShowAllSubjects,
                 onShowSubjectEditor = onShowSubjectEditor,
             )
@@ -183,7 +288,9 @@ private fun OrganizationsInfoSection(
                     }
                 } else {
                     NoneOrganizationView()
-                    val functionalAvailable = (organizations != null && organizations.size < 2) || isPaidUser
+                    val functionalAvailable = remember(organizations, isPaidUser) {
+                        (organizations != null && organizations.size < 2) || isPaidUser
+                    }
                     FilledTonalButton(
                         modifier = Modifier.fillMaxWidth().height(40.dp),
                         onClick = {
@@ -246,7 +353,9 @@ private fun OrganizationsContactSection(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 if (!loading) {
-                    val groupedContactInfo = organizationData?.groupedContactInfo()
+                    val groupedContactInfo = remember(organizationData) {
+                        organizationData?.groupedContactInfo()
+                    }
                     if (!groupedContactInfo.isNullOrEmpty()) {
                         groupedContactInfo.forEach { contactEntry ->
                             OrganizationContactInfoItem(

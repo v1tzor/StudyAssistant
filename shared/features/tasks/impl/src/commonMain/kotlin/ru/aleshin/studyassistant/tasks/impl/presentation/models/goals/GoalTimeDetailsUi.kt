@@ -16,19 +16,18 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.goals
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
  * @author Stanislav Aleshin on 01.06.2025.
  */
-@Parcelize
-internal sealed class GoalTimeDetailsUi : Parcelable {
+@Immutable
+@Serializable
+internal sealed class GoalTimeDetailsUi {
 
     abstract val type: GoalTime.Type
 
@@ -36,10 +35,10 @@ internal sealed class GoalTimeDetailsUi : Parcelable {
 
     abstract val realElapsedTime: Millis
 
+    @Serializable
     data class Timer(
         val targetTime: Millis,
         val pastStopTime: Millis = 0,
-        @TypeParceler<Instant, InstantParceler>
         val startTimePoint: Instant,
         val leftTime: Millis,
         val progress: Float,
@@ -50,9 +49,9 @@ internal sealed class GoalTimeDetailsUi : Parcelable {
         override val realElapsedTime = targetTime - leftTime
     }
 
+    @Serializable
     data class Stopwatch(
         val pastStopTime: Millis = 0,
-        @TypeParceler<Instant, InstantParceler>
         val startTimePoint: Instant,
         val elapsedTime: Millis = 0,
         val progress: Float? = null,
@@ -63,6 +62,7 @@ internal sealed class GoalTimeDetailsUi : Parcelable {
         override val realElapsedTime = elapsedTime
     }
 
+    @Serializable
     data object None : GoalTimeDetailsUi() {
         override val type = GoalTime.Type.NONE
         override val activeStatus = false

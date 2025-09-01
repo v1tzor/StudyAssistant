@@ -16,13 +16,14 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.models.tasks
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 31.08.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class TodoNotificationsUi(
     val beforeStart: Boolean = true,
     val fifteenMinutesBefore: Boolean = false,
@@ -30,4 +31,4 @@ internal data class TodoNotificationsUi(
     val threeHourBefore: Boolean = false,
     val oneDayBefore: Boolean = false,
     val oneWeekBefore: Boolean = false,
-) : Parcelable
+)

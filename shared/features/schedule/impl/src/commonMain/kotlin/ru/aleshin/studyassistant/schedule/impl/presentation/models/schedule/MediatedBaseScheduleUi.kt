@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.DayOfWeek
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
@@ -31,14 +31,15 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.share.Organiz
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class MediatedBaseScheduleUi(
     val uid: UID,
     val dateVersion: DateVersion,
     val dayOfWeek: DayOfWeek,
     val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val classes: List<MediatedClassUi>,
-) : Parcelable
+)
 
 internal fun MediatedBaseScheduleUi.convertToBase(
     linkDataMapper: (UID) -> OrganizationLinkData

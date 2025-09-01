@@ -31,24 +31,37 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import com.arkivanov.decompose.defaultComponentContext
+import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
 import ru.aleshin.studyassistant.core.common.extensions.isAllowPermission
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
+import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponentFactory
 
 class MainActivity : FlavorMainActivity() {
 
+    private val componentFactory = MainDependenciesGraph.fetchDI().instance<MainComponentFactory>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
         )
+
+        val mainComponent = componentFactory.createComponent(
+            componentContext = defaultComponentContext(),
+            deepLink = null,
+        )
+
         setContent {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 RequestNotificationPermission()
             }
-            AppScreen()
+            AppScreen(mainComponent)
         }
     }
 

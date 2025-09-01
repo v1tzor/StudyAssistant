@@ -40,7 +40,7 @@ interface NotificationSettingsLocalDataSource : LocalDataSource.OnlyOffline {
     ) : NotificationSettingsLocalDataSource {
 
         private val coroutineContext: CoroutineContext
-            get() = coroutineManager.backgroundDispatcher
+            get() = coroutineManager.ioDispatcher
 
         override suspend fun fetchSettings(): Flow<NotificationSettingsEntity> {
             return calendarQueries.fetchSettings().asFlow().mapToOne(coroutineContext)
