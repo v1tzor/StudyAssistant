@@ -150,7 +150,7 @@ This project utilizes the following technologies and libraries:
 
 ## 🎨 UI & Navigation
 - **[Compose Material 3](https://developer.android.com/jetpack/compose/material)**: Material Design components for Jetpack Compose.
-- **[Voyager](https://github.com/adrielcafe/voyager)**: Multiplatform navigation library for Jetpack Compose.
+- **[Decompose](https://github.com/arkivanov/Decompose)**: Multiplatform navigation library for Jetpack Compose.
 - **[koalaplot-charts](https://github.com/JetBrains/compose-jb/tree/master/examples/Charts/koalaplot)**: Multiplatform chart library for Compose.
 - **[sketch-compose](https://github.com/sketch-compose/sketch-compose)**: Lightweight image loading library for Jetpack Compose.
 
