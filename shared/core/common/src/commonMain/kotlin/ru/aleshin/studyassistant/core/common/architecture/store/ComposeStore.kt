@@ -29,7 +29,7 @@ interface ComposeStore<S : StoreState, E : StoreEvent, F : StoreEffect, I : Base
 
     val state: S
 
-    fun initialize(input: I)
+    fun initialize(input: I, isRestore: Boolean)
     fun dispatchEvent(event: E)
     suspend fun collectState(collector: FlowCollector<S>)
     suspend fun collectEffects(collector: FlowCollector<F>)

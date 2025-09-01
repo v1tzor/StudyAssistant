@@ -48,7 +48,7 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.NavAct
  */
 @Composable
 @OptIn(ExperimentalResourceApi::class, ExperimentalFoundationApi::class)
-internal fun IntroContentCompact(
+internal fun BaseIntroContentCompact(
     modifier: Modifier,
     pagerState: PagerState,
     onContinueClick: () -> Unit,

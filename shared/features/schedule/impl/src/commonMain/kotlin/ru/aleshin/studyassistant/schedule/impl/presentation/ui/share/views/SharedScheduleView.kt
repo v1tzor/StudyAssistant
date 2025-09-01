@@ -63,8 +63,13 @@ internal fun SharedScheduleView(
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Column {
-            CommonScheduleViewHeader(dayOfWeek = dayOfWeek.mapToSting(StudyAssistantRes.strings))
-            CommonScheduleViewContent(modifier = Modifier.weight(1f), classes = classes)
+            CommonScheduleViewHeader(
+                dayOfWeek = dayOfWeek.mapToSting(StudyAssistantRes.strings)
+            )
+            CommonScheduleViewContent(
+                modifier = Modifier.weight(1f),
+                classes = classes
+            )
         }
     }
 }

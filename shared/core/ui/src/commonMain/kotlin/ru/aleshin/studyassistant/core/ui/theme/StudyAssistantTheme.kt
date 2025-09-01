@@ -20,6 +20,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
@@ -60,16 +61,18 @@ fun StudyAssistantTheme(
     content: @Composable () -> Unit,
 ) {
     val windowSize = rememberScreenSizeInfo()
-    val appLanguage = fetchAppLanguage(languageType)
-    val appElevations = fetchAppElevations()
-    val appIcons = fetchCoreIcons()
-    val coreColors = StudyAssistantColors(themeType.isDarkTheme(), themeType.toColorAccents())
-    val coreStrings = fetchCoreStrings(appLanguage)
+    val appLanguage = remember(languageType) { fetchAppLanguage(languageType) }
+    val appElevations = remember { fetchAppElevations() }
+    val appIcons = remember { fetchCoreIcons() }
+    val isDark = themeType.isDarkTheme()
+    val colorAccents = themeType.toColorAccents()
+    val coreColors = remember(isDark, colorAccents) { StudyAssistantColors(isDark, colorAccents) }
+    val coreStrings = remember(appLanguage) { fetchCoreStrings(appLanguage) }
 
     MaterialTheme(
         colorScheme = themeType.toColorScheme(),
-        shapes = baseShapes,
-        typography = baseTypography,
+        shapes = remember { baseShapes },
+        typography = remember { baseTypography },
     ) {
         CompositionLocalProvider(
             LocalStudyAssistantLanguage provides appLanguage,

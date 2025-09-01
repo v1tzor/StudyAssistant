@@ -17,103 +17,59 @@
 package ru.aleshin.studyassistant.editor.impl.di.modules
 
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
-import ru.aleshin.studyassistant.editor.impl.navigation.EditorFeatureStarterImpl
-import ru.aleshin.studyassistant.editor.impl.navigation.EditorScreenProvider
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.screenmodel.ClassWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.screenmodel.DailyScheduleEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.screenmodel.DailyScheduleScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.screenmodel.DailyScheduleStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.screenmodel.DailyScheduleWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.screenmodel.EmployeeWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.screenmodel.HomeworkWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreen
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.navigation.NavigationScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.screenmodel.OrganizationWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.screenmodel.ProfileEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.screenmodel.ProfileScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.screenmodel.ProfileStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.screenmodel.ProfileWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.WeekScheduleEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.WeekScheduleScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.WeekScheduleStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.screenmodel.WeekScheduleWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.screeenmodel.SubjectWorkProcessor
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.screenmodel.TodoEffectCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.screenmodel.TodoScreenModel
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.screenmodel.TodoStateCommunicator
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.screenmodel.TodoWorkProcessor
+import ru.aleshin.studyassistant.editor.api.EditorFeatureComponentFactory
+import ru.aleshin.studyassistant.editor.impl.navigation.DefaultEditorComponentFactory
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.store.ClassComposeStore
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.store.ClassWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.store.DailyScheduleComposeStore
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.store.DailyScheduleWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.store.EmployeeComposeStore
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.store.EmployeeWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.store.HomeworkComposeStore
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.store.HomeworkWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.store.OrganizationComposeStore
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.store.OrganizationWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.store.ProfileComposeStore
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.store.ProfileWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.store.WeekScheduleComposeStore
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.store.WeekScheduleWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.store.SubjectComposeStore
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.store.SubjectWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.store.TodoComposeStore
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.store.TodoWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<NavigationScreenModel> { NavigationScreenModel() }
-    bindSingleton<NavigationScreen> { NavigationScreen() }
+    bindSingleton<EditorFeatureComponentFactory> { DefaultEditorComponentFactory(instance(), instance(), instance(), instance(),instance(), instance(), instance(), instance(), instance()) }
 
-    bindProvider<EditorFeatureStarter> { EditorFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<EditorScreenProvider> { EditorScreenProvider.Base(instance()) }
+    bindSingleton<WeekScheduleWorkProcessor> { WeekScheduleWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<WeekScheduleComposeStore.Factory> { WeekScheduleComposeStore.Factory(instance(), instance()) }
 
-    bindProvider<WeekScheduleStateCommunicator> { WeekScheduleStateCommunicator.Base() }
-    bindProvider<WeekScheduleEffectCommunicator> { WeekScheduleEffectCommunicator.Base() }
-    bindProvider<WeekScheduleWorkProcessor> { WeekScheduleWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<WeekScheduleScreenModel> { WeekScheduleScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<DailyScheduleWorkProcessor> { DailyScheduleWorkProcessor.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<DailyScheduleComposeStore.Factory> { DailyScheduleComposeStore.Factory(instance(), instance()) }
 
-    bindProvider<DailyScheduleStateCommunicator> { DailyScheduleStateCommunicator.Base() }
-    bindProvider<DailyScheduleEffectCommunicator> { DailyScheduleEffectCommunicator.Base() }
-    bindProvider<DailyScheduleWorkProcessor> { DailyScheduleWorkProcessor.Base(instance(), instance(), instance(), instance()) }
-    bindProvider<DailyScheduleScreenModel> { DailyScheduleScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ClassWorkProcessor> { ClassWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ClassComposeStore.Factory> { ClassComposeStore.Factory(instance(), instance()) }
 
-    bindProvider<ClassStateCommunicator> { ClassStateCommunicator.Base() }
-    bindProvider<ClassEffectCommunicator> { ClassEffectCommunicator.Base() }
-    bindProvider<ClassWorkProcessor> { ClassWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<ClassScreenModel> { ClassScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<SubjectWorkProcessor> { SubjectWorkProcessor.Base(instance(), instance(), instance()) }
+    bindSingleton<SubjectComposeStore.Factory> { SubjectComposeStore.Factory(instance(), instance()) }
 
-    bindProvider<SubjectStateCommunicator> { SubjectStateCommunicator.Base() }
-    bindProvider<SubjectEffectCommunicator> { SubjectEffectCommunicator.Base() }
-    bindProvider<SubjectWorkProcessor> { SubjectWorkProcessor.Base(instance(), instance(), instance()) }
-    bindProvider<SubjectScreenModel> { SubjectScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<EmployeeWorkProcessor> { EmployeeWorkProcessor.Base(instance(), instance()) }
+    bindSingleton<EmployeeComposeStore.Factory> { EmployeeComposeStore.Factory(instance(), instance()) }
 
-    bindProvider<EmployeeStateCommunicator> { EmployeeStateCommunicator.Base() }
-    bindProvider<EmployeeEffectCommunicator> { EmployeeEffectCommunicator.Base() }
-    bindProvider<EmployeeWorkProcessor> { EmployeeWorkProcessor.Base(instance(), instance()) }
-    bindProvider<EmployeeScreenModel> { EmployeeScreenModel(instance(), instance(), instance(), instance()) }
+    bindSingleton<HomeworkWorkProcessor> { HomeworkWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<HomeworkComposeStore.Factory> { HomeworkComposeStore.Factory(instance(), instance(), instance()) }
 
-    bindProvider<HomeworkStateCommunicator> { HomeworkStateCommunicator.Base() }
-    bindProvider<HomeworkEffectCommunicator> { HomeworkEffectCommunicator.Base() }
-    bindProvider<HomeworkWorkProcessor> { HomeworkWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<HomeworkScreenModel> { HomeworkScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<TodoWorkProcessor> { TodoWorkProcessor.Base(instance(), instance(), instance()) }
+    bindSingleton<TodoComposeStore.Factory> { TodoComposeStore.Factory(instance(), instance()) }
 
-    bindProvider<TodoStateCommunicator> { TodoStateCommunicator.Base() }
-    bindProvider<TodoEffectCommunicator> { TodoEffectCommunicator.Base() }
-    bindProvider<TodoWorkProcessor> { TodoWorkProcessor.Base(instance(), instance(), instance()) }
-    bindProvider<TodoScreenModel> { TodoScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<OrganizationWorkProcessor> { OrganizationWorkProcessor.Base(instance()) }
+    bindSingleton<OrganizationComposeStore.Factory> { OrganizationComposeStore.Factory(instance(), instance()) }
 
-    bindProvider<OrganizationStateCommunicator> { OrganizationStateCommunicator.Base() }
-    bindProvider<OrganizationEffectCommunicator> { OrganizationEffectCommunicator.Base() }
-    bindProvider<OrganizationWorkProcessor> { OrganizationWorkProcessor.Base(instance()) }
-    bindProvider<OrganizationScreenModel> { OrganizationScreenModel(instance(), instance(), instance(), instance()) }
-
-    bindProvider<ProfileStateCommunicator> { ProfileStateCommunicator.Base() }
-    bindProvider<ProfileEffectCommunicator> { ProfileEffectCommunicator.Base() }
-    bindProvider<ProfileWorkProcessor> { ProfileWorkProcessor.Base(instance()) }
-    bindProvider<ProfileScreenModel> { ProfileScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ProfileWorkProcessor> { ProfileWorkProcessor.Base(instance()) }
+    bindSingleton<ProfileComposeStore.Factory> { ProfileComposeStore.Factory(instance(), instance()) }
 }

@@ -45,7 +45,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.contract
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.store.VerificationComponent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.views.VerificationTopBar
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
-import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsMutable
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.ui.mappers.toLanguageString
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import kotlin.time.DurationUnit.MILLISECONDS
@@ -67,7 +67,7 @@ internal fun VerificationContent(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
             BaseVerificationContent(
-                state = store.stateAsMutable().value,
+                state = store.stateAsState().value,
                 modifier = Modifier.padding(paddingValues),
                 onSendEmailClick = {
                     store.dispatchEvent(VerificationEvent.ClickSendEmail)

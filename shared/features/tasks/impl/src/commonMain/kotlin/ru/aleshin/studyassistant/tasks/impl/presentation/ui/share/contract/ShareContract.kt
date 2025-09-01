@@ -16,17 +16,16 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract
 
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.ScheduleUi
@@ -35,26 +34,26 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.MediatedHomeworkLinkData
+import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
 
 /**
  * @author Stanislav Aleshin on 18.07.2024
  */
-@Parcelize
-internal data class ShareViewState(
+@Serializable
+internal data class ShareState(
     val isLoading: Boolean = true,
     val isLoadingLink: Boolean = true,
     val isPaidUser: Boolean = false,
-    @TypeParceler<Instant, InstantParceler>
     val currentTime: Instant = Clock.System.now(),
     val sharedHomeworks: SharedHomeworksDetailsUi? = null,
     val organizations: List<OrganizationShortUi> = emptyList(),
     val linkDataList: List<MediatedHomeworkLinkData> = emptyList(),
     val linkSubjects: List<SubjectUi> = emptyList(),
     val linkSchedule: ScheduleUi? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class ShareEvent : BaseEvent {
-    data object Init : ShareEvent()
+internal sealed class ShareEvent : StoreEvent {
+    data object Started : ShareEvent()
     data class LoadLinkData(val receivedHomeworks: ReceivedMediatedHomeworksDetailsUi?) : ShareEvent()
     data class UpdateLinkData(val linkData: MediatedHomeworkLinkData) : ShareEvent()
     data class LoadLinkSubjects(val organization: UID) : ShareEvent()
@@ -64,19 +63,17 @@ internal sealed class ShareEvent : BaseEvent {
     ) : ShareEvent()
     data class RejectHomework(val receivedHomeworks: ReceivedMediatedHomeworksDetailsUi) : ShareEvent()
     data class CancelSendHomework(val sentHomeworks: SentMediatedHomeworksDetailsUi) : ShareEvent()
-    data class NavigateToSubjectEditor(val subjectId: UID?, val organization: UID) : ShareEvent()
-    data class NavigateToUserProfile(val userId: UID) : ShareEvent()
-    data object NavigateToBilling : ShareEvent()
-    data object NavigateToBack : ShareEvent()
+    data class ClickEditSubject(val subjectId: UID?, val organization: UID) : ShareEvent()
+    data class ClickUserProfile(val userId: UID) : ShareEvent()
+    data object ClickPaidFunction : ShareEvent()
+    data object BackClick : ShareEvent()
 }
 
-internal sealed class ShareEffect : BaseUiEffect {
+internal sealed class ShareEffect : StoreEffect {
     data class ShowError(val failures: TasksFailures) : ShareEffect()
-    data class NavigateToGlobal(val screen: Screen) : ShareEffect()
-    data object NavigateToBack : ShareEffect()
 }
 
-internal sealed class ShareAction : BaseAction {
+internal sealed class ShareAction : StoreAction {
     data class UpdateSharedHomeworks(val sharedHomeworks: SharedHomeworksDetailsUi?) : ShareAction()
     data class SetupLinkData(
         val linkDataList: List<MediatedHomeworkLinkData>,
@@ -88,4 +85,11 @@ internal sealed class ShareAction : BaseAction {
     data class UpdateLoading(val isLoading: Boolean) : ShareAction()
     data class UpdateUserPaidStatus(val isPaidUser: Boolean) : ShareAction()
     data class UpdateLinkLoading(val isLoading: Boolean) : ShareAction()
+}
+
+internal sealed class ShareOutput : BaseOutput {
+    data object NavigateToBack : ShareOutput()
+    data object NavigateToBilling : ShareOutput()
+    data class NavigateToUserProfile(val config: UsersConfig.UserProfile) : ShareOutput()
+    data class NavigateToSubjectEditor(val config: EditorConfig.Subject) : ShareOutput()
 }

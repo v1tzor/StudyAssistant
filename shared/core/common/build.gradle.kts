@@ -43,7 +43,6 @@ kotlin {
             api(libs.kotlin.datetime)
             api(libs.kotlin.serialization)
             api(libs.kotlin.serialization.json)
-            api(libs.moko.parcelize)
             api(libs.bignum)
             api(libs.logger)
 
@@ -58,7 +57,6 @@ kotlin {
 
             api(libs.androidx.paging.common)
 
-            implementation(libs.bundles.voyager)
             implementation(libs.bundles.decompose)
 
             implementation(compose.ui)

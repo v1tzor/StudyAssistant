@@ -16,13 +16,14 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contract
 
-import androidx.compose.runtime.Immutable
-import dev.icerock.moko.parcelize.Parcelize
 import io.github.vinceglb.filekit.core.PlatformFile
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
@@ -33,16 +34,15 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactIn
 /**
  * @author Stanislav Aleshin on 08.07.2024
  */
-@Immutable
-@Parcelize
-internal data class OrganizationViewState(
+@Serializable
+internal data class OrganizationState(
     val isLoading: Boolean = true,
     val editableOrganization: EditOrganizationUi? = null,
     val actionWithAvatar: ActionWithAvatar = ActionWithAvatar.None(null),
-) : BaseViewState
+) : StoreState
 
-internal sealed class OrganizationEvent : BaseEvent {
-    data class Init(val organizationId: UID?) : OrganizationEvent()
+internal sealed class OrganizationEvent : StoreEvent {
+    data class Started(val inputData: OrganizationInput) : OrganizationEvent()
     data class UpdateAvatar(val image: PlatformFile) : OrganizationEvent()
     data object DeleteAvatar : OrganizationEvent()
     data class UpdateType(val organizationType: OrganizationType?) : OrganizationEvent()
@@ -57,14 +57,21 @@ internal sealed class OrganizationEvent : BaseEvent {
     data object NavigateToBack : OrganizationEvent()
 }
 
-internal sealed class OrganizationEffect : BaseUiEffect {
+internal sealed class OrganizationEffect : StoreEffect {
     data class ShowError(val failures: EditorFailures) : OrganizationEffect()
-    data object NavigateToBack : OrganizationEffect()
 }
 
-internal sealed class OrganizationAction : BaseAction {
+internal sealed class OrganizationAction : StoreAction {
     data class SetupEditModel(val editModel: EditOrganizationUi) : OrganizationAction()
     data class UpdateEditModel(val editModel: EditOrganizationUi?) : OrganizationAction()
     data class UpdateActionWithAvatar(val action: ActionWithAvatar) : OrganizationAction()
     data class UpdateLoading(val isLoading: Boolean) : OrganizationAction()
+}
+
+internal data class OrganizationInput(
+    val organizationId: UID?
+) : BaseInput
+
+internal sealed class OrganizationOutput : BaseOutput {
+    data object NavigateToBack : OrganizationOutput()
 }

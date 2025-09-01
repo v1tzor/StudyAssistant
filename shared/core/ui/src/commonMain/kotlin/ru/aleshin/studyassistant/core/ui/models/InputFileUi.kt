@@ -16,20 +16,19 @@
 
 package ru.aleshin.studyassistant.core.ui.models
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 
 /**
  * @author Stanislav Aleshin on 02.07.2025.
  */
-@Parcelize
+@Serializable
 data class InputFileUi(
     val uri: String?,
     val filename: String,
     val mimeType: String,
     val fileBytes: ByteArray,
-) : Parcelable {
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false

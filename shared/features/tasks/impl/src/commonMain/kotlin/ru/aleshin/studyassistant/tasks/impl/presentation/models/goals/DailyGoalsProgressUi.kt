@@ -16,16 +16,17 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.goals
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 18.04.2025.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class DailyGoalsProgressUi(
     val goalsCount: Int,
     val homeworkGoals: List<Boolean>,
     val todoGoals: List<Boolean>,
     val progress: Float,
-) : Parcelable
+)

@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.profile.impl.di
 
 import dev.tmapps.konnection.Konnection
-import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
@@ -35,20 +34,11 @@ import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
-import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
-import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
-import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 public interface ProfileFeatureDependencies : BaseFeatureDependencies {
-    public val authFeatureStarter: () -> AuthFeatureStarter
-    public val usersFeatureStarter: () -> UsersFeatureStarter
-    public val settingsFeatureStarter: () -> SettingsFeatureStarter
-    public val editorFeatureStarter: () -> EditorFeatureStarter
-    public val scheduleFeatureStarter: () -> ScheduleFeatureStarter
     public val authRepository: AuthRepository
     public val usersRepository: UsersRepository
     public val friendRequestsRepository: FriendRequestsRepository

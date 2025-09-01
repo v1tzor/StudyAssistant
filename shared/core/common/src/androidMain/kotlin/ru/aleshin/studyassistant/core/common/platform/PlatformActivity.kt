@@ -19,11 +19,10 @@ package ru.aleshin.studyassistant.core.common.platform
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
-import cafe.adriel.voyager.navigator.currentOrThrow
 
 actual typealias PlatformActivity = ComponentActivity
 
 @Composable
 actual fun getPlatformActivity(): PlatformActivity {
-    return LocalActivity.currentOrThrow as ComponentActivity
+    return LocalActivity.current as ComponentActivity
 }

@@ -16,44 +16,42 @@
 
 package ru.aleshin.studyassistant.chat.impl.presentation.models.ai
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage
 
 /**
  * @author Stanislav Aleshin on 22.06.2025.
  */
-@Parcelize
-internal sealed interface AiAssistantMessageUi : Parcelable {
+@Immutable
+@Serializable
+internal sealed interface AiAssistantMessageUi {
     val id: String
     val content: String?
-    val type: AiAssistantMessage.Type
+    val messageType: AiAssistantMessage.Type
 
-    @TypeParceler<Instant, InstantParceler>
     val time: Instant
 }
 
-@Parcelize
+@Immutable
+@Serializable
 internal data class UserMessageUi(
     override val id: String = randomUUID(),
     override val content: String?,
-    @TypeParceler<Instant, InstantParceler>
     override val time: Instant,
     val name: String? = null
 ) : AiAssistantMessageUi {
-    override val type = AiAssistantMessage.Type.USER
+    override val messageType = AiAssistantMessage.Type.USER
 }
 
-@Parcelize
+@Immutable
+@Serializable
 internal data class AssistantMessageUi(
     override val id: String,
     override val content: String?,
-    @TypeParceler<Instant, InstantParceler>
     override val time: Instant,
 ) : AiAssistantMessageUi {
-    override val type = AiAssistantMessage.Type.ASSISTANT
+    override val messageType = AiAssistantMessage.Type.ASSISTANT
 }

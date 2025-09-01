@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -28,7 +28,6 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":shared:features:navigation:api"))
             implementation(project(":shared:features:editor:api"))
             implementation(project(":shared:features:preview:api"))
             implementation(project(":shared:features:billing:api"))

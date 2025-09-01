@@ -17,12 +17,16 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.models.schedules
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.ui.views.SegmentedButtonItem
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
+@Immutable
+@Serializable
 internal enum class NumberOfWeekItem(val isoWeekNumber: Int) : SegmentedButtonItem {
     ONE(1) {
         override val title: String @Composable get() = "1"

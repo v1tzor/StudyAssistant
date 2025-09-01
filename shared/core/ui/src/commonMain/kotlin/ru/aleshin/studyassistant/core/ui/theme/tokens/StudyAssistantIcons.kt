@@ -15,6 +15,7 @@
  */
 package ru.aleshin.studyassistant.core.ui.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import studyassistant.shared.core.ui.generated.resources.Res
@@ -77,6 +78,7 @@ import studyassistant.shared.core.ui.generated.resources.logo_youtube
 /**
  * @author Stanislav Aleshin on 27.01.2024.
  */
+@Immutable
 data class StudyAssistantIcons(
     val logo: DrawableResource,
     val schedule: DrawableResource,

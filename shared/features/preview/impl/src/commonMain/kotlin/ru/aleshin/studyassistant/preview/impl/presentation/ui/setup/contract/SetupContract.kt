@@ -16,14 +16,13 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
 import io.github.vinceglb.filekit.core.PlatformFile
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
@@ -34,9 +33,8 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupP
 /**
  * @author Stanislav Aleshin on 17.04.2024
  */
-@Parcelize
-@Immutable
-internal data class SetupViewState(
+@Serializable
+internal data class SetupState(
     val profile: AppUserUi? = null,
     val isPaidUser: Boolean = false,
     val currentPage: SetupPage = SetupPage.PROFILE,
@@ -44,11 +42,11 @@ internal data class SetupViewState(
     val organization: OrganizationUi? = null,
     val actionWithOrganizationAvatar: ActionWithAvatar = ActionWithAvatar.None(null),
     val calendarSettings: CalendarSettingsUi? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class SetupEvent : BaseEvent {
-    data object Init : SetupEvent()
-    data object NavigateToBackPage : SetupEvent()
+internal sealed class SetupEvent : StoreEvent {
+    data class Started(val isRestore: Boolean) : SetupEvent()
+    data object ClickBackPage : SetupEvent()
     data class UpdateProfile(val userProfile: AppUserUi) : SetupEvent()
     data class UpdateProfileAvatar(val image: PlatformFile) : SetupEvent()
     data object DeleteProfileAvatar : SetupEvent()
@@ -56,23 +54,20 @@ internal sealed class SetupEvent : BaseEvent {
     data class UpdateOrganizationAvatar(val image: PlatformFile) : SetupEvent()
     data object DeleteOrganizationAvatar : SetupEvent()
     data class UpdateCalendarSettings(val calendarSettings: CalendarSettingsUi) : SetupEvent()
-    data object SaveProfileInfo : SetupEvent()
-    data object SaveOrganizationInfo : SetupEvent()
-    data object SaveCalendarInfo : SetupEvent()
-    data object NavigateToWeekScheduleEditor : SetupEvent()
-    data object NavigateToBilling : SetupEvent()
-    data object NavigateToSchedule : SetupEvent()
-    data object NavigateToBack : SetupEvent()
+    data object ClickSaveProfileInfo : SetupEvent()
+    data object ClickSaveOrganizationInfo : SetupEvent()
+    data object ClickSaveCalendarInfo : SetupEvent()
+    data object ClickEditWeekSchedule : SetupEvent()
+    data object ClickPaidFunction : SetupEvent()
+    data object ClickGoToApp : SetupEvent()
+    data object ClickBack : SetupEvent()
 }
 
-internal sealed class SetupEffect : BaseUiEffect {
+internal sealed class SetupEffect : StoreEffect {
     data class ShowError(val failures: PreviewFailures) : SetupEffect()
-    data class NavigateToGlobalScreen(val pushScreen: Screen) : SetupEffect()
-    data class ReplaceGlobalScreen(val screen: Screen) : SetupEffect()
-    data object NavigateToBack : SetupEffect()
 }
 
-internal sealed class SetupAction : BaseAction {
+internal sealed class SetupAction : StoreAction {
     data class UpdatePage(val page: SetupPage) : SetupAction()
     data class UpdateAll(
         val profile: AppUserUi,
@@ -85,4 +80,11 @@ internal sealed class SetupAction : BaseAction {
     data class UpdateOrganization(val organization: OrganizationUi) : SetupAction()
     data class UpdateActionWithOrganizationAvatar(val action: ActionWithAvatar) : SetupAction()
     data class UpdateCalendarSettings(val calendarSettings: CalendarSettingsUi) : SetupAction()
+}
+
+internal sealed class SetupOutput : BaseOutput {
+    data object NavigateToBack : SetupOutput()
+    data object NavigateToApp : SetupOutput()
+    data object NavigateToBilling : SetupOutput()
+    data object NavigateToWeekScheduleEditor : SetupOutput()
 }

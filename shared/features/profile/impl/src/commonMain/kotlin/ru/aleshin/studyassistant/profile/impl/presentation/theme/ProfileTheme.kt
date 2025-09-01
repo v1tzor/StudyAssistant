@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.profile.impl.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.profile.impl.presentation.theme.tokens.LocalProfileIcons
 import ru.aleshin.studyassistant.profile.impl.presentation.theme.tokens.LocalProfileStrings
@@ -29,8 +30,11 @@ import ru.aleshin.studyassistant.profile.impl.presentation.theme.tokens.fetchPro
  */
 @Composable
 internal fun ProfileTheme(content: @Composable () -> Unit) {
-    val icons = fetchProfileIcons(StudyAssistantRes.colors.isDark)
-    val strings = fetchProfileStrings(StudyAssistantRes.language)
+    val isDark = StudyAssistantRes.colors.isDark
+    val language = StudyAssistantRes.language
+
+    val icons = remember(isDark) { fetchProfileIcons(isDark) }
+    val strings = remember(language) { fetchProfileStrings(language) }
 
     CompositionLocalProvider(
         LocalProfileIcons provides icons,

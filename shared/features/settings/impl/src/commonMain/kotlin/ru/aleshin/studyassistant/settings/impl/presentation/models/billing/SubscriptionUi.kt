@@ -16,13 +16,14 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.models.billing
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 19.06.2025.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class SubscriptionUi(
     val purchaseId: String?,
     val productId: String,
@@ -35,4 +36,4 @@ internal data class SubscriptionUi(
     val expiryTime: Long,
     val isActive: Boolean,
     val subscriptionToken: String?,
-) : Parcelable
+)

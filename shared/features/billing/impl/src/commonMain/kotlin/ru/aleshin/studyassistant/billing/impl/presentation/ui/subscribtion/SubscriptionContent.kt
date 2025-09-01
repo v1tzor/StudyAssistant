@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,9 +31,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -41,24 +51,101 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.billing.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.billing.impl.presentation.models.products.SubscriptionProductUi
 import ru.aleshin.studyassistant.billing.impl.presentation.theme.BillingThemeRes
-import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.contract.SubscriptionViewState
+import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.contract.SubscriptionEffect
+import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.contract.SubscriptionEvent
+import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.contract.SubscriptionState
+import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.store.SubscriptionComponent
+import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.views.SubscriptionBottomBar
 import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.views.SubscriptionItemPlaceholder
 import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.views.SubscriptionItemView
+import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.views.SubscriptionTopBar
+import ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.views.SuccessPaymentDialog
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder.PRODUCT
+import ru.aleshin.studyassistant.core.common.platform.closeApp
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 17.06.2025
  */
 @Composable
 internal fun SubscriptionContent(
-    state: SubscriptionViewState,
+    subscriptionComponent: SubscriptionComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = subscriptionComponent.store
+    val state by store.stateAsState()
+    val strings = BillingThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val snackbarState = remember { SnackbarHostState() }
+    var successDialogState by rememberSaveable { mutableStateOf(false) }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseSubscriptionContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+                onChooseProduct = { store.dispatchEvent(SubscriptionEvent.ChooseProduct(it)) }
+            )
+        },
+        topBar = {
+            SubscriptionTopBar(
+                enabled = !state.isLoadingPurchase,
+                onBackClick = { store.dispatchEvent(SubscriptionEvent.ClickBack) },
+            )
+        },
+        bottomBar = {
+            SubscriptionBottomBar(
+                enabled = !state.isLoadingProducts && state.selectedProduct != null && !state.isPaidUser,
+                isLoadingPurchase = state.isLoadingPurchase,
+                onSubscribe = {
+                    val selectedProduct = state.selectedProduct
+                    if (selectedProduct != null) {
+                        store.dispatchEvent(SubscriptionEvent.PurchaseProduct(selectedProduct.productId))
+                    }
+                },
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { Snackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is SubscriptionEffect.ShowSuccessDialog -> {
+                successDialogState = true
+            }
+            is SubscriptionEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+
+    if (successDialogState) {
+        SuccessPaymentDialog(onDismiss = { closeApp() })
+    }
+}
+
+@Composable
+private fun BaseSubscriptionContent(
+    state: SubscriptionState,
     scrollState: ScrollState = rememberScrollState(),
     modifier: Modifier = Modifier,
     onChooseProduct: (SubscriptionProductUi) -> Unit,
-) = with(state) {
+) {
     Column(
         modifier = modifier.verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -66,10 +153,10 @@ internal fun SubscriptionContent(
         SubscriptionHeader()
         PremiumFunctionsSection()
         SubscriptionPlanSection(
-            enabledSelect = !isLoadingPurchase,
-            isLoadingProducts = isLoadingProducts,
-            selectedProduct = selectedProduct,
-            products = products,
+            enabledSelect = !state.isLoadingPurchase,
+            isLoadingProducts = state.isLoadingProducts,
+            selectedProduct = state.selectedProduct,
+            products = state.products,
             onChooseProduct = onChooseProduct,
         )
         Spacer(modifier = Modifier.padding(40.dp))

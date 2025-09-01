@@ -16,18 +16,16 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.BaseScheduleUi
@@ -36,42 +34,39 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.share.Receive
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
 
 /**
  * @author Stanislav Aleshin on 16.08.2024
  */
-@Immutable
-@Parcelize
-internal data class ShareViewState(
+@Serializable
+internal data class ShareState(
     val isLoading: Boolean = true,
     val isLoadingAccept: Boolean = false,
     val isLoadingLinkedOrganization: Boolean = false,
-    @TypeParceler<Instant, InstantParceler>
     val currentTime: Instant = Clock.System.now(),
     val receivedMediatedSchedule: ReceivedMediatedSchedulesUi? = null,
     val allOrganizations: List<OrganizationShortUi> = emptyList(),
     val organizationsLinkData: List<OrganizationLinkData> = emptyList(),
     val linkedSchedules: List<BaseScheduleUi> = emptyList(),
-) : BaseViewState
+) : StoreState
 
-internal sealed class ShareEvent : BaseEvent {
-    data class Init(val shareId: UID) : ShareEvent()
-    data class LinkOrganization(val sharedOrganization: UID, val linkedOrganization: UID?) : ShareEvent()
-    data class UpdateLinkedSubjects(val sharedOrganization: UID, val subjects: Map<UID, SubjectUi>) : ShareEvent()
-    data class UpdateLinkedTeachers(val sharedOrganization: UID, val teachers: Map<UID, EmployeeUi>) : ShareEvent()
-    data object AcceptSharedSchedule : ShareEvent()
-    data object RejectSharedSchedule : ShareEvent()
-    data class NavigateToUserProfile(val user: AppUserUi) : ShareEvent()
-    data object NavigateToBack : ShareEvent()
+internal sealed class ShareEvent : StoreEvent {
+    data class Started(val inputData: ShareInput, val isRestore: Boolean) : ShareEvent()
+    data class ClickLinkOrganization(val sharedOrganization: UID, val linkedOrganization: UID?) : ShareEvent()
+    data class UpdatedLinkedSubjects(val sharedOrganization: UID, val subjects: Map<UID, SubjectUi>) : ShareEvent()
+    data class UpdatedLinkedTeachers(val sharedOrganization: UID, val teachers: Map<UID, EmployeeUi>) : ShareEvent()
+    data object AcceptedSharedSchedule : ShareEvent()
+    data object RejectedSharedSchedule : ShareEvent()
+    data class ClickUserProfile(val user: AppUserUi) : ShareEvent()
+    data object ClickBack : ShareEvent()
 }
 
-internal sealed class ShareEffect : BaseUiEffect {
+internal sealed class ShareEffect : StoreEffect {
     data class ShowError(val failures: ScheduleFailures) : ShareEffect()
-    data object NavigateToBack : ShareEffect()
-    data class NavigateToGlobal(val pushScreen: Screen) : ShareEffect()
 }
 
-internal sealed class ShareAction : BaseAction {
+internal sealed class ShareAction : StoreAction {
 
     data class SetupSharedSchedules(
         val receivedMediatedSchedule: ReceivedMediatedSchedulesUi?,
@@ -90,3 +85,12 @@ internal sealed class ShareAction : BaseAction {
     data class UpdateLoadingAccept(val isLoading: Boolean) : ShareAction()
     data class UpdateLoadingLinkedOrganization(val isLoading: Boolean) : ShareAction()
 }
+
+internal sealed class ShareOutput : BaseOutput {
+    data object NavigateToBack : ShareOutput()
+    data class NavigateToUserProfile(val config: UsersConfig.UserProfile) : ShareOutput()
+}
+
+internal data class ShareInput(
+    val receivedShareId: UID
+) : BaseInput

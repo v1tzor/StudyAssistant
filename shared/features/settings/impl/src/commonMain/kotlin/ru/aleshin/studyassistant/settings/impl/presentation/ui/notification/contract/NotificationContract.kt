@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.contract
 
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
 import ru.aleshin.studyassistant.settings.impl.presentation.models.organizations.OrganizationShortUi
@@ -30,14 +30,14 @@ import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.Noti
 /**
  * @author Stanislav Aleshin on 25.08.2024
  */
-@Parcelize
-internal data class NotificationViewState(
+@Serializable
+internal data class NotificationState(
     val settings: NotificationSettingsUi? = null,
     val isPaidUser: Boolean = false,
     val allOrganizations: List<OrganizationShortUi> = emptyList(),
-) : BaseViewState
+) : StoreState
 
-internal sealed class NotificationEvent : BaseEvent {
+internal sealed class NotificationEvent : StoreEvent {
     data object Init : NotificationEvent()
     data class UpdateBeggingOfClassesNotify(val beforeDelay: Long?) : NotificationEvent()
     data class UpdateBeggingOfClassesExceptions(val organizations: List<UID>) : NotificationEvent()
@@ -48,13 +48,16 @@ internal sealed class NotificationEvent : BaseEvent {
     data object NavigateToBilling : NotificationEvent()
 }
 
-internal sealed class NotificationEffect : BaseUiEffect {
-    data class NavigateToGlobal(val pushScreen: Screen) : NotificationEffect()
+internal sealed class NotificationEffect : StoreEffect {
     data class ShowError(val failures: SettingsFailures) : NotificationEffect()
 }
 
-internal sealed class NotificationAction : BaseAction {
+internal sealed class NotificationAction : StoreAction {
     data class UpdateSettings(val settings: NotificationSettingsUi) : NotificationAction()
     data class UpdatePaidUserStatus(val isPaidUser: Boolean) : NotificationAction()
     data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : NotificationAction()
+}
+
+internal sealed class NotificationOutput : BaseOutput {
+    data object NavigateToBilling : NotificationOutput()
 }

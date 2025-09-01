@@ -35,7 +35,7 @@ interface Communicator<T> {
 
     abstract class AbstractStateFlow<T>(defaultValue: T) : Communicator<T> {
 
-        private val flow = MutableStateFlow(value = defaultValue)
+        protected val flow = MutableStateFlow(value = defaultValue)
 
         override suspend fun collect(collector: FlowCollector<T>) {
             flow.collect(collector)
@@ -56,7 +56,7 @@ interface Communicator<T> {
         flowBufferOverflow: BufferOverflow = BufferOverflow.SUSPEND,
     ) : Communicator<T> {
 
-        private val flow = MutableSharedFlow<T>(
+        protected val flow = MutableSharedFlow<T>(
             replay = flowReplay,
             extraBufferCapacity = flowBufferCapacity,
             onBufferOverflow = flowBufferOverflow,

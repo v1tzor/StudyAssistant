@@ -26,3 +26,7 @@ fun interface OutputConsumer<O : BaseOutput> {
 object EmptyOutputConsumer : OutputConsumer<EmptyOutput> {
     override fun consume(data: EmptyOutput) = Unit
 }
+
+typealias OutputConsumerProvider<O> = () -> OutputConsumer<O>
+
+val EmptyOutputConsumerProvider = { EmptyOutputConsumer }

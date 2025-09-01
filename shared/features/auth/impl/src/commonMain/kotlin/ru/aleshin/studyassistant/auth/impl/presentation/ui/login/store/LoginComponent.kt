@@ -47,7 +47,7 @@ internal abstract class LoginComponent(
             defaultState = LoginState(),
             stateSerializer = LoginState.serializer(),
             outputConsumer = outputConsumer,
-            componentKey = COMPONENT_KEY,
+            storeKey = COMPONENT_KEY,
         )
     }
 }

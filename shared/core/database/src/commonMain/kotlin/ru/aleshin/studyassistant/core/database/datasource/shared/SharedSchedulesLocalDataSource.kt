@@ -39,7 +39,7 @@ interface SharedSchedulesLocalDataSource : LocalDataSource.FullSynced.SingleDocu
     ) : SharedSchedulesLocalDataSource {
 
         private val coroutineContext: CoroutineContext
-            get() = coroutineManager.backgroundDispatcher
+            get() = coroutineManager.ioDispatcher
 
         override suspend fun addOrUpdateItem(item: SharedSchedulesShortDetailsEntity) {
             sharedSchedulesQueries.addOrUpdateSchedules(item.mapToEntity()).await()

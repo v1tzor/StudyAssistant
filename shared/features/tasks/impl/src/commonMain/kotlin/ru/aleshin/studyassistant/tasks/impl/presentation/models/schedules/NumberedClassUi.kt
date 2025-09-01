@@ -16,14 +16,15 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal class NumberedClassUi(
     val data: ClassUi,
     val number: Int,
-) : Parcelable
+)

@@ -56,7 +56,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.views.LoginActi
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.views.LoginInputSection
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.views.SignUpButton
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
-import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsMutable
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.PRIVACY_POLICY
 import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
@@ -81,7 +81,7 @@ internal fun LoginContent(
         content = { paddingValues ->
             when (windowSize.heightWindowType) {
                 else -> BaseLoginContent(
-                    state = store.stateAsMutable().value,
+                    state = store.stateAsState().value,
                     modifier = Modifier.padding(paddingValues),
                     onLoginClick = { email, password ->
                         val credentials = LoginCredentialsUi(email, password)

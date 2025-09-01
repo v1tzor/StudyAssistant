@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.settings.impl.di
 
-import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
@@ -45,7 +44,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
  * @author Stanislav Aleshin on 21.04.2024.
  */
 public interface SettingsFeatureDependencies : BaseFeatureDependencies {
-    public val billingFeatureStarter: () -> BillingFeatureStarter
     public val subscriptionsRepository: SubscriptionsRepository
     public val generalSettingsRepository: GeneralSettingsRepository
     public val calendarSettingsRepository: CalendarSettingsRepository

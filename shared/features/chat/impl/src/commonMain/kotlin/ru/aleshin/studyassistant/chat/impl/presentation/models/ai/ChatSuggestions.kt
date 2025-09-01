@@ -17,11 +17,14 @@
 package ru.aleshin.studyassistant.chat.impl.presentation.models.ai
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.chat.impl.presentation.theme.ChatThemeRes
 
 /**
  * @author Stanislav Aleshin on 22.06.2025.
  */
+@Serializable
 internal enum class ChatSuggestions : ChatSuggestion {
     FUNCTIONAL {
         override val content: String
@@ -33,6 +36,7 @@ internal enum class ChatSuggestions : ChatSuggestion {
     }
 }
 
+@Immutable
 internal interface ChatSuggestion {
     val content: String @Composable get
 }

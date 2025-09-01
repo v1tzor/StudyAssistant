@@ -16,49 +16,48 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.users.EmployeeAndSubjectsUi
+import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
 
 /**
  * @author Stanislav Aleshin on 17.06.2024
  */
-@Immutable
-@Parcelize
-internal data class EmployeeViewState(
+@Serializable
+internal data class EmployeeState(
     val isLoading: Boolean = true,
     val organizations: List<OrganizationShortUi> = emptyList(),
     val selectedOrganization: UID? = null,
     val subjects: List<SubjectUi> = emptyList(),
     val employees: Map<Char, List<EmployeeAndSubjectsUi>> = mapOf(),
-) : BaseViewState
+) : StoreState
 
-internal sealed class EmployeeEvent : BaseEvent {
-    data class Init(val organizationId: UID) : EmployeeEvent()
+internal sealed class EmployeeEvent : StoreEvent {
+    data class Started(val inputData: EmployeeInput) : EmployeeEvent()
     data class SearchEmployee(val query: String) : EmployeeEvent()
     data class SelectedOrganization(val organization: UID) : EmployeeEvent()
-    data class DeleteEmployee(val employeeId: UID) : EmployeeEvent()
-    data class NavigateToProfile(val employeeId: UID) : EmployeeEvent()
-    data class NavigateToEditor(val employeeId: UID?) : EmployeeEvent()
-    data object NavigateToBack : EmployeeEvent()
+    data class ClickDeleteEmployee(val employeeId: UID) : EmployeeEvent()
+    data class ClickEmployeeProfile(val employeeId: UID) : EmployeeEvent()
+    data class ClickEditEmployee(val employeeId: UID?) : EmployeeEvent()
+    data object BackClick : EmployeeEvent()
 }
 
-internal sealed class EmployeeEffect : BaseUiEffect {
+internal sealed class EmployeeEffect : StoreEffect {
     data class ShowError(val failures: InfoFailures) : EmployeeEffect()
-    data object NavigateToBack : EmployeeEffect()
-    data class NavigateToGlobal(val pushScreen: Screen) : EmployeeEffect()
 }
 
-internal sealed class EmployeeAction : BaseAction {
+internal sealed class EmployeeAction : StoreAction {
     data class UpdateEmployees(val employees: Map<Char, List<EmployeeAndSubjectsUi>>) : EmployeeAction()
 
     data class UpdateOrganizations(
@@ -68,4 +67,14 @@ internal sealed class EmployeeAction : BaseAction {
 
     data class UpdateSelectedOrganization(val organization: UID) : EmployeeAction()
     data class UpdateLoading(val isLoading: Boolean) : EmployeeAction()
+}
+
+internal data class EmployeeInput(
+    val organizationId: UID
+) : BaseInput
+
+internal sealed class EmployeeOutput : BaseOutput {
+    data object NavigateToBack : EmployeeOutput()
+    data class NavigateToEmployeeEditor(val config: EditorConfig.Employee) : EmployeeOutput()
+    data class NavigateToEmployeeProfile(val config: UsersConfig.EmployeeProfile) : EmployeeOutput()
 }

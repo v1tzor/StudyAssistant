@@ -15,6 +15,7 @@
  */
 package ru.aleshin.studyassistant.core.ui.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 /**
  * @author Stanislav Aleshin on 27.01.2023.
  */
+@Immutable
 data class StudyAssistantElevations(
     val levelZero: Dp,
     val levelOne: Dp,

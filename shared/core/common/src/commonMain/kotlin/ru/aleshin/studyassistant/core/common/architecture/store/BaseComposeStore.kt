@@ -17,12 +17,9 @@
 package ru.aleshin.studyassistant.core.common.architecture.store
 
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
-import kotlinx.atomicfu.AtomicBoolean
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.FlowCollector
@@ -32,7 +29,6 @@ import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
 import ru.aleshin.studyassistant.core.common.architecture.component.EmptyInput
 import ru.aleshin.studyassistant.core.common.architecture.component.EmptyOutput
-import ru.aleshin.studyassistant.core.common.architecture.component.EmptyOutputConsumer
 import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.EffectCommunicator
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.StateCommunicator
@@ -43,27 +39,27 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreSt
 import ru.aleshin.studyassistant.core.common.architecture.store.functional.Actor
 import ru.aleshin.studyassistant.core.common.architecture.store.functional.Reducer
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
+import ru.aleshin.studyassistant.core.common.managers.CoroutineFlow
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 
 /**
  * @author Stanislav Aleshin on 16.08.2025.
  */
 abstract class BaseComposeStore<S : StoreState, E : StoreEvent, A : StoreAction, F : StoreEffect, I : BaseInput, O : BaseOutput>(
-    protected val inputData: I,
-    protected val outputConsumer: OutputConsumer<O>,
-    protected val stateCommunicator: StateCommunicator<S>,
-    protected val effectCommunicator: EffectCommunicator<F>,
     protected val coroutineManager: CoroutineManager,
+    private val stateCommunicator: StateCommunicator<S>,
+    private val effectCommunicator: EffectCommunicator<F>,
 ) : InstanceKeeper.Instance, ComposeStore<S, E, F, I>, Actor<S, E, A, F, O>, Reducer<S, A> {
 
     override val state: S get() = stateCommunicator.getValue()
 
-    protected val isInit: AtomicBoolean = atomic(false)
+    private val mutex = Mutex()
 
     protected val mainJob: Job = SupervisorJob()
-    protected val storeScope = CoroutineScope(mainJob + coroutineManager.mainDispatcher)
 
-    private val mutex = Mutex()
+    protected val storeScope = CoroutineScope(mainJob + coroutineManager.defaultDispatcher)
+
+    private var innerOutputConsumer: OutputConsumer<O>? = null
 
     private val eventChannel = Channel<E>(Channel.UNLIMITED, BufferOverflow.SUSPEND)
 
@@ -83,13 +79,19 @@ abstract class BaseComposeStore<S : StoreState, E : StoreEvent, A : StoreAction,
         effectCommunicator.collect(collector)
     }
 
+    override fun initialize(input: I, isRestore: Boolean) = Unit
+
     override fun onDestroy() {
         super.onDestroy()
-        storeScope.cancel()
+        mainJob.cancel()
     }
 
-    fun consumeOutput(output: O) {
-        outputConsumer.consume(output)
+    fun setOutputConsumer(outputConsumer: OutputConsumer<O>) {
+        innerOutputConsumer = outputConsumer
+    }
+
+    suspend fun consumeOutput(output: O) = coroutineManager.changeFlow(CoroutineFlow.UI) {
+        innerOutputConsumer?.consume(output)
     }
 
     internal suspend fun updateState(transform: suspend (S) -> S) = mutex.withReentrantLock {
@@ -105,7 +107,7 @@ abstract class BaseComposeStore<S : StoreState, E : StoreEvent, A : StoreAction,
         effectCommunicator.update(effect)
     }
 
-    internal fun startStore() = coroutineManager.runOnBackground(storeScope) {
+    internal fun startStore() = coroutineManager.runOnIOBackground(storeScope) {
         val workScope = WorkScope.Default(store = this@BaseComposeStore, coroutineScope = this)
 
         while (isActive) {
@@ -113,8 +115,8 @@ abstract class BaseComposeStore<S : StoreState, E : StoreEvent, A : StoreAction,
         }
     }
 
-    interface Factory<Store, S : StoreState, I : BaseInput, O : BaseOutput> {
-        fun create(savedState: S, input: I, output: OutputConsumer<O>): Store
+    interface Factory<Store, S : StoreState> {
+        fun create(savedState: S): Store
     }
 }
 
@@ -123,41 +125,33 @@ abstract class BaseSimpleComposeStore<S : StoreState, E : StoreEvent, A : StoreA
     effectCommunicator: EffectCommunicator<F>,
     coroutineManager: CoroutineManager,
 ) : BaseComposeStore<S, E, A, F, EmptyInput, EmptyOutput>(
-    inputData = EmptyInput,
-    outputConsumer = EmptyOutputConsumer,
     stateCommunicator = stateCommunicator,
     effectCommunicator = effectCommunicator,
     coroutineManager = coroutineManager,
 ) {
-    interface Factory<Store, S : StoreState> : BaseComposeStore.Factory<Store, S, EmptyInput, EmptyOutput>
+    interface Factory<Store, S : StoreState> : BaseComposeStore.Factory<Store, S>
 }
 
 abstract class BaseOnlyInComposeStore<S : StoreState, E : StoreEvent, A : StoreAction, F : StoreEffect, I : BaseInput>(
-    inputData: I,
     stateCommunicator: StateCommunicator<S>,
     effectCommunicator: EffectCommunicator<F>,
     coroutineManager: CoroutineManager,
 ) : BaseComposeStore<S, E, A, F, I, EmptyOutput>(
-    inputData = inputData,
-    outputConsumer = EmptyOutputConsumer,
     stateCommunicator = stateCommunicator,
     effectCommunicator = effectCommunicator,
     coroutineManager = coroutineManager,
 ) {
-    interface Factory<Store, S : StoreState, I : BaseInput> : BaseComposeStore.Factory<Store, S, I, EmptyOutput>
+    interface Factory<Store, S : StoreState> : BaseComposeStore.Factory<Store, S>
 }
 
 abstract class BaseOnlyOutComposeStore<S : StoreState, E : StoreEvent, A : StoreAction, F : StoreEffect, O : BaseOutput>(
-    outputConsumer: OutputConsumer<O>,
     stateCommunicator: StateCommunicator<S>,
     effectCommunicator: EffectCommunicator<F>,
     coroutineManager: CoroutineManager,
 ) : BaseComposeStore<S, E, A, F, EmptyInput, O>(
-    inputData = EmptyInput,
-    outputConsumer = outputConsumer,
     stateCommunicator = stateCommunicator,
     effectCommunicator = effectCommunicator,
     coroutineManager = coroutineManager,
 ) {
-    interface Factory<Store, S : StoreState, O : BaseOutput> : BaseComposeStore.Factory<Store, S, EmptyInput, O>
+    interface Factory<Store, S : StoreState> : BaseComposeStore.Factory<Store, S>
 }

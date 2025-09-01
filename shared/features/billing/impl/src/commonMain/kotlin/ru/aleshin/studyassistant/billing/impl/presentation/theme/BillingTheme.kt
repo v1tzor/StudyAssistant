@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.billing.impl.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import ru.aleshin.studyassistant.billing.impl.presentation.theme.tokens.LocalBillingIcons
 import ru.aleshin.studyassistant.billing.impl.presentation.theme.tokens.LocalBillingStrings
 import ru.aleshin.studyassistant.billing.impl.presentation.theme.tokens.fetchBillingIcons
@@ -29,8 +30,11 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
  */
 @Composable
 internal fun BillingTheme(content: @Composable () -> Unit) {
-    val icons = fetchBillingIcons(StudyAssistantRes.colors.isDark)
-    val strings = fetchBillingStrings(StudyAssistantRes.language)
+    val isDark = StudyAssistantRes.colors.isDark
+    val language = StudyAssistantRes.language
+
+    val icons = remember(isDark) { fetchBillingIcons(isDark) }
+    val strings = remember(language) { fetchBillingStrings(language) }
 
     CompositionLocalProvider(
         LocalBillingIcons provides icons,

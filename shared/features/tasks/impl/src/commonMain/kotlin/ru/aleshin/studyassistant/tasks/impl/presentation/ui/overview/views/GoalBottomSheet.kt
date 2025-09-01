@@ -85,8 +85,8 @@ internal fun GoalBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     goal: GoalDetailsUi,
-    onOpenHomeworkEditor: (HomeworkUi) -> Unit,
-    onOpenTodoEditor: (TodoUi) -> Unit,
+    onEditHomeworkClick: (HomeworkUi) -> Unit,
+    onEditTodoClick: (TodoUi) -> Unit,
     onStartTime: () -> Unit,
     onPauseTime: () -> Unit,
     onResetTime: () -> Unit,
@@ -109,13 +109,13 @@ internal fun GoalBottomSheet(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     homework = contentHomework,
                     number = number,
-                    onOpenEditor = onOpenHomeworkEditor,
+                    onEditHomeworkClick = onEditHomeworkClick,
                 )
                 GoalType.TODO -> GoalBottomSheetTodoHeader(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     todo = contentTodo,
                     number = number,
-                    onOpenEditor = onOpenTodoEditor,
+                    onOpenEditor = onEditTodoClick,
                 )
             }
             TimeControlDivider()
@@ -166,12 +166,12 @@ private fun GoalBottomSheetHomeworkHeader(
     modifier: Modifier = Modifier,
     homework: HomeworkUi?,
     number: Int,
-    onOpenEditor: (HomeworkUi) -> Unit,
+    onEditHomeworkClick: (HomeworkUi) -> Unit,
 ) {
     val indicatorColor = homework?.subject?.color?.let { Color(it) }
     Surface(
         enabled = homework != null,
-        onClick = { if (homework != null) onOpenEditor(homework) },
+        onClick = { if (homework != null) onEditHomeworkClick(homework) },
         modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min),
         shape = MaterialTheme.shapes.large,
         color = indicatorColor?.copy(alpha = 0.1f) ?: MaterialTheme.colorScheme.surfaceContainerHigh,

@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.auth.impl.presentation.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import studyassistant.shared.features.auth.impl.generated.resources.Res
@@ -38,6 +39,7 @@ import studyassistant.shared.features.auth.impl.generated.resources.il_verificat
 /**
  * @author Stanislav Aleshin on 14.06.2023.
  */
+@Immutable
 internal data class AuthIcons(
     val loginIllustration: DrawableResource,
     val registerIllustration: DrawableResource,

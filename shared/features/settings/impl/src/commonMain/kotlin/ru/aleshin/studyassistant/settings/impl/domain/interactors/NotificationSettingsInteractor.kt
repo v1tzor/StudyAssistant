@@ -21,8 +21,8 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkResult
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.settings.NotificationSettings
@@ -40,7 +40,7 @@ import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
  */
 internal interface NotificationSettingsInteractor {
 
-    suspend fun fetchSettings(): FlowWorkResult<SettingsFailures, NotificationSettings>
+    suspend fun fetchSettings(): FlowDomainResult<SettingsFailures, NotificationSettings>
     suspend fun updateSettings(settings: NotificationSettings): UnitDomainResult<SettingsFailures>
 
     class Base(

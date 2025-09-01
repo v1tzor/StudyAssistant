@@ -16,18 +16,19 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.organization
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
  * @author Stanislav Aleshin on 17.05.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class NumberedDurationUi(
     val number: Int,
     val duration: Millis,
-) : Parcelable {
+) {
     companion object {
         fun createEmpty() = NumberedDurationUi(0, 0)
     }

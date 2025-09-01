@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -28,7 +28,8 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.Org
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class MediatedHomeworkUi(
     val uid: UID,
     val subjectName: String,
@@ -37,7 +38,7 @@ internal data class MediatedHomeworkUi(
     val presentationTasks: HomeworkTasksDetailsUi,
     val test: String? = null,
     val priority: TaskPriority = TaskPriority.STANDARD,
-) : Parcelable
+)
 
 internal fun HomeworkDetailsUi.convertToMediated(
     uid: UID = randomUUID(),

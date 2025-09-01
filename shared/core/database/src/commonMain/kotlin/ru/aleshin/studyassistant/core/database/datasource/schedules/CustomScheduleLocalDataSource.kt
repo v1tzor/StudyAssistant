@@ -84,7 +84,7 @@ interface CustomScheduleLocalDataSource : CombinedLocalDataSource<CustomSchedule
         ) : Commands {
 
             private val coroutineContext: CoroutineContext
-                get() = coroutineManager.backgroundDispatcher
+                get() = coroutineManager.ioDispatcher
 
             private val isCacheData = if (isCacheSource) 1L else 0L
 

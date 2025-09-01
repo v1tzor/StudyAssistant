@@ -39,7 +39,7 @@ interface SharedHomeworksLocalDataSource : LocalDataSource.FullSynced.SingleDocu
     ) : SharedHomeworksLocalDataSource {
 
         private val coroutineContext: CoroutineContext
-            get() = coroutineManager.backgroundDispatcher
+            get() = coroutineManager.ioDispatcher
 
         override suspend fun addOrUpdateItem(item: SharedHomeworksDetailsEntity) {
             sharedHomeworksQueries.addOrUpdateHomeworks(item.mapToEntity()).await()

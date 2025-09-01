@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import studyassistant.shared.features.profile.impl.generated.resources.Res
@@ -34,6 +35,7 @@ import studyassistant.shared.features.profile.impl.generated.resources.ic_table
 /**
  * @author Stanislav Aleshin on 21.06.2023.
  */
+@Immutable
 internal data class ProfileIcons(
     val edit: DrawableResource,
     val signOut: DrawableResource,

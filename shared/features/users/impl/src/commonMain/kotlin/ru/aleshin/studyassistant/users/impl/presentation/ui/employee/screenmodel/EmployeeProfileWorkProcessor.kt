@@ -17,22 +17,23 @@
 package ru.aleshin.studyassistant.users.impl.presentation.ui.employee.screenmodel
 
 import kotlinx.coroutines.flow.flow
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.ActionResult
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.EffectResult
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkProcessor
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.architecture.store.work.ActionResult
+import ru.aleshin.studyassistant.core.common.architecture.store.work.EffectResult
+import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.users.impl.domain.interactors.EmployeeInteractor
 import ru.aleshin.studyassistant.users.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileAction
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileEffect
+import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileOutput
 
 /**
  * @author Stanislav Aleshin on 10.07.2024.
  */
 internal interface EmployeeProfileWorkProcessor :
-    FlowWorkProcessor<EmployeeProfileWorkCommand, EmployeeProfileAction, EmployeeProfileEffect> {
+    FlowWorkProcessor<EmployeeProfileWorkCommand, EmployeeProfileAction, EmployeeProfileEffect, EmployeeProfileOutput> {
 
     class Base(
         private val employeeInteractor: EmployeeInteractor,

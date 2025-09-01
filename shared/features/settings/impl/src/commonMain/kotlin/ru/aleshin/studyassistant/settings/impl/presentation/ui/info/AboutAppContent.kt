@@ -21,7 +21,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -32,9 +35,14 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -42,18 +50,49 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.functional.Constants
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.BuildKonfig.VERSION_CODE
 import ru.aleshin.studyassistant.settings.impl.BuildKonfig.VERSION_NAME
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.contract.AboutAppViewState
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.contract.AboutAppState
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.store.AboutAppComponent
 
 /**
  * @author Stanislav Aleshin on 04.08.2025
  */
 @Composable
 internal fun AboutAppContent(
-    state: AboutAppViewState,
+    aboutAppComponent: AboutAppComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = aboutAppComponent.store
+    val state by store.stateAsState()
+    val strings = SettingsThemeRes.strings
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseAboutAppContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+        contentWindowInsets = WindowInsets.navigationBars,
+    )
+}
+
+@Composable
+private fun BaseAboutAppContent(
+    state: AboutAppState,
     scrollState: ScrollState = rememberScrollState(),
     modifier: Modifier = Modifier,
 ) = with(state) {

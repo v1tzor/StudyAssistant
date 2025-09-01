@@ -18,9 +18,8 @@ package ru.aleshin.studyassistant.core.common.architecture.store.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.State
+import androidx.compose.runtime.produceState
 import kotlinx.coroutines.CoroutineScope
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
 import ru.aleshin.studyassistant.core.common.architecture.store.ComposeStore
@@ -41,9 +40,12 @@ inline fun <S : StoreState, E : StoreEvent, F : StoreEffect, I : BaseInput> Comp
 }
 
 @Composable
-fun <S : StoreState, E : StoreEvent, F : StoreEffect, I : BaseInput> ComposeStore<S, E, F, I>.stateAsMutable(): MutableState<S> {
-    val state = remember { mutableStateOf(state) }
-    LaunchedEffect(Unit) { collectState { state.value = it } }
-
-    return state
+fun <S : StoreState, E : StoreEvent, F : StoreEffect, I : BaseInput> ComposeStore<S, E, F, I>.stateAsState(): State<S> {
+    return produceState(initialValue = state) {
+        collectState {
+            if (value != it) {
+                value = it
+            }
+        }
+    }
 }

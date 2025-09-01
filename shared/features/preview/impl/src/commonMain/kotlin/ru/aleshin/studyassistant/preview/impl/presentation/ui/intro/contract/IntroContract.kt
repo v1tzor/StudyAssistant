@@ -16,33 +16,35 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 
 /**
  * @author Stanislav Aleshin on 14.04.2024
  */
-@Parcelize
-@Immutable
-internal object IntroViewState : BaseViewState
+@Serializable
+internal object IntroState : StoreState
 
-internal sealed class IntroEvent : BaseEvent {
-    data class NextPage(val currentPage: Int) : IntroEvent()
-    data class PreviousPage(val currentPage: Int) : IntroEvent()
-    data object NavigateToLogin : IntroEvent()
-    data object NavigateToRegister : IntroEvent()
+internal sealed class IntroEvent : StoreEvent {
+    data class SelectedNextPage(val currentPage: Int) : IntroEvent()
+    data class SelectedPreviousPage(val currentPage: Int) : IntroEvent()
+    data object ClickLogin : IntroEvent()
+    data object ClickRegister : IntroEvent()
 }
 
-internal sealed class IntroEffect : BaseUiEffect {
+internal sealed class IntroEffect : StoreEffect {
     data class ShowError(val failures: PreviewFailures) : IntroEffect()
     data class ScrollToPage(val pageIndex: Int) : IntroEffect()
-    data class ReplaceGlobalScreen(val screen: Screen) : IntroEffect()
 }
 
-internal object IntroAction : BaseAction
+internal object IntroAction : StoreAction
+
+internal sealed class IntroOutput : BaseOutput {
+    data object NavigateToLogin : IntroOutput()
+    data object NavigateToRegister : IntroOutput()
+}

@@ -17,42 +17,22 @@
 package ru.aleshin.studyassistant.preview.impl.di.modules
 
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.auth.api.navigation.AuthFeatureStarter
-import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
-import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
-import ru.aleshin.studyassistant.navigation.api.navigation.NavigationFeatureStarter
-import ru.aleshin.studyassistant.preview.api.navigation.PreviewFeatureStarter
-import ru.aleshin.studyassistant.preview.impl.navigation.PreviewFeatureStarterImpl
-import ru.aleshin.studyassistant.preview.impl.navigation.PreviewScreenProvider
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.screenmodel.IntroEffectCommunicator
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.screenmodel.IntroScreenModel
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.screenmodel.IntroStateCommunicator
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.navigation.NavScreenModel
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.navigation.NavigationScreen
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.SetupEffectCommunicator
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.SetupScreenModel
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.SetupStateCommunicator
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.screenmodel.SetupWorkProcessor
+import ru.aleshin.studyassistant.preview.api.PreviewFeatureComponentFactory
+import ru.aleshin.studyassistant.preview.impl.navigation.DefaultPreviewComponentFactory
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.store.IntroComposeStore
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.store.SetupComposeStore
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.store.SetupWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<NavScreenModel> { NavScreenModel() }
-    bindSingleton<NavigationScreen> { NavigationScreen() }
+    bindSingleton<PreviewFeatureComponentFactory> { DefaultPreviewComponentFactory(instance(), instance()) }
 
-    bindProvider<PreviewFeatureStarter> { PreviewFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<PreviewScreenProvider> { PreviewScreenProvider.Base(instance<() -> AuthFeatureStarter>(), instance<() -> EditorFeatureStarter>(), instance<() -> NavigationFeatureStarter>(), instance<() -> BillingFeatureStarter>()) }
+    bindSingleton<IntroComposeStore.Factory> { IntroComposeStore.Factory(instance()) }
 
-    bindProvider<IntroStateCommunicator> { IntroStateCommunicator.Base() }
-    bindProvider<IntroEffectCommunicator> { IntroEffectCommunicator.Base() }
-    bindProvider<IntroScreenModel> { IntroScreenModel(instance(), instance(), instance(), instance()) }
-
-    bindProvider<SetupStateCommunicator> { SetupStateCommunicator.Base() }
-    bindProvider<SetupEffectCommunicator> { SetupEffectCommunicator.Base() }
-    bindProvider<SetupWorkProcessor> { SetupWorkProcessor.Base(instance(), instance(), instance(), instance()) }
-    bindProvider<SetupScreenModel> { SetupScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<SetupWorkProcessor> { SetupWorkProcessor.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<SetupComposeStore.Factory> { SetupComposeStore.Factory(instance(), instance()) }
 }

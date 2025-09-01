@@ -16,14 +16,15 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.models.organizations
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 25.08.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class ContactInfoUi(
     val label: String? = null,
     val value: String = "",
-) : Parcelable
+)

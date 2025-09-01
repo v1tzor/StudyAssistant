@@ -16,18 +16,17 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class HomeworkScopeUi(
-    @TypeParceler<Instant, InstantParceler> val theoreticalTasks: Map<Instant, Int>,
-    @TypeParceler<Instant, InstantParceler> val practicalTasks: Map<Instant, Int>,
-    @TypeParceler<Instant, InstantParceler> val presentationTasks: Map<Instant, Int>,
-) : Parcelable
+    val theoreticalTasks: Map<Instant, Int>,
+    val practicalTasks: Map<Instant, Int>,
+    val presentationTasks: Map<Instant, Int>,
+)

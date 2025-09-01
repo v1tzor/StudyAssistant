@@ -16,20 +16,22 @@
 
 package ru.aleshin.studyassistant.core.ui.models
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 03.08.2024.
  */
-sealed interface ActionWithAvatar : Parcelable {
+@Immutable
+@Serializable
+sealed interface ActionWithAvatar {
 
-    @Parcelize
+    @Serializable
     data object Delete : ActionWithAvatar
 
-    @Parcelize
+    @Serializable
     data class Set(val file: InputFileUi) : ActionWithAvatar
 
-    @Parcelize
+    @Serializable
     data class None(val uri: String?) : ActionWithAvatar
 }

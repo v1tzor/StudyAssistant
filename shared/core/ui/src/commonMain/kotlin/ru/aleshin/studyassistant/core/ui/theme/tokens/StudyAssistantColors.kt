@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.ui.theme.tokens
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
@@ -58,11 +59,13 @@ import ru.aleshin.studyassistant.core.ui.theme.material.yellowLight
 /**
  * @author Stanislav Aleshin on 27.01.2024.
  */
+@Immutable
 data class StudyAssistantColors(
     val isDark: Boolean,
     val accents: ColorAccents,
 )
 
+@Immutable
 data class ColorAccents(
     val red: Color,
     val redContainer: Color,

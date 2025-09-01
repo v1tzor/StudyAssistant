@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,10 +34,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -47,8 +52,13 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
 import kotlinx.datetime.isoDayNumber
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.BaseScheduleUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.NumberOfWeekItem
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.share.ReceivedMediatedSchedulesUi
@@ -56,11 +66,16 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.Subj
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareViewState
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareEffect
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareEvent
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareState
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.store.ShareComponent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.OrganizationDataLinker
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.ScheduleWeekChip
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.SenderUserView
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.SenderUserViewPlaceholder
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.ShareBottomActionBar
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.ShareTopBar
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.SharedScheduleView
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.SharedScheduleViewPlaceholder
 
@@ -69,34 +84,101 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.Share
  */
 @Composable
 internal fun ShareContent(
-    state: ShareViewState,
+    shareComponent: ShareComponent,
+) {
+    val store = shareComponent.store
+    val state by store.stateAsState()
+    val strings = ScheduleThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseShareContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+                onProfileClick = {
+                    store.dispatchEvent(ShareEvent.ClickUserProfile(it))
+                },
+                onLinkOrganization = { sharedOrganization, linkedOrganization ->
+                    store.dispatchEvent(ShareEvent.ClickLinkOrganization(sharedOrganization, linkedOrganization))
+                },
+                onLinkSubjects = { sharedOrganization, subjects ->
+                    store.dispatchEvent(ShareEvent.UpdatedLinkedSubjects(sharedOrganization, subjects))
+                },
+                onLinkTeachers = { sharedOrganization, teachers ->
+                    store.dispatchEvent(ShareEvent.UpdatedLinkedTeachers(sharedOrganization, teachers))
+                },
+            )
+        },
+        topBar = {
+            ShareTopBar(
+                onBackClick = { store.dispatchEvent(ShareEvent.ClickBack) }
+            )
+        },
+        bottomBar = {
+            ShareBottomActionBar(
+                enabled = !state.isLoading && !state.isLoadingAccept,
+                isLoadingAccept = state.isLoadingAccept,
+                onAcceptSharedSchedule = {
+                    store.dispatchEvent(ShareEvent.AcceptedSharedSchedule)
+                },
+                onRejectSharedSchedule = {
+                    store.dispatchEvent(ShareEvent.RejectedSharedSchedule)
+                },
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is ShareEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BaseShareContent(
+    state: ShareState,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
-    onOpenProfile: (AppUserUi) -> Unit,
+    onProfileClick: (AppUserUi) -> Unit,
     onLinkOrganization: (sharedOrganization: UID, linkedOrganization: UID?) -> Unit,
     onLinkSubjects: (sharedOrganization: UID, subjects: Map<UID, SubjectUi>) -> Unit,
     onLinkTeachers: (sharedOrganization: UID, teachers: Map<UID, EmployeeUi>) -> Unit,
-) = with(state) {
+) {
     Column(
         modifier = modifier.verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         SenderSection(
-            isLoading = isLoading,
-            currentTime = currentTime,
-            receivedMediatedSchedules = receivedMediatedSchedule,
-            onOpenProfile = onOpenProfile,
+            isLoading = state.isLoading,
+            currentTime = state.currentTime,
+            receivedMediatedSchedules = state.receivedMediatedSchedule,
+            onProfileClick = onProfileClick,
         )
         SharedScheduleSection(
-            isLoading = isLoading,
-            linkedSchedules = linkedSchedules,
+            isLoading = state.isLoading,
+            linkedSchedules = state.linkedSchedules,
         )
         NewAndLinkedDataSectionDivider()
         OrganizationDataLinker(
-            isLoading = isLoading,
-            isLoadingLinkedOrganization = isLoadingLinkedOrganization,
-            allOrganizations = allOrganizations,
-            organizationsLinkData = organizationsLinkData,
+            isLoading = state.isLoading,
+            isLoadingLinkedOrganization = state.isLoadingLinkedOrganization,
+            allOrganizations = state.allOrganizations,
+            organizationsLinkData = state.organizationsLinkData,
             onLinkOrganization = onLinkOrganization,
             onLinkSubjects = onLinkSubjects,
             onLinkTeachers = onLinkTeachers,
@@ -111,7 +193,7 @@ private fun SenderSection(
     isLoading: Boolean,
     currentTime: Instant,
     receivedMediatedSchedules: ReceivedMediatedSchedulesUi?,
-    onOpenProfile: (AppUserUi) -> Unit,
+    onProfileClick: (AppUserUi) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -129,7 +211,7 @@ private fun SenderSection(
         ) { loading ->
             if (!loading && receivedMediatedSchedules != null) {
                 SenderUserView(
-                    onClick = { onOpenProfile(receivedMediatedSchedules.sender) },
+                    onClick = { onProfileClick(receivedMediatedSchedules.sender) },
                     username = receivedMediatedSchedules.sender.username,
                     email = receivedMediatedSchedules.sender.email,
                     avatar = receivedMediatedSchedules.sender.avatar,
@@ -149,8 +231,10 @@ private fun SharedScheduleSection(
     isLoading: Boolean,
     linkedSchedules: List<BaseScheduleUi>,
 ) {
-    var numberOfWeek by rememberSaveable { mutableStateOf(NumberOfWeekItem.ONE.isoWeekNumber) }
     val coroutineScope = rememberCoroutineScope()
+    var numberOfWeek by rememberSaveable {
+        mutableStateOf(NumberOfWeekItem.ONE.isoWeekNumber)
+    }
 
     Column(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -169,8 +253,12 @@ private fun SharedScheduleSection(
             )
             Spacer(modifier = Modifier.weight(1f))
             ScheduleWeekChip(
-                selected = NumberOfWeekItem.valueOf(numberOfWeek),
-                maxNumberOfWeek = linkedSchedules.maxOfOrNull { it.week.isoRepeatWeekNumber } ?: 1,
+                selected = remember(numberOfWeek) {
+                    NumberOfWeekItem.valueOf(numberOfWeek)
+                },
+                maxNumberOfWeek = remember(linkedSchedules) {
+                    linkedSchedules.maxOfOrNull { it.week.isoRepeatWeekNumber } ?: 1
+                },
                 onSelect = {
                     numberOfWeek = it.isoWeekNumber
                     coroutineScope.launch { schedulesRowState.animateScrollToItem(0) }
@@ -189,8 +277,10 @@ private fun SharedScheduleSection(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     items(DayOfWeek.entries, key = { it.isoDayNumber }) { dayOfWeek ->
-                        val schedule = linkedSchedules.find { schedule ->
-                            schedule.dayOfWeek == dayOfWeek && schedule.week.isoRepeatWeekNumber == numberOfWeek
+                        val schedule = remember(linkedSchedules, dayOfWeek) {
+                            linkedSchedules.find { schedule ->
+                                schedule.dayOfWeek == dayOfWeek && schedule.week.isoRepeatWeekNumber == numberOfWeek
+                            }
                         }
                         SharedScheduleView(
                             dayOfWeek = dayOfWeek,

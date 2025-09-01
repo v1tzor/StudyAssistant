@@ -16,51 +16,50 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.info.api.InfoFeatureComponent.InfoConfig
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationClassesInfoUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationUi
+import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
 
 /**
  * @author Stanislav Aleshin on 16.06.2024
  */
-@Immutable
-@Parcelize
-internal data class OrganizationsViewState(
+@Serializable
+internal data class OrganizationsState(
     val isLoading: Boolean = true,
     val isPaidUser: Boolean = false,
     val shortOrganizations: List<OrganizationShortUi>? = null,
     val organizationData: OrganizationUi? = null,
     val classesInfo: OrganizationClassesInfoUi? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class OrganizationsEvent : BaseEvent {
-    data object Init : OrganizationsEvent()
+internal sealed class OrganizationsEvent : StoreEvent {
+    data object Started : OrganizationsEvent()
     data class Refresh(val organizationId: UID?) : OrganizationsEvent()
     data class ChangeOrganization(val organizationId: UID?) : OrganizationsEvent()
-    data class OpenEmployeeProfile(val employeeId: UID) : OrganizationsEvent()
-    data class NavigateToEmployees(val organizationId: UID) : OrganizationsEvent()
-    data class NavigateToSubjects(val organizationId: UID) : OrganizationsEvent()
-    data class NavigateToOrganizationEditor(val organizationId: UID?) : OrganizationsEvent()
-    data class NavigateToSubjectEditor(val subjectId: UID, val organizationId: UID) : OrganizationsEvent()
-    data object NavigateToBilling : OrganizationsEvent()
+    data class ClickEmployee(val employeeId: UID) : OrganizationsEvent()
+    data class ClickShowAllEmployees(val organizationId: UID) : OrganizationsEvent()
+    data class ClickShowAllSubjects(val organizationId: UID) : OrganizationsEvent()
+    data class ClickEditOrganization(val organizationId: UID?) : OrganizationsEvent()
+    data class ClickEditSubject(val subjectId: UID, val organizationId: UID) : OrganizationsEvent()
+    data object ClickPaidFunction : OrganizationsEvent()
 }
 
-internal sealed class OrganizationsEffect : BaseUiEffect {
+internal sealed class OrganizationsEffect : StoreEffect {
     data class ShowError(val failures: InfoFailures) : OrganizationsEffect()
-    data class NavigateToLocal(val pushScreen: Screen) : OrganizationsEffect()
-    data class NavigateToGlobal(val pushScreen: Screen) : OrganizationsEffect()
 }
 
-internal sealed class OrganizationsAction : BaseAction {
+internal sealed class OrganizationsAction : StoreAction {
     data class UpdateShortOrganizations(val organizations: List<OrganizationShortUi>) : OrganizationsAction()
     data class UpdatePaidUserStatus(val isPaidUser: Boolean) : OrganizationsAction()
     data class UpdateOrganizationData(
@@ -68,4 +67,13 @@ internal sealed class OrganizationsAction : BaseAction {
         val classesInfo: OrganizationClassesInfoUi?,
     ) : OrganizationsAction()
     data class UpdateLoading(val isLoading: Boolean) : OrganizationsAction()
+}
+
+internal sealed class OrganizationsOutput : BaseOutput {
+    data object NavigateToBilling : OrganizationsOutput()
+    data class NavigateToEmployeeProfile(val config: UsersConfig.EmployeeProfile) : OrganizationsOutput()
+    data class NavigateToSubjects(val config: InfoConfig.Subjects) : OrganizationsOutput()
+    data class NavigateToEmployees(val config: InfoConfig.Employee) : OrganizationsOutput()
+    data class NavigateToSubjectEditor(val config: EditorConfig.Subject) : OrganizationsOutput()
+    data class NavigateToOrganizationEditor(val config: EditorConfig.Organization) : OrganizationsOutput()
 }

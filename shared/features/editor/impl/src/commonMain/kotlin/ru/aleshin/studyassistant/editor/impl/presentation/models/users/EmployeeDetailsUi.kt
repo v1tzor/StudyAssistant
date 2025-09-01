@@ -16,19 +16,18 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.models.users
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class EmployeeDetailsUi(
     val uid: UID,
     val organizationId: UID,
@@ -39,16 +38,14 @@ internal data class EmployeeDetailsUi(
     val subjects: List<SubjectUi>,
     val avatar: String? = null,
     val birthday: String? = null,
-    @TypeParceler<Instant?, NullInstantParceler>
     val workTimeStart: Instant? = null,
-    @TypeParceler<Instant?, NullInstantParceler>
     val workTimeEnd: Instant? = null,
     val emails: List<ContactInfoUi> = emptyList(),
     val phones: List<ContactInfoUi> = emptyList(),
     val locations: List<ContactInfoUi> = emptyList(),
     val webs: List<ContactInfoUi> = emptyList(),
     val updatedAt: Long,
-) : Parcelable {
+) {
     fun fullName(): String {
         return buildString {
             append(firstName)

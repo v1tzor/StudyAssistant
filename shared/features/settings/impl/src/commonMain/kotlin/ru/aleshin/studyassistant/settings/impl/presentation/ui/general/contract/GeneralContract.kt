@@ -16,12 +16,11 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract
 
-import androidx.compose.runtime.Immutable
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
@@ -30,22 +29,21 @@ import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.Gene
 /**
  * @author Stanislav Aleshin on 10.07.2024
  */
-@Immutable
-@Parcelize
-internal data class GeneralViewState(
+@Serializable
+internal data class GeneralState(
     val settings: GeneralSettingsUi? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class GeneralEvent : BaseEvent {
+internal sealed class GeneralEvent : StoreEvent {
     data object Init : GeneralEvent()
     data class ChangeLanguage(val language: LanguageUiType) : GeneralEvent()
     data class ChangeTheme(val theme: ThemeUiType) : GeneralEvent()
 }
 
-internal sealed class GeneralEffect : BaseUiEffect {
+internal sealed class GeneralEffect : StoreEffect {
     data class ShowError(val failures: SettingsFailures) : GeneralEffect()
 }
 
-internal sealed class GeneralAction : BaseAction {
+internal sealed class GeneralAction : StoreAction {
     data class UpdateSettings(val settings: GeneralSettingsUi?) : GeneralAction()
 }

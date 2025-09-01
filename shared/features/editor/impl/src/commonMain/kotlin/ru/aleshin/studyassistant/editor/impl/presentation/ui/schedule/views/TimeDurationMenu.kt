@@ -187,7 +187,9 @@ internal fun NumberedDurationCreatorDropdownMenu(
             NumberedDurationCreatorPage.NUMBER -> {
                 BackMenuItem(onClick = { page = NumberedDurationCreatorPage.MAIN })
                 numberRange.forEach { numberItem ->
-                    val enabled = specificDurations.find { it.number == numberItem } == null
+                    val enabled = remember(specificDurations, numberItem) {
+                        specificDurations.find { it.number == numberItem } == null
+                    }
                     DropdownMenuItem(
                         modifier = Modifier.alphaByEnabled(enabled),
                         enabled = enabled,

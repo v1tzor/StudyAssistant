@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,9 +39,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Web
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -49,32 +55,96 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
 import ru.aleshin.studyassistant.core.domain.entities.users.SocialNetworkType
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
+import ru.aleshin.studyassistant.users.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.users.impl.presentation.models.SocialNetworkUi
 import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
-import ru.aleshin.studyassistant.users.impl.presentation.ui.user.contract.UserProfileViewState
+import ru.aleshin.studyassistant.users.impl.presentation.ui.user.contract.UserProfileEffect
+import ru.aleshin.studyassistant.users.impl.presentation.ui.user.contract.UserProfileEvent
+import ru.aleshin.studyassistant.users.impl.presentation.ui.user.contract.UserProfileState
+import ru.aleshin.studyassistant.users.impl.presentation.ui.user.store.UserProfileComponent
+import ru.aleshin.studyassistant.users.impl.presentation.ui.user.views.UserProfileTopBar
+import ru.aleshin.studyassistant.users.impl.presentation.ui.user.views.UserProfileTopSheet
 
 /**
  * @author Stanislav Aleshin on 15.07.2024.
  */
 @Composable
 internal fun UserProfileContent(
-    state: UserProfileViewState,
+    userProfileComponent: UserProfileComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = userProfileComponent.store
+    val state by store.stateAsState()
+    val strings = UsersThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseUserProfileContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+            )
+        },
+        topBar = {
+            Column {
+                UserProfileTopBar(
+                    onBackClick = { store.dispatchEvent(UserProfileEvent.ClickBack) },
+                )
+                UserProfileTopSheet(
+                    isLoading = state.isLoading,
+                    user = state.user,
+                    friendStatus = state.friendStatus,
+                    onAddToFriends = { store.dispatchEvent(UserProfileEvent.SendFriendRequest) },
+                    onAcceptRequest = { store.dispatchEvent(UserProfileEvent.AcceptFriendRequest) },
+                    onCancelSendRequest = { store.dispatchEvent(UserProfileEvent.CancelSendFriendRequest) },
+                    onDeleteFromFriends = { store.dispatchEvent(UserProfileEvent.DeleteFromFriends) },
+                )
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is UserProfileEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun BaseUserProfileContent(
+    state: UserProfileState,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
-) = with(state) {
+) {
     Column(
         modifier = modifier.padding(top = 24.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         UserSocialNetworksSection(
-            isLoading = isLoading,
-            socialNetworks = user?.socialNetworks ?: emptyList(),
+            isLoading = state.isLoading,
+            socialNetworks = state.user?.socialNetworks ?: emptyList(),
         )
     }
 }

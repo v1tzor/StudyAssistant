@@ -16,16 +16,17 @@
 
 package ru.aleshin.studyassistant.chat.impl.presentation.models.ai
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 
 /**
  * @author Stanislav Aleshin on 21.06.2025.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class AiChatHistoryUi(
     val uid: UID,
     val messages: List<AiAssistantMessageUi>,
     val lastMessage: AiAssistantMessageUi? = null,
-) : Parcelable
+)

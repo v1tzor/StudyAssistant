@@ -25,17 +25,35 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.SocialNetworkUi
+import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.BirthdayInfoField
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileViewState
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEffect
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEvent
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileState
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.store.ProfileComponent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.AppUserEmailInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.CityInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.DescriptionInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.GenderInfoField
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.ProfileTopBar
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.ProfileTopSheet
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.SocialNetworksInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.UsernameInfoField
 
@@ -44,7 +62,79 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.Usern
  */
 @Composable
 internal fun ProfileContent(
-    state: ProfileViewState,
+    profileComponent: ProfileComponent,
+    modifier: Modifier = Modifier
+) {
+    val store = profileComponent.store
+    val state by store.stateAsState()
+    val strings = EditorThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseProfileContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+                onUpdateName = { store.dispatchEvent(ProfileEvent.UpdateUsername(it)) },
+                onUpdateDescription = { store.dispatchEvent(ProfileEvent.UpdateDescription(it)) },
+                onUpdateBirthday = { store.dispatchEvent(ProfileEvent.UpdateBirthday(it)) },
+                onUpdateGender = { store.dispatchEvent(ProfileEvent.UpdateGender(it)) },
+                onUpdateCity = { store.dispatchEvent(ProfileEvent.UpdateCity(it)) },
+                onUpdateSocialNetworks = { store.dispatchEvent(ProfileEvent.UpdateSocialNetworks(it)) },
+            )
+        },
+        topBar = {
+            Column {
+                ProfileTopBar(
+                    onBackClick = { store.dispatchEvent(ProfileEvent.NavigateToBack) },
+                    onChangePassword = { old, new ->
+                        store.dispatchEvent(ProfileEvent.UpdatePassword(old, new))
+                    },
+                )
+                ProfileTopSheet(
+                    isLoading = state.isLoading,
+                    isPaidUser = state.isPaidUser,
+                    appUser = state.appUser,
+                    onUpdateAvatar = { file -> store.dispatchEvent(ProfileEvent.UpdateAvatar(file)) },
+                    onDeleteAvatar = { store.dispatchEvent(ProfileEvent.DeleteAvatar) },
+                    onOpenBillingScreen = { store.dispatchEvent(ProfileEvent.NavigateToBillingScreen) },
+                    onExceedingLimit = {
+                        coroutineScope.launch {
+                            snackbarState.showSnackbar(
+                                message = coreStrings.exceedingLimitImageSizeMessage,
+                                withDismissAction = true,
+                            )
+                        }
+                    }
+                )
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is ProfileEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BaseProfileContent(
+    state: ProfileState,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     onUpdateName: (String) -> Unit,
@@ -53,43 +143,43 @@ internal fun ProfileContent(
     onUpdateGender: (Gender?) -> Unit,
     onUpdateCity: (String?) -> Unit,
     onUpdateSocialNetworks: (List<SocialNetworkUi>) -> Unit,
-) = with(state) {
+) {
     Column(
         modifier = modifier.fillMaxSize().verticalScroll(scrollState).padding(top = 24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         UsernameInfoField(
-            isLoading = isLoading,
-            username = appUser?.username ?: "",
+            isLoading = state.isLoading,
+            username = state.appUser?.username ?: "",
             onUpdateName = onUpdateName,
         )
         DescriptionInfoField(
-            isLoading = isLoading,
-            description = appUser?.description,
+            isLoading = state.isLoading,
+            description = state.appUser?.description,
             onUpdateDescription = onUpdateDescription,
         )
         AppUserEmailInfoField(
-            isLoading = isLoading,
-            email = appUser?.email ?: "",
+            isLoading = state.isLoading,
+            email = state.appUser?.email ?: "",
         )
         BirthdayInfoField(
-            isLoading = isLoading,
-            birthday = appUser?.birthday,
+            isLoading = state.isLoading,
+            birthday = state.appUser?.birthday,
             onSelected = onUpdateBirthday,
         )
         GenderInfoField(
-            isLoading = isLoading,
-            gender = appUser?.gender,
+            isLoading = state.isLoading,
+            gender = state.appUser?.gender,
             onUpdateGender = onUpdateGender,
         )
         CityInfoField(
-            isLoading = isLoading,
-            city = appUser?.city,
+            isLoading = state.isLoading,
+            city = state.appUser?.city,
             onUpdateCity = onUpdateCity,
         )
         SocialNetworksInfoFields(
-            isLoading = isLoading,
-            socialNetworks = appUser?.socialNetworks ?: emptyList(),
+            isLoading = state.isLoading,
+            socialNetworks = state.appUser?.socialNetworks ?: emptyList(),
             onUpdateSocialNetworks = onUpdateSocialNetworks,
         )
         Spacer(modifier = Modifier.height(60.dp))

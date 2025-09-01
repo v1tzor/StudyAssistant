@@ -16,11 +16,11 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.contract
 
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
 import ru.aleshin.studyassistant.settings.impl.presentation.models.organizations.OrganizationShortUi
@@ -30,23 +30,23 @@ import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.Holi
 /**
  * @author Stanislav Aleshin on 10.07.2024
  */
-@Parcelize
-internal data class CalendarViewState(
+@Serializable
+internal data class CalendarState(
     val settings: CalendarSettingsUi? = null,
     val allOrganizations: List<OrganizationShortUi> = emptyList(),
-) : BaseViewState
+) : StoreState
 
-internal sealed class CalendarEvent : BaseEvent {
-    data object Init : CalendarEvent()
+internal sealed class CalendarEvent : StoreEvent {
+    data object Started : CalendarEvent()
     data class ChangeNumberOfRepeatWeek(val numberOfWeek: NumberOfRepeatWeek) : CalendarEvent()
     data class UpdateHolidays(val holidays: List<HolidaysUi>) : CalendarEvent()
 }
 
-internal sealed class CalendarEffect : BaseUiEffect {
+internal sealed class CalendarEffect : StoreEffect {
     data class ShowError(val failures: SettingsFailures) : CalendarEffect()
 }
 
-internal sealed class CalendarAction : BaseAction {
+internal sealed class CalendarAction : StoreAction {
     data class UpdateSettings(val settings: CalendarSettingsUi?) : CalendarAction()
     data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : CalendarAction()
 }

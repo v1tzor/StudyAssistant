@@ -34,15 +34,11 @@ import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesReposito
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
-import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 public interface ScheduleFeatureDependencies : BaseFeatureDependencies {
-    public val editorFeatureStarter: () -> EditorFeatureStarter
-    public val usersFeatureStarter: () -> UsersFeatureStarter
     public val baseScheduleRepository: BaseScheduleRepository
     public val customScheduleRepository: CustomScheduleRepository
     public val shareSchedulesRepository: ShareSchedulesRepository

@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.users
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
@@ -25,7 +25,8 @@ import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 /**
  * @author Stanislav Aleshin on 29.04.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class MediatedEmployeeUi(
     val uid: UID,
     val organizationId: UID,
@@ -39,7 +40,7 @@ internal data class MediatedEmployeeUi(
     val phones: List<ContactInfoUi> = emptyList(),
     val locations: List<ContactInfoUi> = emptyList(),
     val webs: List<ContactInfoUi> = emptyList(),
-) : Parcelable {
+) {
 
     fun officialName(): String {
         return buildString {

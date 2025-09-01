@@ -16,44 +16,46 @@
 
 package ru.aleshin.studyassistant.billing.impl.presentation.ui.subscribtion.contract
 
-import androidx.compose.runtime.Immutable
-import dev.icerock.moko.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.billing.impl.domain.entities.BillingFailures
 import ru.aleshin.studyassistant.billing.impl.presentation.models.products.SubscriptionProductUi
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 
 /**
  * @author Stanislav Aleshin on 17.06.2025
  */
-@Immutable
-@Parcelize
-internal data class SubscriptionViewState(
+@Serializable
+internal data class SubscriptionState(
     val isLoadingProducts: Boolean = true,
     val isLoadingPurchase: Boolean = false,
     val isPaidUser: Boolean = false,
     val selectedProduct: SubscriptionProductUi? = null,
     val products: List<SubscriptionProductUi> = emptyList(),
-) : BaseViewState
+) : StoreState
 
-internal sealed class SubscriptionEvent : BaseEvent {
+internal sealed class SubscriptionEvent : StoreEvent {
     data object LoadProducts : SubscriptionEvent()
     data class PurchaseProduct(val productId: String) : SubscriptionEvent()
     data class ChooseProduct(val product: SubscriptionProductUi) : SubscriptionEvent()
-    data object NavigateToBack : SubscriptionEvent()
+    data object ClickBack : SubscriptionEvent()
 }
 
-internal sealed class SubscriptionEffect : BaseUiEffect {
+internal sealed class SubscriptionEffect : StoreEffect {
     data object ShowSuccessDialog : SubscriptionEffect()
     data class ShowError(val failures: BillingFailures) : SubscriptionEffect()
-    data object NavigateToBack : SubscriptionEffect()
 }
 
-internal sealed class SubscriptionAction : BaseAction {
+internal sealed class SubscriptionAction : StoreAction {
     data class UpdateProducts(val products: List<SubscriptionProductUi>) : SubscriptionAction()
     data class UpdateSelectedProduct(val product: SubscriptionProductUi?) : SubscriptionAction()
     data class UpdateUserPaidStatus(val isPaidUser: Boolean) : SubscriptionAction()
     data class UpdateLoadingProduct(val isLoading: Boolean) : SubscriptionAction()
+}
+
+internal sealed class SubscriptionOutput : BaseOutput {
+    data object NavigateToBack : SubscriptionOutput()
 }

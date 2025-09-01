@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import studyassistant.shared.features.settings.impl.generated.resources.Res
@@ -27,6 +28,7 @@ import studyassistant.shared.features.settings.impl.generated.resources.ic_palet
 /**
  * @author Stanislav Aleshin on 21.06.2023.
  */
+@Immutable
 internal data class SettingsIcons(
     val theme: DrawableResource,
     val language: DrawableResource,

@@ -20,21 +20,19 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import org.kodein.di.provider
-import ru.aleshin.studyassistant.navigation.GlobalScreenProvider
-import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainEffectCommunicator
-import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainScreenModel
-import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainStateCommunicator
-import ru.aleshin.studyassistant.presentation.ui.main.screenmodel.MainWorkProcessor
+import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponentFactory
+import ru.aleshin.studyassistant.presentation.ui.main.store.MainComposeStore
+import ru.aleshin.studyassistant.presentation.ui.main.store.MainWorkProcessor
+import ru.aleshin.studyassistant.presentation.ui.tabnavigation.component.TabsComponentFactory
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 val presentationModule = DI.Module("Presentation") {
-    bindProvider<GlobalScreenProvider> { GlobalScreenProvider.Base(provider(), provider(), provider(), provider(), provider()) }
 
-    bindSingleton<MainStateCommunicator> { MainStateCommunicator.Base() }
-    bindSingleton<MainEffectCommunicator> { MainEffectCommunicator.Base() }
-    bindSingleton<MainWorkProcessor> { MainWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<MainScreenModel> { MainScreenModel(instance(), instance(), instance(), instance()) }
+    bindProvider<TabsComponentFactory> { TabsComponentFactory.Default(instance(), instance(), instance(), instance(), instance()) }
+
+    bindSingleton<MainWorkProcessor> { MainWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<MainComposeStore.Factory> { MainComposeStore.Factory(instance(), instance()) }
+    bindProvider<MainComponentFactory> { MainComponentFactory.Default(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 }

@@ -16,16 +16,17 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
-import ru.aleshin.studyassistant.editor.api.presentation.DayOfNumberedWeekUi
+import ru.aleshin.studyassistant.editor.api.DayOfNumberedWeekUi
+import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
@@ -36,18 +37,17 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.settings.Calend
 /**
  * @author Stanislav Aleshin on 05.05.2024
  */
-@Immutable
-@Parcelize
-internal data class WeekScheduleViewState(
+@Serializable
+internal data class WeekScheduleState(
     val isLoading: Boolean = true,
     val weekSchedule: BaseWeekScheduleUi? = null,
     val selectedWeek: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val organizations: List<OrganizationShortUi> = emptyList(),
     val calendarSettings: CalendarSettingsUi? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class WeekScheduleEvent : BaseEvent {
-    data class Init(val week: NumberOfRepeatWeek) : WeekScheduleEvent()
+internal sealed class WeekScheduleEvent : StoreEvent {
+    data class Started(val inputData: WeekScheduleInput, val isRestore: Boolean) : WeekScheduleEvent()
     data object Refresh : WeekScheduleEvent()
     data class ChangeWeek(val numberOfWeek: NumberOfRepeatWeek) : WeekScheduleEvent()
     data class UpdateOrganization(val organization: OrganizationShortUi) : WeekScheduleEvent()
@@ -58,13 +58,11 @@ internal sealed class WeekScheduleEvent : BaseEvent {
     data object NavigateToBack : WeekScheduleEvent()
 }
 
-internal sealed class WeekScheduleEffect : BaseUiEffect {
+internal sealed class WeekScheduleEffect : StoreEffect {
     data class ShowError(val failures: EditorFailures) : WeekScheduleEffect()
-    data class NavigateToLocal(val pushScreen: Screen) : WeekScheduleEffect()
-    data object NavigateToBack : WeekScheduleEffect()
 }
 
-internal sealed class WeekScheduleAction : BaseAction {
+internal sealed class WeekScheduleAction : StoreAction {
     data class UpdateScheduleData(
         val week: NumberOfRepeatWeek,
         val schedule: BaseWeekScheduleUi
@@ -78,4 +76,12 @@ internal sealed class WeekScheduleAction : BaseAction {
     data class UpdateSelectedWeek(val week: NumberOfRepeatWeek) : WeekScheduleAction()
 
     data class UpdateLoading(val isLoading: Boolean) : WeekScheduleAction()
+}
+
+internal data class WeekScheduleInput(val week: NumberOfRepeatWeek) : BaseInput
+
+internal sealed class WeekScheduleOutput : BaseOutput {
+    data object NavigateToBack : WeekScheduleOutput()
+    data class NavigateToClassEditor(val config: EditorConfig.Class) : WeekScheduleOutput()
+    data class NavigateToOrganizationEditor(val config: EditorConfig.Organization) : WeekScheduleOutput()
 }

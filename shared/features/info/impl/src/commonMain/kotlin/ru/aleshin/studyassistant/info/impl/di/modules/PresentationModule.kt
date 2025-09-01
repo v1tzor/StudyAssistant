@@ -17,52 +17,29 @@
 package ru.aleshin.studyassistant.info.impl.di.modules
 
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
-import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
-import ru.aleshin.studyassistant.info.api.navigation.InfoFeatureStarter
-import ru.aleshin.studyassistant.info.impl.navigation.InfoFeatureStarterImpl
-import ru.aleshin.studyassistant.info.impl.navigation.InfoScreenProvider
-import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.screenmodel.EmployeeEffectCommunicator
-import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.screenmodel.EmployeeScreenModel
-import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.screenmodel.EmployeeStateCommunicator
-import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.screenmodel.EmployeeWorkProcessor
-import ru.aleshin.studyassistant.info.impl.presentation.ui.navigation.NavigationScreen
-import ru.aleshin.studyassistant.info.impl.presentation.ui.navigation.NavigationScreenModel
-import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenmodel.OrganizationsEffectCommunicator
-import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenmodel.OrganizationsScreenModel
-import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenmodel.OrganizationsStateCommunicator
-import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.screenmodel.OrganizationsWorkProcessor
-import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.SubjectsEffectCommunicator
-import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.SubjectsScreenModel
-import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.SubjectsStateCommunicator
-import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.screenmodel.SubjectsWorkProcessor
-import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
+import ru.aleshin.studyassistant.info.api.InfoFeatureComponentFactory
+import ru.aleshin.studyassistant.info.impl.navigation.DefaultInfoComponentFactory
+import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.store.EmployeeComposeStore
+import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.store.EmployeeWorkProcessor
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.store.OrganizationsComposeStore
+import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.store.OrganizationsWorkProcessor
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.store.SubjectsComposeStore
+import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.store.SubjectsWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<InfoFeatureStarter> { InfoFeatureStarterImpl(instance(), instance(), instance()) }
-    bindSingleton<InfoScreenProvider> { InfoScreenProvider.Base(instance<() -> EditorFeatureStarter>(), instance<() -> UsersFeatureStarter>(), instance<() -> BillingFeatureStarter>()) }
+    bindSingleton<InfoFeatureComponentFactory> { DefaultInfoComponentFactory(instance(), instance(), instance()) }
 
-    bindSingleton<NavigationScreenModel> { NavigationScreenModel() }
-    bindSingleton<NavigationScreen> { NavigationScreen() }
+    bindSingleton<OrganizationsWorkProcessor> { OrganizationsWorkProcessor.Base(instance(), instance(), instance()) }
+    bindSingleton<OrganizationsComposeStore.Factory> { OrganizationsComposeStore.Factory(instance(), instance()) }
 
-    bindProvider<OrganizationsStateCommunicator> { OrganizationsStateCommunicator.Base() }
-    bindProvider<OrganizationsEffectCommunicator> { OrganizationsEffectCommunicator.Base() }
-    bindProvider<OrganizationsWorkProcessor> { OrganizationsWorkProcessor.Base(instance(), instance(), instance()) }
-    bindProvider<OrganizationsScreenModel> { OrganizationsScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<SubjectsWorkProcessor> { SubjectsWorkProcessor.Base(instance(), instance()) }
+    bindSingleton<SubjectsComposeStore.Factory> { SubjectsComposeStore.Factory(instance(), instance()) }
 
-    bindProvider<SubjectsStateCommunicator> { SubjectsStateCommunicator.Base() }
-    bindProvider<SubjectsEffectCommunicator> { SubjectsEffectCommunicator.Base() }
-    bindProvider<SubjectsWorkProcessor> { SubjectsWorkProcessor.Base(instance(), instance()) }
-    bindProvider<SubjectsScreenModel> { SubjectsScreenModel(instance(), instance(), instance(), instance(), instance()) }
-
-    bindProvider<EmployeeStateCommunicator> { EmployeeStateCommunicator.Base() }
-    bindProvider<EmployeeEffectCommunicator> { EmployeeEffectCommunicator.Base() }
-    bindProvider<EmployeeWorkProcessor> { EmployeeWorkProcessor.Base(instance(), instance(), instance()) }
-    bindProvider<EmployeeScreenModel> { EmployeeScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<EmployeeWorkProcessor> { EmployeeWorkProcessor.Base(instance(), instance(), instance()) }
+    bindSingleton<EmployeeComposeStore.Factory> { EmployeeComposeStore.Factory(instance(), instance()) }
 }

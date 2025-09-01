@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.contract
 
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
 import ru.aleshin.studyassistant.settings.impl.presentation.models.billing.SubscriptionUi
@@ -29,17 +29,17 @@ import ru.aleshin.studyassistant.settings.impl.presentation.models.billing.Subsc
 /**
  * @author Stanislav Aleshin on 28.08.2024
  */
-@Parcelize
-internal data class SubscriptionViewState(
+@Serializable
+internal data class SubscriptionState(
     val isLoadingSync: Boolean = false,
     val isLoadingSubscriptions: Boolean = false,
     val isPaidUser: Boolean? = null,
     val haveRemoteData: Boolean? = null,
     val currentStore: Store? = null,
     val subscriptions: List<SubscriptionUi> = emptyList(),
-) : BaseViewState
+) : StoreState
 
-internal sealed class SubscriptionEvent : BaseEvent {
+internal sealed class SubscriptionEvent : StoreEvent {
     data object Init : SubscriptionEvent()
     data class TransferRemoteData(val mergeData: Boolean) : SubscriptionEvent()
     data class TransferLocalData(val mergeData: Boolean) : SubscriptionEvent()
@@ -48,18 +48,21 @@ internal sealed class SubscriptionEvent : BaseEvent {
     data object NavigateToBilling : SubscriptionEvent()
 }
 
-internal sealed class SubscriptionEffect : BaseUiEffect {
-    data class NavigateToGlobal(val pushScreen: Screen) : SubscriptionEffect()
+internal sealed class SubscriptionEffect : StoreEffect {
     data class OpenUri(val uri: String) : SubscriptionEffect()
     data class ShowError(val failures: SettingsFailures) : SubscriptionEffect()
     data object SuccessRestoreMessage : SubscriptionEffect()
 }
 
-internal sealed class SubscriptionAction : BaseAction {
+internal sealed class SubscriptionAction : StoreAction {
     data class UpdateUserPaidStatus(val isPaidUser: Boolean) : SubscriptionAction()
     data class UpdateRemoteDataStatus(val haveRemoteData: Boolean) : SubscriptionAction()
     data class UpdateSubscriptions(val subscriptions: List<SubscriptionUi>) : SubscriptionAction()
     data class UpdateCurrentStore(val store: Store?) : SubscriptionAction()
     data class UpdateLoadingSubscriptions(val isLoading: Boolean) : SubscriptionAction()
     data class UpdateLoadingSync(val isLoading: Boolean) : SubscriptionAction()
+}
+
+internal sealed class SubscriptionOutput : BaseOutput {
+    data object NavigateToBilling : SubscriptionOutput()
 }

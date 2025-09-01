@@ -58,7 +58,7 @@ interface DateManager {
                 emit(Unit)
                 delay(1000)
             }
-        }.flowOn(workDispatchersProvider.backgroundDispatcher)
+        }.flowOn(workDispatchersProvider.defaultDispatcher)
 
         override fun fetchCurrentInstant() = Clock.System.now()
 

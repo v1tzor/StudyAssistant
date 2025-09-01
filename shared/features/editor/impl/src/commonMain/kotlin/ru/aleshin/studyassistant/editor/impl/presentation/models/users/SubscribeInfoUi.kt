@@ -16,15 +16,16 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.models.users
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.services.iap.Store
 
 /**
  * @author Stanislav Aleshin on 30.08.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class SubscribeInfoUi(
     val uid: UID,
     val deviceId: UID,
@@ -34,4 +35,4 @@ internal data class SubscribeInfoUi(
     val startTimeMillis: Long,
     val expiryTimeMillis: Long,
     val store: Store,
-) : Parcelable
+)

@@ -20,8 +20,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkResult
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
@@ -35,7 +35,7 @@ import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
  */
 internal interface ScheduleInteractor {
 
-    suspend fun fetchScheduleByDate(date: Instant): FlowWorkResult<TasksFailures, Schedule>
+    suspend fun fetchScheduleByDate(date: Instant): FlowDomainResult<TasksFailures, Schedule>
 
     class Base(
         private val baseScheduleRepository: BaseScheduleRepository,

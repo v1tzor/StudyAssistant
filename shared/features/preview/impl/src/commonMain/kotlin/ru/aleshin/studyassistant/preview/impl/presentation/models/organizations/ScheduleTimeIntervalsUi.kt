@@ -16,22 +16,20 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.models.organizations
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class ScheduleTimeIntervalsUi(
-    @TypeParceler<Instant?, NullInstantParceler>
     val firstClassTime: Instant? = null,
     val baseClassDuration: Millis? = null,
     val baseBreakDuration: Millis? = null,
     val specificClassDuration: List<NumberedDurationUi> = emptyList(),
     val specificBreakDuration: List<NumberedDurationUi> = emptyList(),
-) : Parcelable
+)

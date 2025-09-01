@@ -24,24 +24,42 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.DailyGoalsProgressUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalDetailsUi
@@ -54,38 +72,170 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DetailsGro
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworksCompleteProgressUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.OverviewTasksTab
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToBase
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewViewState
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEffect
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEvent
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewState
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.store.OverviewComponent
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.DailyGoalsView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.HomeworksExecutionAnalysisView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.HomeworksOverview
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.OverviewTodosCompletedSection
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.OverviewTodosErrorSection
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.OverviewTodosInProgressSection
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.OverviewTopBar
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.ScopeOfHomeworksView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.ShareHomeworksView
 
 /**
  * @author Stanislav Aleshin on 29.06.2024
  */
-internal enum class OverviewTasksTab {
-    HOMEWORKS, TODO
+@Composable
+internal fun OverviewContent(
+    overviewComponent: OverviewComponent,
+    modifier: Modifier = Modifier
+) {
+    val store = overviewComponent.store
+    val state by store.stateAsState()
+    val strings = TasksThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val overviewTasksTab = rememberSaveable { mutableStateOf(OverviewTasksTab.HOMEWORKS) }
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseOverviewContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+                overviewTasksTab = overviewTasksTab.value,
+                onChangeTab = { overviewTasksTab.value = it },
+                onEditHomeworkClick = {
+                    store.dispatchEvent(OverviewEvent.ClickEditHomework(it))
+                },
+                onShowAllSharedHomeworksClick = {
+                    store.dispatchEvent(OverviewEvent.ClickShowAllSharedHomeworks)
+                },
+                onHomeworkClick = {
+                    store.dispatchEvent(OverviewEvent.ClickHomework(it))
+                },
+                onDoHomework = {
+                    store.dispatchEvent(OverviewEvent.DoHomework(it))
+                },
+                onSkipHomework = {
+                    store.dispatchEvent(OverviewEvent.SkipHomework(it))
+                },
+                onRepeatHomework = {
+                    store.dispatchEvent(OverviewEvent.RepeatHomework(it))
+                },
+                onShareHomeworks = {
+                    store.dispatchEvent(OverviewEvent.ShareHomeworks(it))
+                },
+                onSelectGoalsDate = {
+                    store.dispatchEvent(OverviewEvent.SelectedGoalsDate(it))
+                },
+                onChangeGoalNumbers = {
+                    store.dispatchEvent(OverviewEvent.SetNewGoalNumbers(it))
+                },
+                onCompleteGoal = {
+                    store.dispatchEvent(OverviewEvent.CompleteGoal(it))
+                },
+                onDeleteGoal = {
+                    store.dispatchEvent(OverviewEvent.DeleteGoal(it))
+                },
+                onStartGoalTimeClick = {
+                    store.dispatchEvent(OverviewEvent.ClickStartGoalTime(it))
+                },
+                onPauseGoalTimeClick = {
+                    store.dispatchEvent(OverviewEvent.ClickPauseGoalTime(it))
+                },
+                onResetGoalTimeClick = {
+                    store.dispatchEvent(OverviewEvent.ClickResetGoalTime(it))
+                },
+                onChangeGoalTimeType = { type, goal ->
+                    store.dispatchEvent(OverviewEvent.ChangeGoalTimeType(goal, type))
+                },
+                onChangeGoalDesiredTime = { time, goal ->
+                    store.dispatchEvent(OverviewEvent.ChangeGoalDesiredTime(goal, time))
+                },
+                onScheduleGoal = {
+                    store.dispatchEvent(OverviewEvent.ScheduleGoal(it))
+                },
+                onShowAllTodoClick = {
+                    store.dispatchEvent(OverviewEvent.ClickShowAllTodo)
+                },
+                onEditTodoClick = {
+                    store.dispatchEvent(OverviewEvent.ClickEditTodo(it))
+                },
+                onChangeTodoDone = { task, done ->
+                    store.dispatchEvent(OverviewEvent.UpdateTodoDone(task, done))
+                },
+                onPaidFunctionClick = {
+                    store.dispatchEvent(OverviewEvent.ClickPaidFunction)
+                },
+            )
+        },
+        topBar = {
+            OverviewTopBar()
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    when (overviewTasksTab.value) {
+                        OverviewTasksTab.HOMEWORKS -> {
+                            store.dispatchEvent(OverviewEvent.AddHomeworkInEditor)
+                        }
+                        OverviewTasksTab.TODO -> {
+                            store.dispatchEvent(OverviewEvent.ClickEditTodo(null))
+                        }
+                    }
+                },
+                shape = MaterialTheme.shapes.large,
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+        contentWindowInsets = WindowInsets.statusBars,
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is OverviewEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
 }
 
 @Composable
-internal fun OverviewContent(
-    state: OverviewViewState,
+private fun BaseOverviewContent(
+    state: OverviewState,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     overviewTasksTab: OverviewTasksTab,
     onChangeTab: (OverviewTasksTab) -> Unit,
-    onShowHomeworkTasks: (HomeworkUi?) -> Unit,
-    onOpenHomeworkEditor: (HomeworkUi) -> Unit,
-    onOpenSharedHomeworks: () -> Unit,
+    onHomeworkClick: (HomeworkUi?) -> Unit,
+    onEditHomeworkClick: (HomeworkUi) -> Unit,
+    onShowAllSharedHomeworksClick: () -> Unit,
     onDoHomework: (HomeworkUi) -> Unit,
     onSkipHomework: (HomeworkUi) -> Unit,
     onRepeatHomework: (HomeworkUi) -> Unit,
@@ -94,85 +244,150 @@ internal fun OverviewContent(
     onChangeGoalNumbers: (List<GoalDetailsUi>) -> Unit,
     onCompleteGoal: (GoalDetailsUi) -> Unit,
     onDeleteGoal: (GoalShortUi) -> Unit,
-    onStartGoalTime: (GoalDetailsUi) -> Unit,
-    onPauseGoalTime: (GoalDetailsUi) -> Unit,
-    onResetGoalTime: (GoalDetailsUi) -> Unit,
+    onStartGoalTimeClick: (GoalDetailsUi) -> Unit,
+    onPauseGoalTimeClick: (GoalDetailsUi) -> Unit,
+    onResetGoalTimeClick: (GoalDetailsUi) -> Unit,
     onChangeGoalTimeType: (GoalTime.Type, GoalDetailsUi) -> Unit,
     onChangeGoalDesiredTime: (Millis?, GoalDetailsUi) -> Unit,
     onScheduleGoal: (GoalCreateModelUi) -> Unit,
-    onShowAllTodoTasks: () -> Unit,
-    onOpenTodoTask: (TodoUi) -> Unit,
+    onShowAllTodoClick: () -> Unit,
+    onEditTodoClick: (TodoUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
-    onOpenBillingScreen: () -> Unit,
-) = with(state) {
+    onPaidFunctionClick: () -> Unit,
+) {
     Column(
-        modifier = modifier.fillMaxSize().padding(top = 8.dp).verticalScroll(scrollState),
+        modifier = modifier.padding(top = 8.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         DailyGoalsSection(
-            isLoadingGoals = isLoadingGoals,
-            currentDate = currentDate,
-            selectedGoalsDate = selectedGoalsDate,
-            dailyGoals = dailyGoals,
-            goalsProgress = goalsProgress,
+            isLoadingGoals = false,
+            currentDate = state.currentDate,
+            selectedGoalsDate = state.selectedGoalsDate,
+            dailyGoals = state.dailyGoals,
+            goalsProgress = state.goalsProgress,
             onSelectDate = onSelectGoalsDate,
             onChangeGoalNumbers = onChangeGoalNumbers,
-            onOpenHomeworkEditor = onOpenHomeworkEditor,
-            onOpenTodoEditor = onOpenTodoTask,
+            onEditHomeworkClick = onEditHomeworkClick,
+            onEditTodoClick = onEditTodoClick,
             onCompleteGoal = onCompleteGoal,
             onDeleteGoal = { onDeleteGoal(it.convertToShort()) },
-            onStartGoalTime = onStartGoalTime,
-            onPauseGoalTime = onPauseGoalTime,
-            onResetGoalTime = onResetGoalTime,
+            onStartGoalTime = onStartGoalTimeClick,
+            onPauseGoalTime = onPauseGoalTimeClick,
+            onResetGoalTime = onResetGoalTimeClick,
             onChangeGoalTimeType = onChangeGoalTimeType,
             onChangeGoalDesiredTime = onChangeGoalDesiredTime,
         )
         HorizontalDivider()
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            OverviewTasksTabSelector(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                currentTab = overviewTasksTab,
-                onChangeTab = onChangeTab,
-            )
-            Crossfade(
-                targetState = overviewTasksTab,
-                animationSpec = tween(),
-            ) { tab ->
-                when (tab) {
-                    OverviewTasksTab.HOMEWORKS -> HomeworksSection(
-                        isLoadingHomeworks = isLoadingHomeworks,
-                        isLoadingProgress = isLoadingHomeworksProgress,
-                        isLoadingShare = isLoadingShare,
-                        currentDate = currentDate,
-                        dailyHomeworks = homeworks,
-                        sharedHomeworks = sharedHomeworks,
-                        homeworksScope = homeworksScope,
-                        completeProgress = homeworksProgress,
-                        allFriends = friends,
-                        onOpenHomeworkTasks = onShowHomeworkTasks,
-                        onOpenSharedHomeworks = onOpenSharedHomeworks,
-                        onShowAllHomeworkTasks = { onShowHomeworkTasks(null) },
-                        onDoHomework = onDoHomework,
-                        onSkipHomework = onSkipHomework,
-                        onRepeatHomework = onRepeatHomework,
-                        onShareHomeworks = onShareHomeworks,
-                    )
-                    OverviewTasksTab.TODO -> TodosSection(
-                        isLoadingTasks = isLoadingTasks,
-                        isPaidUser = isPaidUser,
-                        groupedTodos = groupedTodos,
-                        currentDate = currentDate,
-                        onOpenBillingScreen = onOpenBillingScreen,
-                        onShowAllTodoTasks = onShowAllTodoTasks,
-                        onOpenTodoTask = { onOpenTodoTask(it.convertToBase()) },
-                        onChangeTodoDone = onChangeTodoDone,
-                        onScheduleGoal = onScheduleGoal,
-                        onDeleteGoal = onDeleteGoal,
-                    )
-                }
+        OverviewContentDetails(
+            currentTab = overviewTasksTab,
+            isLoadingHomeworks = state.isLoadingHomeworks,
+            isLoadingHomeworksProgress = state.isLoadingHomeworksProgress,
+            isLoadingShare = state.isLoadingShare,
+            isLoadingTasks = state.isLoadingTasks,
+            isPaidUser = state.isPaidUser,
+            currentDate = state.currentDate,
+            groupedTodos = state.groupedTodos,
+            dailyHomeworks = state.homeworks,
+            sharedHomeworks = state.sharedHomeworks,
+            homeworksScope = state.homeworksScope,
+            homeworksProgress = state.homeworksProgress,
+            allFriends = state.friends,
+            onChangeTab = onChangeTab,
+            onHomeworkClick = onHomeworkClick,
+            onShowAllSharedHomeworksClick = onShowAllSharedHomeworksClick,
+            onShowAllHomeworksClick = { onHomeworkClick(null) },
+            onDoHomework = onDoHomework,
+            onSkipHomework = onSkipHomework,
+            onRepeatHomework = onRepeatHomework,
+            onShareHomeworks = onShareHomeworks,
+            onOpenBillingScreen = onPaidFunctionClick,
+            onShowAllTodoTasks = onShowAllTodoClick,
+            onOpenTodoTask = { onEditTodoClick(it.convertToBase()) },
+            onChangeTodoDone = onChangeTodoDone,
+            onScheduleGoal = onScheduleGoal,
+            onDeleteGoal = onDeleteGoal,
+        )
+    }
+}
+
+@Composable
+private fun OverviewContentDetails(
+    modifier: Modifier = Modifier,
+    currentTab: OverviewTasksTab,
+    isLoadingHomeworks: Boolean,
+    isLoadingHomeworksProgress: Boolean,
+    isLoadingShare: Boolean,
+    isLoadingTasks: Boolean,
+    isPaidUser: Boolean,
+    currentDate: Instant,
+    groupedTodos: DetailsGroupedTodosUi?,
+    dailyHomeworks: Map<Instant, DailyHomeworksUi>,
+    sharedHomeworks: SharedHomeworksDetailsUi?,
+    homeworksScope: HomeworkScopeUi?,
+    homeworksProgress: HomeworksCompleteProgressUi?,
+    allFriends: List<AppUserUi>,
+    onChangeTab: (OverviewTasksTab) -> Unit,
+    onShowAllSharedHomeworksClick: () -> Unit,
+    onShowAllHomeworksClick: () -> Unit,
+    onHomeworkClick: (HomeworkUi) -> Unit,
+    onDoHomework: (HomeworkUi) -> Unit,
+    onSkipHomework: (HomeworkUi) -> Unit,
+    onRepeatHomework: (HomeworkUi) -> Unit,
+    onShareHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
+    onOpenBillingScreen: () -> Unit,
+    onShowAllTodoTasks: () -> Unit,
+    onOpenTodoTask: (TodoDetailsUi) -> Unit,
+    onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
+    onScheduleGoal: (GoalCreateModelUi) -> Unit,
+    onDeleteGoal: (GoalShortUi) -> Unit,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        OverviewTasksTabSelector(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            currentTab = currentTab,
+            onChangeTab = onChangeTab,
+        )
+        Crossfade(
+            targetState = currentTab,
+            animationSpec = tween(),
+        ) { tab ->
+            when (tab) {
+                OverviewTasksTab.HOMEWORKS -> HomeworksSection(
+                    isLoadingHomeworks = isLoadingHomeworks,
+                    isLoadingProgress = isLoadingHomeworksProgress,
+                    isLoadingShare = isLoadingShare,
+                    currentDate = currentDate,
+                    dailyHomeworks = dailyHomeworks,
+                    sharedHomeworks = sharedHomeworks,
+                    homeworksScope = homeworksScope,
+                    completeProgress = homeworksProgress,
+                    allFriends = allFriends,
+                    onHomeworkClick = onHomeworkClick,
+                    onShowAllSharedHomeworksClick = onShowAllSharedHomeworksClick,
+                    onShowAllHomeworkTasks = onShowAllHomeworksClick,
+                    onDoHomework = onDoHomework,
+                    onSkipHomework = onSkipHomework,
+                    onRepeatHomework = onRepeatHomework,
+                    onShareHomeworks = onShareHomeworks,
+                )
+                OverviewTasksTab.TODO -> TodosSection(
+                    isLoadingTasks = isLoadingTasks,
+                    isPaidUser = isPaidUser,
+                    groupedTodos = groupedTodos,
+                    currentDate = currentDate,
+                    onOpenBillingScreen = onOpenBillingScreen,
+                    onShowAllTodoTasks = onShowAllTodoTasks,
+                    onOpenTodoTask = onOpenTodoTask,
+                    onChangeTodoDone = onChangeTodoDone,
+                    onScheduleGoal = onScheduleGoal,
+                    onDeleteGoal = onDeleteGoal,
+                )
             }
-            Spacer(modifier = Modifier.padding(48.dp))
         }
+        Spacer(modifier = Modifier.padding(48.dp))
     }
 }
 
@@ -186,8 +401,8 @@ private fun DailyGoalsSection(
     goalsProgress: Map<Instant, DailyGoalsProgressUi>,
     onSelectDate: (Instant) -> Unit,
     onChangeGoalNumbers: (List<GoalDetailsUi>) -> Unit,
-    onOpenHomeworkEditor: (HomeworkUi) -> Unit,
-    onOpenTodoEditor: (TodoUi) -> Unit,
+    onEditHomeworkClick: (HomeworkUi) -> Unit,
+    onEditTodoClick: (TodoUi) -> Unit,
     onCompleteGoal: (GoalDetailsUi) -> Unit,
     onDeleteGoal: (GoalDetailsUi) -> Unit,
     onStartGoalTime: (GoalDetailsUi) -> Unit,
@@ -215,8 +430,8 @@ private fun DailyGoalsSection(
             dailyGoals = dailyGoals,
             goalsProgress = goalsProgress,
             onSelectDate = onSelectDate,
-            onOpenHomeworkEditor = onOpenHomeworkEditor,
-            onOpenTodoEditor = onOpenTodoEditor,
+            onEditHomeworkClick = onEditHomeworkClick,
+            onEditTodoClick = onEditTodoClick,
             onChangeGoalNumbers = onChangeGoalNumbers,
             onCompleteGoal = onCompleteGoal,
             onDeleteGoal = onDeleteGoal,
@@ -301,9 +516,9 @@ private fun HomeworksSection(
     homeworksScope: HomeworkScopeUi?,
     completeProgress: HomeworksCompleteProgressUi?,
     allFriends: List<AppUserUi>,
-    onOpenSharedHomeworks: () -> Unit,
+    onShowAllSharedHomeworksClick: () -> Unit,
     onShowAllHomeworkTasks: () -> Unit,
-    onOpenHomeworkTasks: (HomeworkUi) -> Unit,
+    onHomeworkClick: (HomeworkUi) -> Unit,
     onDoHomework: (HomeworkUi) -> Unit,
     onSkipHomework: (HomeworkUi) -> Unit,
     onRepeatHomework: (HomeworkUi) -> Unit,
@@ -316,7 +531,7 @@ private fun HomeworksSection(
         HomeworksExecutionAnalysisView(
             isLoading = isLoadingProgress,
             completeProgress = completeProgress,
-            onEditHomework = onOpenHomeworkTasks,
+            onEditHomework = onHomeworkClick,
             onDoHomework = onDoHomework,
             onSkipHomework = onSkipHomework,
         )
@@ -325,7 +540,7 @@ private fun HomeworksSection(
             currentDate = currentDate,
             homeworks = dailyHomeworks,
             allFriends = allFriends,
-            onOpenHomeworkTasks = { onOpenHomeworkTasks(it.convertToBase()) },
+            onOpenHomeworkTasks = { onHomeworkClick(it.convertToBase()) },
             onShowAllHomeworkTasks = onShowAllHomeworkTasks,
             onDoHomework = { onDoHomework(it.convertToBase()) },
             onSkipHomework = { onSkipHomework(it.convertToBase()) },
@@ -340,7 +555,7 @@ private fun HomeworksSection(
         ShareHomeworksView(
             isLoadingShare = isLoadingShare,
             sharedHomeworks = sharedHomeworks,
-            onOpenSharedHomeworks = onOpenSharedHomeworks,
+            onSharedHomeworkClick = onShowAllSharedHomeworksClick,
         )
     }
 }

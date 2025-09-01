@@ -16,51 +16,50 @@
 
 package ru.aleshin.studyassistant.users.impl.presentation.ui.requests.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
 import ru.aleshin.studyassistant.users.impl.domain.entities.UsersFailures
 import ru.aleshin.studyassistant.users.impl.presentation.models.FriendRequestsDetailsUi
 
 /**
  * @author Stanislav Aleshin on 13.07.2024
  */
-@Immutable
-@Parcelize
-internal data class RequestsViewState(
+@Serializable
+internal data class RequestsState(
     val isLoading: Boolean = true,
-    @TypeParceler<Instant, InstantParceler>
     val currentTime: Instant = Clock.System.now(),
     val requests: FriendRequestsDetailsUi? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class RequestsEvent : BaseEvent {
-    data object Init : RequestsEvent()
+internal sealed class RequestsEvent : StoreEvent {
+    data object Started : RequestsEvent()
     data class AcceptFriendRequest(val userId: UID) : RequestsEvent()
     data class RejectFriendRequest(val userId: UID) : RequestsEvent()
     data class CancelSendFriendRequest(val userId: UID) : RequestsEvent()
-    data class DeleteHistoryRequest(val userId: UID) : RequestsEvent()
-    data class NavigateToFriendProfile(val userId: UID) : RequestsEvent()
-    data object NavigateToBack : RequestsEvent()
+    data class ClickDeleteHistoryRequest(val userId: UID) : RequestsEvent()
+    data class ClickUserProfile(val userId: UID) : RequestsEvent()
+    data object ClickBack : RequestsEvent()
 }
 
-internal sealed class RequestsEffect : BaseUiEffect {
+internal sealed class RequestsEffect : StoreEffect {
     data class ShowError(val failures: UsersFailures) : RequestsEffect()
-    data class NavigateToLocal(val pushScreen: Screen) : RequestsEffect()
-    data object NavigateToBack : RequestsEffect()
 }
 
-internal sealed class RequestsAction : BaseAction {
+internal sealed class RequestsAction : StoreAction {
     data class UpdateRequests(val requests: FriendRequestsDetailsUi) : RequestsAction()
     data class UpdateCurrentTime(val time: Instant) : RequestsAction()
     data class UpdateLoading(val isLoading: Boolean) : RequestsAction()
+}
+
+internal sealed class RequestsOutput : BaseOutput {
+    data object NavigateToBack : RequestsOutput()
+    data class NavigateToUserProfile(val config: UsersConfig.UserProfile) : RequestsOutput()
 }

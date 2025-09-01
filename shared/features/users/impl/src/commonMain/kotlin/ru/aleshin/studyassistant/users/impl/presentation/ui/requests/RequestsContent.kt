@@ -31,6 +31,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -38,30 +39,109 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.dateTimeDurationOrZero
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.mappers.toLanguageString
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.users.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.users.impl.presentation.models.AppUserUi
 import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
 import ru.aleshin.studyassistant.users.impl.presentation.ui.common.NoneUserRequestsView
 import ru.aleshin.studyassistant.users.impl.presentation.ui.common.UserView
 import ru.aleshin.studyassistant.users.impl.presentation.ui.common.UserViewPlaceholder
 import ru.aleshin.studyassistant.users.impl.presentation.ui.friends.views.RequestsTab
-import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.contract.RequestsViewState
+import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.contract.RequestsEffect
+import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.contract.RequestsEvent
+import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.contract.RequestsState
+import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.store.RequestsComponent
+import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.views.RequestsTabsRow
+import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.views.RequestsTopBar
 
 /**
  * @author Stanislav Aleshin on 13.07.2024.
  */
 @Composable
 internal fun RequestsContent(
-    state: RequestsViewState,
+    requestsComponent: RequestsComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = requestsComponent.store
+    val state by store.stateAsState()
+    val strings = UsersThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarState = remember { SnackbarHostState() }
+    val pagerState = rememberPagerState { RequestsTab.entries.size }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseRequestsContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+                pagerState = pagerState,
+                onOpenUserProfile = { store.dispatchEvent(RequestsEvent.ClickUserProfile(it)) },
+                onAcceptRequest = { store.dispatchEvent(RequestsEvent.AcceptFriendRequest(it)) },
+                onRejectRequest = { store.dispatchEvent(RequestsEvent.RejectFriendRequest(it)) },
+                onDeleteHistoryRequest = { store.dispatchEvent(RequestsEvent.ClickDeleteHistoryRequest(it)) },
+                onCancelSendFriendRequest = { store.dispatchEvent(RequestsEvent.CancelSendFriendRequest(it)) },
+            )
+        },
+        topBar = {
+            Column {
+                RequestsTopBar(
+                    onBackClick = { store.dispatchEvent(RequestsEvent.ClickBack) },
+                )
+                RequestsTabsRow(
+                    pagerState = pagerState,
+                    selectedTab = remember(pagerState.currentPage) {
+                        RequestsTab.byIndex(pagerState.currentPage)
+                    },
+                    requests = state.requests,
+                    onChangeTab = { coroutineScope.launch { pagerState.animateScrollToPage(it.index) } },
+                )
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is RequestsEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BaseRequestsContent(
+    state: RequestsState,
     modifier: Modifier = Modifier,
     pagerState: PagerState,
     onOpenUserProfile: (UID) -> Unit,
@@ -69,26 +149,26 @@ internal fun RequestsContent(
     onRejectRequest: (UID) -> Unit,
     onDeleteHistoryRequest: (UID) -> Unit,
     onCancelSendFriendRequest: (UID) -> Unit,
-) = with(state) {
+) {
     HorizontalPager(
         state = pagerState,
         modifier = modifier.fillMaxSize().padding(top = 12.dp),
     ) { page ->
         when (RequestsTab.byIndex(page)) {
             RequestsTab.RECEIVED -> RequestsReceivedTab(
-                isLoading = isLoading,
-                currentTime = currentTime,
-                receivedRequests = requests?.received,
-                lastActions = requests?.lastActions,
+                isLoading = state.isLoading,
+                currentTime = state.currentTime,
+                receivedRequests = state.requests?.received,
+                lastActions = state.requests?.lastActions,
                 onOpenUserProfile = onOpenUserProfile,
                 onAcceptRequest = onAcceptRequest,
                 onRejectRequest = onRejectRequest,
                 onDeleteHistoryRequest = onDeleteHistoryRequest,
             )
             RequestsTab.SENT -> RequestsSentTab(
-                isLoading = isLoading,
-                currentTime = currentTime,
-                sentRequests = requests?.send,
+                isLoading = state.isLoading,
+                currentTime = state.currentTime,
+                sentRequests = state.requests?.send,
                 onOpenUserProfile = onOpenUserProfile,
                 onCancelSendFriendRequest = onCancelSendFriendRequest,
             )
@@ -115,13 +195,18 @@ internal fun RequestsReceivedTab(
     ) { loading ->
         if (!loading) {
             val listState = rememberLazyListState()
+            val sortedRequests = remember(receivedRequests) {
+                receivedRequests?.toList()?.sortedByDescending { it.second }
+            }
+            val sortedLastActions = remember(lastActions) {
+                lastActions?.toList()?.sortedByDescending { it.second }
+            }
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 state = listState,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                if (!receivedRequests.isNullOrEmpty()) {
-                    val sortedRequests = receivedRequests.toList().sortedByDescending { it.second }
+                if (!sortedRequests.isNullOrEmpty()) {
                     items(sortedRequests, key = { it.first.uid }) { user ->
                         UserView(
                             modifier = Modifier.animateItem(),
@@ -165,8 +250,7 @@ internal fun RequestsReceivedTab(
                         )
                     }
                 }
-                if (!lastActions.isNullOrEmpty()) {
-                    val sortedLastActions = lastActions.toList().sortedByDescending { it.second }
+                if (!sortedLastActions.isNullOrEmpty()) {
                     items(sortedLastActions, key = { it.first.uid + "action" }) { userAction ->
                         UserView(
                             modifier = Modifier.animateItem(),
@@ -232,13 +316,15 @@ internal fun RequestsSentTab(
     ) { loading ->
         if (!loading) {
             val listState = rememberLazyListState()
+            val sortedRequests = remember(sentRequests) {
+                sentRequests?.toList()?.sortedByDescending { it.second }
+            }
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 state = listState,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                if (!sentRequests.isNullOrEmpty()) {
-                    val sortedRequests = sentRequests.toList().sortedByDescending { it.second }
+                if (!sortedRequests.isNullOrEmpty()) {
                     items(sortedRequests, key = { it.first.uid }) { user ->
                         UserView(
                             modifier = Modifier.animateItem(),

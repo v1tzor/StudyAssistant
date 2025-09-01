@@ -28,7 +28,9 @@ import kotlinx.coroutines.withContext
  */
 interface CoroutineManager : WorkDispatchersProvider {
 
-    fun runOnBackground(scope: CoroutineScope, block: CoroutineBlock): Job
+    fun runOnIOBackground(scope: CoroutineScope, block: CoroutineBlock): Job
+
+    fun runOnDefaultBackground(scope: CoroutineScope, block: CoroutineBlock): Job
 
     fun runOnUi(scope: CoroutineScope, block: CoroutineBlock): Job
 
@@ -36,15 +38,20 @@ interface CoroutineManager : WorkDispatchersProvider {
 
     abstract class Abstract(
         override val ioDispatcher: CoroutineDispatcher,
-        override val mainDispatcher: CoroutineDispatcher,
+        override val defaultDispatcher: CoroutineDispatcher,
+        override val uiDispatcher: CoroutineDispatcher,
     ) : CoroutineManager {
 
-        override fun runOnBackground(scope: CoroutineScope, block: CoroutineBlock): Job {
+        override fun runOnIOBackground(scope: CoroutineScope, block: CoroutineBlock): Job {
             return scope.launch(context = ioDispatcher, block = block)
         }
 
+        override fun runOnDefaultBackground(scope: CoroutineScope, block: CoroutineBlock): Job {
+            return scope.launch(context = defaultDispatcher, block = block)
+        }
+
         override fun runOnUi(scope: CoroutineScope, block: CoroutineBlock): Job {
-            return scope.launch(context = mainDispatcher, block = block)
+            return scope.launch(context = uiDispatcher, block = block)
         }
 
         override suspend fun <T> changeFlow(
@@ -53,7 +60,8 @@ interface CoroutineManager : WorkDispatchersProvider {
         ): T {
             val dispatcher = when (coroutineFlow) {
                 CoroutineFlow.IO -> ioDispatcher
-                CoroutineFlow.MAIN -> mainDispatcher
+                CoroutineFlow.DEFAULT -> defaultDispatcher
+                CoroutineFlow.UI -> uiDispatcher
             }
             return withContext(context = dispatcher, block = block)
         }
@@ -61,17 +69,19 @@ interface CoroutineManager : WorkDispatchersProvider {
 
     class Base : Abstract(
         ioDispatcher = Dispatchers.IO,
-        mainDispatcher = Dispatchers.Main,
+        defaultDispatcher = Dispatchers.Default,
+        uiDispatcher = Dispatchers.Main,
     )
 }
 
 interface WorkDispatchersProvider {
     val ioDispatcher: CoroutineDispatcher
-    val mainDispatcher: CoroutineDispatcher
+    val defaultDispatcher: CoroutineDispatcher
+    val uiDispatcher: CoroutineDispatcher
 }
 
 typealias CoroutineBlock = suspend CoroutineScope.() -> Unit
 
 enum class CoroutineFlow {
-    IO, MAIN
+    IO, DEFAULT, UI
 }

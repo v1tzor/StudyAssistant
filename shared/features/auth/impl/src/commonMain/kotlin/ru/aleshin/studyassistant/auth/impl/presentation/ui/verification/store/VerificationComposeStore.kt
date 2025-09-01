@@ -21,8 +21,6 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.contract
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.contract.VerificationEvent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.contract.VerificationOutput
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.verification.contract.VerificationState
-import ru.aleshin.studyassistant.core.common.architecture.component.EmptyInput
-import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
 import ru.aleshin.studyassistant.core.common.architecture.store.BaseOnlyOutComposeStore
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.EffectCommunicator
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.StateCommunicator
@@ -35,20 +33,14 @@ import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
  */
 internal class VerificationComposeStore(
     private val workProcessor: VerificationWorkProcessor,
-    outputConsumer: OutputConsumer<VerificationOutput>,
     stateCommunicator: StateCommunicator<VerificationState>,
     effectCommunicator: EffectCommunicator<VerificationEffect>,
     coroutineManager: CoroutineManager,
 ) : BaseOnlyOutComposeStore<VerificationState, VerificationEvent, VerificationAction, VerificationEffect, VerificationOutput>(
-    outputConsumer = outputConsumer,
     stateCommunicator = stateCommunicator,
     effectCommunicator = effectCommunicator,
     coroutineManager = coroutineManager,
 ) {
-
-    override fun initialize(input: EmptyInput) {
-        isInit.value = true
-    }
 
     override suspend fun WorkScope<VerificationState, VerificationAction, VerificationEffect, VerificationOutput>.handleEvent(
         event: VerificationEvent,
@@ -98,16 +90,11 @@ internal class VerificationComposeStore(
     class Factory(
         private val workProcessor: VerificationWorkProcessor,
         private val coroutineManager: CoroutineManager,
-    ) : BaseOnlyOutComposeStore.Factory<VerificationComposeStore, VerificationState, VerificationOutput> {
+    ) : BaseOnlyOutComposeStore.Factory<VerificationComposeStore, VerificationState> {
 
-        override fun create(
-            savedState: VerificationState,
-            input: EmptyInput,
-            output: OutputConsumer<VerificationOutput>,
-        ): VerificationComposeStore {
+        override fun create(savedState: VerificationState): VerificationComposeStore {
             return VerificationComposeStore(
                 workProcessor = workProcessor,
-                outputConsumer = output,
                 stateCommunicator = StateCommunicator.Default(savedState),
                 effectCommunicator = EffectCommunicator.Default(),
                 coroutineManager = coroutineManager,

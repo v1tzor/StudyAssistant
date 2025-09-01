@@ -22,8 +22,6 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.Forgo
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotOutput
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.ForgotState
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
-import ru.aleshin.studyassistant.core.common.architecture.component.EmptyInput
-import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
 import ru.aleshin.studyassistant.core.common.architecture.store.BaseOnlyOutComposeStore
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.EffectCommunicator
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.StateCommunicator
@@ -38,20 +36,14 @@ import ru.aleshin.studyassistant.core.common.validation.operateValidate
 internal class ForgotComposeStore(
     private val workProcessor: ForgotWorkProcessor,
     private val emailValidator: EmailValidator,
-    outputConsumer: OutputConsumer<ForgotOutput>,
     stateCommunicator: StateCommunicator<ForgotState>,
     effectCommunicator: EffectCommunicator<ForgotEffect>,
     coroutineManager: CoroutineManager,
 ) : BaseOnlyOutComposeStore<ForgotState, ForgotEvent, ForgotAction, ForgotEffect, ForgotOutput>(
-    outputConsumer = outputConsumer,
     stateCommunicator = stateCommunicator,
     effectCommunicator = effectCommunicator,
     coroutineManager = coroutineManager,
 ) {
-
-    override fun initialize(input: EmptyInput) {
-        isInit.value = true
-    }
 
     override suspend fun WorkScope<ForgotState, ForgotAction, ForgotEffect, ForgotOutput>.handleEvent(
         event: ForgotEvent,
@@ -101,17 +93,12 @@ internal class ForgotComposeStore(
         private val workProcessor: ForgotWorkProcessor,
         private val emailValidator: EmailValidator,
         private val coroutineManager: CoroutineManager,
-    ) : BaseOnlyOutComposeStore.Factory<ForgotComposeStore, ForgotState, ForgotOutput> {
+    ) : BaseOnlyOutComposeStore.Factory<ForgotComposeStore, ForgotState> {
 
-        override fun create(
-            savedState: ForgotState,
-            input: EmptyInput,
-            output: OutputConsumer<ForgotOutput>,
-        ): ForgotComposeStore {
+        override fun create(savedState: ForgotState): ForgotComposeStore {
             return ForgotComposeStore(
                 workProcessor = workProcessor,
                 emailValidator = emailValidator,
-                outputConsumer = output,
                 stateCommunicator = StateCommunicator.Default(savedState),
                 effectCommunicator = EffectCommunicator.Default(),
                 coroutineManager = coroutineManager,

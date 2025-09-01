@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.users
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.messages.PushServiceType
 import ru.aleshin.studyassistant.core.common.platform.Platform
@@ -25,7 +25,8 @@ import ru.aleshin.studyassistant.core.common.platform.Platform
 /**
  * @author Stanislav Aleshin on 11.08.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class UserDeviceUi(
     val uid: UID,
     val platform: Platform,
@@ -33,4 +34,4 @@ internal data class UserDeviceUi(
     val deviceName: String,
     val pushToken: String? = null,
     val pushServiceType: PushServiceType = PushServiceType.NONE,
-) : Parcelable
+)

@@ -47,7 +47,7 @@ internal abstract class ForgotComponent(
             defaultState = ForgotState(),
             stateSerializer = ForgotState.serializer(),
             outputConsumer = outputConsumer,
-            componentKey = COMPONENT_KEY,
+            storeKey = COMPONENT_KEY,
         )
     }
 }

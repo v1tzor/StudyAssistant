@@ -16,19 +16,18 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.models.settings
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 
 /**
  * @author Stanislav Aleshin on 28.08.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class HolidaysUi(
     val organizations: List<UID>,
-    @TypeParceler<Instant, InstantParceler> val start: Instant,
-    @TypeParceler<Instant, InstantParceler> val end: Instant,
-) : Parcelable
+    val start: Instant,
+    val end: Instant,
+)

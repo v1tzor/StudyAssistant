@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.editor.impl.di
 
-import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -42,7 +41,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
  * @author Stanislav Aleshin on 21.04.2024.
  */
 public interface EditorFeatureDependencies : BaseFeatureDependencies {
-    public val billingFeatureStarter: () -> BillingFeatureStarter
     public val baseScheduleRepository: BaseScheduleRepository
     public val customScheduleRepository: CustomScheduleRepository
     public val employeeRepository: EmployeeRepository

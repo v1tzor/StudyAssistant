@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.settings.impl.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.tokens.LocalSettingsIcons
 import ru.aleshin.studyassistant.settings.impl.presentation.theme.tokens.LocalSettingsStrings
@@ -29,8 +30,11 @@ import ru.aleshin.studyassistant.settings.impl.presentation.theme.tokens.fetchSe
  */
 @Composable
 internal fun SettingsTheme(content: @Composable () -> Unit) {
-    val icons = fetchSettingsIcons(StudyAssistantRes.colors.isDark)
-    val strings = fetchSettingsStrings(StudyAssistantRes.language)
+    val isDark = StudyAssistantRes.colors.isDark
+    val language = StudyAssistantRes.language
+
+    val icons = remember(isDark) { fetchSettingsIcons(isDark) }
+    val strings = remember(language) { fetchSettingsStrings(language) }
 
     CompositionLocalProvider(
         LocalSettingsIcons provides icons,

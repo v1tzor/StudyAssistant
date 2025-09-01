@@ -43,7 +43,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.store.Regist
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.views.RegisterActionsSection
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.views.RegisterInputSection
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
-import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsMutable
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 
@@ -65,7 +65,7 @@ internal fun RegisterContent(
         content = { paddingValues ->
             when (windowSize.heightWindowType) {
                 else -> BaseRegisterContent(
-                    state = store.stateAsMutable().value,
+                    state = store.stateAsState().value,
                     modifier = Modifier.padding(paddingValues),
                     onLoginClick = {
                         store.dispatchEvent(RegisterEvent.ClickLogin)

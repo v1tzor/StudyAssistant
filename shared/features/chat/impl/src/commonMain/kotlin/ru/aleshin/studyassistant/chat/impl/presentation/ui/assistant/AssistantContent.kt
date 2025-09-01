@@ -47,9 +47,14 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,17 +72,26 @@ import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.markdownAnimations
 import com.mikepenz.markdown.model.rememberMarkdownState
 import kotlinx.coroutines.launch
+import ru.aleshin.studyassistant.chat.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.AiChatHistoryUi
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.AssistantMessageUi
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ChatSuggestions
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ResponseStatus
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.UserMessageUi
 import ru.aleshin.studyassistant.chat.impl.presentation.theme.ChatThemeRes
-import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantViewState
+import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEffect
+import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEvent
+import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantState
+import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.store.AssistantComponent
+import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AssistantBottomBar
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AssistantSenderBadge
+import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AssistantTopBar
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.ChatSuggestionsView
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.functional.Constants
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.TypingDots
 
@@ -85,18 +99,78 @@ import ru.aleshin.studyassistant.core.ui.views.TypingDots
  * @author Stanislav Aleshin on 20.06.2025
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 internal fun AssistantContent(
-    state: AssistantViewState,
+    assistantComponent: AssistantComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = assistantComponent.store
+    val state by store.stateAsState()
+    val strings = ChatThemeRes.strings
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseAssistantContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+                onSendMessageSuggestion = { store.dispatchEvent(AssistantEvent.SendMessage(it)) },
+                onTryAgain = { store.dispatchEvent(AssistantEvent.RetryAttempt) },
+                onDeleteMessage = { store.dispatchEvent(AssistantEvent.ClearUnsendMessage) },
+                onPaidFunctionClick = { store.dispatchEvent(AssistantEvent.ClickPaidFunction) },
+            )
+        },
+        topBar = {
+            AssistantTopBar(
+                isVisibleClearButton = state.responseStatus != ResponseStatus.LOADING &&
+                    !state.chatHistory?.messages.isNullOrEmpty(),
+                onClearChatHistory = { store.dispatchEvent(AssistantEvent.ClearHistory) },
+            )
+        },
+        bottomBar = {
+            AssistantBottomBar(
+                isLoadingChat = state.isLoadingChat,
+                responseStatus = state.responseStatus,
+                isQuotaExpired = state.isQuotaExpired,
+                userQuery = state.userQuery.query,
+                onUpdateUserQuery = { store.dispatchEvent(AssistantEvent.UpdateUserQuery(it)) },
+                onSendMessage = { store.dispatchEvent(AssistantEvent.SendMessage(it)) },
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is AssistantEffect.ShowError -> {
+                store.dispatchEvent(AssistantEvent.StopResponseLoading)
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun BaseAssistantContent(
+    state: AssistantState,
     modifier: Modifier,
     onSendMessageSuggestion: (String) -> Unit,
     onTryAgain: () -> Unit,
     onDeleteMessage: () -> Unit,
-    navigateToBilling: () -> Unit,
-) = with(state) {
+    onPaidFunctionClick: () -> Unit,
+) {
     Crossfade(
         modifier = modifier.fillMaxSize(),
-        targetState = isLoadingChat,
+        targetState = state.isLoadingChat,
         label = "init loading",
         animationSpec = floatSpring(),
     ) { loading ->
@@ -105,25 +179,25 @@ internal fun AssistantContent(
         } else {
             Crossfade(
                 modifier = Modifier.fillMaxSize(),
-                targetState = chatHistory?.messages.isNullOrEmpty(),
+                targetState = state.chatHistory?.messages.isNullOrEmpty(),
                 label = "chat",
                 animationSpec = floatSpring(),
             ) { isEmptyChat ->
                 if (isEmptyChat) {
                     EmptyAssistantChat(
-                        isQuotaExpired = isQuotaExpired,
+                        isQuotaExpired = state.isQuotaExpired,
                         onSendMessageSuggestion = onSendMessageSuggestion
                     )
-                } else if (chatHistory != null) {
+                } else if (state.chatHistory != null) {
                     val chatListState = rememberLazyListState()
                     AssistantChat(
                         chatListState = chatListState,
-                        responseStatus = responseStatus,
-                        isQuotaExpired = isQuotaExpired,
-                        chatHistory = chatHistory,
+                        responseStatus = state.responseStatus,
+                        isQuotaExpired = state.isQuotaExpired,
+                        chatHistory = state.chatHistory,
                         onTryAgain = onTryAgain,
                         onDeleteMessage = onDeleteMessage,
-                        navigateToBilling = navigateToBilling,
+                        navigateToBilling = onPaidFunctionClick,
                     )
                 }
             }
@@ -205,7 +279,7 @@ private fun AssistantChat(
                 )
             }
         }
-        items(messages, key = { it.id }, contentType = { it.type.name }) { message ->
+        items(messages, key = { it.id }, contentType = { it.messageType.name }) { message ->
             when (message) {
                 is AssistantMessageUi -> {
                     AssistantMessageItem(

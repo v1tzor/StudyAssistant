@@ -47,7 +47,7 @@ interface WorkScope<S : StoreState, A : StoreAction, F : StoreEffect, O : BaseOu
 
     fun sendEffect(effect: F)
 
-    fun consumeOutput(output: O)
+    suspend fun consumeOutput(output: O)
 
     class Default<S : StoreState, E : StoreEvent, A : StoreAction, F : StoreEffect, I : BaseInput, O : BaseOutput>(
         private val store: BaseComposeStore<S, E, A, F, I, O>,
@@ -68,7 +68,7 @@ interface WorkScope<S : StoreState, A : StoreAction, F : StoreEffect, O : BaseOu
             store.postEffect(effect)
         }
 
-        override fun consumeOutput(output: O) {
+        override suspend fun consumeOutput(output: O) {
             store.consumeOutput(output)
         }
 

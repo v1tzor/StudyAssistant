@@ -15,21 +15,23 @@
  */
 package ru.aleshin.studyassistant.core.ui.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.intl.Locale
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
  */
+@Immutable
 enum class StudyAssistantLanguage(val code: String) {
     EN("en"),
     RU("ru")
 }
 
-@Parcelize
-enum class LanguageUiType(val code: String?) : Parcelable {
+@Immutable
+@Serializable
+enum class LanguageUiType(val code: String?) {
     DEFAULT(null),
     EN("en"),
     RU("ru")

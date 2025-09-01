@@ -16,9 +16,9 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.DayOfWeek
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
@@ -26,7 +26,8 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.Class
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class BaseScheduleDetailsUi(
     val uid: UID,
     val dateVersion: DateVersionUi,
@@ -34,4 +35,4 @@ internal data class BaseScheduleDetailsUi(
     val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val classes: List<ClassDetailsUi>,
     val updatedAt: Long,
-) : Parcelable
+)

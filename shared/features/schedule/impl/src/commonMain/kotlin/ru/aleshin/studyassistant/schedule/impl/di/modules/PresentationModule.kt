@@ -17,51 +17,29 @@
 package ru.aleshin.studyassistant.schedule.impl.di.modules
 
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
-import ru.aleshin.studyassistant.schedule.api.navigation.ScheduleFeatureStarter
-import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleFeatureStarterImpl
-import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleScreenProvider
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel.DetailsEffectCommunicator
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel.DetailsScreenModel
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel.DetailsStateCommunicator
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.screenmodel.DetailsWorkProcessor
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation.NavigationScreen
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.navigation.NavigationScreenModel
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewEffectCommunicator
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewScreenModel
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewStateCommunicator
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.screenmodel.OverviewWorkProcessor
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.screenmodel.ShareEffectCommunicator
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.screenmodel.ShareScreenModel
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.screenmodel.ShareStateCommunicator
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.screenmodel.ShareWorkProcessor
-import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
+import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureComponentFactory
+import ru.aleshin.studyassistant.schedule.impl.navigation.DefaultScheduleComponentFactory
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.store.DetailsComposeStore
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.store.DetailsWorkProcessor
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.store.OverviewComposeStore
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.store.OverviewWorkProcessor
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.store.ShareComposeStore
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.store.ShareWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<NavigationScreenModel> { NavigationScreenModel() }
-    bindSingleton<NavigationScreen> { NavigationScreen() }
+    bindSingleton<ScheduleFeatureComponentFactory> { DefaultScheduleComponentFactory(instance(), instance(), instance()) }
 
-    bindProvider<ScheduleFeatureStarter> { ScheduleFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<ScheduleScreenProvider> { ScheduleScreenProvider.Base(instance<() -> EditorFeatureStarter>(), instance<() -> UsersFeatureStarter>()) }
+    bindSingleton<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<OverviewComposeStore.Factory> { OverviewComposeStore.Factory(instance(), instance(), instance()) }
 
-    bindProvider<OverviewStateCommunicator> { OverviewStateCommunicator.Base() }
-    bindProvider<OverviewEffectCommunicator> { OverviewEffectCommunicator.Base() }
-    bindProvider<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance(), instance(), instance()) }
-    bindProvider<OverviewScreenModel> { OverviewScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<DetailsWorkProcessor> { DetailsWorkProcessor.Base(instance(), instance(), instance()) }
+    bindSingleton<DetailsComposeStore.Factory> { DetailsComposeStore.Factory(instance(), instance(), instance()) }
 
-    bindProvider<DetailsStateCommunicator> { DetailsStateCommunicator.Base() }
-    bindProvider<DetailsEffectCommunicator> { DetailsEffectCommunicator.Base() }
-    bindProvider<DetailsWorkProcessor> { DetailsWorkProcessor.Base(instance(), instance(), instance()) }
-    bindProvider<DetailsScreenModel> { DetailsScreenModel(instance(), instance(), instance(), instance(), instance()) }
-
-    bindProvider<ShareStateCommunicator> { ShareStateCommunicator.Base() }
-    bindProvider<ShareEffectCommunicator> { ShareEffectCommunicator.Base() }
-    bindProvider<ShareWorkProcessor> { ShareWorkProcessor.Base(instance(), instance(), instance()) }
-    bindProvider<ShareScreenModel> { ShareScreenModel(instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ShareWorkProcessor> { ShareWorkProcessor.Base(instance(), instance(), instance()) }
+    bindSingleton<ShareComposeStore.Factory> { ShareComposeStore.Factory(instance(), instance(), instance()) }
 }

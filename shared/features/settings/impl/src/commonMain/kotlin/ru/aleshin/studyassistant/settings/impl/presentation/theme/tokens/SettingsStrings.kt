@@ -16,12 +16,14 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantLanguage
 
 /**
  * @author Stanislav Aleshin on 14.06.2023.
  */
+@Immutable
 internal data class SettingsStrings(
     val settingsHeader: String,
     val generalTabHeader: String,

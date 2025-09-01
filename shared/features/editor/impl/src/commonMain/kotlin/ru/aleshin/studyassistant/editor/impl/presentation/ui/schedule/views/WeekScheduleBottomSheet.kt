@@ -95,9 +95,11 @@ internal fun WeekScheduleBottomSheet(
         header = {
             WeekScheduleBottomSheetHeader(
                 isLoading = isLoading,
-                numberOfClasses = weekSchedule?.weekDaySchedules?.values?.sumOf { schedule ->
-                    schedule.classes.size
-                } ?: 0,
+                numberOfClasses = remember(weekSchedule) {
+                    weekSchedule?.weekDaySchedules?.values?.sumOf { schedule ->
+                        schedule.classes.size
+                    } ?: 0
+                },
                 maxNumberOfWeek = maxNumberOfWeek,
                 selectedWeek = selectedWeek,
                 onSelectedWeek = onSelectedWeek,
@@ -307,8 +309,12 @@ private fun ScheduleTimeIntervalsItem(
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                     Column {
-                        val minDuration = intervals.minClassDuration()
-                        val maxDuration = intervals.maxClassDuration()
+                        val minDuration = remember(intervals) {
+                            intervals.minClassDuration()
+                        }
+                        val maxDuration = remember(intervals) {
+                            intervals.maxClassDuration()
+                        }
                         Text(
                             text = EditorThemeRes.strings.classesTitle,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -337,8 +343,8 @@ private fun ScheduleTimeIntervalsItem(
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                     Column {
-                        val minDuration = intervals.minBreakDuration()
-                        val maxDuration = intervals.maxBreakDuration()
+                        val minDuration = remember(intervals) { intervals.minBreakDuration() }
+                        val maxDuration = remember(intervals) { intervals.maxBreakDuration() }
                         Text(
                             text = EditorThemeRes.strings.breaksTitle,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,

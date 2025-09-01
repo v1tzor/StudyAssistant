@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.settings.impl.domain.interactors
 
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.work.FlowWorkResult
+import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.settings.GeneralSettings
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
@@ -28,7 +28,7 @@ import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
  */
 internal interface GeneralSettingsInteractor {
 
-    suspend fun fetchSettings(): FlowWorkResult<SettingsFailures, GeneralSettings>
+    suspend fun fetchSettings(): FlowDomainResult<SettingsFailures, GeneralSettings>
     suspend fun updateSettings(settings: GeneralSettings): UnitDomainResult<SettingsFailures>
 
     class Base(

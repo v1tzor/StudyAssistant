@@ -16,17 +16,14 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.ui.contract
 
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
 import ru.aleshin.studyassistant.profile.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.SentMediatedSchedulesUi
@@ -38,42 +35,39 @@ import ru.aleshin.studyassistant.profile.impl.presentation.models.users.FriendRe
 /**
  * @author Stanislav Aleshin on 21.04.2024
  */
-@Parcelize
-internal data class ProfileViewState(
+@Serializable
+internal data class ProfileState(
     val isLoading: Boolean = true,
     val isLoadingShare: Boolean = true,
     val isLoadingSend: Boolean = false,
-    @TypeParceler<Instant, InstantParceler>
     val currentTime: Instant = Clock.System.now(),
     val appUserProfile: AppUserUi? = null,
     val friendRequest: FriendRequestsUi? = null,
     val sharedSchedules: SharedSchedulesShortUi? = null,
     val allOrganizations: List<OrganizationShortUi> = emptyList(),
     val allFriends: List<AppUserUi> = emptyList(),
-) : BaseViewState
+) : StoreState
 
-internal sealed class ProfileEvent : BaseEvent {
-    data object Init : ProfileEvent()
-    data object NavigateToFriends : ProfileEvent()
+internal sealed class ProfileEvent : StoreEvent {
+    data object Started : ProfileEvent()
+    data object ClickFriends : ProfileEvent()
     data class SendSharedSchedule(val sendData: ShareSchedulesSendDataUi) : ProfileEvent()
     data class CancelSentSchedule(val schedule: SentMediatedSchedulesUi) : ProfileEvent()
-    data class NavigateToShareScheduleViewer(val shareId: UID) : ProfileEvent()
-    data object NavigateToAboutApp : ProfileEvent()
-    data object NavigateToGeneralSettings : ProfileEvent()
-    data object NavigateToNotifySettings : ProfileEvent()
-    data object NavigateToCalendarSettings : ProfileEvent()
-    data object NavigateToPaymentsSettings : ProfileEvent()
-    data object NavigateToProfileEditor : ProfileEvent()
-    data object SignOut : ProfileEvent()
+    data class ClickSharedSchedule(val shareId: UID) : ProfileEvent()
+    data object ClickAboutApp : ProfileEvent()
+    data object ClickGeneralSettings : ProfileEvent()
+    data object ClickNotifySettings : ProfileEvent()
+    data object ClickCalendarSettings : ProfileEvent()
+    data object ClickPaymentsSettings : ProfileEvent()
+    data object ClickEditProfile : ProfileEvent()
+    data object ClickSignOut : ProfileEvent()
 }
 
-internal sealed class ProfileEffect : BaseUiEffect {
+internal sealed class ProfileEffect : StoreEffect {
     data class ShowError(val failures: ProfileFailures) : ProfileEffect()
-    data class PushGlobalScreen(val screen: Screen) : ProfileEffect()
-    data class ReplaceGlobalScreen(val screen: Screen) : ProfileEffect()
 }
 
-internal sealed class ProfileAction : BaseAction {
+internal sealed class ProfileAction : StoreAction {
 
     data class UpdateProfileInfo(
         val profile: AppUserUi?,

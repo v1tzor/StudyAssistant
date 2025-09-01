@@ -16,9 +16,14 @@
 
 package ru.aleshin.studyassistant.core.ui.models
 
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
+
 /**
  * @author Stanislav Aleshin on 27.01.2024.
  */
+@Immutable
+@Serializable
 enum class ThemeUiType {
     DEFAULT, LIGHT, DARK
 }

@@ -54,7 +54,7 @@ interface TodoLocalDataSource : CombinedLocalDataSource<BaseTodoEntity, OfflineS
         ) : Commands {
 
             protected val coroutineContext: CoroutineContext
-                get() = coroutineManager.backgroundDispatcher
+                get() = coroutineManager.ioDispatcher
 
             protected val isCacheData = if (isCacheSource) 1L else 0L
 

@@ -16,13 +16,10 @@
 
 package ru.aleshin.studyassistant.core.common.architecture.component
 
+import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.statekeeper.ExperimentalStateKeeperApi
-import com.arkivanov.essenty.statekeeper.saveable
 import kotlinx.serialization.KSerializer
 import ru.aleshin.studyassistant.core.common.architecture.store.BaseComposeStore
-import ru.aleshin.studyassistant.core.common.architecture.store.BaseOnlyInComposeStore
-import ru.aleshin.studyassistant.core.common.architecture.store.BaseOnlyOutComposeStore
-import ru.aleshin.studyassistant.core.common.architecture.store.BaseSimpleComposeStore
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
@@ -34,89 +31,87 @@ import kotlin.properties.ReadOnlyProperty
  * @author Stanislav Aleshin on 20.08.2025.
  */
 @OptIn(ExperimentalStateKeeperApi::class)
-fun <Store : BaseComposeStore<S, E, A, F, I, O>, S : StoreState, E : StoreEvent, A : StoreAction, F : StoreEffect, I : BaseInput, O : BaseOutput> BaseComponent.saveableStore(
-    storeFactory: BaseComposeStore.Factory<Store, S, I, O>,
+inline fun <reified Store : BaseComposeStore<S, E, A, F, I, O>, S : StoreState, E : StoreEvent, A : StoreAction, F : StoreEffect, I : BaseInput, O : BaseOutput> BaseComponent.saveableStore(
+    storeFactory: BaseComposeStore.Factory<Store, S>,
     defaultState: S,
     stateSerializer: KSerializer<S>,
     input: I,
     outputConsumer: OutputConsumer<O>,
-    componentKey: String,
+    storeKey: String,
 ): PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, Store>> {
-    return saveable(
-        serializer = stateSerializer,
-        state = { it.state },
-        key = componentKey,
-    ) { savedState ->
-        storeFactory.create(savedState ?: defaultState, input, outputConsumer).apply {
-            initialize(input)
+    return PropertyDelegateProvider { _, property ->
+        val store = instanceKeeper.getOrCreate<Store>(key = storeKey) {
+            val savedState = stateKeeper.consume("${storeKey}State", stateSerializer)
+            storeFactory.create(savedState ?: defaultState).apply {
+                initialize(input, savedState != null)
+            }
         }
+        stateKeeper.register("${storeKey}State", stateSerializer) { store.state }
+        store.setOutputConsumer(outputConsumer)
+        ReadOnlyProperty { _, _ -> store }
     }
 }
 
 @OptIn(ExperimentalStateKeeperApi::class)
-fun <Store : BaseSimpleComposeStore<S, E, A, F>, S : StoreState, E : StoreEvent, A : StoreAction, F : StoreEffect> BaseComponent.saveableStore(
-    storeFactory: BaseSimpleComposeStore.Factory<Store, S>,
+inline fun <reified Store : BaseComposeStore<S, E, A, F, EmptyInput, EmptyOutput>, S : StoreState, E : StoreEvent, A : StoreAction, F : StoreEffect> BaseComponent.saveableStore(
+    storeFactory: BaseComposeStore.Factory<Store, S>,
     defaultState: S,
     stateSerializer: KSerializer<S>,
-    componentKey: String,
+    storeKey: String,
 ): PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, Store>> {
-    return saveable(
-        serializer = stateSerializer,
-        state = { it.state },
-        key = componentKey,
-    ) { savedState ->
-        storeFactory.create(
-            savedState = savedState ?: defaultState,
-            input = EmptyInput,
-            output = EmptyOutputConsumer,
-        ).apply {
-            initialize(EmptyInput)
+    return PropertyDelegateProvider { _, property ->
+        val store = instanceKeeper.getOrCreate<Store>(key = storeKey) {
+            val savedState = stateKeeper.consume("${storeKey}State", stateSerializer)
+            storeFactory.create(savedState ?: defaultState).apply {
+                initialize(EmptyInput, savedState != null)
+            }
         }
+        stateKeeper.register("${storeKey}State", stateSerializer) { store.state }
+        store.setOutputConsumer(EmptyOutputConsumer)
+        ReadOnlyProperty { _, _ -> store }
     }
 }
 
 @OptIn(ExperimentalStateKeeperApi::class)
-fun <Store : BaseOnlyInComposeStore<S, E, A, F, I>, S : StoreState, E : StoreEvent, A : StoreAction, F : StoreEffect, I : BaseInput> BaseComponent.saveableStore(
-    storeFactory: BaseOnlyInComposeStore.Factory<Store, S, I>,
+inline fun <reified Store : BaseComposeStore<S, E, A, F, I, EmptyOutput>, S : StoreState, E : StoreEvent, A : StoreAction, F : StoreEffect, I : BaseInput> BaseComponent.saveableStore(
+    storeFactory: BaseComposeStore.Factory<Store, S>,
     defaultState: S,
     stateSerializer: KSerializer<S>,
     input: I,
-    componentKey: String,
+    storeKey: String,
 ): PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, Store>> {
-    return saveable(
-        serializer = stateSerializer,
-        state = { it.state },
-        key = componentKey,
-    ) { savedState ->
-        storeFactory.create(
-            savedState = savedState ?: defaultState,
-            input = input,
-            output = EmptyOutputConsumer,
-        ).apply {
-            initialize(input)
+    return PropertyDelegateProvider { _, property ->
+        val store = instanceKeeper.getOrCreate<Store>(key = storeKey) {
+            val savedState = stateKeeper.consume("${storeKey}State", stateSerializer)
+            storeFactory.create(savedState ?: defaultState).apply {
+                initialize(input, savedState != null)
+            }
         }
+        stateKeeper.register("${storeKey}State", stateSerializer) { store.state }
+        store.setOutputConsumer(EmptyOutputConsumer)
+        ReadOnlyProperty { _, _ -> store }
     }
 }
 
 @OptIn(ExperimentalStateKeeperApi::class)
-fun <Store : BaseOnlyOutComposeStore<S, E, A, F, O>, S : StoreState, E : StoreEvent, A : StoreAction, F : StoreEffect, O : BaseOutput> BaseComponent.saveableStore(
-    storeFactory: BaseOnlyOutComposeStore.Factory<Store, S, O>,
+inline fun <reified Store : BaseComposeStore<S, E, A, F, EmptyInput, O>, S : StoreState, E : StoreEvent, A : StoreAction, F : StoreEffect, O : BaseOutput> BaseComponent.saveableStore(
+    storeFactory: BaseComposeStore.Factory<Store, S>,
     defaultState: S,
     stateSerializer: KSerializer<S>,
     outputConsumer: OutputConsumer<O>,
-    componentKey: String,
+    storeKey: String,
 ): PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, Store>> {
-    return saveable(
-        serializer = stateSerializer,
-        state = { it.state },
-        key = componentKey,
-    ) { savedState ->
-        storeFactory.create(
-            savedState = savedState ?: defaultState,
-            input = EmptyInput,
-            output = outputConsumer,
-        ).apply {
-            initialize(EmptyInput)
+    return PropertyDelegateProvider { _, property ->
+        val store = instanceKeeper.getOrCreate<Store>(key = storeKey) {
+            val savedState = stateKeeper.consume("${storeKey}State", stateSerializer)
+            storeFactory.create(savedState ?: defaultState).apply {
+                initialize(EmptyInput, savedState != null)
+            }
         }
+        stateKeeper.register("${storeKey}State", stateSerializer) {
+            store.state
+        }
+        store.setOutputConsumer(outputConsumer)
+        ReadOnlyProperty { _, _ -> store }
     }
 }

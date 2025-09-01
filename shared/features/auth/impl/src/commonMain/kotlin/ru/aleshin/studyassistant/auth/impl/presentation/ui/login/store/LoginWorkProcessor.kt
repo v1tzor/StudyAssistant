@@ -69,7 +69,7 @@ internal interface LoginWorkProcessor : FlowWorkProcessor<LoginWorkCommand, Logi
                 onLeftAction = { emit(EffectResult(LoginEffect.ShowError(it))) },
                 onRightAction = { authUser ->
                     if (authUser.emailVerification) {
-                        emit(OutputResult(LoginOutput.NavigateToRecovery))
+                        emit(OutputResult(LoginOutput.NavigateToApp))
                     } else {
                         emit(OutputResult(LoginOutput.NavigateToVerification))
                     }

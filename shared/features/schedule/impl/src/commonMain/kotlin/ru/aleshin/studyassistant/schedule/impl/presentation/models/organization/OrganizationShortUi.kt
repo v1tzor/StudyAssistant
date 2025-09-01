@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.models.organization
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.ContactInfoUi
@@ -25,7 +25,8 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.Contact
 /**
  * @author Stanislav Aleshin on 05.05.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class OrganizationShortUi(
     val uid: UID,
     val isMain: Boolean,
@@ -36,7 +37,7 @@ internal data class OrganizationShortUi(
     val offices: List<String>,
     val scheduleTimeIntervals: ScheduleTimeIntervalsUi = ScheduleTimeIntervalsUi(),
     val updatedAt: Long,
-) : Parcelable
+)
 
 internal fun OrganizationUi.convertToShort() = OrganizationShortUi(
     uid = uid,

@@ -42,7 +42,7 @@ interface DailyAiStatisticsLocalDataSource : LocalDataSource.FullSynced.Multiple
     ) : DailyAiStatisticsLocalDataSource {
 
         private val coroutineContext: CoroutineContext
-            get() = coroutineManager.backgroundDispatcher
+            get() = coroutineManager.ioDispatcher
 
         override suspend fun addOrUpdateItem(item: BaseDailyAiResponsesEntity) {
             dailyAiResponsesQuery.addOrUpdateStatistics(item.mapToEntity()).await()

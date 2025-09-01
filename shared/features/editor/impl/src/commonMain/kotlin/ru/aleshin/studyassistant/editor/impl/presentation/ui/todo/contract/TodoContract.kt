@@ -16,14 +16,14 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
@@ -33,17 +33,16 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.TodoNotif
 /**
  * @author Stanislav Aleshin on 26.07.2024
  */
-@Immutable
-@Parcelize
-internal data class TodoViewState(
+@Serializable
+internal data class TodoState(
     val isLoading: Boolean = true,
     val isLoadingSave: Boolean = false,
     val isPaidUser: Boolean = false,
     val editableTodo: EditTodoUi? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class TodoEvent : BaseEvent {
-    data class Init(val todoId: UID?) : TodoEvent()
+internal sealed class TodoEvent : StoreEvent {
+    data class Started(val inputData: TodoInput) : TodoEvent()
     data class UpdateTodoName(val todo: String) : TodoEvent()
     data class UpdateTodoDescription(val description: String) : TodoEvent()
     data class UpdateDeadline(val deadline: Instant?) : TodoEvent()
@@ -55,15 +54,22 @@ internal sealed class TodoEvent : BaseEvent {
     data object NavigateToBack : TodoEvent()
 }
 
-internal sealed class TodoEffect : BaseUiEffect {
+internal sealed class TodoEffect : StoreEffect {
     data class ShowError(val failures: EditorFailures) : TodoEffect()
-    data object NavigateToBack : TodoEffect()
-    data class NavigateToGlobal(val pushScreen: Screen) : TodoEffect()
 }
 
-internal sealed class TodoAction : BaseAction {
+internal sealed class TodoAction : StoreAction {
     data class SetupEditModel(val editModel: EditTodoUi, val isPaidUser: Boolean) : TodoAction()
     data class UpdateEditModel(val editModel: EditTodoUi?) : TodoAction()
     data class UpdateLoading(val isLoading: Boolean) : TodoAction()
     data class UpdateLoadingSave(val isLoading: Boolean) : TodoAction()
+}
+
+internal data class TodoInput(
+    val todoId: UID?
+) : BaseInput
+
+internal sealed class TodoOutput : BaseOutput {
+    data object NavigateToBack : TodoOutput()
+    data object NavigateToBilling : TodoOutput()
 }

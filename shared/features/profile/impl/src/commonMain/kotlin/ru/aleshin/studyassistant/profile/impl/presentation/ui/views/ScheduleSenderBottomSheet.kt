@@ -95,7 +95,7 @@ internal fun ScheduleSenderBottomSheet(
     allOrganizations: List<OrganizationShortUi>,
     allFriends: List<AppUserUi>,
     onDismissRequest: () -> Unit,
-    onShareSchedule: (ShareSchedulesSendDataUi) -> Unit,
+    onShareScheduleClick: (ShareSchedulesSendDataUi) -> Unit,
 ) {
     ModalBottomSheet(
         modifier = modifier,
@@ -207,7 +207,7 @@ internal fun ScheduleSenderBottomSheet(
                                     sendAllSubjects = sendAllSubjectsOption,
                                     sendAllEmployee = sendAllEmployeesOption,
                                 )
-                                onShareSchedule(shareSchedulesSendData)
+                                onShareScheduleClick(shareSchedulesSendData)
                                 isSendSchedule = true
                             },
                         ) {

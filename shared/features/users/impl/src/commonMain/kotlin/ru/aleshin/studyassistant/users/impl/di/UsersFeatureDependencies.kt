@@ -28,13 +28,11 @@ import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksReposito
 import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.
  */
 public interface UsersFeatureDependencies : BaseFeatureDependencies {
-    public val editorFeatureStarter: () -> EditorFeatureStarter
     public val subjectsRepository: SubjectsRepository
     public val employeeRepository: EmployeeRepository
     public val friendRequestsRepository: FriendRequestsRepository

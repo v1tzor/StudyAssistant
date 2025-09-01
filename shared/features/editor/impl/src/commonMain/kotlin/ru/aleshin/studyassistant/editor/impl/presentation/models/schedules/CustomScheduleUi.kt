@@ -16,22 +16,20 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.models.schedules
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 
 /**
  * @author Stanislav Aleshin on 02.06.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class CustomScheduleUi(
     val uid: UID,
-    @TypeParceler<Instant, InstantParceler>
     val date: Instant,
     val classes: List<ClassUi>,
     val updatedAt: Long = 0L,
-) : Parcelable
+)

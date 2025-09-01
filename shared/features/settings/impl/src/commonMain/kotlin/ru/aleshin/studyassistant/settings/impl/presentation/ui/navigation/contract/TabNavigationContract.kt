@@ -16,22 +16,20 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 
 /**
  * @author Stanislav Aleshin on 08.07.2024
  */
-@Immutable
-@Parcelize
-internal object TabNavigationViewState : BaseViewState
+@Serializable
+internal object TabNavigationState : StoreState
 
-internal sealed class TabNavigationEvent : BaseEvent {
+internal sealed class TabNavigationEvent : StoreEvent {
     data object NavigateToGeneral : TabNavigationEvent()
     data object NavigateToNotification : TabNavigationEvent()
     data object NavigateToCalendar : TabNavigationEvent()
@@ -40,9 +38,15 @@ internal sealed class TabNavigationEvent : BaseEvent {
     data object NavigateToBack : TabNavigationEvent()
 }
 
-internal sealed class TabNavigationEffect : BaseUiEffect {
-    data class ReplaceScreen(val screen: Screen) : TabNavigationEffect()
-    data object NavigateToBack : TabNavigationEffect()
-}
+internal sealed class TabNavigationEffect : StoreEffect
 
-internal object TabNavigationAction : BaseAction
+internal object TabNavigationAction : StoreAction
+
+internal sealed class TabNavigationOutput : BaseOutput {
+    data object NavigateToGeneral : TabNavigationOutput()
+    data object NavigateToNotification : TabNavigationOutput()
+    data object NavigateToCalendar : TabNavigationOutput()
+    data object NavigateToSubscription : TabNavigationOutput()
+    data object NavigateToAboutApp : TabNavigationOutput()
+    data object NavigateToBack : TabNavigationOutput()
+}

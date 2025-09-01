@@ -45,7 +45,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.contract.Forgo
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.store.ForgotComponent
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.views.ForgotActionsSection
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
-import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsMutable
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.SpacerToKeyboard
@@ -68,7 +68,7 @@ internal fun ForgotContent(
         content = { paddingValues ->
             when (windowSize.heightWindowType) {
                 else -> BaseForgotContent(
-                    state = store.stateAsMutable().value,
+                    state = store.stateAsState().value,
                     modifier = Modifier.padding(paddingValues),
                     onLoginClick = {
                         store.dispatchEvent(ForgotEvent.ClickLogin)

@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.ui.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import studyassistant.shared.features.info.impl.generated.resources.Res
@@ -24,6 +25,7 @@ import studyassistant.shared.features.info.impl.generated.resources.ic_star_circ
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
+@Immutable
 internal data class InfoIcons(
     val mainOrganization: DrawableResource,
 ) {

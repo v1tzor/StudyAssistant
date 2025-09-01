@@ -16,22 +16,20 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.models.shared
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.profile.impl.presentation.models.users.AppUserUi
 
 /**
  * @author Stanislav Aleshin on 14.08.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class SentMediatedSchedulesUi(
     val uid: UID,
-    @TypeParceler<Instant, InstantParceler>
     val sendDate: Instant,
     val recipient: AppUserUi,
     val organizationNames: List<String>,
-) : Parcelable
+)

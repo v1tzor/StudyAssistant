@@ -1,0 +1,100 @@
+/*
+ * Copyright 2024 Stanislav Aleshin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.store
+
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
+import ru.aleshin.studyassistant.core.common.architecture.store.work.ActionResult
+import ru.aleshin.studyassistant.core.common.architecture.store.work.EffectResult
+import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.store.work.OutputResult
+import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkResult
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.common.functional.firstRightOrNull
+import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.AppUserInteractor
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.TodoInteractor
+import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
+import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.EditTodoUi
+import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.convertToBase
+import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.convertToEdit
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.contract.TodoAction
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.contract.TodoEffect
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.contract.TodoOutput
+
+/**
+ * @author Stanislav Aleshin on 26.07.2024.
+ */
+internal interface TodoWorkProcessor : FlowWorkProcessor<TodoWorkCommand, TodoAction, TodoEffect, TodoOutput> {
+
+    class Base(
+        private val todoInteractor: TodoInteractor,
+        private val usersInteractor: AppUserInteractor,
+        private val dateManager: DateManager,
+    ) : TodoWorkProcessor {
+
+        override suspend fun work(command: TodoWorkCommand) = when (command) {
+            is TodoWorkCommand.LoadEditModel -> loadEditModelWork(command.todoId)
+            is TodoWorkCommand.SaveTodo -> saveTodoWork(command.todo)
+            is TodoWorkCommand.DeleteTodo -> deleteTodoWork(command.todo)
+        }
+
+        private fun loadEditModelWork(todoId: UID?) = flow {
+            val isPaidUser = usersInteractor.fetchAppUserPaidStatus().firstRightOrNull {
+                emit(EffectResult(TodoEffect.ShowError(it)))
+            } ?: false
+            val todoModel = todoInteractor.fetchTodoById(todoId ?: "").firstRightOrNull {
+                emit(EffectResult(TodoEffect.ShowError(it)))
+            }
+
+            val editModel = todoModel?.mapToUi()?.convertToEdit() ?: EditTodoUi.createEditModel(
+                uid = todoId,
+                enableNotifications = isPaidUser,
+                createdAt = dateManager.fetchCurrentInstant(),
+            )
+
+            emit(ActionResult(TodoAction.SetupEditModel(editModel, isPaidUser)))
+        }
+
+        private fun saveTodoWork(todo: EditTodoUi) = flow<TodoWorkResult> {
+            todoInteractor.addOrUpdateTodo(todo.convertToBase().mapToDomain()).handle(
+                onLeftAction = { emit(EffectResult(TodoEffect.ShowError(it))) },
+                onRightAction = { emit(OutputResult(TodoOutput.NavigateToBack)) },
+            )
+        }.onStart {
+            emit(ActionResult(TodoAction.UpdateLoadingSave(true)))
+        }
+
+        private fun deleteTodoWork(todo: EditTodoUi) = flow {
+            todoInteractor.deleteTodo(todo.uid).handle(
+                onLeftAction = { emit(EffectResult(TodoEffect.ShowError(it))) },
+                onRightAction = { emit(OutputResult(TodoOutput.NavigateToBack)) },
+            )
+        }
+    }
+}
+
+internal sealed class TodoWorkCommand : WorkCommand {
+    data class LoadEditModel(val todoId: UID?) : TodoWorkCommand()
+    data class SaveTodo(val todo: EditTodoUi) : TodoWorkCommand()
+    data class DeleteTodo(val todo: EditTodoUi) : TodoWorkCommand()
+}
+
+internal typealias TodoWorkResult = WorkResult<TodoAction, TodoEffect, TodoOutput>

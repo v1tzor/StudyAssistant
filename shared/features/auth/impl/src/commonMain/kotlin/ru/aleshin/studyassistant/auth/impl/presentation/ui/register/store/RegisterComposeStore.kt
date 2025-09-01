@@ -24,8 +24,6 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.contract.Reg
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.PasswordValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.UsernameValidator
-import ru.aleshin.studyassistant.core.common.architecture.component.EmptyInput
-import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
 import ru.aleshin.studyassistant.core.common.architecture.store.BaseOnlyOutComposeStore
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.EffectCommunicator
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.StateCommunicator
@@ -42,20 +40,14 @@ internal class RegisterComposeStore(
     private val usernameValidator: UsernameValidator,
     private val emailValidator: EmailValidator,
     private val passwordValidator: PasswordValidator,
-    outputConsumer: OutputConsumer<RegisterOutput>,
     stateCommunicator: StateCommunicator<RegisterState>,
     effectCommunicator: EffectCommunicator<RegisterEffect>,
     coroutineManager: CoroutineManager,
 ) : BaseOnlyOutComposeStore<RegisterState, RegisterEvent, RegisterAction, RegisterEffect, RegisterOutput>(
-    outputConsumer = outputConsumer,
     stateCommunicator = stateCommunicator,
     effectCommunicator = effectCommunicator,
     coroutineManager = coroutineManager,
 ) {
-
-    override fun initialize(input: EmptyInput) {
-        isInit.value = true
-    }
 
     override suspend fun WorkScope<RegisterState, RegisterAction, RegisterEffect, RegisterOutput>.handleEvent(
         event: RegisterEvent,
@@ -117,19 +109,14 @@ internal class RegisterComposeStore(
         private val emailValidator: EmailValidator,
         private val passwordValidator: PasswordValidator,
         private val coroutineManager: CoroutineManager,
-    ) : BaseOnlyOutComposeStore.Factory<RegisterComposeStore, RegisterState, RegisterOutput> {
+    ) : BaseOnlyOutComposeStore.Factory<RegisterComposeStore, RegisterState> {
 
-        override fun create(
-            savedState: RegisterState,
-            input: EmptyInput,
-            output: OutputConsumer<RegisterOutput>,
-        ): RegisterComposeStore {
+        override fun create(savedState: RegisterState): RegisterComposeStore {
             return RegisterComposeStore(
                 workProcessor = workProcessor,
                 usernameValidator = usernameValidator,
                 emailValidator = emailValidator,
                 passwordValidator = passwordValidator,
-                outputConsumer = output,
                 stateCommunicator = StateCommunicator.Default(savedState),
                 effectCommunicator = EffectCommunicator.Default(),
                 coroutineManager = coroutineManager,

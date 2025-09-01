@@ -17,14 +17,12 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views
 
 import androidx.compose.runtime.Composable
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
 import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
  */
-@Parcelize
 internal enum class SetupPage : SetupPageData {
     PROFILE {
         override val id get() = 0
@@ -57,7 +55,8 @@ internal enum class SetupPage : SetupPageData {
     }
 }
 
-internal interface SetupPageData : Parcelable {
+@Immutable
+internal interface SetupPageData {
     val id: Int
     val stepTitle: String @Composable get
     val buttonLabel: String @Composable get

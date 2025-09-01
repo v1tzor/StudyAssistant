@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.jetbrains.compose.resources.DrawableResource
 import studyassistant.shared.features.preview.impl.generated.resources.Res
@@ -34,6 +35,7 @@ import studyassistant.shared.features.preview.impl.generated.resources.il_study_
 /**
  * @author Stanislav Aleshin on 14.06.2023.
  */
+@Immutable
 internal data class PreviewIcons(
     val studyIllustration: DrawableResource,
     val organizationIllustration: DrawableResource,

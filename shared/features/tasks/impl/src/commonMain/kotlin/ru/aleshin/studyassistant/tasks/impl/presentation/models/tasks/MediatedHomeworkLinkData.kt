@@ -16,21 +16,22 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.NumberedClassUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class MediatedHomeworkLinkData(
     val homework: MediatedHomeworkUi,
     val receivedSubjectName: String,
     val actualSubject: SubjectUi? = null,
     val actualLinkedClass: NumberedClassUi? = null,
-) : Parcelable
+)
 
 internal fun MediatedHomeworkUi.prepareDataForLink(
     actualSubject: SubjectUi? = null,

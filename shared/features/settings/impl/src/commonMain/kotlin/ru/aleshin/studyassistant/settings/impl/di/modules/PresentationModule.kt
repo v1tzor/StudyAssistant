@@ -17,69 +17,40 @@
 package ru.aleshin.studyassistant.settings.impl.di.modules
 
 import org.kodein.di.DI
-import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
-import ru.aleshin.studyassistant.settings.api.navigation.SettingsFeatureStarter
-import ru.aleshin.studyassistant.settings.impl.navigation.SettingsFeatureStarterImpl
-import ru.aleshin.studyassistant.settings.impl.navigation.SettingsScreenProvider
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.screenmodel.CalendarEffectCommunicator
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.screenmodel.CalendarScreenModel
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.screenmodel.CalendarStateCommunicator
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.screenmodel.CalendarWorkProcessor
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel.GeneralEffectCommunicator
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel.GeneralScreenModel
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel.GeneralStateCommunicator
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.screenmodel.GeneralWorkProcessor
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.screenmodel.AboutAppScreenModel
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.screenmodel.AboutAppStateCommunicator
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.TabNavigationScreen
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.screenmodel.TabNavigationEffectCommunicator
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.screenmodel.TabNavigationScreenModel
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.screenmodel.TabNavigationStateCommunicator
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.screenmodel.NotificationEffectCommunicator
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.screenmodel.NotificationScreenModel
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.screenmodel.NotificationStateCommunicator
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.screenmodel.NotificationWorkProcessor
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.screenmodel.SubscriptionEffectCommunicator
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.screenmodel.SubscriptionScreenModel
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.screenmodel.SubscriptionStateCommunicator
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.screenmodel.SubscriptionWorkProcessor
+import ru.aleshin.studyassistant.settings.api.SettingsFeatureComponentFactory
+import ru.aleshin.studyassistant.settings.impl.navigation.DefaultSettingsComponentFactory
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.store.CalendarComposeStore
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.store.CalendarWorkProcessor
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.store.GeneralComposeStore
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.store.GeneralWorkProcessor
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.store.AboutAppComposeStore
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.store.TabNavigationComposeStore
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.store.NotificationComposeStore
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.store.NotificationWorkProcessor
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.store.SubscriptionComposeStore
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.subscription.store.SubscriptionWorkProcessor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<TabNavigationScreen> { TabNavigationScreen() }
+    bindSingleton<SettingsFeatureComponentFactory> { DefaultSettingsComponentFactory(instance(), instance(), instance(), instance(), instance(), instance()) }
 
-    bindProvider<SettingsFeatureStarter> { SettingsFeatureStarterImpl(instance(), instance(), instance()) }
-    bindProvider<SettingsScreenProvider> { SettingsScreenProvider.Base(instance<() -> BillingFeatureStarter>()) }
+    bindSingleton<TabNavigationComposeStore.Factory> { TabNavigationComposeStore.Factory(instance()) }
 
-    bindProvider<TabNavigationStateCommunicator> { TabNavigationStateCommunicator.Base() }
-    bindProvider<TabNavigationEffectCommunicator> { TabNavigationEffectCommunicator.Base() }
-    bindProvider<TabNavigationScreenModel> { TabNavigationScreenModel(instance(), instance(), instance(), instance()) }
-
-    bindSingleton<GeneralStateCommunicator> { GeneralStateCommunicator.Base() }
-    bindSingleton<GeneralEffectCommunicator> { GeneralEffectCommunicator.Base() }
     bindSingleton<GeneralWorkProcessor> { GeneralWorkProcessor.Base(instance()) }
-    bindSingleton<GeneralScreenModel> { GeneralScreenModel(instance(), instance(), instance(), instance()) }
+    bindSingleton<GeneralComposeStore.Factory> { GeneralComposeStore.Factory(instance(), instance()) }
 
-    bindSingleton<CalendarStateCommunicator> { CalendarStateCommunicator.Base() }
-    bindSingleton<CalendarEffectCommunicator> { CalendarEffectCommunicator.Base() }
     bindSingleton<CalendarWorkProcessor> { CalendarWorkProcessor.Base(instance(), instance()) }
-    bindSingleton<CalendarScreenModel> { CalendarScreenModel(instance(), instance(), instance(), instance()) }
+    bindSingleton<CalendarComposeStore.Factory> { CalendarComposeStore.Factory(instance(), instance()) }
 
-    bindSingleton<NotificationStateCommunicator> { NotificationStateCommunicator.Base() }
-    bindSingleton<NotificationEffectCommunicator> { NotificationEffectCommunicator.Base() }
     bindSingleton<NotificationWorkProcessor> { NotificationWorkProcessor.Base(instance(), instance(), instance()) }
-    bindSingleton<NotificationScreenModel> { NotificationScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<NotificationComposeStore.Factory> { NotificationComposeStore.Factory(instance(), instance()) }
 
-    bindSingleton<SubscriptionStateCommunicator> { SubscriptionStateCommunicator.Base() }
-    bindSingleton<SubscriptionEffectCommunicator> { SubscriptionEffectCommunicator.Base() }
     bindSingleton<SubscriptionWorkProcessor> { SubscriptionWorkProcessor.Base(instance(), instance(), instance()) }
-    bindSingleton<SubscriptionScreenModel> { SubscriptionScreenModel(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<SubscriptionComposeStore.Factory> { SubscriptionComposeStore.Factory(instance(), instance()) }
 
-    bindSingleton<AboutAppStateCommunicator> { AboutAppStateCommunicator.Base() }
-    bindSingleton<AboutAppScreenModel> { AboutAppScreenModel(instance(), instance()) }
+    bindSingleton<AboutAppComposeStore.Factory> { AboutAppComposeStore.Factory(instance()) }
 }

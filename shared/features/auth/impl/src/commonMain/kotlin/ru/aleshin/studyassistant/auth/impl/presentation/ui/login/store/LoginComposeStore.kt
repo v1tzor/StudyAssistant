@@ -24,7 +24,6 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.login.contract.LoginS
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.EmailValidator
 import ru.aleshin.studyassistant.auth.impl.presentation.validation.PasswordValidator
 import ru.aleshin.studyassistant.core.common.architecture.component.EmptyInput
-import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
 import ru.aleshin.studyassistant.core.common.architecture.store.BaseOnlyOutComposeStore
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.EffectCommunicator
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.StateCommunicator
@@ -40,22 +39,17 @@ internal class LoginComposeStore(
     private val workProcessor: LoginWorkProcessor,
     private val emailValidator: EmailValidator,
     private val passwordValidator: PasswordValidator,
-    outputConsumer: OutputConsumer<LoginOutput>,
     stateCommunicator: StateCommunicator<LoginState>,
     effectCommunicator: EffectCommunicator<LoginEffect>,
     coroutineManager: CoroutineManager,
 ) : BaseOnlyOutComposeStore<LoginState, LoginEvent, LoginAction, LoginEffect, LoginOutput>(
-    outputConsumer = outputConsumer,
     stateCommunicator = stateCommunicator,
     effectCommunicator = effectCommunicator,
     coroutineManager = coroutineManager,
 ) {
 
-    override fun initialize(input: EmptyInput) {
-        if (!isInit.value) {
-            dispatchEvent(LoginEvent.Started)
-            isInit.value = true
-        }
+    override fun initialize(input: EmptyInput, isRestore: Boolean) {
+        dispatchEvent(LoginEvent.Started)
     }
 
     override suspend fun WorkScope<LoginState, LoginAction, LoginEffect, LoginOutput>.handleEvent(
@@ -128,18 +122,13 @@ internal class LoginComposeStore(
         private val emailValidator: EmailValidator,
         private val passwordValidator: PasswordValidator,
         private val coroutineManager: CoroutineManager,
-    ) : BaseOnlyOutComposeStore.Factory<LoginComposeStore, LoginState, LoginOutput> {
+    ) : BaseOnlyOutComposeStore.Factory<LoginComposeStore, LoginState> {
 
-        override fun create(
-            savedState: LoginState,
-            input: EmptyInput,
-            output: OutputConsumer<LoginOutput>,
-        ): LoginComposeStore {
+        override fun create(savedState: LoginState): LoginComposeStore {
             return LoginComposeStore(
                 workProcessor = workProcessor,
                 emailValidator = emailValidator,
                 passwordValidator = passwordValidator,
-                outputConsumer = output,
                 stateCommunicator = StateCommunicator.Default(savedState),
                 effectCommunicator = EffectCommunicator.Default(),
                 coroutineManager = coroutineManager,

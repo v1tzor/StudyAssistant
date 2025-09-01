@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -27,7 +27,6 @@ kotlin {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:domain"))
 
-            api(libs.bundles.voyager)
             api(libs.bundles.decompose)
 
             api(libs.kodein.compose)

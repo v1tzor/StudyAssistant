@@ -16,19 +16,19 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract
 
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
+import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.DailyGoalsProgressUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
@@ -49,32 +49,29 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 /**
  * @author Stanislav Aleshin on 27.06.2024
  */
-@Parcelize
-internal data class OverviewViewState(
+@Serializable
+@Immutable
+internal data class OverviewState(
     val isLoadingHomeworks: Boolean = true,
     val isLoadingHomeworksProgress: Boolean = true,
     val isLoadingTasks: Boolean = true,
     val isLoadingShare: Boolean = true,
     val isLoadingGoals: Boolean = true,
     val isPaidUser: Boolean = false,
-    @TypeParceler<Instant, InstantParceler>
     val currentDate: Instant = Clock.System.now().startThisDay(),
     val activeSchedule: ScheduleUi? = null,
-    @TypeParceler<Instant, InstantParceler>
     val selectedGoalsDate: Instant = currentDate,
     val dailyGoals: List<GoalDetailsUi> = emptyList(),
-    @TypeParceler<Instant, InstantParceler>
     val goalsProgress: Map<Instant, DailyGoalsProgressUi> = emptyMap(),
-    @TypeParceler<Instant, InstantParceler>
-    val homeworks: Map<Instant, DailyHomeworksUi> = mapOf(),
+    val homeworks: Map<Instant, DailyHomeworksUi> = emptyMap(),
     val friends: List<AppUserUi> = emptyList(),
     val sharedHomeworks: SharedHomeworksDetailsUi? = null,
     val groupedTodos: DetailsGroupedTodosUi? = null,
     val homeworksScope: HomeworkScopeUi? = null,
     val homeworksProgress: HomeworksCompleteProgressUi? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class OverviewEvent : BaseEvent {
+internal sealed class OverviewEvent : StoreEvent {
     data object Init : OverviewEvent()
     data class DoHomework(val homework: HomeworkUi) : OverviewEvent()
     data class RepeatHomework(val homework: HomeworkUi) : OverviewEvent()
@@ -85,28 +82,26 @@ internal sealed class OverviewEvent : BaseEvent {
     data class SelectedGoalsDate(val date: Instant) : OverviewEvent()
     data class CompleteGoal(val goal: GoalDetailsUi) : OverviewEvent()
     data class DeleteGoal(val goal: GoalShortUi) : OverviewEvent()
-    data class StartGoalTime(val goal: GoalDetailsUi) : OverviewEvent()
-    data class PauseGoalTime(val goal: GoalDetailsUi) : OverviewEvent()
-    data class ResetGoalTime(val goal: GoalDetailsUi) : OverviewEvent()
+    data class ClickStartGoalTime(val goal: GoalDetailsUi) : OverviewEvent()
+    data class ClickPauseGoalTime(val goal: GoalDetailsUi) : OverviewEvent()
+    data class ClickResetGoalTime(val goal: GoalDetailsUi) : OverviewEvent()
     data class ChangeGoalTimeType(val goal: GoalDetailsUi, val type: GoalTime.Type) : OverviewEvent()
     data class ChangeGoalDesiredTime(val goal: GoalDetailsUi, val time: Millis?) : OverviewEvent()
     data class ScheduleGoal(val createModel: GoalCreateModelUi) : OverviewEvent()
-    data class NavigateToHomeworkEditor(val homework: HomeworkUi) : OverviewEvent()
-    data class NavigateToTodoEditor(val todo: TodoUi?) : OverviewEvent()
+    data class ClickEditHomework(val homework: HomeworkUi) : OverviewEvent()
+    data class ClickEditTodo(val todo: TodoUi?) : OverviewEvent()
     data object AddHomeworkInEditor : OverviewEvent()
-    data class NavigateToHomeworks(val homework: HomeworkUi?) : OverviewEvent()
-    data object NavigateToShare : OverviewEvent()
-    data object NavigateToTodos : OverviewEvent()
-    data object NavigateToBilling : OverviewEvent()
+    data class ClickHomework(val homework: HomeworkUi?) : OverviewEvent()
+    data object ClickShowAllSharedHomeworks : OverviewEvent()
+    data object ClickShowAllTodo : OverviewEvent()
+    data object ClickPaidFunction : OverviewEvent()
 }
 
-internal sealed class OverviewEffect : BaseUiEffect {
+internal sealed class OverviewEffect : StoreEffect {
     data class ShowError(val failures: TasksFailures) : OverviewEffect()
-    data class NavigateToLocal(val pushScreen: Screen) : OverviewEffect()
-    data class NavigateToGlobal(val pushScreen: Screen) : OverviewEffect()
 }
 
-internal sealed class OverviewAction : BaseAction {
+internal sealed class OverviewAction : StoreAction {
     data class UpdateHomeworks(
         val homeworks: Map<Instant, DailyHomeworksUi>,
         val homeworkScope: HomeworkScopeUi,
@@ -133,4 +128,13 @@ internal sealed class OverviewAction : BaseAction {
     data class UpdateTasksLoading(val isLoading: Boolean) : OverviewAction()
     data class UpdateShareLoading(val isLoading: Boolean) : OverviewAction()
     data class UpdateGoalsLoading(val isLoading: Boolean) : OverviewAction()
+}
+
+internal sealed class OverviewOutput : BaseOutput {
+    data class NavigateToHomeworkEditor(val config: EditorConfig.Homework) : OverviewOutput()
+    data class NavigateToTodoEditor(val config: EditorConfig.Todo) : OverviewOutput()
+    data class NavigateToHomeworks(val targetDate: Long?) : OverviewOutput()
+    data object NavigateToBilling : OverviewOutput()
+    data object NavigateToTodo : OverviewOutput()
+    data object NavigateToShareHomeworks : OverviewOutput()
 }

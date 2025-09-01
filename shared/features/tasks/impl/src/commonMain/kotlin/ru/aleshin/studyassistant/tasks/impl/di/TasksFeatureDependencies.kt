@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.tasks.impl.di
 
 import dev.tmapps.konnection.Konnection
-import ru.aleshin.studyassistant.billing.api.navigation.BillingFeatureStarter
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -34,16 +33,11 @@ import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksReposito
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.editor.api.navigation.EditorFeatureStarter
-import ru.aleshin.studyassistant.users.api.navigation.UsersFeatureStarter
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.
  */
 public interface TasksFeatureDependencies : BaseFeatureDependencies {
-    public val editorFeatureStarter: () -> EditorFeatureStarter
-    public val usersFeatureStarter: () -> UsersFeatureStarter
-    public val billingFeatureStarter: () -> BillingFeatureStarter
     public val baseScheduleRepository: BaseScheduleRepository
     public val goalsRepository: DailyGoalsRepository
     public val customScheduleRepository: CustomScheduleRepository

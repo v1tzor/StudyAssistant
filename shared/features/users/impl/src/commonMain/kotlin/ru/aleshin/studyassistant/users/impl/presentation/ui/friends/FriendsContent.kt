@@ -50,6 +50,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -63,29 +66,95 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.dateTimeDurationOrZero
+import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.extensions.limitSize
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder.FRIENDS
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder.OVERVIEW_FRIEND_REQUESTS
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.MediumInfoBadge
+import ru.aleshin.studyassistant.users.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.users.impl.presentation.models.AppUserUi
 import ru.aleshin.studyassistant.users.impl.presentation.models.FriendRequestsDetailsUi
 import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
 import ru.aleshin.studyassistant.users.impl.presentation.ui.common.NoneUserRequestsView
 import ru.aleshin.studyassistant.users.impl.presentation.ui.common.UserView
 import ru.aleshin.studyassistant.users.impl.presentation.ui.common.UserViewPlaceholder
-import ru.aleshin.studyassistant.users.impl.presentation.ui.friends.contract.FriendsViewState
+import ru.aleshin.studyassistant.users.impl.presentation.ui.friends.contract.FriendsEffect
+import ru.aleshin.studyassistant.users.impl.presentation.ui.friends.contract.FriendsEvent
+import ru.aleshin.studyassistant.users.impl.presentation.ui.friends.contract.FriendsState
+import ru.aleshin.studyassistant.users.impl.presentation.ui.friends.store.FriendsComponent
 import ru.aleshin.studyassistant.users.impl.presentation.ui.friends.views.FriendDropdownMenu
+import ru.aleshin.studyassistant.users.impl.presentation.ui.friends.views.FriendsSearchTopBar
 
 /**
  * @author Stanislav Aleshin on 12.07.2024.
  */
 @Composable
 internal fun FriendsContent(
-    state: FriendsViewState,
+    friendsComponent: FriendsComponent,
+    modifier: Modifier = Modifier,
+) {
+    val store = friendsComponent.store
+    val state by store.stateAsState()
+    val strings = UsersThemeRes.strings
+    val coreStrings = StudyAssistantRes.strings
+    val snackbarState = remember { SnackbarHostState() }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            BaseFriendsContent(
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+                onShowAllRequests = { store.dispatchEvent(FriendsEvent.ClickShowRequests) },
+                onOpenUserProfile = { store.dispatchEvent(FriendsEvent.ClickUserProfile(it)) },
+                onAcceptRequest = { store.dispatchEvent(FriendsEvent.AcceptFriendRequest(it)) },
+                onRejectRequest = { store.dispatchEvent(FriendsEvent.RejectFriendRequest(it)) },
+                onDeleteFriend = { store.dispatchEvent(FriendsEvent.DeleteFriend(it)) },
+            )
+        },
+        topBar = {
+            FriendsSearchTopBar(
+                isLoadingSearch = state.isLoadingSearch,
+                searchedUsers = state.searchedUsers,
+                friendRequests = state.requests,
+                friends = state.friends.values.toList().extractAllItem(),
+                onBackPress = { store.dispatchEvent(FriendsEvent.ClickBack) },
+                onSearch = { store.dispatchEvent(FriendsEvent.SearchUsers(it)) },
+                onOpenUserProfile = { store.dispatchEvent(FriendsEvent.ClickUserProfile(it)) },
+                onSendFriendRequest = { store.dispatchEvent(FriendsEvent.SendFriendRequest(it)) },
+                onCancelFriendRequest = { store.dispatchEvent(FriendsEvent.CancelSendFriendRequest(it)) },
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
+            )
+        },
+    )
+
+    store.handleEffects { effect ->
+        when (effect) {
+            is FriendsEffect.ShowError -> {
+                snackbarState.showSnackbar(
+                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    withDismissAction = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BaseFriendsContent(
+    state: FriendsState,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     onShowAllRequests: () -> Unit,
@@ -93,15 +162,15 @@ internal fun FriendsContent(
     onAcceptRequest: (UID) -> Unit,
     onRejectRequest: (UID) -> Unit,
     onDeleteFriend: (UID) -> Unit,
-) = with(state) {
+) {
     Column(
         modifier = modifier.fillMaxSize().padding(top = 12.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         FriendsRequestsSection(
-            isLoading = isLoading,
-            currentTime = currentTime,
-            friendRequests = requests,
+            isLoading = state.isLoading,
+            currentTime = state.currentTime,
+            friendRequests = state.requests,
             onShowAllRequests = onShowAllRequests,
             onOpenUserProfile = onOpenUserProfile,
             onAcceptRequest = onAcceptRequest,
@@ -109,8 +178,8 @@ internal fun FriendsContent(
         )
         HorizontalDivider()
         MyFriendsSection(
-            isLoading = isLoading,
-            friends = friends,
+            isLoading = state.isLoading,
+            friends = state.friends,
             onOpenUserProfile = onOpenUserProfile,
             onDeleteFriend = onDeleteFriend,
         )
@@ -149,10 +218,13 @@ private fun FriendsRequestsSection(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     maxItemsInEachColumn = 3,
                 ) {
-                    val receivedRequests =
+                    val receivedRequests = remember(friendRequests?.received) {
                         friendRequests?.received?.toList()?.sortedByDescending { it.second }
+                    }
                     if (!receivedRequests.isNullOrEmpty()) {
-                        val receivedUsers = receivedRequests.limitSize(OVERVIEW_FRIEND_REQUESTS)
+                        val receivedUsers = remember(receivedRequests) {
+                            receivedRequests.limitSize(OVERVIEW_FRIEND_REQUESTS)
+                        }
                         receivedUsers.forEach { user ->
                             UserView(
                                 onClick = { onOpenUserProfile(user.first.uid) },
@@ -280,7 +352,7 @@ private fun MyFriendsSection(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     if (friends.isNotEmpty()) {
-                        val alphabeticFriends = friends.toList()
+                        val alphabeticFriends = remember(friends) { friends.toList() }
                         alphabeticFriends.forEach { friend ->
                             FriendsViewItem(
                                 char = friend.first,

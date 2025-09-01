@@ -16,17 +16,16 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 30.05.2024.
  */
-@Parcelize
-data class DateVersionUi(
-    @TypeParceler<Instant, InstantParceler> val from: Instant,
-    @TypeParceler<Instant, InstantParceler> val to: Instant,
-) : Parcelable
+@Immutable
+@Serializable
+internal data class DateVersionUi(
+    val from: Instant,
+    val to: Instant,
+)

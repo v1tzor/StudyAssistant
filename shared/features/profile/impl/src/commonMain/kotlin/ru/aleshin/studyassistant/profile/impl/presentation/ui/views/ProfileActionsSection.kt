@@ -93,9 +93,9 @@ internal fun ProfileActionsSection(
     onNotifySettingsClick: () -> Unit,
     onCalendarSettingsClick: () -> Unit,
     onPaymentsSettingsClick: () -> Unit,
-    onShowSchedule: (ReceivedMediatedSchedulesShortUi) -> Unit,
-    onCancelSentSchedule: (SentMediatedSchedulesUi) -> Unit,
-    onShareSchedule: (ShareSchedulesSendDataUi) -> Unit,
+    onShowScheduleClick: (ReceivedMediatedSchedulesShortUi) -> Unit,
+    onCancelSentScheduleClick: (SentMediatedSchedulesUi) -> Unit,
+    onShareScheduleClick: (ShareSchedulesSendDataUi) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = modifier.fillMaxSize().padding(start = 16.dp, end = 16.dp, top = 24.dp),
@@ -187,9 +187,9 @@ internal fun ProfileActionsSection(
                 sharedSchedules = sharedSchedules,
                 allOrganizations = allOrganizations,
                 allFriends = allFriends,
-                onShowSchedule = onShowSchedule,
-                onCancelSentSchedule = onCancelSentSchedule,
-                onShareSchedule = onShareSchedule,
+                onShowScheduleClick = onShowScheduleClick,
+                onCancelSentScheduleClick = onCancelSentScheduleClick,
+                onShareScheduleClick = onShareScheduleClick,
             )
         }
     }
@@ -309,9 +309,9 @@ internal fun ShareScheduleView(
     allOrganizations: List<OrganizationShortUi>,
     allFriends: List<AppUserUi>,
     sharedSchedules: SharedSchedulesShortUi?,
-    onShowSchedule: (ReceivedMediatedSchedulesShortUi) -> Unit,
-    onCancelSentSchedule: (SentMediatedSchedulesUi) -> Unit,
-    onShareSchedule: (ShareSchedulesSendDataUi) -> Unit,
+    onShowScheduleClick: (ReceivedMediatedSchedulesShortUi) -> Unit,
+    onCancelSentScheduleClick: (SentMediatedSchedulesUi) -> Unit,
+    onShareScheduleClick: (ShareSchedulesSendDataUi) -> Unit,
 ) {
     var openSharedSchedulesSheet by remember { mutableStateOf(false) }
     var openSchedulesSenderSheet by remember { mutableStateOf(false) }
@@ -415,11 +415,11 @@ internal fun ShareScheduleView(
             sharedSchedules = sharedSchedules,
             currentTime = currentTime,
             onDismissRequest = { openSharedSchedulesSheet = false },
-            onShowSchedule = {
-                onShowSchedule(it)
+            onShowScheduleClick = {
+                onShowScheduleClick(it)
                 openSharedSchedulesSheet = false
             },
-            onCancelSentSchedule = onCancelSentSchedule,
+            onCancelSentScheduleClick = onCancelSentScheduleClick,
         )
     }
 
@@ -429,7 +429,7 @@ internal fun ShareScheduleView(
             allOrganizations = allOrganizations,
             allFriends = allFriends,
             onDismissRequest = { openSchedulesSenderSheet = false },
-            onShareSchedule = onShareSchedule,
+            onShareScheduleClick = onShareScheduleClick,
         )
     }
 }

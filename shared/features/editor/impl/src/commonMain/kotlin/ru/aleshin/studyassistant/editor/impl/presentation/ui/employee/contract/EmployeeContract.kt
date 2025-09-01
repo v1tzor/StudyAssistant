@@ -16,14 +16,15 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract
 
-import androidx.compose.runtime.Immutable
-import dev.icerock.moko.parcelize.Parcelize
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
@@ -35,17 +36,16 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EditEmplo
 /**
  * @author Stanislav Aleshin on 06.06.2024
  */
-@Immutable
-@Parcelize
-internal data class EmployeeViewState(
+@Serializable
+internal data class EmployeeState(
     val isLoading: Boolean = true,
     val editableEmployee: EditEmployeeUi? = null,
     val organization: OrganizationShortUi? = null,
     val actionWithAvatar: ActionWithAvatar = ActionWithAvatar.None(null),
-) : BaseViewState
+) : StoreState
 
-internal sealed class EmployeeEvent : BaseEvent {
-    data class Init(val employeeId: UID?, val organizationId: UID) : EmployeeEvent()
+internal sealed class EmployeeEvent : StoreEvent {
+    data class Started(val inputData: EmployeeInput) : EmployeeEvent()
     data class UpdateAvatar(val image: PlatformFile) : EmployeeEvent()
     data object DeleteAvatar : EmployeeEvent()
     data class UpdateName(val first: String?, val second: String?, val patronymic: String?) : EmployeeEvent()
@@ -60,15 +60,23 @@ internal sealed class EmployeeEvent : BaseEvent {
     data object NavigateToBack : EmployeeEvent()
 }
 
-internal sealed class EmployeeEffect : BaseUiEffect {
+internal sealed class EmployeeEffect : StoreEffect {
     data class ShowError(val failures: EditorFailures) : EmployeeEffect()
-    data object NavigateToBack : EmployeeEffect()
 }
 
-internal sealed class EmployeeAction : BaseAction {
+internal sealed class EmployeeAction : StoreAction {
     data class SetupEditModel(val editModel: EditEmployeeUi) : EmployeeAction()
     data class UpdateEditModel(val editModel: EditEmployeeUi?) : EmployeeAction()
     data class UpdateOrganization(val organization: OrganizationShortUi) : EmployeeAction()
     data class UpdateActionWithAvatar(val actionWithAvatar: ActionWithAvatar) : EmployeeAction()
     data class UpdateLoading(val isLoading: Boolean) : EmployeeAction()
+}
+
+internal data class EmployeeInput(
+    val employeeId: UID?,
+    val organizationId: UID,
+) : BaseInput
+
+internal sealed class EmployeeOutput : BaseOutput {
+    data object NavigateToBack : EmployeeOutput()
 }

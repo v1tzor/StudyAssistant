@@ -16,25 +16,22 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.share
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.InstantParceler
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.MediatedHomeworkUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class SentMediatedHomeworksDetailsUi(
     val uid: UID,
-    @TypeParceler<Instant, InstantParceler>
     val date: Instant,
-    @TypeParceler<Instant, InstantParceler>
     val sendDate: Instant,
     val recipients: List<AppUserUi>,
     val homeworks: List<MediatedHomeworkUi>,
-) : Parcelable
+)

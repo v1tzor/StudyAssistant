@@ -47,7 +47,7 @@ internal abstract class RegisterComponent(
             defaultState = RegisterState(),
             stateSerializer = RegisterState.serializer(),
             outputConsumer = outputConsumer,
-            componentKey = COMPONENT_KEY,
+            storeKey = COMPONENT_KEY,
         )
     }
 }

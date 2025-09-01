@@ -16,11 +16,13 @@
 
 package ru.aleshin.studyassistant.core.common.navigation
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 23.08.2025.
  */
+@Immutable
 @Serializable
 data class DeepLinkUrl(
     val pathSegments: List<String>,

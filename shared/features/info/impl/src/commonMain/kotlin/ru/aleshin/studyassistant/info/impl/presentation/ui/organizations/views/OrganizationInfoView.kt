@@ -34,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -117,13 +118,13 @@ internal fun OrganizationView(
                     OrganizationInfoViewItem(
                         icon = painterResource(StudyAssistantRes.icons.duration),
                         label = InfoThemeRes.strings.classesDurationInWeekLabel,
-                        text = classesInfo.classesDurationString(),
+                        text = remember(classesInfo) { classesInfo.classesDurationString() },
                     )
                     VerticalDivider(modifier = Modifier.padding(top = 12.dp))
                     OrganizationInfoViewItem(
                         icon = painterResource(StudyAssistantRes.icons.classes),
                         label = InfoThemeRes.strings.numberOfClassesInWeekLabel,
-                        text = classesInfo.numberOfClassesString(),
+                        text = remember(classesInfo) { classesInfo.numberOfClassesString() },
                     )
                 }
             }

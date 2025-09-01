@@ -41,7 +41,6 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -126,7 +125,7 @@ internal fun TeacherSelectorBottomSheet(
     onConfirm: (EmployeeDetailsUi?) -> Unit,
 ) {
     var searchQuery by remember { mutableStateOf<String?>(null) }
-    val selectedEmployee by derivedStateOf { employees.find { it.uid == selected?.uid } }
+    val selectedEmployee = remember(employees, selected) { employees.find { it.uid == selected?.uid } }
     val searchedTeachers = remember(searchQuery, employees) {
         employees.filter { employee ->
             val firstNameFilter = employee.firstName.contains(searchQuery ?: "", true)

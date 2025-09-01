@@ -16,13 +16,11 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.models.classes
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.parcelize.TypeParceler
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.platform.NullInstantParceler
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
@@ -32,7 +30,8 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeU
 /**
  * @author Stanislav Aleshin on 01.06.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class EditClassUi(
     val uid: UID,
     val scheduleId: UID?,
@@ -43,11 +42,9 @@ internal data class EditClassUi(
     val teacher: EmployeeUi? = null,
     val office: String? = null,
     val location: ContactInfoUi? = null,
-    @TypeParceler<Instant?, NullInstantParceler>
     val startTime: Instant? = null,
-    @TypeParceler<Instant?, NullInstantParceler>
     val endTime: Instant? = null,
-) : Parcelable {
+) {
 
     fun isValid() = organization != null && eventType != null && subject != null &&
         teacher != null && office != null && startTime != null && endTime != null

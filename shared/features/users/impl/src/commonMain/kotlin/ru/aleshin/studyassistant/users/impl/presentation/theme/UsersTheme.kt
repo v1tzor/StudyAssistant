@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.users.impl.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.users.impl.presentation.theme.tokens.LocalUsersIcons
 import ru.aleshin.studyassistant.users.impl.presentation.theme.tokens.LocalUsersStrings
@@ -31,8 +32,11 @@ import ru.aleshin.studyassistant.users.impl.presentation.theme.tokens.fetchUsers
 internal fun UsersTheme(
     content: @Composable () -> Unit,
 ) {
-    val icons = fetchUsersIcons(StudyAssistantRes.colors.isDark)
-    val strings = fetchUsersStrings(StudyAssistantRes.language)
+    val isDark = StudyAssistantRes.colors.isDark
+    val language = StudyAssistantRes.language
+
+    val icons = remember(isDark) { fetchUsersIcons(isDark) }
+    val strings = remember(language) { fetchUsersStrings(language) }
 
     CompositionLocalProvider(
         LocalUsersIcons provides icons,

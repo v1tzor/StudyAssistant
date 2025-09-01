@@ -16,8 +16,8 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.extensions.toHorses
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
@@ -25,11 +25,12 @@ import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 /**
  * @author Stanislav Aleshin on 16.06.2024.
  */
-@Parcelize
+@Immutable
+@Serializable
 internal data class OrganizationClassesInfoUi(
     val numberOfClassesInWeek: Map<NumberOfRepeatWeek, Int>,
     val classesDurationInWeek: Map<NumberOfRepeatWeek, Millis>,
-) : Parcelable {
+) {
 
     fun numberOfClassesString(): String {
         val classesList = numberOfClassesInWeek.toList()

@@ -47,7 +47,7 @@ internal abstract class VerificationComponent(
             defaultState = VerificationState(),
             stateSerializer = VerificationState.serializer(),
             outputConsumer = outputConsumer,
-            componentKey = COMPONENT_KEY,
+            storeKey = COMPONENT_KEY,
         )
     }
 }

@@ -16,40 +16,47 @@
 
 package ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract
 
-import androidx.compose.runtime.Immutable
-import cafe.adriel.voyager.core.screen.Screen
-import dev.icerock.moko.parcelize.Parcelize
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseAction
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseEvent
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseUiEffect
-import ru.aleshin.studyassistant.core.common.architecture.screenmodel.contract.BaseViewState
+import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
+import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
 import ru.aleshin.studyassistant.users.impl.domain.entities.UsersFailures
 import ru.aleshin.studyassistant.users.impl.presentation.models.EmployeeDetailsUi
 
 /**
  * @author Stanislav Aleshin on 10.07.2024
  */
-@Immutable
-@Parcelize
-internal data class EmployeeProfileViewState(
+@Serializable
+internal data class EmployeeProfileState(
     val isLoading: Boolean = true,
     val employee: EmployeeDetailsUi? = null,
-) : BaseViewState
+) : StoreState
 
-internal sealed class EmployeeProfileEvent : BaseEvent {
-    data class Init(val employeeId: UID) : EmployeeProfileEvent()
-    data object NavigateToBack : EmployeeProfileEvent()
-    data object NavigateToEditor : EmployeeProfileEvent()
+internal sealed class EmployeeProfileEvent : StoreEvent {
+    data class Started(val employeeId: UID) : EmployeeProfileEvent()
+    data object ClickBack : EmployeeProfileEvent()
+    data object ClickEdit : EmployeeProfileEvent()
 }
 
-internal sealed class EmployeeProfileEffect : BaseUiEffect {
+internal sealed class EmployeeProfileEffect : StoreEffect {
     data class ShowError(val failures: UsersFailures) : EmployeeProfileEffect()
-    data class NavigateToGlobal(val pushScreen: Screen) : EmployeeProfileEffect()
-    data object NavigateToBack : EmployeeProfileEffect()
 }
 
-internal sealed class EmployeeProfileAction : BaseAction {
+internal sealed class EmployeeProfileAction : StoreAction {
     data class UpdateEmployee(val employee: EmployeeDetailsUi?) : EmployeeProfileAction()
     data class UpdateLoading(val isLoading: Boolean) : EmployeeProfileAction()
+}
+
+internal data class EmployeeProfileInput(
+    val employeeId: UID
+) : BaseInput
+
+internal sealed class EmployeeProfileOutput : BaseOutput {
+    data object NavigateToBack : EmployeeProfileOutput()
+    data class NavigateToEmployeeEditor(val config: EditorConfig.Employee) : EmployeeProfileOutput()
 }
