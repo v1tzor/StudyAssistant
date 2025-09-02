@@ -40,7 +40,7 @@ interface SourceSyncManager {
      * Local changes are pushed first, then local data is updated with remote state,
      * and finally live remote updates are collected and applied.
      */
-    suspend fun startSourceSync()
+    suspend fun startBackgroundSync()
 
     /**
      * Single two-directional synchronization between local and remote sources.

@@ -73,7 +73,7 @@ interface SourceSyncFacade {
 
         override suspend fun syncAllSource() {
             coroutineManager.changeFlow(IO) {
-                allSyncManagers.map { async { it.startSourceSync() } }.awaitAll()
+                allSyncManagers.map { async { it.startBackgroundSync() } }.awaitAll()
             }
         }
 

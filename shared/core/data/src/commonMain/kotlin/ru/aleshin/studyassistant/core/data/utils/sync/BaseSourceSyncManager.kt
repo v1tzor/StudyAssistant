@@ -96,7 +96,7 @@ abstract class BaseSourceSyncManager(
      * This method is safe to call multiple times — it will cancel any ongoing sync before restarting.
      */
 
-    override suspend fun startSourceSync() {
+    override suspend fun startBackgroundSync() {
         var isCompletedFirstSync: Boolean = singleSyncRound()
 
         connectJob?.cancel()
