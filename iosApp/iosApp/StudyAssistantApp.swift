@@ -11,6 +11,16 @@ import BackgroundTasks
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
     
+    var stateKeeper: StateKeeperDispatcher = StateKeeperDispatcher(savedState: nil)
+    var backDispatcher: BackDispatcher = BackDispatcher()
+    
+    lazy var componentContext: ComponentContext = DefaultComponentContext(
+        lifecycle: ApplicationLifecycle(),
+        stateKeeper: stateKeeper,
+        instanceKeeper: nil,
+        backHandler: backDispatcher
+    )
+    
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         guard let url = URLContexts.first?.url,
             url.absoluteString.contains("appwrite-callback") else {
@@ -77,7 +87,10 @@ struct iOSApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView().onOpenURL(
+            ContentView(
+                componentContext: delegate.componentContext,
+                backDispatcher: delegate.backDispatcher
+            ).onOpenURL(
                 perform: { url in
                     GIDSignIn.sharedInstance.handle(url)
                 }

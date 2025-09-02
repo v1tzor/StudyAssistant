@@ -17,7 +17,7 @@
 package ru.aleshin.studyassistant.core.common.navigation
 
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimation
+import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.StackAnimation
 import com.arkivanov.essenty.backhandler.BackHandler
 
 /**

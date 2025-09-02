@@ -24,7 +24,14 @@ kotlin {
         it.binaries.framework {
             baseName = "shared"
             isStatic = true
+
             binaryOption("bundleId", "ru.aleshin.studyassistant.shared")
+
+            export(libs.decompose.core)
+            export(libs.decompose.essenty.statekeeper)
+            export(libs.decompose.essenty.instancekeeper)
+            export(libs.decompose.essenty.backhandler)
+            export(libs.decompose.essenty.lifecycle)
         }
     }
 
@@ -64,6 +71,8 @@ kotlin {
             api(project(":shared:core:remote"))
             api(project(":shared:core:client-api"))
 
+            api(libs.bundles.decompose)
+            api(libs.bundles.essenty)
             implementation(compose.components.resources)
         }
         commonTest.dependencies {

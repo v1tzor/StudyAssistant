@@ -23,7 +23,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.ExperimentalDecomposeApi
+import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import ru.aleshin.studyassistant.presentation.ui.tabnavigation.component.TabsComponent
 import ru.aleshin.studyassistant.presentation.ui.tabnavigation.component.TabsComponent.TabsChild
@@ -35,6 +36,7 @@ import ru.aleshin.studyassistant.presentation.ui.tabnavigation.views.mapToItem
  * @author Stanislav Aleshin on 18.02.2023.
  */
 @Composable
+@OptIn(ExperimentalDecomposeApi::class)
 fun TabsContent(
     tabsComponent: TabsComponent,
     modifier: Modifier = Modifier,
@@ -61,7 +63,7 @@ fun TabsContent(
             )
         },
     ) { paddingValues ->
-        Children(
+        ChildStack(
             modifier = Modifier.padding(paddingValues),
             stack = stack
         ) { child ->

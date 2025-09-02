@@ -22,7 +22,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.io.IOException
 import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
@@ -58,7 +57,7 @@ abstract class BaseSourceSyncManager(
     protected var taskJob: Job? = null
     protected val mainJob = SupervisorJob()
 
-    protected val scope = CoroutineScope(mainJob + coroutineManager.ioDispatcher)
+    protected val scope = CoroutineScope(mainJob)
 
     /**
      * Pushes queued offline changes to the remote database.
@@ -98,29 +97,22 @@ abstract class BaseSourceSyncManager(
      */
 
     override suspend fun startSourceSync() {
-        var isFirstSync: Boolean
-        try {
-            uploadOfflineChanges()
-            syncLocalDatabase()
-            isFirstSync = true
-        } catch (_: Exception) {
-            isFirstSync = false
-        }
+        var isCompletedFirstSync: Boolean = singleSyncRound()
 
         connectJob?.cancel()
-        connectJob = scope.launch(SupervisorJob()) {
+        connectJob = coroutineManager.runOnIOBackground(scope) {
             connectionManger.observeHasConnection().collect { hasConnection ->
                 taskJob?.cancel()
                 taskJob = null
 
                 if (!hasConnection) {
-                    isFirstSync = false
+                    isCompletedFirstSync = false
                     return@collect
                 }
 
-                taskJob = scope.launch {
+                taskJob = coroutineManager.runOnIOBackground(scope) {
                     try {
-                        if (!isFirstSync) {
+                        if (!isCompletedFirstSync) {
                             uploadOfflineChanges()
                             syncLocalDatabase()
                         }

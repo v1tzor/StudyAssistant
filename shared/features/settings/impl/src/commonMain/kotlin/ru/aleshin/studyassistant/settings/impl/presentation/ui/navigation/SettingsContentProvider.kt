@@ -27,8 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.stack.Children
-import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
+import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
+import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import ru.aleshin.studyassistant.core.common.di.withDirectDI
 import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
@@ -65,7 +65,7 @@ public class SettingsContentProvider internal constructor(
                 Scaffold(
                     modifier = modifier.fillMaxSize(),
                     content = { paddingValues ->
-                        Children(
+                        ChildStack(
                             modifier = Modifier.padding(paddingValues),
                             stack = stack,
                             animation = stackAnimation(),

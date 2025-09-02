@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.editor.impl.presentation.ui.root
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import ru.aleshin.studyassistant.core.common.di.withDirectDI
 import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
 import ru.aleshin.studyassistant.core.common.navigation.backAnimation
@@ -48,7 +48,7 @@ public class EditorContentProvider internal constructor(
     override fun invoke(modifier: Modifier) {
         withDirectDI(directDI = { EditorFeatureManager.fetchDI() }) {
             EditorTheme {
-                Children(
+                ChildStack(
                     modifier = modifier,
                     stack = component.stack,
                     animation = backAnimation(

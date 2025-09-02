@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.root
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import ru.aleshin.studyassistant.core.common.di.withDirectDI
 import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
 import ru.aleshin.studyassistant.core.common.navigation.backAnimation
@@ -42,7 +42,7 @@ internal class ScheduleContentProvider(
     override fun invoke(modifier: Modifier) {
         withDirectDI(directDI = { ScheduleFeatureManager.fetchDI() }) {
             ScheduleTheme {
-                Children(
+                ChildStack(
                     modifier = modifier,
                     stack = component.stack,
                     animation = backAnimation(

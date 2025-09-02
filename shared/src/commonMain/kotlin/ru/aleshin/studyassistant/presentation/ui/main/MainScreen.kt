@@ -28,7 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.navigation.backAnimation
@@ -71,7 +71,7 @@ fun MainScreen(
                 )
             },
         ) { paddingValues ->
-            Children(
+            ChildStack(
                 modifier = Modifier.padding(paddingValues),
                 stack = mainComponent.stack,
                 animation = backAnimation(

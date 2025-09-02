@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.billing.impl.presentation.ui.root
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import ru.aleshin.studyassistant.billing.impl.di.holder.BillingFeatureManager
 import ru.aleshin.studyassistant.billing.impl.presentation.theme.BillingTheme
 import ru.aleshin.studyassistant.billing.impl.presentation.ui.root.InternalBillingFeatureComponent.Child
@@ -40,7 +40,7 @@ public class BillingContentProvider internal constructor(
     override fun invoke(modifier: Modifier) {
         withDirectDI(directDI = { BillingFeatureManager.fetchDI() }) {
             BillingTheme {
-                Children(
+                ChildStack(
                     modifier = modifier,
                     stack = component.stack,
                     animation = backAnimation(

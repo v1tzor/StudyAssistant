@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.ui.root
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import ru.aleshin.studyassistant.core.common.di.withDirectDI
 import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
 import ru.aleshin.studyassistant.core.common.navigation.backAnimation
@@ -43,7 +43,7 @@ public class TasksContentProvider internal constructor(
     override fun invoke(modifier: Modifier) {
         withDirectDI(directDI = { TasksFeatureManager.fetchDI() }) {
             TasksTheme {
-                Children(
+                ChildStack(
                     modifier = modifier,
                     stack = component.stack,
                     animation = backAnimation(

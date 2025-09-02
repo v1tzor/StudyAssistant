@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.chat.impl.presentation.ui.root
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import ru.aleshin.studyassistant.chat.impl.di.holder.ChatFeatureManager
 import ru.aleshin.studyassistant.chat.impl.presentation.theme.ChatTheme
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.AssistantContent
@@ -40,7 +40,7 @@ public class ChatContentProvider internal constructor(
     override fun invoke(modifier: Modifier) {
         withDirectDI(directDI = { ChatFeatureManager.fetchDI() }) {
             ChatTheme {
-                Children(
+                ChildStack(
                     modifier = modifier,
                     stack = component.stack,
                     animation = backAnimation(

@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.auth.impl.presentation.ui.root
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import ru.aleshin.studyassistant.auth.impl.di.holder.AuthFeatureManager
 import ru.aleshin.studyassistant.auth.impl.presentation.theme.AuthTheme
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.ForgotContent
@@ -43,7 +43,7 @@ public class AuthContentProvider internal constructor(
     override fun invoke(modifier: Modifier) {
         withDirectDI(directDI = { AuthFeatureManager.fetchDI() }) {
             AuthTheme {
-                Children(
+                ChildStack(
                     modifier = modifier,
                     stack = component.stack,
                     animation = backAnimation(

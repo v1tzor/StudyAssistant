@@ -14,12 +14,38 @@
  * limitations under the License.
  */
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ComposeUIViewController
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.ExperimentalDecomposeApi
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.PredictiveBackGestureOverlay
+import com.arkivanov.essenty.backhandler.BackDispatcher
+import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.presentation.ui.main.MainScreen
+import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponentFactory
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
  */
-fun MainViewController() = ComposeUIViewController {
-    MainScreen()
+@OptIn(ExperimentalDecomposeApi::class)
+fun MainViewController(
+    componentContext: ComponentContext,
+    backDispatcher: BackDispatcher,
+) = ComposeUIViewController {
+    val componentFactory = remember {
+        MainDependenciesGraph.fetchDI().instance<MainComponentFactory>()
+    }
+    val mainComponent = remember {
+        componentFactory.createComponent(componentContext)
+    }
+    PredictiveBackGestureOverlay(
+        backDispatcher = backDispatcher,
+        backIcon = null,
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        MainScreen(mainComponent = mainComponent)
+    }
 }

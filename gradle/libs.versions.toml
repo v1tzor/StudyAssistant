@@ -186,6 +186,10 @@ decompose-core = { module = "com.arkivanov.decompose:decompose", version.ref = "
 decompose-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
 decompose-compose-experimental = { module = "com.arkivanov.decompose:extensions-compose-experimental", version.ref = "decompose" }
 decompose-lifecycle-coroutines = { module = "com.arkivanov.essenty:lifecycle-coroutines", version.ref = "essenty" }
+decompose-essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
+decompose-essenty-statekeeper = { module = "com.arkivanov.essenty:state-keeper", version.ref = "essenty" }
+decompose-essenty-instancekeeper = { module = "com.arkivanov.essenty:instance-keeper", version.ref = "essenty" }
+decompose-essenty-backhandler = { module = "com.arkivanov.essenty:back-handler", version.ref = "essenty" }
 
 # Ktor
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -218,6 +222,7 @@ filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref =
 
 [bundles]
 decompose = ["decompose-core", "decompose-compose", "decompose-compose-experimental", "decompose-lifecycle-coroutines"]
+essenty = ["decompose-essenty-lifecycle", "decompose-essenty-backhandler", "decompose-essenty-instancekeeper", "decompose-essenty-statekeeper"]
 sketch = ["sketch-compose", "sketch-compose-resources", "sketch-compose-extnsions-resources", "sketch-http", "sketch-ktor"]
 tracer = ["tracer-crashReport", "tracer-crashReportNative", "tracer-heapDumps", "tracer-diskUsage", "tracer-samplingProfiler", "tracer-systraceProfiler"]
 filekit = ["filekit-core", "filekit-compose"]

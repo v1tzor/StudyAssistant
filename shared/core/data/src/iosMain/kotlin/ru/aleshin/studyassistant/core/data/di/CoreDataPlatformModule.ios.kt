@@ -21,6 +21,8 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import platform.UserNotifications.UNUserNotificationCenter
+import ru.aleshin.studyassistant.core.api.auth.AccountService
+import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
 import ru.aleshin.studyassistant.core.data.managers.reminders.EndClassesReminderManagerImpl
 import ru.aleshin.studyassistant.core.data.managers.reminders.HomeworksReminderManagerImpl
 import ru.aleshin.studyassistant.core.data.managers.reminders.NotificationScheduler
@@ -42,6 +44,7 @@ actual val coreDataPlatformModule = DI.Module("CoreDataPlatform") {
     bindProvider<HomeworksReminderManager> { HomeworksReminderManagerImpl() }
     bindProvider<StartClassesReminderManager> { StartClassesReminderManagerImpl() }
     bindProvider<EndClassesReminderManager> { EndClassesReminderManagerImpl() }
+    bindSingleton<UserSessionProvider> { instance<AccountService>() }
     bindSingleton<NotificationScheduler> {
         NotificationScheduler(UNUserNotificationCenter.currentNotificationCenter(), instance())
     }
