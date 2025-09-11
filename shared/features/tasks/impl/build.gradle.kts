@@ -63,3 +63,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 }
+
+composeCompiler {
+    reportsDestination = layout.buildDirectory.dir("compose_metrics")
+    metricsDestination = layout.buildDirectory.dir("compose_metrics")
+}

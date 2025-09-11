@@ -44,7 +44,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.views.Regist
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.register.views.RegisterInputSection
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
+import ru.aleshin.studyassistant.core.ui.views.AdaptiveContent
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 
 /**
@@ -57,14 +57,13 @@ internal fun RegisterContent(
 ) {
     val store = registerComponent.store
     val strings = AuthThemeRes.strings
-    val windowSize = LocalWindowSize.current
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            when (windowSize.heightWindowType) {
-                else -> BaseRegisterContent(
+            AdaptiveContent {
+                BaseRegisterContent(
                     state = store.stateAsState().value,
                     modifier = Modifier.padding(paddingValues),
                     onLoginClick = {

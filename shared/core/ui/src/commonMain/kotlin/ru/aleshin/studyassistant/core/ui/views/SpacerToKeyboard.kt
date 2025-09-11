@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.common.extensions.pxToDp
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
 
 /**
  * @author Stanislav Aleshin on 17.07.2025.
@@ -45,7 +44,7 @@ fun SpacerToKeyboard(
     additionOffset: Dp = 12.dp
 ) {
     val density = LocalDensity.current
-    val windowSize = LocalWindowSize.current
+    val windowSize = currentScreenSize()
 
     val imeHeight = WindowInsets.ime.getBottom(density).pxToDp(density)
     val bottomBarHeight = WindowInsets.navigationBars.getBottom(density).pxToDp(density)
@@ -62,7 +61,7 @@ fun SpacerToKeyboard(
                 val position = coordinates.positionInWindow()
                 val bottomPx = with(density) { (position.y + coordinates.size.height).toDp() }
 
-                bottomOffsetDp = windowSize.heightWindowDpSize - bottomPx
+                bottomOffsetDp = windowSize.height - bottomPx
             }
             .padding(
                 bottom = bottomPadding

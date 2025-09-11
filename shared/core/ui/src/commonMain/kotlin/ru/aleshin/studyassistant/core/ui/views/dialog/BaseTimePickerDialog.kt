@@ -61,7 +61,7 @@ import kotlinx.datetime.toInstant
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
+import ru.aleshin.studyassistant.core.ui.views.currentScreenSize
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -85,7 +85,7 @@ fun TimePickerDialog(
     val localTime = remember(pickerState.hour, pickerState.minute) {
         LocalTime(pickerState.hour, pickerState.minute)
     }
-    val configuration = LocalWindowSize.current
+    val configuration = currentScreenSize()
 
     BasicTimePickerDialog(
         modifier = modifier,
@@ -109,7 +109,7 @@ fun TimePickerDialog(
             pickerState.minute = if (currentDateTime.minute != 59) currentDateTime.minute + 1 else 0
         },
         toggle = {
-            if (configuration.heightWindowDpSize > 400.dp) {
+            if (configuration.height > 400.dp) {
                 IconButton(
                     modifier = Modifier.size(36.dp),
                     onClick = { showingPicker = !showingPicker }
@@ -126,7 +126,7 @@ fun TimePickerDialog(
             }
         }
     ) {
-        if (showingPicker && configuration.heightWindowDpSize > 400.dp) {
+        if (showingPicker && configuration.height > 400.dp) {
             TimePicker(state = pickerState)
         } else {
             TimeInput(state = pickerState)

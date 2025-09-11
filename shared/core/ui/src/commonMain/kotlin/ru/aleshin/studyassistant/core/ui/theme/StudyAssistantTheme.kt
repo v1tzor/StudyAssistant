@@ -42,13 +42,11 @@ import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantElevati
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantIcons
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantLanguage
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantStrings
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantColors
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppElevations
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreIcons
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
-import ru.aleshin.studyassistant.core.ui.theme.tokens.rememberScreenSizeInfo
 import ru.aleshin.studyassistant.core.ui.views.NavigationBarColor
 
 /**
@@ -60,14 +58,23 @@ fun StudyAssistantTheme(
     languageType: LanguageUiType = LanguageUiType.DEFAULT,
     content: @Composable () -> Unit,
 ) {
-    val windowSize = rememberScreenSizeInfo()
-    val appLanguage = remember(languageType) { fetchAppLanguage(languageType) }
-    val appElevations = remember { fetchAppElevations() }
-    val appIcons = remember { fetchCoreIcons() }
+    val appLanguage = remember(languageType) {
+        fetchAppLanguage(languageType)
+    }
+    val appElevations = remember {
+        fetchAppElevations()
+    }
+    val appIcons = remember {
+        fetchCoreIcons()
+    }
     val isDark = themeType.isDarkTheme()
     val colorAccents = themeType.toColorAccents()
-    val coreColors = remember(isDark, colorAccents) { StudyAssistantColors(isDark, colorAccents) }
-    val coreStrings = remember(appLanguage) { fetchCoreStrings(appLanguage) }
+    val coreColors = remember(isDark, colorAccents) {
+        StudyAssistantColors(isDark, colorAccents)
+    }
+    val coreStrings = remember(appLanguage) {
+        fetchCoreStrings(appLanguage)
+    }
 
     MaterialTheme(
         colorScheme = themeType.toColorScheme(),
@@ -80,7 +87,6 @@ fun StudyAssistantTheme(
             LocalStudyAssistantElevations provides appElevations,
             LocalStudyAssistantStrings provides coreStrings,
             LocalStudyAssistantIcons provides appIcons,
-            LocalWindowSize provides windowSize,
         ) {
             KoalaPlotTheme(
                 sizes = Sizes(),

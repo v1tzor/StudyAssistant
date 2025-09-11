@@ -50,6 +50,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
@@ -57,6 +58,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsS
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder.OVERVIEW_ITEMS
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.views.AdaptiveContent
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
@@ -171,6 +173,12 @@ private fun BaseOverviewContent(
     onAgainHomeworkClick: (HomeworkDetailsUi) -> Unit,
     onCompleteHomeworkClick: (HomeworkDetailsUi) -> Unit,
 ) {
+    AdaptiveContent(
+        mediumContent = { Logger.i("test") { "show medium content" } },
+        expandedContent = { Logger.i("test") { "show expanded content" } }
+    ) {
+        Logger.i("test") { "show compact content" }
+    }
     Crossfade(
         modifier = modifier.fillMaxSize().padding(top = 12.dp),
         targetState = state.isScheduleLoading,

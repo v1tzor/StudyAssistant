@@ -31,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -40,12 +41,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowHeightSizeClass
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
-import ru.aleshin.studyassistant.core.ui.theme.tokens.WindowSize
 import ru.aleshin.studyassistant.core.ui.views.CircularStepsRow
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
@@ -68,15 +68,15 @@ internal fun IntroContent(
     val store = introComponent.store
     val strings = PreviewThemeRes.strings
     val coreStrings = StudyAssistantRes.strings
-    val windowSize = LocalWindowSize.current
+    val windowSize = currentWindowAdaptiveInfo().windowSizeClass
     val pagerState = rememberPagerState { IntroPage.entries.size }
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         content = { paddingValues ->
-            when (windowSize.heightWindowType) {
-                WindowSize.WindowType.COMPACT -> BaseIntroContentCompact(
+            when (windowSize.windowHeightSizeClass) {
+                WindowHeightSizeClass.COMPACT -> BaseIntroContentCompact(
                     modifier = Modifier.padding(paddingValues),
                     pagerState = pagerState,
                     onBackClick = {

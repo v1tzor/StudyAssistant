@@ -50,7 +50,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEf
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
+import ru.aleshin.studyassistant.core.ui.views.AdaptiveContent
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
@@ -81,15 +81,14 @@ internal fun SetupContent(
     val state by store.stateAsState()
     val strings = PreviewThemeRes.strings
     val coreStrings = StudyAssistantRes.strings
-    val windowSize = LocalWindowSize.current
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            when (windowSize.heightWindowType) {
-                else -> BaseSetupContent(
+            AdaptiveContent {
+                BaseSetupContent(
                     state = state,
                     modifier = Modifier.padding(paddingValues),
                     onUpdateProfile = { store.dispatchEvent(SetupEvent.UpdateProfile(it)) },

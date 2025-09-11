@@ -59,7 +59,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEf
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.functional.Constants.App.PRIVACY_POLICY
 import ru.aleshin.studyassistant.core.domain.entities.users.UserSession
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
+import ru.aleshin.studyassistant.core.ui.views.AdaptiveContent
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 
 /**
@@ -71,7 +71,6 @@ internal fun LoginContent(
     modifier: Modifier = Modifier,
 ) {
     val store = loginComponent.store
-    val windowSize = LocalWindowSize.current
     val strings = AuthThemeRes.strings
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
@@ -79,8 +78,8 @@ internal fun LoginContent(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            when (windowSize.heightWindowType) {
-                else -> BaseLoginContent(
+            AdaptiveContent {
+                BaseLoginContent(
                     state = store.stateAsState().value,
                     modifier = Modifier.padding(paddingValues),
                     onLoginClick = { email, password ->

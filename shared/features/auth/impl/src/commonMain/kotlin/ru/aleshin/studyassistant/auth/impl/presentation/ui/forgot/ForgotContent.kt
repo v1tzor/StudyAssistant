@@ -46,7 +46,7 @@ import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.store.ForgotCo
 import ru.aleshin.studyassistant.auth.impl.presentation.ui.forgot.views.ForgotActionsSection
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalWindowSize
+import ru.aleshin.studyassistant.core.ui.views.AdaptiveContent
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.SpacerToKeyboard
 
@@ -60,14 +60,13 @@ internal fun ForgotContent(
 ) {
     val store = forgotComponent.store
     val strings = AuthThemeRes.strings
-    val windowSize = LocalWindowSize.current
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            when (windowSize.heightWindowType) {
-                else -> BaseForgotContent(
+            AdaptiveContent {
+                BaseForgotContent(
                     state = store.stateAsState().value,
                     modifier = Modifier.padding(paddingValues),
                     onLoginClick = {
