@@ -76,7 +76,7 @@ internal data class PreviewStrings(
             friendsIntroTitle = "Находите друзей, делитесь заданиями и расписаниями",
             friendsIntroBody = "Войдите в аккаунт, чтобы начать взаимодействовать с другими людьми, а также обмениваться расписаниями и заданиями",
             loginLabel = "Войти в аккаунт",
-            registerLabel = "Зарегестрироваться",
+            registerLabel = "Зарегистрироваться",
             stepTitle = "Шаг ",
             profileStepTitle = "Заполните ваш профиль",
             profileButtonLabel = "Сохранить",
