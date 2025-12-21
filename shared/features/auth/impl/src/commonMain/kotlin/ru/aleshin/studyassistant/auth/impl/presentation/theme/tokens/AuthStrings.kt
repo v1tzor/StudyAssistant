@@ -124,7 +124,7 @@ internal data class AuthStrings(
             alreadyHavePasswordLabelSecond = "Войдите",
             registerDesc = "Регистрация",
             registerHeadline = "Давайте\nначнём вместе!",
-            registerLabel = "Зарегестрироваться",
+            registerLabel = "Зарегистрироваться",
             forgotDesc = "Восстановление пароля",
             forgotHeadline = "Давайте\nвосстановим\nваш пароль",
             sendEmailLabel = "Отправить письмо",
