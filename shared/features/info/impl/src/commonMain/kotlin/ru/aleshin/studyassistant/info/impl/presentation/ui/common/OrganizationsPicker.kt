@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
 import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
-import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
+import ru.aleshin.studyassistant.info.impl.resources.Res
+import ru.aleshin.studyassistant.info.impl.resources.organization_selector_header
+import ru.aleshin.studyassistant.info.impl.resources.organization_selector_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_organization_geo as core_ic_organization_geo
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.
@@ -79,12 +84,12 @@ internal fun OrganizationPicker(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            painter = painterResource(StudyAssistantRes.icons.organizationGeo),
+            painter = painterResource(CoreRes.drawable.core_ic_organization_geo),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            text = organization?.shortName ?: StudyAssistantRes.strings.noneTitle,
+            text = organization?.shortName ?: stringResource(CoreRes.string.core_none_title),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -123,14 +128,14 @@ private fun OrganizationSelectorBottomSheet(
         modifier = modifier,
         selected = selectedOrganization,
         items = organizations,
-        header = InfoThemeRes.strings.organizationSelectorHeader,
-        title = InfoThemeRes.strings.organizationSelectorTitle,
+        header = stringResource(Res.string.organization_selector_header),
+        title = stringResource(Res.string.organization_selector_title),
         itemView = { organization ->
             SelectorItemView(
                 onClick = { selectedOrganization = organization },
                 selected = organization.uid == selectedOrganization?.uid,
                 title = organization.shortName,
-                label = organization.type.mapToSting(StudyAssistantRes.strings),
+                label = organization.type.mapToSting(),
             )
         },
         onDismissRequest = onDismiss,

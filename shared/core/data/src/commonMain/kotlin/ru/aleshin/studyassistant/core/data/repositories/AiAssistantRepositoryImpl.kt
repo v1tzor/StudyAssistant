@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,34 +17,24 @@
 package ru.aleshin.studyassistant.core.data.repositories
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.data.handlers.AiConversationHandler
 import ru.aleshin.studyassistant.core.data.mappers.ai.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.ai.mapToLocal
-import ru.aleshin.studyassistant.core.data.mappers.ai.mapToRemote
 import ru.aleshin.studyassistant.core.database.datasource.ai.AiLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantResponse
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiChat
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiChatHistory
-import ru.aleshin.studyassistant.core.domain.entities.ai.dropUnconfirmedMessages
-import ru.aleshin.studyassistant.core.domain.entities.ai.dropUntilConfirmedMessage
-import ru.aleshin.studyassistant.core.domain.entities.ai.optimisedMessagesForSend
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
-import ru.aleshin.studyassistant.core.remote.api.ai.AiRemoteApi
-import ru.aleshin.studyassistant.core.remote.models.ai.ChatCompletionRequest
-import ru.aleshin.studyassistant.core.remote.models.ai.ChatCompletionToolChoicePojo
-import ru.aleshin.studyassistant.core.remote.models.ai.ChatModel
 
 /**
  * @author Stanislav Aleshin on 21.06.2025.
  */
-class AiAssistantRepositoryImpl(
-    private val aiApi: AiRemoteApi,
+internal class AiAssistantRepositoryImpl(
     private val localDataSource: AiLocalDataSource,
-    private val dateManager: DateManager,
+    private val conversationHandler: AiConversationHandler,
 ) : AiAssistantRepository {
 
     override suspend fun addOrUpdateChat(chatHistory: AiChatHistory) {
@@ -70,102 +60,21 @@ class AiAssistantRepositoryImpl(
     }
 
     override suspend fun retrySendLastMessage(chatId: UID): AiAssistantMessage.AssistantMessage? {
-        val chatHistory = localDataSource.fetchChatHistoryById(chatId).first()
-        val messages = chatHistory?.messages?.map { it.mapToDomain() }
-        if (messages.isNullOrEmpty()) throw NoSuchElementException()
-
-        val assistantMessage = if (
-            messages.last { it !is AiAssistantMessage.SystemMessage } is AiAssistantMessage.UserMessage
-        ) {
-            val optimisedMessages = messages.optimisedMessagesForSend()
-            val request = ChatCompletionRequest(
-                model = ChatModel.DEEPSEEK_CHAT.model,
-                messages = optimisedMessages.map { it.mapToRemote() },
-                tools = listOf(
-                    AiRemoteApi.Base.createTodoTool,
-                    AiRemoteApi.Base.createHomework,
-                    AiRemoteApi.Base.getOrganizationsTool,
-                    AiRemoteApi.Base.getSubjectsTool,
-                    AiRemoteApi.Base.getEmployeeTool,
-                    AiRemoteApi.Base.getHomeworksTool,
-                    AiRemoteApi.Base.getOverdueHomeworksTool,
-                    AiRemoteApi.Base.getClassesByDateTool,
-                    AiRemoteApi.Base.getNearClassTool,
-                ),
-                toolChoice = ChatCompletionToolChoicePojo.AUTO
-            )
-            val response = aiApi.chatCompletion(request).mapToDomain(
-                time = dateManager.fetchCurrentInstant(),
-            )
-            response.choices.firstOrNull()?.message
-        } else {
-            messages.dropUntilConfirmedMessage { message ->
-                localDataSource.deleteChatMessage(message.id)
-            }
-        }
-
-        return assistantMessage as? AiAssistantMessage.AssistantMessage
+        return conversationHandler.retryLastMessage(chatId)
     }
 
     override suspend fun sendUserMessage(
         chatId: UID,
         message: AiAssistantMessage.UserMessage?,
     ): AiAssistantResponse {
-        deleteUnconfirmedMessages(chatId)
-        if (message != null) {
-            localDataSource.addChatMessage(message.mapToLocal(chatId))
-        }
-        val chatHistory = localDataSource.fetchChatHistoryById(chatId).first()
-        val messages = chatHistory?.messages?.map { it.mapToDomain() }?.optimisedMessagesForSend()
-        if (messages.isNullOrEmpty()) throw NoSuchElementException()
-        val request = ChatCompletionRequest(
-            model = ChatModel.DEEPSEEK_CHAT.model,
-            messages = messages.map { it.mapToRemote() },
-            tools = listOf(
-                AiRemoteApi.Base.createTodoTool,
-                AiRemoteApi.Base.createHomework,
-                AiRemoteApi.Base.getOrganizationsTool,
-                AiRemoteApi.Base.getSubjectsTool,
-                AiRemoteApi.Base.getEmployeeTool,
-                AiRemoteApi.Base.getHomeworksTool,
-                AiRemoteApi.Base.getOverdueHomeworksTool,
-                AiRemoteApi.Base.getClassesByDateTool,
-                AiRemoteApi.Base.getNearClassTool,
-            ),
-            toolChoice = ChatCompletionToolChoicePojo.AUTO
-        )
-        return aiApi.chatCompletion(request).mapToDomain(
-            time = dateManager.fetchCurrentInstant(),
-        )
+        return conversationHandler.sendUserMessage(chatId, message)
     }
 
     override suspend fun sendToolResponse(
         chatId: UID,
         messages: List<AiAssistantMessage.ToolMessage>
     ): AiAssistantResponse {
-        localDataSource.addChatMessages(messages.map { it.mapToLocal(chatId) })
-        val chatHistory = localDataSource.fetchChatHistoryById(chatId).first()
-        val messages = chatHistory?.messages?.map { it.mapToDomain() }?.optimisedMessagesForSend()
-        if (messages.isNullOrEmpty()) throw NoSuchElementException()
-        val request = ChatCompletionRequest(
-            model = ChatModel.DEEPSEEK_CHAT.model,
-            messages = messages.map { it.mapToRemote() },
-            tools = listOf(
-                AiRemoteApi.Base.createTodoTool,
-                AiRemoteApi.Base.createHomework,
-                AiRemoteApi.Base.getOrganizationsTool,
-                AiRemoteApi.Base.getEmployeeTool,
-                AiRemoteApi.Base.getSubjectsTool,
-                AiRemoteApi.Base.getHomeworksTool,
-                AiRemoteApi.Base.getOverdueHomeworksTool,
-                AiRemoteApi.Base.getClassesByDateTool,
-                AiRemoteApi.Base.getNearClassTool,
-            ),
-            toolChoice = ChatCompletionToolChoicePojo.AUTO,
-        )
-        return aiApi.chatCompletion(request).mapToDomain(
-            time = dateManager.fetchCurrentInstant(),
-        )
+        return conversationHandler.sendToolResponse(chatId, messages)
     }
 
     override suspend fun saveAssistantMessage(
@@ -183,11 +92,11 @@ class AiAssistantRepositoryImpl(
     }
 
     override suspend fun deleteUnconfirmedMessages(chatId: UID) {
-        val chatHistory = localDataSource.fetchChatHistoryById(chatId).first()
-        val messages = chatHistory?.messages?.map { it.mapToDomain() }
-        messages?.dropUnconfirmedMessages {
-            localDataSource.deleteChatMessage(it.id)
-        }
+        conversationHandler.deleteUnconfirmedMessages(chatId)
+    }
+
+    override suspend fun testPersonalKey(apiKey: String) {
+        conversationHandler.testPersonalKey(apiKey)
     }
 
     override suspend fun deleteChat(chatId: UID?) {

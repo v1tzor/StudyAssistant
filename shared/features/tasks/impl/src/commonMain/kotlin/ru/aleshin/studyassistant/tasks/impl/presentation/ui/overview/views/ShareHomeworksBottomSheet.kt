@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,14 +31,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -51,7 +45,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,26 +53,29 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
-import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.views.CircularStepsRow
-import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkTaskComponentUi
 import ru.aleshin.studyassistant.core.ui.views.sheet.MediumDragHandle
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.HomeworkShareSelectionUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTaskComponentUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToMediated
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.fetchAllTasks
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.create_share_code_title
+import ru.aleshin.studyassistant.tasks.impl.resources.selection_subject_step_header
+import ru.aleshin.studyassistant.tasks.impl.resources.selection_subject_step_label
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_book_study as core_ic_book_study
+import ru.aleshin.studyassistant.core.ui.resources.ic_presentation as core_ic_presentation
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
 
 /**
  * @author Stanislav Aleshin on 24.07.2024.
@@ -89,13 +85,10 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 internal fun ShareHomeworksBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-    pagerState: PagerState = rememberPagerState { ShareHomeworksStep.entries.size },
-    currentTime: Instant,
     targetDate: Instant,
     homeworks: List<HomeworkDetailsUi>,
-    allFriends: List<AppUserUi>,
     onDismissRequest: () -> Unit,
-    onConfirm: (SentMediatedHomeworksDetailsUi) -> Unit,
+    onConfirm: (HomeworkShareSelectionUi) -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -109,103 +102,34 @@ internal fun ShareHomeworksBottomSheet(
             verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            var selectedHomeworks by remember { mutableStateOf(homeworks) }
-            var targetRecipients by remember { mutableStateOf<List<AppUserUi>>(emptyList()) }
-
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxWidth(),
-                userScrollEnabled = false,
-            ) { page ->
-                when (ShareHomeworksStep.byNumber(page)) {
-                    ShareHomeworksStep.SUBJECTS -> ShareHomeworksSheetSubjectsStep(
-                        selectedHomeworks = selectedHomeworks,
-                        allHomeworks = homeworks,
-                        onSelectedHomework = { homework ->
-                            selectedHomeworks = buildList {
-                                addAll(selectedHomeworks)
-                                add(homework)
-                            }
-                        },
-                        onUnselectedHomework = { homework ->
-                            selectedHomeworks = buildList {
-                                addAll(selectedHomeworks)
-                                remove(homework)
-                            }
-                        },
-                    )
-                    ShareHomeworksStep.RECIPIENTS -> ShareHomeworksSheetRecipientsStep(
-                        recipients = targetRecipients,
-                        allFriends = allFriends,
-                        onSelectedRecipient = { user ->
-                            targetRecipients = buildList {
-                                addAll(targetRecipients)
-                                add(user)
-                            }
-                        },
-                        onUnselectedRecipient = { user ->
-                            targetRecipients = buildList {
-                                addAll(targetRecipients)
-                                remove(user)
-                            }
-                        },
-                    )
-                }
+            var selectedHomeworks by remember(homeworks) {
+                mutableStateOf(homeworks.take(MAX_SHARED_HOMEWORKS))
             }
-            CircularStepsRow(
-                stepsCount = ShareHomeworksStep.entries.size,
-                currentStep = pagerState.currentPage,
+            ShareHomeworksSheetSubjectsStep(
+                selectedHomeworks = selectedHomeworks,
+                allHomeworks = homeworks,
+                onSelectedHomework = { homework ->
+                    if (selectedHomeworks.size < MAX_SHARED_HOMEWORKS) {
+                        selectedHomeworks = selectedHomeworks + homework
+                    }
+                },
+                onUnselectedHomework = { homework ->
+                    selectedHomeworks = selectedHomeworks - homework
+                },
             )
-            Row(
+            Button(
+                enabled = selectedHomeworks.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                val scope = rememberCoroutineScope()
-                when (ShareHomeworksStep.byNumber(pagerState.currentPage)) {
-                    ShareHomeworksStep.SUBJECTS -> {
-                        FilledTonalButton(
-                            enabled = selectedHomeworks.isNotEmpty(),
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = {
-                                scope.launch {
-                                    pagerState.animateScrollToPage(ShareHomeworksStep.RECIPIENTS.number)
-                                }
-                            },
-                            content = { Text(text = TasksThemeRes.strings.selectionSubjectStepAction) },
+                onClick = {
+                    onConfirm(
+                        HomeworkShareSelectionUi(
+                            date = targetDate.startThisDay(),
+                            homeworks = selectedHomeworks.map { it.convertToMediated() },
                         )
-                    }
-                    ShareHomeworksStep.RECIPIENTS -> {
-                        Button(
-                            enabled = selectedHomeworks.isNotEmpty() && targetRecipients.isNotEmpty(),
-                            modifier = Modifier.weight(1f),
-                            onClick = {
-                                val sentMediatedHomeworks = SentMediatedHomeworksDetailsUi(
-                                    uid = randomUUID(),
-                                    date = targetDate.startThisDay(),
-                                    sendDate = currentTime,
-                                    recipients = targetRecipients,
-                                    homeworks = selectedHomeworks.map { it.convertToMediated() },
-                                )
-                                onConfirm(sentMediatedHomeworks)
-                            },
-                            content = { Text(text = TasksThemeRes.strings.specifyRecipientsStepAction) },
-                        )
-                        Button(
-                            onClick = {
-                                scope.launch {
-                                    pagerState.animateScrollToPage(ShareHomeworksStep.SUBJECTS.number)
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            ),
-                            content = { Text(text = StudyAssistantRes.strings.backTitle) },
-                        )
-                    }
-                }
-            }
+                    )
+                },
+                content = { Text(text = stringResource(Res.string.create_share_code_title)) },
+            )
         }
     }
 }
@@ -224,7 +148,7 @@ private fun ShareHomeworksSheetSubjectsStep(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
-                text = TasksThemeRes.strings.selectionSubjectStepHeader,
+                text = stringResource(Res.string.selection_subject_step_header),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 overflow = TextOverflow.Ellipsis,
@@ -232,7 +156,7 @@ private fun ShareHomeworksSheetSubjectsStep(
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
-                text = TasksThemeRes.strings.selectionSubjectStepLabel,
+                text = stringResource(Res.string.selection_subject_step_label),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2,
@@ -245,6 +169,8 @@ private fun ShareHomeworksSheetSubjectsStep(
         ) {
             items(allHomeworks, key = { it.uid }) { homework ->
                 ShareHomeworkView(
+                    enabled = selectedHomeworks.contains(homework) ||
+                        selectedHomeworks.size < MAX_SHARED_HOMEWORKS,
                     checked = selectedHomeworks.contains(homework),
                     deadline = homework.deadline,
                     subject = homework.subject,
@@ -259,6 +185,8 @@ private fun ShareHomeworksSheetSubjectsStep(
         }
     }
 }
+
+private const val MAX_SHARED_HOMEWORKS = 20
 
 @Composable
 private fun ShareHomeworkView(
@@ -315,7 +243,7 @@ private fun ShareHomeworkViewContent(
         Column {
             Text(
                 text = deadline.formatByTimeZone(
-                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings),
+                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(),
                 ),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
@@ -324,7 +252,7 @@ private fun ShareHomeworkViewContent(
                 style = MaterialTheme.typography.labelSmall,
             )
             Text(
-                text = subject ?: StudyAssistantRes.strings.noneTitle,
+                text = subject ?: stringResource(CoreRes.string.core_none_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2,
@@ -333,15 +261,15 @@ private fun ShareHomeworkViewContent(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             ShareHomeworkTaskCountView(
-                painter = painterResource(StudyAssistantRes.icons.theoreticalTasks),
+                painter = painterResource(CoreRes.drawable.core_ic_book_study),
                 count = theoreticalTasks.fetchAllTasks().size,
             )
             ShareHomeworkTaskCountView(
-                painter = painterResource(StudyAssistantRes.icons.practicalTasks),
+                painter = painterResource(CoreRes.drawable.core_ic_tasks_circular),
                 count = practicalTasks.fetchAllTasks().size,
             )
             ShareHomeworkTaskCountView(
-                painter = painterResource(StudyAssistantRes.icons.presentationTasks),
+                painter = painterResource(CoreRes.drawable.core_ic_presentation),
                 count = presentationTasks.fetchAllTasks().size,
             )
         }
@@ -373,124 +301,5 @@ private fun ShareHomeworkTaskCountView(
             maxLines = 1,
             style = MaterialTheme.typography.labelMedium,
         )
-    }
-}
-
-@Composable
-private fun ShareHomeworksSheetRecipientsStep(
-    modifier: Modifier = Modifier,
-    recipients: List<AppUserUi>,
-    allFriends: List<AppUserUi>,
-    onSelectedRecipient: (AppUserUi) -> Unit,
-    onUnselectedRecipient: (AppUserUi) -> Unit,
-) {
-    Column(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(
-                text = TasksThemeRes.strings.specifyRecipientsStepHeader,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = TasksThemeRes.strings.specifyRecipientsStepLabel,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 2,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth().height(350.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(allFriends, key = { it.uid }) { friendUser ->
-                UserView(
-                    checked = recipients.contains(friendUser),
-                    name = friendUser.username,
-                    email = friendUser.email,
-                    avatar = friendUser.avatar,
-                    onCheckedChange = { isAdd ->
-                        if (isAdd) onSelectedRecipient(friendUser) else onUnselectedRecipient(friendUser)
-                    },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-internal fun UserView(
-    checked: Boolean,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    name: String,
-    email: String,
-    avatar: String?,
-    onCheckedChange: (Boolean) -> Unit,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AvatarView(
-            modifier = Modifier.size(40.dp),
-            firstName = name.split(' ').getOrElse(0) { "-" },
-            secondName = name.split(' ').getOrNull(1),
-            imageUrl = avatar,
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth().animateContentSize(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = name,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 2,
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                    Text(
-                        text = email,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-            }
-            Box(contentAlignment = Alignment.Center) {
-                Checkbox(
-                    checked = checked,
-                    onCheckedChange = onCheckedChange,
-                    modifier = Modifier.size(40.dp),
-                    enabled = enabled,
-                )
-            }
-        }
-    }
-}
-
-internal enum class ShareHomeworksStep(val number: Int) {
-    SUBJECTS(0), RECIPIENTS(1);
-
-    companion object {
-        fun byNumber(number: Int) = when (number) {
-            0 -> SUBJECTS
-            1 -> RECIPIENTS
-            else -> SUBJECTS
-        }
     }
 }

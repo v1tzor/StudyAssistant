@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import kotlinx.serialization.json.JsonElement
  */
 sealed class ClientParam {
     data class StringParam(val key: String, val value: String?) : ClientParam()
+
+    data class BooleanParam(val key: String, val value: Boolean) : ClientParam()
 
     data class MapParam(val key: String, val value: Map<String, Any>) : ClientParam()
 

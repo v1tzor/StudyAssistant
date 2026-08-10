@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import ru.aleshin.studyassistant.core.common.functional.TimeRange
 interface TimePeriodManager {
 
     fun splitByTimeRanges(period: TimePeriod): List<TimeRange>
-    
+
     class Base constructor(
         private val dateManager: DateManager,
     ) : TimePeriodManager {
@@ -36,14 +36,14 @@ interface TimePeriodManager {
             val timeRanges = mutableListOf<TimeRange>()
             val currentDate = dateManager.fetchEndCurrentInstant()
             val daysInChildPeriod = period.quantityDaysInChildPeriod()
-            
+
             repeat(period.quantityOfChildPeriods()) { childPeriod ->
                 val actualStartDate = currentDate.shiftDay(-period.toDays() + 1)
                 val start = actualStartDate.shiftDay(daysInChildPeriod * childPeriod)
                 val end = actualStartDate.shiftDay(daysInChildPeriod * (childPeriod + 1))
                 timeRanges.add(TimeRange(start, end.endThisDay()))
             }
-            
+
             return timeRanges
         }
     }

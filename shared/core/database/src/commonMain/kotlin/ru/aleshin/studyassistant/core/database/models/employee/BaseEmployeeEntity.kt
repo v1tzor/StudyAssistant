@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,13 @@
 package ru.aleshin.studyassistant.core.database.models.employee
 
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.database.utils.BaseLocalEntity
 
 /**
  * @author Stanislav Aleshin on 08.07.2024.
  */
 @Serializable
 data class BaseEmployeeEntity(
-    override val uid: String,
+    val uid: String,
     val organizationId: String,
     val firstName: String,
     val secondName: String?,
@@ -38,6 +37,5 @@ data class BaseEmployeeEntity(
     val phones: List<String>,
     val locations: List<String>,
     val webs: List<String>,
-    override val updatedAt: Long,
-    val isCacheData: Long,
-) : BaseLocalEntity()
+    val updatedAt: Long,
+)

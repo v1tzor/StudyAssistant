@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.editor.impl.presentation.models.classes
 
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.presentation.models.schedules.ClassUi
 
 /**
  * @author Stanislav Aleshin on 23.06.2024.

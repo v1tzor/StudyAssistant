@@ -1,23 +1,45 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+/*
+ * Copyright 2026 Stanislav Aleshin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.library)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.konfig)
     alias(libs.plugins.skie)
 }
 
 kotlin {
     jvmToolchain(17)
 
-    androidTarget()
+    android {
+        namespace = "ru.aleshin.studyassistant.shared"
+        compileSdk = libs.versions.compileSdk.get().toInt()
+        minSdk = libs.versions.minSdk.get().toInt()
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach {
@@ -36,14 +58,9 @@ kotlin {
     }
 
     sourceSets {
-        androidMain.dependencies {
-            implementation(libs.rustore.universalpush.core)
-        }
         commonMain.dependencies {
             implementation(project(":shared:features:preview:api"))
             implementation(project(":shared:features:preview:impl"))
-            implementation(project(":shared:features:auth:api"))
-            implementation(project(":shared:features:auth:impl"))
             implementation(project(":shared:features:schedule:api"))
             implementation(project(":shared:features:schedule:impl"))
             implementation(project(":shared:features:tasks:api"))
@@ -58,13 +75,13 @@ kotlin {
             implementation(project(":shared:features:users:impl"))
             implementation(project(":shared:features:editor:api"))
             implementation(project(":shared:features:editor:impl"))
-            implementation(project(":shared:features:billing:api"))
-            implementation(project(":shared:features:billing:impl"))
             implementation(project(":shared:features:chat:api"))
             implementation(project(":shared:features:chat:impl"))
+            implementation(project(":shared:features:analytics:api"))
+            implementation(project(":shared:features:analytics:impl"))
 
             api(project(":shared:core:common"))
-            api(project(":shared:core:ui"))
+            api(project(":shared:core:presentation"))
             api(project(":shared:core:domain"))
             api(project(":shared:core:data"))
             api(project(":shared:core:database"))
@@ -78,35 +95,5 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
-    }
-
-    task("testClasses")
-}
-
-android {
-    namespace = "ru.aleshin.studyassistant.shared"
-    compileSdk = libs.versions.compileSdk.get().toIntOrNull()
-
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toIntOrNull()
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
-
-buildkonfig {
-    packageName = "ru.aleshin.studyassistant"
-
-    val webClientId: String = gradleLocalProperties(rootDir, providers).getProperty("web_client_id")
-
-    require(webClientId.isNotEmpty()) {
-        "Enter your Google server's client ID (not your Android client ID) in local.properties"
-    }
-
-    defaultConfigs {
-        buildConfigField(STRING, "WEB_CLIENT_ID", webClientId)
     }
 }

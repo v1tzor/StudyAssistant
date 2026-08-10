@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,12 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.back_icon_desc as core_back_icon_desc
+import ru.aleshin.studyassistant.core.ui.resources.clear_search_bar_desk as core_clear_search_bar_desk
+import ru.aleshin.studyassistant.core.ui.resources.ic_employee as core_ic_employee
+import ru.aleshin.studyassistant.editor.impl.resources.*
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -60,9 +66,8 @@ import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemVie
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorSwipeItemView
 import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
 import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeDetailsUi
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -85,9 +90,9 @@ internal fun TeacherInfoField(
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
         value = teacher?.fullName(),
-        label = EditorThemeRes.strings.teacherFieldLabel,
-        placeholder = EditorThemeRes.strings.teacherFieldPlaceholder,
-        infoIcon = painterResource(StudyAssistantRes.icons.employee),
+        label = stringResource(Res.string.teacher_field_label),
+        placeholder = stringResource(Res.string.teacher_field_placeholder),
+        infoIcon = painterResource(CoreRes.drawable.core_ic_employee),
         trailingIcon = {
             ExpandedIcon(
                 isExpanded = openTeacherSelectorSheet,
@@ -125,7 +130,8 @@ internal fun TeacherSelectorBottomSheet(
     onConfirm: (EmployeeDetailsUi?) -> Unit,
 ) {
     var searchQuery by remember { mutableStateOf<String?>(null) }
-    val selectedEmployee = remember(employees, selected) { employees.find { it.uid == selected?.uid } }
+    val selectedEmployee =
+        remember(employees, selected) { employees.find { it.uid == selected?.uid } }
     val searchedTeachers = remember(searchQuery, employees) {
         employees.filter { employee ->
             val firstNameFilter = employee.firstName.contains(searchQuery ?: "", true)
@@ -146,8 +152,8 @@ internal fun TeacherSelectorBottomSheet(
         modifier = modifier,
         selected = selectedTeacher,
         items = teachers + otherEmployee,
-        header = EditorThemeRes.strings.teacherSelectorHeader,
-        title = EditorThemeRes.strings.teacherSelectorTitle,
+        header = stringResource(Res.string.teacher_selector_header),
+        title = stringResource(Res.string.teacher_selector_title),
         itemView = { employee ->
             val dismissState = rememberSwipeToDismissBoxState(
                 confirmValueChange = { dismissBoxValue ->
@@ -165,7 +171,7 @@ internal fun TeacherSelectorBottomSheet(
                 state = dismissState,
                 selected = employee.uid == selectedTeacher?.uid,
                 title = employee.fullName(),
-                label = employee.subjects.firstOrNull()?.name ?: employee.post.mapToString(StudyAssistantRes.strings),
+                label = employee.subjects.firstOrNull()?.name ?: employee.post.mapToString(),
                 leadingIcon = {
                     AvatarView(
                         modifier = modifier.size(40.dp),
@@ -230,12 +236,12 @@ internal fun TeacherSelectorBottomSheet(
                         onExpandedChange = {},
                         enabled = true,
                         placeholder = {
-                            Text(text = EditorThemeRes.strings.employeeSearchBarPlaceholder)
+                            Text(text = stringResource(Res.string.employee_search_bar_placeholder))
                         },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Search,
-                                contentDescription = StudyAssistantRes.strings.backIconDesc,
+                                contentDescription = stringResource(CoreRes.string.core_back_icon_desc),
                                 tint = MaterialTheme.colorScheme.onSurface,
                             )
                         },
@@ -253,7 +259,7 @@ internal fun TeacherSelectorBottomSheet(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
-                                        contentDescription = StudyAssistantRes.strings.clearSearchBarDesk,
+                                        contentDescription = stringResource(CoreRes.string.core_clear_search_bar_desk),
                                         tint = MaterialTheme.colorScheme.error,
                                     )
                                 }

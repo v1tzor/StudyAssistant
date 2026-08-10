@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="overview_header">Обзор заданий</string>
+    <string name="homeworks_header">Задания</string>
+    <string name="todos_header">Задачи</string>
+    <string name="daily_goals_section_header">Дневные цели</string>
+    <string name="goals_view_progress_title">Прогресс</string>
+    <string name="goals_view_progress_homework_label">Домашние задания</string>
+    <string name="goals_view_progress_todo_label">Задачи</string>
+    <string name="goals_view_closest_title">Цели на ближайшие дни</string>
+    <string name="goals_view_list_title">Список целей</string>
+    <string name="goals_view_list_empty_title">Список целей пуст</string>
+    <string name="delete_goal_warning_title">Предупреждение!</string>
+    <string name="delete_goal_warning_text">Вы действительно хотите удалить цель на день?</string>
+    <string name="goal_creator_headline">Планирование</string>
+    <string name="goal_creator_title">Установите дневную цель</string>
+    <string name="goal_creator_date_field_title">Дата</string>
+    <string name="goal_creator_date_field_placeholder">Выберите дату</string>
+    <string name="goal_creator_desired_time_field_title">Желаемая продолжительность</string>
+    <string name="goal_creator_confirm_title">Запланировать</string>
+    <string name="goal_sheet_time_control_title">Время выполнения</string>
+    <string name="goal_sheet_desired_time_label">Планируемое</string>
+    <string name="goal_sheet_desired_time_picker_title">Планируемое время</string>
+    <string name="goal_sheet_real_time_label">Настоящее</string>
+    <string name="goal_sheet_time_type_stopwatch">Секундомер</string>
+    <string name="goal_sheet_time_type_timer">Таймер</string>
+    <string name="goal_sheet_time_type_none">Без контроля</string>
+    <string name="goal_sheet_left_time_label">Осталось</string>
+    <string name="goal_sheet_elapsed_time_label">Прошло</string>
+    <string name="goal_sheet_homework_tasks_title">Задания</string>
+    <string name="goal_sheet_delete_action_label">Удалить</string>
+    <string name="goal_sheet_complete_action_label">Выполнить</string>
+    <string name="goal_sheet_cancel_action_label">Отменить</string>
+    <string name="homeworks_tasks_tab">Домашние задания</string>
+    <string name="todos_tasks_tab">Задачи</string>
+    <string name="share_homeworks_header">Обмен заданиями</string>
+    <string name="share_homeworks_button_title">Поделиться</string>
+    <string name="tasks_progress_tomorrow_label">На завтра</string>
+    <string name="tasks_progress_in_the_week_label">На неделе</string>
+    <string name="homework_errors_title">Ошибки</string>
+    <string name="homeworks_completed_title">Выполнено</string>
+    <string name="homework_execution_analysis_header">Аналитика выполенния</string>
+    <string name="coming_homeworks_execution_analysis_title">Ближайшее время</string>
+    <string name="all_homeworks_execution_analysis_title">За всё время</string>
+    <string name="scope_of_homeworks_header">Объём заданий</string>
+    <string name="homeworks_section_header">Обзор домашних заданий</string>
+    <string name="add_homework_title">Добавить задание</string>
+    <string name="show_all_title">Смотреть все</string>
+    <string name="homeworks_section_subtitle">Текущая неделя</string>
+    <string name="none_tasks_title">Задания отсутствуют</string>
+    <string name="none_todos_title">Задачи отсутствуют</string>
+    <string name="theoretical_tasks_bar_name">Теория</string>
+    <string name="practical_tasks_bar_name">Практика</string>
+    <string name="presentations_tasks_bar_name">Доклады</string>
+    <string name="in_progress_todos_section_header">В процессе</string>
+    <string name="error_todos_section_header">Пропущено</string>
+    <string name="completed_todos_section_header">Выполнено за неделю</string>
+    <string name="show_all_todos_title">Показать все</string>
+    <string name="until_deadline_date_suffix">До</string>
+    <string name="none_deadline_title">Без дедлайна</string>
+    <string name="overdue_deadline_title">Просрочено</string>
+    <string name="overall_homeworks_progress">Общий прогресс</string>
+    <string name="homework_test_label">Тест</string>
+    <string name="overdue_homeworks_header">Пропущенные задания</string>
+    <string name="detached_active_homeworks_header">Активные открепленные задания</string>
+    <string name="overdue_todos_header">Пропущенные задачи</string>
+    <string name="none_errors_title">Ошибки отсутствуют</string>
+    <string name="accept_homework_title">Принять</string>
+    <string name="ago_suffix">назад</string>
+    <string name="apply_shared_homeworks_title">Добавить</string>
+    <string name="homeworks_linked_header">Добавление заданий</string>
+    <string name="homeworks_linked_label">Свяжите предметы и занятия по названию</string>
+    <string name="target_user_subjects_title">Пользователь</string>
+    <string name="current_user_subjects_title">Вы</string>
+    <string name="specify_subject_label">Указать</string>
+    <string name="classes_not_found_label">Занятия не найдены</string>
+    <string name="subject_selector_header">Предмет</string>
+    <string name="subject_selector_title">Выберите соответствующий предмет</string>
+    <string name="linked_class_selector_header">Занятие</string>
+    <string name="linked_class_selector_title">Выберите соответствующее занятие</string>
+    <string name="number_of_class_suffix">занятие</string>
+    <string name="attach_classes_label">Прикрепите задание</string>
+    <string name="selection_subject_step_header">1. Выбор предметов</string>
+    <string name="selection_subject_step_label">Выберите предметы которыми хотите поделиться</string>
+    <string name="create_share_code_title">Создать код</string>
+    <string name="homework_share_ready_title">Код домашних заданий готов</string>
+    <string name="homework_share_expires_at_label">Действует до</string>
+    <string name="copy_share_link_title">Копировать ссылку</string>
+    <string name="receive_homework_share_title">Получить домашние задания</string>
+    <string name="share_code_label">Код обмена</string>
+    <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>
+    <string name="open_share_title">Открыть</string>
+    <string name="scan_qr_button_title">Сканировать QR-код</string>
+    <string name="homework_share_imported_title">Домашние задания добавлены</string>
+    <string name="homework_share_subject_item">• %1$s</string>
+    <string name="duplicate_homework_share_title">Эти задания уже были добавлены на этом устройстве</string>
+    <string name="invalid_homework_share_title">Код не найден или введён неверно</string>
+    <string name="expired_homework_share_title">Срок действия кода истёк</string>
+    <string name="share_rate_limit_message">Слишком много попыток. Попробуйте позже</string>
+    <string name="share_daily_limit_message">Достигнут лимит публикаций. Попробуйте через сутки</string>
+    <string name="share_item_limit_message">За раз можно поделиться не более чем 20 заданиями</string>
+    <string name="share_payload_limit_message">Выбранные задания занимают слишком много места</string>
+    <string name="current_time_range_desc">Отобразить текущие даты</string>
+    <string name="test_label">Тест</string>
+    <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
+    <string name="open_analytics_desc">Открыть аналитику</string>
+</resources>

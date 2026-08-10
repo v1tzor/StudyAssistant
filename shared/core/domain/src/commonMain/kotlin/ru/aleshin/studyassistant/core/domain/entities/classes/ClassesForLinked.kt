@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,6 @@ import kotlinx.datetime.Instant
 /**
  * @author Stanislav Aleshin on 23.06.2024.
  */
-typealias ClassesForLinked = List<Pair<Int, Class>>
+typealias ClassesForLinked = List<Class>
 
 typealias ClassesForLinkedMap = Map<Instant, ClassesForLinked>

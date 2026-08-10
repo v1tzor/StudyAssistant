@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoNotificationsUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoUi
 
 /**
  * @author Stanislav Aleshin on 26.07.2024.

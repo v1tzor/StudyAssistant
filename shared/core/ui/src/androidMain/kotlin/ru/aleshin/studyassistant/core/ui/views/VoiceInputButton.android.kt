@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
 import java.util.Locale
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.voice_input_promt as core_voice_input_promt
 
 @Composable
 actual fun VoiceInputButton(
@@ -36,7 +38,7 @@ actual fun VoiceInputButton(
     enabled: Boolean,
     onResult: (String) -> Unit
 ) {
-    val coreStrings = StudyAssistantRes.strings
+    val coreVoiceInputPromt = stringResource(CoreRes.string.core_voice_input_promt)
 
     val voiceLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -52,14 +54,18 @@ actual fun VoiceInputButton(
         enabled = enabled,
         onClick = {
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                putExtra(
+                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                )
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                putExtra(RecognizerIntent.EXTRA_PROMPT, coreStrings.voiceInputPromt)
+                putExtra(RecognizerIntent.EXTRA_PROMPT, coreVoiceInputPromt)
             }
 
             try {
                 voiceLauncher.launch(intent)
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+            }
         },
     ) {
         Icon(imageVector = Icons.Default.Mic, contentDescription = null)

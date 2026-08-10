@@ -28,8 +28,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.back_title as core_back_title
 
 /**
  * @author Stanislav Aleshin on 04.08.2023.
@@ -69,7 +71,7 @@ fun BackMenuItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    title: String = StudyAssistantRes.strings.backTitle,
+    title: String = stringResource(CoreRes.string.core_back_title),
     interactionSource: MutableInteractionSource? = null,
 ) = DropdownMenuItem(
     modifier = modifier.alphaByEnabled(enabled),

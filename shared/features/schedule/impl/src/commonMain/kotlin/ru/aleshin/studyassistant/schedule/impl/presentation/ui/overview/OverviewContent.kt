@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,20 +50,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder.OVERVIEW_ITEMS
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.views.AdaptiveContent
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.ClassBottomSheet
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewEvent
@@ -76,9 +73,12 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.De
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.OverviewBottomBar
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.OverviewTopBar
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.OverviewTopSheet
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.empty_classes_title
+import ru.aleshin.studyassistant.schedule.impl.resources.il_free_time
 
 /**
- * @author Stanislav Aleshin on 09.06.2024
+ * @author Stanislav Aleshin on 09.06.2024.
  */
 @Composable
 internal fun OverviewContent(
@@ -87,8 +87,6 @@ internal fun OverviewContent(
 ) {
     val store = overviewComponent.store
     val state by store.stateAsState()
-    val strings = ScheduleThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -155,7 +153,7 @@ internal fun OverviewContent(
         when (effect) {
             is OverviewEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -173,12 +171,6 @@ private fun BaseOverviewContent(
     onAgainHomeworkClick: (HomeworkDetailsUi) -> Unit,
     onCompleteHomeworkClick: (HomeworkDetailsUi) -> Unit,
 ) {
-    AdaptiveContent(
-        mediumContent = { Logger.i("test") { "show medium content" } },
-        expandedContent = { Logger.i("test") { "show expanded content" } }
-    ) {
-        Logger.i("test") { "show compact content" }
-    }
     Crossfade(
         modifier = modifier.fillMaxSize().padding(top = 12.dp),
         targetState = state.isScheduleLoading,
@@ -271,7 +263,7 @@ private fun EmptyClassesView(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = ScheduleThemeRes.strings.emptyClassesTitle,
+                text = stringResource(Res.string.empty_classes_title),
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Normal,
@@ -279,7 +271,7 @@ private fun EmptyClassesView(
             )
             Image(
                 modifier = Modifier.fillMaxWidth(0.85f),
-                painter = painterResource(ScheduleThemeRes.icons.emptyClassesIllustration),
+                painter = painterResource(Res.drawable.il_free_time),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
             )

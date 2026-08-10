@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_organization as core_ic_organization
+import ru.aleshin.studyassistant.editor.impl.resources.*
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -37,8 +41,7 @@ import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorAddItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
 import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -46,6 +49,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 @Composable
 internal fun OrganizationInfoField(
     modifier: Modifier = Modifier,
+    required: Boolean = false,
     isLoading: Boolean,
     organization: OrganizationShortUi?,
     allOrganization: List<OrganizationShortUi>,
@@ -59,9 +63,15 @@ internal fun OrganizationInfoField(
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
         value = organization?.shortName,
-        label = EditorThemeRes.strings.organizationFieldLabel,
-        placeholder = EditorThemeRes.strings.organizationFieldPlaceholder,
-        infoIcon = painterResource(StudyAssistantRes.icons.organization),
+        label = stringResource(
+            if (required) {
+                Res.string.organization_required_field_label
+            } else {
+                Res.string.organization_field_label
+            },
+        ),
+        placeholder = stringResource(Res.string.organization_field_placeholder),
+        infoIcon = painterResource(CoreRes.drawable.core_ic_organization),
         trailingIcon = {
             ExpandedIcon(
                 isExpanded = openOrganizationSelectorSheet,
@@ -108,14 +118,14 @@ internal fun OrganizationSelectorBottomSheet(
         modifier = modifier,
         selected = selectedOrganization,
         items = organizations,
-        header = EditorThemeRes.strings.organizationSelectorHeader,
-        title = EditorThemeRes.strings.organizationSelectorTitle,
+        header = stringResource(Res.string.organization_selector_header),
+        title = stringResource(Res.string.organization_selector_title),
         itemView = { organization ->
             SelectorItemView(
                 onClick = { selectedOrganization = organization },
                 selected = organization.uid == selectedOrganization?.uid,
                 title = organization.shortName,
-                label = organization.type.mapToSting(StudyAssistantRes.strings),
+                label = organization.type.mapToSting(),
             )
         },
         addItemView = {

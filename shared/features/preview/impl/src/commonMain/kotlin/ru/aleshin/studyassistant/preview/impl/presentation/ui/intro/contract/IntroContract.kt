@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,7 @@ internal object IntroState : StoreState
 internal sealed class IntroEvent : StoreEvent {
     data class SelectedNextPage(val currentPage: Int) : IntroEvent()
     data class SelectedPreviousPage(val currentPage: Int) : IntroEvent()
-    data object ClickLogin : IntroEvent()
-    data object ClickRegister : IntroEvent()
+    data object ClickSetup : IntroEvent()
 }
 
 internal sealed class IntroEffect : StoreEffect {
@@ -45,6 +44,5 @@ internal sealed class IntroEffect : StoreEffect {
 internal object IntroAction : StoreAction
 
 internal sealed class IntroOutput : BaseOutput {
-    data object NavigateToLogin : IntroOutput()
-    data object NavigateToRegister : IntroOutput()
+    data object NavigateToSetup : IntroOutput()
 }

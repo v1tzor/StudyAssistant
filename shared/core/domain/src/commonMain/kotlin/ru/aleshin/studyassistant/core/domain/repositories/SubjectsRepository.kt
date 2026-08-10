@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.core.domain.repositories
 
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 
 /**
@@ -32,5 +31,4 @@ interface SubjectsRepository {
     suspend fun fetchSubjectsByEmployee(employeeId: UID): Flow<List<Subject>>
     suspend fun fetchSubjectById(uid: UID): Flow<Subject?>
     suspend fun deleteSubject(targetId: UID)
-    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

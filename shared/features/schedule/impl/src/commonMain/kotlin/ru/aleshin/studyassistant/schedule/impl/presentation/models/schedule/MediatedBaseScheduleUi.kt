@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,10 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.DayOfWeek
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
-import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.MediatedClassUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.convertToBase
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.share.OrganizationLinkData
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
@@ -40,21 +36,3 @@ internal data class MediatedBaseScheduleUi(
     val week: NumberOfRepeatWeek = NumberOfRepeatWeek.ONE,
     val classes: List<MediatedClassUi>,
 )
-
-internal fun MediatedBaseScheduleUi.convertToBase(
-    linkDataMapper: (UID) -> OrganizationLinkData
-): BaseScheduleUi {
-    val sortedClasses = classes.sortedBy { classModel -> classModel.timeRange.from.dateTime().time }
-    val groupedClasses = sortedClasses.groupBy { it.organizationId }
-    return BaseScheduleUi(
-        uid = uid,
-        dateVersion = dateVersion.mapToUi(),
-        dayOfWeek = dayOfWeek,
-        week = week,
-        classes = sortedClasses.map { classModel ->
-            val number = groupedClasses[classModel.organizationId]?.indexOf(classModel)?.inc() ?: 0
-            val linkData = linkDataMapper(classModel.organizationId)
-            classModel.convertToBase(linkData, number)
-        },
-    )
-}

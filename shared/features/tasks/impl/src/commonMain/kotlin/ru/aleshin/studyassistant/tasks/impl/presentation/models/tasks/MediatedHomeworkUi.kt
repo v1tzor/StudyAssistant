@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,10 @@
 package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
 import androidx.compose.runtime.Immutable
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkTasksDetailsUi
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
@@ -41,7 +38,7 @@ internal data class MediatedHomeworkUi(
 )
 
 internal fun HomeworkDetailsUi.convertToMediated(
-    uid: UID = randomUUID(),
+    uid: UID = this.uid,
 ) = MediatedHomeworkUi(
     uid = uid,
     subjectName = subject?.name ?: "*",
@@ -50,24 +47,4 @@ internal fun HomeworkDetailsUi.convertToMediated(
     presentationTasks = presentationTasks,
     test = test,
     priority = priority,
-)
-
-internal fun MediatedHomeworkUi.createHomework(
-    uid: String = randomUUID(),
-    date: Instant,
-    organization: OrganizationShortUi,
-    linkData: MediatedHomeworkLinkData,
-) = HomeworkUi(
-    uid = uid,
-    classId = linkData.actualLinkedClass?.data?.uid,
-    deadline = date.startThisDay(),
-    subject = linkData.actualSubject,
-    organization = organization,
-    theoreticalTasks = theoreticalTasks.origin,
-    practicalTasks = practicalTasks.origin,
-    presentationTasks = presentationTasks.origin,
-    test = test,
-    priority = priority,
-    isDone = false,
-    completeDate = null,
 )

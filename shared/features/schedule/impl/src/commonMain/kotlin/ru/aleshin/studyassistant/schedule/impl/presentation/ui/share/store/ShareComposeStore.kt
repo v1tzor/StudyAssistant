@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundW
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.share.ShareStatus
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareAction
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareEvent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareInput
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareOutput
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareState
-import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
 
 /**
- * @author Stanislav Aleshin on 16.08.2024
+ * @author Stanislav Aleshin on 08.08.2026.
  */
 internal class ShareComposeStore(
     private val workProcessor: ShareWorkProcessor,
@@ -56,23 +56,41 @@ internal class ShareComposeStore(
         when (event) {
             is ShareEvent.Started -> with(event) {
                 sendAction(ShareAction.UpdateCurrentTime(dateManager.fetchCurrentInstant()))
-                if (!isRestore) {
-                    launchBackgroundWork(BackgroundKey.LOAD_SHARED_SCHEDULES) {
-                        val command = ShareWorkCommand.LoadSharedSchedules(inputData.receivedShareId)
+                if (!isRestore && !inputData.code.isNullOrBlank()) {
+                    sendAction(ShareAction.UpdateCode(inputData.code))
+                    launchBackgroundWork(BackgroundKey.SHARE_ACTION) {
+                        val command = ShareWorkCommand.ClaimShare(inputData.code)
                         workProcessor.work(command).collectAndHandleWork()
                     }
                 }
-                launchBackgroundWork(BackgroundKey.LOAD_ORGANIZATIONS) {
-                    val command = ShareWorkCommand.LoadAllOrganizations
+            }
+            is ShareEvent.UpdatedCode -> {
+                sendAction(ShareAction.UpdateCode(event.code))
+            }
+            is ShareEvent.CreateShare -> {
+                launchBackgroundWork(BackgroundKey.SHARE_ACTION) {
+                    workProcessor.work(ShareWorkCommand.CreateShare).collectAndHandleWork()
+                }
+            }
+            is ShareEvent.ClaimShare -> with(state) {
+                launchBackgroundWork(BackgroundKey.SHARE_ACTION) {
+                    val command = ShareWorkCommand.ClaimShare(code)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is ShareEvent.ScannedCode -> with(event) {
+                sendAction(ShareAction.UpdateCode(code))
+                launchBackgroundWork(BackgroundKey.SHARE_ACTION) {
+                    val command = ShareWorkCommand.ClaimShare(code)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
             is ShareEvent.ClickLinkOrganization -> with(state()) {
                 launchBackgroundWork(BackgroundKey.LINK_ORGANIZATION) {
-                    val receivedMediatedSchedule = checkNotNull(receivedMediatedSchedule)
+                    val claim = checkNotNull(claim)
                     val command = ShareWorkCommand.LinkOrganization(
                         allLinkData = organizationsLinkData,
-                        sharedSchedules = receivedMediatedSchedule.schedules,
+                        sharedSchedules = claim.schedules,
                         sharedOrganization = event.sharedOrganization,
                         targetOrganization = event.linkedOrganization,
                     )
@@ -81,10 +99,10 @@ internal class ShareComposeStore(
             }
             is ShareEvent.UpdatedLinkedSubjects -> with(state()) {
                 launchBackgroundWork(BackgroundKey.LINK_DATA) {
-                    val receivedMediatedSchedule = checkNotNull(receivedMediatedSchedule)
+                    val claim = checkNotNull(claim)
                     val command = ShareWorkCommand.UpdateLinkedSubjects(
                         allLinkData = organizationsLinkData,
-                        sharedSchedules = receivedMediatedSchedule.schedules,
+                        sharedSchedules = claim.schedules,
                         sharedOrganization = event.sharedOrganization,
                         subjects = event.subjects,
                     )
@@ -93,10 +111,10 @@ internal class ShareComposeStore(
             }
             is ShareEvent.UpdatedLinkedTeachers -> with(state()) {
                 launchBackgroundWork(BackgroundKey.LINK_DATA) {
-                    val receivedMediatedSchedule = checkNotNull(receivedMediatedSchedule)
+                    val claim = checkNotNull(claim)
                     val command = ShareWorkCommand.UpdateLinkedEmployees(
                         allLinkData = organizationsLinkData,
-                        sharedSchedules = receivedMediatedSchedule.schedules,
+                        sharedSchedules = claim.schedules,
                         sharedOrganization = event.sharedOrganization,
                         teachers = event.teachers,
                     )
@@ -105,65 +123,79 @@ internal class ShareComposeStore(
             }
             is ShareEvent.AcceptedSharedSchedule -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SHARE_ACTION) {
-                    val sharedSchedules = checkNotNull(receivedMediatedSchedule)
                     val command = ShareWorkCommand.AcceptSharedSchedule(
-                        sharedSchedules = sharedSchedules,
+                        claim = checkNotNull(claim),
                         organizationsLinkData = organizationsLinkData,
-                        linkedSchedules = linkedSchedules,
                     )
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
             is ShareEvent.RejectedSharedSchedule -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SHARE_ACTION) {
-                    val sharedSchedules = checkNotNull(receivedMediatedSchedule)
-                    val command = ShareWorkCommand.RejectSharedSchedule(sharedSchedules)
+                    val command = ShareWorkCommand.ReleaseShare(
+                        claim = checkNotNull(claim),
+                        navigateBack = false,
+                    )
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is ShareEvent.ClickUserProfile -> with(event) {
-                val config = UsersConfig.UserProfile(user.uid)
-                consumeOutput(ShareOutput.NavigateToUserProfile(config))
+            is ShareEvent.Reset -> {
+                sendAction(ShareAction.Reset)
             }
             is ShareEvent.ClickBack -> {
-                consumeOutput(ShareOutput.NavigateToBack)
+                if (state().status == ShareStatus.PREVIEW && state().claim != null) {
+                    launchBackgroundWork(BackgroundKey.SHARE_ACTION) {
+                        val command = ShareWorkCommand.ReleaseShare(
+                            claim = checkNotNull(state().claim),
+                            navigateBack = true,
+                        )
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
+                } else {
+                    consumeOutput(ShareOutput.NavigateToBack)
+                }
             }
         }
     }
 
-    override suspend fun reduce(
-        action: ShareAction,
-        currentState: ShareState,
-    ) = when (action) {
-        is ShareAction.SetupSharedSchedules -> currentState.copy(
-            receivedMediatedSchedule = action.receivedMediatedSchedule,
+    override suspend fun reduce(action: ShareAction, currentState: ShareState) = when (action) {
+        is ShareAction.UpdateCode -> currentState.copy(
+            code = action.code
+        )
+        is ShareAction.UpdateStatus -> currentState.copy(
+            status = action.status
+        )
+        is ShareAction.SetupLink -> currentState.copy(
+            status = ShareStatus.READY,
+            link = action.link
+        )
+        is ShareAction.SetupClaim -> currentState.copy(
+            status = ShareStatus.PREVIEW,
+            claim = action.claim,
             organizationsLinkData = action.organizationsLinkData,
             linkedSchedules = action.linkedSchedules,
-            isLoading = false,
+            maxNumberOfWeek = action.maxNumberOfWeek,
         )
         is ShareAction.UpdateLinkData -> currentState.copy(
             organizationsLinkData = action.linkData,
             linkedSchedules = action.linkedSchedules,
         )
         is ShareAction.UpdateOrganizations -> currentState.copy(
-            allOrganizations = action.organizations,
+            allOrganizations = action.organizations
         )
         is ShareAction.UpdateCurrentTime -> currentState.copy(
-            currentTime = action.time,
-        )
-        is ShareAction.UpdateLoading -> currentState.copy(
-            isLoading = action.isLoading,
-        )
-        is ShareAction.UpdateLoadingAccept -> currentState.copy(
-            isLoadingAccept = action.isLoading,
+            currentTime = action.time
         )
         is ShareAction.UpdateLoadingLinkedOrganization -> currentState.copy(
             isLoadingLinkedOrganization = action.isLoading,
         )
+        is ShareAction.Reset -> ShareState(currentTime = currentState.currentTime)
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_SHARED_SCHEDULES, LOAD_ORGANIZATIONS, LINK_ORGANIZATION, LINK_DATA, SHARE_ACTION
+        LINK_ORGANIZATION,
+        LINK_DATA,
+        SHARE_ACTION,
     }
 
     class Factory(
@@ -171,15 +203,12 @@ internal class ShareComposeStore(
         private val dateManager: DateManager,
         private val coroutineManager: CoroutineManager,
     ) : BaseComposeStore.Factory<ShareComposeStore, ShareState> {
-
-        override fun create(savedState: ShareState): ShareComposeStore {
-            return ShareComposeStore(
-                workProcessor = workProcessor,
-                dateManager = dateManager,
-                stateCommunicator = StateCommunicator.Default(savedState),
-                effectCommunicator = EffectCommunicator.Default(),
-                coroutineManager = coroutineManager,
-            )
-        }
+        override fun create(savedState: ShareState) = ShareComposeStore(
+            workProcessor = workProcessor,
+            dateManager = dateManager,
+            stateCommunicator = StateCommunicator.Default(savedState),
+            effectCommunicator = EffectCommunicator.Default(),
+            coroutineManager = coroutineManager,
+        )
     }
 }

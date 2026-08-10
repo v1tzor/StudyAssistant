@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
@@ -32,10 +31,16 @@ interface BaseScheduleRepository {
     suspend fun addOrUpdateSchedule(schedule: BaseSchedule): UID
     suspend fun addOrUpdateSchedulesGroup(schedules: List<BaseSchedule>)
     suspend fun fetchScheduleById(uid: UID): Flow<BaseSchedule?>
-    suspend fun fetchScheduleByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek): Flow<BaseSchedule?>
-    suspend fun fetchSchedulesByVersion(version: TimeRange, numberOfWeek: NumberOfRepeatWeek?): Flow<List<BaseSchedule>>
-    suspend fun fetchSchedulesByTimeRange(timeRange: TimeRange, maxNumberOfWeek: NumberOfRepeatWeek): Flow<Map<Instant, BaseSchedule?>>
+    suspend fun fetchScheduleByDate(
+        date: Instant,
+        numberOfWeek: NumberOfRepeatWeek
+    ): Flow<BaseSchedule?>
+
+    suspend fun fetchSchedulesByVersion(
+        version: TimeRange,
+        numberOfWeek: NumberOfRepeatWeek?
+    ): Flow<List<BaseSchedule>>
+
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<Class?>
     suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange)
-    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

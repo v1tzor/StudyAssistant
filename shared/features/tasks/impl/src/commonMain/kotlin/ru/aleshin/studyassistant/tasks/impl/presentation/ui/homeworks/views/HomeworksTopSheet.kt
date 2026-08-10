@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,16 +46,19 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.common.extensions.calculateProgress
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.ui.mappers.format
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.shortDayMonthFormat
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.overall_homeworks_progress
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.not_selected_title as core_not_selected_title
 
 /**
  * @author Stanislav Aleshin on 03.07.2024.
@@ -126,7 +129,7 @@ internal fun HomeworksTimeRangeSelector(
                 text = selectedTimeRange?.format(
                     fromDateTimeFormat = DateTimeComponents.Formats.shortDayMonthFormat(),
                     toDateTimeFormat = DateTimeComponents.Formats.shortDayMonthFormat(),
-                ) ?: StudyAssistantRes.strings.notSelectedTitle,
+                ) ?: stringResource(CoreRes.string.core_not_selected_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
@@ -157,7 +160,7 @@ private fun HomeworksProgressView(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
-            text = TasksThemeRes.strings.overallHomeworksProgress,
+            text = stringResource(Res.string.overall_homeworks_progress),
             color = MaterialTheme.colorScheme.onSurface,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
@@ -178,7 +181,8 @@ private fun HomeworksProgressView(
                 if (!loading) {
                     val progress by animateFloatAsState(targetValue = progressList.calculateProgress { it })
                     LinearProgressIndicator(
-                        modifier = Modifier.height(10.dp).weight(1f).clip(MaterialTheme.shapes.full),
+                        modifier = Modifier.height(10.dp).weight(1f)
+                            .clip(MaterialTheme.shapes.full),
                         progress = { progress },
                         trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                         strokeCap = StrokeCap.Square,

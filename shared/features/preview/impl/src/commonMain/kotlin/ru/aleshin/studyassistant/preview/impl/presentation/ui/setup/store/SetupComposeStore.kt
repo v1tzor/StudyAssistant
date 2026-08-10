@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,13 +63,9 @@ internal class SetupComposeStore(
                         workProcessor.work(command).collectAndHandleWork()
                     }
                 }
-                launchBackgroundWork(BackgroundKey.LOAD_PAID_USER_STATUS) {
-                    val command = SetupWorkCommand.LoadPaidUserStatus
-                    workProcessor.work(command).collectAndHandleWork()
-                }
             }
             is SetupEvent.UpdateProfile -> {
-                sendAction(SetupAction.UpdateUserProfile(event.userProfile))
+                sendAction(SetupAction.UpdateUserProfile(event.profile))
             }
             is SetupEvent.UpdateOrganization -> {
                 sendAction(SetupAction.UpdateOrganization(event.organization))
@@ -80,10 +76,9 @@ internal class SetupComposeStore(
             is SetupEvent.ClickSaveProfileInfo -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SAVE_PROFILE) {
                     val profile = checkNotNull(profile)
-                    val command = SetupWorkCommand.UpdateUserProfile(profile, actionWithProfileAvatar)
+                    val command = SetupWorkCommand.UpdateProfile(profile, actionWithProfileAvatar)
                     workProcessor.work(command).collectAndHandleWork()
                 }
-                sendAction(SetupAction.UpdatePage(SetupPage.ORGANIZATION))
             }
             is SetupEvent.UpdateProfileAvatar -> with(event) {
                 val inputFile = image.convertToInputFile()
@@ -103,7 +98,6 @@ internal class SetupComposeStore(
                     val command = SetupWorkCommand.UpdateOrganization(organization, actionWithOrganizationAvatar)
                     workProcessor.work(command).collectAndHandleWork()
                 }
-                sendAction(SetupAction.UpdatePage(SetupPage.CALENDAR))
             }
             is SetupEvent.UpdateOrganizationAvatar -> with(event) {
                 val inputFile = image.convertToInputFile()
@@ -123,21 +117,21 @@ internal class SetupComposeStore(
                     val command = SetupWorkCommand.UpdateCalendarSettings(calendarSettings)
                     workProcessor.work(command).collectAndHandleWork()
                 }
-                sendAction(SetupAction.UpdatePage(SetupPage.SCHEDULE))
             }
             is SetupEvent.ClickEditWeekSchedule -> {
-                workProcessor.work(SetupWorkCommand.FinishSetup).collectAndHandleWork()
-                consumeOutput(SetupOutput.NavigateToWeekScheduleEditor)
+                launchBackgroundWork(BackgroundKey.FINISH_SETUP) {
+                    val command = SetupWorkCommand.FinishSetup(SetupDestination.WEEK_SCHEDULE)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is SetupEvent.ClickGoToApp -> {
-                workProcessor.work(SetupWorkCommand.FinishSetup).collectAndHandleWork()
-                consumeOutput(SetupOutput.NavigateToApp)
+                launchBackgroundWork(BackgroundKey.FINISH_SETUP) {
+                    val command = SetupWorkCommand.FinishSetup(SetupDestination.APP)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is SetupEvent.ClickBackPage -> with(state()) {
                 sendAction(SetupAction.UpdatePage(SetupPage.previousPage(currentPage)))
-            }
-            is SetupEvent.ClickPaidFunction -> {
-                consumeOutput(SetupOutput.NavigateToBilling)
             }
             is SetupEvent.ClickBack -> {
                 consumeOutput(SetupOutput.NavigateToBack)
@@ -159,9 +153,6 @@ internal class SetupComposeStore(
             actionWithOrganizationAvatar = None(action.organization.avatar),
             calendarSettings = action.calendarSettings,
         )
-        is SetupAction.UpdateUserPaidStatus -> currentState.copy(
-            isPaidUser = action.isPaid,
-        )
         is SetupAction.UpdateUserProfile -> currentState.copy(
             profile = action.profile,
         )
@@ -180,7 +171,11 @@ internal class SetupComposeStore(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_ALL_DATA, LOAD_PAID_USER_STATUS, SAVE_PROFILE, SAVE_ORGANIZATION, SAVE_SETTINGS
+        LOAD_ALL_DATA,
+        SAVE_PROFILE,
+        SAVE_ORGANIZATION,
+        SAVE_SETTINGS,
+        FINISH_SETUP,
     }
 
     class Factory(

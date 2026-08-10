@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,8 +44,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.info.impl.resources.Res
+import ru.aleshin.studyassistant.info.impl.resources.subjects_search_bar_placeholder
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.back_icon_desc as core_back_icon_desc
+import ru.aleshin.studyassistant.core.ui.resources.clear_search_bar_desk as core_clear_search_bar_desk
 
 /**
  * @author Stanislav Aleshin on 18.06.2024.
@@ -77,13 +81,13 @@ internal fun SubjectsSearchTopBar(
         onActiveChange = {},
         modifier = modifier.fillMaxWidth().padding(top = 8.dp, start = 16.dp, end = 16.dp),
         placeholder = {
-            Text(text = InfoThemeRes.strings.subjectsSearchBarPlaceholder)
+            Text(text = stringResource(Res.string.subjects_search_bar_placeholder))
         },
         leadingIcon = {
             IconButton(onClick = onBackPress) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = StudyAssistantRes.strings.backIconDesc,
+                    contentDescription = stringResource(CoreRes.string.core_back_icon_desc),
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
@@ -103,7 +107,7 @@ internal fun SubjectsSearchTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = StudyAssistantRes.strings.clearSearchBarDesk,
+                        contentDescription = stringResource(CoreRes.string.core_clear_search_bar_desk),
                         tint = MaterialTheme.colorScheme.error,
                     )
                 }
@@ -114,6 +118,10 @@ internal fun SubjectsSearchTopBar(
     )
 
     if (isLoading) {
-        LaunchedEffect(true) { if (query.isNotBlank()) { query = "" } }
+        LaunchedEffect(true) {
+            if (query.isNotBlank()) {
+                query = ""
+            }
+        }
     }
 }

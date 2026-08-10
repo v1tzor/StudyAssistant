@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.info.impl.resources.Res
+import ru.aleshin.studyassistant.info.impl.resources.none_employee_subject_title
 
 /**
  * @author Stanislav Aleshin on 17.06.2024.
@@ -92,7 +94,7 @@ internal fun NoneEmployeeSubjectView(
             )
             Box(modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
                 Text(
-                    text = InfoThemeRes.strings.noneEmployeeSubjectTitle,
+                    text = stringResource(Res.string.none_employee_subject_title),
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

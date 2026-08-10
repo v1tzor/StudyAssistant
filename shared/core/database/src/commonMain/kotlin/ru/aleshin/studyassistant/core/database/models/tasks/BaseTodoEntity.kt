@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,13 @@
 package ru.aleshin.studyassistant.core.database.models.tasks
 
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.database.utils.BaseLocalEntity
 
 /**
  * @author Stanislav Aleshin on 23.07.2025.
  */
 @Serializable
 data class BaseTodoEntity(
-    override val uid: String,
+    val uid: String,
     val deadline: Long?,
     val name: String,
     val description: String?,
@@ -38,6 +37,5 @@ data class BaseTodoEntity(
     val isDone: Long,
     val completeDate: Long?,
     val createdAt: Long,
-    override val updatedAt: Long,
-    val isCacheData: Long,
-) : BaseLocalEntity()
+    val updatedAt: Long,
+)

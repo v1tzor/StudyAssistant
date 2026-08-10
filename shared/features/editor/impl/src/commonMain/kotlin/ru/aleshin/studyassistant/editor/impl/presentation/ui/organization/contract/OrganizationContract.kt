@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contract
 
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
@@ -26,10 +26,10 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEv
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.EditOrganizationUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 
 /**
  * @author Stanislav Aleshin on 08.07.2024

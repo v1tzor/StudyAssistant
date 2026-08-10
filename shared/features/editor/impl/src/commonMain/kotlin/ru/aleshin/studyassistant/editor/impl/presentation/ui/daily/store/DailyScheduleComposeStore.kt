@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.editor.api.DayOfNumberedWeekUi
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleEvent
@@ -59,7 +59,8 @@ internal class DailyScheduleComposeStore(
             is DailyScheduleEvent.Started -> with(event.inputData) {
                 sendAction(DailyScheduleAction.UpdateTargetDate(date.mapEpochTimeToInstant()))
                 launchBackgroundWork(BackgroundKey.SCHEDULES_WORK) {
-                    val command = DailyScheduleWorkCommand.LoadSchedules(baseScheduleId, customScheduleId)
+                    val command =
+                        DailyScheduleWorkCommand.LoadSchedules(baseScheduleId, customScheduleId)
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_SETTINGS) {
@@ -67,13 +68,16 @@ internal class DailyScheduleComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is DailyScheduleEvent.CreateCustomSchedule -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SCHEDULES_WORK) {
                     val targetDate = checkNotNull(targetDate)
-                    val command = DailyScheduleWorkCommand.CreateCustomSchedule(targetDate, baseSchedule)
+                    val command =
+                        DailyScheduleWorkCommand.CreateCustomSchedule(targetDate, baseSchedule)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is DailyScheduleEvent.DeleteCustomSchedule -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SCHEDULES_WORK) {
                     val customScheduleId = checkNotNull(customSchedule?.uid)
@@ -81,13 +85,16 @@ internal class DailyScheduleComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is DailyScheduleEvent.SwapClasses -> with(state()) {
                 launchBackgroundWork(BackgroundKey.EDIT_ACTION) {
                     val schedule = checkNotNull(customSchedule)
-                    val command = DailyScheduleWorkCommand.SwapClasses(event.from, event.to, schedule)
+                    val command =
+                        DailyScheduleWorkCommand.SwapClasses(event.from, event.to, schedule)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is DailyScheduleEvent.FastEditStartOfDay -> with(state()) {
                 launchBackgroundWork(BackgroundKey.EDIT_ACTION) {
                     val schedule = checkNotNull(customSchedule)
@@ -95,20 +102,25 @@ internal class DailyScheduleComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is DailyScheduleEvent.FastEditClassesDuration -> with(state()) {
                 launchBackgroundWork(BackgroundKey.EDIT_ACTION) {
                     val schedule = checkNotNull(customSchedule)
-                    val command = DailyScheduleWorkCommand.UpdateClassesDuration(event.durations, schedule)
+                    val command =
+                        DailyScheduleWorkCommand.UpdateClassesDuration(event.durations, schedule)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is DailyScheduleEvent.FastEditBreaksDuration -> with(state()) {
                 launchBackgroundWork(BackgroundKey.EDIT_ACTION) {
                     val schedule = checkNotNull(customSchedule)
-                    val command = DailyScheduleWorkCommand.UpdateBreaksDuration(event.durations, schedule)
+                    val command =
+                        DailyScheduleWorkCommand.UpdateBreaksDuration(event.durations, schedule)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is DailyScheduleEvent.DeleteClass -> with(state()) {
                 launchBackgroundWork(BackgroundKey.CLASS_ACTION) {
                     val schedule = checkNotNull(customSchedule)
@@ -116,6 +128,7 @@ internal class DailyScheduleComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is DailyScheduleEvent.CreateClassInEditor -> with(state()) {
                 val maxNumberOfWeek = checkNotNull(calendarSettings).numberOfWeek
                 val scheduleId = checkNotNull(customSchedule?.uid)
@@ -133,6 +146,7 @@ internal class DailyScheduleComposeStore(
                 )
                 consumeOutput(DailyScheduleOutput.NavigateToClassEditor(config))
             }
+
             is DailyScheduleEvent.EditClassInEditor -> with(state()) {
                 val maxNumberOfWeek = checkNotNull(calendarSettings).numberOfWeek
                 val targetDate = checkNotNull(targetDate)
@@ -149,6 +163,7 @@ internal class DailyScheduleComposeStore(
                 )
                 consumeOutput(DailyScheduleOutput.NavigateToClassEditor(config))
             }
+
             is DailyScheduleEvent.NavigateToBack -> {
                 consumeOutput(DailyScheduleOutput.NavigateToBack)
             }
@@ -164,12 +179,15 @@ internal class DailyScheduleComposeStore(
             customSchedule = action.customSchedule,
             isLoading = false,
         )
+
         is DailyScheduleAction.UpdateCalendarSettings -> currentState.copy(
             calendarSettings = action.settings,
         )
+
         is DailyScheduleAction.UpdateTargetDate -> currentState.copy(
             targetDate = action.date,
         )
+
         is DailyScheduleAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )

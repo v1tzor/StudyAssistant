@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,14 +56,13 @@ import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsS
 import ru.aleshin.studyassistant.core.common.extensions.navigationBarsInDp
 import ru.aleshin.studyassistant.core.common.extensions.safeNavigationBarsInPx
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.presentation.models.schedules.BaseScheduleUi
+import ru.aleshin.studyassistant.core.presentation.models.schedules.ClassUi
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.sheet.BottomSheetScaffold
 import ru.aleshin.studyassistant.editor.api.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleState
@@ -84,10 +83,9 @@ internal fun WeekScheduleContent(
 ) {
     val store = weekScheduleComponent.store
     val state by store.stateAsState()
-    val strings = EditorThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
     val snackbarState = remember { SnackbarHostState() }
-    val sheetState = rememberStandardBottomSheetState(confirmValueChange = { it != SheetValue.Hidden })
+    val sheetState =
+        rememberStandardBottomSheetState(confirmValueChange = { it != SheetValue.Hidden })
     val scaffoldState = rememberBottomSheetScaffoldState(sheetState, snackbarState)
     var layoutHeight by rememberSaveable { mutableIntStateOf(0) }
     val navBar = WindowInsets.safeNavigationBarsInPx(LocalDensity.current)
@@ -105,7 +103,13 @@ internal fun WeekScheduleContent(
                     maxNumberOfWeek = state.calendarSettings?.numberOfWeek,
                     selectedWeek = state.selectedWeek,
                     onSaveClick = { store.dispatchEvent(WeekScheduleEvent.NavigateToBack) },
-                    onUpdateOrganization = { store.dispatchEvent(WeekScheduleEvent.UpdateOrganization(it)) },
+                    onUpdateOrganization = {
+                        store.dispatchEvent(
+                            WeekScheduleEvent.UpdateOrganization(
+                                it
+                            )
+                        )
+                    },
                     onAddOrganization = { store.dispatchEvent(WeekScheduleEvent.NavigateToOrganizationEditor) },
                     onSelectedWeek = { store.dispatchEvent(WeekScheduleEvent.ChangeWeek(it)) },
                 )
@@ -118,7 +122,12 @@ internal fun WeekScheduleContent(
                         store.dispatchEvent(WeekScheduleEvent.Refresh)
                     },
                     onCreateClass = { weekDay, schedule ->
-                        store.dispatchEvent(WeekScheduleEvent.CreateClassInEditor(weekDay, schedule))
+                        store.dispatchEvent(
+                            WeekScheduleEvent.CreateClassInEditor(
+                                weekDay,
+                                schedule
+                            )
+                        )
                     },
                     onEditClass = { editClass, weekDay ->
                         store.dispatchEvent(WeekScheduleEvent.EditClassInEditor(editClass, weekDay))
@@ -152,7 +161,7 @@ internal fun WeekScheduleContent(
         when (effect) {
             is WeekScheduleEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -195,13 +204,22 @@ private fun BaseWeekScheduleContent(
                             dayOfWeek = dayOfWeek,
                             schedule = dayOfWeekSchedule,
                             onCreateClass = {
-                                onCreateClass(DayOfNumberedWeekUi(dayOfWeek, state.selectedWeek), dayOfWeekSchedule)
+                                onCreateClass(
+                                    DayOfNumberedWeekUi(dayOfWeek, state.selectedWeek),
+                                    dayOfWeekSchedule
+                                )
                             },
                             onEditClass = { editClass ->
-                                onEditClass(editClass, DayOfNumberedWeekUi(dayOfWeek, state.selectedWeek))
+                                onEditClass(
+                                    editClass,
+                                    DayOfNumberedWeekUi(dayOfWeek, state.selectedWeek)
+                                )
                             },
                             onDeleteClass = { targetClass ->
-                                if (dayOfWeekSchedule != null) onDeleteClass(targetClass.uid, dayOfWeekSchedule)
+                                if (dayOfWeekSchedule != null) onDeleteClass(
+                                    targetClass.uid,
+                                    dayOfWeekSchedule
+                                )
                             },
                         )
                     }

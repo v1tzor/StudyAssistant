@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ import ru.aleshin.studyassistant.di.modules.presentationModule
 object PlatformSDK {
 
     fun doInit(configuration: PlatformConfiguration) {
-        configuration.appService.initializeApp()
         configuration.analyticsService.initializeService()
         configuration.crashlyticsService.initializeService()
 

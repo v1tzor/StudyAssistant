@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,40 @@
 
 package ru.aleshin.studyassistant.core.ui.mappers
 
+import androidx.compose.runtime.Composable
 import kotlinx.datetime.DayOfWeek
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.friday_title as core_friday_title
+import ru.aleshin.studyassistant.core.ui.resources.monday_title as core_monday_title
+import ru.aleshin.studyassistant.core.ui.resources.one_week_plural as core_one_week_plural
+import ru.aleshin.studyassistant.core.ui.resources.saturday_title as core_saturday_title
+import ru.aleshin.studyassistant.core.ui.resources.sunday_title as core_sunday_title
+import ru.aleshin.studyassistant.core.ui.resources.three_week_plural as core_three_week_plural
+import ru.aleshin.studyassistant.core.ui.resources.thursday_title as core_thursday_title
+import ru.aleshin.studyassistant.core.ui.resources.tuesday_title as core_tuesday_title
+import ru.aleshin.studyassistant.core.ui.resources.two_week_plural as core_two_week_plural
+import ru.aleshin.studyassistant.core.ui.resources.wednesday_title as core_wednesday_title
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
  */
-fun NumberOfRepeatWeek.mapToSting(strings: StudyAssistantStrings) = when (this) {
-    NumberOfRepeatWeek.ONE -> strings.oneWeekPlural
-    NumberOfRepeatWeek.TWO -> strings.twoWeekPlural
-    NumberOfRepeatWeek.THREE -> strings.threeWeekPlural
+@Composable
+fun NumberOfRepeatWeek.mapToSting() = when (this) {
+    NumberOfRepeatWeek.ONE -> stringResource(CoreRes.string.core_one_week_plural)
+    NumberOfRepeatWeek.TWO -> stringResource(CoreRes.string.core_two_week_plural)
+    NumberOfRepeatWeek.THREE -> stringResource(CoreRes.string.core_three_week_plural)
 }
 
-fun DayOfWeek.mapToSting(strings: StudyAssistantStrings) = when (this) {
-    DayOfWeek.MONDAY -> strings.mondayTitle
-    DayOfWeek.TUESDAY -> strings.tuesdayTitle
-    DayOfWeek.WEDNESDAY -> strings.wednesdayTitle
-    DayOfWeek.THURSDAY -> strings.thursdayTitle
-    DayOfWeek.FRIDAY -> strings.fridayTitle
-    DayOfWeek.SATURDAY -> strings.saturdayTitle
-    DayOfWeek.SUNDAY -> strings.sundayTitle
+@Composable
+fun DayOfWeek.mapToSting() = when (this) {
+    DayOfWeek.MONDAY -> stringResource(CoreRes.string.core_monday_title)
+    DayOfWeek.TUESDAY -> stringResource(CoreRes.string.core_tuesday_title)
+    DayOfWeek.WEDNESDAY -> stringResource(CoreRes.string.core_wednesday_title)
+    DayOfWeek.THURSDAY -> stringResource(CoreRes.string.core_thursday_title)
+    DayOfWeek.FRIDAY -> stringResource(CoreRes.string.core_friday_title)
+    DayOfWeek.SATURDAY -> stringResource(CoreRes.string.core_saturday_title)
+    DayOfWeek.SUNDAY -> stringResource(CoreRes.string.core_sunday_title)
     else -> error("Unknown day of week: $this")
 }

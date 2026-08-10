@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.InfoTextField
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.city_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.city_field_placeholder
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -63,8 +66,8 @@ internal fun CityInfoField(
         readOnly = !isEditCity,
         value = editableCity,
         onValueChange = { editableCity = it.takeIf { it.isNotBlank() } },
-        label = EditorThemeRes.strings.cityFieldLabel,
-        placeholder = { Text(text = EditorThemeRes.strings.cityFieldPlaceholder) },
+        label = stringResource(Res.string.city_field_label),
+        placeholder = { Text(text = stringResource(Res.string.city_field_placeholder)) },
         leadingInfoIcon = Icons.Outlined.HomeWork,
         trailingIcon = {
             if (!isEditCity) {

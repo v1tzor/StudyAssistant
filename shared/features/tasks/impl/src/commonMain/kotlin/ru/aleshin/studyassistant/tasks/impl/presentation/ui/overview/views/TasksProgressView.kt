@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,9 +51,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.coming_homeworks_execution_analysis_title
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_calendar_clock_outline
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_timeline_in_progress
+import ru.aleshin.studyassistant.tasks.impl.resources.tasks_progress_in_the_week_label
+import ru.aleshin.studyassistant.tasks.impl.resources.tasks_progress_tomorrow_label
 
 /**
  * @author Stanislav Aleshin on 29.06.2024.
@@ -72,7 +78,7 @@ internal fun ComingHomeworksExecutionAnalysisView(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = TasksThemeRes.strings.comingHomeworksExecutionAnalysisTitle,
+            text = stringResource(Res.string.coming_homeworks_execution_analysis_title),
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleSmall,
@@ -82,10 +88,10 @@ internal fun ComingHomeworksExecutionAnalysisView(
                 isLoading = isLoading,
                 items = comingHomeworksExecution,
                 progress = comingHomeworksProgress,
-                progressIcon = painterResource(TasksThemeRes.icons.tomorrowTime),
+                progressIcon = painterResource(Res.drawable.ic_timeline_in_progress),
                 infoLabel = {
                     Text(
-                        text = TasksThemeRes.strings.tasksProgressTomorrowLabel,
+                        text = stringResource(Res.string.tasks_progress_tomorrow_label),
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
                     )
@@ -96,10 +102,10 @@ internal fun ComingHomeworksExecutionAnalysisView(
                 isLoading = isLoading,
                 items = weekHomeworksExecution,
                 progress = weekHomeworksProgress,
-                progressIcon = painterResource(TasksThemeRes.icons.weekTime),
+                progressIcon = painterResource(Res.drawable.ic_calendar_clock_outline),
                 infoLabel = {
                     Text(
-                        text = TasksThemeRes.strings.tasksProgressInTheWeekLabel,
+                        text = stringResource(Res.string.tasks_progress_in_the_week_label),
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
                     )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,48 +18,93 @@ package ru.aleshin.studyassistant.core.remote.api.ai
 
 import dev.tmapps.konnection.Konnection
 import io.ktor.client.HttpClient
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.HttpHeaders
+import kotlinx.coroutines.delay
 import kotlinx.io.IOException
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
+import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceException
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor
-import ru.aleshin.studyassistant.core.remote.models.ai.ChatCompletionRequest
+import ru.aleshin.studyassistant.core.remote.models.ai.ChatCompletionRequestPojo
 import ru.aleshin.studyassistant.core.remote.models.ai.ChatCompletionResponsePojo
+import ru.aleshin.studyassistant.core.remote.models.ai.DeepSeekException
 import ru.aleshin.studyassistant.core.remote.models.ai.FunctionRequestPojo
 import ru.aleshin.studyassistant.core.remote.models.ai.ToolCallTypePojo
 import ru.aleshin.studyassistant.core.remote.models.ai.ToolPojo
 import ru.aleshin.studyassistant.core.remote.models.ai.bodyOrAiError
+import kotlin.random.Random
 
 /**
  * @author Stanislav Aleshin on 14.06.2025.
  */
 interface AiRemoteApi {
+    suspend fun chatCompletion(
+        request: ChatCompletionRequestPojo,
+        credential: String,
+        requestKey: String? = null,
+    ): AiCompletionResult
 
-    suspend fun chatCompletion(request: ChatCompletionRequest): ChatCompletionResponsePojo
-
-    class Base(
+    class DeepSeek(
         private val httpClient: HttpClient,
         private val connectionManager: Konnection,
     ) : AiRemoteApi {
 
-        override suspend fun chatCompletion(request: ChatCompletionRequest): ChatCompletionResponsePojo {
+        override suspend fun chatCompletion(
+            request: ChatCompletionRequestPojo,
+            credential: String,
+            requestKey: String?,
+        ): AiCompletionResult {
             if (!connectionManager.isConnected()) throw InternetConnectionException()
-            try {
-                val response = httpClient.post(StudyAssistantKtor.DeepSeek.CHAT_COMPLETIONS) {
-                    setBody(request)
+            repeat(MAX_ATTEMPTS) { attempt ->
+                try {
+                    val response = httpClient.post(StudyAssistantKtor.DeepSeek.CHAT_COMPLETIONS) {
+                        bearerAuth(credential)
+                        setBody(request)
+                    }
+                    return AiCompletionResult(
+                        response = response.bodyOrAiError<ChatCompletionResponsePojo>(),
+                    )
+                } catch (error: DeepSeekException) {
+                    if (error.statusCode !in RETRYABLE_STATUS_CODES || attempt == MAX_ATTEMPTS - 1) {
+                        throw error.mapToServiceException()
+                    }
+                    delay(error.retryDelayMillis(attempt))
+                } catch (_: IOException) {
+                    if (attempt == MAX_ATTEMPTS - 1) throw InternetConnectionException()
+                    delay(retryDelayMillis(attempt))
                 }
-                return response.bodyOrAiError<ChatCompletionResponsePojo>()
-            } catch (e: IOException) {
-                e.printStackTrace()
-                throw InternetConnectionException()
             }
+            throw AiServiceException.ServerUnavailable()
+        }
+
+        private fun DeepSeekException.retryDelayMillis(attempt: Int): Long {
+            val retryAfterSeconds = headers[HttpHeaders.RetryAfter]?.toLongOrNull()
+            return retryAfterSeconds?.times(1_000L) ?: retryDelayMillis(attempt)
+        }
+
+        private fun retryDelayMillis(attempt: Int): Long {
+            val exponential = 500L * (1L shl attempt)
+            return exponential + Random.nextLong(100L, 400L)
+        }
+
+        private fun DeepSeekException.mapToServiceException(): Throwable = when (statusCode) {
+            401, 403 -> AiServiceException.InvalidKey()
+            402 -> AiServiceException.InsufficientBalance()
+            429 -> AiServiceException.RateLimited()
+            500, 503 -> AiServiceException.ServerUnavailable()
+            else -> this
         }
 
         companion object Companion {
+            private const val MAX_ATTEMPTS = 3
+            private val RETRYABLE_STATUS_CODES = setOf(429, 500, 503)
+
             val createTodoTool = ToolPojo(
                 type = ToolCallTypePojo.FUNCTION,
                 function = FunctionRequestPojo(

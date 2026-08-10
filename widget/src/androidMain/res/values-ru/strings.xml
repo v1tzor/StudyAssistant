@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_schedule_name">StudyAssistant: Расписание</string>
+    <string name="widget_schedule_description">Занятия на сегодня со временем, типом и кабинетом</string>
+    <string name="widget_homeworks_name">StudyAssistant: Домашние задания</string>
+    <string name="widget_homeworks_description">Предстоящие домашние задания по датам</string>
+    <string name="widget_todos_name">StudyAssistant: Задачи</string>
+    <string name="widget_todos_description">Активные задачи с быстрым завершением</string>
+    <string name="widget_goals_name">StudyAssistant: Цели на день</string>
+    <string name="widget_goals_description">Учебные цели и прогресс на сегодня</string>
+
+    <string name="widget_schedule_title">Расписание</string>
+    <string name="widget_homeworks_title">Домашние задания</string>
+    <string name="widget_todos_title">Задачи</string>
+    <string name="widget_goals_title">Цели на день</string>
+    <string name="widget_today">Сегодня</string>
+    <string name="widget_loading">Загрузка…</string>
+    <string name="widget_error">Не удалось обновить</string>
+    <string name="widget_stale">Данные могут быть устаревшими</string>
+    <string name="widget_schedule_empty">Сегодня нет занятий</string>
+    <string name="widget_homeworks_empty">Нет предстоящих заданий</string>
+    <string name="widget_todos_empty">Нет активных задач</string>
+    <string name="widget_goals_empty">На сегодня нет целей</string>
+
+    <string name="widget_refresh_description">Обновить виджеты</string>
+    <string name="widget_add_schedule_description">Изменить расписание на сегодня</string>
+    <string name="widget_add_homework_description">Добавить домашнее задание</string>
+    <string name="widget_add_todo_description">Добавить задачу</string>
+    <string name="widget_add_goal_description">Добавить цель на день</string>
+    <string name="widget_complete_todo_description">Завершить задачу</string>
+    <string name="widget_room_description">Кабинет</string>
+    <string name="widget_no_subject">Без предмета</string>
+
+    <string name="widget_event_lesson">Урок</string>
+    <string name="widget_event_lecture">Лекция</string>
+    <string name="widget_event_practice">Практика</string>
+    <string name="widget_event_seminar">Семинар</string>
+    <string name="widget_event_class">Занятие</string>
+    <string name="widget_event_online_class">Онлайн-занятие</string>
+    <string name="widget_event_webinar">Вебинар</string>
+
+    <string name="widget_theory_description">Теоретические задания</string>
+    <string name="widget_practice_description">Практические задания</string>
+    <string name="widget_presentation_description">Презентации</string>
+    <string name="widget_homework_complete">Выполнено</string>
+    <string name="widget_homework_wait">Скоро срок</string>
+    <string name="widget_homework_future">Предстоит</string>
+    <string name="widget_homework_skipped">Пропущено</string>
+    <string name="widget_homework_overdue">Просрочено</string>
+
+    <string name="widget_goal_without_timer">Без таймера</string>
+    <string name="widget_goal_homework">Цель по домашнему заданию</string>
+    <string name="widget_goal_todo">Цель по задаче</string>
+</resources>

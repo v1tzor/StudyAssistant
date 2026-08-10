@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ package ru.aleshin.studyassistant.core.api.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.api.AppwriteApi.Client.ENDPOINT
-import ru.aleshin.studyassistant.core.api.AppwriteApi.Client.PROJECT_ID
 
 /**
  * @author Stanislav Aleshin on 30.06.2025.
@@ -37,88 +35,4 @@ data class FilePojo(
     @SerialName("sizeOriginal") val sizeOriginal: Long = 0L,
     @SerialName("chunksTotal") val chunksTotal: Long = 0L,
     @SerialName("chunksUploaded") val chunksUploaded: Long = 0L,
-) {
-    fun getDownloadUrl() = buildString {
-        append(ENDPOINT)
-        append('/')
-        append("storage")
-        append('/')
-        append("buckets")
-        append('/')
-        append(bucketId)
-        append('/')
-        append("files")
-        append('/')
-        append(id)
-        append('/')
-        append("view?project=")
-        append(PROJECT_ID)
-    }
-
-    companion object {
-        fun getDownloadUrl(id: String, bucketId: String): String = FilePojo(id, bucketId).getDownloadUrl()
-    }
-}
-
-fun String.extractIdFromFileUrl(): String {
-    return substringAfter("files/").substringBefore('/')
-}
-
-fun String.extractBucketIdFromFileUrl(): String {
-    return substringAfter("buckets/").substringBefore('/')
-}
-
-@Serializable
-enum class ImageGravity(val value: String) {
-    @SerialName("center")
-    CENTER("center"),
-
-    @SerialName("top-left")
-    TOP_LEFT("top-left"),
-
-    @SerialName("top")
-    TOP("top"),
-
-    @SerialName("top-right")
-    TOP_RIGHT("top-right"),
-
-    @SerialName("left")
-    LEFT("left"),
-
-    @SerialName("right")
-    RIGHT("right"),
-
-    @SerialName("bottom-left")
-    BOTTOM_LEFT("bottom-left"),
-
-    @SerialName("bottom")
-    BOTTOM("bottom"),
-
-    @SerialName("bottom-right")
-    BOTTOM_RIGHT("bottom-right");
-
-    override fun toString() = value
-}
-
-@Serializable
-enum class ImageFormat(val value: String) {
-    @SerialName("jpg")
-    JPG("jpg"),
-
-    @SerialName("jpeg")
-    JPEG("jpeg"),
-
-    @SerialName("png")
-    PNG("png"),
-
-    @SerialName("webp")
-    WEBP("webp"),
-
-    @SerialName("heic")
-    HEIC("heic"),
-
-    @SerialName("avif")
-    AVIF("avif");
-
-    override fun toString() = value
-}
+)

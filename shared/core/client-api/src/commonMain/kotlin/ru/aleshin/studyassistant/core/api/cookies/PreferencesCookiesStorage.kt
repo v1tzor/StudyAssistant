@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,8 @@ interface PreferencesCookiesStorage : CookiesStorage {
             mutex.withLock {
                 val container = readAllCookies().toMutableList()
                 container.removeAll { (existingCookie, _) ->
-                    existingCookie.name == cookie.name && existingCookie.toHttpCookie().matches(requestUrl)
+                    existingCookie.name == cookie.name && existingCookie.toHttpCookie()
+                        .matches(requestUrl)
                 }
                 val createdAt = getTimeMillis()
                 container.add(
@@ -81,7 +82,8 @@ interface PreferencesCookiesStorage : CookiesStorage {
             val container = readAllCookies()
             val now = getTimeMillis()
             if (now >= oldestCookie.value) cleanup(now, container)
-            val cookies = container.map { entity -> entity.cookie.toHttpCookie() }.filter { it.matches(requestUrl) }
+            val cookies = container.map { entity -> entity.cookie.toHttpCookie() }
+                .filter { it.matches(requestUrl) }
             return@withLock cookies
         }
 
@@ -90,7 +92,8 @@ interface PreferencesCookiesStorage : CookiesStorage {
         }
 
         private fun readAllCookies(): List<CookieCacheEntity> {
-            return settings.getStringOrNull("cookies")?.fromJson<List<CookieCacheEntity>>() ?: emptyList()
+            return settings.getStringOrNull("cookies")?.fromJson<List<CookieCacheEntity>>()
+                ?: emptyList()
         }
 
         private fun writeAllCookies(cookies: List<CookieCacheEntity>) {
@@ -103,7 +106,8 @@ interface PreferencesCookiesStorage : CookiesStorage {
         ) {
             val container = cachedCookies.toMutableList()
             container.removeAll { (cookie, createdAt) ->
-                val expires = cookie.toHttpCookie().maxAgeOrExpires(createdAt) ?: return@removeAll false
+                val expires =
+                    cookie.toHttpCookie().maxAgeOrExpires(createdAt) ?: return@removeAll false
                 expires < timestamp
             }
 

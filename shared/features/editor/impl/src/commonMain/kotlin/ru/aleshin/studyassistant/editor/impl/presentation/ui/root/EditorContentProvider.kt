@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
-import ru.aleshin.studyassistant.core.common.di.withDirectDI
+import org.kodein.di.DI
 import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
 import ru.aleshin.studyassistant.core.common.navigation.backAnimation
-import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureManager
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorTheme
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.ClassContent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.DailyScheduleContent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.EmployeeContent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.HomeworkContent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.OrganizationContent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.ProfileContent
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.root.InternalEditorFeatureComponent.Child
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.root.EditorFeatureComponent.Child
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.WeekScheduleContent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.SubjectContent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.TodoContent
@@ -39,52 +37,49 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.TodoContent
 /**
  * @author Stanislav Aleshin on 26.08.2025.
  */
-public class EditorContentProvider internal constructor(
-    private val component: InternalEditorFeatureComponent,
-) : FeatureContentProvider {
+internal class EditorContentProvider(
+    di: DI,
+    private val component: EditorFeatureComponent,
+) : FeatureContentProvider(di) {
 
     @Composable
     @OptIn(ExperimentalDecomposeApi::class)
-    override fun invoke(modifier: Modifier) {
-        withDirectDI(directDI = { EditorFeatureManager.fetchDI() }) {
-            EditorTheme {
-                ChildStack(
-                    modifier = modifier,
-                    stack = component.stack,
-                    animation = backAnimation(
-                        backHandler = component.backHandler,
-                        onBack = component::navigateToBack
-                    )
-                ) { child ->
-                    when (val instance = child.instance) {
-                        is Child.ClassChild -> {
-                            ClassContent(instance.component)
-                        }
-                        is Child.DailyScheduleChild -> {
-                            DailyScheduleContent(instance.component)
-                        }
-                        is Child.EmployeeChild -> {
-                            EmployeeContent(instance.component)
-                        }
-                        is Child.HomeworkChild -> {
-                            HomeworkContent(instance.component)
-                        }
-                        is Child.OrganizationChild -> {
-                            OrganizationContent(instance.component)
-                        }
-                        is Child.ProfileChild -> {
-                            ProfileContent(instance.component)
-                        }
-                        is Child.SubjectChild -> {
-                            SubjectContent(instance.component)
-                        }
-                        is Child.TodoChild -> {
-                            TodoContent(instance.component)
-                        }
-                        is Child.WeekScheduleChild -> {
-                            WeekScheduleContent(instance.component)
-                        }
-                    }
+    override fun RootContent(modifier: Modifier) {
+        ChildStack(
+            modifier = modifier,
+            stack = component.stack,
+            animation = backAnimation(
+                backHandler = component.backHandler,
+                onBack = component::navigateToBack
+            )
+        ) { child ->
+            when (val instance = child.instance) {
+                is Child.ClassChild -> {
+                    ClassContent(instance.component)
+                }
+                is Child.DailyScheduleChild -> {
+                    DailyScheduleContent(instance.component)
+                }
+                is Child.EmployeeChild -> {
+                    EmployeeContent(instance.component)
+                }
+                is Child.HomeworkChild -> {
+                    HomeworkContent(instance.component)
+                }
+                is Child.OrganizationChild -> {
+                    OrganizationContent(instance.component)
+                }
+                is Child.ProfileChild -> {
+                    ProfileContent(instance.component)
+                }
+                is Child.SubjectChild -> {
+                    SubjectContent(instance.component)
+                }
+                is Child.TodoChild -> {
+                    TodoContent(instance.component)
+                }
+                is Child.WeekScheduleChild -> {
+                    WeekScheduleContent(instance.component)
                 }
             }
         }

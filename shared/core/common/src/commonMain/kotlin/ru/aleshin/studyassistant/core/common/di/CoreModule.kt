@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.common.di
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
@@ -28,7 +29,8 @@ import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
  */
 val coreCommonModule = DI.Module("CoreCommon") {
     import(corePlatformModule)
-    bindSingleton<CoroutineManager> { CoroutineManager.Base() }
+
+    bindSingleton<CoroutineManager> { val dispatchers = instance<AppDispatchers>(); CoroutineManager.Base(defaultDispatcher = dispatchers.default, ioDispatcher = dispatchers.io, uiDispatcher = dispatchers.ui) }
     bindSingleton<DateManager> { DateManager.Base(workDispatchersProvider = instance<CoroutineManager>()) }
     bindSingleton<TimeOverlayManager> { TimeOverlayManager.Base() }
 }

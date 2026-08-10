@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,5 +22,5 @@ import ru.aleshin.studyassistant.core.common.inject.BaseFeatureApi
  * @author Stanislav Aleshin on 16.06.2024.
  */
 public interface InfoFeatureApi : BaseFeatureApi {
-    public fun componentFactory(): InfoFeatureComponentFactory
+    public fun contentProviderFactory(): InfoContentProviderFactory
 }

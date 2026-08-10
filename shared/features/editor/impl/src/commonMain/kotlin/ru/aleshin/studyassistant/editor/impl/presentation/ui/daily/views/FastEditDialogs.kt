@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,14 +34,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.presentation.models.organizations.NumberedDurationUi
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
 import ru.aleshin.studyassistant.core.ui.views.DialogHeader
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.NumberedDurationsList
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.StartOfClassesField
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.breaks_duration_dialog_header
+import ru.aleshin.studyassistant.editor.impl.resources.breaks_duration_dialog_title
+import ru.aleshin.studyassistant.editor.impl.resources.classes_duration_dialog_header
+import ru.aleshin.studyassistant.editor.impl.resources.classes_duration_dialog_title
+import ru.aleshin.studyassistant.editor.impl.resources.start_of_day_dialog_header
+import ru.aleshin.studyassistant.editor.impl.resources.start_of_day_dialog_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.save_confirm_title as core_save_confirm_title
 
 /**
  * @author Stanislav Aleshin on 14.07.2024.
@@ -65,8 +73,8 @@ internal fun StartOfDayEditorDialog(
         ) {
             Column {
                 DialogHeader(
-                    header = EditorThemeRes.strings.startOfDayDialogHeader,
-                    title = EditorThemeRes.strings.startOfDayDialogTitle,
+                    header = stringResource(Res.string.start_of_day_dialog_header),
+                    title = stringResource(Res.string.start_of_day_dialog_title),
                 )
                 HorizontalDivider()
                 Column(
@@ -81,7 +89,7 @@ internal fun StartOfDayEditorDialog(
                 }
                 DialogButtons(
                     enabledConfirm = editableTime != null,
-                    confirmTitle = StudyAssistantRes.strings.saveConfirmTitle,
+                    confirmTitle = stringResource(CoreRes.string.core_save_confirm_title),
                     onCancelClick = onDismiss,
                     onConfirmClick = { editableTime?.let { onConfirm(it) } },
                 )
@@ -122,8 +130,8 @@ internal fun ClassesDurationEditorDialog(
         ) {
             Column {
                 DialogHeader(
-                    header = EditorThemeRes.strings.classesDurationDialogHeader,
-                    title = EditorThemeRes.strings.classesDurationDialogTitle,
+                    header = stringResource(Res.string.classes_duration_dialog_header),
+                    title = stringResource(Res.string.classes_duration_dialog_title),
                 )
                 HorizontalDivider()
                 Column(
@@ -140,7 +148,7 @@ internal fun ClassesDurationEditorDialog(
                 }
                 DialogButtons(
                     enabledConfirm = editableBaseDuration != null,
-                    confirmTitle = StudyAssistantRes.strings.saveConfirmTitle,
+                    confirmTitle = stringResource(CoreRes.string.core_save_confirm_title),
                     onCancelClick = onDismiss,
                     onConfirmClick = {
                         editableBaseDuration?.let { onConfirm(it, editableSpecificDurations.value) }
@@ -183,8 +191,8 @@ internal fun BreaksDurationEditorDialog(
         ) {
             Column {
                 DialogHeader(
-                    header = EditorThemeRes.strings.breaksDurationDialogHeader,
-                    title = EditorThemeRes.strings.breaksDurationDialogTitle,
+                    header = stringResource(Res.string.breaks_duration_dialog_header),
+                    title = stringResource(Res.string.breaks_duration_dialog_title),
                 )
                 HorizontalDivider()
                 Column(
@@ -203,7 +211,7 @@ internal fun BreaksDurationEditorDialog(
                 }
                 DialogButtons(
                     enabledConfirm = editableBaseDuration != null,
-                    confirmTitle = StudyAssistantRes.strings.saveConfirmTitle,
+                    confirmTitle = stringResource(CoreRes.string.core_save_confirm_title),
                     onCancelClick = onDismiss,
                     onConfirmClick = {
                         editableBaseDuration?.let { onConfirm(it, editableSpecificDurations.value) }

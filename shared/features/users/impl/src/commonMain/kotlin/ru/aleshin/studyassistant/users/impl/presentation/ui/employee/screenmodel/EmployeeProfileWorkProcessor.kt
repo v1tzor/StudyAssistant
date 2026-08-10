@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkPro
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToUi
 import ru.aleshin.studyassistant.users.impl.domain.interactors.EmployeeInteractor
-import ru.aleshin.studyassistant.users.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileAction
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileEffect
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileOutput

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,17 +61,31 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.presentation.models.schedules.ClassUi
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
-import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassesForLinkedMapUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.homework_date_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.homework_date_field_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.homework_date_picker_headline
+import ru.aleshin.studyassistant.editor.impl.resources.link_class_view_empty_title
+import ru.aleshin.studyassistant.editor.impl.resources.link_class_view_title
+import ru.aleshin.studyassistant.editor.impl.resources.number_of_class_suffix
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
+import ru.aleshin.studyassistant.core.ui.resources.date_picker_dialog_header as core_date_picker_dialog_header
+import ru.aleshin.studyassistant.core.ui.resources.ic_calendar_today as core_ic_calendar_today
+import ru.aleshin.studyassistant.core.ui.resources.ic_select_date as core_ic_select_date
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
+import ru.aleshin.studyassistant.core.ui.resources.select_confirm_title as core_select_confirm_title
 
 /**
  * @author Stanislav Aleshin on 23.06.2024.
@@ -95,7 +109,7 @@ internal fun LinkedClassInfoField(
         Box(modifier = Modifier.height(61.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(StudyAssistantRes.icons.calendarToday),
+                painter = painterResource(CoreRes.drawable.core_ic_calendar_today),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -105,13 +119,13 @@ internal fun LinkedClassInfoField(
                 onClick = { datePickerState = true },
                 enabled = !isLoading,
                 value = selectedDate?.formatByTimeZone(
-                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings)
+                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat()
                 ),
-                label = EditorThemeRes.strings.homeworkDateFieldLabel,
-                placeholder = EditorThemeRes.strings.homeworkDateFieldPlaceholder,
+                label = stringResource(Res.string.homework_date_field_label),
+                placeholder = stringResource(Res.string.homework_date_field_placeholder),
                 trailingIcon = {
                     Icon(
-                        painter = painterResource(StudyAssistantRes.icons.selectDate),
+                        painter = painterResource(CoreRes.drawable.core_ic_select_date),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -159,7 +173,7 @@ private fun LinkClassView(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                text = EditorThemeRes.strings.linkClassViewTitle,
+                text = stringResource(Res.string.link_class_view_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 style = MaterialTheme.typography.bodySmall,
@@ -206,11 +220,18 @@ private fun LinkClassView(
                                 selected = linkedClass == null,
                             )
                         }
-                        items(classes, key = { it.first.toString() + it.second.uid }) { dateClassModel ->
+                        items(
+                            classes,
+                            key = { it.first.toString() + it.second.uid }) { dateClassModel ->
                             LinkClassItem(
-                                onClick = { onSelectedClass(dateClassModel.second, dateClassModel.first) },
+                                onClick = {
+                                    onSelectedClass(
+                                        dateClassModel.second,
+                                        dateClassModel.first
+                                    )
+                                },
                                 selected = linkedClass == dateClassModel.second.uid &&
-                                    dateClassModel.first.equalsDay(selectedDate),
+                                        dateClassModel.first.equalsDay(selectedDate),
                                 isNext = nextClass == dateClassModel,
                                 date = dateClassModel.first,
                                 numberOfClass = dateClassModel.second.number,
@@ -225,7 +246,7 @@ private fun LinkClassView(
                     }
                 } else {
                     Text(
-                        text = EditorThemeRes.strings.linkClassViewEmptyTitle,
+                        text = stringResource(Res.string.link_class_view_empty_title),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 2,
                         style = MaterialTheme.typography.bodyMedium,
@@ -262,7 +283,7 @@ private fun LinkClassItem(
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
             Text(
                 text = date.formatByTimeZone(
-                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings)
+                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat()
                 ),
                 color = if (isNext) {
                     StudyAssistantRes.colors.accents.orange
@@ -277,7 +298,7 @@ private fun LinkClassItem(
             Text(
                 text = buildString {
                     append(numberOfClass, " ")
-                    append(EditorThemeRes.strings.numberOfClassSuffix)
+                    append(stringResource(Res.string.number_of_class_suffix))
                 },
                 color = if (selected) {
                     MaterialTheme.colorScheme.onPrimaryContainer
@@ -314,7 +335,7 @@ private fun NoneLinkClassItem(
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = StudyAssistantRes.strings.noneTitle,
+                text = stringResource(CoreRes.string.core_none_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.titleSmall,
             )
@@ -343,12 +364,12 @@ private fun HomeworkDatePicker(
                     val birthday = selectedDate.mapEpochTimeToInstant()
                     onSelectedDate.invoke(birthday)
                 },
-                content = { Text(text = StudyAssistantRes.strings.selectConfirmTitle) }
+                content = { Text(text = stringResource(CoreRes.string.core_select_confirm_title)) }
             )
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = StudyAssistantRes.strings.cancelTitle)
+                Text(text = stringResource(CoreRes.string.core_cancel_title))
             }
         },
     ) {
@@ -357,13 +378,13 @@ private fun HomeworkDatePicker(
             title = {
                 Text(
                     modifier = Modifier.padding(start = 24.dp, top = 24.dp),
-                    text = StudyAssistantRes.strings.datePickerDialogHeader,
+                    text = stringResource(CoreRes.string.core_date_picker_dialog_header),
                 )
             },
             headline = {
                 Text(
                     modifier = Modifier.padding(start = 24.dp),
-                    text = EditorThemeRes.strings.homeworkDatePickerHeadline,
+                    text = stringResource(Res.string.homework_date_picker_headline),
                 )
             },
         )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,83 +53,71 @@ internal class ProfileComposeStore(
     ) {
         when (event) {
             is ProfileEvent.Started -> {
-                launchBackgroundWork(BackgroundKey.LOAD_APP_USER) {
-                    val command = ProfileWorkCommand.LoadAppUser
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-                launchBackgroundWork(BackgroundKey.LOAD_PAID_STATUS) {
-                    val command = ProfileWorkCommand.LoadPaidUserStatus
+                launchBackgroundWork(BackgroundKey.LOAD_PROFILE) {
+                    val command = ProfileWorkCommand.LoadProfile
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is ProfileEvent.UpdateAvatar -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
-                    val user = checkNotNull(appUser)
+                    val user = checkNotNull(profile)
                     val inputFile = event.file.convertToInputFile()
                     val command = ProfileWorkCommand.UpdateAvatar(user, inputFile)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is ProfileEvent.DeleteAvatar -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
-                    val user = checkNotNull(appUser)
+                    val user = checkNotNull(profile)
                     val command = ProfileWorkCommand.DeleteAvatar(user)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is ProfileEvent.UpdateUsername -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
-                    val updatedUser = checkNotNull(appUser).copy(username = event.name)
-                    val command = ProfileWorkCommand.UpdateAppUser(updatedUser)
+                    val updatedUser = checkNotNull(profile).copy(username = event.name)
+                    val command = ProfileWorkCommand.UpdateProfile(updatedUser)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is ProfileEvent.UpdateDescription -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
-                    val updatedUser = checkNotNull(appUser).copy(description = event.text)
-                    val command = ProfileWorkCommand.UpdateAppUser(updatedUser)
+                    val updatedUser = checkNotNull(profile).copy(description = event.text)
+                    val command = ProfileWorkCommand.UpdateProfile(updatedUser)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is ProfileEvent.UpdateBirthday -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
-                    val updatedUser = checkNotNull(appUser).copy(birthday = event.text)
-                    val command = ProfileWorkCommand.UpdateAppUser(updatedUser)
+                    val updatedUser = checkNotNull(profile).copy(birthday = event.text)
+                    val command = ProfileWorkCommand.UpdateProfile(updatedUser)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is ProfileEvent.UpdateGender -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
-                    val updatedUser = checkNotNull(appUser).copy(gender = event.gender)
-                    val command = ProfileWorkCommand.UpdateAppUser(updatedUser)
+                    val updatedUser = checkNotNull(profile).copy(gender = event.gender)
+                    val command = ProfileWorkCommand.UpdateProfile(updatedUser)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is ProfileEvent.UpdateCity -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
-                    val updatedUser = checkNotNull(appUser).copy(city = event.city)
-                    val command = ProfileWorkCommand.UpdateAppUser(updatedUser)
+                    val updatedUser = checkNotNull(profile).copy(city = event.city)
+                    val command = ProfileWorkCommand.UpdateProfile(updatedUser)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is ProfileEvent.UpdateSocialNetworks -> with(state()) {
-                launchBackgroundWork(BackgroundKey.USER_ACTION) {
-                    val updatedUser = checkNotNull(appUser).copy(socialNetworks = event.socialNetworks)
-                    val command = ProfileWorkCommand.UpdateAppUser(updatedUser)
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-            }
-            is ProfileEvent.UpdatePassword -> with(event) {
-                launchBackgroundWork(BackgroundKey.USER_ACTION) {
-                    val command = ProfileWorkCommand.UpdatePassword(oldPassword, newPassword)
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-            }
+
             is ProfileEvent.NavigateToBack -> {
                 consumeOutput(ProfileOutput.NavigateToBack)
-            }
-            is ProfileEvent.NavigateToBillingScreen -> {
-                consumeOutput(ProfileOutput.NavigateToBilling)
             }
         }
     }
@@ -138,20 +126,18 @@ internal class ProfileComposeStore(
         action: ProfileAction,
         currentState: ProfileState,
     ) = when (action) {
-        is ProfileAction.SetupAppUser -> currentState.copy(
-            appUser = action.user,
+        is ProfileAction.SetupProfile -> currentState.copy(
+            profile = action.profile,
             isLoading = false,
         )
+
         is ProfileAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
-        )
-        is ProfileAction.UpdatePaidUserStatus -> currentState.copy(
-            isPaidUser = action.isPaidUser,
         )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_APP_USER, LOAD_PAID_STATUS, USER_ACTION
+        LOAD_PROFILE, USER_ACTION
     }
 
     class Factory(

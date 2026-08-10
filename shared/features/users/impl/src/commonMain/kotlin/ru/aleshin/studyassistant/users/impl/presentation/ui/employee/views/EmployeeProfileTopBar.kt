@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.users.impl.resources.Res
+import ru.aleshin.studyassistant.users.impl.resources.employee_profile_header
 
 /**
  * @author Stanislav Aleshin on 10.07.2024.
@@ -44,7 +46,7 @@ internal fun EmployeeProfileTopBar(
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = {
-            Text(text = UsersThemeRes.strings.employeeProfileHeader)
+            Text(text = stringResource(Res.string.employee_profile_header))
         },
         navigationIcon = {
             IconButton(onClick = onBackClick) {

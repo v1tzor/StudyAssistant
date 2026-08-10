@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,85 +17,41 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
-import ru.aleshin.studyassistant.core.domain.entities.classes.ClassDetails
-import ru.aleshin.studyassistant.core.domain.entities.classes.MediatedClass
-import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
-import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.MediatedClassUi
+import ru.aleshin.studyassistant.core.presentation.models.schedules.ClassUi
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToDomain as mapOrganizationToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi as mapOrganizationToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToDomain as mapSubjectToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToUi as mapSubjectToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToDomain as mapUserToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToUi as mapUserToUi
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
  */
-internal fun Class.mapToUi(number: Int) = ClassUi(
+internal fun Class.mapToUi() = ClassUi(
     uid = uid,
     scheduleId = scheduleId,
-    organization = organization.mapToUi(),
+    organization = organization.mapOrganizationToUi(),
     eventType = eventType,
-    subject = subject?.mapToUi(),
+    subject = subject?.mapSubjectToUi(),
     customData = customData,
-    teacher = teacher?.mapToUi(),
+    teacher = teacher?.mapUserToUi(),
     office = office,
-    location = location?.mapToUi(),
+    location = location?.mapUserToUi(),
     timeRange = timeRange,
     number = number,
-)
-
-
-internal inline fun ClassDetails.mapToUi(
-    number: Int,
-    homeworkStatus: (Homework) -> HomeworkStatus,
-) = ClassDetailsUi(
-    uid = uid,
-    scheduleId = scheduleId,
-    organization = organization.mapToUi(),
-    eventType = eventType,
-    subject = subject?.mapToUi(),
-    customData = customData,
-    teacher = teacher?.mapToUi(),
-    office = office,
-    location = location?.mapToUi(),
-    timeRange = timeRange,
-    number = number,
-    homework = homework?.let { it.mapToUi(status = homeworkStatus(it)) },
-)
-
-internal fun MediatedClass.mapToUi() = MediatedClassUi(
-    uid = uid,
-    scheduleId = scheduleId,
-    organizationId = organizationId,
-    eventType = eventType,
-    subjectId = subjectId,
-    customData = customData,
-    teacherId = teacherId,
-    office = office,
-    location = location?.mapToUi(),
-    timeRange = timeRange,
 )
 
 internal fun ClassUi.mapToDomain() = Class(
     uid = uid,
     scheduleId = scheduleId,
-    organization = organization.mapToDomain(),
+    organization = organization.mapOrganizationToDomain(),
     eventType = eventType,
-    subject = subject?.mapToDomain(),
+    subject = subject?.mapSubjectToDomain(),
     customData = customData,
-    teacher = teacher?.mapToDomain(),
+    teacher = teacher?.mapUserToDomain(),
     office = office,
-    location = location?.mapToDomain(),
+    location = location?.mapUserToDomain(),
     timeRange = timeRange,
-)
-
-internal fun MediatedClassUi.mapToDomain() = MediatedClass(
-    uid = uid,
-    scheduleId = scheduleId,
-    organizationId = organizationId,
-    eventType = eventType,
-    subjectId = subjectId,
-    customData = customData,
-    teacherId = teacherId,
-    office = office,
-    location = location?.mapToDomain(),
-    timeRange = timeRange,
+    number = number,
 )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.presentation.models.schedules.ClassUi
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
 
 /**
  * @author Stanislav Aleshin on 14.07.2024.
@@ -59,7 +61,8 @@ internal fun SwapClassesDropdownMenu(
                 enabled = targetClass.first.uid != currentClass.uid,
                 text = {
                     Text(
-                        text = targetClass.first.subject?.name ?: StudyAssistantRes.strings.noneTitle,
+                        text = targetClass.first.subject?.name
+                            ?: stringResource(CoreRes.string.core_none_title),
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
                     )

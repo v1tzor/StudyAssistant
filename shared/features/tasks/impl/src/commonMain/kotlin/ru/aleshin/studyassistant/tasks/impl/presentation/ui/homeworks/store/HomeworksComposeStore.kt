@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksAction
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksEffect
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksEvent
@@ -71,8 +71,10 @@ internal class HomeworksComposeStore(
                     )
                     sendAction(HomeworksAction.UpdateDates(currentDate, targetTimeRange))
                     launchBackgroundWork(BackgroundKey.LOAD_HOMEWORKS) {
-                        val scrollDate = event.inputData.targetDate?.mapEpochTimeToInstant() ?: currentDate
-                        val command = HomeworksDetailsWorkCommand.LoadHomeworks(targetTimeRange, scrollDate)
+                        val scrollDate =
+                            event.inputData.targetDate?.mapEpochTimeToInstant() ?: currentDate
+                        val command =
+                            HomeworksDetailsWorkCommand.LoadHomeworks(targetTimeRange, scrollDate)
                         workProcessor.work(command).collectAndHandleWork()
                     }
                 } else {
@@ -82,37 +84,37 @@ internal class HomeworksComposeStore(
                         workProcessor.work(command).collectAndHandleWork()
                     }
                 }
-                launchBackgroundWork(BackgroundKey.LOAD_FRIENDS) {
-                    val command = HomeworksDetailsWorkCommand.LoadFriends
-                    workProcessor.work(command).collectAndHandleWork()
-                }
                 launchBackgroundWork(BackgroundKey.LOAD_ACTIVE_SCHEDULE) {
                     val command = HomeworksDetailsWorkCommand.LoadActiveSchedule(currentDate)
                     workProcessor.work(command).collectAndHandleWork()
                 }
-                launchBackgroundWork(BackgroundKey.LOAD_PAID_USER_STATUS) {
-                    val command = HomeworksDetailsWorkCommand.LoadPaidUserStatus
-                    workProcessor.work(command).collectAndHandleWork()
-                }
             }
+
             is HomeworksEvent.ScheduleGoal -> with(event) {
                 launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
                     val command = HomeworksDetailsWorkCommand.ScheduleGoal(goalCreateModel)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworksEvent.DeleteGoal -> with(event) {
                 launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
                     val command = HomeworksDetailsWorkCommand.DeleteGoal(goal)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworksEvent.ShareHomeworks -> with(event) {
                 launchBackgroundWork(BackgroundKey.SHARE_HOMEWORK) {
-                    val command = HomeworksDetailsWorkCommand.ShareHomeworks(sentMediatedHomeworks)
+                    val command = HomeworksDetailsWorkCommand.ShareHomeworks(selection)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
+            is HomeworksEvent.ClearHomeworkShareLink -> {
+                sendAction(HomeworksAction.UpdateHomeworkShareLink(null))
+            }
+
             is HomeworksEvent.ClickCurrentTimeRange -> {
                 val currentDate = dateManager.fetchBeginningCurrentInstant()
                 val targetTimeRange = TimeRange(
@@ -125,6 +127,7 @@ internal class HomeworksComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworksEvent.ClickNextTimeRange -> with(state()) {
                 val currentDate = dateManager.fetchBeginningCurrentInstant()
                 val currentTimeRange = checkNotNull(selectedTimeRange)
@@ -138,6 +141,7 @@ internal class HomeworksComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworksEvent.ClickPreviousTimeRange -> with(state()) {
                 val currentDate = dateManager.fetchBeginningCurrentInstant()
                 val currentTimeRange = checkNotNull(selectedTimeRange)
@@ -151,6 +155,7 @@ internal class HomeworksComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworksEvent.DoHomework -> with(event) {
                 val currentTime = dateManager.fetchCurrentInstant()
                 val updatedHomework = homework.copy(isDone = true, completeDate = currentTime)
@@ -159,6 +164,7 @@ internal class HomeworksComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworksEvent.SkipHomework -> with(event) {
                 val currentTime = dateManager.fetchCurrentInstant()
                 val updatedHomework = homework.copy(isDone = false, completeDate = currentTime)
@@ -167,6 +173,7 @@ internal class HomeworksComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworksEvent.RepeatHomework -> with(event) {
                 val updatedHomework = homework.copy(isDone = false, completeDate = null)
                 launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
@@ -174,6 +181,7 @@ internal class HomeworksComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworksEvent.ClickEditHomework -> with(event) {
                 val config = EditorConfig.Homework(
                     homeworkId = homework.uid,
@@ -183,6 +191,7 @@ internal class HomeworksComposeStore(
                 )
                 consumeOutput(HomeworksOutput.NavigateToHomeworkEditor(config))
             }
+
             is HomeworksEvent.ClickAddHomework -> with(event) {
                 val config = EditorConfig.Homework(
                     homeworkId = null,
@@ -192,25 +201,28 @@ internal class HomeworksComposeStore(
                 )
                 consumeOutput(HomeworksOutput.NavigateToHomeworkEditor(config))
             }
+
             is HomeworksEvent.AddHomeworkInEditor -> with(state()) {
                 val currentTime = dateManager.fetchCurrentInstant()
-                val activeClass = if (activeSchedule != null && activeSchedule.classes.isNotEmpty()) {
-                    val dailyTimeRange = TimeRange(
-                        from = activeSchedule.classes.first().timeRange.from,
-                        to = activeSchedule.classes.last().timeRange.to.shiftMinutes(10),
-                    )
-                    if (dailyTimeRange.containsTime(currentTime)) {
-                        activeSchedule.classes.findLast { classModel ->
-                            val firstFilter = classModel.timeRange.to.dateTime().time < currentTime.dateTime().time
-                            val secondFilter = classModel.timeRange.containsTime(currentTime)
-                            return@findLast firstFilter || secondFilter
+                val activeClass =
+                    if (activeSchedule != null && activeSchedule.classes.isNotEmpty()) {
+                        val dailyTimeRange = TimeRange(
+                            from = activeSchedule.classes.first().timeRange.from,
+                            to = activeSchedule.classes.last().timeRange.to.shiftMinutes(10),
+                        )
+                        if (dailyTimeRange.containsTime(currentTime)) {
+                            activeSchedule.classes.findLast { classModel ->
+                                val firstFilter =
+                                    classModel.timeRange.to.dateTime().time < currentTime.dateTime().time
+                                val secondFilter = classModel.timeRange.containsTime(currentTime)
+                                return@findLast firstFilter || secondFilter
+                            }
+                        } else {
+                            null
                         }
                     } else {
                         null
                     }
-                } else {
-                    null
-                }
                 val config = EditorConfig.Homework(
                     homeworkId = null,
                     date = null,
@@ -219,11 +231,9 @@ internal class HomeworksComposeStore(
                 )
                 consumeOutput(HomeworksOutput.NavigateToHomeworkEditor(config))
             }
+
             is HomeworksEvent.ClickBack -> {
                 consumeOutput(HomeworksOutput.NavigateToBack)
-            }
-            is HomeworksEvent.ClickPaidFunction -> {
-                consumeOutput(HomeworksOutput.NavigateToBilling)
             }
         }
     }
@@ -236,19 +246,20 @@ internal class HomeworksComposeStore(
             homeworks = action.homeworks,
             isLoading = false,
         )
+
         is HomeworksAction.UpdateActiveSchedule -> currentState.copy(
             activeSchedule = action.activeSchedule,
         )
+
         is HomeworksAction.UpdateDates -> currentState.copy(
             currentDate = action.currentDate,
             selectedTimeRange = action.selectedTimeRange,
         )
-        is HomeworksAction.UpdateUserPaidStatus -> currentState.copy(
-            isPaidUser = action.isPaidUser,
+
+        is HomeworksAction.UpdateHomeworkShareLink -> currentState.copy(
+            homeworkShareLink = action.link,
         )
-        is HomeworksAction.UpdateFriends -> currentState.copy(
-            friends = action.friends,
-        )
+
         is HomeworksAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )
@@ -256,9 +267,7 @@ internal class HomeworksComposeStore(
 
     enum class BackgroundKey : BackgroundWorkKey {
         LOAD_HOMEWORKS,
-        LOAD_FRIENDS,
         LOAD_ACTIVE_SCHEDULE,
-        LOAD_PAID_USER_STATUS,
         HOMEWORK_ACTION,
         GOAL_ACTION,
         SHARE_HOMEWORK

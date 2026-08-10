@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,15 +49,27 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.epochTimeDuration
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.tokens.dayOfWeekNames
-import ru.aleshin.studyassistant.core.ui.theme.tokens.monthNames
+import ru.aleshin.studyassistant.core.presentation.models.schedules.CustomScheduleUi
+import ru.aleshin.studyassistant.core.ui.views.dayOfWeekNames
+import ru.aleshin.studyassistant.core.ui.views.monthNames
 import ru.aleshin.studyassistant.core.ui.views.sheet.StickyBottomSheet
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.FastEditDurations
-import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.CustomScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.custom_schedule_date_title
+import ru.aleshin.studyassistant.editor.impl.resources.edit_custom_schedule_title
+import ru.aleshin.studyassistant.editor.impl.resources.fast_edit_breaks_duration_label
+import ru.aleshin.studyassistant.editor.impl.resources.fast_edit_classes_duration_label
+import ru.aleshin.studyassistant.editor.impl.resources.fast_edit_daily_schedule_header
+import ru.aleshin.studyassistant.editor.impl.resources.fast_edit_start_of_day_label
+import ru.aleshin.studyassistant.editor.impl.resources.ic_break
+import ru.aleshin.studyassistant.editor.impl.resources.return_schedule_title
+import ru.aleshin.studyassistant.editor.impl.resources.save_button_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_class as core_ic_class
+import ru.aleshin.studyassistant.core.ui.resources.ic_clock_outline as core_ic_clock_outline
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -115,13 +127,14 @@ internal fun DailyScheduleSheetHeader(
     modifier: Modifier = Modifier,
     targetDate: Instant?,
 ) {
-    val coreStrings = StudyAssistantRes.strings
+    val localizedMonthNames = monthNames()
+    val localizedDayOfWeekNames = dayOfWeekNames()
     val dateFormat = DateTimeComponents.Format {
         dayOfMonth()
         char(' ')
-        monthName(coreStrings.monthNames())
+        monthName(localizedMonthNames)
         chars(", ")
-        dayOfWeek(coreStrings.dayOfWeekNames())
+        dayOfWeek(localizedDayOfWeekNames)
     }
 
     Row(
@@ -134,7 +147,7 @@ internal fun DailyScheduleSheetHeader(
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Text(
-                text = EditorThemeRes.strings.customScheduleDateTitle,
+                text = stringResource(Res.string.custom_schedule_date_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -177,43 +190,43 @@ private fun DailyScheduleBottomSheetContent(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                text = EditorThemeRes.strings.fastEditDailyScheduleHeader,
+                text = stringResource(Res.string.fast_edit_daily_schedule_header),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.labelMedium,
             )
             Column {
                 AssistChip(
                     onClick = { startOfDayEditorDialogState = true },
-                    label = { Text(text = EditorThemeRes.strings.fastEditStartOfDayLabel) },
+                    label = { Text(text = stringResource(Res.string.fast_edit_start_of_day_label)) },
                     enabled = enabledFastEdit,
                     leadingIcon = {
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            painter = painterResource(StudyAssistantRes.icons.timeOutline),
+                            painter = painterResource(CoreRes.drawable.core_ic_clock_outline),
                             contentDescription = null,
                         )
                     },
                 )
                 AssistChip(
                     onClick = { classesDurationEditorDialogState = true },
-                    label = { Text(text = EditorThemeRes.strings.fastEditClassesDurationLabel) },
+                    label = { Text(text = stringResource(Res.string.fast_edit_classes_duration_label)) },
                     enabled = enabledFastEdit,
                     leadingIcon = {
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            painter = painterResource(StudyAssistantRes.icons.classes),
+                            painter = painterResource(CoreRes.drawable.core_ic_class),
                             contentDescription = null,
                         )
                     },
                 )
                 AssistChip(
                     onClick = { breaksDurationEditorDialogState = true },
-                    label = { Text(text = EditorThemeRes.strings.fastEditBreaksDurationLabel) },
+                    label = { Text(text = stringResource(Res.string.fast_edit_breaks_duration_label)) },
                     enabled = enabledFastEdit,
                     leadingIcon = {
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            painter = painterResource(EditorThemeRes.icons.breaks),
+                            painter = painterResource(Res.drawable.ic_break),
                             contentDescription = null,
                         )
                     },
@@ -257,7 +270,15 @@ private fun DailyScheduleBottomSheetContent(
                 customSchedule.classes.forEachIndexed { index, classModel ->
                     if (index != customSchedule.classes.lastIndex) {
                         val nextClassModel = customSchedule.classes[index + 1]
-                        add(Pair(index.inc(), epochTimeDuration(classModel.timeRange.to, nextClassModel.timeRange.from)))
+                        add(
+                            Pair(
+                                index.inc(),
+                                epochTimeDuration(
+                                    classModel.timeRange.to,
+                                    nextClassModel.timeRange.from
+                                )
+                            )
+                        )
                     }
                 }
             }
@@ -293,17 +314,17 @@ private fun DailyScheduleBottomSheetFooter(
                 onClick = onSaveClick,
                 modifier = Modifier.weight(1f),
             ) {
-                Text(text = EditorThemeRes.strings.saveButtonTitle)
+                Text(text = stringResource(Res.string.save_button_title))
             }
             FilledTonalButton(onClick = onReturnScheduleClick) {
-                Text(text = EditorThemeRes.strings.returnScheduleTitle)
+                Text(text = stringResource(Res.string.return_schedule_title))
             }
         } else {
             Button(
                 onClick = onEditClick,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(text = EditorThemeRes.strings.editCustomScheduleTitle)
+                Text(text = stringResource(Res.string.edit_custom_schedule_title))
             }
         }
     }

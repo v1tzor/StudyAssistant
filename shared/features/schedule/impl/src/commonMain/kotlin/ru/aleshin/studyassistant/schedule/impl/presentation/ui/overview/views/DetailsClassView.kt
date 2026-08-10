@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,21 +51,26 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.endSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.VerticalLeftTimeProgress
 import ru.aleshin.studyassistant.core.ui.views.timeFormat
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_employee as core_ic_employee
+import ru.aleshin.studyassistant.core.ui.resources.ic_map_marker as core_ic_map_marker
+import ru.aleshin.studyassistant.core.ui.resources.ic_organization as core_ic_organization
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
 
 /**
  * @author Stanislav Aleshin on 12.06.2024.
@@ -77,7 +82,7 @@ internal fun DetailsClassViewItem(
     enabled: Boolean = true,
     isActive: Boolean,
     number: Int,
-    progress: Progress,
+    progress: Float?,
     timeRange: TimeRange,
     subject: SubjectUi?,
     eventType: EventType,
@@ -169,7 +174,7 @@ private fun DetailsClassTime(
     modifier: Modifier = Modifier,
     isActive: Boolean,
     number: Int,
-    progress: Progress,
+    progress: Float?,
     timeRange: TimeRange,
 ) {
     Column(
@@ -289,8 +294,8 @@ private fun DetailsClassViewHeader(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Icon(
-            painter = painterResource(eventType.mapToIcon(StudyAssistantRes.icons)),
-            contentDescription = eventType.mapToString(StudyAssistantRes.strings),
+            painter = painterResource(eventType.mapToIcon()),
+            contentDescription = eventType.mapToString(),
             tint = MaterialTheme.colorScheme.primary,
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -306,13 +311,13 @@ private fun DetailsClassViewContent(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = eventType.mapToString(StudyAssistantRes.strings),
+            text = eventType.mapToString(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             style = MaterialTheme.typography.labelSmall,
         )
         Text(
-            text = subject?.name ?: StudyAssistantRes.strings.noneTitle,
+            text = subject?.name ?: stringResource(CoreRes.string.core_none_title),
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
@@ -333,39 +338,43 @@ private fun DetailsClassViewFooter(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            if (teacher != null) {
-                DetailsClassViewFooterItem(
-                    icon = painterResource(StudyAssistantRes.icons.employee),
-                    text = teacher.officialName()
-                )
-            }
-            if (organization?.isMain == false) {
-                DetailsClassViewFooterItem(
-                    icon = painterResource(StudyAssistantRes.icons.organization),
-                    text = organization.shortName,
-                )
-            }
-            if (location != null) {
-                DetailsClassViewFooterItem(
-                    icon = painterResource(StudyAssistantRes.icons.location),
-                    text = location.label ?: location.value,
-                )
+        if (teacher != null || organization?.isMain == false || location != null) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                if (teacher != null) {
+                    DetailsClassViewFooterItem(
+                        icon = painterResource(CoreRes.drawable.core_ic_employee),
+                        text = teacher.officialName()
+                    )
+                }
+                if (organization?.isMain == false) {
+                    DetailsClassViewFooterItem(
+                        icon = painterResource(CoreRes.drawable.core_ic_organization),
+                        text = organization.shortName,
+                    )
+                }
+                if (location != null) {
+                    DetailsClassViewFooterItem(
+                        icon = painterResource(CoreRes.drawable.core_ic_map_marker),
+                        text = location.label ?: location.value,
+                    )
+                }
             }
         }
-        Surface(
-            shape = MaterialTheme.shapes.small,
-            color = MaterialTheme.colorScheme.surfaceVariant,
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                text = office,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelMedium,
-            )
+        if (office.isNotBlank()) {
+            Surface(
+                shape = MaterialTheme.shapes.small,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                    text = office,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
         }
     }
 }
@@ -411,5 +420,3 @@ private fun DetailsClassColorIndicator(
         content = { Box(modifier = Modifier.fillMaxHeight()) }
     )
 }
-
-typealias Progress = Float?

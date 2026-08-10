@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,17 +25,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.ui.mappers.toLanguageString
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.dialog.TimePickerDialog
-import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
+import ru.aleshin.studyassistant.settings.impl.resources.Res
+import ru.aleshin.studyassistant.settings.impl.resources.before_time_prefix
+import ru.aleshin.studyassistant.settings.impl.resources.reminder_time_prefix
+import kotlin.time.Clock
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -56,7 +59,7 @@ internal fun BeforeTimeChip(
         label = {
             Text(
                 text = buildString {
-                    append(SettingsThemeRes.strings.beforeTimePrefix)
+                    append(stringResource(Res.string.before_time_prefix))
                     append(selectedTime.toDuration(DurationUnit.MILLISECONDS).toLanguageString())
                 },
                 color = MaterialTheme.colorScheme.onSurface,
@@ -105,7 +108,7 @@ internal fun ReminderTimeChip(
         label = {
             Text(
                 text = buildString {
-                    append(SettingsThemeRes.strings.reminderTimePrefix)
+                    append(stringResource(Res.string.reminder_time_prefix))
                     append(time.format(timeFormat))
                 },
                 color = MaterialTheme.colorScheme.onSurface,

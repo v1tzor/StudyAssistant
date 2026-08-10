@@ -1,6 +1,6 @@
 naming:
   FunctionNaming:
-    ignoreAnnotated: ['Composable']
+    ignoreAnnotated: [ 'Composable' ]
   MatchingDeclarationName:
     mustBeFirst: false
 complexity:
@@ -10,15 +10,15 @@ complexity:
     functionThreshold: 25
     constructorThreshold: 15
   TooManyFunctions:
-    ignoreAnnotatedFunctions: ['Preview']
+    ignoreAnnotatedFunctions: [ 'Preview' ]
 formatting:
   FinalNewline:
-    insertFinalNewLine: false
+    active: false
 style:
   MagicNumber:
     ignorePropertyDeclaration: true
     ignoreCompanionObjectPropertyDeclaration: true
   UnusedPrivateMember:
-    ignoreAnnotated: ['Preview']
+    ignoreAnnotated: [ 'Preview' ]
   NewLineAtEndOfFile:
     active: false

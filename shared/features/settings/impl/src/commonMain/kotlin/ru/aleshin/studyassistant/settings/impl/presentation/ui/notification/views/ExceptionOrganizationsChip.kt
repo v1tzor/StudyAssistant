@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,14 +30,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseCheckedDialog
 import ru.aleshin.studyassistant.core.ui.views.dialog.CheckedItemView
-import ru.aleshin.studyassistant.settings.impl.presentation.models.organizations.OrganizationShortUi
-import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
+import ru.aleshin.studyassistant.settings.impl.resources.Res
+import ru.aleshin.studyassistant.settings.impl.resources.add_exception_chip_label
+import ru.aleshin.studyassistant.settings.impl.resources.exception_organizations_dialog_header
+import ru.aleshin.studyassistant.settings.impl.resources.exception_organizations_dialog_title
+import ru.aleshin.studyassistant.settings.impl.resources.exceptions_chip_label_prefix
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_organization_remove_outline as core_ic_organization_remove_outline
 
 /**
  * @author Stanislav Aleshin on 25.08.2024.
@@ -58,10 +64,10 @@ internal fun ExceptionOrganizationsChip(
             Text(
                 text = buildString {
                     if (exceptions.isNotEmpty()) {
-                        append(SettingsThemeRes.strings.exceptionsChipLabelPrefix)
+                        append(stringResource(Res.string.exceptions_chip_label_prefix))
                         append(exceptions.size)
                     } else {
-                        append(SettingsThemeRes.strings.addExceptionChipLabel)
+                        append(stringResource(Res.string.add_exception_chip_label))
                     }
                 },
                 color = MaterialTheme.colorScheme.onSurface,
@@ -72,7 +78,7 @@ internal fun ExceptionOrganizationsChip(
         leadingIcon = {
             Icon(
                 modifier = Modifier.size(18.dp),
-                painter = painterResource(StudyAssistantRes.icons.organizationRemove),
+                painter = painterResource(CoreRes.drawable.core_ic_organization_remove_outline),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.error,
             )
@@ -117,8 +123,8 @@ private fun OrganizationSelectorDialog(
         modifier = modifier,
         selected = selectedOrganization,
         items = allOrganizations,
-        header = SettingsThemeRes.strings.exceptionOrganizationsDialogHeader,
-        title = SettingsThemeRes.strings.exceptionOrganizationsDialogTitle,
+        header = stringResource(Res.string.exception_organizations_dialog_header),
+        title = stringResource(Res.string.exception_organizations_dialog_title),
         itemView = { organization ->
             val isSelected = selectedOrganization.contains(organization)
             CheckedItemView(
@@ -131,7 +137,7 @@ private fun OrganizationSelectorDialog(
                 },
                 selected = isSelected,
                 title = organization.shortName,
-                label = organization.type.mapToSting(StudyAssistantRes.strings),
+                label = organization.type.mapToSting(),
             )
         },
         onDismiss = onDismiss,

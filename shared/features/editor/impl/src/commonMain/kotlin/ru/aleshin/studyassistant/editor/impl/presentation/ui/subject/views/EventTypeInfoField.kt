@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EventTypeSelectorBottomSheet
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.event_type_field_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.event_type_required_field_label
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_class as core_ic_class
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -50,10 +54,10 @@ internal fun EventTypeInfoField(
         onClick = { openEventTypeSelectorSheet = true },
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
-        value = eventType?.mapToString(StudyAssistantRes.strings),
-        label = EditorThemeRes.strings.eventTypeFieldLabel,
-        placeholder = EditorThemeRes.strings.eventTypeFieldPlaceholder,
-        infoIcon = painterResource(StudyAssistantRes.icons.classes),
+        value = eventType?.mapToString(),
+        label = stringResource(Res.string.event_type_required_field_label),
+        placeholder = stringResource(Res.string.event_type_field_placeholder),
+        infoIcon = painterResource(CoreRes.drawable.core_ic_class),
         trailingIcon = {
             ExpandedIcon(
                 isExpanded = openEventTypeSelectorSheet,

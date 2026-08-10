@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,16 +36,19 @@ import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.schedules.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.settings.mapToUi
+import ru.aleshin.studyassistant.core.presentation.models.schedules.BaseScheduleUi
+import ru.aleshin.studyassistant.core.presentation.models.schedules.ClassUi
+import ru.aleshin.studyassistant.core.presentation.models.schedules.CustomScheduleUi
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseScheduleInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.CalendarSettingsInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.CustomClassInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.CustomScheduleInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.FastEditDurations
-import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.CustomScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleOutput
@@ -68,31 +71,38 @@ internal interface DailyScheduleWorkProcessor :
                 baseScheduleId = command.baseScheduleId,
                 customScheduleId = command.customScheduleId,
             )
-            is DailyScheduleWorkCommand.LoadCalendarSettings -> loadCalendarSettings()
+
+            is DailyScheduleWorkCommand.LoadCalendarSettings -> loadCalendarSettingsWork()
             is DailyScheduleWorkCommand.CreateCustomSchedule -> createCustomScheduleWork(
                 date = command.date,
                 baseSchedule = command.baseSchedule,
             )
+
             is DailyScheduleWorkCommand.DeleteCustomSchedule -> deleteCustomScheduleWork(
                 customScheduleId = command.customScheduleId,
             )
+
             is DailyScheduleWorkCommand.DeleteClass -> deleteClassWork(
                 targetId = command.targetId,
                 schedule = command.schedule,
             )
+
             is DailyScheduleWorkCommand.SwapClasses -> swapClassesWork(
                 from = command.from,
                 to = command.to,
                 schedule = command.schedule,
             )
+
             is DailyScheduleWorkCommand.UpdateStartOfDay -> updateStartOfDayWork(
                 time = command.time,
                 schedule = command.schedule,
             )
+
             is DailyScheduleWorkCommand.UpdateClassesDuration -> updateClassesDurationWork(
                 durations = command.durations,
                 schedule = command.schedule,
             )
+
             is DailyScheduleWorkCommand.UpdateBreaksDuration -> updateBreaksDurationWork(
                 durations = command.durations,
                 schedule = command.schedule,
@@ -128,7 +138,7 @@ internal interface DailyScheduleWorkProcessor :
             emit(ActionResult(DailyScheduleAction.UpdateLoading(true)))
         }
 
-        private fun loadCalendarSettings() = flow {
+        private fun loadCalendarSettingsWork() = flow {
             settingsInteractor.fetchSettings().collectAndHandle(
                 onLeftAction = { emit(EffectResult(DailyScheduleEffect.ShowError(it))) },
                 onRightAction = { calendarSettings ->
@@ -171,13 +181,11 @@ internal interface DailyScheduleWorkProcessor :
             to: ClassUi,
             schedule: CustomScheduleUi,
         ) = flow<DailyScheduleWorkResult> {
-            val updatedClasses = schedule.classes.toMutableList().apply {
-                set(indexOf(from), from.copy(timeRange = to.timeRange))
-                set(indexOf(to), to.copy(timeRange = from.timeRange))
-            }
-            val updatedSchedule = schedule.copy(classes = updatedClasses)
-
-            customScheduleInteractor.addOrUpdateSchedule(updatedSchedule.mapToDomain()).handle(
+            classInteractor.swapClassTimeRanges(
+                from = from.mapToDomain(),
+                to = to.mapToDomain(),
+                schedule = schedule.mapToDomain(),
+            ).handle(
                 onLeftAction = { emit(EffectResult(DailyScheduleEffect.ShowError(it))) },
             )
         }
@@ -203,6 +211,7 @@ internal interface DailyScheduleWorkProcessor :
                 onLeftAction = { emit(EffectResult(DailyScheduleEffect.ShowError(it))) },
             )
         }
+
         private fun updateBreaksDurationWork(
             durations: FastEditDurations,
             schedule: CustomScheduleUi,

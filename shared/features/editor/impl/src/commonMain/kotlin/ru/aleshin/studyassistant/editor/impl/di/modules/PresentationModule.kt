@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,15 @@
 package ru.aleshin.studyassistant.editor.impl.di.modules
 
 import org.kodein.di.DI
+import org.kodein.di.bind
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponentFactory
-import ru.aleshin.studyassistant.editor.impl.navigation.DefaultEditorComponentFactory
+import org.kodein.di.multiton
+import org.kodein.di.scoped
+import ru.aleshin.studyassistant.core.common.di.scope.FeatureComponentScope
+import ru.aleshin.studyassistant.editor.api.EditorContentProviderFactory
+import ru.aleshin.studyassistant.editor.impl.navigation.DefaultEditorContentProviderFactory
+import ru.aleshin.studyassistant.editor.impl.navigation.EditorComponentDeps
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.store.ClassComposeStore
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.store.ClassWorkProcessor
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.store.DailyScheduleComposeStore
@@ -33,6 +38,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.store.
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.store.OrganizationWorkProcessor
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.store.ProfileComposeStore
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.store.ProfileWorkProcessor
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.root.EditorFeatureComponent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.store.WeekScheduleComposeStore
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.store.WeekScheduleWorkProcessor
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.store.SubjectComposeStore
@@ -44,7 +50,23 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.store.TodoWork
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<EditorFeatureComponentFactory> { DefaultEditorComponentFactory(instance(), instance(), instance(), instance(),instance(), instance(), instance(), instance(), instance()) }
+    bind<EditorFeatureComponent>() with scoped(FeatureComponentScope).multiton { deps: EditorComponentDeps ->
+        EditorFeatureComponent.Default(
+            componentContext = context,
+            startConfig = deps.startConfig,
+            outputConsumer = deps.outputConsumer,
+            classStoreFactory = instance(),
+            employeeStoreFactory = instance(),
+            weekScheduleStoreFactory = instance(),
+            dailyScheduleStoreFactory = instance(),
+            subjectStoreFactory = instance(),
+            homeworkStoreFactory = instance(),
+            todoStoreFactory = instance(),
+            organizationStoreFactory = instance(),
+            profileStoreFactory = instance(),
+        )
+    }
+    bindSingleton<EditorContentProviderFactory> { DefaultEditorContentProviderFactory(di) }
 
     bindSingleton<WeekScheduleWorkProcessor> { WeekScheduleWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<WeekScheduleComposeStore.Factory> { WeekScheduleComposeStore.Factory(instance(), instance()) }
@@ -52,7 +74,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<DailyScheduleWorkProcessor> { DailyScheduleWorkProcessor.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<DailyScheduleComposeStore.Factory> { DailyScheduleComposeStore.Factory(instance(), instance()) }
 
-    bindSingleton<ClassWorkProcessor> { ClassWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ClassWorkProcessor> { ClassWorkProcessor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<ClassComposeStore.Factory> { ClassComposeStore.Factory(instance(), instance()) }
 
     bindSingleton<SubjectWorkProcessor> { SubjectWorkProcessor.Base(instance(), instance(), instance()) }
@@ -64,7 +86,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<HomeworkWorkProcessor> { HomeworkWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<HomeworkComposeStore.Factory> { HomeworkComposeStore.Factory(instance(), instance(), instance()) }
 
-    bindSingleton<TodoWorkProcessor> { TodoWorkProcessor.Base(instance(), instance(), instance()) }
+    bindSingleton<TodoWorkProcessor> { TodoWorkProcessor.Base(instance(), instance()) }
     bindSingleton<TodoComposeStore.Factory> { TodoComposeStore.Factory(instance(), instance()) }
 
     bindSingleton<OrganizationWorkProcessor> { OrganizationWorkProcessor.Base(instance()) }

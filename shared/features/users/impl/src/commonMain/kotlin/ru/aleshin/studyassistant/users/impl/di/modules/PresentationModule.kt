@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,34 +17,33 @@
 package ru.aleshin.studyassistant.users.impl.di.modules
 
 import org.kodein.di.DI
+import org.kodein.di.bind
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.users.api.UsersFeatureComponentFactory
-import ru.aleshin.studyassistant.users.impl.navigation.DefaultUsersComponentFactory
+import org.kodein.di.multiton
+import org.kodein.di.scoped
+import ru.aleshin.studyassistant.core.common.di.scope.FeatureComponentScope
+import ru.aleshin.studyassistant.users.api.UsersContentProviderFactory
+import ru.aleshin.studyassistant.users.impl.navigation.DefaultUsersContentProviderFactory
+import ru.aleshin.studyassistant.users.impl.navigation.UsersComponentDeps
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.screenmodel.EmployeeProfileComposeStore
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.screenmodel.EmployeeProfileWorkProcessor
-import ru.aleshin.studyassistant.users.impl.presentation.ui.friends.store.FriendsComposeStore
-import ru.aleshin.studyassistant.users.impl.presentation.ui.friends.store.FriendsWorkProcessor
-import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.store.RequestsComposeStore
-import ru.aleshin.studyassistant.users.impl.presentation.ui.requests.store.RequestsWorkProcessor
-import ru.aleshin.studyassistant.users.impl.presentation.ui.user.store.UserProfileComposeStore
-import ru.aleshin.studyassistant.users.impl.presentation.ui.user.store.UserProfileWorkProcessor
+import ru.aleshin.studyassistant.users.impl.presentation.ui.root.UsersFeatureComponent
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<UsersFeatureComponentFactory> { DefaultUsersComponentFactory(instance(), instance(), instance(), instance()) }
+    bind<UsersFeatureComponent>() with scoped(FeatureComponentScope).multiton { deps: UsersComponentDeps ->
+        UsersFeatureComponent.Default(
+            componentContext = context,
+            startConfig = deps.startConfig,
+            outputConsumer = deps.outputConsumer,
+            employeeProfileStoreFactory = instance(),
+        )
+    }
+    bindSingleton<UsersContentProviderFactory> { DefaultUsersContentProviderFactory(di) }
 
     bindSingleton<EmployeeProfileWorkProcessor> { EmployeeProfileWorkProcessor.Base(instance()) }
     bindSingleton<EmployeeProfileComposeStore.Factory> { EmployeeProfileComposeStore.Factory(instance(), instance()) }
-
-    bindSingleton<UserProfileWorkProcessor> { UserProfileWorkProcessor.Base(instance(), instance()) }
-    bindSingleton<UserProfileComposeStore.Factory> { UserProfileComposeStore.Factory(instance(), instance()) }
-
-    bindSingleton<FriendsWorkProcessor> { FriendsWorkProcessor.Base(instance(), instance()) }
-    bindSingleton<FriendsComposeStore.Factory> { FriendsComposeStore.Factory(instance(), instance(), instance()) }
-
-    bindSingleton<RequestsWorkProcessor> { RequestsWorkProcessor.Base(instance(), instance()) }
-    bindSingleton<RequestsComposeStore.Factory> { RequestsComposeStore.Factory(instance(), instance(), instance()) }
 }

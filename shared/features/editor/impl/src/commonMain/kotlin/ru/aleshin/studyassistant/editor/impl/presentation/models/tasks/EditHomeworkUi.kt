@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,9 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkUi
 
 /**
  * @author Stanislav Aleshin on 22.06.2024.
@@ -46,7 +47,7 @@ internal data class EditHomeworkUi(
 ) {
 
     fun isValid() = deadline != null && subject != null && organization != null &&
-        (theoreticalTasks.isNotEmpty() || practicalTasks.isNotEmpty() || presentationTasks.isNotEmpty())
+            (theoreticalTasks.isNotEmpty() || practicalTasks.isNotEmpty() || presentationTasks.isNotEmpty())
 
     companion object {
         fun createEditModel(

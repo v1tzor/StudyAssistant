@@ -1,12 +1,28 @@
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="800dp"
     android:height="800dp"
     android:viewportWidth="16"
     android:viewportHeight="16">
-  <path
-      android:pathData="M14.712,4.633a1.754,1.754 0,0 0,-1.234 -1.234C12.382,3.11 8,3.11 8,3.11s-4.382,0 -5.478,0.289c-0.6,0.161 -1.072,0.634 -1.234,1.234C1,5.728 1,8 1,8s0,2.283 0.288,3.367c0.162,0.6 0.635,1.073 1.234,1.234C3.618,12.89 8,12.89 8,12.89s4.382,0 5.478,-0.289a1.754,1.754 0,0 0,1.234 -1.234C15,10.272 15,8 15,8s0,-2.272 -0.288,-3.367z"
-      android:fillColor="#ff0000"/>
-  <path
-      android:pathData="M6.593,10.11l3.644,-2.098 -3.644,-2.11v4.208z"
-      android:fillColor="#ffffff"/>
+    <path
+        android:pathData="M14.712,4.633a1.754,1.754 0,0 0,-1.234 -1.234C12.382,3.11 8,3.11 8,3.11s-4.382,0 -5.478,0.289c-0.6,0.161 -1.072,0.634 -1.234,1.234C1,5.728 1,8 1,8s0,2.283 0.288,3.367c0.162,0.6 0.635,1.073 1.234,1.234C3.618,12.89 8,12.89 8,12.89s4.382,0 5.478,-0.289a1.754,1.754 0,0 0,1.234 -1.234C15,10.272 15,8 15,8s0,-2.272 -0.288,-3.367z"
+        android:fillColor="#ff0000" />
+    <path
+        android:pathData="M6.593,10.11l3.644,-2.098 -3.644,-2.11v4.208z"
+        android:fillColor="#ffffff" />
 </vector>

@@ -2,95 +2,89 @@
 applicationId = "ru.aleshin.studyassistant"
 minSdk = "24"
 targetSdk = "36"
-compileSdk = "36"
+compileSdk = "37"
 jvmTarget = "17"
 version-name = "1.0.0"
 version-code = "4"
 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
 # Gradle
-agp = "8.10.0"
-ksp = "2.1.20-2.0.0"
+agp = "9.3.0"
+ksp = "2.3.11"
 
 # Kotlin
-kotlin = "2.1.0"
-kotlin-coroutines = "1.10.2"
-kotlin-datetime = "0.6.1"
-kotlin-serialization = "1.8.0"
-kotlin-io = "0.7.0"
-kotlin-atomic = "0.28.0"
-kotlin-immutable = "0.4.0"
+kotlin = "2.4.10"
+kotlin-coroutines = "1.11.0"
+kotlin-serialization = "1.11.0"
+kotlin-datetime = "0.7.1"
+kotlin-io = "0.9.1"
+kotlin-atomic = "0.33.0"
+kotlin-immutable = "0.5.1"
 
 # Swift
-skie = "0.10.4"
-kswift = "0.7.0"
+skie = "0.10.14"
 swiftklib = "0.6.4"
 
 # Compose
-compose = "1.8.3"
-compose-compiler = "1.5.11"
-compose-material = "1.12.0"
-compose-material3 = "1.3.2"
-compose-adaptive = "1.1.2"
-compose-multiplatform = "1.9.0-rc01"
+compose = "1.11.2"
+compose-bom = "2026.06.01"
+compose-material = "1.14.0"
+compose-material3 = "1.4.0"
+compose-adaptive = "1.3.0-beta02"
+compose-multiplatform = "1.11.1"
 
 # UI
-richtext = "0.35.0"
-placeholder = "1.0.7"
-drag-and-drop = "0.3.0"
-koalaplot-charts = "0.6.3"
-sketch = "4.2.0"
-guava = "33.4.8-android"
+richtext = "0.43.0"
+placeholder = "1.0.12"
+drag-and-drop = "0.5.0"
+koalaplot-charts = "0.12.0"
+charty = "3.0.0-rc01"
+sketch = "4.6.0"
+guava = "33.6.0-android"
 
 # AndroidX
-androidx-activity-compose = "1.10.1"
-androidx-browser = "1.8.0"
-androidx-core-ktx = "1.13.1"
-androidx-workmanager = "2.10.0"
-anroidx-paging = "3.4.0-alpha02"
+androidx-activity-compose = "1.13.0"
+androidx-browser = "1.10.0"
+androidx-core-ktx = "1.19.0"
+androidx-workmanager = "2.11.2"
+androidx-paging = "3.5.0"
+androidx-camera = "1.6.1"
+androidx-glance = "1.1.1"
+zxing = "3.5.4"
 
-# Google & Firebase
-google-gms = "4.4.3"
-google-gms-auth = "21.3.0"
-google-oauth = "1.37.1"
+# Google
 google-accompanist = "0.36.0"
-firebase-bom = "33.16.0"
-
-# Huawei
-hms = "1.9.1.304"
-hms-iap = "6.13.0.300"
 
 # RuStore
-rustore-push = "6.10.0"
-rustore-billing = "9.0.1"
-rustore-pay = "9.1.0"
-rustore-review = "8.0.0"
-rustore-updates = "8.0.0"
+rustore-review = "10.5.0"
+rustore-updates = "10.5.0"
+yandex-ads = "8.3.0"
+mytarget-ads = "5.45.3.4"
 
 # Crashlytics & Analytics
-tracer = "1.1.1"
-mytracker = "3.5.0"
+tracer = "1.4.0"
+mytracker = "3.6.0"
 
 # DI
-kodein = "7.26.1"
+kodein = "7.33.0"
 
 # Decompose & Essenty
-decompose = "3.4.0-alpha03"
+decompose = "3.5.0"
 essenty = "2.5.0"
 
 # Ktor
-ktor = "3.2.2"
+ktor = "3.5.2"
 
 # Databases
-sqldelight = "2.1.0"
+sqldelight = "2.3.2"
 settings = "1.3.0"
 
 # Multiplatform Utils
 bignum = "0.3.10"
-logger-kermit = "2.0.6"
-konnektion = "1.4.4"
-filekit = "0.8.8"
-konfig = "0.17.1"
+logger-kermit = "2.1.0"
+konnektion = "1.4.5"
+filekit = "0.14.2"
+konfig = "0.22.0"
 
 [libraries]
 
@@ -105,6 +99,7 @@ kotlin-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "k
 kotlin-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlin-immutable" }
 
 # Compose
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-material = { group = "com.google.android.material", name = "material", version.ref = "compose-material" }
@@ -117,6 +112,7 @@ richtext = { module = "com.mikepenz:multiplatform-markdown-renderer", version.re
 richtext-material3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "richtext" }
 placeholder = { group = "com.eygraber", name = "compose-placeholder-material3", version.ref = "placeholder" }
 koalaplot-charts = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot-charts" }
+charty = { module = "com.himanshoe:charty", version.ref = "charty" }
 dragAndDrop = { module = "com.mohamedrejeb.dnd:compose-dnd", version.ref = "drag-and-drop" }
 sketch-compose = { module = "io.github.panpf.sketch4:sketch-compose", version.ref = "sketch" }
 sketch-http = { module = "io.github.panpf.sketch4:sketch-http", version.ref = "sketch" }
@@ -131,40 +127,29 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-workmanager = { module = "androidx.work:work-runtime", version.ref = "androidx-workmanager" }
 androidx-workmanager-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-workmanager" }
 androidx-guava = { module = "com.google.guava:guava", version.ref = "guava" }
-androidx-tools = { module = "com.android.tools.build:gradle", version.ref="agp" }
-androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref="anroidx-paging" }
-androidx-paging-common = { module = "androidx.paging:paging-common", version.ref="anroidx-paging" }
-androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref="anroidx-paging" }
+androidx-tools = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "androidx-paging" }
+androidx-paging-common = { module = "androidx.paging:paging-common", version.ref = "androidx-paging" }
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "androidx-paging" }
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidx-camera" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidx-camera" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "androidx-camera" }
+androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "androidx-glance" }
+androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "androidx-glance" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 # Google
-google-gms-services = { module = "com.google.android.gms:play-services-auth", version.ref = "google-gms-auth" }
-google-oauth-bom-android = { module = "com.google.auth:google-auth-library-bom", version.ref = "google-oauth" }
-google-oauth-android = { module = "com.google.auth:google-auth-library-oauth2-http" }
-google-oauth-credentials-android = { module = "com.google.auth:google-auth-library-credentials" }
 google-accompanist = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "google-accompanist" }
 
-# Firebase
-firebase-bom-android = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
-firebase-auth-android = { module = "com.google.firebase:firebase-auth-ktx" }
-firebase-messaging-android = { module = "com.google.firebase:firebase-messaging" }
-firebase-messaging-directboot-android = { module = "com.google.firebase:firebase-messaging-directboot" }
-
-# Huawei
-hms-core = { module = "com.huawei.agconnect:agconnect-core", version.ref = "hms" }
-hms-push = { module = "com.huawei.hms:push", version.ref = "hms" }
-hms-agcp = { module = "com.huawei.agconnect:agcp", version.ref = "hms" }
-hms-iap = { module = "com.huawei.hms:iap", version.ref = "hms-iap" }
-hms-core-installer = { module = "com.huawei.hms:hmscoreinstaller", version.ref = "hms" }
-
 # RuStore
-rustore-universalpush-core = { module = "ru.rustore.sdk:universalpush", version.ref="rustore-push" }
-rustore-universalpush-rustore = { module = "ru.rustore.sdk:universalrustore", version.ref="rustore-push" }
-rustore-universalpush-fcm = { module = "ru.rustore.sdk:universalfcm", version.ref="rustore-push" }
-rustore-universalpush-hms = { module = "ru.rustore.sdk:universalhms", version.ref="rustore-push" }
-rustore-billing = { module = "ru.rustore.sdk:billingclient", version.ref = "rustore-billing" }
-rustore-pay = { module = "ru.rustore.sdk:pay", version.ref = "rustore-pay" }
 rustore-review = { module = "ru.rustore.sdk:review", version.ref = "rustore-review" }
 rustore-updates = { module = "ru.rustore.sdk:appupdate", version.ref = "rustore-updates" }
+
+# Yandex
+yandex-ads-multiplatform = { module = "com.yandex.ads.multiplatform:mobileads-compose", version.ref = "yandex-ads" }
+yandex-ads-core = { module = "com.yandex.android:mobileads", version.ref = "yandex-ads" }
+yandex-ads-compose = { module = "com.yandex.android:mobileads-compose", version.ref = "yandex-ads" }
+yandex-ads-mytarget = { module = "com.yandex.ads.mediation:mobileads-mytarget", version.ref = "mytarget-ads" }
 
 # Crashlytics & Analytics
 tracer-bom = { module = "ru.ok.tracer:tracer-platform", version.ref = "tracer" }
@@ -217,7 +202,7 @@ bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 logger = { module = "co.touchlab:kermit", version.ref = "logger-kermit" }
 networkcheker = { module = "dev.tmapps:konnection", version.ref = "konnektion" }
 filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
-filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekit" }
+filekit-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }
 
 
 [bundles]
@@ -229,21 +214,16 @@ filekit = ["filekit-core", "filekit-compose"]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlin-atomic = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "kotlin-atomic" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
-gms = { id = "com.google.gms.google-services", version.ref = "google-gms" }
 swiftklib = { id = "io.github.ttypic.swiftklib", version.ref = "swiftklib" }
 skie = { id = "co.touchlab.skie", version.ref = "skie" }
-hms = { id = "com.huawei.agconnect", version.ref = "hms" }
 konfig = { id = "com.codingfeline.buildkonfig", version.ref = "konfig" }
 tracer = { id = "ru.ok.tracer", version.ref = "tracer" }

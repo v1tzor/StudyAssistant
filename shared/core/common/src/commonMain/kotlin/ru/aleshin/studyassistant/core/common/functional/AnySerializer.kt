@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,7 @@ object AnySerializer : KSerializer<Any> {
             is Map<*, *> -> JsonObject(value.mapKeys { (k, _) ->
                 k.toString()
             }.mapValues { (_, v) -> serializeToElement(v) })
+
             else -> error("Not supported type: ${value::class.simpleName}")
         }
 
@@ -86,6 +87,7 @@ object AnySerializer : KSerializer<Any> {
         is Map<*, *> -> JsonObject(value.mapKeys { (k, _) ->
             k.toString()
         }.mapValues { (_, v) -> serializeToElement(v) })
+
         else -> error("Not supported type: ${value::class.simpleName}")
     }
 
@@ -97,6 +99,7 @@ object AnySerializer : KSerializer<Any> {
             element.doubleOrNull != null -> element.double
             else -> element.content
         }
+
         is JsonArray -> element.map { decodeFromElement(it) }
         is JsonObject -> element.mapValues { decodeFromElement(it.value) }
     }
@@ -126,6 +129,7 @@ object AnyNullSerializer : KSerializer<Any?> {
             is Map<*, *> -> JsonObject(value.mapKeys { (k, _) ->
                 k.toString()
             }.mapValues { (_, v) -> serializeToElement(v) })
+
             else -> error("Not supported type: ${value::class.simpleName}")
         }
 
@@ -150,6 +154,7 @@ object AnyNullSerializer : KSerializer<Any?> {
         is Map<*, *> -> JsonObject(value.mapKeys { (k, _) ->
             k.toString()
         }.mapValues { (_, v) -> serializeToElement(v) })
+
         else -> error("Not supported type: ${value::class.simpleName}")
     }
 
@@ -161,6 +166,7 @@ object AnyNullSerializer : KSerializer<Any?> {
             element.doubleOrNull != null -> element.double
             else -> element.content
         }
+
         is JsonArray -> element.map { decodeFromElement(it) }
         is JsonObject -> element.mapValues { decodeFromElement(it.value) }
     }

@@ -1,0 +1,13 @@
+CREATE TABLE homeworkShareReceiptEntity (
+  share_code TEXT PRIMARY KEY NOT NULL,
+  imported_at INTEGER NOT NULL
+);
+
+fetchReceipt:
+SELECT share_code
+FROM homeworkShareReceiptEntity
+WHERE share_code = ?;
+
+addReceipt:
+INSERT INTO homeworkShareReceiptEntity (share_code, imported_at)
+VALUES (?, ?);

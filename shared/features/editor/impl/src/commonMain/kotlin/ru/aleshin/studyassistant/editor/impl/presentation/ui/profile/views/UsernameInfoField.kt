@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,9 +38,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.InfoTextField
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.ic_subject_name
+import ru.aleshin.studyassistant.editor.impl.resources.username_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.username_field_placeholder
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -61,9 +66,9 @@ internal fun UsernameInfoField(
         readOnly = !isEditUsername,
         value = editableUsername,
         onValueChange = { editableUsername = it },
-        label = EditorThemeRes.strings.usernameFieldLabel,
-        placeholder = { Text(text = EditorThemeRes.strings.usernameFieldPlaceholder) },
-        leadingInfoIcon = painterResource(EditorThemeRes.icons.name),
+        label = stringResource(Res.string.username_field_label),
+        placeholder = { Text(text = stringResource(Res.string.username_field_placeholder)) },
+        leadingInfoIcon = painterResource(Res.drawable.ic_subject_name),
         trailingIcon = {
             if (!isEditUsername) {
                 IconButton(onClick = { isEditUsername = true }) {
@@ -75,6 +80,11 @@ internal fun UsernameInfoField(
                 }
             } else {
                 Row(modifier = Modifier.padding(end = 8.dp)) {
+                    Button(
+                        onClick = {}
+                    ) {
+                        Text("Привет это текст")
+                    }
                     IconButton(
                         modifier = Modifier.size(32.dp),
                         onClick = {

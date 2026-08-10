@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,202 +14,71 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package ru.aleshin.studyassistant.core.data.repositories
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.api.auth.UserSessionProvider
 import ru.aleshin.studyassistant.core.common.extensions.endThisDay
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.data.mappers.tasks.convertToLocal
-import ru.aleshin.studyassistant.core.data.mappers.tasks.convertToRemote
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToLocalData
-import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToRemoteData
-import ru.aleshin.studyassistant.core.data.utils.SubscriptionChecker
-import ru.aleshin.studyassistant.core.data.utils.sync.RemoteResultSyncHandler
 import ru.aleshin.studyassistant.core.database.datasource.tasks.TodoLocalDataSource
-import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
-import ru.aleshin.studyassistant.core.domain.entities.sync.OfflineChangeType.UPSERT
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
-import ru.aleshin.studyassistant.core.domain.managers.sync.TodoSourceSyncManager.Companion.TODO_SOURCE_KEY
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.remote.datasources.tasks.TodoRemoteDataSource
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.
  */
 class TodoRepositoryImpl(
-    private val remoteDataSource: TodoRemoteDataSource,
     private val localDataSource: TodoLocalDataSource,
-    private val subscriptionChecker: SubscriptionChecker,
-    private val userSessionProvider: UserSessionProvider,
-    private val resultSyncHandler: RemoteResultSyncHandler,
 ) : TodoRepository {
 
     override suspend fun addOrUpdateTodo(todo: Todo): UID {
-        val currentUser = userSessionProvider.getCurrentUserId()
-        val isSubscriber = subscriptionChecker.getSubscriptionActive()
-
-        val upsertModel = todo.copy(uid = todo.uid.ifBlank { randomUUID() })
-
-        if (isSubscriber) {
-            localDataSource.sync().addOrUpdateItem(upsertModel.mapToLocalData())
-            resultSyncHandler.executeOrAddToQueue(
-                data = upsertModel.mapToRemoteData(userId = currentUser),
-                type = UPSERT,
-                sourceKey = TODO_SOURCE_KEY,
-            ) {
-                remoteDataSource.addOrUpdateItem(it)
-            }
-        } else {
-            localDataSource.offline().addOrUpdateItem(upsertModel.mapToLocalData())
-        }
-
-        return upsertModel.uid
+        val updatedTodo = todo.copy(uid = todo.uid.ifBlank { randomUUID() })
+        localDataSource.addOrUpdateTodo(updatedTodo.mapToLocalData())
+        return updatedTodo.uid
     }
 
     override suspend fun fetchTodoById(uid: UID): Flow<Todo?> {
-        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
-            if (isSubscriber) {
-                localDataSource.sync().fetchItemById(uid).map { it?.mapToDomain() }
-            } else {
-                localDataSource.offline().fetchItemById(uid).map { it?.mapToDomain() }
-            }
-        }
+        return localDataSource.fetchTodoById(uid).map { todo -> todo?.mapToDomain() }
     }
 
     override suspend fun fetchTodosByDate(date: Instant): Flow<List<Todo>> {
-        val timeStart = date.startThisDay().toEpochMilliseconds()
-        val timeEnd = date.endThisDay().toEpochMilliseconds()
-
-        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
-            if (isSubscriber) {
-                localDataSource.sync().fetchTodosByTimeRange(timeStart, timeEnd).map { todos ->
-                    todos.map { todoEntity -> todoEntity.mapToDomain() }
-                }
-            } else {
-                localDataSource.offline().fetchTodosByTimeRange(timeStart, timeEnd).map { todos ->
-                    todos.map { todoEntity -> todoEntity.mapToDomain() }
-                }
-            }
-        }
+        return localDataSource.fetchTodosByTimeRange(
+            from = date.startThisDay().toEpochMilliseconds(),
+            to = date.endThisDay().toEpochMilliseconds(),
+        ).map { todos -> todos.map { it.mapToDomain() } }
     }
 
     override suspend fun fetchTodosByTimeRange(timeRange: TimeRange): Flow<List<Todo>> {
-        val timeStart = timeRange.from.toEpochMilliseconds()
-        val timeEnd = timeRange.to.toEpochMilliseconds()
-
-        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
-            if (isSubscriber) {
-                localDataSource.sync().fetchTodosByTimeRange(timeStart, timeEnd).map { todos ->
-                    todos.map { todoEntity -> todoEntity.mapToDomain() }
-                }
-            } else {
-                localDataSource.offline().fetchTodosByTimeRange(timeStart, timeEnd).map { todos ->
-                    todos.map { todoEntity -> todoEntity.mapToDomain() }
-                }
-            }
-        }
+        return localDataSource.fetchTodosByTimeRange(
+            from = timeRange.from.toEpochMilliseconds(),
+            to = timeRange.to.toEpochMilliseconds(),
+        ).map { todos -> todos.map { it.mapToDomain() } }
     }
 
     override suspend fun fetchActiveTodos(): Flow<List<Todo>> {
-        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
-            if (isSubscriber) {
-                localDataSource.sync().fetchActiveTodos().map { todos ->
-                    todos.map { todoEntity -> todoEntity.mapToDomain() }
-                }
-            } else {
-                localDataSource.offline().fetchActiveTodos().map { todos ->
-                    todos.map { todoEntity -> todoEntity.mapToDomain() }
-                }
-            }
-        }
+        return localDataSource.fetchActiveTodos().map { todos -> todos.map { it.mapToDomain() } }
     }
 
     override suspend fun fetchCompletedTodos(completeTimeRange: TimeRange?): Flow<List<Todo>> {
-        val timeStart = completeTimeRange?.from?.toEpochMilliseconds()
-        val timeEnd = completeTimeRange?.to?.toEpochMilliseconds()
-
-        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
-            if (isSubscriber) {
-                localDataSource.sync().fetchCompletedTodos(timeStart, timeEnd).map { todos ->
-                    todos.map { todoEntity -> todoEntity.mapToDomain() }
-                }
-            } else {
-                localDataSource.offline().fetchCompletedTodos(timeStart, timeEnd).map { todos ->
-                    todos.map { todoEntity -> todoEntity.mapToDomain() }
-                }
-            }
-        }
+        return localDataSource.fetchCompletedTodos(
+            from = completeTimeRange?.from?.toEpochMilliseconds(),
+            to = completeTimeRange?.to?.toEpochMilliseconds(),
+        ).map { todos -> todos.map { it.mapToDomain() } }
     }
 
     override suspend fun fetchOverdueTodos(currentDate: Instant): Flow<List<Todo>> {
-        val date = currentDate.endThisDay().toEpochMilliseconds()
-
-        return subscriptionChecker.getSubscriptionActiveFlow().flatMapLatest { isSubscriber ->
-            if (isSubscriber) {
-                localDataSource.sync().fetchOverdueTodos(date).map { todos ->
-                    todos.map { todoEntity -> todoEntity.mapToDomain() }
-                }
-            } else {
-                localDataSource.offline().fetchOverdueTodos(date).map { todos ->
-                    todos.map { todoEntity -> todoEntity.mapToDomain() }
-                }
-            }
-        }
+        return localDataSource.fetchOverdueTodos(
+            currentDate.endThisDay().toEpochMilliseconds()
+        ).map { todos -> todos.map { it.mapToDomain() } }
     }
 
     override suspend fun deleteTodo(uid: UID) {
-        val isSubscriber = subscriptionChecker.getSubscriptionActive()
-
-        return if (isSubscriber) {
-            localDataSource.sync().deleteItemsById(listOf(uid))
-            resultSyncHandler.executeOrAddToQueue(
-                documentId = uid,
-                type = UPSERT,
-                sourceKey = TODO_SOURCE_KEY,
-            ) {
-                remoteDataSource.deleteItemById(uid)
-            }
-        } else {
-            localDataSource.offline().deleteItemsById(listOf(uid))
-        }
-    }
-
-    override suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean) {
-        val currentUser = userSessionProvider.getCurrentUserId()
-        when (direction) {
-            DataTransferDirection.REMOTE_TO_LOCAL -> {
-                val allTodosFlow = remoteDataSource.fetchAllItems(currentUser)
-                val todos = allTodosFlow.first().map { it.convertToLocal() }
-
-                if (!mergeData) {
-                    localDataSource.offline().deleteAllItems()
-                }
-                localDataSource.offline().addOrUpdateItems(todos)
-            }
-            DataTransferDirection.LOCAL_TO_REMOTE -> {
-                val allTodos = localDataSource.offline().fetchAllTodos().first()
-                val remoteTodos = allTodos.map { it.convertToRemote(currentUser) }
-
-                if (!mergeData) {
-                    remoteDataSource.deleteAllItems(currentUser)
-                }
-                remoteDataSource.addOrUpdateItems(remoteTodos)
-
-                localDataSource.sync().deleteAllItems()
-                localDataSource.sync().addOrUpdateItems(allTodos)
-            }
-        }
+        localDataSource.deleteTodosByIds(listOf(uid))
     }
 }

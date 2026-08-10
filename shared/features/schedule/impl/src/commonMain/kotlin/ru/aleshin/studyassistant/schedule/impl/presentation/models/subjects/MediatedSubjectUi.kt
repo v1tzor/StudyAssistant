@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,7 @@ import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
@@ -37,17 +36,4 @@ internal data class MediatedSubjectUi(
     val office: String,
     val color: Int,
     val location: ContactInfoUi?,
-)
-
-internal fun MediatedSubjectUi.convertToBase(
-    teacherMapper: (UID?) -> EmployeeUi?,
-) = SubjectUi(
-    uid = uid,
-    organizationId = organizationId,
-    eventType = eventType,
-    name = name,
-    teacher = teacherMapper(teacherId),
-    office = office,
-    color = color,
-    location = location,
 )

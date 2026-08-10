@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="continue_label">Дальше</string>
+    <string name="setup_label">Настроить приложение</string>
+    <string name="back_label">Назад</string>
+    <string name="study_intro_title">Быстро и просто отслеживайте ваше расписание</string>
+    <string name="study_intro_body">На главном экране вы сможете увидеть расписание на текущий день, его ход выполнения, недельную загруженность, а также все привязанные задания к занятиям</string>
+    <string name="analytics_intro_title">Более эффективно выполняйте заданные задания</string>
+    <string name="analytics_intro_body">Удобная система управления заданиями поможет вам более лучше визуализировать заданные задания, распределить всю нагрузку по дням недели и многое другое</string>
+    <string name="organization_intro_title">Создавайте разные организации и вносите дневные изменения</string>
+    <string name="organization_intro_body">Приложение поддерживает работу с несколькими учебными заведениями, а также возможность быстрого внесения дневных корректировок в постоянное расписание</string>
+    <string name="sharing_intro_title">Делитесь без аккаунта</string>
+    <string name="sharing_intro_body">Отправляйте расписания и домашние задания по временному коду или QR. Учебные данные остаются на этом устройстве.</string>
+    <string name="step_title">Шаг\u0020</string>
+    <string name="profile_step_title">Заполните ваш профиль</string>
+    <string name="profile_button_label">Сохранить</string>
+    <string name="organization_step_title">Создайте вашу первую образовательную организацию</string>
+    <string name="organization_button_label">Создать</string>
+    <string name="calendar_step_title">Выберите количество недель в вашем расписании</string>
+    <string name="calendar_button_label">Продолжить</string>
+    <string name="schedule_step_title">Заполните расписания и начните пользоваться приложением!</string>
+    <string name="schedule_fill_out_button_label">Заполнить</string>
+    <string name="schedule_start_button_label">Начать пользоваться</string>
+    <string name="username_label">Отображаемое имя *</string>
+    <string name="profile_description_label">Описание профиля</string>
+    <string name="email_label">Email</string>
+    <string name="birthday_label">День рождения</string>
+    <string name="birthday_placeholder">Выберите дату</string>
+    <string name="gender_label">Пол</string>
+    <string name="gender_placeholder">Выберите ваш пол</string>
+    <string name="short_name_label">Краткое название *</string>
+    <string name="short_name_placeholder">Введите название</string>
+    <string name="organization_type_label">Вид организации *</string>
+    <string name="organization_type_placeholder">Выберите подходящий вид</string>
+    <string name="phone_number_label">Телефон</string>
+    <string name="website_label">Сайт</string>
+    <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
+</resources>

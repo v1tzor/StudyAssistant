@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -75,6 +74,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.DISABLED_ALPHA
@@ -82,16 +82,15 @@ import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.common.extensions.limitSize
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.core.presentation.utils.groupedContactInfo
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationClassesInfoUi
-import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationUi
-import ru.aleshin.studyassistant.info.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEffect
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEvent
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsState
@@ -105,7 +104,13 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.O
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.ShortEmployeeView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.ShortSubjectView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.views.ShowAllItemView
-import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
+import ru.aleshin.studyassistant.info.impl.resources.Res
+import ru.aleshin.studyassistant.info.impl.resources.add_organization_title
+import ru.aleshin.studyassistant.info.impl.resources.contact_info_section_title
+import ru.aleshin.studyassistant.info.impl.resources.copy_message
+import ru.aleshin.studyassistant.info.impl.resources.edit_organization_title
+import ru.aleshin.studyassistant.info.impl.resources.employees_section_title
+import ru.aleshin.studyassistant.info.impl.resources.subjects_section_title
 
 /**
  * @author Stanislav Aleshin on 16.06.2024
@@ -118,10 +123,10 @@ internal fun OrganizationsContent(
 ) {
     val store = organizationsComponent.store
     val state by store.stateAsState()
-    val strings = InfoThemeRes.strings
     val clipboardManager = LocalClipboardManager.current
     val snackbarState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val copyMessage = stringResource(Res.string.copy_message)
     val pagerState = rememberPagerState { (state.shortOrganizations?.size ?: 0) + 1 }
     val organizationId by derivedStateOf { state.shortOrganizations?.getOrNull(pagerState.currentPage)?.uid }
 
@@ -142,22 +147,36 @@ internal fun OrganizationsContent(
                 },
                 onCopyContactInfo = {
                     clipboardManager.setText(AnnotatedString(it.value))
-                    coroutineScope.launch { snackbarState.showSnackbar(strings.copyMessage) }
+                    coroutineScope.launch { snackbarState.showSnackbar(copyMessage) }
                 },
                 onShowAllEmployee = {
-                    store.dispatchEvent(OrganizationsEvent.ClickShowAllEmployees(checkNotNull(organizationId)))
+                    store.dispatchEvent(
+                        OrganizationsEvent.ClickShowAllEmployees(
+                            checkNotNull(
+                                organizationId
+                            )
+                        )
+                    )
                 },
                 onShowEmployeeProfile = {
                     store.dispatchEvent(OrganizationsEvent.ClickEmployee(it))
                 },
                 onShowAllSubjects = {
-                    store.dispatchEvent(OrganizationsEvent.ClickShowAllSubjects(checkNotNull(organizationId)))
+                    store.dispatchEvent(
+                        OrganizationsEvent.ClickShowAllSubjects(
+                            checkNotNull(
+                                organizationId
+                            )
+                        )
+                    )
                 },
                 onShowSubjectEditor = {
-                    store.dispatchEvent(OrganizationsEvent.ClickEditSubject(it, checkNotNull(organizationId)))
-                },
-                onPaidFunctionClick = {
-                    store.dispatchEvent(OrganizationsEvent.ClickPaidFunction)
+                    store.dispatchEvent(
+                        OrganizationsEvent.ClickEditSubject(
+                            it,
+                            checkNotNull(organizationId)
+                        )
+                    )
                 }
             )
         },
@@ -186,7 +205,7 @@ internal fun OrganizationsContent(
         when (effect) {
             is OrganizationsEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -209,7 +228,6 @@ private fun BaseOrganizationsContent(
     onShowEmployeeProfile: (UID) -> Unit,
     onShowAllSubjects: () -> Unit,
     onShowSubjectEditor: (UID) -> Unit,
-    onPaidFunctionClick: () -> Unit,
 ) {
     PullToRefreshBox(
         modifier = modifier,
@@ -223,13 +241,10 @@ private fun BaseOrganizationsContent(
         ) {
             OrganizationsInfoSection(
                 isLoading = state.isLoading,
-                isPaidUser = state.isPaidUser,
                 organizationData = state.organizationData,
-                organizations = state.shortOrganizations,
                 classesInfo = state.classesInfo,
                 onAddOrganization = onAddOrganization,
                 onEditOrganization = onEditOrganization,
-                onOpenBillingScreen = onPaidFunctionClick,
             )
             OrganizationsContactSection(
                 isLoading = state.isLoading,
@@ -257,13 +272,10 @@ private fun BaseOrganizationsContent(
 private fun OrganizationsInfoSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    isPaidUser: Boolean,
     organizationData: OrganizationUi?,
-    organizations: List<OrganizationShortUi>?,
     classesInfo: OrganizationClassesInfoUi?,
     onAddOrganization: () -> Unit,
     onEditOrganization: () -> Unit,
-    onOpenBillingScreen: () -> Unit,
 ) {
     Crossfade(
         targetState = isLoading,
@@ -284,33 +296,15 @@ private fun OrganizationsInfoSection(
                         modifier = Modifier.fillMaxWidth().height(40.dp),
                         onClick = onEditOrganization,
                     ) {
-                        Text(text = InfoThemeRes.strings.editOrganizationTitle)
+                        Text(text = stringResource(Res.string.edit_organization_title))
                     }
                 } else {
                     NoneOrganizationView()
-                    val functionalAvailable = remember(organizations, isPaidUser) {
-                        (organizations != null && organizations.size < 2) || isPaidUser
-                    }
                     FilledTonalButton(
                         modifier = Modifier.fillMaxWidth().height(40.dp),
-                        onClick = {
-                            if (functionalAvailable) onAddOrganization() else onOpenBillingScreen()
-                        },
+                        onClick = onAddOrganization,
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(text = InfoThemeRes.strings.addOrganizationTitle)
-                            if (!functionalAvailable) {
-                                Icon(
-                                    modifier = Modifier.size(18.dp),
-                                    imageVector = Icons.Default.Stars,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                )
-                            }
-                        }
+                        Text(text = stringResource(Res.string.add_organization_title))
                     }
                 }
             } else {
@@ -344,7 +338,7 @@ private fun OrganizationsContactSection(
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = InfoThemeRes.strings.contactInfoSectionTitle,
+                text = stringResource(Res.string.contact_info_section_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
             )
@@ -360,7 +354,9 @@ private fun OrganizationsContactSection(
                         groupedContactInfo.forEach { contactEntry ->
                             OrganizationContactInfoItem(
                                 onClick = { onCopyContactInfo(contactEntry.key) },
-                                icon = painterResource(contactEntry.value.mapToIcon(StudyAssistantRes.icons)),
+                                icon = painterResource(
+                                    contactEntry.value.mapToIcon()
+                                ),
                                 contactInfo = contactEntry.key
                             )
                         }
@@ -410,7 +406,7 @@ private fun OrganizationsEmployeesSection(
             ) {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = InfoThemeRes.strings.employeesSectionTitle,
+                    text = stringResource(Res.string.employees_section_title),
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleMedium,
                 )
@@ -439,7 +435,9 @@ private fun OrganizationsEmployeesSection(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        items(organizationData.employee.limitSize(7), key = { it.uid }) { employee ->
+                        items(
+                            organizationData.employee.limitSize(7),
+                            key = { it.uid }) { employee ->
                             ShortEmployeeView(
                                 onClick = { onShowEmployeeProfile(employee.uid) },
                                 avatar = employee.avatar,
@@ -519,7 +517,7 @@ private fun OrganizationsSubjectsSection(
             ) {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = InfoThemeRes.strings.subjectsSectionTitle,
+                    text = stringResource(Res.string.subjects_section_title),
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleMedium,
                 )

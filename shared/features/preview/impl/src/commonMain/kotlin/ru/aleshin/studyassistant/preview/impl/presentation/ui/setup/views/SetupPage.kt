@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,16 @@ package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.preview.impl.resources.Res
+import ru.aleshin.studyassistant.preview.impl.resources.calendar_button_label
+import ru.aleshin.studyassistant.preview.impl.resources.calendar_step_title
+import ru.aleshin.studyassistant.preview.impl.resources.organization_button_label
+import ru.aleshin.studyassistant.preview.impl.resources.organization_step_title
+import ru.aleshin.studyassistant.preview.impl.resources.profile_button_label
+import ru.aleshin.studyassistant.preview.impl.resources.profile_step_title
+import ru.aleshin.studyassistant.preview.impl.resources.schedule_fill_out_button_label
+import ru.aleshin.studyassistant.preview.impl.resources.schedule_step_title
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
@@ -26,23 +35,23 @@ import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 internal enum class SetupPage : SetupPageData {
     PROFILE {
         override val id get() = 0
-        override val stepTitle @Composable get() = PreviewThemeRes.strings.profileStepTitle
-        override val buttonLabel @Composable get() = PreviewThemeRes.strings.profileButtonLabel
+        override val stepTitle @Composable get() = stringResource(Res.string.profile_step_title)
+        override val buttonLabel @Composable get() = stringResource(Res.string.profile_button_label)
     },
     ORGANIZATION {
         override val id get() = 1
-        override val stepTitle @Composable get() = PreviewThemeRes.strings.organizationStepTitle
-        override val buttonLabel @Composable get() = PreviewThemeRes.strings.organizationButtonLabel
+        override val stepTitle @Composable get() = stringResource(Res.string.organization_step_title)
+        override val buttonLabel @Composable get() = stringResource(Res.string.organization_button_label)
     },
     CALENDAR {
         override val id get() = 2
-        override val stepTitle @Composable get() = PreviewThemeRes.strings.calendarStepTitle
-        override val buttonLabel @Composable get() = PreviewThemeRes.strings.calendarButtonLabel
+        override val stepTitle @Composable get() = stringResource(Res.string.calendar_step_title)
+        override val buttonLabel @Composable get() = stringResource(Res.string.calendar_button_label)
     },
     SCHEDULE {
         override val id get() = 3
-        override val stepTitle @Composable get() = PreviewThemeRes.strings.scheduleStepTitle
-        override val buttonLabel @Composable get() = PreviewThemeRes.strings.scheduleFillOutButtonLabel
+        override val stepTitle @Composable get() = stringResource(Res.string.schedule_step_title)
+        override val buttonLabel @Composable get() = stringResource(Res.string.schedule_fill_out_button_label)
     };
 
     fun progress(): Float {
@@ -50,8 +59,11 @@ internal enum class SetupPage : SetupPageData {
     }
 
     companion object {
-        fun previousPage(current: SetupPage) = SetupPage.entries.find { it.id == current.id - 1 } ?: current
-        fun nextPage(current: SetupPage) = SetupPage.entries.find { it.id == current.id + 1 } ?: current
+        fun previousPage(current: SetupPage) =
+            SetupPage.entries.find { it.id == current.id - 1 } ?: current
+
+        fun nextPage(current: SetupPage) =
+            SetupPage.entries.find { it.id == current.id + 1 } ?: current
     }
 }
 

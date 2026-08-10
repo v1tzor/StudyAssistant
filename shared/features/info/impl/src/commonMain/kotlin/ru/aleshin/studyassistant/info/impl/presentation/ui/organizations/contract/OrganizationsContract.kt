@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEf
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
-import ru.aleshin.studyassistant.info.api.InfoFeatureComponent.InfoConfig
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationUi
+import ru.aleshin.studyassistant.editor.api.EditorConfig
+import ru.aleshin.studyassistant.info.api.InfoConfig
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationClassesInfoUi
-import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationUi
-import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
+import ru.aleshin.studyassistant.users.api.UsersConfig
 
 /**
  * @author Stanislav Aleshin on 16.06.2024
@@ -37,7 +37,6 @@ import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
 @Serializable
 internal data class OrganizationsState(
     val isLoading: Boolean = true,
-    val isPaidUser: Boolean = false,
     val shortOrganizations: List<OrganizationShortUi>? = null,
     val organizationData: OrganizationUi? = null,
     val classesInfo: OrganizationClassesInfoUi? = null,
@@ -52,7 +51,6 @@ internal sealed class OrganizationsEvent : StoreEvent {
     data class ClickShowAllSubjects(val organizationId: UID) : OrganizationsEvent()
     data class ClickEditOrganization(val organizationId: UID?) : OrganizationsEvent()
     data class ClickEditSubject(val subjectId: UID, val organizationId: UID) : OrganizationsEvent()
-    data object ClickPaidFunction : OrganizationsEvent()
 }
 
 internal sealed class OrganizationsEffect : StoreEffect {
@@ -60,20 +58,24 @@ internal sealed class OrganizationsEffect : StoreEffect {
 }
 
 internal sealed class OrganizationsAction : StoreAction {
-    data class UpdateShortOrganizations(val organizations: List<OrganizationShortUi>) : OrganizationsAction()
-    data class UpdatePaidUserStatus(val isPaidUser: Boolean) : OrganizationsAction()
+    data class UpdateShortOrganizations(val organizations: List<OrganizationShortUi>) :
+        OrganizationsAction()
+
     data class UpdateOrganizationData(
         val data: OrganizationUi?,
         val classesInfo: OrganizationClassesInfoUi?,
     ) : OrganizationsAction()
+
     data class UpdateLoading(val isLoading: Boolean) : OrganizationsAction()
 }
 
 internal sealed class OrganizationsOutput : BaseOutput {
-    data object NavigateToBilling : OrganizationsOutput()
-    data class NavigateToEmployeeProfile(val config: UsersConfig.EmployeeProfile) : OrganizationsOutput()
+    data class NavigateToEmployeeProfile(val config: UsersConfig.EmployeeProfile) :
+        OrganizationsOutput()
+
     data class NavigateToSubjects(val config: InfoConfig.Subjects) : OrganizationsOutput()
     data class NavigateToEmployees(val config: InfoConfig.Employee) : OrganizationsOutput()
     data class NavigateToSubjectEditor(val config: EditorConfig.Subject) : OrganizationsOutput()
-    data class NavigateToOrganizationEditor(val config: EditorConfig.Organization) : OrganizationsOutput()
+    data class NavigateToOrganizationEditor(val config: EditorConfig.Organization) :
+        OrganizationsOutput()
 }

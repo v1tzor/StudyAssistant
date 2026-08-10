@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 
 /**
-* @author Stanislav Aleshin on 14.06.2025.
-*/
+ * @author Stanislav Aleshin on 14.06.2025.
+ */
 data class ActiveClass(
     val uid: UID,
     val isStarted: Boolean,

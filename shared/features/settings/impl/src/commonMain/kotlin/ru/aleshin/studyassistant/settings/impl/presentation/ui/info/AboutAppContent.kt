@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,14 +50,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.BuildKonfig.VERSION_CODE
 import ru.aleshin.studyassistant.settings.impl.BuildKonfig.VERSION_NAME
-import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.contract.AboutAppState
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.store.AboutAppComponent
+import ru.aleshin.studyassistant.settings.impl.resources.Res
+import ru.aleshin.studyassistant.settings.impl.resources.about_app_header
+import ru.aleshin.studyassistant.settings.impl.resources.ask_question_title
+import ru.aleshin.studyassistant.settings.impl.resources.developer_title
+import ru.aleshin.studyassistant.settings.impl.resources.github_title
+import ru.aleshin.studyassistant.settings.impl.resources.ic_github
+import ru.aleshin.studyassistant.settings.impl.resources.license_title
+import ru.aleshin.studyassistant.settings.impl.resources.version_code_title
+import ru.aleshin.studyassistant.settings.impl.resources.version_name_title
+import ru.aleshin.studyassistant.settings.impl.resources.website_title
 
 /**
  * @author Stanislav Aleshin on 04.08.2025
@@ -69,7 +79,6 @@ internal fun AboutAppContent(
 ) {
     val store = aboutAppComponent.store
     val state by store.stateAsState()
-    val strings = SettingsThemeRes.strings
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -104,7 +113,7 @@ private fun BaseAboutAppContent(
     ) {
         val uriHandler = LocalUriHandler.current
         Text(
-            text = SettingsThemeRes.strings.aboutAppHeader,
+            text = stringResource(Res.string.about_app_header),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelMedium,
         )
@@ -131,12 +140,12 @@ private fun AboutAppSectionVersion(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             InfoView(
-                title = SettingsThemeRes.strings.versionNameTitle,
+                title = stringResource(Res.string.version_name_title),
                 text = VERSION_NAME,
             )
             Spacer(modifier = Modifier.weight(1f))
             InfoView(
-                title = SettingsThemeRes.strings.versionCodeTitle,
+                title = stringResource(Res.string.version_code_title),
                 text = VERSION_CODE,
             )
         }
@@ -162,13 +171,13 @@ private fun AboutAppSectionDevelopment(
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 InfoView(
                     modifier = Modifier.fillMaxWidth(),
-                    title = SettingsThemeRes.strings.developerTitle,
+                    title = stringResource(Res.string.developer_title),
                     spaceInside = true,
                     text = Constants.App.DEVELOPER,
                 )
                 InfoView(
                     modifier = Modifier.fillMaxWidth(),
-                    title = SettingsThemeRes.strings.licenseTitle,
+                    title = stringResource(Res.string.license_title),
                     spaceInside = true,
                     text = Constants.App.LICENCE,
                 )
@@ -180,13 +189,13 @@ private fun AboutAppSectionDevelopment(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Web,
-                        contentDescription = SettingsThemeRes.strings.websiteTitle,
+                        contentDescription = stringResource(Res.string.website_title),
                     )
                 },
                 label = {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = SettingsThemeRes.strings.websiteTitle,
+                        text = stringResource(Res.string.website_title),
                         textAlign = TextAlign.Center,
                     )
                 },
@@ -200,7 +209,7 @@ private fun AboutAppSectionDevelopment(
                     label = {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = SettingsThemeRes.strings.askQuestionTitle,
+                            text = stringResource(Res.string.ask_question_title),
                             textAlign = TextAlign.Center,
                         )
                     },
@@ -213,13 +222,13 @@ private fun AboutAppSectionDevelopment(
                     label = {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = SettingsThemeRes.strings.githubTitle,
+                            text = stringResource(Res.string.github_title),
                             textAlign = TextAlign.Center,
                         )
                     },
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(SettingsThemeRes.icons.git),
+                            painter = painterResource(Res.drawable.ic_github),
                             contentDescription = null,
                         )
                     },

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,11 +47,12 @@ internal interface SubjectInteractor {
             subjectsRepository.addOrUpdateSubject(updatedSubject)
         }
 
-        override suspend fun fetchAllSubjectsByOrganization(organizationId: UID) = eitherWrapper.wrapFlow {
-            subjectsRepository.fetchAllSubjectsByOrganization(organizationId).map { subjects ->
-                subjects.sortedBy { subject -> subject.name }
+        override suspend fun fetchAllSubjectsByOrganization(organizationId: UID) =
+            eitherWrapper.wrapFlow {
+                subjectsRepository.fetchAllSubjectsByOrganization(organizationId).map { subjects ->
+                    subjects.sortedBy { subject -> subject.name }
+                }
             }
-        }
 
         override suspend fun fetchSubjectById(uid: UID) = eitherWrapper.wrapFlow {
             subjectsRepository.fetchSubjectById(uid)

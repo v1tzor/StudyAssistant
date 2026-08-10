@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import ru.aleshin.studyassistant.core.domain.entities.ai.DailyAiResponses
  */
 interface DailyAiStatisticsRepository {
     suspend fun addOrUpdateStatistics(statistics: DailyAiResponses)
-    suspend fun incrementResponseByDate(date: Instant): DailyAiResponses
     suspend fun fetchStatisticsByDate(date: Instant): Flow<DailyAiResponses?>
     suspend fun deleteStatisticsById(id: String)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
@@ -56,7 +55,7 @@ fun GenderDropdownMenu(
                 enabled = !isSelected,
                 text = {
                     Text(
-                        text = gender.mapToSting(StudyAssistantRes.strings),
+                        text = gender.mapToSting(),
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.titleMedium,
                     )

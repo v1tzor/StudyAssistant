@@ -17,15 +17,14 @@
 package ru.aleshin.studyassistant.presentation.ui.tabnavigation.component
 
 import com.arkivanov.decompose.ComponentContext
-import ru.aleshin.studyassistant.chat.api.ChatFeatureStarter
+import ru.aleshin.studyassistant.chat.api.ChatDecomposeFeatureFactory
 import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
-import ru.aleshin.studyassistant.core.common.inject.StartFeatureConfig
-import ru.aleshin.studyassistant.info.api.InfoFeatureStarter
+import ru.aleshin.studyassistant.info.api.InfoDecomposeFeatureFactory
 import ru.aleshin.studyassistant.presentation.ui.tabnavigation.component.TabsComponent.TabsConfig
 import ru.aleshin.studyassistant.presentation.ui.tabnavigation.component.TabsComponent.TabsOutput
-import ru.aleshin.studyassistant.profile.api.ProfileFeatureStarter
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureStarter
-import ru.aleshin.studyassistant.tasks.api.TasksFeatureStarter
+import ru.aleshin.studyassistant.profile.api.ProfileDecomposeFeatureFactory
+import ru.aleshin.studyassistant.schedule.api.ScheduleDecomposeFeatureFactory
+import ru.aleshin.studyassistant.tasks.api.TasksDecomposeFeatureFactory
 
 /**
  * @author Stanislav Aleshin on 26.08.2025.
@@ -34,32 +33,32 @@ interface TabsComponentFactory {
 
     fun createComponent(
         componentContext: ComponentContext,
-        startConfig: StartFeatureConfig<TabsConfig>,
+        startConfig: TabsConfig,
         outputConsumer: OutputConsumer<TabsOutput>
     ): TabsComponent
 
     class Default(
-        private val scheduleFeatureStarter: ScheduleFeatureStarter,
-        private val tasksFeatureStarter: TasksFeatureStarter,
-        private val chatFeatureStarter: ChatFeatureStarter,
-        private val infoFeatureStarter: InfoFeatureStarter,
-        private val profileFeatureStarter: ProfileFeatureStarter,
+        private val scheduleFeatureFactory: ScheduleDecomposeFeatureFactory,
+        private val tasksFeatureFactory: TasksDecomposeFeatureFactory,
+        private val chatFeatureFactory: ChatDecomposeFeatureFactory,
+        private val infoFeatureFactory: InfoDecomposeFeatureFactory,
+        private val profileFeatureFactory: ProfileDecomposeFeatureFactory,
     ) : TabsComponentFactory {
 
         override fun createComponent(
             componentContext: ComponentContext,
-            startConfig: StartFeatureConfig<TabsConfig>,
+            startConfig: TabsConfig,
             outputConsumer: OutputConsumer<TabsOutput>
         ): TabsComponent {
             return TabsComponent.Default(
                 componentContext = componentContext,
                 startConfig = startConfig,
                 outputConsumer = outputConsumer,
-                scheduleFeatureStarter = scheduleFeatureStarter,
-                tasksFeatureStarter = tasksFeatureStarter,
-                chatFeatureStarter = chatFeatureStarter,
-                infoFeatureStarter = infoFeatureStarter,
-                profileFeatureStarter = profileFeatureStarter,
+                scheduleFeatureFactory = scheduleFeatureFactory,
+                tasksFeatureFactory = tasksFeatureFactory,
+                chatFeatureFactory = chatFeatureFactory,
+                infoFeatureFactory = infoFeatureFactory,
+                profileFeatureFactory = profileFeatureFactory,
             )
         }
     }

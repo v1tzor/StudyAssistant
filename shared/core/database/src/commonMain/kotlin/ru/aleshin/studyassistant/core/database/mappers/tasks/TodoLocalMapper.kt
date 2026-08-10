@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,6 @@ internal fun FetchCompletedTodos.mapToBase() = BaseTodoEntity(
     completeDate = complete_date,
     createdAt = created_at,
     updatedAt = updated_at,
-    isCacheData = is_cache_data,
 )
 
 internal fun FetchCompletedTodosByTimeRange.mapToBase() = BaseTodoEntity(
@@ -59,7 +58,6 @@ internal fun FetchCompletedTodosByTimeRange.mapToBase() = BaseTodoEntity(
     completeDate = complete_date,
     updatedAt = updated_at,
     createdAt = created_at,
-    isCacheData = is_cache_data,
 )
 
 internal fun TodoEntity.mapToBase() = BaseTodoEntity(
@@ -78,7 +76,6 @@ internal fun TodoEntity.mapToBase() = BaseTodoEntity(
     createdAt = created_at,
     completeDate = complete_date,
     updatedAt = updated_at,
-    isCacheData = is_cache_data,
 )
 
 internal fun BaseTodoEntity.mapToEntity() = TodoEntity(
@@ -97,5 +94,4 @@ internal fun BaseTodoEntity.mapToEntity() = TodoEntity(
     created_at = createdAt,
     complete_date = completeDate,
     updated_at = updatedAt,
-    is_cache_data = isCacheData,
 )

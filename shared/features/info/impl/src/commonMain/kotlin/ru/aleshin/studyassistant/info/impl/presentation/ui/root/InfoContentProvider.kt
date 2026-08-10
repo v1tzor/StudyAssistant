@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,47 +20,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
-import ru.aleshin.studyassistant.core.common.di.withDirectDI
+import org.kodein.di.DI
 import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
 import ru.aleshin.studyassistant.core.common.navigation.backAnimation
-import ru.aleshin.studyassistant.info.impl.di.holder.InfoFeatureManager
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.EmployeeContent
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.OrganizationsContent
-import ru.aleshin.studyassistant.info.impl.presentation.ui.root.InternalInfoFeatureComponent.Child
+import ru.aleshin.studyassistant.info.impl.presentation.ui.root.InfoFeatureComponent.Child
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.SubjectsContent
-import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoTheme
 
 /**
  * @author Stanislav Aleshin on 25.08.2025.
  */
-public class InfoContentProvider internal constructor(
-    private val component: InternalInfoFeatureComponent,
-) : FeatureContentProvider {
+internal class InfoContentProvider(
+    di: DI,
+    private val component: InfoFeatureComponent,
+) : FeatureContentProvider(di) {
 
     @Composable
     @OptIn(ExperimentalDecomposeApi::class)
-    override fun invoke(modifier: Modifier) {
-        withDirectDI(directDI = { InfoFeatureManager.fetchDI() }) {
-            InfoTheme {
-                ChildStack(
-                    modifier = modifier,
-                    stack = component.stack,
-                    animation = backAnimation(
-                        backHandler = component.backHandler,
-                        onBack = component::navigateToBack
-                    )
-                ) { child ->
-                    when (val instance = child.instance) {
-                        is Child.OrganizationsChild -> {
-                            OrganizationsContent(instance.component)
-                        }
-                        is Child.EmployeeChild -> {
-                            EmployeeContent(instance.component)
-                        }
-                        is Child.SubjectsChild -> {
-                            SubjectsContent(instance.component)
-                        }
-                    }
+    override fun RootContent(modifier: Modifier) {
+        ChildStack(
+            modifier = modifier,
+            stack = component.stack,
+            animation = backAnimation(
+                backHandler = component.backHandler,
+                onBack = component::navigateToBack
+            )
+        ) { child ->
+            when (val instance = child.instance) {
+                is Child.OrganizationsChild -> {
+                    OrganizationsContent(instance.component)
+                }
+                is Child.EmployeeChild -> {
+                    EmployeeContent(instance.component)
+                }
+                is Child.SubjectsChild -> {
+                    SubjectsContent(instance.component)
                 }
             }
         }

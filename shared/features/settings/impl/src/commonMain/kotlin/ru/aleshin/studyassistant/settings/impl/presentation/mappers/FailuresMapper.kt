@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,14 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.mappers
 
-import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
+import org.jetbrains.compose.resources.getString
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
-import ru.aleshin.studyassistant.settings.impl.presentation.theme.tokens.SettingsStrings
+import ru.aleshin.studyassistant.settings.impl.resources.Res
+import ru.aleshin.studyassistant.settings.impl.resources.other_error_message
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-internal fun SettingsFailures.mapToMessage(
-    strings: SettingsStrings,
-    coreStrings: StudyAssistantStrings
-) = when (this) {
-    is SettingsFailures.IapError -> type.mapToString(coreStrings)
-    is SettingsFailures.RestoreError -> strings.failureRestoreSubscriptionTitle
-    is SettingsFailures.OtherError -> strings.otherErrorMessage
+internal suspend fun SettingsFailures.mapToMessage() = when (this) {
+    is SettingsFailures.OtherError -> getString(Res.string.other_error_message)
 }

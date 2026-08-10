@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
+import ru.aleshin.studyassistant.users.impl.resources.Res
+import ru.aleshin.studyassistant.users.impl.resources.none_contact_info_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
 
 /**
  * @author Stanislav Aleshin on 11.07.2024.
@@ -119,12 +122,12 @@ internal fun EmployeeContactInfoNoneView(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    painter = painterResource(StudyAssistantRes.icons.practicalTasks),
+                    painter = painterResource(CoreRes.drawable.core_ic_tasks_circular),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = UsersThemeRes.strings.noneContactInfoTitle,
+                    text = stringResource(Res.string.none_contact_info_title),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelLarge,
                 )

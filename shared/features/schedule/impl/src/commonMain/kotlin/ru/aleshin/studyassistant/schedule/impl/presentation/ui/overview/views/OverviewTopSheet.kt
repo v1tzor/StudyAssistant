@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,8 +56,10 @@ import io.github.koalaplot.core.xygraph.CategoryAxisModel
 import io.github.koalaplot.core.xygraph.DefaultPoint
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import io.github.koalaplot.core.xygraph.XYGraph
+import io.github.koalaplot.core.xygraph.rememberAxisContent
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.calculateProgress
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
@@ -70,8 +72,24 @@ import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.SmallInfoBadge
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.analysis.DailyAnalysisUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.analysis_classes_label
+import ru.aleshin.studyassistant.schedule.impl.resources.analysis_day_title
+import ru.aleshin.studyassistant.schedule.impl.resources.analysis_homeworks_label
+import ru.aleshin.studyassistant.schedule.impl.resources.analysis_movement_label
+import ru.aleshin.studyassistant.schedule.impl.resources.analysis_tasks_label
+import ru.aleshin.studyassistant.schedule.impl.resources.analysis_tests_label
+import ru.aleshin.studyassistant.schedule.impl.resources.complete_schedule_title
+import ru.aleshin.studyassistant.schedule.impl.resources.tasks_progress_title
+import ru.aleshin.studyassistant.schedule.impl.resources.until_end_class_title
+import ru.aleshin.studyassistant.schedule.impl.resources.until_start_class_title
 import kotlin.math.roundToInt
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_alert_circle_outline as core_ic_alert_circle_outline
+import ru.aleshin.studyassistant.core.ui.resources.ic_classes_column as core_ic_classes_column
+import ru.aleshin.studyassistant.core.ui.resources.ic_movements as core_ic_movements
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_outline as core_ic_tasks_outline
 
 /**
  * @author Stanislav Aleshin on 13.06.2024.
@@ -157,32 +175,34 @@ private fun OverviewTopSheetChart(
             )
         },
         modifier = modifier.fillMaxWidth().height(130.dp),
-        xAxisLabels = { date ->
-            Text(
-                text = date?.dateTime()?.dayOfMonth?.toString() ?: "",
-                color = if (date?.equalsDay(selectedDate) == true) {
-                    StudyAssistantRes.colors.accents.red
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                },
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Visible,
-                modifier = Modifier.padding(top = 2.dp)
-            )
-        },
-        yAxisLabels = {
-            Text(
-                text = it.toString(),
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 1,
-                modifier = Modifier.padding(top = 2.dp)
-            )
-        },
-        xAxisTitle = {},
-        yAxisTitle = {},
+        xAxisContent = rememberAxisContent(
+            labels = { date ->
+                Text(
+                    text = date?.dateTime()?.dayOfMonth?.toString() ?: "",
+                    color = if (date?.equalsDay(selectedDate) == true) {
+                        StudyAssistantRes.colors.accents.red
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Visible,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            },
+        ),
+        yAxisContent = rememberAxisContent(
+            labels = { value ->
+                Text(
+                    text = value.toString(),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            },
+        ),
     ) {
         AreaPlot(
             data = axisPoints,
@@ -195,7 +215,7 @@ private fun OverviewTopSheetChart(
                 brush = SolidColor(MaterialTheme.colorScheme.primaryContainer),
                 alpha = 0.5f,
             ),
-            areaBaseline = AreaBaseline.ConstantLine(0f),
+            areaBaseline = AreaBaseline.HorizontalLine(0f),
         )
     }
 }
@@ -236,11 +256,11 @@ private fun OverviewTopSheetClassTime(
                     Text(
                         modifier = Modifier.weight(1f),
                         text = when {
-                            activeClass?.isStarted == true -> ScheduleThemeRes.strings.untilEndClassTitle
-                            activeClass?.isStarted == false -> ScheduleThemeRes.strings.untilStartClassTitle
-                            homeworksProgressList.isNotEmpty() -> ScheduleThemeRes.strings.tasksProgressTitle
-                            tasksProgressList.isNotEmpty() -> ScheduleThemeRes.strings.tasksProgressTitle
-                            else -> ScheduleThemeRes.strings.completeScheduleTitle
+                            activeClass?.isStarted == true -> stringResource(Res.string.until_end_class_title)
+                            activeClass?.isStarted == false -> stringResource(Res.string.until_start_class_title)
+                            homeworksProgressList.isNotEmpty() -> stringResource(Res.string.tasks_progress_title)
+                            tasksProgressList.isNotEmpty() -> stringResource(Res.string.tasks_progress_title)
+                            else -> stringResource(Res.string.complete_schedule_title)
                         },
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -311,7 +331,7 @@ private fun OverviewTopSheetAnalysis(
             ) {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = ScheduleThemeRes.strings.analysisDayTitle,
+                    text = stringResource(Res.string.analysis_day_title),
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -355,8 +375,8 @@ private fun OverviewTopSheetAnalysis(
             }
             OverviewTopSheetAnalysisItem(
                 isLoading = isLoading,
-                icon = painterResource(StudyAssistantRes.icons.homeworks),
-                label = ScheduleThemeRes.strings.analysisHomeworksLabel,
+                icon = painterResource(CoreRes.drawable.core_ic_tasks_circular),
+                label = stringResource(Res.string.analysis_homeworks_label),
                 value = analysis?.let {
                     buildString {
                         append(analysis.numberOfHomeworks.count { it })
@@ -376,8 +396,8 @@ private fun OverviewTopSheetAnalysis(
             )
             OverviewTopSheetAnalysisItem(
                 isLoading = isLoading,
-                icon = painterResource(StudyAssistantRes.icons.testsOutline),
-                label = ScheduleThemeRes.strings.analysisTestsLabel,
+                icon = painterResource(CoreRes.drawable.core_ic_alert_circle_outline),
+                label = stringResource(Res.string.analysis_tests_label),
                 value = analysis?.numberOfTests?.toString(),
                 valueColor = if (analysis?.numberOfTests == 0) {
                     MaterialTheme.colorScheme.onSurface
@@ -387,15 +407,15 @@ private fun OverviewTopSheetAnalysis(
             )
             OverviewTopSheetAnalysisItem(
                 isLoading = isLoading,
-                icon = painterResource(StudyAssistantRes.icons.classesList),
-                label = ScheduleThemeRes.strings.analysisClassesLabel,
+                icon = painterResource(CoreRes.drawable.core_ic_classes_column),
+                label = stringResource(Res.string.analysis_classes_label),
                 value = analysis?.numberOfClasses?.toString(),
                 valueColor = MaterialTheme.colorScheme.onSurface,
             )
             OverviewTopSheetAnalysisItem(
                 isLoading = isLoading,
-                icon = painterResource(StudyAssistantRes.icons.movements),
-                label = ScheduleThemeRes.strings.analysisMovementLabel,
+                icon = painterResource(CoreRes.drawable.core_ic_movements),
+                label = stringResource(Res.string.analysis_movement_label),
                 value = analysis?.numberOfMovements?.toString(),
                 valueColor = if ((analysis?.numberOfTests ?: 0) <= 2) {
                     MaterialTheme.colorScheme.onSurface
@@ -405,8 +425,8 @@ private fun OverviewTopSheetAnalysis(
             )
             OverviewTopSheetAnalysisItem(
                 isLoading = isLoading,
-                icon = painterResource(StudyAssistantRes.icons.tasksOutline),
-                label = ScheduleThemeRes.strings.analysisTasksLabel,
+                icon = painterResource(CoreRes.drawable.core_ic_tasks_outline),
+                label = stringResource(Res.string.analysis_tasks_label),
                 value = analysis?.let {
                     buildString {
                         append(analysis.numberOfTasks.count { it })

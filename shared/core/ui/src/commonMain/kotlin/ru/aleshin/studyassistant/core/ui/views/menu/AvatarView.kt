@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,14 +53,21 @@ import com.github.panpf.sketch.AsyncImageState
 import com.github.panpf.sketch.rememberAsyncImageState
 import com.github.panpf.sketch.request.ComposableImageOptions
 import com.github.panpf.sketch.request.placeholder
-import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
-import io.github.vinceglb.filekit.core.PickerType
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.add_title as core_add_title
+import ru.aleshin.studyassistant.core.ui.resources.avatar_desc as core_avatar_desc
+import ru.aleshin.studyassistant.core.ui.resources.change_confirm_title as core_change_confirm_title
+import ru.aleshin.studyassistant.core.ui.resources.delete_confirm_title as core_delete_confirm_title
+import ru.aleshin.studyassistant.core.ui.resources.ic_upload_circular as core_ic_upload_circular
 
 /**
  * @author Stanislav Aleshin on 20.07.2024.
@@ -204,7 +211,7 @@ fun SelectableAvatarView(
     Box {
         var isExpandAvatarMenu by remember { mutableStateOf(false) }
         val coroutineScope = rememberCoroutineScope()
-        val imagePickerLauncher = rememberFilePickerLauncher(PickerType.Image) { file ->
+        val imagePickerLauncher = rememberFilePickerLauncher(FileKitType.Image) { file ->
             coroutineScope.launch {
                 if (file != null) {
                     val size = file.readBytes().size
@@ -230,8 +237,8 @@ fun SelectableAvatarView(
                         .size(24.dp)
                         .clip(MaterialTheme.shapes.full)
                         .border(2.dp, MaterialTheme.colorScheme.surfaceContainerLow),
-                    painter = painterResource(StudyAssistantRes.icons.upload),
-                    contentDescription = StudyAssistantRes.strings.avatarDesc,
+                    painter = painterResource(CoreRes.drawable.core_ic_upload_circular),
+                    contentDescription = stringResource(CoreRes.string.core_avatar_desc),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 AvatarDropdownMenu(
@@ -281,7 +288,7 @@ internal fun AvatarDropdownMenu(
         if (alreadyHaveAvatar && enabledAdd) {
             DropdownMenuItem(
                 onClick = onAddOrUpdate,
-                text = { Text(text = StudyAssistantRes.strings.changeConfirmTitle) },
+                text = { Text(text = stringResource(CoreRes.string.core_change_confirm_title)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Edit,
@@ -293,7 +300,7 @@ internal fun AvatarDropdownMenu(
         } else if (enabledAdd) {
             DropdownMenuItem(
                 onClick = onAddOrUpdate,
-                text = { Text(text = StudyAssistantRes.strings.addTitle) },
+                text = { Text(text = stringResource(CoreRes.string.core_add_title)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -306,7 +313,7 @@ internal fun AvatarDropdownMenu(
         if (alreadyHaveAvatar) {
             DropdownMenuItem(
                 onClick = onDelete,
-                text = { Text(text = StudyAssistantRes.strings.deleteConfirmTitle) },
+                text = { Text(text = stringResource(CoreRes.string.core_delete_confirm_title)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Delete,

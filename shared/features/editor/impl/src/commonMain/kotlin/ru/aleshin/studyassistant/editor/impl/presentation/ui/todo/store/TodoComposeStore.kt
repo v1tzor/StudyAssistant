@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,9 +97,6 @@ internal class TodoComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is TodoEvent.NavigateToBilling -> {
-                consumeOutput(TodoOutput.NavigateToBilling)
-            }
             is TodoEvent.NavigateToBack -> {
                 consumeOutput(TodoOutput.NavigateToBack)
             }
@@ -112,7 +109,6 @@ internal class TodoComposeStore(
     ) = when (action) {
         is TodoAction.SetupEditModel -> currentState.copy(
             editableTodo = action.editModel,
-            isPaidUser = action.isPaidUser,
             isLoading = false,
         )
         is TodoAction.UpdateEditModel -> currentState.copy(

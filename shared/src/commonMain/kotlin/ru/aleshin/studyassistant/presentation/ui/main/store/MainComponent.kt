@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,36 +25,29 @@ import com.arkivanov.decompose.router.stack.pushToFront
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.auth.api.AuthFeatureComponent
-import ru.aleshin.studyassistant.auth.api.AuthFeatureComponent.AuthConfig
-import ru.aleshin.studyassistant.auth.api.AuthFeatureComponent.AuthOutput
-import ru.aleshin.studyassistant.auth.api.AuthFeatureStarter
-import ru.aleshin.studyassistant.billing.api.BillingFeatureComponent
-import ru.aleshin.studyassistant.billing.api.BillingFeatureComponent.BillingConfig
-import ru.aleshin.studyassistant.billing.api.BillingFeatureComponent.BillingOutput
-import ru.aleshin.studyassistant.billing.api.BillingFeatureStarter
+import ru.aleshin.studyassistant.analytics.api.AnalyticsConfig
+import ru.aleshin.studyassistant.analytics.api.AnalyticsDecomposeFeatureFactory
+import ru.aleshin.studyassistant.analytics.api.AnalyticsOutput
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseComponent
 import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
 import ru.aleshin.studyassistant.core.common.architecture.component.saveableStore
-import ru.aleshin.studyassistant.core.common.inject.StartFeatureConfig
+import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
 import ru.aleshin.studyassistant.core.common.navigation.DeepLinkUrl
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorOutput
-import ru.aleshin.studyassistant.editor.api.EditorFeatureStarter
+import ru.aleshin.studyassistant.core.common.navigation.WidgetDeepLinkDestination
+import ru.aleshin.studyassistant.editor.api.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorDecomposeFeatureFactory
+import ru.aleshin.studyassistant.editor.api.EditorOutput
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainInput
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainOutput
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainState
-import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Child.AuthChild
-import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Child.BillingChild
+import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Child.AnalyticsChild
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Child.EditorChild
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Child.PreviewChild
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Child.ScheduleChild
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Child.SettingsChild
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Child.TabNavigationChild
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Child.UsersChild
-import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Config.Auth
-import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Config.Billing
+import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Config.Analytics
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Config.Editor
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Config.Preview
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent.Config.Schedule
@@ -66,23 +59,20 @@ import ru.aleshin.studyassistant.presentation.ui.tabnavigation.component.TabsCom
 import ru.aleshin.studyassistant.presentation.ui.tabnavigation.component.TabsComponent.TabsConfig
 import ru.aleshin.studyassistant.presentation.ui.tabnavigation.component.TabsComponent.TabsOutput
 import ru.aleshin.studyassistant.presentation.ui.tabnavigation.component.TabsComponentFactory
-import ru.aleshin.studyassistant.preview.api.PreviewFeatureComponent
-import ru.aleshin.studyassistant.preview.api.PreviewFeatureComponent.PreviewConfig
-import ru.aleshin.studyassistant.preview.api.PreviewFeatureComponent.PreviewOutput
-import ru.aleshin.studyassistant.preview.api.PreviewFeatureStarter
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureComponent
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureComponent.ScheduleConfig
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureComponent.ScheduleOutput
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureComponent.ScheduleOutput.NavigateToEditor
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureStarter
-import ru.aleshin.studyassistant.settings.api.SettingsFeatureComponent
-import ru.aleshin.studyassistant.settings.api.SettingsFeatureComponent.SettingsConfig
-import ru.aleshin.studyassistant.settings.api.SettingsFeatureComponent.SettingsOutput
-import ru.aleshin.studyassistant.settings.api.SettingsFeatureStarter
-import ru.aleshin.studyassistant.users.api.UsersFeatureComponent
-import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
-import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersOutput
-import ru.aleshin.studyassistant.users.api.UsersFeatureStarter
+import ru.aleshin.studyassistant.preview.api.PreviewConfig
+import ru.aleshin.studyassistant.preview.api.PreviewDecomposeFeatureFactory
+import ru.aleshin.studyassistant.preview.api.PreviewOutput
+import ru.aleshin.studyassistant.schedule.api.ScheduleConfig
+import ru.aleshin.studyassistant.schedule.api.ScheduleDecomposeFeatureFactory
+import ru.aleshin.studyassistant.schedule.api.ScheduleOutput
+import ru.aleshin.studyassistant.schedule.api.ScheduleOutput.NavigateToEditor
+import ru.aleshin.studyassistant.settings.api.SettingsConfig
+import ru.aleshin.studyassistant.settings.api.SettingsDecomposeFeatureFactory
+import ru.aleshin.studyassistant.settings.api.SettingsOutput
+import ru.aleshin.studyassistant.tasks.api.TasksConfig
+import ru.aleshin.studyassistant.users.api.UsersConfig
+import ru.aleshin.studyassistant.users.api.UsersDecomposeFeatureFactory
+import ru.aleshin.studyassistant.users.api.UsersOutput
 
 /**
  * @author Stanislav Aleshin on 21.08.2025.
@@ -98,6 +88,7 @@ abstract class MainComponent(
     abstract val stack: Value<ChildStack<*, Child>>
 
     abstract fun navigateToBack()
+    abstract fun handleDeepLink(deepLinkUrl: DeepLinkUrl)
 
     @Serializable
     sealed class Config {
@@ -105,55 +96,35 @@ abstract class MainComponent(
         data object Splash : Config()
 
         @Serializable
-        data class TabNavigation(
-            val startConfig: StartFeatureConfig<TabsConfig> = StartFeatureConfig(null)
-        ) : Config()
+        data class Preview(val startConfig: PreviewConfig = PreviewConfig.Intro) : Config()
 
         @Serializable
-        data class Preview(
-            val startConfig: StartFeatureConfig<PreviewConfig> = StartFeatureConfig(null)
-        ) : Config()
+        data class TabNavigation(val startConfig: TabsConfig = TabsConfig.Schedule()) : Config()
 
         @Serializable
-        data class Auth(
-            val startConfig: StartFeatureConfig<AuthConfig> = StartFeatureConfig(null)
-        ) : Config()
+        data class Schedule(val startConfig: ScheduleConfig = ScheduleConfig.Overview) : Config()
 
         @Serializable
-        data class Schedule(
-            val startConfig: StartFeatureConfig<ScheduleConfig> = StartFeatureConfig(null)
-        ) : Config()
+        data class Editor(val startConfig: EditorConfig) : Config()
 
         @Serializable
-        data class Billing(
-            val startConfig: StartFeatureConfig<BillingConfig> = StartFeatureConfig(null)
-        ) : Config()
+        data class Users(val startConfig: UsersConfig) : Config()
 
         @Serializable
-        data class Editor(
-            val startConfig: StartFeatureConfig<EditorConfig> = StartFeatureConfig(null)
-        ) : Config()
+        data class Settings(val startConfig: SettingsConfig = SettingsConfig.General) : Config()
 
         @Serializable
-        data class Users(
-            val startConfig: StartFeatureConfig<UsersConfig> = StartFeatureConfig(null)
-        ) : Config()
-
-        @Serializable
-        data class Settings(
-            val startConfig: StartFeatureConfig<SettingsConfig> = StartFeatureConfig(null)
-        ) : Config()
+        data class Analytics(val startConfig: AnalyticsConfig = AnalyticsConfig.Overview) : Config()
     }
 
     sealed class Child {
         object SplashChild : Child()
-        data class PreviewChild(val component: PreviewFeatureComponent) : Child()
-        data class AuthChild(val component: AuthFeatureComponent) : Child()
-        data class ScheduleChild(val component: ScheduleFeatureComponent) : Child()
-        data class EditorChild(val component: EditorFeatureComponent) : Child()
-        data class BillingChild(val component: BillingFeatureComponent) : Child()
-        data class SettingsChild(val component: SettingsFeatureComponent) : Child()
-        data class UsersChild(val component: UsersFeatureComponent) : Child()
+        data class PreviewChild(val contentProvider: FeatureContentProvider) : Child()
+        data class ScheduleChild(val contentProvider: FeatureContentProvider) : Child()
+        data class EditorChild(val contentProvider: FeatureContentProvider) : Child()
+        data class SettingsChild(val contentProvider: FeatureContentProvider) : Child()
+        data class AnalyticsChild(val contentProvider: FeatureContentProvider) : Child()
+        data class UsersChild(val contentProvider: FeatureContentProvider) : Child()
         data class TabNavigationChild(val component: TabsComponent) : Child()
     }
 
@@ -161,19 +132,18 @@ abstract class MainComponent(
         storeFactory: MainComposeStore.Factory,
         componentContext: ComponentContext,
         deepLink: DeepLinkUrl?,
-        private val previewFeatureStarter: PreviewFeatureStarter,
-        private val authFeatureStarter: AuthFeatureStarter,
-        private val scheduleFeatureStarter: ScheduleFeatureStarter,
-        private val editorFeatureStarter: EditorFeatureStarter,
-        private val billingFeatureStarter: BillingFeatureStarter,
-        private val settingsFeatureStarter: SettingsFeatureStarter,
-        private val usersFeatureStarter: UsersFeatureStarter,
+        private val previewFeatureFactory: PreviewDecomposeFeatureFactory,
+        private val scheduleFeatureFactory: ScheduleDecomposeFeatureFactory,
+        private val editorFeatureFactory: EditorDecomposeFeatureFactory,
+        private val settingsFeatureFactory: SettingsDecomposeFeatureFactory,
+        private val analyticsFeatureFactory: AnalyticsDecomposeFeatureFactory,
+        private val usersFeatureFactory: UsersDecomposeFeatureFactory,
         private val tabsComponentFactory: TabsComponentFactory,
     ) : MainComponent(componentContext) {
 
         private companion object {
             const val STORE_KEY = "MAIN_COMPONENT_KEY"
-            const val STACK_KEY = "MAIN_STACK_KEY"
+            const val STACK_KEY = "LOCAL_FIRST_MAIN_STACK_KEY"
         }
 
         private val stackNavigation = StackNavigation<Config>()
@@ -200,73 +170,131 @@ abstract class MainComponent(
             stackNavigation.pop()
         }
 
+        override fun handleDeepLink(deepLinkUrl: DeepLinkUrl) {
+            stackNavigation.replaceAll(*resolveDeepLink(deepLinkUrl).toTypedArray())
+        }
+
+        private fun resolveDeepLink(deepLinkUrl: DeepLinkUrl): List<Config> {
+            val widgetDestination = WidgetDeepLinkDestination.fromDeepLinkUrl(deepLinkUrl)
+            val widgetConfigs = when (widgetDestination) {
+                WidgetDeepLinkDestination.Schedule -> listOf(
+                    TabNavigation(TabsConfig.Schedule(ScheduleConfig.Overview)),
+                )
+                WidgetDeepLinkDestination.Homeworks -> listOf(
+                    TabNavigation(TabsConfig.Tasks(TasksConfig.Homeworks())),
+                )
+                WidgetDeepLinkDestination.Todos -> listOf(
+                    TabNavigation(TabsConfig.Tasks(TasksConfig.Todos)),
+                )
+                WidgetDeepLinkDestination.Goals -> listOf(
+                    TabNavigation(TabsConfig.Tasks(TasksConfig.Overview)),
+                )
+                is WidgetDeepLinkDestination.ScheduleEditor -> listOf(
+                    TabNavigation(TabsConfig.Schedule(ScheduleConfig.Overview)),
+                    Editor(
+                        EditorConfig.DailySchedule(
+                            date = widgetDestination.date,
+                            customScheduleId = widgetDestination.customScheduleId,
+                            baseScheduleId = widgetDestination.baseScheduleId,
+                        ),
+                    ),
+                )
+                is WidgetDeepLinkDestination.HomeworkEditor -> listOf(
+                    TabNavigation(TabsConfig.Tasks(TasksConfig.Homeworks())),
+                    Editor(
+                        EditorConfig.Homework(
+                            homeworkId = widgetDestination.homeworkId,
+                            date = widgetDestination.date,
+                            subjectId = widgetDestination.subjectId,
+                            organizationId = widgetDestination.organizationId,
+                        ),
+                    ),
+                )
+                is WidgetDeepLinkDestination.TodoEditor -> listOf(
+                    TabNavigation(TabsConfig.Tasks(TasksConfig.Todos)),
+                    Editor(EditorConfig.Todo(widgetDestination.todoId)),
+                )
+                null -> null
+            }
+            if (widgetConfigs != null) return widgetConfigs
+
+            val code = deepLinkUrl.params["code"]
+            val destination = deepLinkUrl.pathSegments.takeIf {
+                it.firstOrNull() == "share" && !code.isNullOrBlank()
+            }?.getOrNull(1)
+            val tabConfig = when (destination) {
+                "schedule" -> TabsConfig.Schedule(ScheduleConfig.Share(code))
+                "homework" -> TabsConfig.Tasks(TasksConfig.Share(code))
+                else -> TabsConfig.Schedule()
+            }
+            return listOf(TabNavigation(tabConfig))
+        }
+
         private fun createChild(config: Config, componentContext: ComponentContext): Child {
             return when (config) {
                 is Splash -> Child.SplashChild
-
-                is Preview -> PreviewChild(
-                    component = previewFeatureStarter.createOrGetFeature().componentFactory().createComponent(
-                        componentContext = componentContext,
+                is Preview -> {
+                    val api = previewFeatureFactory.createOrGetFeature(componentContext)
+                    val provider = api.contentProviderFactory().createProvider(
                         startConfig = config.startConfig,
                         outputConsumer = previewOutputConsumer(),
-                    )
-                )
-
-                is Auth -> AuthChild(
-                    component = authFeatureStarter.createOrGetFeature().componentFactory().createComponent(
                         componentContext = componentContext,
-                        startConfig = config.startConfig,
-                        outputConsumer = authOutputConsumer(),
                     )
-                )
-
-                is Editor -> EditorChild(
-                    component = editorFeatureStarter.createOrGetFeature().componentFactory().createComponent(
+                    PreviewChild(contentProvider = provider)
+                }
+                is Editor -> {
+                    val api = editorFeatureFactory.createOrGetFeature(componentContext)
+                    val provider = api.contentProviderFactory().createProvider(
                         startConfig = config.startConfig,
                         outputConsumer = editorOutputConsumer(),
                         componentContext = componentContext,
                     )
-                )
-
-                is Schedule -> ScheduleChild(
-                    component = scheduleFeatureStarter.createOrGetFeature().componentFactory().createComponent(
+                    EditorChild(contentProvider = provider)
+                }
+                is Schedule -> {
+                    val api = scheduleFeatureFactory.createOrGetFeature(componentContext)
+                    val provider = api.contentProviderFactory().createProvider(
                         startConfig = config.startConfig,
                         outputConsumer = scheduleOutputConsumer(),
                         componentContext = componentContext,
                     )
-                )
-
-                is Billing -> BillingChild(
-                    component = billingFeatureStarter.createOrGetFeature().componentFactory().createComponent(
-                        startConfig = config.startConfig,
-                        outputConsumer = billingOutputConsumer(),
-                        componentContext = componentContext,
-                    )
-                )
-
-                is Settings -> SettingsChild(
-                    component = settingsFeatureStarter.createOrGetFeature().componentFactory().createComponent(
+                    ScheduleChild(contentProvider = provider)
+                }
+                is Settings -> {
+                    val api = settingsFeatureFactory.createOrGetFeature(componentContext)
+                    val provider = api.contentProviderFactory().createProvider(
                         startConfig = config.startConfig,
                         outputConsumer = settingsOutputConsumer(),
                         componentContext = componentContext,
                     )
-                )
-
-                is Users -> UsersChild(
-                    component = usersFeatureStarter.createOrGetFeature().componentFactory().createComponent(
+                    SettingsChild(contentProvider = provider)
+                }
+                is Analytics -> {
+                    val api = analyticsFeatureFactory.createOrGetFeature(componentContext)
+                    val provider = api.contentProviderFactory().createProvider(
+                        startConfig = config.startConfig,
+                        outputConsumer = analyticsOutputConsumer(),
+                        componentContext = componentContext,
+                    )
+                    AnalyticsChild(contentProvider = provider)
+                }
+                is Users -> {
+                    val api = usersFeatureFactory.createOrGetFeature(componentContext)
+                    val provider = api.contentProviderFactory().createProvider(
                         startConfig = config.startConfig,
                         outputConsumer = usersOutputConsumer(),
                         componentContext = componentContext,
                     )
-                )
-
-                is TabNavigation -> TabNavigationChild(
-                    component = tabsComponentFactory.createComponent(
+                    UsersChild(contentProvider = provider)
+                }
+                is TabNavigation -> {
+                    val component = tabsComponentFactory.createComponent(
                         startConfig = config.startConfig,
                         outputConsumer = tabNavOutputConsumer(),
                         componentContext = componentContext,
                     )
-                )
+                    TabNavigationChild(component = component)
+                }
             }
         }
 
@@ -275,35 +303,12 @@ abstract class MainComponent(
                 is MainOutput.NavigateToApp -> {
                     stackNavigation.replaceAll(TabNavigation())
                 }
-                is MainOutput.NavigateToAuth -> {
-                    val config = StartFeatureConfig<AuthConfig>(listOf(AuthConfig.Login))
-                    stackNavigation.replaceAll(Auth(config))
+                is MainOutput.NavigateToPreview -> {
+                    stackNavigation.replaceAll(Preview())
                 }
-                is MainOutput.NavigateToIntro -> {
-                    val config = StartFeatureConfig<PreviewConfig>(listOf(PreviewConfig.Intro))
-                    stackNavigation.replaceAll(Preview(config))
+                is MainOutput.NavigateToDeepLink -> {
+                    handleDeepLink(output.deepLinkUrl)
                 }
-                is MainOutput.NavigateToSetup -> {
-                    val config = StartFeatureConfig<PreviewConfig>(listOf(PreviewConfig.Setup))
-                    stackNavigation.replaceAll(Preview(config))
-                }
-                is MainOutput.NavigateToVerification -> {
-                    val config = StartFeatureConfig<AuthConfig>(listOf(AuthConfig.Verification))
-                    stackNavigation.replaceAll(Auth(config))
-                }
-            }
-        }
-
-        private fun authOutputConsumer() = OutputConsumer<AuthOutput> { output ->
-            when (output) {
-                is AuthOutput.NavigateToApp -> {
-                    stackNavigation.replaceAll(TabNavigation())
-                }
-                is AuthOutput.NavigateToFirstSetup -> {
-                    val config = StartFeatureConfig<PreviewConfig>(listOf(PreviewConfig.Setup))
-                    stackNavigation.replaceAll(Preview(config))
-                }
-                is AuthOutput.NavigateToBack -> navigateToBack()
             }
         }
 
@@ -312,31 +317,17 @@ abstract class MainComponent(
                 is PreviewOutput.NavigateToApp -> {
                     stackNavigation.replaceAll(TabNavigation())
                 }
-                is PreviewOutput.NavigateToBilling -> {
-                    stackNavigation.pushToFront(Billing())
-                }
-                is PreviewOutput.NavigateToLogin -> {
-                    val config = StartFeatureConfig<AuthConfig>(listOf(AuthConfig.Login))
-                    stackNavigation.replaceAll(Auth(config))
-                }
-                is PreviewOutput.NavigateToRegister -> {
-                    val config = StartFeatureConfig<AuthConfig>(listOf(AuthConfig.Register))
-                    stackNavigation.replaceAll(Auth(config))
-                }
                 is PreviewOutput.NavigateToWeekScheduleEditor -> {
-                    val screenConfig = EditorConfig.WeekSchedule()
-                    val startConfig = StartFeatureConfig<EditorConfig>(listOf(screenConfig))
-                    stackNavigation.pushToFront(Editor(startConfig))
+                    stackNavigation.replaceAll(
+                        TabNavigation(),
+                        Editor(EditorConfig.WeekSchedule()),
+                    )
                 }
-                is PreviewOutput.NavigateToBack -> navigateToBack()
             }
         }
 
         private fun editorOutputConsumer() = OutputConsumer<EditorOutput> { output ->
             when (output) {
-                is EditorOutput.NavigateToBilling -> {
-                    stackNavigation.pushToFront(Billing())
-                }
                 is EditorOutput.NavigateToBack -> navigateToBack()
             }
         }
@@ -360,30 +351,21 @@ abstract class MainComponent(
                             week = output.week,
                         )
                     }
-                    val startConfig = StartFeatureConfig<EditorConfig>(listOf(screenConfig))
-                    stackNavigation.pushToFront(Editor(startConfig))
-                }
-                is ScheduleOutput.NavigateToUserProfile -> {
-                    val screenConfig = UsersConfig.UserProfile(output.userId)
-                    val startConfig = StartFeatureConfig<UsersConfig>(listOf(screenConfig))
-                    stackNavigation.pushToFront(Users(startConfig))
+                    stackNavigation.pushToFront(Editor(screenConfig))
                 }
                 is ScheduleOutput.NavigateToBack -> navigateToBack()
             }
         }
 
-        private fun billingOutputConsumer() = OutputConsumer<BillingOutput> { output ->
+        private fun settingsOutputConsumer() = OutputConsumer<SettingsOutput> { output ->
             when (output) {
-                is BillingOutput.NavigateToBack -> navigateToBack()
+                is SettingsOutput.NavigateToBack -> navigateToBack()
             }
         }
 
-        private fun settingsOutputConsumer() = OutputConsumer<SettingsOutput> { output ->
+        private fun analyticsOutputConsumer() = OutputConsumer<AnalyticsOutput> { output ->
             when (output) {
-                is SettingsOutput.NavigateToBilling -> {
-                    stackNavigation.pushToFront(Billing())
-                }
-                is SettingsOutput.NavigateToBack -> navigateToBack()
+                is AnalyticsOutput.NavigateToBack -> navigateToBack()
             }
         }
 
@@ -394,8 +376,7 @@ abstract class MainComponent(
                         employeeId = output.employeeId,
                         organizationId = output.organizationId,
                     )
-                    val startConfig = StartFeatureConfig<EditorConfig>(listOf(screenConfig))
-                    stackNavigation.pushToFront(Editor(startConfig))
+                    stackNavigation.pushToFront(Editor(screenConfig))
                 }
                 is UsersOutput.NavigateToBack -> navigateToBack()
             }
@@ -403,31 +384,22 @@ abstract class MainComponent(
 
         private fun tabNavOutputConsumer() = OutputConsumer<TabsOutput> { output ->
             when (output) {
-                is TabsOutput.NavigateToAuth -> {
-                    val config = StartFeatureConfig<AuthConfig>(listOf(AuthConfig.Login))
-                    stackNavigation.replaceAll(Auth(config))
-                }
                 is TabsOutput.NavigateToEditor -> {
-                    val config = StartFeatureConfig<EditorConfig>(listOf(output.config))
-                    stackNavigation.pushToFront(Editor(config))
+                    stackNavigation.pushToFront(Editor(output.config))
                 }
                 is TabsOutput.NavigateToSettings -> {
-                    val config = StartFeatureConfig<SettingsConfig>(listOf(output.config))
-                    stackNavigation.pushToFront(Settings(config))
+                    stackNavigation.pushToFront(Settings(output.config))
                 }
-                is TabsOutput.NavigateToSharedSchedule -> {
-                    val screenConfig = ScheduleConfig.Share(
-                        receivedShareId = output.receivedShareId,
-                    )
-                    val startConfig = StartFeatureConfig<ScheduleConfig>(listOf(screenConfig))
-                    stackNavigation.pushToFront(Schedule(startConfig))
+                is TabsOutput.NavigateToAnalytics -> {
+                    stackNavigation.pushToFront(Analytics())
+                }
+                is TabsOutput.NavigateToScheduleSharing -> {
+                    stackNavigation.pushToFront(Schedule(ScheduleConfig.Share()))
                 }
                 is TabsOutput.NavigateToUsers -> {
-                    val config = StartFeatureConfig<UsersConfig>(listOf(output.config))
-                    stackNavigation.pushToFront(Users(config))
-                }
-                is TabsOutput.NavigateToBilling -> {
-                    stackNavigation.pushToFront(Billing())
+                    if (output.config is UsersConfig.EmployeeProfile) {
+                        stackNavigation.pushToFront(Users(output.config))
+                    }
                 }
                 is TabsOutput.NavigateToBack -> navigateToBack()
             }

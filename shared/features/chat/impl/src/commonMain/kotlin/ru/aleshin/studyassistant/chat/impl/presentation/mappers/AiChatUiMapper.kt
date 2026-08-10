@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ internal suspend fun AiAssistantMessage.mapToUi() = when (this) {
         time = time,
         name = name,
     )
+
     is AiAssistantMessage.AssistantMessage -> {
         AssistantMessageUi(
             id = id,
@@ -45,5 +46,6 @@ internal suspend fun AiAssistantMessage.mapToUi() = when (this) {
             time = time,
         )
     }
+
     else -> throw IllegalArgumentException("Not supported message type $this")
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,16 +26,19 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.firstOrNullHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToUi
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.EmployeeInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.SubjectInteractor
-import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
-import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.EditSubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.convertToBase
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.convertToEditModel
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectOutput
@@ -57,30 +60,36 @@ internal interface SubjectWorkProcessor :
                 organizationId = command.organizationId,
                 subjectId = command.subjectId,
             )
+
             is SubjectWorkCommand.LoadOrganization -> loadOrganizationWork(
                 organizationId = command.organizationId,
             )
+
             is SubjectWorkCommand.LoadEmployees -> loadEmployeesWork(
                 organizationId = command.organizationId
             )
+
             is SubjectWorkCommand.UpdateOrganizationOffices -> updateOfficesWork(
                 organization = command.organization,
                 offices = command.offices,
             )
+
             is SubjectWorkCommand.UpdateOrganizationLocations -> updateLocationsWork(
                 organization = command.organization,
                 locations = command.locations,
             )
+
             is SubjectWorkCommand.SaveEditModel -> saveEditModelWork(
                 editableSubject = command.editableSubject,
             )
         }
 
         private fun loadEditModelWork(subjectId: UID?, organizationId: UID) = flow {
-            val subject = subjectInteractor.fetchSubjectById(subjectId ?: "").firstOrNullHandleAndGet(
-                onLeftAction = { emit(EffectResult(SubjectEffect.ShowError(it))).let { null } },
-                onRightAction = { subject -> subject?.mapToUi() }
-            )
+            val subject =
+                subjectInteractor.fetchSubjectById(subjectId ?: "").firstOrNullHandleAndGet(
+                    onLeftAction = { emit(EffectResult(SubjectEffect.ShowError(it))).let { null } },
+                    onRightAction = { subject -> subject?.mapToUi() }
+                )
             val editModel = subject?.convertToEditModel() ?: EditSubjectUi.createEditModel(
                 uid = subjectId,
                 organizationId = organizationId,
@@ -107,18 +116,24 @@ internal interface SubjectWorkProcessor :
             )
         }
 
-        private fun updateOfficesWork(organization: OrganizationShortUi, offices: List<String>) = flow {
-            val updatedOrganization = organization.copy(offices = offices)
-            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain()).handle(
-                onLeftAction = { emit(EffectResult(SubjectEffect.ShowError(it))) },
-            )
-        }
+        private fun updateOfficesWork(organization: OrganizationShortUi, offices: List<String>) =
+            flow {
+                val updatedOrganization = organization.copy(offices = offices)
+                organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain())
+                    .handle(
+                        onLeftAction = { emit(EffectResult(SubjectEffect.ShowError(it))) },
+                    )
+            }
 
-        private fun updateLocationsWork(organization: OrganizationShortUi, locations: List<ContactInfoUi>) = flow {
+        private fun updateLocationsWork(
+            organization: OrganizationShortUi,
+            locations: List<ContactInfoUi>
+        ) = flow {
             val updatedOrganization = organization.copy(locations = locations)
-            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain()).handle(
-                onLeftAction = { emit(EffectResult(SubjectEffect.ShowError(it))) },
-            )
+            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain())
+                .handle(
+                    onLeftAction = { emit(EffectResult(SubjectEffect.ShowError(it))) },
+                )
         }
 
         private fun saveEditModelWork(editableSubject: EditSubjectUi) = flow {

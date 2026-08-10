@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,12 +38,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.info.impl.presentation.models.users.EmployeeUi
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_employee as core_ic_employee
 
 /**
  * @author Stanislav Aleshin on 17.06.2024.
@@ -77,26 +78,28 @@ internal fun ShortSubjectView(
             ) {
                 Icon(
                     modifier = Modifier.size(18.dp),
-                    painter = painterResource(eventType.mapToIcon(StudyAssistantRes.icons)),
+                    painter = painterResource(eventType.mapToIcon()),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                 )
                 Text(
-                    text = eventType.mapToString(StudyAssistantRes.strings),
+                    text = eventType.mapToString(),
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.labelMedium,
                 )
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = office,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.End,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.labelMedium,
-                )
+                if (office.isNotBlank()) {
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = office,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.End,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
             }
             Row(
                 modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(end = 8.dp),
@@ -117,25 +120,27 @@ internal fun ShortSubjectView(
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    modifier = Modifier.size(18.dp),
-                    painter = painterResource(StudyAssistantRes.icons.employee),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = teacher?.officialName() ?: StudyAssistantRes.strings.noneTitle,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.labelMedium,
-                )
+            if (teacher != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        modifier = Modifier.size(18.dp),
+                        painter = painterResource(CoreRes.drawable.core_ic_employee),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = teacher.officialName(),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
             }
         }
     }

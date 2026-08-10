@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
+import ru.aleshin.studyassistant.preview.impl.resources.Res
+import ru.aleshin.studyassistant.preview.impl.resources.il_schedule
 
 /**
  * @author Stanislav Aleshin on 27.04.2024
@@ -34,7 +35,7 @@ internal fun SchedulePageInfo(
 ) {
     Image(
         modifier = modifier,
-        painter = painterResource(PreviewThemeRes.icons.scheduleIllustration),
+        painter = painterResource(Res.drawable.il_schedule),
         contentDescription = null,
         contentScale = ContentScale.FillWidth,
     )

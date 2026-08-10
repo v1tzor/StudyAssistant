@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
@@ -42,9 +41,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoNotificationsUi
 import ru.aleshin.studyassistant.core.ui.views.menu.CheckedMenuItem
-import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.TodoNotificationsUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.todo_notification_label
+import ru.aleshin.studyassistant.editor.impl.resources.todo_notification_title
+import ru.aleshin.studyassistant.editor.impl.resources.todo_notify_params_before_fifteen_minutes
+import ru.aleshin.studyassistant.editor.impl.resources.todo_notify_params_before_one_day
+import ru.aleshin.studyassistant.editor.impl.resources.todo_notify_params_before_one_hour
+import ru.aleshin.studyassistant.editor.impl.resources.todo_notify_params_before_one_week
+import ru.aleshin.studyassistant.editor.impl.resources.todo_notify_params_before_start
+import ru.aleshin.studyassistant.editor.impl.resources.todo_notify_params_before_three_hour
 
 /**
  * @author Stanislav Aleshin on 26.07.2024.
@@ -52,10 +60,8 @@ import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 @Composable
 internal fun TodoNotificationSelector(
     modifier: Modifier = Modifier,
-    isPaidUser: Boolean,
     notifications: TodoNotificationsUi?,
     onChangeNotifications: (TodoNotificationsUi) -> Unit,
-    onOpenBillingScreen: () -> Unit,
 ) {
     Row(
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
@@ -69,12 +75,12 @@ internal fun TodoNotificationSelector(
         )
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = EditorThemeRes.strings.todoNotificationTitle,
+                text = stringResource(Res.string.todo_notification_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
-                text = EditorThemeRes.strings.todoNotificationLabel,
+                text = stringResource(Res.string.todo_notification_label),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelMedium,
             )
@@ -84,9 +90,7 @@ internal fun TodoNotificationSelector(
 
             IconButton(
                 modifier = Modifier.size(32.dp),
-                onClick = {
-                    if (isPaidUser) openNotificationsMenu = true else onOpenBillingScreen()
-                },
+                onClick = { openNotificationsMenu = true },
                 enabled = notifications != null,
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -94,7 +98,7 @@ internal fun TodoNotificationSelector(
                 ),
             ) {
                 Icon(
-                    imageVector = if (isPaidUser) Icons.Default.Settings else Icons.Default.Star,
+                    imageVector = Icons.Default.Settings,
                     contentDescription = null
                 )
             }
@@ -127,32 +131,32 @@ private fun TodoNotificationsMenu(
         offset = DpOffset(0.dp, 6.dp),
     ) {
         CheckedMenuItem(
-            text = EditorThemeRes.strings.todoNotifyParamsBeforeStart,
+            text = stringResource(Res.string.todo_notify_params_before_start),
             check = notifications.beforeStart,
             onCheckedChange = { onUpdate(notifications.copy(beforeStart = it)) },
         )
         CheckedMenuItem(
-            text = EditorThemeRes.strings.todoNotifyParamsBeforeFifteenMinutes,
+            text = stringResource(Res.string.todo_notify_params_before_fifteen_minutes),
             check = notifications.fifteenMinutesBefore,
             onCheckedChange = { onUpdate(notifications.copy(fifteenMinutesBefore = it)) },
         )
         CheckedMenuItem(
-            text = EditorThemeRes.strings.todoNotifyParamsBeforeOneHour,
+            text = stringResource(Res.string.todo_notify_params_before_one_hour),
             check = notifications.oneHourBefore,
             onCheckedChange = { onUpdate(notifications.copy(oneHourBefore = it)) },
         )
         CheckedMenuItem(
-            text = EditorThemeRes.strings.todoNotifyParamsBeforeThreeHour,
+            text = stringResource(Res.string.todo_notify_params_before_three_hour),
             check = notifications.threeHourBefore,
             onCheckedChange = { onUpdate(notifications.copy(threeHourBefore = it)) },
         )
         CheckedMenuItem(
-            text = EditorThemeRes.strings.todoNotifyParamsBeforeOneDay,
+            text = stringResource(Res.string.todo_notify_params_before_one_day),
             check = notifications.oneDayBefore,
             onCheckedChange = { onUpdate(notifications.copy(oneDayBefore = it)) },
         )
         CheckedMenuItem(
-            text = EditorThemeRes.strings.todoNotifyParamsBeforeOneWeek,
+            text = stringResource(Res.string.todo_notify_params_before_one_week),
             check = notifications.oneWeekBefore,
             onCheckedChange = { onUpdate(notifications.copy(oneWeekBefore = it)) },
         )

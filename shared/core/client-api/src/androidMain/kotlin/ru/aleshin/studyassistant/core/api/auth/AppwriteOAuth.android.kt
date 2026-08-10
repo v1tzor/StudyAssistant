@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,10 +40,12 @@ actual suspend fun launchOAuth2Url(
                 AppwriteException(error).printStackTrace()
                 trySend("")
             }
+
             callbackUrl == null -> {
                 AppwriteException("Invalid callback URL").printStackTrace()
                 trySend("")
             }
+
             else -> {
                 trySend(callbackUrl)
             }

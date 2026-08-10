@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package ru.aleshin.studyassistant.core.common.extensions
 
 import androidx.compose.ui.util.fastForEach
-import kotlinx.datetime.Clock
 import kotlin.math.abs
 import kotlin.random.Random
+import kotlin.time.Clock
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.

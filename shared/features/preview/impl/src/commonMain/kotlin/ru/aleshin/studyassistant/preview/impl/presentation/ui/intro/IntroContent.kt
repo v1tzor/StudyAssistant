@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,46 +16,38 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.intro
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.window.core.layout.WindowHeightSizeClass
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.views.CircularStepsRow
+import ru.aleshin.studyassistant.core.ui.utils.isCompactHeight
+import ru.aleshin.studyassistant.core.ui.utils.useExpandedLayout
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroEffect
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroEvent
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.store.IntroComponent
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.AuthActionsSection
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.IntroNavigationSection
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.IntroPage
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.NavActionsSection
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.IntroPageSection
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.IntroStepsSection
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
@@ -63,161 +55,110 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views.NavAct
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 internal fun IntroContent(
-    introComponent: IntroComponent
+    introComponent: IntroComponent,
+    modifier: Modifier = Modifier,
 ) {
     val store = introComponent.store
-    val strings = PreviewThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
-    val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+    val adaptiveInfo = currentWindowAdaptiveInfoV2()
     val pagerState = rememberPagerState { IntroPage.entries.size }
     val snackbarState = remember { SnackbarHostState() }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        content = { paddingValues ->
-            when (windowSize.windowHeightSizeClass) {
-                WindowHeightSizeClass.COMPACT -> BaseIntroContentCompact(
-                    modifier = Modifier.padding(paddingValues),
-                    pagerState = pagerState,
-                    onBackClick = {
-                        store.dispatchEvent(IntroEvent.SelectedPreviousPage(pagerState.currentPage))
-                    },
-                    onContinueClick = {
-                        store.dispatchEvent(IntroEvent.SelectedNextPage(pagerState.currentPage))
-                    },
-                    onLoginClick = {
-                        store.dispatchEvent(IntroEvent.ClickLogin)
-                    },
-                    onRegisterClick = {
-                        store.dispatchEvent(IntroEvent.ClickRegister)
-                    },
-                )
-                else -> BaseIntroContent(
-                    modifier = Modifier.padding(paddingValues),
-                    pagerState = pagerState,
-                    onBackClick = {
-                        store.dispatchEvent(IntroEvent.SelectedPreviousPage(pagerState.currentPage))
-                    },
-                    onContinueClick = {
-                        store.dispatchEvent(IntroEvent.SelectedNextPage(pagerState.currentPage))
-                    },
-                    onLoginClick = {
-                        store.dispatchEvent(IntroEvent.ClickLogin)
-                    },
-                    onRegisterClick = {
-                        store.dispatchEvent(IntroEvent.ClickRegister)
-                    },
-                )
-            }
+    IntroScaffold(
+        modifier = modifier,
+        pagerState = pagerState,
+        useHorizontalPageLayout = adaptiveInfo.useExpandedLayout || adaptiveInfo.isCompactHeight,
+        snackbarState = snackbarState,
+        onBackClick = {
+            store.dispatchEvent(IntroEvent.SelectedPreviousPage(pagerState.currentPage))
         },
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarState,
-                snackbar = { ErrorSnackbar(it) },
-            )
+        onContinueClick = {
+            store.dispatchEvent(IntroEvent.SelectedNextPage(pagerState.currentPage))
+        },
+        onSetupClick = {
+            store.dispatchEvent(IntroEvent.ClickSetup)
         },
     )
 
     store.handleEffects { effect ->
         when (effect) {
             is IntroEffect.ScrollToPage -> pagerState.animateScrollToPage(effect.pageIndex)
-            is IntroEffect.ShowError -> {
-                snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
-                    withDismissAction = true,
-                )
-            }
+            is IntroEffect.ShowError -> snackbarState.showSnackbar(
+                message = effect.failures.mapToMessage(),
+                withDismissAction = true,
+            )
         }
     }
 }
 
 @Composable
-@OptIn(ExperimentalResourceApi::class, ExperimentalFoundationApi::class)
-private fun BaseIntroContent(
-    modifier: Modifier,
+@OptIn(ExperimentalFoundationApi::class)
+private fun IntroScaffold(
     pagerState: PagerState,
-    onContinueClick: () -> Unit,
+    useHorizontalPageLayout: Boolean,
+    snackbarState: SnackbarHostState,
     onBackClick: () -> Unit,
-    onLoginClick: () -> Unit,
-    onRegisterClick: () -> Unit,
+    onContinueClick: () -> Unit,
+    onSetupClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
-        HorizontalPager(
-            modifier = Modifier.weight(1f),
-            state = pagerState
-        ) { pageIndex ->
-            val page = IntroPage.fetchByIndex(pageIndex) ?: IntroPage.entries.first()
-            InfoSection(
-                illustration = painterResource(page.illustration),
-                headline = page.headline,
-                body = page.body,
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets.safeDrawing,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
             )
-        }
+        },
+    ) { paddingValues ->
+        IntroLayout(
+            modifier = Modifier.padding(paddingValues),
+            pagerState = pagerState,
+            useHorizontalPageLayout = useHorizontalPageLayout,
+            onBackClick = onBackClick,
+            onContinueClick = onContinueClick,
+            onSetupClick = onSetupClick,
+        )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun IntroLayout(
+    pagerState: PagerState,
+    useHorizontalPageLayout: Boolean,
+    onBackClick: () -> Unit,
+    onContinueClick: () -> Unit,
+    onSetupClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter,
+    ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize().widthIn(max = 1200.dp),
         ) {
-            CircularStepsRow(
+            HorizontalPager(
+                modifier = Modifier.weight(1f),
+                state = pagerState,
+                key = { pageIndex -> IntroPage.entries[pageIndex].name },
+            ) { pageIndex ->
+                IntroPageSection(
+                    page = IntroPage.entries[pageIndex],
+                    useHorizontalLayout = useHorizontalPageLayout,
+                )
+            }
+            IntroStepsSection(
                 stepsCount = IntroPage.entries.size,
                 currentStep = pagerState.currentPage,
             )
-            AnimatedContent(
-                targetState = pagerState.currentPage == IntroPage.entries.lastIndex,
-            ) { isLastPage ->
-                if (isLastPage) {
-                    AuthActionsSection(
-                        onBackClick = onBackClick,
-                        onLoginClick = onLoginClick,
-                        onRegisterClick = onRegisterClick,
-                    )
-                } else {
-                    NavActionsSection(
-                        canBackMove = pagerState.currentPage != 0,
-                        onBackClick = onBackClick,
-                        onContinueClick = onContinueClick,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-@ExperimentalResourceApi
-internal fun InfoSection(
-    modifier: Modifier = Modifier,
-    illustration: Painter,
-    headline: String,
-    body: String,
-) {
-    Column(
-        modifier = modifier.fillMaxSize().padding(top = 32.dp),
-        verticalArrangement = Arrangement.spacedBy(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Image(
-            modifier = Modifier.padding(horizontal = 32.dp).weight(1f),
-            painter = illustration,
-            contentDescription = headline,
-            contentScale = ContentScale.Fit,
-            alignment = Alignment.BottomCenter,
-        )
-        Column(
-            modifier = Modifier.padding(horizontal = 24.dp).weight(1f),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Text(
-                text = headline,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.Black,
-                )
-            )
-            Text(
-                text = body,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge,
+            IntroNavigationSection(
+                isFirstPage = pagerState.currentPage == 0,
+                isLastPage = pagerState.currentPage == IntroPage.entries.lastIndex,
+                onBackClick = onBackClick,
+                onContinueClick = onContinueClick,
+                onSetupClick = onSetupClick,
             )
         }
     }

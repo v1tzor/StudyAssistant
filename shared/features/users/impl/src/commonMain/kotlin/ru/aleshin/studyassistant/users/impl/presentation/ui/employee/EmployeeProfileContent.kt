@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,17 +55,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.MediumInfoBadge
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.users.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.users.impl.presentation.models.ContactInfoUi
-import ru.aleshin.studyassistant.users.impl.presentation.models.SubjectUi
-import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileEffect
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileEvent
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileState
@@ -78,6 +77,13 @@ import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.Emplo
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeSubjectViewItem
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeSubjectViewPlaceholder
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeTopSheet
+import ru.aleshin.studyassistant.users.impl.resources.Res
+import ru.aleshin.studyassistant.users.impl.resources.employee_contact_info_header
+import ru.aleshin.studyassistant.users.impl.resources.employee_email_title
+import ru.aleshin.studyassistant.users.impl.resources.employee_location_title
+import ru.aleshin.studyassistant.users.impl.resources.employee_phone_title
+import ru.aleshin.studyassistant.users.impl.resources.employee_subjects_header
+import ru.aleshin.studyassistant.users.impl.resources.employee_website_title
 
 /**
  * @author Stanislav Aleshin on 10.07.2024.
@@ -89,8 +95,6 @@ internal fun EmployeeProfileContent(
 ) {
     val store = employeeProfileComponent.store
     val state by store.stateAsState()
-    val strings = UsersThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -126,7 +130,7 @@ internal fun EmployeeProfileContent(
         when (effect) {
             is EmployeeProfileEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -173,7 +177,7 @@ private fun EmployeeProfileSubjectsSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = UsersThemeRes.strings.employeeSubjectsHeader,
+                text = stringResource(Res.string.employee_subjects_header),
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 style = MaterialTheme.typography.titleMedium,
@@ -253,7 +257,7 @@ private fun EmployeeProfileContactInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = UsersThemeRes.strings.employeeContactInfoHeader,
+                text = stringResource(Res.string.employee_contact_info_header),
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 style = MaterialTheme.typography.titleMedium,
@@ -271,7 +275,7 @@ private fun EmployeeProfileContactInfoSection(
                             EmployeeContactInfoView(
                                 onClick = { clipboardManager.setText(AnnotatedString(phone.value)) },
                                 icon = Icons.Outlined.Phone,
-                                title = phone.label ?: UsersThemeRes.strings.employeePhoneTitle,
+                                title = phone.label ?: stringResource(Res.string.employee_phone_title),
                                 value = phone.value,
                             )
                         }
@@ -281,7 +285,7 @@ private fun EmployeeProfileContactInfoSection(
                             EmployeeContactInfoView(
                                 onClick = { clipboardManager.setText(AnnotatedString(email.value)) },
                                 icon = Icons.Outlined.Email,
-                                title = email.label ?: UsersThemeRes.strings.employeeEmailTitle,
+                                title = email.label ?: stringResource(Res.string.employee_email_title),
                                 value = email.value,
                             )
                         }
@@ -291,7 +295,7 @@ private fun EmployeeProfileContactInfoSection(
                             EmployeeContactInfoView(
                                 onClick = { clipboardManager.setText(AnnotatedString(web.value)) },
                                 icon = Icons.Default.Language,
-                                title = web.label ?: UsersThemeRes.strings.employeeWebsiteTitle,
+                                title = web.label ?: stringResource(Res.string.employee_website_title),
                                 value = web.value,
                             )
                         }
@@ -301,7 +305,8 @@ private fun EmployeeProfileContactInfoSection(
                             EmployeeContactInfoView(
                                 onClick = { clipboardManager.setText(AnnotatedString(location.value)) },
                                 icon = Icons.Outlined.LocationOn,
-                                title = location.label ?: UsersThemeRes.strings.employeeLocationTitle,
+                                title = location.label
+                                    ?: stringResource(Res.string.employee_location_title),
                                 value = location.value,
                             )
                         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,35 +16,22 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.store
 
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.isActive
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import ru.aleshin.studyassistant.core.common.architecture.store.work.ActionResult
 import ru.aleshin.studyassistant.core.common.architecture.store.work.EffectResult
 import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
-import ru.aleshin.studyassistant.core.common.extensions.dateTimeByWeek
-import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
-import ru.aleshin.studyassistant.core.common.functional.Constants.Delay
+import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.HomeworkInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleInteractor
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.WeekScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsAction
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsOutput
@@ -66,25 +53,20 @@ internal interface DetailsWorkProcessor :
             is DetailsWorkCommand.UpdateIsHomeworkDone -> updateIsHomeworkDoneWork(command.homework, command.isDone)
         }
 
-        private fun loadWeekScheduleWork(week: TimeRange) = channelFlow {
-            var cycleUpdateJob: Job? = null
-            scheduleInteractor.fetchDetailsWeekSchedule(week).collect { scheduleEither ->
-                cycleUpdateJob?.cancelAndJoin()
-                scheduleEither.handle(
-                    onLeftAction = { send(EffectResult(DetailsEffect.ShowError(it))) },
-                    onRightAction = { weekScheduleDetails ->
-                        val currentTime = dateManager.fetchCurrentInstant()
-                        val weekSchedule = weekScheduleDetails.mapToUi(currentTime)
-
-                        send(ActionResult(DetailsAction.UpdateWeekSchedule(weekSchedule)))
-
-                        cycleUpdateJob = cycleUpdateActiveClass(weekSchedule)
-                            .onEach { send(it) }
-                            .launchIn(this)
-                            .apply { start() }
-                    }
-                )
-            }
+        private fun loadWeekScheduleWork(week: TimeRange) = flow<DetailsWorkResult> {
+            scheduleInteractor.fetchDetailsWeekSchedule(week).collectAndHandle(
+                onLeftAction = { emit(EffectResult(DetailsEffect.ShowError(it))) },
+                onRightAction = { overview ->
+                    emit(
+                        ActionResult(
+                            DetailsAction.UpdateWeekSchedule(
+                                schedule = overview.schedule.mapToUi(),
+                                activeClass = overview.activeClass?.mapToUi(),
+                            )
+                        )
+                    )
+                },
+            )
         }.onStart {
             emit(ActionResult(DetailsAction.UpdateLoading(true)))
         }
@@ -100,41 +82,6 @@ internal interface DetailsWorkProcessor :
             )
         }
 
-        private fun cycleUpdateActiveClass(schedule: WeekScheduleDetailsUi) = flow {
-            while (currentCoroutineContext().isActive) {
-                var activeClassData: ActiveClassUi? = null
-                val currentInstant = dateManager.fetchCurrentInstant()
-                val currentDateTime = currentInstant.toLocalDateTime(TimeZone.currentSystemDefault())
-
-                val weekDaySchedule = schedule.weekDaySchedules[currentDateTime.dayOfWeek]
-                val classesDate = currentDateTime.dayOfWeek.dateTimeByWeek(schedule.from)
-                val scheduleClasses = weekDaySchedule?.mapToValue(
-                    onBaseSchedule = { it?.classes },
-                    onCustomSchedule = { it?.classes }
-                )
-
-                if (scheduleClasses != null) {
-                    val activeClass = scheduleClasses.find { classModel ->
-                        val startInstant = classesDate.setHoursAndMinutes(classModel.timeRange.from)
-                        val endInstant = classesDate.setHoursAndMinutes(classModel.timeRange.to)
-                        return@find currentInstant in startInstant..endInstant
-                    }
-                    if (activeClass != null) {
-                        val startInstant = classesDate.setHoursAndMinutes(activeClass.timeRange.from)
-                        val endInstant = classesDate.setHoursAndMinutes(activeClass.timeRange.to)
-                        val isStarted = currentInstant > startInstant
-                        activeClassData = ActiveClassUi(
-                            uid = activeClass.uid,
-                            isStarted = isStarted,
-                            progress = dateManager.calculateProgress(startInstant, endInstant),
-                            duration = dateManager.calculateLeftDateTime(if (isStarted) endInstant else startInstant)
-                        )
-                    }
-                }
-                emit(ActionResult(DetailsAction.UpdateActiveClass(activeClassData)))
-                delay(Delay.UPDATE_ACTIVE_CLASS)
-            }
-        }
     }
 }
 
@@ -142,3 +89,5 @@ internal sealed class DetailsWorkCommand : WorkCommand {
     data class LoadWeekSchedule(val week: TimeRange) : DetailsWorkCommand()
     data class UpdateIsHomeworkDone(val homework: HomeworkDetailsUi, val isDone: Boolean) : DetailsWorkCommand()
 }
+
+internal typealias DetailsWorkResult = WorkResult<DetailsAction, DetailsEffect, DetailsOutput>

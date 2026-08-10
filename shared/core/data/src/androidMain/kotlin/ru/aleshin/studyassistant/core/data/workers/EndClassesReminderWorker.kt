@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,39 +16,32 @@
 
 package ru.aleshin.studyassistant.core.data.workers
 
-import android.app.AlarmManager
-import android.app.AlarmManager.RTC_WAKEUP
-import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_CANCEL_CURRENT
-import android.app.PendingIntent.FLAG_MUTABLE
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.getString
 import org.kodein.di.DI
 import org.kodein.di.DirectDIAware
 import org.kodein.di.bindProvider
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.di.coreCommonModule
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
-import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.common.messages.LocalNotificationReceiver
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.data.di.coreDataModule
+import ru.aleshin.studyassistant.core.data.managers.reminders.NotificationScheduler
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.end_classes_reminder_title as core_end_classes_reminder_title
 
 /**
  * @author Stanislav Aleshin on 22.08.2024.
@@ -63,18 +56,15 @@ class EndClassesReminderWorker(
         bindProvider<CrashlyticsService> { CrashlyticsService.Empty() }
         importAll(coreCommonModule, coreDataModule)
     }
-    private val coreStrings: StudyAssistantStrings
-        get() = fetchCoreStrings(fetchAppLanguage(applicationContext.fetchCurrentLanguage()))
-
-    private val alarmManager by lazy { applicationContext.getSystemService(AlarmManager::class.java) }
+    private val notificationScheduler = instance<NotificationScheduler>()
     private val dateManager = instance<DateManager>()
     private val calendarSettingsRepository = instance<CalendarSettingsRepository>()
     private val notificationSettingRepository = instance<NotificationSettingsRepository>()
     private val baseScheduleRepository = instance<BaseScheduleRepository>()
     private val customScheduleRepository = instance<CustomScheduleRepository>()
-    private val organizationsRepository = instance<OrganizationsRepository>()
 
     override suspend fun doWork(): Result {
+        val reminderTitle = getString(CoreRes.string.core_end_classes_reminder_title)
         val holidays = calendarSettingsRepository.fetchSettings().first().holidays
         val notificationSettings = notificationSettingRepository.fetchSettings().first()
 
@@ -93,28 +83,26 @@ class EndClassesReminderWorker(
             }
         }?.filter { classesEntry ->
             notificationSettings.exceptionsForEndOfClasses.contains(classesEntry.key.uid).not() &&
-                classesEntry.value.isNotEmpty()
+                    classesEntry.value.isNotEmpty()
         }
 
-        clearOldNotifications()
+        val notificationIds = buildList {
+            groupedClasses?.forEach { classesEntry ->
+                val endClassesTime = classesEntry.value.last().timeRange.to
+                val currentTime = dateManager.fetchCurrentInstant()
+                val targetTime = currentDate.setHoursAndMinutes(endClassesTime)
 
-        groupedClasses?.forEach { classesEntry ->
-            val endClassesTime = classesEntry.value.last().timeRange.to
-            val currentTime = dateManager.fetchCurrentInstant()
-            val targetTime = currentDate.setHoursAndMinutes(endClassesTime)
+                if (targetTime > currentTime) {
+                    val title = reminderTitle
+                    val body = classesEntry.key.shortName
 
-            if (targetTime > currentTime) {
-                val title = coreStrings.endClassesReminderTitle
-                val body = classesEntry.key.shortName
-
-                val id = classesEntry.key.uid.hashCode() + NOTIFICATION_ID_APPEND
-                val intent = LocalNotificationReceiver.createIntent(applicationContext, title, body)
-                val flag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
-                val pendingIntent = PendingIntent.getBroadcast(applicationContext, id, intent, flag)
-                val time = targetTime.toEpochMilliseconds()
-                alarmManager.setExactAndAllowWhileIdle(RTC_WAKEUP, time, pendingIntent)
+                    val id = classesEntry.key.uid.hashCode() + NOTIFICATION_ID_APPEND
+                    add(id)
+                    notificationScheduler.scheduleNotification(id, title, body, targetTime)
+                }
             }
         }
+        notificationScheduler.updateNotificationGroup(NOTIFICATION_GROUP, notificationIds)
 
         return Result.success()
     }
@@ -139,23 +127,10 @@ class EndClassesReminderWorker(
         }
     }
 
-    private suspend fun clearOldNotifications() {
-        val organizations = organizationsRepository.fetchAllShortOrganization().first()
-        organizations.forEach { organization ->
-            val id = organization.uid.hashCode() + NOTIFICATION_ID_APPEND
-            val intent = LocalNotificationReceiver.createCancelIntent(applicationContext)
-            val cancelFlag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
-            val cancelPendingIntent = PendingIntent.getBroadcast(applicationContext, id, intent, cancelFlag)
-            if (cancelPendingIntent != null) {
-                alarmManager.cancel(cancelPendingIntent)
-                cancelPendingIntent.cancel()
-            }
-        }
-    }
-
     companion object {
         const val WORK_KEY = "END_CLASSES_REMINDER_SCHEDULER"
         const val REPEAT_WORK_KEY = "END_CLASSES_REMINDER_SCHEDULER_REPEAT"
+        const val NOTIFICATION_GROUP = "END_CLASSES_REMINDERS"
         const val NOTIFICATION_ID_APPEND = 924
     }
 }

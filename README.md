@@ -44,14 +44,14 @@ Talk directly to your personal neural network assistant — a smart AI that not 
 ### 🎯 Daily Goals with Timer & Stopwatch
 Set clear daily goals and stay on track with built-in timers and a stopwatch. Organize your homework, track your focus sessions, and never miss a task again — ideal for maintaining momentum and beating procrastination.
 
-### 🌐 Offline-First with Seamless Sync
-No internet? No problem! The app is fully functional offline, and when you’re back online, everything syncs automatically across all your devices. Enjoy full freedom and reliability, wherever and whenever you study.
+### 🌐 Offline by Design
+Schedules, homework, TODOs, organizations, employees, subjects, settings, and your profile are stored locally and work without an account. Network access is used only when you explicitly share or import a schedule/homework item and when you use the AI assistant.
 
 ### 📚 Convenient Organization of Classes
 Divide all classes, subjects and assignments by educational organizations – colleges, schools, courses, universities, etc. Work comfortably with each of them and get the most out of your learning processes.
 
-### 👥 Share with Friends
-Stay connected with your friends! Add them to your network and share your schedules and homework from any organization. Share valuable information, stay in sync, and help each other succeed!
+### 🔗 Temporary Sharing
+Share schedules and homework with a short-lived code or QR link. The recipient sees a preview before importing the data into their local database; friends, contacts, and cloud profiles are not required.
 
 ### ⏰ Flexible Scheduling
 Design your recurring schedules with ease and make one-time adjustments for specific days. Change class durations, swap subjects, and keep a history of all schedule changes so you’re always on top of your time management.
@@ -79,7 +79,7 @@ Start today with the Study Assistant app—a powerful tool to make your learning
 >   <img alt="Info" src="https://raw.githubusercontent.com/Mqxx/GitHub-Markdown/main/blockquotes/badge/dark-theme/info.svg">
 > </picture><br>
 >
-> We do not share your account data with third parties without your consent. All information is securely stored on our Appwrite servers (Data of schedules, tasks, etc. in free version stored only in your phone's memory).
+> Study data is stored locally on the device. Only data explicitly sent through temporary sharing and AI requests leaves the device. The application has no account, subscription, or background cloud synchronization.
 
 # Screenshots
 
@@ -107,21 +107,19 @@ Start today with the Study Assistant app—a powerful tool to make your learning
 ###  
 
 ## Markets
-| Service        | Free version   | Subscription version |
-| -------------- | -------------- | -------------------- |
-| Github         | &check;        | &cross;              |
-| RuStore        | &check;        | &check;              |
-| App gallery    | &check;        | &check;              |
-| Play Market    | In planned     | In planned           |
-| App Store      | In planned     | In planned           |
+| Service        | Availability |
+| -------------- | ------------ |
+| GitHub         | &check;      |
+| RuStore        | &check;      |
+| AppGallery     | &check;      |
+| Play Market    | Planned      |
+| App Store      | Planned      |
 
 ## Technical capabilities
-| Flavor         | Crashlytics    | Offline-Support   | Messaging         | Reminders  |
-| -------------- | -------------- | ----------------- | ----------------- | ---------- |
-| Github         | &check;        | &check;           | FMS, HMS, RUSTORE | &check;    |
-| RuStore        | &check;        | &check;           | RUSTORE, HMS, FMS | &check;    |
-| Huawei         | &check;        | &check;           | HMS, RUSTORE      | &check;    |
-| Apple          | In progress    | &check;           | In planned (APNS) | In planned |
+| Platform       | Local data | Temporary sharing | AI | Local reminders |
+| -------------- | ---------- | ----------------- | -- | --------------- |
+| Android        | &check;    | &check;           | &check; | &check;   |
+| iOS            | &check;    | &check;           | &check; | In progress |
 
 # Project Dependencies
 
@@ -140,13 +138,10 @@ This project utilizes the following technologies and libraries:
 
 ## 🌐 Networking & API
 - **[Ktor](https://ktor.io/)**: Asynchronous HTTP client and server framework for Kotlin.
-- **[Google OAuth 2.0](https://developers.google.com/identity/protocols/oauth2)**: Secure authorization for Google APIs.
-- **[Appwrite REST API](https://appwrite.io/docs)**: Authorization, Database, Storage, Realtime service
-- **[Rustore UniversalPush](https://www.rustore.ru/help/sdk/general-push-notifications)**: Push notifications for alternative app stores.
-- **[Rustore Billing](https://www.rustore.ru/help/sdk/payments/kotlin-java)**: Rustore billing service for purchases.
-- **[Huawei IAP](https://developer.huawei.com/consumer/en/codelab/HMSInAppPurchase-Kotlin/)**: Huawei billing service for purchases.
-- **[Tracer](https://apptracer.ru/)**: Alternative crashlytics sevice.
-- **[MyTracker](https://tracker.my.com/ru/)**: Analytics serivce
+- **[Appwrite Functions](https://appwrite.io/docs/products/functions)**: Explicit temporary sharing and the shared AI endpoint.
+- **[DeepSeek API](https://api-docs.deepseek.com/)**: Optional personal-key AI mode.
+- **[Tracer](https://apptracer.ru/)**: Android crash reporting.
+- **[MyTracker](https://tracker.my.com/ru/)**: Android analytics.
 
 ## 🎨 UI & Navigation
 - **[Compose Material 3](https://developer.android.com/jetpack/compose/material)**: Material Design components for Jetpack Compose.
@@ -182,19 +177,16 @@ graph LR;
 
     subgraph one [Core]
     direction LR;
-    core --> common & ui & domain & data
+    core --> common & ui & presentation & domain & data
     data --> remote & database & client-api
     remote --> client-api
-    database --> client-api
     end
 
     shared --> features
 
     subgraph two [Features]
     direction LR;
-    features --> navigation-impl --> navigation-api 
     features --> preview-impl --> preview-api
-    features --> auth-impl --> auth-api
     features --> schedule-impl --> schedule-api
     features --> tasks-impl --> tasks-api
     features --> info-impl --> info-api
@@ -203,14 +195,13 @@ graph LR;
     features --> users-impl --> users-api
     features --> editor-impl --> editor-api
     features --> chat-impl --> chat-api
-    features --> bliing-impl --> bliing-api
     end
 ```
 
 # License
 
 ```
-Copyright 2025 Stanislav Aleshin
+Copyright 2026 Stanislav Aleshin
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

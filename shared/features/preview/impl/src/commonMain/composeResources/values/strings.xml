@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="continue_label">Next</string>
+    <string name="setup_label">Set up the app</string>
+    <string name="back_label">Back</string>
+    <string name="study_intro_title">Quickly and easily track your schedule</string>
+    <string name="study_intro_body">On the main screen, you can see the schedule for the current day, its progress, weekly workload, as well as all tasks</string>
+    <string name="analytics_intro_title">Perform assigned tasks more efficiently</string>
+    <string name="analytics_intro_body">A convenient task management system will help you better visualize the assigned tasks, distribute the entire workload by day of the week and much more</string>
+    <string name="organization_intro_title">Create different organizations and make daily changes</string>
+    <string name="organization_intro_body">The application supports working with several educational institutions and allows for quick daily adjustments to the permanent schedule</string>
+    <string name="sharing_intro_title">Share without an account</string>
+    <string name="sharing_intro_body">Send schedules and homework with a temporary code or QR. Your study data stays on this device.</string>
+    <string name="step_title">Step\u0020</string>
+    <string name="profile_step_title">Fill out your profile</string>
+    <string name="profile_button_label">Save</string>
+    <string name="organization_step_title">Create your first educational organization</string>
+    <string name="organization_button_label">Create</string>
+    <string name="calendar_step_title">Select the number of weeks in your schedule</string>
+    <string name="calendar_button_label">Continue</string>
+    <string name="schedule_step_title">Fill out the schedules and start using the app!</string>
+    <string name="schedule_fill_out_button_label">Fill out</string>
+    <string name="schedule_start_button_label">Start using</string>
+    <string name="username_label">Display Name *</string>
+    <string name="profile_description_label">Profile Description</string>
+    <string name="email_label">Email</string>
+    <string name="birthday_label">Birthday</string>
+    <string name="birthday_placeholder">Select a date</string>
+    <string name="gender_label">Gender</string>
+    <string name="gender_placeholder">Choose your gender</string>
+    <string name="short_name_label">Short name *</string>
+    <string name="short_name_placeholder">Enter a name</string>
+    <string name="organization_type_label">Type of organization *</string>
+    <string name="organization_type_placeholder">Choose the type</string>
+    <string name="phone_number_label">Phone number</string>
+    <string name="website_label">Website</string>
+    <string name="other_error_message">Error! Contact the developer!</string>
+</resources>

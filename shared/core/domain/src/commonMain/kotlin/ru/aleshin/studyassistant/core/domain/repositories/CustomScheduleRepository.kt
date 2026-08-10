@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
 
@@ -35,5 +34,4 @@ interface CustomScheduleRepository {
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<Class?>
     suspend fun deleteScheduleById(scheduleId: UID)
     suspend fun deleteSchedulesByTimeRange(timeRange: TimeRange)
-    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,14 +34,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.settings.NotificationSettings
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.common.SettingsSwitchView
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.contract.NotificationEffect
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.contract.NotificationEvent
@@ -51,6 +50,15 @@ import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.view
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.views.ExceptionOrganizationsChip
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.views.ReminderTimeChip
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.views.WorkloadRateChip
+import ru.aleshin.studyassistant.settings.impl.resources.Res
+import ru.aleshin.studyassistant.settings.impl.resources.begging_of_classes_notify_description
+import ru.aleshin.studyassistant.settings.impl.resources.begging_of_classes_notify_title
+import ru.aleshin.studyassistant.settings.impl.resources.end_of_classes_notify_description
+import ru.aleshin.studyassistant.settings.impl.resources.end_of_classes_notify_title
+import ru.aleshin.studyassistant.settings.impl.resources.high_workload_warning_notify_description
+import ru.aleshin.studyassistant.settings.impl.resources.high_workload_warning_notify_title
+import ru.aleshin.studyassistant.settings.impl.resources.unfinished_homeworks_notify_description
+import ru.aleshin.studyassistant.settings.impl.resources.unfinished_homeworks_notify_title
 
 /**
  * @author Stanislav Aleshin on 25.08.2024
@@ -62,8 +70,6 @@ internal fun NotificationContent(
 ) {
     val store = notificationComponent.store
     val state by store.stateAsState()
-    val strings = SettingsThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -90,9 +96,6 @@ internal fun NotificationContent(
                 onUpdateWorkloadWarningNotify = {
                     store.dispatchEvent(NotificationEvent.UpdateHighWorkloadWarningNotify(it))
                 },
-                onOpenBillingScreen = {
-                    store.dispatchEvent(NotificationEvent.NavigateToBilling)
-                }
             )
         },
         snackbarHost = {
@@ -108,7 +111,7 @@ internal fun NotificationContent(
         when (effect) {
             is NotificationEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -127,7 +130,6 @@ private fun NotificationContent(
     onUpdateEndOfClassesExceptions: (List<UID>) -> Unit,
     onUpdateUnfinishedHomeworksNotify: (Long?) -> Unit,
     onUpdateWorkloadWarningNotify: (Int?) -> Unit,
-    onOpenBillingScreen: () -> Unit,
 ) = with(state) {
     Column(
         modifier = modifier.padding(vertical = 24.dp).verticalScroll(scrollState),
@@ -137,14 +139,12 @@ private fun NotificationContent(
             enabled = settings != null,
             modifier = Modifier.padding(horizontal = 16.dp),
             checked = settings?.beginningOfClasses != null,
-            isPaidUser = isPaidUser,
-            onBuyContent = onOpenBillingScreen,
             onCheckedChange = { isChecked ->
                 val result = if (isChecked) NotificationSettings.BEFORE_BEGINNING_CLASSES_NOTIFY_TIME else null
                 onUpdateBeggingOfClassesNotify(result)
             },
-            title = SettingsThemeRes.strings.beggingOfClassesNotifyTitle,
-            description = SettingsThemeRes.strings.beggingOfClassesNotifyDescription,
+            title = stringResource(Res.string.begging_of_classes_notify_title),
+            description = stringResource(Res.string.begging_of_classes_notify_description),
         ) {
             if (settings?.beginningOfClasses != null) {
                 ExceptionOrganizationsChip(
@@ -162,11 +162,9 @@ private fun NotificationContent(
             enabled = settings != null,
             modifier = Modifier.padding(horizontal = 16.dp),
             checked = settings?.endOfClasses == true,
-            isPaidUser = isPaidUser,
-            onBuyContent = onOpenBillingScreen,
             onCheckedChange = { isChecked -> onUpdateEndOfClassesNotify(isChecked) },
-            title = SettingsThemeRes.strings.endOfClassesNotifyTitle,
-            description = SettingsThemeRes.strings.endOfClassesNotifyDescription,
+            title = stringResource(Res.string.end_of_classes_notify_title),
+            description = stringResource(Res.string.end_of_classes_notify_description),
         ) {
             if (settings?.endOfClasses == true) {
                 ExceptionOrganizationsChip(
@@ -181,14 +179,12 @@ private fun NotificationContent(
             enabled = settings != null,
             modifier = Modifier.padding(horizontal = 16.dp),
             checked = settings?.unfinishedHomeworks != null,
-            isPaidUser = isPaidUser,
-            onBuyContent = onOpenBillingScreen,
             onCheckedChange = { isChecked ->
                 val result = if (isChecked) NotificationSettings.UNFINISHED_HOMEWORKS_NOTIFY_TIME else null
                 onUpdateUnfinishedHomeworksNotify(result)
             },
-            title = SettingsThemeRes.strings.unfinishedHomeworksNotifyTitle,
-            description = SettingsThemeRes.strings.unfinishedHomeworksNotifyDescription,
+            title = stringResource(Res.string.unfinished_homeworks_notify_title),
+            description = stringResource(Res.string.unfinished_homeworks_notify_description),
         ) {
             if (settings?.unfinishedHomeworks != null) {
                 ReminderTimeChip(
@@ -201,14 +197,12 @@ private fun NotificationContent(
             enabled = settings != null,
             modifier = Modifier.padding(horizontal = 16.dp),
             checked = settings?.highWorkload != null,
-            isPaidUser = isPaidUser,
-            onBuyContent = onOpenBillingScreen,
             onCheckedChange = { isChecked ->
                 val result = if (isChecked) NotificationSettings.WORKLOAD_HIGH_VALUE else null
                 onUpdateWorkloadWarningNotify(result)
             },
-            title = SettingsThemeRes.strings.highWorkloadWarningNotifyTitle,
-            description = SettingsThemeRes.strings.highWorkloadWarningNotifyDescription,
+            title = stringResource(Res.string.high_workload_warning_notify_title),
+            description = stringResource(Res.string.high_workload_warning_notify_description),
         ) {
             if (settings?.highWorkload != null) {
                 WorkloadRateChip(

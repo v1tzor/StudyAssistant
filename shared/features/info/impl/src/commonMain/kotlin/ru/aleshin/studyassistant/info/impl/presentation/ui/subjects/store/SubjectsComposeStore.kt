@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.communicators.St
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsAction
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsEffect
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsEvent

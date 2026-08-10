@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.views.dialog.WarningAlertDialog
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.delete_goal_warning_text
+import ru.aleshin.studyassistant.tasks.impl.resources.delete_goal_warning_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.delete_confirm_title as core_delete_confirm_title
 
 /**
  * @author Stanislav Aleshin on 05.06.2025.
@@ -40,9 +44,9 @@ internal fun DeleteGoalWarningDialog(
     WarningAlertDialog(
         modifier = modifier,
         icon = { Icon(imageVector = Icons.Default.Delete, contentDescription = null) },
-        title = { Text(text = TasksThemeRes.strings.deleteGoalWarningTitle) },
-        text = { Text(text = TasksThemeRes.strings.deleteGoalWarningText) },
-        confirmTitle = StudyAssistantRes.strings.deleteConfirmTitle,
+        title = { Text(text = stringResource(Res.string.delete_goal_warning_title)) },
+        text = { Text(text = stringResource(Res.string.delete_goal_warning_text)) },
+        confirmTitle = stringResource(CoreRes.string.core_delete_confirm_title),
         onDismiss = onDismiss,
         onConfirm = onDelete,
     )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,59 +78,40 @@ fun List<AiAssistantMessage>.filterNotTools() = filter {
     it.type == Type.USER || it.type == Type.ASSISTANT
 }
 
-/**
- * Optimizes a message history for sending to the AI assistant.
- *
- * If the total number of messages exceeds [defaultMaxMessages], this function returns:
- * - The last [defaultMaxMessages] messages,
- * - Any preceding system messages,
- * - One additional user message (if available), to provide context for the assistant.
- *
- * This ensures that the assistant receives the most recent messages,
- * necessary system context, and a triggering user prompt.
- *
- * @param defaultMaxMessages The number of recent messages to retain (default is 15).
- * @return A list of messages optimized for assistant input.
- *
- * @author Stanislav Aleshin on 21.06.2025.
- */
 fun List<AiAssistantMessage>.optimisedMessagesForSend(
-    defaultMaxMessages: Int = 15
+    tokenBudget: Int = 6_000,
 ): List<AiAssistantMessage> {
     val messages = this.sortedBy { it.time }
-    return if (size <= 15) {
-        messages
-    } else {
-        val lastMessages = takeLast(defaultMaxMessages)
-        val firstLastMessageIndex = size - defaultMaxMessages
-        val requiredMessages = buildList {
-            var isUserMessageAdded = false
-            for (i in (firstLastMessageIndex - 1) downTo 0 step 1) {
-                if (messages[i] is AiAssistantMessage.SystemMessage) {
-                    add(messages[i])
-                } else if (!isUserMessageAdded) {
-                    add(messages[i])
-                    if (messages[i] is AiAssistantMessage.UserMessage) isUserMessageAdded = true
-                }
+    val systemMessages = messages.filterIsInstance<AiAssistantMessage.SystemMessage>()
+    val conversationTurns = messages.filterNot { it is AiAssistantMessage.SystemMessage }
+        .fold(mutableListOf<MutableList<AiAssistantMessage>>()) { turns, message ->
+            if (message is AiAssistantMessage.UserMessage || turns.isEmpty()) {
+                turns += mutableListOf(message)
+            } else {
+                turns.last() += message
             }
+            turns
         }
-        return requiredMessages.reversed() + lastMessages
+
+    var remainingTokens = tokenBudget - systemMessages.sumOf(AiAssistantMessage::estimatedTokens)
+    val selectedTurns = mutableListOf<List<AiAssistantMessage>>()
+    for (turn in conversationTurns.asReversed()) {
+        val turnTokens = turn.sumOf(AiAssistantMessage::estimatedTokens)
+        if (selectedTurns.isNotEmpty() && turnTokens > remainingTokens) break
+        selectedTurns += turn
+        remainingTokens -= turnTokens
+        if (remainingTokens <= 0) break
     }
+    return systemMessages + selectedTurns.asReversed().flatten()
 }
 
-/**
- * Drops all unconfirmed messages at the end of the message list,
- * up to and including the most recent confirmed assistant response.
- *
- * This is useful when recovering from a failed or interrupted request (e.g., due to network loss),
- * so that incomplete or invalid messages are discarded and the chat is rolled back
- * to the last known good assistant message.
- *
- * @param onDrop Callback triggered for each dropped message.
- * @return A cleaned list of confirmed messages.
- *
- * @author Stanislav Aleshin on 21.06.2025.
- */
+private fun AiAssistantMessage.estimatedTokens(): Int {
+    val toolPayloadSize = (this as? AiAssistantMessage.AssistantMessage)?.toolCalls
+        ?.sumOf { call -> call.function.arguments?.toString()?.length ?: 0 }
+        ?: 0
+    return ((content?.length ?: 0) + toolPayloadSize + 3) / 4 + 8
+}
+
 suspend fun List<AiAssistantMessage>.dropUnconfirmedMessages(
     onDrop: suspend (AiAssistantMessage) -> Unit,
 ): List<AiAssistantMessage> {

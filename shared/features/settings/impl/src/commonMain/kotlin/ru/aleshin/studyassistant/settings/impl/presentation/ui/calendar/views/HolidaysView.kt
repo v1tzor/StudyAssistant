@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,10 +62,12 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.settings.HolidaysUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.topSide
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
@@ -75,12 +77,28 @@ import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseCheckedDialog
 import ru.aleshin.studyassistant.core.ui.views.dialog.CheckedItemView
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
-import ru.aleshin.studyassistant.settings.impl.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.EditHolidaysUi
-import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.HolidaysUi
 import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.convertToBase
 import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.convertToEdit
-import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
+import ru.aleshin.studyassistant.settings.impl.resources.Res
+import ru.aleshin.studyassistant.settings.impl.resources.holidays_date_picker_headline
+import ru.aleshin.studyassistant.settings.impl.resources.holidays_date_placeholder
+import ru.aleshin.studyassistant.settings.impl.resources.holidays_editor_header
+import ru.aleshin.studyassistant.settings.impl.resources.holidays_end_label
+import ru.aleshin.studyassistant.settings.impl.resources.holidays_organizations_label
+import ru.aleshin.studyassistant.settings.impl.resources.holidays_organizations_placeholder
+import ru.aleshin.studyassistant.settings.impl.resources.holidays_organizations_selector_header
+import ru.aleshin.studyassistant.settings.impl.resources.holidays_start_label
+import ru.aleshin.studyassistant.settings.impl.resources.holidays_view_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.add_title as core_add_title
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
+import ru.aleshin.studyassistant.core.ui.resources.date_picker_dialog_header as core_date_picker_dialog_header
+import ru.aleshin.studyassistant.core.ui.resources.delete_confirm_title as core_delete_confirm_title
+import ru.aleshin.studyassistant.core.ui.resources.ic_organization_geo as core_ic_organization_geo
+import ru.aleshin.studyassistant.core.ui.resources.ic_select_date as core_ic_select_date
+import ru.aleshin.studyassistant.core.ui.resources.save_confirm_title as core_save_confirm_title
+import ru.aleshin.studyassistant.core.ui.resources.select_confirm_title as core_select_confirm_title
 
 /**
  * @author Stanislav Aleshin on 30.08.2024.
@@ -121,7 +139,7 @@ internal fun HolidaysView(
                     )
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = SettingsThemeRes.strings.holidaysViewTitle,
+                        text = stringResource(Res.string.holidays_view_title),
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.titleMedium,
                     )
@@ -219,7 +237,7 @@ private fun HolidayViewItem(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                val dateFormat = DateTimeComponents.Formats.dayMonthFormat(StudyAssistantRes.strings)
+                val dateFormat = DateTimeComponents.Formats.dayMonthFormat()
                 Text(
                     text = start.format(dateFormat),
                     color = MaterialTheme.colorScheme.onSurface,
@@ -278,7 +296,7 @@ private fun AddHolidayViewItem(
                 contentDescription = null,
             )
             Text(
-                text = StudyAssistantRes.strings.addTitle,
+                text = stringResource(CoreRes.string.core_add_title),
                 maxLines = 1,
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -304,7 +322,7 @@ private fun HolidayOrganizationView(
         ) {
             Icon(
                 modifier = Modifier.size(18.dp),
-                painter = painterResource(StudyAssistantRes.icons.organizationGeo),
+                painter = painterResource(CoreRes.drawable.core_ic_organization_geo),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
             )
@@ -348,7 +366,7 @@ private fun HolidaysEditorDialog(
             shadowElevation = 4.dp,
         ) {
             Column {
-                DialogHeader(header = SettingsThemeRes.strings.holidaysEditorHeader)
+                DialogHeader(header = stringResource(Res.string.holidays_editor_header))
                 HorizontalDivider()
                 Column(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
@@ -361,14 +379,14 @@ private fun HolidaysEditorDialog(
                     ClickableTextField(
                         onClick = { startDatePickerState = true },
                         value = editableHoliday.start?.formatByTimeZone(
-                            format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings)
+                            format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat()
                         ),
-                        label = SettingsThemeRes.strings.holidaysStartLabel,
-                        placeholder = SettingsThemeRes.strings.holidaysDatePlaceholder,
+                        label = stringResource(Res.string.holidays_start_label),
+                        placeholder = stringResource(Res.string.holidays_date_placeholder),
                         backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
                         trailingIcon = {
                             Icon(
-                                painter = painterResource(StudyAssistantRes.icons.selectDate),
+                                painter = painterResource(CoreRes.drawable.core_ic_select_date),
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -378,14 +396,14 @@ private fun HolidaysEditorDialog(
                     ClickableTextField(
                         onClick = { endDatePickerState = true },
                         value = editableHoliday.end?.formatByTimeZone(
-                            format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings)
+                            format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat()
                         ),
-                        label = SettingsThemeRes.strings.holidaysEndLabel,
-                        placeholder = SettingsThemeRes.strings.holidaysDatePlaceholder,
+                        label = stringResource(Res.string.holidays_end_label),
+                        placeholder = stringResource(Res.string.holidays_date_placeholder),
                         backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
                         trailingIcon = {
                             Icon(
-                                painter = painterResource(StudyAssistantRes.icons.selectDate),
+                                painter = painterResource(CoreRes.drawable.core_ic_select_date),
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -395,9 +413,9 @@ private fun HolidaysEditorDialog(
                     ClickableTextField(
                         onClick = { organizationsPickerState = true },
                         value = selectedOrganizations.takeIf { it.isNotEmpty() }?.joinToString { it.shortName },
-                        label = SettingsThemeRes.strings.holidaysOrganizationsLabel,
+                        label = stringResource(Res.string.holidays_organizations_label),
                         backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
-                        placeholder = SettingsThemeRes.strings.holidaysOrganizationsPlaceholder,
+                        placeholder = stringResource(Res.string.holidays_organizations_placeholder),
                         trailingIcon = {
                             ExpandedIcon(
                                 isExpanded = organizationsPickerState,
@@ -443,8 +461,8 @@ private fun HolidaysEditorDialog(
                 DialogButtons(
                     enabledConfirmFirst = editableHoliday.isValid(),
                     enabledConfirmSecond = holiday != null,
-                    confirmFirstTitle = StudyAssistantRes.strings.saveConfirmTitle,
-                    confirmSecondTitle = StudyAssistantRes.strings.deleteConfirmTitle,
+                    confirmFirstTitle = stringResource(CoreRes.string.core_save_confirm_title),
+                    confirmSecondTitle = stringResource(CoreRes.string.core_delete_confirm_title),
                     onCancelClick = onDismissRequest,
                     onConfirmFirstClick = { onSave(editableHoliday.convertToBase()) },
                     onConfirmSecondClick = { if (holiday != null) onDelete(holiday) },
@@ -475,12 +493,12 @@ private fun HolidayDatePicker(
                     val birthday = selectedDate.mapEpochTimeToInstant()
                     onSelectedDate.invoke(birthday)
                 },
-                content = { Text(text = StudyAssistantRes.strings.selectConfirmTitle) }
+                content = { Text(text = stringResource(CoreRes.string.core_select_confirm_title)) }
             )
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = StudyAssistantRes.strings.cancelTitle)
+                Text(text = stringResource(CoreRes.string.core_cancel_title))
             }
         },
     ) {
@@ -489,13 +507,13 @@ private fun HolidayDatePicker(
             title = {
                 Text(
                     modifier = Modifier.padding(start = 24.dp, top = 24.dp),
-                    text = StudyAssistantRes.strings.datePickerDialogHeader,
+                    text = stringResource(CoreRes.string.core_date_picker_dialog_header),
                 )
             },
             headline = {
                 Text(
                     modifier = Modifier.padding(start = 24.dp),
-                    text = SettingsThemeRes.strings.holidaysDatePickerHeadline,
+                    text = stringResource(Res.string.holidays_date_picker_headline),
                 )
             },
         )
@@ -517,7 +535,7 @@ internal fun OrganizationsSelectorDialog(
         modifier = modifier,
         selected = selectedOrganizations,
         items = organizations,
-        header = SettingsThemeRes.strings.holidaysOrganizationsSelectorHeader,
+        header = stringResource(Res.string.holidays_organizations_selector_header),
         title = null,
         itemView = { organization ->
             val isSelected = selectedOrganizations.contains(organization)
@@ -531,7 +549,7 @@ internal fun OrganizationsSelectorDialog(
                 },
                 selected = isSelected,
                 title = organization.shortName,
-                label = organization.type.mapToSting(StudyAssistantRes.strings),
+                label = organization.type.mapToSting(),
             )
         },
         onDismiss = onDismiss,

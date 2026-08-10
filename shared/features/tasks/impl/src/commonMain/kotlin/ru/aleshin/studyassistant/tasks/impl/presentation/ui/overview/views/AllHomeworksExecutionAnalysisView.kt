@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,10 +40,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkUi
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.all_homeworks_execution_analysis_title
+import ru.aleshin.studyassistant.tasks.impl.resources.homework_errors_title
+import ru.aleshin.studyassistant.tasks.impl.resources.homeworks_completed_title
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_alert_triangular
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_menu_open
 
 /**
  * @author Stanislav Aleshin on 29.06.2024.
@@ -62,7 +68,7 @@ internal fun AllHomeworksExecutionAnalysisView(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = TasksThemeRes.strings.allHomeworksExecutionAnalysisTitle,
+            text = stringResource(Res.string.all_homeworks_execution_analysis_title),
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleSmall,
@@ -85,7 +91,7 @@ internal fun AllHomeworksExecutionAnalysisView(
                     )
                     Text(
                         modifier = Modifier.animateContentSize().weight(1f),
-                        text = TasksThemeRes.strings.homeworksCompletedTitle,
+                        text = stringResource(Res.string.homeworks_completed_title),
                         color = StudyAssistantRes.colors.accents.onGreenContainer,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
@@ -130,13 +136,13 @@ internal fun AllHomeworksExecutionAnalysisView(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            painter = painterResource(TasksThemeRes.icons.homeworkError),
+                            painter = painterResource(Res.drawable.ic_alert_triangular),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.error,
                         )
                         Text(
                             modifier = Modifier.animateContentSize().weight(1f),
-                            text = TasksThemeRes.strings.homeworkErrorsTitle,
+                            text = stringResource(Res.string.homework_errors_title),
                             color = MaterialTheme.colorScheme.error,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1,
@@ -176,7 +182,7 @@ internal fun AllHomeworksExecutionAnalysisView(
                 ) {
                     Icon(
                         modifier = Modifier.wrapContentSize(Alignment.Center).size(24.dp),
-                        painter = painterResource(TasksThemeRes.icons.openMenu),
+                        painter = painterResource(Res.drawable.ic_menu_open),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.error,
                     )

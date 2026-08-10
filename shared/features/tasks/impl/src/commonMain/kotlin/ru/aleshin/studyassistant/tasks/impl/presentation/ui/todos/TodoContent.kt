@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,11 +46,9 @@ import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEf
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewItem
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewItemPlaceholder
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewNoneItem
@@ -70,8 +68,6 @@ internal fun TodoContent(
 ) {
     val store = todoComponent.store
     val state by store.stateAsState()
-    val strings = TasksThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -121,7 +117,7 @@ internal fun TodoContent(
         when (effect) {
             is TodoEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }

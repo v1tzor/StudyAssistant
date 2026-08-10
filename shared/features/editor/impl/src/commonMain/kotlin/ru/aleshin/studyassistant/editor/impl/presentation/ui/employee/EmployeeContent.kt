@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,18 +40,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.BirthdayInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EmailInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationsInfoFields
@@ -66,6 +65,10 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.Empl
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeePostInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeeTopBar
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.WorkTimeInfoField
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.contact_info_section_header
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.exceeding_limit_image_size_message as core_exceeding_limit_image_size_message
 
 /**
  * @author Stanislav Aleshin on 06.06.2024
@@ -77,8 +80,7 @@ internal fun EmployeeContent(
 ) {
     val store = employeeComponent.store
     val state by store.stateAsState()
-    val strings = EditorThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
+    val coreExceedingLimitImageSizeMessage = stringResource(CoreRes.string.core_exceeding_limit_image_size_message)
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
 
@@ -105,7 +107,7 @@ internal fun EmployeeContent(
                 onExceedingAvatarSizeLimit = {
                     coroutineScope.launch {
                         snackbarState.showSnackbar(
-                            message = coreStrings.exceedingLimitImageSizeMessage,
+                            message = coreExceedingLimitImageSizeMessage,
                             withDismissAction = true,
                         )
                     }
@@ -131,7 +133,7 @@ internal fun EmployeeContent(
         when (effect) {
             is EmployeeEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -209,7 +211,7 @@ private fun BaseEmployeeContent(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = EditorThemeRes.strings.contactInfoSectionHeader,
+                    text = stringResource(Res.string.contact_info_section_header),
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.labelSmall,
                 )

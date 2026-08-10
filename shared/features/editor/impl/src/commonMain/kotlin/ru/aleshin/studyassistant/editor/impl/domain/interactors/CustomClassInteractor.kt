@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,10 +37,27 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
  */
 internal interface CustomClassInteractor {
 
-    suspend fun addClassBySchedule(classModel: Class, schedule: CustomSchedule): DomainResult<EditorFailures, UID>
+    suspend fun addClassBySchedule(
+        classModel: Class,
+        schedule: CustomSchedule
+    ): DomainResult<EditorFailures, UID>
+
     suspend fun fetchClass(classId: UID, scheduleId: UID): FlowDomainResult<EditorFailures, Class?>
-    suspend fun updateClassBySchedule(classModel: Class, schedule: CustomSchedule): DomainResult<EditorFailures, UID>
-    suspend fun deleteClassBySchedule(uid: UID, schedule: CustomSchedule): UnitDomainResult<EditorFailures>
+    suspend fun updateClassBySchedule(
+        classModel: Class,
+        schedule: CustomSchedule
+    ): DomainResult<EditorFailures, UID>
+
+    suspend fun deleteClassBySchedule(
+        uid: UID,
+        schedule: CustomSchedule
+    ): UnitDomainResult<EditorFailures>
+
+    suspend fun swapClassTimeRanges(
+        from: Class,
+        to: Class,
+        schedule: CustomSchedule,
+    ): UnitDomainResult<EditorFailures>
 
     class Base(
         private val customScheduleRepository: CustomScheduleRepository,
@@ -101,7 +118,29 @@ internal interface CustomClassInteractor {
             uid: UID,
             schedule: CustomSchedule,
         ) = eitherWrapper.wrapUnit {
-            val updatedClasses = schedule.classes.toMutableList().apply { removeAll { it.uid == uid } }
+            val updatedClasses =
+                schedule.classes.toMutableList().apply { removeAll { it.uid == uid } }
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val updatedSchedule = schedule.copy(classes = updatedClasses, updatedAt = updatedAt)
+
+            customScheduleRepository.addOrUpdateSchedule(updatedSchedule).apply {
+                updateReminderServices()
+            }
+        }
+
+        override suspend fun swapClassTimeRanges(
+            from: Class,
+            to: Class,
+            schedule: CustomSchedule,
+        ) = eitherWrapper.wrapUnit {
+            val fromIndex = schedule.classes.indexOfFirst { it.uid == from.uid }
+            val toIndex = schedule.classes.indexOfFirst { it.uid == to.uid }
+            check(fromIndex >= 0 && toIndex >= 0)
+
+            val updatedClasses = schedule.classes.toMutableList().apply {
+                set(fromIndex, from.copy(timeRange = to.timeRange))
+                set(toIndex, to.copy(timeRange = from.timeRange))
+            }
             val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val updatedSchedule = schedule.copy(classes = updatedClasses, updatedAt = updatedAt)
 
@@ -112,9 +151,7 @@ internal interface CustomClassInteractor {
 
         private suspend fun updateReminderServices() {
             val notificationSettings = notificationSettingsRepository.fetchSettings().first()
-            if (notificationSettings.beginningOfClasses != null) {
-                startClassesReminderManager.startOrRetryReminderService()
-            }
+            startClassesReminderManager.startOrRetryReminderService()
             if (notificationSettings.endOfClasses) {
                 endClassesReminderManager.startOrRetryReminderService()
             }

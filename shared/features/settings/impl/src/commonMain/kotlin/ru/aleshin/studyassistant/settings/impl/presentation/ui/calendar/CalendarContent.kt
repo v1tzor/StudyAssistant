@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,21 +34,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.presentation.models.settings.HolidaysUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.HolidaysUi
-import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.contract.CalendarEffect
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.contract.CalendarEvent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.contract.CalendarState
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.store.CalendarComponent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.views.HolidaysView
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.common.SettingsSelectorView
+import ru.aleshin.studyassistant.settings.impl.resources.Res
+import ru.aleshin.studyassistant.settings.impl.resources.ic_calendar_week
+import ru.aleshin.studyassistant.settings.impl.resources.number_of_repeat_week_view_title
 
 /**
  * @author Stanislav Aleshin on 10.07.2024
@@ -60,8 +62,6 @@ internal fun CalendarContent(
 ) {
     val store = calendarComponent.store
     val state by store.stateAsState()
-    val strings = SettingsThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -91,7 +91,7 @@ internal fun CalendarContent(
         when (effect) {
             is CalendarEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -117,9 +117,9 @@ private fun BaseCalendarContent(
             enabled = state.settings != null,
             selected = state.settings?.numberOfWeek,
             allItems = remember { NumberOfRepeatWeek.entries.toList() },
-            icon = painterResource(SettingsThemeRes.icons.numberOfWeek),
-            title = SettingsThemeRes.strings.numberOfRepeatWeekViewTitle,
-            itemName = { it.mapToSting(StudyAssistantRes.strings) },
+            icon = painterResource(Res.drawable.ic_calendar_week),
+            title = stringResource(Res.string.number_of_repeat_week_view_title),
+            itemName = { it.mapToSting() },
         )
         HolidaysView(
             modifier = Modifier.padding(horizontal = 16.dp),

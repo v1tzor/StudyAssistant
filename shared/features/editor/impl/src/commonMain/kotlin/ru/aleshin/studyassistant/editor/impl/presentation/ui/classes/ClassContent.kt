@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,14 +35,12 @@ import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeDetailsUi
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassState
@@ -64,8 +62,6 @@ internal fun ClassContent(
 ) {
     val store = classComponent.store
     val state by store.stateAsState()
-    val strings = EditorThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -131,7 +127,7 @@ internal fun ClassContent(
         when (effect) {
             is ClassEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -161,10 +157,12 @@ private fun BaseClassContent(
         modifier = modifier.fillMaxSize().padding(top = 20.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        val selectedOrganization = remember(state.organizations, state.editableClass?.organization) {
-            state.organizations.find { it.uid == state.editableClass?.organization?.uid }
-        }
+        val selectedOrganization =
+            remember(state.organizations, state.editableClass?.organization) {
+                state.organizations.find { it.uid == state.editableClass?.organization?.uid }
+            }
         OrganizationInfoField(
+            required = true,
             isLoading = state.isLoading,
             organization = selectedOrganization,
             allOrganization = state.organizations,

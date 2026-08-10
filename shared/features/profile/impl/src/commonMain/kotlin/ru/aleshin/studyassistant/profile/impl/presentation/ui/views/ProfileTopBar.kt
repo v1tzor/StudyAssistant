@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,23 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.ui.views
 
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarButton
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarEmptyButton
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
-import ru.aleshin.studyassistant.profile.impl.presentation.theme.ProfileThemeRes
+import ru.aleshin.studyassistant.profile.impl.resources.Res
+import ru.aleshin.studyassistant.profile.impl.resources.edit_profile_desc
+import ru.aleshin.studyassistant.profile.impl.resources.ic_edit
+import ru.aleshin.studyassistant.profile.impl.resources.profile_header
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -37,30 +42,24 @@ import ru.aleshin.studyassistant.profile.impl.presentation.theme.ProfileThemeRes
 internal fun ProfileTopBar(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    onSignOutClick: () -> Unit,
     onEditClick: () -> Unit,
 ) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         modifier = modifier,
         title = {
             TopAppBarTitle(
                 textAlign = TextAlign.Center,
-                header = ProfileThemeRes.strings.profileHeader,
+                header = stringResource(Res.string.profile_header),
             )
         },
         navigationIcon = {
-            TopAppBarButton(
-                enabled = enabled,
-                imagePainter = painterResource(ProfileThemeRes.icons.signOut),
-                imageDescription = ProfileThemeRes.strings.signOutDesc,
-                onButtonClick = onSignOutClick,
-            )
+            TopAppBarEmptyButton()
         },
         actions = {
             TopAppBarButton(
                 enabled = enabled,
-                imagePainter = painterResource(ProfileThemeRes.icons.edit),
-                imageDescription = ProfileThemeRes.strings.editProfileDesc,
+                imagePainter = painterResource(Res.drawable.ic_edit),
+                imageDescription = stringResource(Res.string.edit_profile_desc),
                 onButtonClick = onEditClick,
             )
         },

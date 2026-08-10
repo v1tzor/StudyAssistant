@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,10 +40,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants.Text.TASK_MAX_LENGTH
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.InfoTextField
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.practice_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.practice_field_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.presentations_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.presentations_field_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.task_title
+import ru.aleshin.studyassistant.editor.impl.resources.theory_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.theory_field_placeholder
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_book_study as core_ic_book_study
+import ru.aleshin.studyassistant.core.ui.resources.ic_presentation as core_ic_presentation
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
 
 /**
  * @author Stanislav Aleshin on 23.06.2024.
@@ -75,7 +87,7 @@ internal fun HomeworkTasksFields(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = EditorThemeRes.strings.taskTitle,
+                text = stringResource(Res.string.task_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleSmall,
             )
@@ -90,9 +102,9 @@ internal fun HomeworkTasksFields(
                 editableTheory = it
                 onTaskChange(it, editablePractice, editablePresentations)
             },
-            label = EditorThemeRes.strings.theoryFieldLabel,
-            leadingInfoIcon = painterResource(StudyAssistantRes.icons.theoreticalTasks),
-            placeholder = { Text(text = EditorThemeRes.strings.theoryFieldPlaceholder) },
+            label = stringResource(Res.string.theory_field_label),
+            leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_book_study),
+            placeholder = { Text(text = stringResource(Res.string.theory_field_placeholder)) },
             trailingIcon = {
                 if (theoryInteraction.collectIsFocusedAsState().value) {
                     IconButton(onClick = { focusManager.clearFocus() }) {
@@ -115,9 +127,9 @@ internal fun HomeworkTasksFields(
                 editablePractice = it
                 onTaskChange(editableTheory, it, editablePresentations)
             },
-            label = EditorThemeRes.strings.practiceFieldLabel,
-            leadingInfoIcon = painterResource(StudyAssistantRes.icons.practicalTasks),
-            placeholder = { Text(text = EditorThemeRes.strings.practiceFieldPlaceholder) },
+            label = stringResource(Res.string.practice_field_label),
+            leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_tasks_circular),
+            placeholder = { Text(text = stringResource(Res.string.practice_field_placeholder)) },
             trailingIcon = {
                 if (practiceInteraction.collectIsFocusedAsState().value) {
                     IconButton(onClick = { focusManager.clearFocus() }) {
@@ -140,9 +152,9 @@ internal fun HomeworkTasksFields(
                 editablePresentations = it
                 onTaskChange(editableTheory, editablePractice, it)
             },
-            label = EditorThemeRes.strings.presentationsFieldLabel,
-            leadingInfoIcon = painterResource(StudyAssistantRes.icons.presentationTasks),
-            placeholder = { Text(text = EditorThemeRes.strings.presentationsFieldPlaceholder) },
+            label = stringResource(Res.string.presentations_field_label),
+            leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_presentation),
+            placeholder = { Text(text = stringResource(Res.string.presentations_field_placeholder)) },
             trailingIcon = {
                 if (presentationsInteraction.collectIsFocusedAsState().value) {
                     IconButton(onClick = { focusManager.clearFocus() }) {

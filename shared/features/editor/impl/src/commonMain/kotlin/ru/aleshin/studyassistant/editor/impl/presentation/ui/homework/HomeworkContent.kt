@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,13 +37,11 @@ import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.schedules.ClassUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.OrganizationInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.SubjectInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.TaskPriorityInfoView
@@ -67,8 +65,6 @@ internal fun HomeworkContent(
 ) {
     val store = homeworkComponent.store
     val state by store.stateAsState()
-    val strings = EditorThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -77,7 +73,13 @@ internal fun HomeworkContent(
             BaseHomeworkContent(
                 state = state,
                 modifier = Modifier.padding(paddingValues),
-                onAddOrganization = { store.dispatchEvent(HomeworkEvent.NavigateToOrganizationEditor(null)) },
+                onAddOrganization = {
+                    store.dispatchEvent(
+                        HomeworkEvent.NavigateToOrganizationEditor(
+                            null
+                        )
+                    )
+                },
                 onAddSubject = { store.dispatchEvent(HomeworkEvent.NavigateToSubjectEditor(null)) },
                 onEditSubject = { store.dispatchEvent(HomeworkEvent.NavigateToSubjectEditor(it.uid)) },
                 onSelectedOrganization = { store.dispatchEvent(HomeworkEvent.UpdateOrganization(it)) },
@@ -122,7 +124,7 @@ internal fun HomeworkContent(
         when (effect) {
             is HomeworkEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,15 @@ import kotlinx.datetime.Instant
  */
 expect class NotificationScheduler {
     fun scheduleNotification(id: Int, title: String, body: String, time: Instant)
-    fun scheduleRepeatNotification(id: Int, title: String, body: String, time: Instant, interval: Long)
+    fun scheduleOngoingNotification(
+        id: Int,
+        title: String,
+        body: String,
+        time: Instant,
+        endTime: Instant,
+    )
+
+    fun updateNotificationGroup(group: String, notificationIds: List<Int>)
+    fun clearNotificationGroup(group: String)
     fun cancelNotification(id: Int)
 }

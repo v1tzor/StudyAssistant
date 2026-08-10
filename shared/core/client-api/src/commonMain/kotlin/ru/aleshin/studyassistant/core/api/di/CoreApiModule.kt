@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.api.auth.AuthUserStorage
 import ru.aleshin.studyassistant.core.api.client.AppwriteClient
 import ru.aleshin.studyassistant.core.api.cookies.PreferencesCookiesStorage
 import ru.aleshin.studyassistant.core.api.databases.DatabaseService
+import ru.aleshin.studyassistant.core.api.functions.FunctionsService
 import ru.aleshin.studyassistant.core.api.realtime.RealtimeService
 import ru.aleshin.studyassistant.core.api.storage.StorageService
 
@@ -37,19 +38,11 @@ val coreClintApiModule = DI.Module("CoreClientApi") {
 
     bindSingleton<PreferencesCookiesStorage> { PreferencesCookiesStorage.Base(instance()) }
 
-    bindSingleton<AppwriteClient> {
-        val creator = AppwriteClient.Companion.Creator(
-            headersProvider = instance(),
-            coroutineManager = instance(),
-            httpClientEngineFactory = instance(),
-            cookiesStorage = instance(),
-            connectionManager = instance(),
-        )
-        return@bindSingleton creator.setup()
-    }
+    bindSingleton<AppwriteClient> { val creator = AppwriteClient.Companion.Creator(headersProvider = instance(), coroutineManager = instance(), httpClientEngineFactory = instance(), cookiesStorage = instance(), connectionManager = instance()); return@bindSingleton creator.setup() }
     bindSingleton<AccountService> { AccountService(instance(), instance(), instance(), instance()) }
     bindSingleton<StorageService> { StorageService(instance()) }
     bindSingleton<DatabaseService> { DatabaseService(instance(), instance()) }
+    bindSingleton<FunctionsService> { FunctionsService(instance()) }
     bindSingleton<RealtimeService> { RealtimeService(instance(), instance(), instance()) }
 
     bindSingleton<AuthUserStorage> { AuthUserStorage.Base(instance()) }

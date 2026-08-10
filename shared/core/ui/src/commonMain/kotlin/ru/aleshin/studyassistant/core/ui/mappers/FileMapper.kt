@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@
 
 package ru.aleshin.studyassistant.core.ui.mappers
 
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.path
+import io.github.vinceglb.filekit.readBytes
 import ru.aleshin.studyassistant.core.common.functional.getMimeTypeFromFileName
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.ui.models.InputFileUi

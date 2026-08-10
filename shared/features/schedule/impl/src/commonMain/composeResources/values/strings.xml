@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="overview_header">Overview</string>
+    <string name="details_header">Schedule</string>
+    <string name="share_header">Sharing a schedule</string>
+    <string name="current_week_title">Current week</string>
+    <string name="previous_week_title">Previous week</string>
+    <string name="next_week_title">Next week</string>
+    <string name="common_schedule_view_type">General view</string>
+    <string name="vertical_schedule_view_type">Vertical view</string>
+    <string name="test_label">Test</string>
+    <string name="empty_classes_title">Classes are absent</string>
+    <string name="until_end_class_title">Until end of lesson</string>
+    <string name="until_start_class_title">Until start of lesson</string>
+    <string name="tasks_progress_title">Completed tasks</string>
+    <string name="complete_schedule_title">There are no upcoming events</string>
+    <string name="analysis_day_title">Day analysis</string>
+    <string name="analysis_homeworks_label">Homeworks</string>
+    <string name="analysis_tests_label">Tests</string>
+    <string name="analysis_classes_label">Classes</string>
+    <string name="analysis_movement_label">Movements</string>
+    <string name="analysis_tasks_label">Tasks</string>
+    <string name="class_sheet_task_title">Task</string>
+    <string name="none_homework_title">The task is missing</string>
+    <string name="homework_is_complete_title">Completed</string>
+    <string name="homework_is_complete_short_title">H.W. is complete</string>
+    <string name="homework_in_progress_title">In progress</string>
+    <string name="homework_in_progress_short_title">H.W. in progress</string>
+    <string name="homework_is_set_title">The task is set</string>
+    <string name="homework_is_set_short_title">H.W. is set</string>
+    <string name="homework_is_not_complete_title">The task not completed</string>
+    <string name="homework_is_not_complete_short_title">H.W. not completed</string>
+    <string name="homework_is_skipped_title">Task was skipped</string>
+    <string name="homework_is_skipped_short_title">H.W. skipped</string>
+    <string name="again_homework_title">Again</string>
+    <string name="complete_homework_title">Complete</string>
+    <string name="add_homework_title">Add homework</string>
+    <string name="shared_schedule_sender_header">Sender</string>
+    <string name="shared_schedule_header">Schedule</string>
+    <string name="new_and_linked_data_section_label">New and linked data</string>
+    <string name="shared_organization_header">Organizations</string>
+    <string name="organization_linker_dialog_header">Organizations</string>
+    <string name="organization_linker_dialog_title">If an organization has already been created, select it to link it</string>
+    <string name="shared_subjects_header">Subjects</string>
+    <string name="subject_linker_dialog_header">Subjects</string>
+    <string name="subject_linker_dialog_title">If the subject has already been created, select it to link it</string>
+    <string name="shared_employees_header">Employees</string>
+    <string name="employee_linker_dialog_header">Employees</string>
+    <string name="employee_linker_dialog_title">If the employee\'s profile has already been created, select it to link it</string>
+    <string name="link_button_title">Link</string>
+    <string name="unlink_button_title">Unlink</string>
+    <string name="first_week_title">1 week</string>
+    <string name="second_week_title">2 week</string>
+    <string name="thirty_week_title">3 week</string>
+    <string name="accept_shared_schedule_button_title">Accept</string>
+    <string name="reject_shared_schedule_button_title">Reject</string>
+    <string name="create_share_title">Share schedule</string>
+    <string name="create_share_description">Create a temporary code containing the schedule and related study data without profile or account data.</string>
+    <string name="create_share_button_title">Create code</string>
+    <string name="receive_share_title">Receive schedule</string>
+    <string name="share_code_label">Sharing code</string>
+    <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>
+    <string name="receive_share_button_title">Open</string>
+    <string name="scan_qr_button_title">Scan QR code</string>
+    <string name="share_code_ready_title">Code is ready</string>
+    <string name="share_expires_at_label">Expires at</string>
+    <string name="copy_link_button_title">Copy link</string>
+    <string name="new_share_button_title">Create another code</string>
+    <string name="share_import_success_title">Schedule imported</string>
+    <string name="share_invalid_title">The code was not found or is invalid</string>
+    <string name="share_expired_title">The code has expired</string>
+    <string name="share_claimed_title">This schedule is being imported on another device</string>
+    <string name="share_consumed_title">This schedule has already been accepted</string>
+    <string name="share_offline_title">An internet connection is required for sharing</string>
+    <string name="share_rate_limit_message">Too many attempts. Try again later</string>
+    <string name="share_daily_limit_message">Publication limit reached. Try again in a day</string>
+    <string name="share_item_limit_message">You can share up to 20 schedule entries at once</string>
+    <string name="share_payload_limit_message">The schedule data is too large</string>
+    <string name="try_again_button_title">Try again</string>
+    <string name="ago_suffix">ago</string>
+    <string name="other_error_message">Error! Contact the developer!</string>
+</resources>

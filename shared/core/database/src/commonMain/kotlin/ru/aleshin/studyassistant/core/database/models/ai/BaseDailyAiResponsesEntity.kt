@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
 
 package ru.aleshin.studyassistant.core.database.models.ai
 
-import ru.aleshin.studyassistant.core.database.utils.BaseLocalEntity
 
 /**
  * @author Stanislav Aleshin on 21.06.2025.
  */
 data class BaseDailyAiResponsesEntity(
-    override val uid: String,
+    val uid: String,
     val totalResponses: Long,
     val date: Long,
-    override val updatedAt: Long,
-) : BaseLocalEntity()
+    val updatedAt: Long,
+)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,32 @@
 package ru.aleshin.studyassistant.chat.impl.di.modules
 
 import org.kodein.di.DI
+import org.kodein.di.bind
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.chat.api.ChatFeatureComponentFactory
-import ru.aleshin.studyassistant.chat.impl.navigation.DefaultChatComponentFactory
+import org.kodein.di.multiton
+import org.kodein.di.scoped
+import ru.aleshin.studyassistant.chat.api.ChatContentProviderFactory
+import ru.aleshin.studyassistant.chat.impl.navigation.ChatComponentDeps
+import ru.aleshin.studyassistant.chat.impl.navigation.DefaultChatContentProviderFactory
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.store.AssistantComposeStore
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.store.AssistantWorkProcessor
+import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.store.ChatFeatureComponent
+import ru.aleshin.studyassistant.core.common.di.scope.FeatureComponentScope
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<ChatFeatureComponentFactory> { DefaultChatComponentFactory(instance()) }
+    bind<ChatFeatureComponent>() with scoped(FeatureComponentScope).multiton { deps: ChatComponentDeps ->
+        ChatFeatureComponent.Default(
+            componentContext = context,
+            startConfig = deps.startConfig,
+            outputConsumer = deps.outputConsumer,
+            storeFactory = instance(),
+        )
+    }
+    bindSingleton<ChatContentProviderFactory> { DefaultChatContentProviderFactory(di) }
 
     bindSingleton<AssistantWorkProcessor> { AssistantWorkProcessor.Base(instance()) }
     bindSingleton<AssistantComposeStore.Factory> { AssistantComposeStore.Factory(instance(), instance()) }

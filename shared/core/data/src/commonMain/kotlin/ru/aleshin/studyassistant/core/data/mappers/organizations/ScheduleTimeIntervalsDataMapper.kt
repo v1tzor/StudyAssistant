@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,8 @@
 package ru.aleshin.studyassistant.core.data.mappers.organizations
 
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
-import ru.aleshin.studyassistant.core.database.models.organizations.NumberedDurationEntity
 import ru.aleshin.studyassistant.core.database.models.organizations.ScheduleTimeIntervalsEntity
-import ru.aleshin.studyassistant.core.domain.entities.organizations.NumberedDuration
 import ru.aleshin.studyassistant.core.domain.entities.organizations.ScheduleTimeIntervals
-import ru.aleshin.studyassistant.core.remote.models.organizations.NumberedDurationPojo
 import ru.aleshin.studyassistant.core.remote.models.organizations.ScheduleTimeIntervalsPojo
 
 /**
@@ -35,22 +32,12 @@ fun ScheduleTimeIntervalsPojo.mapToDomain() = ScheduleTimeIntervals(
     specificBreakDuration = specificBreakDuration.map { it.mapToDomain() },
 )
 
-fun NumberedDurationPojo.mapToDomain() = NumberedDuration(
-    number = number,
-    duration = duration,
-)
-
 fun ScheduleTimeIntervalsEntity.mapToDomain() = ScheduleTimeIntervals(
     firstClassTime = firstClassTime?.mapEpochTimeToInstant(),
     baseClassDuration = baseClassDuration,
     baseBreakDuration = baseBreakDuration,
     specificClassDuration = specificClassDuration.map { it.mapToDomain() },
     specificBreakDuration = specificBreakDuration.map { it.mapToDomain() },
-)
-
-fun NumberedDurationEntity.mapToDomain() = NumberedDuration(
-    number = number,
-    duration = duration,
 )
 
 fun ScheduleTimeIntervals.mapToRemoteDate() = ScheduleTimeIntervalsPojo(
@@ -61,20 +48,10 @@ fun ScheduleTimeIntervals.mapToRemoteDate() = ScheduleTimeIntervalsPojo(
     specificBreakDuration = specificBreakDuration.map { it.mapToRemoteDate() }
 )
 
-fun NumberedDuration.mapToRemoteDate() = NumberedDurationPojo(
-    number = number,
-    duration = duration,
-)
-
 fun ScheduleTimeIntervals.mapToLocalDate() = ScheduleTimeIntervalsEntity(
     firstClassTime = firstClassTime?.toEpochMilliseconds(),
     baseClassDuration = baseClassDuration,
     baseBreakDuration = baseBreakDuration,
     specificClassDuration = specificClassDuration.map { it.mapToLocalDate() },
     specificBreakDuration = specificBreakDuration.map { it.mapToLocalDate() }
-)
-
-fun NumberedDuration.mapToLocalDate() = NumberedDurationEntity(
-    number = number,
-    duration = duration,
 )

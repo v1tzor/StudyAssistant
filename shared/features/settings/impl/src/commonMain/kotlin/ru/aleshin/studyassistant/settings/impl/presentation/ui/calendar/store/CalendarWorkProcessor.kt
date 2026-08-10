@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,12 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkPro
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.settings.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.settings.mapToUi
+import ru.aleshin.studyassistant.core.presentation.models.settings.CalendarSettingsUi
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.CalendarSettingsInteractor
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.OrganizationInteractor
-import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToDomain
-import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.CalendarSettingsUi
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.contract.CalendarAction
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.contract.CalendarEffect
 

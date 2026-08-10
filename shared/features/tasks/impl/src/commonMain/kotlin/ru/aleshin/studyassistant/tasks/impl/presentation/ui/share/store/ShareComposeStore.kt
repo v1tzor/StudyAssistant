@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,38 +16,37 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.store
 
-import ru.aleshin.studyassistant.core.common.architecture.component.EmptyInput
-import ru.aleshin.studyassistant.core.common.architecture.store.BaseOnlyOutComposeStore
+import ru.aleshin.studyassistant.core.common.architecture.store.BaseComposeStore
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.EffectCommunicator
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.StateCommunicator
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.HomeworkShareStatus
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareAction
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareEffect
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareEvent
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareInput
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareOutput
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareState
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.store.ShareWorkCommand.LoadSubjects
-import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
 
 /**
- * @author Stanislav Aleshin on 18.07.2024
+ * @author Stanislav Aleshin on 08.08.2026.
  */
 internal class ShareComposeStore(
     private val workProcessor: ShareWorkProcessor,
     stateCommunicator: StateCommunicator<ShareState>,
     effectCommunicator: EffectCommunicator<ShareEffect>,
     coroutineManager: CoroutineManager,
-) : BaseOnlyOutComposeStore<ShareState, ShareEvent, ShareAction, ShareEffect, ShareOutput>(
+) : BaseComposeStore<ShareState, ShareEvent, ShareAction, ShareEffect, ShareInput, ShareOutput>(
     stateCommunicator = stateCommunicator,
     effectCommunicator = effectCommunicator,
     coroutineManager = coroutineManager,
 ) {
 
-    override fun initialize(input: EmptyInput, isRestore: Boolean) {
-        dispatchEvent(ShareEvent.Started)
+    override fun initialize(input: ShareInput, isRestore: Boolean) {
+        dispatchEvent(ShareEvent.Started(input, isRestore))
     }
 
     override suspend fun WorkScope<ShareState, ShareAction, ShareEffect, ShareOutput>.handleEvent(
@@ -55,71 +54,59 @@ internal class ShareComposeStore(
     ) {
         when (event) {
             is ShareEvent.Started -> {
-                launchBackgroundWork(BackgroundKey.LOAD_SHARED_HOMEWORKS) {
-                    val command = ShareWorkCommand.LoadSharedHomeworks
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-                launchBackgroundWork(BackgroundKey.LOAD_ORGANIZATION) {
-                    val command = ShareWorkCommand.LoadOrganizations
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-                launchBackgroundWork(BackgroundKey.LOAD_PAID_STATE) {
-                    val command = ShareWorkCommand.LoadPaidUserState
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-            }
-            is ShareEvent.LoadLinkData -> with(event) {
-                launchBackgroundWork(BackgroundKey.LOAD_MATCHING_DATA) {
-                    if (receivedHomeworks != null) {
-                        val command = ShareWorkCommand.LoadLinkData(receivedHomeworks)
+                if (!event.isRestore && !event.input.code.isNullOrBlank()) {
+                    sendAction(ShareAction.UpdateCode(event.input.code))
+                    launchBackgroundWork(BackgroundKey.LOAD_SHARE) {
+                        val command = ShareWorkCommand.FetchShare(event.input.code)
                         workProcessor.work(command).collectAndHandleWork()
-                    } else {
-                        sendAction(ShareAction.SetupLinkData(emptyList(), null))
                     }
                 }
             }
+            is ShareEvent.UpdatedCode -> {
+                sendAction(ShareAction.UpdateCode(event.code))
+            }
+            is ShareEvent.FetchShare -> with(state) {
+                launchBackgroundWork(BackgroundKey.LOAD_SHARE) {
+                    val command = ShareWorkCommand.FetchShare(code)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is ShareEvent.ScannedCode -> {
+                sendAction(ShareAction.UpdateCode(event.code))
+                launchBackgroundWork(BackgroundKey.LOAD_SHARE) {
+                    val command = ShareWorkCommand.FetchShare(event.code)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
             is ShareEvent.UpdateLinkData -> with(state()) {
-                val updateLinkDataList = linkDataList.toMutableList().apply {
-                    val targetIndex = linkDataList.indexOfFirst { it.homework.uid == event.linkData.homework.uid }
-                    if (targetIndex != -1) set(targetIndex, event.linkData)
+                val updated = linkDataList.toMutableList().apply {
+                    val index = indexOfFirst { it.homework.uid == event.linkData.homework.uid }
+                    if (index != -1) set(index, event.linkData)
                 }
-                sendAction(ShareAction.UpdateLinkData(updateLinkDataList))
+                sendAction(ShareAction.UpdateLinkData(updated))
             }
-            is ShareEvent.LoadLinkSubjects -> with(event) {
+            is ShareEvent.LoadLinkSubjects -> {
                 launchBackgroundWork(BackgroundKey.LOAD_SUBJECTS) {
-                    val command = LoadSubjects(organization)
+                    val command = ShareWorkCommand.LoadSubjects(event.organization)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is ShareEvent.AcceptHomework -> with(event) {
+            is ShareEvent.AcceptHomework -> with(state()) {
                 launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
-                    val organizations = state().organizations
-                    val command = ShareWorkCommand.AcceptHomework(receivedHomeworks, linkDataList, organizations)
+                    val command = ShareWorkCommand.AcceptHomework(
+                        code = code,
+                        share = checkNotNull(share),
+                        linkDataList = linkDataList,
+                    )
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is ShareEvent.RejectHomework -> with(event) {
-                launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
-                    val command = ShareWorkCommand.RejectHomework(receivedHomeworks)
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-            }
-            is ShareEvent.CancelSendHomework -> with(event) {
-                launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
-                    val command = ShareWorkCommand.CancelSendHomework(sentHomeworks)
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-            }
-            is ShareEvent.ClickEditSubject -> with(event) {
-                val config = EditorConfig.Subject(subjectId, organization)
+            is ShareEvent.ClickEditSubject -> {
+                val config = EditorConfig.Subject(event.subjectId, event.organization)
                 consumeOutput(ShareOutput.NavigateToSubjectEditor(config))
             }
-            is ShareEvent.ClickUserProfile -> with(event) {
-                val config = UsersConfig.UserProfile(userId)
-                consumeOutput(ShareOutput.NavigateToUserProfile(config))
-            }
-            is ShareEvent.ClickPaidFunction -> {
-                consumeOutput(ShareOutput.NavigateToBilling)
+            is ShareEvent.Reset -> {
+                sendAction(ShareAction.Reset)
             }
             is ShareEvent.BackClick -> {
                 consumeOutput(ShareOutput.NavigateToBack)
@@ -127,55 +114,46 @@ internal class ShareComposeStore(
         }
     }
 
-    override suspend fun reduce(
-        action: ShareAction,
-        currentState: ShareState,
-    ) = when (action) {
-        is ShareAction.UpdateSharedHomeworks -> currentState.copy(
-            sharedHomeworks = action.sharedHomeworks,
-            isLoading = false,
+    override suspend fun reduce(action: ShareAction, currentState: ShareState) = when (action) {
+        is ShareAction.UpdateCode -> currentState.copy(
+            code = action.code
         )
-        is ShareAction.SetupLinkData -> currentState.copy(
+        is ShareAction.UpdateStatus -> currentState.copy(
+            status = action.status
+        )
+        is ShareAction.SetupShare -> currentState.copy(
+            status = HomeworkShareStatus.PREVIEW,
+            share = action.share,
             linkDataList = action.linkDataList,
             linkSchedule = action.linkSchedule,
-            isLoadingLink = false,
         )
         is ShareAction.UpdateLinkData -> currentState.copy(
-            linkDataList = action.linkDataList,
+            linkDataList = action.linkDataList
         )
         is ShareAction.UpdateSubjects -> currentState.copy(
-            linkSubjects = action.subjects,
+            linkSubjects = action.subjects
         )
         is ShareAction.UpdateOrganizations -> currentState.copy(
-            organizations = action.organizations,
+            organizations = action.organizations
         )
-        is ShareAction.UpdateUserPaidStatus -> currentState.copy(
-            isPaidUser = action.isPaidUser,
-        )
-        is ShareAction.UpdateLoading -> currentState.copy(
-            isLoading = action.isLoading,
-        )
-        is ShareAction.UpdateLinkLoading -> currentState.copy(
-            isLoadingLink = action.isLoading,
-        )
+        is ShareAction.Reset -> ShareState()
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_SHARED_HOMEWORKS, LOAD_PAID_STATE, LOAD_ORGANIZATION, LOAD_SUBJECTS, LOAD_MATCHING_DATA, HOMEWORK_ACTION
+        LOAD_SHARE,
+        LOAD_SUBJECTS,
+        HOMEWORK_ACTION,
     }
 
     class Factory(
         private val workProcessor: ShareWorkProcessor,
         private val coroutineManager: CoroutineManager,
-    ) : BaseOnlyOutComposeStore.Factory<ShareComposeStore, ShareState> {
-
-        override fun create(savedState: ShareState): ShareComposeStore {
-            return ShareComposeStore(
-                workProcessor = workProcessor,
-                stateCommunicator = StateCommunicator.Default(savedState),
-                effectCommunicator = EffectCommunicator.Default(),
-                coroutineManager = coroutineManager,
-            )
-        }
+    ) : BaseComposeStore.Factory<ShareComposeStore, ShareState> {
+        override fun create(savedState: ShareState) = ShareComposeStore(
+            workProcessor = workProcessor,
+            stateCommunicator = StateCommunicator.Default(savedState),
+            effectCommunicator = EffectCommunicator.Default(),
+            coroutineManager = coroutineManager,
+        )
     }
 }

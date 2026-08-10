@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="assistant_top_bar_title">Assistant (Beta)</string>
+    <string name="assistant_sender_badge">Assistant</string>
+    <string name="chat_assistant_error_message">Error in assistant work</string>
+    <string name="functional_chat_suggestion">What can you do?</string>
+    <string name="homework_chat_suggestion">What\'s the assignment for tomorrow?</string>
+    <string name="assistant_chat_text_field_placeholder">Enter your query</string>
+    <string name="assistant_empty_chat_title">How can I help you?</string>
+    <string name="failure_response_text">Unfortunately, the request could not be completed</string>
+    <string name="quota_expired_title">Your free daily quota has expired.\nAccess will be restored tomorrow.</string>
+    <string name="personal_key_suggestion_text">You can continue without an app limit using your own DeepSeek key.</string>
+    <string name="ai_settings_button">Configure AI</string>
+    <string name="quota_error_message">The daily quota of 25 messages has been used</string>
+    <string name="invalid_key_error_message">DeepSeek rejected the API key. Check it in AI settings</string>
+    <string name="insufficient_balance_error_message">Your DeepSeek account has insufficient balance</string>
+    <string name="offline_error_message">No internet connection</string>
+    <string name="rate_limit_error_message">Too many requests. Try again shortly</string>
+    <string name="server_unavailable_error_message">The AI service is temporarily unavailable</string>
+    <string name="try_again_button">Try again</string>
+    <string name="other_error_message">Error! Contact the developer!</string>
+</resources>

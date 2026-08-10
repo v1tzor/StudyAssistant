@@ -23,11 +23,10 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushToFront
 import com.arkivanov.decompose.value.Value
-import com.arkivanov.essenty.backhandler.BackCallback
+import ru.aleshin.studyassistant.core.common.architecture.component.FeatureComponent
 import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
-import ru.aleshin.studyassistant.core.common.inject.StartFeatureConfig
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent
-import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureManager
+import ru.aleshin.studyassistant.editor.api.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorOutput
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassInput
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassOutput
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.store.ClassComponent
@@ -67,15 +66,11 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.store.TodoComp
 /**
  * @author Stanislav Aleshin on 26.08.2025.
  */
-internal abstract class InternalEditorFeatureComponent(
+internal abstract class EditorFeatureComponent(
     componentContext: ComponentContext,
-    startConfig: StartFeatureConfig<EditorConfig>,
-    outputConsumer: OutputConsumer<EditorOutput>,
-) : EditorFeatureComponent(
-    componentContext = componentContext,
-    startConfig = startConfig,
-    outputConsumer = outputConsumer,
-) {
+    protected val startConfig: EditorConfig,
+    protected val outputConsumer: OutputConsumer<EditorOutput>,
+) : FeatureComponent<EditorConfig, EditorOutput>(componentContext) {
 
     abstract val stack: Value<ChildStack<*, Child>>
 
@@ -92,7 +87,7 @@ internal abstract class InternalEditorFeatureComponent(
     }
 
     class Default(
-        startConfig: StartFeatureConfig<EditorConfig>,
+        startConfig: EditorConfig,
         componentContext: ComponentContext,
         outputConsumer: OutputConsumer<EditorOutput>,
         private val classStoreFactory: ClassComposeStore.Factory,
@@ -104,23 +99,19 @@ internal abstract class InternalEditorFeatureComponent(
         private val todoStoreFactory: TodoComposeStore.Factory,
         private val organizationStoreFactory: OrganizationComposeStore.Factory,
         private val profileStoreFactory: ProfileComposeStore.Factory
-    ) : InternalEditorFeatureComponent(
+    ) : EditorFeatureComponent(
         componentContext = componentContext,
         startConfig = startConfig,
         outputConsumer = outputConsumer,
     ) {
-        override val contentProvider = EditorContentProvider(this)
-
-        private val backCallback = BackCallback { navigateToBack() }
 
         private val stackNavigation = StackNavigation<EditorConfig>()
 
         override val stack: Value<ChildStack<*, Child>> = childStack(
             source = stackNavigation,
             serializer = EditorConfig.serializer(),
-            initialStack = { startConfig.backstack ?: listOf() },
+            initialStack = { listOf(startConfig) },
             key = STACK_KEY,
-            handleBackButton = false,
             childFactory = ::createChild,
         )
 
@@ -128,18 +119,10 @@ internal abstract class InternalEditorFeatureComponent(
             const val STACK_KEY = "Editor_ROOT_STACK"
         }
 
-        init {
-            backHandler.register(backCallback)
-        }
-
         override fun navigateToBack() {
             stackNavigation.pop { isPop ->
                 if (!isPop) outputConsumer.consume(EditorOutput.NavigateToBack)
             }
-        }
-
-        override fun onDestroyInstance() {
-            EditorFeatureManager.finish()
         }
 
         private fun createChild(config: EditorConfig, componentContext: ComponentContext): Child {
@@ -248,10 +231,12 @@ internal abstract class InternalEditorFeatureComponent(
                     )
                     stackNavigation.pushToFront(outputData)
                 }
+
                 is ClassOutput.NavigateToOrganizationEditor -> {
                     val outputData = EditorConfig.Organization(output.config.organizationId)
                     stackNavigation.pushToFront(outputData)
                 }
+
                 is ClassOutput.NavigateToSubjectEditor -> {
                     val outputData = EditorConfig.Subject(
                         subjectId = output.config.subjectId,
@@ -259,6 +244,7 @@ internal abstract class InternalEditorFeatureComponent(
                     )
                     stackNavigation.pushToFront(outputData)
                 }
+
                 is ClassOutput.NavigateToBack -> navigateToBack()
             }
         }
@@ -275,10 +261,12 @@ internal abstract class InternalEditorFeatureComponent(
                     )
                     stackNavigation.pushToFront(outputData)
                 }
+
                 is DailyScheduleOutput.NavigateToOrganizationEditor -> {
                     val outputData = EditorConfig.Organization(output.config.organizationId)
                     stackNavigation.pushToFront(outputData)
                 }
+
                 is DailyScheduleOutput.NavigateToBack -> navigateToBack()
             }
         }
@@ -295,6 +283,7 @@ internal abstract class InternalEditorFeatureComponent(
                     val outputData = EditorConfig.Organization(output.config.organizationId)
                     stackNavigation.pushToFront(outputData)
                 }
+
                 is HomeworkOutput.NavigateToSubjectEditor -> {
                     val outputData = EditorConfig.Subject(
                         subjectId = output.config.subjectId,
@@ -302,6 +291,7 @@ internal abstract class InternalEditorFeatureComponent(
                     )
                     stackNavigation.pushToFront(outputData)
                 }
+
                 is HomeworkOutput.NavigateToBack -> navigateToBack()
             }
         }
@@ -314,9 +304,6 @@ internal abstract class InternalEditorFeatureComponent(
 
         private fun profileOutputConsumer() = OutputConsumer<ProfileOutput> { output ->
             when (output) {
-                is ProfileOutput.NavigateToBilling -> {
-                    outputConsumer.consume(EditorOutput.NavigateToBilling)
-                }
                 is ProfileOutput.NavigateToBack -> navigateToBack()
             }
         }
@@ -330,15 +317,13 @@ internal abstract class InternalEditorFeatureComponent(
                     )
                     stackNavigation.pushToFront(outputData)
                 }
+
                 is SubjectOutput.NavigateToBack -> navigateToBack()
             }
         }
 
         private fun todoOutputConsumer() = OutputConsumer<TodoOutput> { output ->
             when (output) {
-                is TodoOutput.NavigateToBilling -> {
-                    outputConsumer.consume(EditorOutput.NavigateToBilling)
-                }
                 is TodoOutput.NavigateToBack -> navigateToBack()
             }
         }
@@ -355,10 +340,12 @@ internal abstract class InternalEditorFeatureComponent(
                     )
                     stackNavigation.pushToFront(outputData)
                 }
+
                 is WeekScheduleOutput.NavigateToOrganizationEditor -> {
                     val outputData = EditorConfig.Organization(output.config.organizationId)
                     stackNavigation.pushToFront(outputData)
                 }
+
                 is WeekScheduleOutput.NavigateToBack -> navigateToBack()
             }
         }

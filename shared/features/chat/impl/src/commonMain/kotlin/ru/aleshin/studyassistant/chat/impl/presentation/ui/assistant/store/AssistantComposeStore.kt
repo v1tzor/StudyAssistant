@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,24 +62,29 @@ internal class AssistantComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is AssistantEvent.SendMessage -> with(event) {
                 launchBackgroundWork(BackgroundKey.SEND_MESSAGE) {
-                    val command = AssistantWorkCommand.SendMessage(state().chatHistory?.uid, message)
+                    val command =
+                        AssistantWorkCommand.SendMessage(state().chatHistory?.uid, message)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is AssistantEvent.RetryAttempt -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SEND_MESSAGE) {
                     val command = AssistantWorkCommand.RetryAttempt(chatHistory?.uid)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is AssistantEvent.ClearUnsendMessage -> with(state()) {
                 launchBackgroundWork(BackgroundKey.MESSAGE_ACTION) {
                     val command = AssistantWorkCommand.ClearUnsendMessage(chatHistory?.uid)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is AssistantEvent.ClearHistory -> with(state()) {
                 val chatId = chatHistory?.uid
                 if (chatId != null) {
@@ -89,13 +94,16 @@ internal class AssistantComposeStore(
                     }
                 }
             }
+
             is AssistantEvent.UpdateUserQuery -> with(event) {
                 val query = state().userQuery.copy(query)
                 sendAction(AssistantAction.UpdateUserQuery(query))
             }
-            is AssistantEvent.ClickPaidFunction -> {
-                consumeOutput(AssistantOutput.NavigateToBilling)
+
+            is AssistantEvent.OpenAiSettings -> {
+                consumeOutput(AssistantOutput.NavigateToAiSettings)
             }
+
             is AssistantEvent.StopResponseLoading -> {
                 sendAction(AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE))
             }
@@ -109,16 +117,20 @@ internal class AssistantComposeStore(
         is AssistantAction.UpdateLoadingChat -> currentState.copy(
             isLoadingChat = action.isLoading,
         )
+
         is AssistantAction.UpdateUserQuery -> currentState.copy(
             userQuery = action.query,
         )
+
         is AssistantAction.UpdateResponseStatus -> currentState.copy(
             responseStatus = action.responseStatus,
         )
+
         is AssistantAction.UpdateChatHistory -> currentState.copy(
             chatHistory = action.chatHistory,
             isLoadingChat = false,
         )
+
         is AssistantAction.UpdateQuotaExpiredStatus -> currentState.copy(
             isQuotaExpired = action.isQuotaExpired,
         )

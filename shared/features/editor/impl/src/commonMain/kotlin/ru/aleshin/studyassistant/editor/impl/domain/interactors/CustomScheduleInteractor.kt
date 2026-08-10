@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,9 @@ internal interface CustomScheduleInteractor {
 
         override suspend fun fetchScheduleById(uid: UID) = eitherWrapper.wrapFlow {
             scheduleRepository.fetchScheduleById(uid).map { schedule ->
-                schedule?.copy(classes = schedule.classes.sortedBy { it.timeRange.from.dateTime().time })
+                schedule?.copy(
+                    classes = schedule.classes.sortedBy { it.timeRange.from.dateTime().time },
+                )?.withClassNumbers()
             }
         }
 
@@ -134,7 +136,9 @@ internal interface CustomScheduleInteractor {
             val updatedClasses = buildList<Class> {
                 schedule.classes.forEachIndexed { index, classModel ->
                     val targetClass = lastOrNull() ?: classModel
-                    val targetDuration = specificDurations.find { it.number == index.inc() }?.duration ?: baseDuration
+                    val targetDuration =
+                        specificDurations.find { it.number == index.inc() }?.duration
+                            ?: baseDuration
 
                     // Update target class duration
                     val updatedTargetClass = targetClass.copy(
@@ -143,7 +147,10 @@ internal interface CustomScheduleInteractor {
                             to = targetClass.timeRange.from.shiftMillis(targetDuration),
                         )
                     )
-                    if (getOrNull(index) == null) add(updatedTargetClass) else set(index, updatedTargetClass)
+                    if (getOrNull(index) == null) add(updatedTargetClass) else set(
+                        index,
+                        updatedTargetClass
+                    )
 
                     if (index != schedule.classes.lastIndex) {
                         val nextClass = schedule.classes[index + 1]
@@ -181,12 +188,13 @@ internal interface CustomScheduleInteractor {
             baseDuration: Millis,
             specificDurations: List<NumberedDuration>
         ) = eitherWrapper.wrapUnit {
-            val updatedClasses = buildList {
+            val updatedClasses = buildList<Class> {
                 schedule.classes.forEachIndexed { index, targetClass ->
-                    val targetDuration = specificDurations.find { it.number == index }?.duration ?: baseDuration
+                    val targetDuration =
+                        specificDurations.find { it.number == index }?.duration ?: baseDuration
 
                     if (index != 0) {
-                        val previousClass = last() as Class
+                        val previousClass = last()
 
                         val breakDifference = epochTimeDuration(
                             start = targetClass.timeRange.from,
@@ -220,12 +228,22 @@ internal interface CustomScheduleInteractor {
 
         private suspend fun updateReminderServices() {
             val notificationSettings = notificationSettingsRepository.fetchSettings().first()
-            if (notificationSettings.beginningOfClasses != null) {
-                startClassesReminderManager.startOrRetryReminderService()
-            }
+            startClassesReminderManager.startOrRetryReminderService()
             if (notificationSettings.endOfClasses) {
                 endClassesReminderManager.startOrRetryReminderService()
             }
+        }
+
+        private fun CustomSchedule.withClassNumbers(): CustomSchedule {
+            val organizationNumbers = mutableMapOf<UID, Int>()
+            return copy(
+                classes = classes.map { classModel ->
+                    val organizationId = classModel.organization.uid
+                    val number = organizationNumbers.getOrElse(organizationId) { 0 } + 1
+                    organizationNumbers[organizationId] = number
+                    classModel.copy(number = number)
+                },
+            )
         }
     }
 }

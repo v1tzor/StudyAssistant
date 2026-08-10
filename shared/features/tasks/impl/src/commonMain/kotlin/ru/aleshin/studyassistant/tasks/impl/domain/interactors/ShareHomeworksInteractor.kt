@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,139 +16,158 @@
 
 package ru.aleshin.studyassistant.tasks.impl.domain.interactors
 
-import dev.tmapps.konnection.Konnection
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
-import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
-import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
+import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.domain.entities.message.NotifyPushContent
-import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.ReceivedMediatedHomeworks
-import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SentMediatedHomeworks
-import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SentMediatedHomeworksDetails
-import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.SharedHomeworksDetails
-import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.convertToBase
-import ru.aleshin.studyassistant.core.domain.entities.share.homeworks.convertToReceived
-import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
+import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
+import ru.aleshin.studyassistant.core.domain.entities.share.HomeworkShare
+import ru.aleshin.studyassistant.core.domain.entities.share.ShareException
+import ru.aleshin.studyassistant.core.domain.entities.share.ShareLink
+import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
+import ru.aleshin.studyassistant.core.domain.entities.tasks.MediatedHomework
+import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.HomeworkShareRepository
+import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
+import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
+import ru.aleshin.studyassistant.tasks.impl.domain.entities.HomeworkImportLink
+import ru.aleshin.studyassistant.tasks.impl.domain.entities.HomeworkSharePreview
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 
 /**
- * @author Stanislav Aleshin on 18.07.2024.
+ * @author Stanislav Aleshin on 08.08.2026.
  */
 internal interface ShareHomeworksInteractor {
 
-    suspend fun fetchSharedHomeworksDetails(): FlowDomainResult<TasksFailures, SharedHomeworksDetails>
-    suspend fun shareHomeworks(homeworks: SentMediatedHomeworksDetails): UnitDomainResult<TasksFailures>
-    suspend fun cancelSendHomeworks(homeworks: SentMediatedHomeworks): UnitDomainResult<TasksFailures>
-    suspend fun acceptOrRejectHomeworks(homeworks: ReceivedMediatedHomeworks): UnitDomainResult<TasksFailures>
+    suspend fun createShare(
+        date: Instant,
+        homeworks: List<MediatedHomework>,
+    ): DomainResult<TasksFailures, ShareLink>
+
+    suspend fun fetchSharePreview(code: String): DomainResult<TasksFailures, HomeworkSharePreview>
+
+    suspend fun importShare(
+        code: String,
+        share: HomeworkShare,
+        links: List<HomeworkImportLink>,
+    ): UnitDomainResult<TasksFailures>
 
     class Base(
-        private val shareRepository: ShareHomeworksRepository,
-        private val usersRepository: UsersRepository,
-        private val messageRepository: MessageRepository,
-        private val connectionManager: Konnection,
+        private val shareRepository: HomeworkShareRepository,
+        private val profileRepository: ProfileRepository,
+        private val subjectsRepository: SubjectsRepository,
+        private val organizationsRepository: OrganizationsRepository,
+        private val baseScheduleRepository: BaseScheduleRepository,
+        private val customScheduleRepository: CustomScheduleRepository,
+        private val calendarSettingsRepository: CalendarSettingsRepository,
         private val dateManager: DateManager,
         private val eitherWrapper: TasksEitherWrapper,
     ) : ShareHomeworksInteractor {
 
-        override suspend fun fetchSharedHomeworksDetails() = eitherWrapper.wrapFlow {
-            shareRepository.fetchCurrentSharedHomeworksDetails()
-        }
-
-        override suspend fun shareHomeworks(homeworks: SentMediatedHomeworksDetails) = eitherWrapper.wrapUnit {
-            if (!connectionManager.isConnected()) throw InternetConnectionException()
-
-            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-            val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentUserInfo = usersRepository.fetchCurrentUserProfile().first()
-            val currentSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(currentUser)
-            val updatedCurrentSharedHomeworks = currentSharedHomeworks.copy(
-                updatedAt = updatedAt,
-                sent = buildMap {
-                    putAll(currentSharedHomeworks.sent)
-                    put(homeworks.uid, homeworks.convertToBase())
-                },
-            )
-            shareRepository.addOrUpdateCurrentSharedHomework(updatedCurrentSharedHomeworks)
-
-            homeworks.recipients.forEach { recipient ->
-                val recipientSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(recipient.uid)
-                val updatedRecipientSharedHomeworks = recipientSharedHomeworks.copy(
-                    updatedAt = updatedAt,
-                    received = buildMap {
-                        putAll(recipientSharedHomeworks.received)
-                        put(homeworks.uid, homeworks.convertToBase().convertToReceived(currentUser))
-                    }
-                )
-                shareRepository.addOrUpdateSharedHomeworkForUser(updatedRecipientSharedHomeworks, recipient.uid)
+        override suspend fun createShare(
+            date: Instant,
+            homeworks: List<MediatedHomework>,
+        ) = eitherWrapper.wrap {
+            if (homeworks.isEmpty() || homeworks.size > MAX_HOMEWORKS) {
+                throw ShareException.ItemLimit()
             }
-
-            val notifyContent = NotifyPushContent.ShareHomework(
-                devices = homeworks.recipients.map { it.devices }.extractAllItem(),
-                senderUsername = checkNotNull(currentUserInfo).username,
-                senderUserId = currentUser,
-                subjectNames = homeworks.homeworks.map { it.subjectName }
-            )
-            messageRepository.sendMessage(notifyContent.toMessageBody())
-        }
-
-        override suspend fun cancelSendHomeworks(homeworks: SentMediatedHomeworks) = eitherWrapper.wrapUnit {
-            if (!connectionManager.isConnected()) throw InternetConnectionException()
-
-            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-            val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(currentUser)
-            val updatedCurrentSharedHomeworks = currentSharedHomeworks.copy(
-                updatedAt = updatedAt,
-                sent = buildMap {
-                    putAll(currentSharedHomeworks.sent)
-                    remove(homeworks.uid)
-                }
-            )
-            shareRepository.addOrUpdateCurrentSharedHomework(updatedCurrentSharedHomeworks)
-
-            homeworks.recipients.forEach { recipient ->
-                val recipientSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(recipient)
-                val updatedRecipientSharedHomeworks = recipientSharedHomeworks.copy(
-                    updatedAt = updatedAt,
-                    received = buildMap {
-                        putAll(recipientSharedHomeworks.received)
-                        remove(homeworks.uid)
-                    }
+            val profile = profileRepository.fetchProfile().filterNotNull().first()
+            shareRepository.createShare(
+                HomeworkShare(
+                    senderName = profile.username,
+                    date = date,
+                    homeworks = homeworks,
                 )
-                shareRepository.addOrUpdateSharedHomeworkForUser(updatedRecipientSharedHomeworks, recipient)
-            }
+            )
         }
 
-        override suspend fun acceptOrRejectHomeworks(homeworks: ReceivedMediatedHomeworks) = eitherWrapper.wrapUnit {
-            if (!connectionManager.isConnected()) throw InternetConnectionException()
-
-            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-            val currentUser = usersRepository.fetchCurrentUserOrError().uid
-            val currentSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(currentUser)
-            val senderSharedHomeworks = shareRepository.fetchRealtimeSharedHomeworksByUser(homeworks.sender)
-
-            val updatedCurrentSharedHomeworks = currentSharedHomeworks.copy(
-                updatedAt = updatedAt,
-                received = buildMap {
-                    putAll(currentSharedHomeworks.received)
-                    remove(homeworks.uid)
-                }
+        override suspend fun fetchSharePreview(code: String) = eitherWrapper.wrap {
+            if (shareRepository.isShareImported(code)) throw ShareException.Duplicate()
+            val share = shareRepository.fetchShare(code)
+            val subjects = subjectsRepository.fetchAllSubjectsByNames(
+                share.homeworks.map { homework -> homework.subjectName },
             )
-            val updatedSenderSharedHomeworks = senderSharedHomeworks.copy(
-                updatedAt = updatedAt,
-                sent = buildMap {
-                    putAll(senderSharedHomeworks.sent)
-                    remove(homeworks.uid)
-                }
+            val schedule = fetchSchedule(share.date.startThisDay())
+            val classes = schedule.mapToValue(
+                onBaseSchedule = { base -> base?.classes.orEmpty() },
+                onCustomSchedule = { custom -> custom?.classes.orEmpty() },
             )
+            val links = share.homeworks.map { homework ->
+                val subject = subjects.find { it.name == homework.subjectName }
+                val linkedClass = classes.find { it.subject?.name == homework.subjectName }
+                HomeworkImportLink(
+                    homework = homework,
+                    receivedSubjectName = homework.subjectName,
+                    actualSubject = subject,
+                    actualClass = linkedClass,
+                    classNumber = linkedClass?.let { classes.indexOf(it).inc() },
+                )
+            }
+            HomeworkSharePreview(
+                share = share,
+                organizations = organizationsRepository.fetchAllShortOrganization().first()
+                    .sortedByDescending { it.isMain },
+                schedule = schedule,
+                links = links,
+            )
+        }
 
-            shareRepository.addOrUpdateCurrentSharedHomework(updatedCurrentSharedHomeworks)
-            shareRepository.addOrUpdateSharedHomeworkForUser(updatedSenderSharedHomeworks, homeworks.sender)
+        override suspend fun importShare(
+            code: String,
+            share: HomeworkShare,
+            links: List<HomeworkImportLink>,
+        ) = eitherWrapper.wrapUnit {
+            val organizations = organizationsRepository.fetchAllShortOrganization().first()
+                .associateBy { it.uid }
+            val currentTime = dateManager.fetchCurrentInstant()
+            val homeworks = links.map { link ->
+                val subject = checkNotNull(link.actualSubject)
+                Homework(
+                    uid = randomUUID(),
+                    classId = link.actualClass?.uid,
+                    deadline = share.date.startThisDay(),
+                    subject = subject,
+                    organization = checkNotNull(organizations[subject.organizationId]),
+                    theoreticalTasks = link.homework.theoreticalTasks,
+                    practicalTasks = link.homework.practicalTasks,
+                    presentationTasks = link.homework.presentationTasks,
+                    test = link.homework.test,
+                    priority = link.homework.priority,
+                    isDone = false,
+                    completeDate = null,
+                    updatedAt = currentTime.toEpochMilliseconds(),
+                )
+            }
+            shareRepository.importShare(code, homeworks)
+        }
+
+        private suspend fun fetchSchedule(date: Instant): Schedule {
+            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings().first().numberOfWeek
+            val numberOfWeek = date.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
+            val customSchedule = customScheduleRepository.fetchScheduleByDate(date).first()
+            if (customSchedule != null) {
+                return Schedule.Custom(customSchedule.copy(classes = customSchedule.classes.sortedBy {
+                    it.timeRange.from.dateTime().time
+                }))
+            }
+            val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, numberOfWeek).first()
+            return Schedule.Base(baseSchedule?.copy(classes = baseSchedule.classes.sortedBy {
+                it.timeRange.from.dateTime().time
+            }))
+        }
+
+        private companion object {
+            const val MAX_HOMEWORKS = 20
         }
     }
 }

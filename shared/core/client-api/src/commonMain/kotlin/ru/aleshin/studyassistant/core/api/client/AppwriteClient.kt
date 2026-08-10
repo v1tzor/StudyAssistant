@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.plugins.onUpload
+import io.ktor.client.plugins.timeout
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.pingInterval
 import io.ktor.client.request.HttpRequestBuilder
@@ -61,7 +62,6 @@ import kotlinx.serialization.json.putJsonObject
 import ru.aleshin.studyassistant.core.api.AppwriteApi.Client.ENDPOINT
 import ru.aleshin.studyassistant.core.api.AppwriteApi.Client.ENDPOINT_REALTIME
 import ru.aleshin.studyassistant.core.api.AppwriteApi.Client.PROJECT_ID
-import ru.aleshin.studyassistant.core.api.BuildKonfig.APPWRITE_SERVER_KEY
 import ru.aleshin.studyassistant.core.api.BuildKonfig.IS_DEBUG
 import ru.aleshin.studyassistant.core.api.cookies.PreferencesCookiesStorage
 import ru.aleshin.studyassistant.core.api.models.ClientParam
@@ -122,7 +122,7 @@ class AppwriteClient private constructor(
                 endpoint: String = ENDPOINT,
                 endpointRealtime: String = ENDPOINT_REALTIME,
                 projectId: String = PROJECT_ID,
-                serverKey: String = APPWRITE_SERVER_KEY,
+                serverKey: String = "",
             ): AppwriteClient {
                 setProject(projectId)
                 setKey(serverKey)
@@ -165,7 +165,7 @@ class AppwriteClient private constructor(
                     install(WebSockets) { pingInterval = 20.seconds }
                     install(ContentNegotiation) { json(Json.Decode) }
                     install(Logging) {
-                        level = if (IS_DEBUG) LogLevel.ALL else LogLevel.NONE
+                        level = if (IS_DEBUG) LogLevel.INFO else LogLevel.NONE
                         logger = object : Logger {
                             override fun log(message: String) {
                                 co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }
@@ -183,6 +183,7 @@ class AppwriteClient private constructor(
                             AppwriteClientType.CLIENT -> clientHeaders.forEach {
                                 headers.append(it.key, it.value)
                             }
+
                             AppwriteClientType.SERVER -> serverHeaders.forEach {
                                 headers.append(it.key, it.value)
                             }
@@ -210,6 +211,7 @@ class AppwriteClient private constructor(
         headers: Map<String, String> = mapOf(),
         params: List<ClientParam> = emptyList(),
         clientType: AppwriteClientType = AppwriteClientType.CLIENT,
+        requestTimeoutMillis: Long? = null,
         onUpload: ((ProgressPojo) -> Unit)? = null,
         onDownload: ((ProgressPojo) -> Unit)? = null,
     ): T {
@@ -223,6 +225,12 @@ class AppwriteClient private constructor(
             }
             val response = httpClient.request(path) {
                 this.method = method
+                if (requestTimeoutMillis != null) {
+                    timeout {
+                        this.requestTimeoutMillis = requestTimeoutMillis
+                        this.socketTimeoutMillis = requestTimeoutMillis
+                    }
+                }
                 if (method == HttpMethod.Get) {
                     setupGetRequest(params)
                 } else if (headers["content-type"] == ContentType.MultiPart.FormData.toString()) {
@@ -327,8 +335,9 @@ class AppwriteClient private constructor(
         clientType: AppwriteClientType = AppwriteClientType.CLIENT,
         onProgress: ((UploadProgressPojo) -> Unit)? = null,
     ): T {
-        val fileId = params.find { it is ClientParam.StringParam && it.key == "fileId" } as? ClientParam.StringParam
-            ?: throw IllegalArgumentException("chunkedUpload required StringParam (key: fileId) in params")
+        val fileId =
+            params.find { it is ClientParam.StringParam && it.key == "fileId" } as? ClientParam.StringParam
+                ?: throw IllegalArgumentException("chunkedUpload required StringParam (key: fileId) in params")
 
         var fileParam = params.find { it is ClientParam.FileParam } as? ClientParam.FileParam
             ?: throw IllegalArgumentException("chunkedUpload required FileParm in params")
@@ -372,7 +381,8 @@ class AppwriteClient private constructor(
 
             fileParam = ClientParam.FileParam(fileParam.fileName, buffer)
 
-            headers["Content-Range"] = "bytes $offset-${((offset + CHUNK_SIZE) - 1).coerceAtMost(size - 1)}/$size"
+            headers["Content-Range"] =
+                "bytes $offset-${((offset + CHUNK_SIZE) - 1).coerceAtMost(size - 1)}/$size"
 
             result = call(
                 method = HttpMethod.Post,
@@ -420,15 +430,20 @@ class AppwriteClient private constructor(
         params.forEach { param ->
             when (param) {
                 is ClientParam.FileParam -> {}
+                is ClientParam.BooleanParam -> {
+                    parameter(param.key, param.value)
+                }
                 is ClientParam.ListParam -> {
                     param.value.forEach { paramValue ->
                         parameter("${param.key}[]", paramValue)
                     }
                 }
+
                 is ClientParam.JsonListParam -> {}
                 is ClientParam.StringParam -> {
                     parameter(param.key, param.value)
                 }
+
                 is ClientParam.MapParam -> {}
             }
         }
@@ -440,24 +455,35 @@ class AppwriteClient private constructor(
                 when (param) {
                     is ClientParam.FileParam -> {
                         val headers = Headers.build {
-                            append(HttpHeaders.ContentType, ContentType.Application.OctetStream.toString())
+                            append(
+                                HttpHeaders.ContentType,
+                                ContentType.Application.OctetStream.toString()
+                            )
                             append(HttpHeaders.ContentDisposition, "filename=\"${param.fileName}\"")
                         }
                         append("file", param.data, headers)
                     }
+
+                    is ClientParam.BooleanParam -> {
+                        append(param.key, param.value.toString())
+                    }
+
                     is ClientParam.ListParam -> {
                         param.value.forEach { paramValue ->
                             append("${param.key}[]", paramValue)
                         }
                     }
+
                     is ClientParam.JsonListParam -> {
                         param.value.forEach { paramValue ->
                             append("${param.key}[]", paramValue.toString())
                         }
                     }
+
                     is ClientParam.StringParam -> {
                         append(param.key, param.value.toString())
                     }
+
                     is ClientParam.MapParam -> {}
                 }
             }
@@ -471,19 +497,25 @@ class AppwriteClient private constructor(
             params.forEach { param ->
                 when (param) {
                     is ClientParam.FileParam -> {}
+                    is ClientParam.BooleanParam -> {
+                        put(param.key, param.value)
+                    }
                     is ClientParam.ListParam -> {
                         putJsonArray(param.key) {
                             addAll(param.value)
                         }
                     }
+
                     is ClientParam.JsonListParam -> {
                         putJsonArray(param.key) {
                             addAll(param.value)
                         }
                     }
+
                     is ClientParam.StringParam -> {
                         put(param.key, param.value)
                     }
+
                     is ClientParam.MapParam -> {
                         putJsonObject(param.key) {
                             param.value.forEach { entry ->

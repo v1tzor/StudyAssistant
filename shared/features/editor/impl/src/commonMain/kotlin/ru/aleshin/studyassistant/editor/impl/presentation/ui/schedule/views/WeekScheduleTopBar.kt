@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.week_schedule_editor_header
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -35,7 +37,7 @@ internal fun WeekScheduleTopBar(
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
-        title = { Text(text = EditorThemeRes.strings.weekScheduleEditorHeader) },
+        title = { Text(text = stringResource(Res.string.week_schedule_editor_header)) },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
         ),

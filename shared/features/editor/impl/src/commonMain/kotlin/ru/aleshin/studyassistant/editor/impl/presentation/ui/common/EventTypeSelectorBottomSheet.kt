@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
 import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.event_type_selector_header
+import ru.aleshin.studyassistant.editor.impl.resources.event_type_selector_title
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -52,17 +54,17 @@ internal fun EventTypeSelectorBottomSheet(
         modifier = modifier,
         selected = selectedEventType,
         items = EventType.entries,
-        header = EditorThemeRes.strings.eventTypeSelectorHeader,
-        title = EditorThemeRes.strings.eventTypeSelectorTitle,
+        header = stringResource(Res.string.event_type_selector_header),
+        title = stringResource(Res.string.event_type_selector_title),
         itemView = { eventType ->
             SelectorItemView(
                 onClick = { selectedEventType = eventType },
                 selected = eventType == selectedEventType,
-                title = eventType.mapToString(StudyAssistantRes.strings),
+                title = eventType.mapToString(),
                 label = null,
                 leadingIcon = {
                     Icon(
-                        painter = painterResource(eventType.mapToIcon(StudyAssistantRes.icons)),
+                        painter = painterResource(eventType.mapToIcon()),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                     )

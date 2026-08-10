@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,13 +40,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.endSide
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
+import ru.aleshin.studyassistant.users.impl.resources.Res
+import ru.aleshin.studyassistant.users.impl.resources.none_subjects_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
 
 /**
  * @author Stanislav Aleshin on 11.07.2024.
@@ -77,20 +80,22 @@ internal fun EmployeeSubjectViewItem(
             ) {
                 Row(modifier = Modifier.weight(1f)) {
                     Icon(
-                        painter = painterResource(eventType.mapToIcon(StudyAssistantRes.icons)),
+                        painter = painterResource(eventType.mapToIcon()),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = office,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    if (office.isNotBlank()) {
+                        Text(
+                            text = office,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        text = eventType.mapToString(StudyAssistantRes.strings),
+                        text = eventType.mapToString(),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -136,12 +141,12 @@ internal fun EmployeeProfileSubjectsNoneView(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    painter = painterResource(StudyAssistantRes.icons.practicalTasks),
+                    painter = painterResource(CoreRes.drawable.core_ic_tasks_circular),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = UsersThemeRes.strings.noneSubjectsTitle,
+                    text = stringResource(Res.string.none_subjects_title),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelLarge,
                 )

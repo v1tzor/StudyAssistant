@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@ import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ScheduleShareRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -41,8 +41,9 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 public interface ScheduleFeatureDependencies : BaseFeatureDependencies {
     public val baseScheduleRepository: BaseScheduleRepository
     public val customScheduleRepository: CustomScheduleRepository
-    public val shareSchedulesRepository: ShareSchedulesRepository
+    public val scheduleShareRepository: ScheduleShareRepository
     public val organizationsRepository: OrganizationsRepository
+    public val profileRepository: ProfileRepository
     public val subjectsRepository: SubjectsRepository
     public val employeeRepository: EmployeeRepository
     public val calendarSettingsRepository: CalendarSettingsRepository
@@ -51,7 +52,6 @@ public interface ScheduleFeatureDependencies : BaseFeatureDependencies {
     public val endClassesReminderManager: EndClassesReminderManager
     public val homeworkRepository: HomeworksRepository
     public val todoRepository: TodoRepository
-    public val usersRepository: UsersRepository
     public val connectionManager: Konnection
     public val dateManager: DateManager
     public val coroutineManager: CoroutineManager

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.presentation.models.schedules.DateVersionUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 
 /**

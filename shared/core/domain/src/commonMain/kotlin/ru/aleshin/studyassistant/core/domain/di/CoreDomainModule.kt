@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,8 @@
 package ru.aleshin.studyassistant.core.domain.di
 
 import org.kodein.di.DI
-import org.kodein.di.bindSingleton
-import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.domain.managers.sync.SourceSyncFacade
 
 /**
  * @author Stanislav Aleshin on 02.08.2025.
  */
-val coreDomainModule = DI.Module("CoreDomainModule") {
-    bindSingleton<SourceSyncFacade> { SourceSyncFacade.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
-}
+val coreDomainModule = DI.Module("CoreDomainModule") {}

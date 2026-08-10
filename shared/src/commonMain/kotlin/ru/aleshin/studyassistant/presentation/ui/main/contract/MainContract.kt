@@ -36,7 +36,7 @@ data class MainState(
 ) : StoreState
 
 sealed class MainEvent : StoreEvent {
-    data object StartBackgroundWork : MainEvent()
+    data object Init : MainEvent()
     data object ExecuteNavigation : MainEvent()
 }
 
@@ -53,9 +53,7 @@ data class MainInput(
 ) : BaseInput
 
 sealed class MainOutput : BaseOutput {
-    data object NavigateToIntro : MainOutput()
-    data object NavigateToAuth : MainOutput()
-    data object NavigateToVerification : MainOutput()
-    data object NavigateToSetup : MainOutput()
     data object NavigateToApp : MainOutput()
+    data object NavigateToPreview : MainOutput()
+    data class NavigateToDeepLink(val deepLinkUrl: DeepLinkUrl) : MainOutput()
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,15 +43,14 @@ internal class IntroComposeStore(
     override suspend fun WorkScope<IntroState, IntroAction, IntroEffect, IntroOutput>.handleEvent(
         event: IntroEvent,
     ) = when (event) {
-        is IntroEvent.ClickLogin -> {
-            consumeOutput(IntroOutput.NavigateToLogin)
+        is IntroEvent.ClickSetup -> {
+            consumeOutput(IntroOutput.NavigateToSetup)
         }
-        is IntroEvent.ClickRegister -> {
-            consumeOutput(IntroOutput.NavigateToRegister)
-        }
+
         is IntroEvent.SelectedNextPage -> {
             sendEffect(IntroEffect.ScrollToPage(event.currentPage + 1))
         }
+
         is IntroEvent.SelectedPreviousPage -> {
             sendEffect(IntroEffect.ScrollToPage(event.currentPage - 1))
         }

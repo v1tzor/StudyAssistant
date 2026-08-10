@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,20 @@
 
 package ru.aleshin.studyassistant.core.ui.mappers
 
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.high_priority_title as core_high_priority_title
+import ru.aleshin.studyassistant.core.ui.resources.medium_priority_title as core_medium_priority_title
+import ru.aleshin.studyassistant.core.ui.resources.standard_priority_title as core_standard_priority_title
 
 /**
  * @author Stanislav Aleshin on 21.06.2024.
  */
-fun TaskPriority.mapToString(strings: StudyAssistantStrings) = when (this) {
-    TaskPriority.STANDARD -> strings.standardPriorityTitle
-    TaskPriority.MEDIUM -> strings.mediumPriorityTitle
-    TaskPriority.HIGH -> strings.highPriorityTitle
+@Composable
+fun TaskPriority.mapToString() = when (this) {
+    TaskPriority.STANDARD -> stringResource(CoreRes.string.core_standard_priority_title)
+    TaskPriority.MEDIUM -> stringResource(CoreRes.string.core_medium_priority_title)
+    TaskPriority.HIGH -> stringResource(CoreRes.string.core_high_priority_title)
 }

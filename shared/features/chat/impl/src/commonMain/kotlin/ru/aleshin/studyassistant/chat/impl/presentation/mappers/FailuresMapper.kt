@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,28 @@
 
 package ru.aleshin.studyassistant.chat.impl.presentation.mappers
 
+import org.jetbrains.compose.resources.getString
 import ru.aleshin.studyassistant.chat.impl.domain.entities.ChatFailures
-import ru.aleshin.studyassistant.chat.impl.presentation.theme.tokens.ChatStrings
+import ru.aleshin.studyassistant.chat.impl.resources.Res
+import ru.aleshin.studyassistant.chat.impl.resources.chat_assistant_error_message
+import ru.aleshin.studyassistant.chat.impl.resources.insufficient_balance_error_message
+import ru.aleshin.studyassistant.chat.impl.resources.invalid_key_error_message
+import ru.aleshin.studyassistant.chat.impl.resources.offline_error_message
+import ru.aleshin.studyassistant.chat.impl.resources.other_error_message
+import ru.aleshin.studyassistant.chat.impl.resources.quota_error_message
+import ru.aleshin.studyassistant.chat.impl.resources.rate_limit_error_message
+import ru.aleshin.studyassistant.chat.impl.resources.server_unavailable_error_message
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
-internal fun ChatFailures.mapToMessage(strings: ChatStrings) = when (this) {
-    is ChatFailures.ChatAssistantError -> strings.chatAssistantErrorMessage
-    is ChatFailures.OtherError -> strings.otherErrorMessage
+internal suspend fun ChatFailures.mapToMessage() = when (this) {
+    is ChatFailures.ChatAssistantError -> getString(Res.string.chat_assistant_error_message)
+    is ChatFailures.QuotaExceeded -> getString(Res.string.quota_error_message)
+    is ChatFailures.InvalidKey -> getString(Res.string.invalid_key_error_message)
+    is ChatFailures.InsufficientBalance -> getString(Res.string.insufficient_balance_error_message)
+    is ChatFailures.Offline -> getString(Res.string.offline_error_message)
+    is ChatFailures.RateLimited -> getString(Res.string.rate_limit_error_message)
+    is ChatFailures.ServerUnavailable -> getString(Res.string.server_unavailable_error_message)
+    is ChatFailures.OtherError -> getString(Res.string.other_error_message)
 }

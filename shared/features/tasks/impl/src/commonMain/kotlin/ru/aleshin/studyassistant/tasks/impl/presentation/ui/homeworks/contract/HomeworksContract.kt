@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
@@ -27,15 +26,16 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEv
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.ScheduleUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.HomeworkShareLinkUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.HomeworkShareSelectionUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
+import kotlin.time.Clock
 
 /**
  * @author Stanislav Aleshin on 27.06.2024
@@ -43,12 +43,11 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
 @Serializable
 internal data class HomeworksState(
     val isLoading: Boolean = true,
-    val isPaidUser: Boolean = false,
     val currentDate: Instant = Clock.System.now().startThisDay(),
     val selectedTimeRange: TimeRange? = null,
     val activeSchedule: ScheduleUi? = null,
     val homeworks: Map<Instant, DailyHomeworksUi> = mapOf(),
-    val friends: List<AppUserUi> = emptyList(),
+    val homeworkShareLink: HomeworkShareLinkUi? = null,
 ) : StoreState
 
 internal sealed class HomeworksEvent : StoreEvent {
@@ -59,13 +58,13 @@ internal sealed class HomeworksEvent : StoreEvent {
     data class DoHomework(val homework: HomeworkDetailsUi) : HomeworksEvent()
     data class RepeatHomework(val homework: HomeworkDetailsUi) : HomeworksEvent()
     data class SkipHomework(val homework: HomeworkDetailsUi) : HomeworksEvent()
-    data class ShareHomeworks(val sentMediatedHomeworks: SentMediatedHomeworksDetailsUi) : HomeworksEvent()
+    data class ShareHomeworks(val selection: HomeworkShareSelectionUi) : HomeworksEvent()
+    data object ClearHomeworkShareLink : HomeworksEvent()
     data class ScheduleGoal(val goalCreateModel: GoalCreateModelUi) : HomeworksEvent()
     data class DeleteGoal(val goal: GoalShortUi) : HomeworksEvent()
     data class ClickEditHomework(val homework: HomeworkDetailsUi) : HomeworksEvent()
     data class ClickAddHomework(val date: Instant) : HomeworksEvent()
     data object AddHomeworkInEditor : HomeworksEvent()
-    data object ClickPaidFunction : HomeworksEvent()
     data object ClickBack : HomeworksEvent()
 }
 
@@ -78,8 +77,7 @@ internal sealed class HomeworksAction : StoreAction {
     data class UpdateHomeworks(val homeworks: Map<Instant, DailyHomeworksUi>) : HomeworksAction()
     data class UpdateActiveSchedule(val activeSchedule: ScheduleUi?) : HomeworksAction()
     data class UpdateDates(val currentDate: Instant, val selectedTimeRange: TimeRange?) : HomeworksAction()
-    data class UpdateUserPaidStatus(val isPaidUser: Boolean) : HomeworksAction()
-    data class UpdateFriends(val friends: List<AppUserUi>) : HomeworksAction()
+    data class UpdateHomeworkShareLink(val link: HomeworkShareLinkUi?) : HomeworksAction()
     data class UpdateLoading(val isLoading: Boolean) : HomeworksAction()
 }
 
@@ -89,6 +87,5 @@ internal data class HomeworksInput(
 
 internal sealed class HomeworksOutput : BaseOutput {
     data object NavigateToBack : HomeworksOutput()
-    data object NavigateToBilling : HomeworksOutput()
     data class NavigateToHomeworkEditor(val config: EditorConfig.Homework) : HomeworksOutput()
 }

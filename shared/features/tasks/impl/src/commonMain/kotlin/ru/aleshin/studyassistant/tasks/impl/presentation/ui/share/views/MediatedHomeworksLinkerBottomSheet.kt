@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,17 +67,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.topSide
 import ru.aleshin.studyassistant.core.ui.views.sheet.MediumDragHandle
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.NumberedClassUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.ScheduleUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.MediatedHomeworkLinkData
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.apply_shared_homeworks_title
+import ru.aleshin.studyassistant.tasks.impl.resources.attach_classes_label
+import ru.aleshin.studyassistant.tasks.impl.resources.classes_not_found_label
+import ru.aleshin.studyassistant.tasks.impl.resources.current_user_subjects_title
+import ru.aleshin.studyassistant.tasks.impl.resources.homeworks_linked_header
+import ru.aleshin.studyassistant.tasks.impl.resources.homeworks_linked_label
+import ru.aleshin.studyassistant.tasks.impl.resources.number_of_class_suffix
+import ru.aleshin.studyassistant.tasks.impl.resources.specify_subject_label
+import ru.aleshin.studyassistant.tasks.impl.resources.target_user_subjects_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
 
 /**
  * @author Stanislav Aleshin on 20.07.2024.
@@ -127,7 +139,7 @@ internal fun MediatedHomeworksLinkerBottomSheet(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 onClick = { onAdd(linkDataList) },
             ) {
-                Text(text = TasksThemeRes.strings.applySharedHomeworksTitle)
+                Text(text = stringResource(Res.string.apply_shared_homeworks_title))
             }
         }
     }
@@ -142,7 +154,7 @@ private fun MediatedHomeworksLinkerHeader(
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         Text(
-            text = TasksThemeRes.strings.homeworksLinkedHeader,
+            text = stringResource(Res.string.homeworks_linked_header),
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
             overflow = TextOverflow.Ellipsis,
@@ -150,7 +162,7 @@ private fun MediatedHomeworksLinkerHeader(
             style = MaterialTheme.typography.titleMedium,
         )
         Text(
-            text = TasksThemeRes.strings.homeworksLinkedLabel,
+            text = stringResource(Res.string.homeworks_linked_label),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             overflow = TextOverflow.Ellipsis,
             maxLines = 2,
@@ -183,7 +195,7 @@ private fun MediatedHomeworksLinkerContent(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = TasksThemeRes.strings.targetUserSubjectsTitle,
+                text = stringResource(Res.string.target_user_subjects_title),
                 color = MaterialTheme.colorScheme.tertiary,
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis,
@@ -192,7 +204,7 @@ private fun MediatedHomeworksLinkerContent(
             )
             Text(
                 modifier = Modifier.weight(1f),
-                text = TasksThemeRes.strings.currentUserSubjectsTitle,
+                text = stringResource(Res.string.current_user_subjects_title),
                 color = MaterialTheme.colorScheme.tertiary,
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis,
@@ -378,7 +390,8 @@ private fun SubjectAndClassSelectorView(
             if (actualLinkedClass != null) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = actualLinkedClass.data.subject?.name ?: StudyAssistantRes.strings.noneTitle,
+                        text = actualLinkedClass.data.subject?.name
+                            ?: stringResource(CoreRes.string.core_none_title),
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
                         overflow = TextOverflow.Ellipsis,
@@ -388,7 +401,7 @@ private fun SubjectAndClassSelectorView(
                     Text(
                         text = buildString {
                             append(actualLinkedClass.number)
-                            append(" ", TasksThemeRes.strings.numberOfClassSuffix)
+                            append(" ", stringResource(Res.string.number_of_class_suffix))
                         },
                         color = MaterialTheme.colorScheme.onSurface,
                         overflow = TextOverflow.Ellipsis,
@@ -404,7 +417,7 @@ private fun SubjectAndClassSelectorView(
             } else if (linkSchedule?.classes?.isNotEmpty() == true) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                     Text(
-                        text = TasksThemeRes.strings.attachClassesLabel,
+                        text = stringResource(Res.string.attach_classes_label),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
@@ -414,7 +427,7 @@ private fun SubjectAndClassSelectorView(
             } else {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                     Text(
-                        text = TasksThemeRes.strings.classesNotFoundLabel,
+                        text = stringResource(Res.string.classes_not_found_label),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
@@ -491,7 +504,7 @@ private fun SubjectSelectorView(
         ) {
             Text(
                 modifier = Modifier,
-                text = TasksThemeRes.strings.specifySubjectLabel,
+                text = stringResource(Res.string.specify_subject_label),
                 color = MaterialTheme.colorScheme.primary,
                 maxLines = 1,
                 style = MaterialTheme.typography.labelMedium,

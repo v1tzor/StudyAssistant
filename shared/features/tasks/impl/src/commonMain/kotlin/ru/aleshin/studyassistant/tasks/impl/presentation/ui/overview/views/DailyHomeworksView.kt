@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,23 +69,33 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.domain.entities.tasks.DailyHomeworksStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkTaskComponentUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.HomeworksCompleteBadge
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTaskComponentUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.fetchAllTasks
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.none_tasks_title
+import ru.aleshin.studyassistant.tasks.impl.resources.share_homeworks_button_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_book_study as core_ic_book_study
+import ru.aleshin.studyassistant.core.ui.resources.ic_presentation as core_ic_presentation
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
+import ru.aleshin.studyassistant.core.ui.resources.today_title as core_today_title
+import ru.aleshin.studyassistant.core.ui.resources.tomorrow_title as core_tomorrow_title
 
 /**
  * @author Stanislav Aleshin on 29.06.2024.
@@ -109,10 +119,14 @@ internal fun DailyHomeworksView(
     ) {
         val homeworks = dailyHomeworks.homeworks
         val completedHomeworks = remember(homeworks) {
-            homeworks.getOrElse(HomeworkStatus.COMPLETE) { emptyList() } + homeworks.getOrElse(HomeworkStatus.SKIPPED) { emptyList() }
+            homeworks.getOrElse(HomeworkStatus.COMPLETE) { emptyList() } + homeworks.getOrElse(
+                HomeworkStatus.SKIPPED
+            ) { emptyList() }
         }
         val runningHomeworks = remember(homeworks) {
-            homeworks.getOrElse(HomeworkStatus.WAIT) { emptyList() } + homeworks.getOrElse(HomeworkStatus.IN_FUTURE) { emptyList() }
+            homeworks.getOrElse(HomeworkStatus.WAIT) { emptyList() } + homeworks.getOrElse(
+                HomeworkStatus.IN_FUTURE
+            ) { emptyList() }
         }
         val errorHomeworks = remember(homeworks) {
             homeworks.getOrElse(HomeworkStatus.NOT_COMPLETE) { emptyList() }
@@ -120,7 +134,9 @@ internal fun DailyHomeworksView(
         DailyHomeworksViewHeader(
             targetDate = date,
             currentDate = currentDate,
-            totalHomeworks = remember(homeworks) { homeworks.map { it.value }.extractAllItem().count() },
+            totalHomeworks = remember(homeworks) {
+                homeworks.map { it.value }.extractAllItem().count()
+            },
             completedHomeworks = remember(homeworks) {
                 homeworks[HomeworkStatus.COMPLETE]?.size ?: 0
             },
@@ -195,7 +211,7 @@ internal fun DailyHomeworksView(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = TasksThemeRes.strings.noneTasksTitle,
+                            text = stringResource(Res.string.none_tasks_title),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.titleSmall,
                         )
@@ -207,7 +223,12 @@ internal fun DailyHomeworksView(
             OutlinedButton(
                 onClick = onShareHomeworks,
                 modifier = Modifier.fillMaxWidth().height(32.dp),
-                contentPadding = PaddingValues(start = 12.dp, end = 8.dp, top = 7.dp, bottom = 7.dp),
+                contentPadding = PaddingValues(
+                    start = 12.dp,
+                    end = 8.dp,
+                    top = 7.dp,
+                    bottom = 7.dp
+                ),
                 shape = MaterialTheme.shapes.medium,
             ) {
                 Row(
@@ -215,7 +236,7 @@ internal fun DailyHomeworksView(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = TasksThemeRes.strings.shareHomeworksButtonTitle,
+                        text = stringResource(Res.string.share_homeworks_button_title),
                         style = MaterialTheme.typography.labelMedium,
                     )
                     Icon(
@@ -282,11 +303,11 @@ private fun DailyHomeworksViewHeader(
                 }
                 withStyle(style = MaterialTheme.typography.titleSmall.toSpanStyle()) {
                     if (targetDate.equalsDay(currentDate)) {
-                        append(StudyAssistantRes.strings.todayTitle)
+                        append(stringResource(CoreRes.string.core_today_title))
                     } else if (targetDate.equalsDay(currentDate.shiftDay(1))) {
-                        append(StudyAssistantRes.strings.tomorrowTitle)
+                        append(stringResource(CoreRes.string.core_tomorrow_title))
                     } else {
-                        append(targetDate.dateTime().dayOfWeek.mapToSting(StudyAssistantRes.strings))
+                        append(targetDate.dateTime().dayOfWeek.mapToSting())
                     }
                 }
             },
@@ -448,7 +469,7 @@ private fun ShortHomeworkViewContent(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = subject ?: StudyAssistantRes.strings.noneTitle,
+                text = subject ?: stringResource(CoreRes.string.core_none_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2,
@@ -465,24 +486,28 @@ private fun ShortHomeworkViewContent(
                         StudyAssistantRes.colors.accents.green
                     },
                 )
+
                 HomeworkStatus.WAIT -> Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Default.AccessTime,
                     contentDescription = null,
                     tint = StudyAssistantRes.colors.accents.orange,
                 )
+
                 HomeworkStatus.IN_FUTURE -> Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Default.AccessTime,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                 )
+
                 HomeworkStatus.NOT_COMPLETE -> Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Default.Error,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.error,
                 )
+
                 HomeworkStatus.SKIPPED -> Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Default.Close,
@@ -497,15 +522,15 @@ private fun ShortHomeworkViewContent(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             ShortHomeworkTaskCountView(
-                painter = painterResource(StudyAssistantRes.icons.theoreticalTasks),
+                painter = painterResource(CoreRes.drawable.core_ic_book_study),
                 count = theoreticalTasks.fetchAllTasks().size,
             )
             ShortHomeworkTaskCountView(
-                painter = painterResource(StudyAssistantRes.icons.practicalTasks),
+                painter = painterResource(CoreRes.drawable.core_ic_tasks_circular),
                 count = practicalTasks.fetchAllTasks().size,
             )
             ShortHomeworkTaskCountView(
-                painter = painterResource(StudyAssistantRes.icons.presentationTasks),
+                painter = painterResource(CoreRes.drawable.core_ic_presentation),
                 count = presentationTasks.fetchAllTasks().size,
             )
         }

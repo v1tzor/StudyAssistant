@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,11 @@ import com.russhwolf.settings.Settings
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngineConfig
 import io.ktor.client.engine.HttpClientEngineFactory
-import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.auth.Auth
-import io.ktor.client.plugins.auth.providers.BearerTokens
-import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -42,39 +33,13 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
-import ru.aleshin.studyassistant.core.remote.BuildKonfig
 import ru.aleshin.studyassistant.core.remote.api.ai.AiRemoteApi
-import ru.aleshin.studyassistant.core.remote.api.auth.AuthRemoteApi
-import ru.aleshin.studyassistant.core.remote.api.billing.AppGallerySubscriptionStatusProvider
-import ru.aleshin.studyassistant.core.remote.api.billing.AppStoreSubscriptionStatusProvider
-import ru.aleshin.studyassistant.core.remote.api.billing.GooglePlaySubscriptionStatusProvider
-import ru.aleshin.studyassistant.core.remote.api.billing.RuStoreJweTokenProvider
-import ru.aleshin.studyassistant.core.remote.api.billing.RuStoreSubscriptionStatusProvider
-import ru.aleshin.studyassistant.core.remote.api.billing.SubscriptionStatusProviderFactory
-import ru.aleshin.studyassistant.core.remote.api.billing.SubscriptionsRemoteApi
-import ru.aleshin.studyassistant.core.remote.api.message.HmsAuthTokenProvider
-import ru.aleshin.studyassistant.core.remote.api.message.MessageRemoteApi
-import ru.aleshin.studyassistant.core.remote.api.message.PushServiceAuthTokenFactory
-import ru.aleshin.studyassistant.core.remote.api.message.PushServiceAuthTokenProvider
-import ru.aleshin.studyassistant.core.remote.datasources.ai.DailyAiStatisticsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.employee.EmployeeRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.goals.DailyGoalsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.organizations.OrganizationsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.requests.FriendRequestsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.schedules.BaseScheduleRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.schedules.CustomScheduleRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.settings.CalendarSettingsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.share.SharedHomeworksRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.share.SharedSchedulesRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.subjects.SubjectsRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.tasks.HomeworksRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.tasks.TodoRemoteDataSource
-import ru.aleshin.studyassistant.core.remote.datasources.users.UsersRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.api.ai.SharedAiRemoteApi
+import ru.aleshin.studyassistant.core.remote.datasources.ai.AiAssistantRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.share.HomeworkShareRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.share.ScheduleShareRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.ktor.HttpEngineFactory
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.DeepSeek
-import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.UniversalMessaging
-import kotlin.random.Random
 
 /**
  * @author Stanislav Aleshin on 01.08.2024.
@@ -84,7 +49,6 @@ val coreRemoteModule = DI.Module("CoreRemote") {
     import(coreRemotePlatformModule)
 
     bindSingleton<Settings> { Settings() }
-
     bindSingleton<Json> {
         Json {
             isLenient = true
@@ -93,29 +57,17 @@ val coreRemoteModule = DI.Module("CoreRemote") {
             namingStrategy = JsonNamingStrategy.SnakeCase
         }
     }
-    bindSingleton<HttpEngineFactory> { HttpEngineFactory() }
-    bindProvider<HttpClientEngineFactory<HttpClientEngineConfig>> { instance<HttpEngineFactory>().createEngine() }
-    bindSingleton<HttpClient>(tag = "HmsToken") {
-        HttpClient(instance<HttpEngineFactory>().createEngine()) {
-            defaultRequest {
-                url(HmsAuthTokenProvider.OAUTH_URL)
-                contentType(ContentType.Application.FormUrlEncoded)
-            }
-            install(Logging) {
-                level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }
-                    }
-                }
-            }
-            install(HttpTimeout) {
-                connectTimeoutMillis = 15_000
-                requestTimeoutMillis = 15_000
-                socketTimeoutMillis = 15_000
-            }
-            install(ContentNegotiation) { json(instance<Json>()) }
+    bindSingleton<Json>(tag = "Functions") {
+        Json {
+            isLenient = true
+            ignoreUnknownKeys = true
+            useAlternativeNames = false
         }
+    }
+
+    bindSingleton<HttpEngineFactory> { HttpEngineFactory() }
+    bindProvider<HttpClientEngineFactory<HttpClientEngineConfig>> {
+        instance<HttpEngineFactory>().createEngine()
     }
     bindSingleton<HttpClient>(tag = "DeepSeek") {
         HttpClient(instance<HttpEngineFactory>().createEngine()) {
@@ -123,112 +75,32 @@ val coreRemoteModule = DI.Module("CoreRemote") {
                 url(DeepSeek.HOST)
                 contentType(ContentType.Application.Json)
             }
-            install(Auth) {
-                bearer {
-                    loadTokens {
-                        BearerTokens(BuildKonfig.DEEP_SEEK_KEY, "")
-                    }
-                }
-            }
-            install(HttpRequestRetry) {
-                maxRetries = 3
-                retryIf { _, response -> !response.status.isSuccess() }
-                delayMillis { retry ->
-                    val delay = (retry * 0.2).toLong().coerceAtLeast(1L)
-                    retry + Random.nextLong(delay)
-                }
-            }
             install(HttpTimeout) {
                 connectTimeoutMillis = 300_000
                 requestTimeoutMillis = 300_000
                 socketTimeoutMillis = 300_000
             }
-            install(Logging) {
-                level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }
-                    }
-                }
-            }
             install(ContentNegotiation) { json(instance<Json>()) }
-            install(HttpCookies)
-        }
-    }
-    bindSingleton<HttpClient>(tag = "Messages") {
-        HttpClient(instance<HttpEngineFactory>().createEngine()) {
-            defaultRequest {
-                url(UniversalMessaging.HOST + UniversalMessaging.SEND_TOKENS)
-                contentType(ContentType.Application.Json)
-            }
-            install(Logging) {
-                level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }
-                    }
-                }
-            }
-            install(HttpTimeout) {
-                requestTimeoutMillis = 15000
-                socketTimeoutMillis = 15000
-                connectTimeoutMillis = 15000
-            }
-            install(ContentNegotiation) {
-                json(instance<Json>())
-            }
-        }
-    }
-    bindSingleton<HttpClient>(tag = "Iap") {
-        HttpClient(instance<HttpEngineFactory>().createEngine()) {
-            install(Logging) {
-                level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }
-                    }
-                }
-            }
-            install(HttpTimeout) {
-                requestTimeoutMillis = 15000
-                socketTimeoutMillis = 15000
-                connectTimeoutMillis = 15000
-            }
-            install(ContentNegotiation) {
-                json(instance<Json>())
-            }
         }
     }
 
-    bindSingleton<AiRemoteApi> { AiRemoteApi.Base(instance(tag = "DeepSeek"), instance()) }
-    bindSingleton<AuthRemoteApi> { AuthRemoteApi.Base(instance()) }
-    bindSingleton<SubscriptionsRemoteApi> { SubscriptionsRemoteApi.Base(instance(), instance(), instance()) }
-    bindSingleton<MessageRemoteApi> { MessageRemoteApi.Base(instance(tag = "Messages"), instance(), instance(), instance(), instance()) }
-    bindSingleton<HmsAuthTokenProvider> { HmsAuthTokenProvider.Base(instance<HttpClient>(tag = "HmsToken")) }
-    bindSingleton<SubscriptionStatusProviderFactory> { SubscriptionStatusProviderFactory.Base(instance(), instance(), instance(), instance()) }
-    bindSingleton<RuStoreSubscriptionStatusProvider> { RuStoreSubscriptionStatusProvider.Base(instance(tag = "Iap"), instance()) }
-    bindSingleton<AppGallerySubscriptionStatusProvider> { AppGallerySubscriptionStatusProvider.Base(instance(tag = "Iap")) }
-    bindSingleton<GooglePlaySubscriptionStatusProvider> { GooglePlaySubscriptionStatusProvider.Base(instance(tag = "Iap")) }
-    bindSingleton<AppStoreSubscriptionStatusProvider> { AppStoreSubscriptionStatusProvider.Base(instance(tag = "Iap")) }
-    bindSingleton<RuStoreJweTokenProvider> { RuStoreJweTokenProvider.Base(instance(tag = "Iap")) }
+    bindSingleton<AiRemoteApi>(tag = "SharedAi") {
+        SharedAiRemoteApi(instance(), instance(tag = "Functions"))
+    }
+    bindSingleton<AiRemoteApi>(tag = "PersonalAi") {
+        AiRemoteApi.DeepSeek(instance(tag = "DeepSeek"), instance())
+    }
+    bindSingleton<AiAssistantRemoteDataSource> {
+        AiAssistantRemoteDataSource.Base(
+            sharedApi = instance(tag = "SharedAi"),
+            personalApi = instance(tag = "PersonalAi"),
+        )
+    }
 
-    bindProvider<UsersRemoteDataSource> { UsersRemoteDataSource.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<CalendarSettingsRemoteDataSource> { CalendarSettingsRemoteDataSource.Base(instance(), instance(), instance()) }
-    bindProvider<FriendRequestsRemoteDataSource> { FriendRequestsRemoteDataSource.Base(instance(), instance(), instance()) }
-    bindProvider<SharedHomeworksRemoteDataSource> { SharedHomeworksRemoteDataSource.Base(instance(), instance(), instance()) }
-    bindProvider<SharedSchedulesRemoteDataSource> { SharedSchedulesRemoteDataSource.Base(instance(), instance(), instance()) }
-    bindProvider<BaseScheduleRemoteDataSource> { BaseScheduleRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
-    bindProvider<CustomScheduleRemoteDataSource> { CustomScheduleRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
-    bindProvider<SubjectsRemoteDataSource> { SubjectsRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
-    bindProvider<EmployeeRemoteDataSource> { EmployeeRemoteDataSource.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<HomeworksRemoteDataSource> { HomeworksRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
-    bindProvider<DailyGoalsRemoteDataSource> { DailyGoalsRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
-    bindProvider<TodoRemoteDataSource> { TodoRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
-    bindProvider<OrganizationsRemoteDataSource> { OrganizationsRemoteDataSource.Base(instance(), instance(), instance(), instance(), instance()) }
-    bindProvider<DailyAiStatisticsRemoteDataSource> { DailyAiStatisticsRemoteDataSource.Base(instance(), instance(), instance(), instance()) }
-
-    bindProvider<PushServiceAuthTokenFactory> { PushServiceAuthTokenFactory.Base(instance(), instance(), instance()) }
-    bindProvider<PushServiceAuthTokenProvider.Firebase> { PushServiceAuthTokenProvider.Firebase(instance()) }
-    bindProvider<PushServiceAuthTokenProvider.RuStore> { PushServiceAuthTokenProvider.RuStore() }
-    bindProvider<PushServiceAuthTokenProvider.Huawei> { PushServiceAuthTokenProvider.Huawei(instance()) }
+    bindProvider<ScheduleShareRemoteDataSource> {
+        ScheduleShareRemoteDataSource.Base(instance(), instance(tag = "Functions"))
+    }
+    bindProvider<HomeworkShareRemoteDataSource> {
+        HomeworkShareRemoteDataSource.Base(instance(), instance(tag = "Functions"))
+    }
 }

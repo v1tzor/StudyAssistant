@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkPro
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
-import ru.aleshin.studyassistant.settings.impl.domain.interactors.AppUserInteractor
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.NotificationSettingsInteractor
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.OrganizationInteractor
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToDomain
@@ -42,13 +42,11 @@ internal interface NotificationWorkProcessor :
     class Base(
         private val settingsInteractor: NotificationSettingsInteractor,
         private val organizationInteractor: OrganizationInteractor,
-        private val appUserInteractor: AppUserInteractor,
     ) : NotificationWorkProcessor {
 
         override suspend fun work(command: NotificationWorkCommand) = when (command) {
             is NotificationWorkCommand.LoadSettings -> loadSettingsWork()
             is NotificationWorkCommand.LoadOrganizations -> loadOrganizationsWork()
-            is NotificationWorkCommand.LoadPaidUserStatus -> loadPaidUserStatusWork()
             is NotificationWorkCommand.UpdateSettings -> updateSettingsWork(command.settings)
         }
 
@@ -69,15 +67,6 @@ internal interface NotificationWorkProcessor :
             )
         }
 
-        private fun loadPaidUserStatusWork() = flow {
-            appUserInteractor.fetchAppUserPaidStatus().collectAndHandle(
-                onLeftAction = { emit(EffectResult(NotificationEffect.ShowError(it))) },
-                onRightAction = {
-                    emit(ActionResult(NotificationAction.UpdatePaidUserStatus(it)))
-                }
-            )
-        }
-
         private fun updateSettingsWork(settings: NotificationSettingsUi) = flow {
             settingsInteractor.updateSettings(settings.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(NotificationEffect.ShowError(it))) },
@@ -89,6 +78,5 @@ internal interface NotificationWorkProcessor :
 internal sealed class NotificationWorkCommand : WorkCommand {
     data object LoadSettings : NotificationWorkCommand()
     data object LoadOrganizations : NotificationWorkCommand()
-    data object LoadPaidUserStatus : NotificationWorkCommand()
     data class UpdateSettings(val settings: NotificationSettingsUi) : NotificationWorkCommand()
 }

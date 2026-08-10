@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,6 @@ fun BaseOrganizationEntity.mapToEntity() = OrganizationEntity(
     offices = offices,
     is_hide = isHide,
     updated_at = updatedAt,
-    is_cache_data = isCacheData,
 )
 
 fun OrganizationEntity.mapToBase() = BaseOrganizationEntity(
@@ -62,7 +61,6 @@ fun OrganizationEntity.mapToBase() = BaseOrganizationEntity(
     offices = offices,
     isHide = is_hide,
     updatedAt = updated_at,
-    isCacheData = is_cache_data,
 )
 
 fun OrganizationDetailsEntity.mapToBase() = BaseOrganizationEntity(
@@ -80,7 +78,6 @@ fun OrganizationDetailsEntity.mapToBase() = BaseOrganizationEntity(
     offices = offices,
     isHide = if (isHide) 1L else 0L,
     updatedAt = updatedAt,
-    isCacheData = 0L,
 )
 
 fun BaseOrganizationEntity.mapToDetails(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@ package ru.aleshin.studyassistant.core.data.managers.reminders
 import android.app.AlarmManager
 import android.app.AlarmManager.RTC_WAKEUP
 import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_CANCEL_CURRENT
-import android.app.PendingIntent.FLAG_MUTABLE
+import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
+import android.os.Build
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.messages.LocalNotificationReceiver
 
@@ -39,32 +40,75 @@ actual class NotificationScheduler(
         body: String,
         time: Instant
     ) {
-        val intent = LocalNotificationReceiver.createIntent(context, title, body)
-        val flag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
+        val intent = LocalNotificationReceiver.createIntent(context, id, title, body)
+        val flag = FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
         val pendingIntent = PendingIntent.getBroadcast(context, id, intent, flag)
-        val timeMillis = time.toEpochMilliseconds()
-        alarmManager.setExactAndAllowWhileIdle(RTC_WAKEUP, timeMillis, pendingIntent)
+        scheduleAlarm(time.toEpochMilliseconds(), pendingIntent)
     }
 
-    actual fun scheduleRepeatNotification(
+    actual fun scheduleOngoingNotification(
         id: Int,
         title: String,
         body: String,
         time: Instant,
-        interval: Long
+        endTime: Instant,
     ) {
-        val intent = LocalNotificationReceiver.createIntent(context, title, body)
-        val flag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
+        val intent = LocalNotificationReceiver.createOngoingIntent(
+            context = context,
+            id = id,
+            title = title,
+            body = body,
+            endTime = endTime.toEpochMilliseconds(),
+        )
+        val flag = FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
         val pendingIntent = PendingIntent.getBroadcast(context, id, intent, flag)
-        val timeMillis = time.toEpochMilliseconds()
-        alarmManager.setInexactRepeating(RTC_WAKEUP, timeMillis, interval, pendingIntent)
+        scheduleAlarm(time.toEpochMilliseconds(), pendingIntent)
+    }
+
+    actual fun updateNotificationGroup(group: String, notificationIds: List<Int>) {
+        val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+        val storedIds = preferences.getStringSet(group, emptySet()).orEmpty().mapNotNull(String::toIntOrNull)
+        storedIds.filterNot(notificationIds::contains).forEach(::cancelNotification)
+        preferences.edit().putStringSet(group, notificationIds.map(Int::toString).toSet()).apply()
+    }
+
+    actual fun clearNotificationGroup(group: String) {
+        val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+        val storedIds = preferences.getStringSet(group, emptySet()).orEmpty().mapNotNull(String::toIntOrNull)
+        storedIds.forEach(::cancelNotification)
+        preferences.edit().remove(group).apply()
     }
 
     actual fun cancelNotification(id: Int) {
         val intent = LocalNotificationReceiver.createCancelIntent(context)
-        val cancelFlag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
+        val cancelFlag = FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
         val cancelPendingIntent = PendingIntent.getBroadcast(context, id, intent, cancelFlag)
         alarmManager.cancel(cancelPendingIntent)
         cancelPendingIntent.cancel()
+        LocalNotificationReceiver.cancelNotification(context, id)
+    }
+
+    private fun scheduleAlarm(timeMillis: Long, pendingIntent: PendingIntent) {
+        try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) {
+                alarmManager.setExactAndAllowWhileIdle(RTC_WAKEUP, timeMillis, pendingIntent)
+            } else {
+                alarmManager.setAndAllowWhileIdle(RTC_WAKEUP, timeMillis, pendingIntent)
+            }
+        } catch (_: SecurityException) {
+            scheduleInexactAlarm(timeMillis, pendingIntent)
+        } catch (_: RuntimeException) {
+            scheduleInexactAlarm(timeMillis, pendingIntent)
+        }
+    }
+
+    private fun scheduleInexactAlarm(timeMillis: Long, pendingIntent: PendingIntent) {
+        runCatching {
+            alarmManager.setAndAllowWhileIdle(RTC_WAKEUP, timeMillis, pendingIntent)
+        }
+    }
+
+    companion object {
+        private const val PREFERENCES_NAME = "scheduled_notification_groups"
     }
 }

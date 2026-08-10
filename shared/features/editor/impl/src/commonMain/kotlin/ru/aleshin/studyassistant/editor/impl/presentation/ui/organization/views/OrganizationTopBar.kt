@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarButton
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarTextButton
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.organization_editor_header
+import ru.aleshin.studyassistant.editor.impl.resources.save_button_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.back_icon_desc as core_back_icon_desc
 
 /**
  * @author Stanislav Aleshin on 08.07.2024.
@@ -46,7 +50,7 @@ internal fun OrganizationTopBar(
         modifier = modifier,
         title = {
             TopAppBarTitle(
-                header = EditorThemeRes.strings.organizationEditorHeader,
+                header = stringResource(Res.string.organization_editor_header),
                 headerStyle = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Normal,
                 ),
@@ -55,14 +59,14 @@ internal fun OrganizationTopBar(
         navigationIcon = {
             TopAppBarButton(
                 imageVector = Icons.Default.Close,
-                imageDescription = StudyAssistantRes.strings.backIconDesc,
+                imageDescription = stringResource(CoreRes.string.core_back_icon_desc),
                 onButtonClick = onBackClick,
             )
         },
         actions = {
             TopAppBarTextButton(
                 enabled = enabledSave,
-                text = EditorThemeRes.strings.saveButtonTitle,
+                text = stringResource(Res.string.save_button_title),
                 onClick = onSaveClick,
             )
         },

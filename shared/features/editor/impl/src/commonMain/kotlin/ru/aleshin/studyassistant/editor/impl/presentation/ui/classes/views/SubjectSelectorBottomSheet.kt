@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
@@ -62,8 +64,13 @@ import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorAddItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorSwipeItemView
 import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
-import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.subject_selector_header
+import ru.aleshin.studyassistant.editor.impl.resources.subject_selector_title
+import ru.aleshin.studyassistant.editor.impl.resources.subjects_search_bar_placeholder
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.back_icon_desc as core_back_icon_desc
+import ru.aleshin.studyassistant.core.ui.resources.clear_search_bar_desk as core_clear_search_bar_desk
 
 /**
  * @author Stanislav Aleshin on 02.06.2024.
@@ -99,8 +106,8 @@ internal fun SubjectSelectorBottomSheet(
         modifier = modifier,
         selected = selectedSubject,
         items = subjectsByEventType + otherSubjects,
-        header = EditorThemeRes.strings.subjectSelectorHeader,
-        title = EditorThemeRes.strings.subjectSelectorTitle,
+        header = stringResource(Res.string.subject_selector_header),
+        title = stringResource(Res.string.subject_selector_title),
         itemView = { subject ->
             val dismissState = rememberSwipeToDismissBoxState(
                 confirmValueChange = { dismissBoxValue ->
@@ -118,7 +125,7 @@ internal fun SubjectSelectorBottomSheet(
                 state = dismissState,
                 selected = subject.uid == selectedSubject?.uid,
                 title = subject.name,
-                label = subject.eventType.mapToString(StudyAssistantRes.strings),
+                label = subject.eventType.mapToString(),
                 leadingIcon = {
                     Surface(
                         modifier = Modifier.height(IntrinsicSize.Min),
@@ -180,12 +187,12 @@ internal fun SubjectSelectorBottomSheet(
                         onExpandedChange = {},
                         enabled = true,
                         placeholder = {
-                            Text(text = EditorThemeRes.strings.subjectsSearchBarPlaceholder)
+                            Text(text = stringResource(Res.string.subjects_search_bar_placeholder))
                         },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Search,
-                                contentDescription = StudyAssistantRes.strings.backIconDesc,
+                                contentDescription = stringResource(CoreRes.string.core_back_icon_desc),
                                 tint = MaterialTheme.colorScheme.onSurface,
                             )
                         },
@@ -203,7 +210,7 @@ internal fun SubjectSelectorBottomSheet(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
-                                        contentDescription = StudyAssistantRes.strings.clearSearchBarDesk,
+                                        contentDescription = stringResource(CoreRes.string.core_clear_search_bar_desk),
                                         tint = MaterialTheme.colorScheme.error,
                                     )
                                 }

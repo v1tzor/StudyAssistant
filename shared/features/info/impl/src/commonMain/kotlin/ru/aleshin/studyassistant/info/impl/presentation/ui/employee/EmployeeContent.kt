@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,12 +46,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToMessage
@@ -62,7 +62,8 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.store.Employ
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.views.DetailsEmployeeViewItem
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.views.EmployeeFiltersView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.views.EmployeeSearchTopBar
-import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.no_result_title as core_no_result_title
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.
@@ -74,7 +75,6 @@ internal fun EmployeeContent(
 ) {
     val store = employeeComponent.store
     val state by store.stateAsState()
-    val strings = InfoThemeRes.strings
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -143,7 +143,7 @@ internal fun EmployeeContent(
         when (effect) {
             is EmployeeEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -222,7 +222,7 @@ private fun BaseEmployeeContent(
         } else {
             Text(
                 modifier = Modifier.fillMaxSize(),
-                text = StudyAssistantRes.strings.noResultTitle,
+                text = stringResource(CoreRes.string.core_no_result_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyLarge,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,34 +17,26 @@
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
-import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
-import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkTaskComponent
-import ru.aleshin.studyassistant.core.domain.entities.tasks.toHomeworkComponents
+import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkDetails
+import ru.aleshin.studyassistant.core.presentation.mappers.tasks.mapToUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkTaskComponentUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkTasksUi
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToDomain as mapOrganizationToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi as mapOrganizationToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToDomain as mapSubjectToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToUi as mapSubjectToUi
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
  */
-internal fun Homework.mapToUi(status: HomeworkStatus) = HomeworkDetailsUi(
+internal fun HomeworkDetails.mapToUi() = HomeworkDetailsUi(
     uid = uid,
     classId = classId,
     deadline = deadline,
-    subject = subject?.mapToUi(),
-    organization = organization.mapToUi(),
-    theoreticalTasks = HomeworkTasksUi(
-        origin = theoreticalTasks,
-        components = theoreticalTasks.toHomeworkComponents().map { it.mapToUi() }
-    ),
-    practicalTasks = HomeworkTasksUi(
-        origin = practicalTasks,
-        components = practicalTasks.toHomeworkComponents().map { it.mapToUi() }
-    ),
-    presentationTasks = HomeworkTasksUi(
-        origin = presentationTasks,
-        components = presentationTasks.toHomeworkComponents().map { it.mapToUi() }
-    ),
+    subject = subject?.mapSubjectToUi(),
+    organization = organization.mapOrganizationToUi(),
+    theoreticalTasks = theoreticalTasks.mapToUi(),
+    practicalTasks = practicalTasks.mapToUi(),
+    presentationTasks = presentationTasks.mapToUi(),
     test = test,
     priority = priority,
     isDone = isDone,
@@ -57,8 +49,8 @@ internal fun HomeworkDetailsUi.mapToDomain() = Homework(
     uid = uid,
     classId = classId,
     deadline = deadline,
-    subject = subject?.mapToDomain(),
-    organization = organization.mapToDomain(),
+    subject = subject?.mapSubjectToDomain(),
+    organization = organization.mapOrganizationToDomain(),
     theoreticalTasks = theoreticalTasks.origin,
     practicalTasks = practicalTasks.origin,
     presentationTasks = presentationTasks.origin,
@@ -68,8 +60,3 @@ internal fun HomeworkDetailsUi.mapToDomain() = Homework(
     completeDate = completeDate,
     updatedAt = updatedAt,
 )
-
-internal fun HomeworkTaskComponent.mapToUi() = when (this) {
-    is HomeworkTaskComponent.Label -> HomeworkTaskComponentUi.Label(text)
-    is HomeworkTaskComponent.Tasks -> HomeworkTaskComponentUi.Tasks(taskList)
-}

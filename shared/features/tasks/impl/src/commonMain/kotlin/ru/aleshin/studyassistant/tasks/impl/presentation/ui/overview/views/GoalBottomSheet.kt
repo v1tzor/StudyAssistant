@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents.Formats
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalType
@@ -64,17 +65,26 @@ import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.HIGH
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.MEDIUM
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.STANDARD
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
 import ru.aleshin.studyassistant.core.ui.views.sheet.MediumDragHandle
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.mapToHomeworkTasks
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.DeleteGoalWarningDialog
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_cancel_action_label
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_complete_action_label
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_delete_action_label
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_homework_tasks_title
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_time_control_title
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_deadline
+import ru.aleshin.studyassistant.tasks.impl.resources.until_deadline_date_suffix
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
 
 /**
  * @author Stanislav Aleshin on 05.06.2025.
@@ -111,6 +121,7 @@ internal fun GoalBottomSheet(
                     number = number,
                     onEditHomeworkClick = onEditHomeworkClick,
                 )
+
                 GoalType.TODO -> GoalBottomSheetTodoHeader(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     todo = contentTodo,
@@ -134,8 +145,8 @@ internal fun GoalBottomSheet(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    if (contentHomework?.test != null) {
-                        TestHomeworkView(testTopic = contentHomework.test)
+                    contentHomework?.test?.let { testTopic ->
+                        TestHomeworkView(testTopic = testTopic)
                     }
                     GoalHomeworkTasksView(
                         theoreticalTasks = remember(contentHomework) {
@@ -174,7 +185,8 @@ private fun GoalBottomSheetHomeworkHeader(
         onClick = { if (homework != null) onEditHomeworkClick(homework) },
         modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min),
         shape = MaterialTheme.shapes.large,
-        color = indicatorColor?.copy(alpha = 0.1f) ?: MaterialTheme.colorScheme.surfaceContainerHigh,
+        color = indicatorColor?.copy(alpha = 0.1f)
+            ?: MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -201,15 +213,15 @@ private fun GoalBottomSheetHomeworkHeader(
                 Column {
                     Text(
                         text = homework?.deadline?.formatByTimeZone(
-                            format = Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings)
-                        ) ?: StudyAssistantRes.strings.noneTitle,
+                            format = Formats.shortWeekdayDayMonthFormat()
+                        ) ?: stringResource(CoreRes.string.core_none_title),
                         color = MaterialTheme.colorScheme.onSurface,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 2,
                         style = MaterialTheme.typography.titleSmall,
                     )
                     Text(
-                        text = homework?.subject?.name ?: StudyAssistantRes.strings.noneTitle,
+                        text = homework?.subject?.name ?: stringResource(CoreRes.string.core_none_title),
                         color = MaterialTheme.colorScheme.onSurface,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 3,
@@ -262,8 +274,8 @@ private fun GoalBottomSheetTodoHeader(
                 )
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = todo?.priority?.mapToString(StudyAssistantRes.strings)
-                            ?: StudyAssistantRes.strings.noneTitle,
+                        text = todo?.priority?.mapToString()
+                            ?: stringResource(CoreRes.string.core_none_title),
                         color = when (todo?.priority) {
                             STANDARD -> MaterialTheme.colorScheme.onSurfaceVariant
                             MEDIUM -> StudyAssistantRes.colors.accents.orange
@@ -274,7 +286,7 @@ private fun GoalBottomSheetTodoHeader(
                         style = MaterialTheme.typography.labelMedium,
                     )
                     Text(
-                        text = todo?.name ?: StudyAssistantRes.strings.noneTitle,
+                        text = todo?.name ?: stringResource(CoreRes.string.core_none_title),
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
@@ -293,18 +305,18 @@ private fun GoalBottomSheetTodoHeader(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                val deadlineDateFormat = Formats.dayMonthFormat(StudyAssistantRes.strings)
+                val deadlineDateFormat = Formats.dayMonthFormat()
                 Icon(
                     modifier = Modifier.size(18.dp),
-                    painter = painterResource(TasksThemeRes.icons.deadline),
+                    painter = painterResource(Res.drawable.ic_deadline),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.error,
                 )
                 Text(
                     text = buildString {
-                        append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
+                        append(stringResource(Res.string.until_deadline_date_suffix), " ")
                         val deadlineTitle = todo?.deadline?.formatByTimeZone(deadlineDateFormat)
-                        append(deadlineTitle ?: StudyAssistantRes.strings.noneTitle)
+                        append(deadlineTitle ?: stringResource(CoreRes.string.core_none_title))
                     },
                     maxLines = 1,
                     color = MaterialTheme.colorScheme.error,
@@ -326,7 +338,7 @@ private fun TimeControlDivider(
     ) {
         HorizontalDivider(modifier = Modifier.weight(1f))
         Text(
-            text = TasksThemeRes.strings.goalSheetTimeControlTitle,
+            text = stringResource(Res.string.goal_sheet_time_control_title),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             style = MaterialTheme.typography.labelSmall,
@@ -346,7 +358,7 @@ private fun HomeworkTaskDivider(
     ) {
         HorizontalDivider(modifier = Modifier.weight(1f))
         Text(
-            text = TasksThemeRes.strings.goalSheetHomeworkTasksTitle,
+            text = stringResource(Res.string.goal_sheet_homework_tasks_title),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             style = MaterialTheme.typography.labelSmall,
@@ -378,7 +390,7 @@ private fun GoalBottomSheetActionFooter(
                 contentColor = MaterialTheme.colorScheme.error,
             ),
         ) {
-            Text(text = TasksThemeRes.strings.goalSheetDeleteActionLabel)
+            Text(text = stringResource(Res.string.goal_sheet_delete_action_label))
         }
 
         if (!isDone) {
@@ -387,7 +399,7 @@ private fun GoalBottomSheetActionFooter(
                 onClick = onComplete,
                 enabled = enabled,
             ) {
-                Text(text = TasksThemeRes.strings.goalSheetCompleteActionLabel)
+                Text(text = stringResource(Res.string.goal_sheet_complete_action_label))
             }
         } else {
             FilledTonalButton(
@@ -395,7 +407,7 @@ private fun GoalBottomSheetActionFooter(
                 onClick = onComplete,
                 enabled = enabled,
             ) {
-                Text(text = TasksThemeRes.strings.goalSheetCancelActionLabel)
+                Text(text = stringResource(Res.string.goal_sheet_cancel_action_label))
             }
         }
     }

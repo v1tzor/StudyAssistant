@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,50 +16,15 @@
 
 package ru.aleshin.studyassistant.core.data.mappers.organizations
 
-import ru.aleshin.studyassistant.core.common.extensions.fromJson
-import ru.aleshin.studyassistant.core.common.extensions.toJson
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
-import ru.aleshin.studyassistant.core.data.mappers.users.mapToRemoteData
 import ru.aleshin.studyassistant.core.database.models.organizations.OrganizationShortEntity
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
-import ru.aleshin.studyassistant.core.remote.models.organizations.OrganizationShortPojo
-import ru.aleshin.studyassistant.core.remote.models.organizations.ScheduleTimeIntervalsPojo
-import ru.aleshin.studyassistant.core.remote.models.users.ContactInfoPojo
 
 /**
  * @author Stanislav Aleshin on 04.05.2024.
  */
-
-// Remote
-
-fun OrganizationShort.mapToRemoteData() = OrganizationShortPojo(
-    uid = uid,
-    main = isMain,
-    shortName = shortName,
-    type = type.name,
-    avatar = avatar,
-    locations = locations.map { it.mapToRemoteData().toJson() },
-    offices = offices,
-    scheduleTimeIntervals = scheduleTimeIntervals.mapToRemoteDate().toJson(),
-    updatedAt = updatedAt,
-)
-
-fun OrganizationShortPojo.mapToDomain() = OrganizationShort(
-    uid = uid,
-    isMain = main,
-    shortName = shortName,
-    type = OrganizationType.valueOf(type),
-    locations = locations.map { it.fromJson<ContactInfoPojo>().mapToDomain() },
-    offices = offices,
-    avatar = avatar,
-    scheduleTimeIntervals = scheduleTimeIntervals.fromJson<ScheduleTimeIntervalsPojo>().mapToDomain(),
-    updatedAt = updatedAt,
-)
-
-// Local
-
 fun OrganizationShortEntity.mapToDomain() = OrganizationShort(
     uid = uid,
     isMain = main,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.scope_of_homeworks_header
 
 /**
  * @author Stanislav Aleshin on 26.03.2025.
@@ -59,7 +61,7 @@ internal fun ScopeOfHomeworksView(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = TasksThemeRes.strings.scopeOfHomeworksHeader,
+                    text = stringResource(Res.string.scope_of_homeworks_header),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall,

@@ -9,8 +9,8 @@
 import Foundation
 import shared
 
-public class ReviewServiceImpl : CommonReviewService {
-    
+public class ReviewServiceImpl: CommonReviewService {
+
     @nonobjc
     public func __requestReview(completionHandler: @escaping (KotlinBoolean?, (any Error)?) -> Void) {
         Task {
@@ -22,7 +22,7 @@ public class ReviewServiceImpl : CommonReviewService {
             }
         }
     }
-    
+
     public func __requestReview() async throws -> KotlinBoolean {
         return false
     }

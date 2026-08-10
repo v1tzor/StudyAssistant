@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
@@ -54,8 +56,9 @@ import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.MediatedSubjectUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.subject_linker_dialog_header
+import ru.aleshin.studyassistant.schedule.impl.resources.subject_linker_dialog_title
 
 /**
  * @author Stanislav Aleshin on 16.08.2024.
@@ -180,14 +183,14 @@ internal fun SubjectLinkerDialog(
         modifier = modifier,
         selected = selectedSubject,
         items = subjects,
-        header = ScheduleThemeRes.strings.subjectLinkerDialogHeader,
-        title = ScheduleThemeRes.strings.subjectLinkerDialogTitle,
+        header = stringResource(Res.string.subject_linker_dialog_header),
+        title = stringResource(Res.string.subject_linker_dialog_title),
         itemView = { subject ->
             SelectorItemView(
                 onClick = { selectedSubject = subject },
                 selected = subject.uid == selectedSubject?.uid,
                 title = subject.name,
-                label = subject.eventType.mapToString(StudyAssistantRes.strings),
+                label = subject.eventType.mapToString(),
                 leadingIcon = {
                     Surface(
                         modifier = Modifier.height(IntrinsicSize.Min),

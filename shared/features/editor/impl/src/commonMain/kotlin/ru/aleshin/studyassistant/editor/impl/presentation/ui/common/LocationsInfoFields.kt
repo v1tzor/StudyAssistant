@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,12 +34,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.dialog.ContactInfoEditorDialog
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.location_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.location_field_placeholder
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_map_marker as core_ic_map_marker
 
 /**
  * @author Stanislav Aleshin on 06.06.2024.
@@ -61,7 +65,7 @@ internal fun LocationsInfoFields(
         Box(modifier = Modifier.height(61.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(StudyAssistantRes.icons.location),
+                painter = painterResource(CoreRes.drawable.core_ic_map_marker),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -81,8 +85,8 @@ internal fun LocationsInfoFields(
                     enabled = !isLoading,
                     modifier = Modifier.height(61.dp).weight(1f),
                     value = mainLocation?.value,
-                    label = EditorThemeRes.strings.locationFieldLabel,
-                    placeholder = EditorThemeRes.strings.locationFieldPlaceholder,
+                    label = stringResource(Res.string.location_field_label),
+                    placeholder = stringResource(Res.string.location_field_placeholder),
                     trailingIcon = {
                         ExpandedIcon(
                             isExpanded = contactInfoEditorDialogState,
@@ -109,7 +113,7 @@ internal fun LocationsInfoFields(
                         modifier = Modifier.height(61.dp).weight(1f),
                         value = additionalLocation.value,
                         label = null,
-                        placeholder = EditorThemeRes.strings.locationFieldPlaceholder,
+                        placeholder = stringResource(Res.string.location_field_placeholder),
                         trailingIcon = {
                             ExpandedIcon(
                                 isExpanded = contactInfoEditorDialogState,
@@ -133,7 +137,7 @@ internal fun LocationsInfoFields(
 
     if (contactInfoEditorDialogState) {
         ContactInfoEditorDialog(
-            header = EditorThemeRes.strings.locationFieldLabel,
+            header = stringResource(Res.string.location_field_label),
             label = editableContactInfo?.label,
             value = editableContactInfo?.value,
             onDismiss = {

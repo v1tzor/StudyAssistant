@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,16 +52,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atDate
 import kotlinx.datetime.toInstant
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.views.currentScreenSize
+import ru.aleshin.studyassistant.core.ui.views.adaptive.currentScreenSize
+import kotlin.time.Clock
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
+import ru.aleshin.studyassistant.core.ui.resources.ic_clock_outline as core_ic_clock_outline
+import ru.aleshin.studyassistant.core.ui.resources.ok_confirm_title as core_ok_confirm_title
+import ru.aleshin.studyassistant.core.ui.resources.time_picker_dialog_header as core_time_picker_dialog_header
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -72,7 +77,7 @@ fun TimePickerDialog(
     modifier: Modifier = Modifier,
     initTime: Instant?,
     timeRestriction: LocalTime? = null,
-    header: String = StudyAssistantRes.strings.timePickerDialogHeader,
+    header: String = stringResource(CoreRes.string.core_time_picker_dialog_header),
     showCurrentTimeSelector: Boolean = false,
     onDismiss: () -> Unit,
     onConfirmTime: (Instant) -> Unit,
@@ -209,7 +214,7 @@ internal fun TimePickerActions(
                 onClick = onCurrentTimeChoose
             ) {
                 Icon(
-                    painter = painterResource(StudyAssistantRes.icons.timeOutline),
+                    painter = painterResource(CoreRes.drawable.core_ic_clock_outline),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
@@ -226,9 +231,9 @@ internal fun TimePickerActions(
             bottom = ContentPadding.calculateBottomPadding()
         ),
     ) {
-        Text(text = StudyAssistantRes.strings.cancelTitle)
+        Text(text = stringResource(CoreRes.string.core_cancel_title))
     }
     TextButton(enabled = enabledConfirm, onClick = onConfirmClick) {
-        Text(text = StudyAssistantRes.strings.okConfirmTitle)
+        Text(text = stringResource(CoreRes.string.core_ok_confirm_title))
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsAction
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEvent
@@ -152,13 +152,11 @@ internal class DetailsComposeStore(
     ) = when (action) {
         is DetailsAction.UpdateWeekSchedule -> currentState.copy(
             weekSchedule = action.schedule,
+            activeClass = action.activeClass,
             isLoading = false,
         )
         is DetailsAction.UpdateSelectedWeek -> currentState.copy(
             selectedWeek = action.week,
-        )
-        is DetailsAction.UpdateActiveClass -> currentState.copy(
-            activeClass = action.activeClass,
         )
         is DetailsAction.UpdateViewType -> currentState.copy(
             scheduleView = action.scheduleView,

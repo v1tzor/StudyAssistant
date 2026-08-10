@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,14 +61,19 @@ internal class EmployeeComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_EMPLOYEE) {
-                    val command = EmployeeWorkCommand.LoadEditModel(inputData.employeeId, inputData.organizationId)
+                    val command = EmployeeWorkCommand.LoadEditModel(
+                        inputData.employeeId,
+                        inputData.organizationId
+                    )
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is EmployeeEvent.UpdateAvatar -> with(event) {
                 val inputFile = image.convertToInputFile()
                 sendAction(EmployeeAction.UpdateActionWithAvatar(ActionWithAvatar.Set(inputFile)))
             }
+
             is EmployeeEvent.DeleteAvatar -> with(state()) {
                 val action = if (editableEmployee?.avatar != null) {
                     ActionWithAvatar.Delete
@@ -77,6 +82,7 @@ internal class EmployeeComposeStore(
                 }
                 sendAction(EmployeeAction.UpdateActionWithAvatar(action))
             }
+
             is EmployeeEvent.UpdateName -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(
                     firstName = event.first,
@@ -85,10 +91,12 @@ internal class EmployeeComposeStore(
                 )
                 sendAction(EmployeeAction.UpdateEditModel(updatedEmployee))
             }
+
             is EmployeeEvent.UpdatePost -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(post = event.post)
                 sendAction(EmployeeAction.UpdateEditModel(updatedEmployee))
             }
+
             is EmployeeEvent.UpdateWorkTime -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(
                     workTimeStart = event.start,
@@ -96,26 +104,32 @@ internal class EmployeeComposeStore(
                 )
                 sendAction(EmployeeAction.UpdateEditModel(updatedEmployee))
             }
+
             is EmployeeEvent.UpdateBirthday -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(birthday = event.date)
                 sendAction(EmployeeAction.UpdateEditModel(updatedEmployee))
             }
+
             is EmployeeEvent.UpdateEmails -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(emails = event.emails)
                 sendAction(EmployeeAction.UpdateEditModel(updatedEmployee))
             }
+
             is EmployeeEvent.UpdatePhones -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(phones = event.phones)
                 sendAction(EmployeeAction.UpdateEditModel(updatedEmployee))
             }
+
             is EmployeeEvent.UpdateWebs -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(webs = event.webs)
                 sendAction(EmployeeAction.UpdateEditModel(updatedEmployee))
             }
+
             is EmployeeEvent.UpdateLocations -> with(state()) {
                 val updatedEmployee = editableEmployee?.copy(locations = event.locations)
                 sendAction(EmployeeAction.UpdateEditModel(updatedEmployee))
             }
+
             is EmployeeEvent.SaveEmployee -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SAVE_EMPLOYEE) {
                     val employee = checkNotNull(editableEmployee)
@@ -123,6 +137,7 @@ internal class EmployeeComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is EmployeeEvent.NavigateToBack -> {
                 consumeOutput(EmployeeOutput.NavigateToBack)
             }
@@ -138,15 +153,19 @@ internal class EmployeeComposeStore(
             actionWithAvatar = ActionWithAvatar.None(action.editModel.avatar),
             isLoading = false,
         )
+
         is EmployeeAction.UpdateEditModel -> currentState.copy(
             editableEmployee = action.editModel,
         )
+
         is EmployeeAction.UpdateOrganization -> currentState.copy(
             organization = action.organization,
         )
+
         is EmployeeAction.UpdateActionWithAvatar -> currentState.copy(
             actionWithAvatar = action.actionWithAvatar,
         )
+
         is EmployeeAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )

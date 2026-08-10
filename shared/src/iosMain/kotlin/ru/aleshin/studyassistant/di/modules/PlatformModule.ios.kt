@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,24 +21,16 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.platform.IosUUIDProvider
 import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
-import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
-import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
 import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
-import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
-import ru.aleshin.studyassistant.core.remote.api.message.GoogleAuthTokenProvider
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 
 /**
  * @author Stanislav Aleshin on 24.04.2024.
  */
 actual val platformModule = DI.Module("PlatformModule") {
-    bindSingleton<AppService> { instance<PlatformConfiguration>().appService }
     bindSingleton<AnalyticsService> { instance<PlatformConfiguration>().analyticsService }
-    bindSingleton<MessagingService> { instance<PlatformConfiguration>().messagingService }
     bindSingleton<CrashlyticsService> { instance<PlatformConfiguration>().crashlyticsService }
     bindSingleton<ReviewService> { instance<PlatformConfiguration>().reviewService }
-    bindSingleton<IapService> { instance<PlatformConfiguration>().iapService }
-    bindSingleton<GoogleAuthTokenProvider> { instance<PlatformConfiguration>().serviceTokenProvider }
     bindSingleton<IosUUIDProvider> { instance<PlatformConfiguration>().uuidProvider }
 }

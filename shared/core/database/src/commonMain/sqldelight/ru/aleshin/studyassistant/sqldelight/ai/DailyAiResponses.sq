@@ -9,24 +9,10 @@ addOrUpdateStatistics:
 INSERT OR REPLACE INTO dailyAiResponsesEntity (id, total_responses, date, updated_at)
 VALUES ?;
 
-fetchStatisticsById:
-SELECT * FROM dailyAiResponsesEntity
-WHERE id = ?;
-
-fetchStatisticsByIds:
-SELECT * FROM dailyAiResponsesEntity
-WHERE id IN ?;
-
 fetchStatisticsByDate:
 SELECT * FROM dailyAiResponsesEntity
 WHERE date = ?;
 
-fetchStatisticsMetadata:
-SELECT id, updated_at FROM dailyAiResponsesEntity;
-
 deleteStatisticsByIds:
 DELETE FROM dailyAiResponsesEntity
 WHERE id IN ?;
-
-deleteAllStatistics:
-DELETE FROM dailyAiResponsesEntity;

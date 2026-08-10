@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkPro
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ProfileUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToDomain
 import ru.aleshin.studyassistant.core.ui.models.InputFileUi
-import ru.aleshin.studyassistant.editor.impl.domain.interactors.AppUserInteractor
-import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
-import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.AppUserUi
+import ru.aleshin.studyassistant.editor.impl.domain.interactors.ProfileInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileOutput
@@ -40,66 +40,49 @@ internal interface ProfileWorkProcessor :
     FlowWorkProcessor<ProfileWorkCommand, ProfileAction, ProfileEffect, ProfileOutput> {
 
     class Base(
-        private val appUserInteractor: AppUserInteractor,
+        private val profileInteractor: ProfileInteractor,
     ) : ProfileWorkProcessor {
 
         override suspend fun work(command: ProfileWorkCommand) = when (command) {
-            is ProfileWorkCommand.LoadAppUser -> loadAppUserWork()
-            is ProfileWorkCommand.LoadPaidUserStatus -> loadPaidUserStatusWork()
-            is ProfileWorkCommand.UpdateAppUser -> updateAppUserWork(command.user)
-            is ProfileWorkCommand.UpdatePassword -> updatePasswordWork(command.oldPassword, command.newPassword)
+            is ProfileWorkCommand.LoadProfile -> loadProfileWork()
+            is ProfileWorkCommand.UpdateProfile -> updateProfileWork(command.profile)
             is ProfileWorkCommand.UpdateAvatar -> updateAvatarWork(command.user, command.file)
             is ProfileWorkCommand.DeleteAvatar -> deleteAvatarWork(command.user)
         }
 
-        private fun loadAppUserWork() = flow {
-            appUserInteractor.fetchAppUser().collectAndHandle(
+        private fun loadProfileWork() = flow {
+            profileInteractor.fetchProfile().collectAndHandle(
                 onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
-                onRightAction = { user ->
-                    emit(ActionResult(ProfileAction.SetupAppUser(user.mapToUi())))
+                onRightAction = { profile ->
+                    emit(ActionResult(ProfileAction.SetupProfile(profile.mapToUi())))
                 },
             )
         }
 
-        private fun loadPaidUserStatusWork() = flow {
-            appUserInteractor.fetchAppUserPaidStatus().collectAndHandle(
-                onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
-                onRightAction = { isPaidUser ->
-                    emit(ActionResult(ProfileAction.UpdatePaidUserStatus(isPaidUser)))
-                },
-            )
-        }
-
-        private fun updateAppUserWork(user: AppUserUi) = flow {
-            appUserInteractor.updateUser(user.mapToDomain()).handle(
+        private fun updateProfileWork(profile: ProfileUi) = flow {
+            profileInteractor.updateProfile(profile.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
             )
         }
 
-        private fun updatePasswordWork(oldPassword: String?, newPassword: String) = flow {
-            appUserInteractor.updatePassword(oldPassword, newPassword).handle(
-                onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
-            )
-        }
-
-        private fun updateAvatarWork(user: AppUserUi, file: InputFileUi) = flow {
-            appUserInteractor.uploadAvatar(user.avatar, file.mapToDomain()).handle(
+        private fun updateAvatarWork(user: ProfileUi, file: InputFileUi) = flow {
+            profileInteractor.uploadAvatar(user.avatar, file.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
                 onRightAction = { imageUrl ->
                     val updatedUser = user.copy(avatar = imageUrl)
-                    appUserInteractor.updateUser(updatedUser.mapToDomain()).handle(
+                    profileInteractor.updateProfile(updatedUser.mapToDomain()).handle(
                         onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
                     )
                 }
             )
         }
 
-        private fun deleteAvatarWork(user: AppUserUi) = flow {
-            appUserInteractor.deleteAvatar(user.avatar ?: "").handle(
+        private fun deleteAvatarWork(user: ProfileUi) = flow {
+            profileInteractor.deleteAvatar(user.avatar ?: "").handle(
                 onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
                 onRightAction = {
                     val updatedUser = user.copy(avatar = null)
-                    appUserInteractor.updateUser(updatedUser.mapToDomain()).handle(
+                    profileInteractor.updateProfile(updatedUser.mapToDomain()).handle(
                         onLeftAction = { emit(EffectResult(ProfileEffect.ShowError(it))) },
                     )
                 }
@@ -109,10 +92,8 @@ internal interface ProfileWorkProcessor :
 }
 
 internal sealed class ProfileWorkCommand : WorkCommand {
-    data object LoadAppUser : ProfileWorkCommand()
-    data object LoadPaidUserStatus : ProfileWorkCommand()
-    data class UpdateAppUser(val user: AppUserUi) : ProfileWorkCommand()
-    data class UpdateAvatar(val user: AppUserUi, val file: InputFileUi) : ProfileWorkCommand()
-    data class DeleteAvatar(val user: AppUserUi) : ProfileWorkCommand()
-    data class UpdatePassword(val oldPassword: String?, val newPassword: String) : ProfileWorkCommand()
+    data object LoadProfile : ProfileWorkCommand()
+    data class UpdateProfile(val profile: ProfileUi) : ProfileWorkCommand()
+    data class UpdateAvatar(val user: ProfileUi, val file: InputFileUi) : ProfileWorkCommand()
+    data class DeleteAvatar(val user: ProfileUi) : ProfileWorkCommand()
 }

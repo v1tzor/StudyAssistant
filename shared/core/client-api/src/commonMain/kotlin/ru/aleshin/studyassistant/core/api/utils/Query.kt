@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ package ru.aleshin.studyassistant.core.api.utils
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import ru.aleshin.studyassistant.core.api.utils.Query.Companion.limit
-import ru.aleshin.studyassistant.core.api.utils.Query.Companion.offset
 import ru.aleshin.studyassistant.core.common.functional.ListAnySerializer
 
 /**
@@ -47,7 +45,8 @@ class Query(
          * @param value The value to compare against.
          * @returns The query string.
          */
-        fun equal(attribute: String, value: Any) = Query("equal", attribute, parseValue(value)).toString()
+        fun equal(attribute: String, value: Any) =
+            Query("equal", attribute, parseValue(value)).toString()
 
         /**
          * Filter resources where attribute is not equal to value.
@@ -56,7 +55,8 @@ class Query(
          * @param value The value to compare against.
          * @returns The query string.
          */
-        fun notEqual(attribute: String, value: Any) = Query("notEqual", attribute, parseValue(value)).toString()
+        fun notEqual(attribute: String, value: Any) =
+            Query("notEqual", attribute, parseValue(value)).toString()
 
         /**
          * Filter resources where attribute is less than value.
@@ -65,7 +65,8 @@ class Query(
          * @param value The value to compare against.
          * @returns The query string.
          */
-        fun lessThan(attribute: String, value: Any) = Query("lessThan", attribute, parseValue(value)).toString()
+        fun lessThan(attribute: String, value: Any) =
+            Query("lessThan", attribute, parseValue(value)).toString()
 
         /**
          * Filter resources where attribute is less than or equal to value.
@@ -74,7 +75,8 @@ class Query(
          * @param value The value to compare against.
          * @returns The query string.
          */
-        fun lessThanEqual(attribute: String, value: Any) = Query("lessThanEqual", attribute, parseValue(value)).toString()
+        fun lessThanEqual(attribute: String, value: Any) =
+            Query("lessThanEqual", attribute, parseValue(value)).toString()
 
         /**
          * Filter resources where attribute is greater than value.
@@ -83,7 +85,8 @@ class Query(
          * @param value The value to compare against.
          * @returns The query string.
          */
-        fun greaterThan(attribute: String, value: Any) = Query("greaterThan", attribute, parseValue(value)).toString()
+        fun greaterThan(attribute: String, value: Any) =
+            Query("greaterThan", attribute, parseValue(value)).toString()
 
         /**
          * Filter resources where attribute is greater than or equal to value.
@@ -92,7 +95,8 @@ class Query(
          * @param value The value to compare against.
          * @returns The query string.
          */
-        fun greaterThanEqual(attribute: String, value: Any) = Query("greaterThanEqual", attribute, parseValue(value)).toString()
+        fun greaterThanEqual(attribute: String, value: Any) =
+            Query("greaterThanEqual", attribute, parseValue(value)).toString()
 
         /**
          * Filter resources where attribute matches the search value.
@@ -101,7 +105,8 @@ class Query(
          * @param value The search value to match against.
          * @returns The query string.
          */
-        fun search(attribute: String, value: String) = Query("search", attribute, listOf(value)).toString()
+        fun search(attribute: String, value: String) =
+            Query("search", attribute, listOf(value)).toString()
 
         /**
          * Filter resources where attribute is null.
@@ -127,7 +132,8 @@ class Query(
          * @param end The end value of the range.
          * @returns The query string.
          */
-        fun between(attribute: String, start: Any, end: Any) = Query("between", attribute, listOf(start, end)).toString()
+        fun between(attribute: String, start: Any, end: Any) =
+            Query("between", attribute, listOf(start, end)).toString()
 
         /**
          * Filter resources where attribute starts with value.
@@ -136,7 +142,8 @@ class Query(
          * @param value The value to compare against.
          * @returns The query string.
          */
-        fun startsWith(attribute: String, value: String) = Query("startsWith", attribute, listOf(value)).toString()
+        fun startsWith(attribute: String, value: String) =
+            Query("startsWith", attribute, listOf(value)).toString()
 
         /**
          * Filter resources where attribute ends with value.
@@ -145,7 +152,8 @@ class Query(
          * @param value The value to compare against.
          * @returns The query string.
          */
-        fun endsWith(attribute: String, value: String) = Query("endsWith", attribute, listOf(value)).toString()
+        fun endsWith(attribute: String, value: String) =
+            Query("endsWith", attribute, listOf(value)).toString()
 
         /**
          * Specify which attributes should be returned by the API call.
@@ -177,7 +185,8 @@ class Query(
          * @param documentId The document ID to use as cursor.
          * @returns The query string.
          */
-        fun cursorBefore(documentId: String) = Query("cursorBefore", null, listOf(documentId)).toString()
+        fun cursorBefore(documentId: String) =
+            Query("cursorBefore", null, listOf(documentId)).toString()
 
         /**
          * Return results after documentId.
@@ -185,8 +194,9 @@ class Query(
          * @param documentId The document ID to use as cursor.
          * @returns The query string.
          */
-        fun cursorAfter(documentId: String) = Query("cursorAfter", null, listOf(documentId)).toString()
-        
+        fun cursorAfter(documentId: String) =
+            Query("cursorAfter", null, listOf(documentId)).toString()
+
         /**
          * Return only limit results.
          *
@@ -210,7 +220,8 @@ class Query(
          * @param value The value to compare against.
          * @returns The query string.
          */
-        fun contains(attribute: String, value: Any) = Query("contains", attribute, parseValue(value)).toString()
+        fun contains(attribute: String, value: Any) =
+            Query("contains", attribute, parseValue(value)).toString()
 
         /**
          * Combine multiple queries using logical OR operator.

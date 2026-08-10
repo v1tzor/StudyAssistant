@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,10 +53,13 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.theme.tokens.CustomColors
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.color_picker_required_label
+import ru.aleshin.studyassistant.editor.impl.resources.ic_color
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -77,7 +80,7 @@ internal fun ColorInfoField(
         Box(modifier = Modifier.padding(top = 5.dp)) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(EditorThemeRes.icons.color),
+                painter = painterResource(Res.drawable.ic_color),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -90,7 +93,8 @@ internal fun ColorInfoField(
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
             ) {
                 LazyRow(
-                    modifier = Modifier.height(64.dp).fillMaxWidth().padding(horizontal = 12.dp, vertical = 16.dp),
+                    modifier = Modifier.height(64.dp).fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     userScrollEnabled = !isLoading,
                 ) {
@@ -121,7 +125,7 @@ internal fun ColorInfoField(
             ) {
                 Text(
                     modifier = Modifier.padding(horizontal = 4.dp),
-                    text = EditorThemeRes.strings.colorPickerLabel,
+                    text = stringResource(Res.string.color_picker_required_label),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )

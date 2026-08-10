@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,19 @@ package ru.aleshin.studyassistant.core.common.inject
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import org.kodein.di.DI
+import org.kodein.di.compose.withDI
 
 /**
  * @author Stanislav Aleshin on 20.08.2025.
  */
-interface FeatureContentProvider {
+abstract class FeatureContentProvider(protected val di: DI) {
 
     @Composable
-    operator fun invoke(modifier: Modifier)
+    fun Content(modifier: Modifier = Modifier) = withDI(di) {
+        RootContent(modifier)
+    }
+
+    @Composable
+    protected abstract fun RootContent(modifier: Modifier)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,19 +30,26 @@ data class DeepLinkUrl(
 ) {
     companion object {
         fun fromString(url: String): DeepLinkUrl {
-            var path: String = url.substringAfter(delimiter = "://").substringAfter(delimiter = "/")
+            var path: String = url.substringAfter(delimiter = "://")
             var params: Map<String, String> = emptyMap()
 
             if ('?' in path) {
                 params = path.substringAfter(delimiter = "?")
                     .split("&")
-                    .map { it.split("=") }
-                    .associate { (key, value) -> key to value }
+                    .mapNotNull { parameter ->
+                        val key = parameter.substringBefore("=")
+                        val value = parameter.substringAfter("=", missingDelimiterValue = "")
+                        key.takeIf { it.isNotBlank() }?.let { it to value }
+                    }
+                    .toMap()
 
                 path = path.substringBefore(delimiter = "?")
             }
 
-            return DeepLinkUrl(pathSegments = path.split("/"), params = params)
+            return DeepLinkUrl(
+                pathSegments = path.split("/").filter { it.isNotBlank() },
+                params = params,
+            )
         }
     }
 }

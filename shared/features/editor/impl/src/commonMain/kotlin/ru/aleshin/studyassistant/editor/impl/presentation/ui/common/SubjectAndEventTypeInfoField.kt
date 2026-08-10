@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_class as core_ic_class
+import ru.aleshin.studyassistant.editor.impl.resources.*
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,8 +47,7 @@ import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
-import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.SubjectSelectorBottomSheet
 
 /**
@@ -73,7 +76,7 @@ internal fun SubjectAndEventTypeInfoField(
         Box(modifier = Modifier.height(61.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(StudyAssistantRes.icons.classes),
+                painter = painterResource(CoreRes.drawable.core_ic_class),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -83,8 +86,8 @@ internal fun SubjectAndEventTypeInfoField(
                 onClick = { openSubjectSelectorSheet = true },
                 enabled = !isLoading,
                 value = subject?.name,
-                label = EditorThemeRes.strings.subjectFieldLabel,
-                placeholder = EditorThemeRes.strings.subjectFieldPlaceholder,
+                label = stringResource(Res.string.subject_required_field_label),
+                placeholder = stringResource(Res.string.subject_field_placeholder),
                 leadingIcon = {
                     Surface(
                         shape = MaterialTheme.shapes.full,
@@ -105,9 +108,9 @@ internal fun SubjectAndEventTypeInfoField(
             ClickableTextField(
                 onClick = { openEventTypeSelectorSheet = true },
                 enabled = !isLoading,
-                value = eventType?.mapToString(StudyAssistantRes.strings),
-                label = EditorThemeRes.strings.eventTypeFieldLabel,
-                placeholder = EditorThemeRes.strings.eventTypeFieldPlaceholder,
+                value = eventType?.mapToString(),
+                label = stringResource(Res.string.event_type_required_field_label),
+                placeholder = stringResource(Res.string.event_type_field_placeholder),
                 trailingIcon = {
                     ExpandedIcon(
                         isExpanded = openEventTypeSelectorSheet,
@@ -164,13 +167,14 @@ internal fun SubjectInfoField(
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
         value = subject?.name,
-        label = EditorThemeRes.strings.subjectFieldLabel,
-        infoIcon = painterResource(StudyAssistantRes.icons.classes),
-        placeholder = EditorThemeRes.strings.subjectFieldPlaceholder,
+        label = stringResource(Res.string.subject_field_label),
+        infoIcon = painterResource(CoreRes.drawable.core_ic_class),
+        placeholder = stringResource(Res.string.subject_field_placeholder),
         leadingIcon = {
             Surface(
                 shape = MaterialTheme.shapes.full,
-                color = subject?.color?.let { Color(it) } ?: MaterialTheme.colorScheme.outlineVariant,
+                color = subject?.color?.let { Color(it) }
+                    ?: MaterialTheme.colorScheme.outlineVariant,
                 content = { Box(modifier = Modifier.size(8.dp, 24.dp)) },
             )
         },

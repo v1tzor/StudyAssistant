@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,7 @@ import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.convertToShort
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.covertToBase
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.share.OrganizationLinkData
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 
 /**
  * @author Stanislav Aleshin on 01.05.2024.
@@ -43,29 +40,3 @@ internal data class MediatedClassUi(
     val location: ContactInfoUi?,
     val timeRange: TimeRange,
 )
-
-internal fun MediatedClassUi.convertToBase(
-    linkData: OrganizationLinkData,
-    number: Int,
-): ClassUi {
-    val sharedOrganization = linkData.sharedOrganization.covertToBase()
-    val organization = linkData.linkedOrganization ?: sharedOrganization
-    val linkSubject = linkData.linkedSubjects[subjectId]
-    val linkTeacher = linkData.linkedTeachers[teacherId]
-    val actualSubject = linkSubject ?: sharedOrganization.subjects.find { it.uid == subjectId }
-    val teacher = linkTeacher ?: sharedOrganization.employee.find { it.uid == teacherId }
-
-    return ClassUi(
-        uid = uid,
-        scheduleId = scheduleId,
-        organization = organization.convertToShort(),
-        eventType = eventType,
-        subject = actualSubject,
-        customData = customData,
-        teacher = teacher,
-        office = office,
-        location = location,
-        timeRange = timeRange,
-        number = number,
-    )
-}

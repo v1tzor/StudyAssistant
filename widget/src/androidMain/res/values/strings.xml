@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_schedule_name">StudyAssistant: Schedule</string>
+    <string name="widget_schedule_description">Today’s classes with time, event type and room</string>
+    <string name="widget_homeworks_name">StudyAssistant: Homework</string>
+    <string name="widget_homeworks_description">Upcoming homework grouped by date</string>
+    <string name="widget_todos_name">StudyAssistant: TODO</string>
+    <string name="widget_todos_description">Active tasks with quick completion</string>
+    <string name="widget_goals_name">StudyAssistant: Daily goals</string>
+    <string name="widget_goals_description">Today’s study goals and progress</string>
+
+    <string name="widget_schedule_title">Schedule</string>
+    <string name="widget_homeworks_title">Homework</string>
+    <string name="widget_todos_title">TODO</string>
+    <string name="widget_goals_title">Daily goals</string>
+    <string name="widget_today">Today</string>
+    <string name="widget_loading">Loading…</string>
+    <string name="widget_error">Couldn’t update</string>
+    <string name="widget_stale">Data may be outdated</string>
+    <string name="widget_schedule_empty">No classes today</string>
+    <string name="widget_homeworks_empty">No upcoming homework</string>
+    <string name="widget_todos_empty">No active tasks</string>
+    <string name="widget_goals_empty">No goals for today</string>
+
+    <string name="widget_refresh_description">Refresh widgets</string>
+    <string name="widget_add_schedule_description">Edit today’s schedule</string>
+    <string name="widget_add_homework_description">Add homework</string>
+    <string name="widget_add_todo_description">Add task</string>
+    <string name="widget_add_goal_description">Add daily goal</string>
+    <string name="widget_complete_todo_description">Complete task</string>
+    <string name="widget_room_description">Room</string>
+    <string name="widget_no_subject">No subject</string>
+
+    <string name="widget_event_lesson">Lesson</string>
+    <string name="widget_event_lecture">Lecture</string>
+    <string name="widget_event_practice">Practice</string>
+    <string name="widget_event_seminar">Seminar</string>
+    <string name="widget_event_class">Class</string>
+    <string name="widget_event_online_class">Online class</string>
+    <string name="widget_event_webinar">Webinar</string>
+
+    <string name="widget_theory_description">Theory tasks</string>
+    <string name="widget_practice_description">Practical tasks</string>
+    <string name="widget_presentation_description">Presentation tasks</string>
+    <string name="widget_homework_complete">Completed</string>
+    <string name="widget_homework_wait">Due soon</string>
+    <string name="widget_homework_future">Upcoming</string>
+    <string name="widget_homework_skipped">Skipped</string>
+    <string name="widget_homework_overdue">Overdue</string>
+
+    <string name="widget_goal_without_timer">No timer</string>
+    <string name="widget_goal_homework">Homework goal</string>
+    <string name="widget_goal_todo">Task goal</string>
+</resources>

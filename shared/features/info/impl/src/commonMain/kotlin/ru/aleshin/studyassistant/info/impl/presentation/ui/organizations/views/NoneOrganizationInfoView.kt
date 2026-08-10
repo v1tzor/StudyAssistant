@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.absent_title as core_absent_title
 
 /**
  * @author Stanislav Aleshin on 17.06.2024.
@@ -44,7 +46,7 @@ internal fun NoneOrganizationInfoView(
         Box(modifier = Modifier.fillMaxSize()) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
-                text = StudyAssistantRes.strings.absentTitle,
+                text = stringResource(CoreRes.string.core_absent_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.titleMedium,
             )

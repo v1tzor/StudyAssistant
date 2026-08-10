@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,12 +34,17 @@ import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponentFactory
 fun MainViewController(
     componentContext: ComponentContext,
     backDispatcher: BackDispatcher,
+    deepLinkReceiver: DeepLinkReceiver,
 ) = ComposeUIViewController {
     val componentFactory = remember {
         MainDependenciesGraph.fetchDI().instance<MainComponentFactory>()
     }
     val mainComponent = remember {
         componentFactory.createComponent(componentContext)
+    }
+    remember(mainComponent, deepLinkReceiver) {
+        deepLinkReceiver.attach(mainComponent::handleDeepLink)
+        Unit
     }
     PredictiveBackGestureOverlay(
         backDispatcher = backDispatcher,

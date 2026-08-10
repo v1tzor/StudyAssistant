@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewAction
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewEffect
@@ -151,6 +151,7 @@ internal class OverviewComposeStore(
     ) = when (action) {
         is OverviewAction.UpdateSchedule -> currentState.copy(
             schedule = action.schedule,
+            activeClass = action.activeClass,
             isScheduleLoading = false,
         )
         is OverviewAction.UpdateAnalysis -> currentState.copy(
@@ -159,9 +160,6 @@ internal class OverviewComposeStore(
         )
         is OverviewAction.UpdateSelectedDate -> currentState.copy(
             selectedDate = action.date,
-        )
-        is OverviewAction.UpdateActiveClass -> currentState.copy(
-            activeClass = action.activeClass,
         )
         is OverviewAction.UpdateScheduleLoading -> currentState.copy(
             isScheduleLoading = action.isLoading,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -953,8 +953,12 @@ class AccountService(
         val apiPath = "/account/sessions/oauth2/${provider.value}"
 
         val query = buildList {
-            if (success != null) { add("success=${success.encodeURLParameter()}") }
-            if (failure != null) { add("failure=${failure.encodeURLParameter()}") }
+            if (success != null) {
+                add("success=${success.encodeURLParameter()}")
+            }
+            if (failure != null) {
+                add("failure=${failure.encodeURLParameter()}")
+            }
             scopes?.forEach { add("scopes[]=${it.encodeURLParameter()}") }
             add("project=${client.projectId?.encodeURLParameter()}")
         }

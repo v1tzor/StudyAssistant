@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,15 +34,21 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.common.functional.Constants.Class.MAX_NUMBER
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
+import ru.aleshin.studyassistant.core.presentation.models.organizations.NumberedDurationUi
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.dialog.DurationPickerDialog
 import ru.aleshin.studyassistant.core.ui.views.menu.BackMenuItem
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.duration_title
+import ru.aleshin.studyassistant.editor.impl.resources.ic_number
+import ru.aleshin.studyassistant.editor.impl.resources.number_of_class_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.create_confirm_title as core_create_confirm_title
+import ru.aleshin.studyassistant.core.ui.resources.ic_clock_outline as core_ic_clock_outline
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -72,7 +78,7 @@ internal fun NumberDropdownMenu(
                 enabled = enabled(number),
                 text = {
                     Text(
-                        text = EditorThemeRes.strings.numberOfClassTitle + ": " + number,
+                        text = stringResource(Res.string.number_of_class_title) + ": " + number,
                         color = when (number == currentNumber) {
                             true -> MaterialTheme.colorScheme.primary
                             false -> MaterialTheme.colorScheme.onSurface
@@ -112,14 +118,14 @@ internal fun NumberedDurationCreatorDropdownMenu(
                     onClick = { page = NumberedDurationCreatorPage.NUMBER },
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(EditorThemeRes.icons.number),
+                            painter = painterResource(Res.drawable.ic_number),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurface,
                         )
                     },
                     text = {
                         Text(
-                            text = EditorThemeRes.strings.numberOfClassTitle,
+                            text = stringResource(Res.string.number_of_class_title),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -137,14 +143,14 @@ internal fun NumberedDurationCreatorDropdownMenu(
                     onClick = { isOpenDurationPickerDialog = true },
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(StudyAssistantRes.icons.timeOutline),
+                            painter = painterResource(CoreRes.drawable.core_ic_clock_outline),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurface,
                         )
                     },
                     text = {
                         Text(
-                            text = EditorThemeRes.strings.durationTitle,
+                            text = stringResource(Res.string.duration_title),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -169,7 +175,7 @@ internal fun NumberedDurationCreatorDropdownMenu(
                     },
                     text = {
                         Text(
-                            text = StudyAssistantRes.strings.createConfirmTitle,
+                            text = stringResource(CoreRes.string.core_create_confirm_title),
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.titleSmall,
                         )
@@ -199,7 +205,7 @@ internal fun NumberedDurationCreatorDropdownMenu(
                         },
                         text = {
                             Text(
-                                text = EditorThemeRes.strings.numberOfClassTitle + ": " + numberItem,
+                                text = stringResource(Res.string.number_of_class_title) + ": " + numberItem,
                                 color = when (number == numberItem) {
                                     true -> MaterialTheme.colorScheme.primary
                                     false -> MaterialTheme.colorScheme.onSurface
@@ -213,7 +219,7 @@ internal fun NumberedDurationCreatorDropdownMenu(
 
         if (isOpenDurationPickerDialog) {
             DurationPickerDialog(
-                headerTitle = EditorThemeRes.strings.durationTitle,
+                headerTitle = stringResource(Res.string.duration_title),
                 duration = duration,
                 onDismiss = { isOpenDurationPickerDialog = false },
                 onSelectedDuration = {

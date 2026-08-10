@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,14 +31,17 @@ import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.settings.mapToUi
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.schedules.BaseScheduleUi
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseClassInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseScheduleInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.CalendarSettingsInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleOutput

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="employee_profile_header">Сотрудник</string>
+    <string name="employee_post_label">Должность</string>
+    <string name="employee_work_time_label">График работы</string>
+    <string name="employee_birthday_label">День рождения</string>
+    <string name="employee_subjects_header">Предметы</string>
+    <string name="employee_contact_info_header">Связь и данные</string>
+    <string name="employee_phone_title">Телефон</string>
+    <string name="employee_email_title">Email</string>
+    <string name="employee_website_title">Сайт</string>
+    <string name="employee_location_title">Место</string>
+    <string name="none_subjects_title">Предметы отсутствуют</string>
+    <string name="none_contact_info_title">Информация отсутствует</string>
+    <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
+</resources>

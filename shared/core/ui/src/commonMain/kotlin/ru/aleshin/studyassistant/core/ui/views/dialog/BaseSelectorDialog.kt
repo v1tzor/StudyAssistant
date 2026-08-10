@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,10 +64,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
 import ru.aleshin.studyassistant.core.ui.views.DialogHeader
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.add_title as core_add_title
+import ru.aleshin.studyassistant.core.ui.resources.not_selected_title as core_not_selected_title
+import ru.aleshin.studyassistant.core.ui.resources.select_confirm_title as core_select_confirm_title
 
 /**
  * @author Stanislav Aleshin on 02.06.2024.
@@ -119,7 +124,8 @@ fun <T> BaseSelectorDialog(
                 }
                 HorizontalDivider()
                 LazyColumn(
-                    modifier = Modifier.height(sizes.contentHeight).padding(sizes.itemsListPaddings),
+                    modifier = Modifier.height(sizes.contentHeight)
+                        .padding(sizes.itemsListPaddings),
                     state = itemsListState,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
@@ -133,7 +139,7 @@ fun <T> BaseSelectorDialog(
                 }
                 DialogButtons(
                     enabledConfirm = confirmEnabled,
-                    confirmTitle = StudyAssistantRes.strings.selectConfirmTitle,
+                    confirmTitle = stringResource(CoreRes.string.core_select_confirm_title),
                     onCancelClick = onDismiss,
                     onConfirmClick = { onConfirm(selected) },
                 )
@@ -270,7 +276,7 @@ fun LazyItemScope.SelectorAddItemView(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = StudyAssistantRes.strings.addTitle,
+                    text = stringResource(CoreRes.string.core_add_title),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelLarge,
                 )
@@ -367,7 +373,7 @@ fun LazyItemScope.SelectorNotSelectedItemView(
     enabled = enabled,
     onClick = onClick,
     selected = selected,
-    title = StudyAssistantRes.strings.notSelectedTitle,
+    title = stringResource(CoreRes.string.core_not_selected_title),
     label = null,
 )
 

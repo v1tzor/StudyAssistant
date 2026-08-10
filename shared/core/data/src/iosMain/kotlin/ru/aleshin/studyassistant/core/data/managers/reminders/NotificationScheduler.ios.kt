@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@
 package ru.aleshin.studyassistant.core.data.managers.reminders
 
 import kotlinx.datetime.Instant
-import platform.UIKit.UIApplication
-import platform.UIKit.scheduledLocalNotifications
+import platform.Foundation.NSUserDefaults
 import platform.UserNotifications.UNMutableNotificationContent
 import platform.UserNotifications.UNNotificationRequest
 import platform.UserNotifications.UNNotificationSound
@@ -42,7 +41,12 @@ actual class NotificationScheduler(
     ) {
         val currentTime = dateManager.fetchCurrentInstant()
         val delayDuration = time - currentTime
-        val delay = if (delayDuration.isPositive()) delayDuration.inWholeMilliseconds.toDouble() else 0.0
+        val delay =
+            if (delayDuration.isPositive()) {
+                delayDuration.inWholeSeconds.coerceAtLeast(1L).toDouble()
+            } else {
+                1.0
+            }
 
         val content = UNMutableNotificationContent().apply {
             setTitle(title)
@@ -53,33 +57,39 @@ actual class NotificationScheduler(
         val trigger = UNTimeIntervalNotificationTrigger.triggerWithTimeInterval(delay, false)
         val request = UNNotificationRequest.requestWithIdentifier(id.toString(), content, trigger)
 
-        notificationCenter.addNotificationRequest(request) { error ->
-            if (error != null) throw IllegalStateException(error.description)
-        }
+        notificationCenter.addNotificationRequest(request) { }
     }
 
-    actual fun scheduleRepeatNotification(
+    actual fun scheduleOngoingNotification(
         id: Int,
         title: String,
         body: String,
         time: Instant,
-        interval: Long
+        endTime: Instant,
     ) {
-        UIApplication.sharedApplication().scheduledLocalNotifications()
-        val content = UNMutableNotificationContent().apply {
-            setTitle(title)
-            setBody(body)
-            setSound(UNNotificationSound.defaultSound())
-        }
-        val trigger = UNTimeIntervalNotificationTrigger.triggerWithTimeInterval(interval.toDouble(), true)
-        val request = UNNotificationRequest.requestWithIdentifier(id.toString(), content, trigger)
+        scheduleNotification(id, title, body, time)
+    }
 
-        notificationCenter.addNotificationRequest(request) { error ->
-            if (error != null) throw IllegalStateException(error.description)
+    actual fun updateNotificationGroup(group: String, notificationIds: List<Int>) {
+        val defaults = NSUserDefaults.standardUserDefaults
+        val storedIds = defaults.stringArrayForKey(group).orEmpty().mapNotNull { value ->
+            (value as? String)?.toIntOrNull()
         }
+        storedIds.filterNot(notificationIds::contains).forEach(::cancelNotification)
+        defaults.setObject(notificationIds.map(Int::toString), forKey = group)
+    }
+
+    actual fun clearNotificationGroup(group: String) {
+        val defaults = NSUserDefaults.standardUserDefaults
+        val storedIds = defaults.stringArrayForKey(group).orEmpty().mapNotNull { value ->
+            (value as? String)?.toIntOrNull()
+        }
+        storedIds.forEach(::cancelNotification)
+        defaults.removeObjectForKey(group)
     }
 
     actual fun cancelNotification(id: Int) {
         notificationCenter.removePendingNotificationRequestsWithIdentifiers(listOf(id.toString()))
+        notificationCenter.removeDeliveredNotificationsWithIdentifiers(listOf(id.toString()))
     }
 }

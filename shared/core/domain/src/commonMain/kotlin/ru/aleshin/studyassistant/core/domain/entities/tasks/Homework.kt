@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.tasks
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
+import kotlin.time.Clock
 
 /**
  * @author Stanislav Aleshin on 01.05.2024.

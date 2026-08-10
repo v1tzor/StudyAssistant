@@ -1,0 +1,31 @@
+CREATE TABLE aiSettingsEntity (
+  id INTEGER PRIMARY KEY NOT NULL,
+  service_type TEXT NOT NULL,
+  has_personal_key INTEGER NOT NULL,
+  shared_quota_remaining INTEGER NOT NULL,
+  shared_quota_reset_at INTEGER DEFAULT NULL
+);
+
+INSERT INTO aiSettingsEntity (
+  id,
+  service_type,
+  has_personal_key,
+  shared_quota_remaining,
+  shared_quota_reset_at
+)
+VALUES (1, 'SHARED', 0, 25, NULL);
+
+fetchSettings:
+SELECT *
+FROM aiSettingsEntity
+WHERE id = 1;
+
+updateSettings:
+INSERT OR REPLACE INTO aiSettingsEntity (
+  id,
+  service_type,
+  has_personal_key,
+  shared_quota_remaining,
+  shared_quota_reset_at
+)
+VALUES ?;

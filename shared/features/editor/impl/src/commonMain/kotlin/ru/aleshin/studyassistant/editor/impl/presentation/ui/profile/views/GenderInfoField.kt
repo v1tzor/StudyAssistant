@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.GenderDropdownMenu
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.user_gender_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.user_gender_field_placeholder
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_gender as core_ic_gender
 
 /**
  * @author Stanislav Aleshin on 28.07.2024.
@@ -49,11 +53,11 @@ internal fun GenderInfoField(
     ClickableInfoTextField(
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
-        value = gender?.mapToSting(StudyAssistantRes.strings),
+        value = gender?.mapToSting(),
         onClick = { isExpandedGenderMenu = true },
-        label = EditorThemeRes.strings.userGenderFieldLabel,
-        placeholder = EditorThemeRes.strings.userGenderFieldPlaceholder,
-        infoIcon = painterResource(StudyAssistantRes.icons.gender),
+        label = stringResource(Res.string.user_gender_field_label),
+        placeholder = stringResource(Res.string.user_gender_field_placeholder),
+        infoIcon = painterResource(CoreRes.drawable.core_ic_gender),
         trailingIcon = {
             ExpandedIcon(
                 isExpanded = isExpandedGenderMenu,

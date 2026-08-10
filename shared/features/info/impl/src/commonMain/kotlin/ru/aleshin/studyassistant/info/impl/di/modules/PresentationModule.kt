@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,20 @@
 package ru.aleshin.studyassistant.info.impl.di.modules
 
 import org.kodein.di.DI
+import org.kodein.di.bind
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.info.api.InfoFeatureComponentFactory
-import ru.aleshin.studyassistant.info.impl.navigation.DefaultInfoComponentFactory
+import org.kodein.di.multiton
+import org.kodein.di.scoped
+import ru.aleshin.studyassistant.core.common.di.scope.FeatureComponentScope
+import ru.aleshin.studyassistant.info.api.InfoContentProviderFactory
+import ru.aleshin.studyassistant.info.impl.navigation.DefaultInfoContentProviderFactory
+import ru.aleshin.studyassistant.info.impl.navigation.InfoComponentDeps
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.store.EmployeeComposeStore
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.store.EmployeeWorkProcessor
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.store.OrganizationsComposeStore
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.store.OrganizationsWorkProcessor
+import ru.aleshin.studyassistant.info.impl.presentation.ui.root.InfoFeatureComponent
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.store.SubjectsComposeStore
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.store.SubjectsWorkProcessor
 
@@ -32,14 +38,24 @@ import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.store.Subjec
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<InfoFeatureComponentFactory> { DefaultInfoComponentFactory(instance(), instance(), instance()) }
+    bind<InfoFeatureComponent>() with scoped(FeatureComponentScope).multiton { deps: InfoComponentDeps ->
+        InfoFeatureComponent.Default(
+            componentContext = context,
+            startConfig = deps.startConfig,
+            outputConsumer = deps.outputConsumer,
+            organizationsStoreFactory = instance(),
+            employeeStoreFactory = instance(),
+            subjectsStoreFactory = instance(),
+        )
+    }
+    bindSingleton<InfoContentProviderFactory> { DefaultInfoContentProviderFactory(di) }
 
-    bindSingleton<OrganizationsWorkProcessor> { OrganizationsWorkProcessor.Base(instance(), instance(), instance()) }
-    bindSingleton<OrganizationsComposeStore.Factory> { OrganizationsComposeStore.Factory(instance(), instance()) }
+    bindSingleton<OrganizationsWorkProcessor> {  OrganizationsWorkProcessor.Base(instance(), instance())  }
+    bindSingleton<OrganizationsComposeStore.Factory> {  OrganizationsComposeStore.Factory(instance(), instance())  }
 
     bindSingleton<SubjectsWorkProcessor> { SubjectsWorkProcessor.Base(instance(), instance()) }
-    bindSingleton<SubjectsComposeStore.Factory> { SubjectsComposeStore.Factory(instance(), instance()) }
+    bindSingleton<SubjectsComposeStore.Factory> {  SubjectsComposeStore.Factory(instance(), instance())  }
 
-    bindSingleton<EmployeeWorkProcessor> { EmployeeWorkProcessor.Base(instance(), instance(), instance()) }
-    bindSingleton<EmployeeComposeStore.Factory> { EmployeeComposeStore.Factory(instance(), instance()) }
+    bindSingleton<EmployeeWorkProcessor> { EmployeeWorkProcessor.Base(instance(), instance()) }
+    bindSingleton<EmployeeComposeStore.Factory> {  EmployeeComposeStore.Factory(instance(), instance())  }
 }

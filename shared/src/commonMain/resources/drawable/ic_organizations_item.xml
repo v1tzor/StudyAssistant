@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="25dp"
+    android:height="24dp"
+    android:viewportWidth="25"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M2.4,20H4.4M4.4,20H9.4M4.4,20V7.2C4.4,6.08 4.4,5.52 4.618,5.092C4.81,4.715 5.116,4.41 5.492,4.218C5.92,4 6.48,4 7.601,4H9.201C10.321,4 10.88,4 11.308,4.218C11.684,4.41 11.991,4.715 12.183,5.092C12.4,5.519 12.4,6.079 12.4,7.197V10M9.4,20H20.4M9.4,20V14.368C9.4,13.843 9.4,13.58 9.463,13.335C9.519,13.118 9.611,12.912 9.735,12.725C9.875,12.515 10.071,12.338 10.462,11.988L12.764,9.92C13.518,9.242 13.896,8.903 14.323,8.774C14.699,8.66 15.101,8.66 15.477,8.774C15.905,8.903 16.283,9.242 17.039,9.921L19.339,11.988C19.73,12.339 19.925,12.515 20.065,12.725C20.189,12.912 20.281,13.118 20.337,13.335C20.4,13.58 20.4,13.843 20.4,14.368V20M20.4,20H22.4"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:strokeColor="#9AA6B9"
+        android:strokeLineCap="round" />
+</vector>

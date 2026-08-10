@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoEitherWrapper
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoErrorHandler
-import ru.aleshin.studyassistant.info.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.info.impl.domain.interactors.ClassesInfoInteractor
 import ru.aleshin.studyassistant.info.impl.domain.interactors.EmployeesInteractor
 import ru.aleshin.studyassistant.info.impl.domain.interactors.OrganizationsInteractor
@@ -34,9 +33,8 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<InfoErrorHandler> { InfoErrorHandler.Base() }
     bindSingleton<InfoEitherWrapper> { InfoEitherWrapper.Base(instance(), instance()) }
 
-    bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance()) }
     bindSingleton<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance()) }
     bindSingleton<SubjectsInteractor> { SubjectsInteractor.Base(instance(), instance()) }
-    bindSingleton<EmployeesInteractor> { EmployeesInteractor.Base(instance(), instance()) }
+    bindSingleton<EmployeesInteractor> { EmployeesInteractor.Base(instance(), instance(), instance()) }
     bindSingleton<ClassesInfoInteractor> { ClassesInfoInteractor.Base(instance(), instance(), instance()) }
 }

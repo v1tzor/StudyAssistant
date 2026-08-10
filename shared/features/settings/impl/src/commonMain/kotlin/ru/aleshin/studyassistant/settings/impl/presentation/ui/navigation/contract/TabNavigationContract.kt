@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ internal sealed class TabNavigationEvent : StoreEvent {
     data object NavigateToGeneral : TabNavigationEvent()
     data object NavigateToNotification : TabNavigationEvent()
     data object NavigateToCalendar : TabNavigationEvent()
-    data object NavigateToSubscription : TabNavigationEvent()
+    data object NavigateToAi : TabNavigationEvent()
     data object NavigateToAboutApp : TabNavigationEvent()
     data object NavigateToBack : TabNavigationEvent()
 }
@@ -46,7 +46,7 @@ internal sealed class TabNavigationOutput : BaseOutput {
     data object NavigateToGeneral : TabNavigationOutput()
     data object NavigateToNotification : TabNavigationOutput()
     data object NavigateToCalendar : TabNavigationOutput()
-    data object NavigateToSubscription : TabNavigationOutput()
+    data object NavigateToAi : TabNavigationOutput()
     data object NavigateToAboutApp : TabNavigationOutput()
     data object NavigateToBack : TabNavigationOutput()
 }

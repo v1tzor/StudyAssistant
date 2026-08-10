@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,12 +41,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.boldWeight
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.ui.mappers.format
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
 
 /**
  * @author Stanislav Aleshin on 25.05.2024.
@@ -117,12 +119,14 @@ internal fun OfficeAndOrganizationFooter(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Text(
-            text = office,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            style = MaterialTheme.typography.labelMedium,
-        )
+        if (office.isNotBlank()) {
+            Text(
+                text = office,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                style = MaterialTheme.typography.labelMedium,
+            )
+        }
         if (organization != null) {
             Text(
                 text = organization,
@@ -194,7 +198,7 @@ private fun CommonClassViewContent(
                 headerBadge?.invoke()
             }
             Text(
-                text = subject ?: StudyAssistantRes.strings.noneTitle,
+                text = subject ?: stringResource(CoreRes.string.core_none_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewAction
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEffect
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEvent
@@ -83,105 +83,117 @@ internal class OverviewComposeStore(
                     val command = HomeworksWorkCommand.LoadActiveSchedule(currentDate)
                     homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
-                launchBackgroundWork(BackgroundKey.LOAD_SHARE) {
-                    val command = HomeworksWorkCommand.LoadSharedHomeworks
-                    homeworksWorkProcessor.work(command).collectAndHandleWork()
-                }
-                launchBackgroundWork(BackgroundKey.LOAD_PAID_USER_STATUS) {
-                    val command = HomeworksWorkCommand.LoadPaidUserStatus
-                    homeworksWorkProcessor.work(command).collectAndHandleWork()
-                }
             }
+
             is OverviewEvent.DoHomework -> with(event) {
                 launchBackgroundWork(BackgroundKey.TASK_ACTION) {
                     val command = HomeworksWorkCommand.DoHomework(homework)
                     homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.SkipHomework -> with(event) {
                 launchBackgroundWork(BackgroundKey.TASK_ACTION) {
                     val command = HomeworksWorkCommand.SkipHomework(homework)
                     homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.RepeatHomework -> with(event) {
                 launchBackgroundWork(BackgroundKey.TASK_ACTION) {
                     val command = HomeworksWorkCommand.RepeatHomework(homework)
                     homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.SelectedGoalsDate -> with(event) {
                 launchBackgroundWork(BackgroundKey.LOAD_GOALS) {
                     val command = GoalWorkCommand.LoadGoals(date)
                     goalWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.SetNewGoalNumbers -> with(event) {
                 launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
                     val command = GoalWorkCommand.SetNewGoalNumbers(goals)
                     goalWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.CompleteGoal -> with(event) {
                 launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
                     val command = GoalWorkCommand.CompleteGoal(state().dailyGoals, goal)
                     goalWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.DeleteGoal -> with(event) {
                 launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
                     val command = GoalWorkCommand.DeleteGoal(goal)
                     goalWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.ChangeGoalDesiredTime -> with(event) {
                 launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
                     val command = GoalWorkCommand.ChangeGoalDesiredTime(goal, time)
                     goalWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.ChangeGoalTimeType -> with(event) {
                 launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
                     val command = GoalWorkCommand.ChangeGoalTimeType(goal, type)
                     goalWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.ClickPauseGoalTime -> with(event) {
                 launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
                     val command = GoalWorkCommand.PauseGoalTime(goal)
                     goalWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.ClickResetGoalTime -> with(event) {
                 launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
                     val command = GoalWorkCommand.ResetGoalTime(goal)
                     goalWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.ClickStartGoalTime -> with(event) {
                 launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
                     val command = GoalWorkCommand.StartGoalTime(goal)
                     goalWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.ScheduleGoal -> with(event) {
                 launchBackgroundWork(BackgroundKey.GOAL_ACTION) {
                     val command = GoalWorkCommand.ScheduleGoal(createModel)
                     goalWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.UpdateTodoDone -> with(event) {
                 launchBackgroundWork(BackgroundKey.TASK_ACTION) {
                     val command = TodoWorkCommand.UpdateTodoDone(todo)
                     todoWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OverviewEvent.ShareHomeworks -> with(event) {
                 launchBackgroundWork(BackgroundKey.TASK_ACTION) {
-                    val command = HomeworksWorkCommand.ShareHomeworks(sentMediatedHomeworks)
+                    val command = HomeworksWorkCommand.ShareHomeworks(selection)
                     homeworksWorkProcessor.work(command).collectAndHandleWork()
                 }
             }
+
+            is OverviewEvent.ClearHomeworkShareLink -> {
+                sendAction(OverviewAction.UpdateHomeworkShareLink(null))
+            }
+
             is OverviewEvent.ClickEditHomework -> with(event) {
                 val config = EditorConfig.Homework(
                     homeworkId = homework.uid,
@@ -191,29 +203,33 @@ internal class OverviewComposeStore(
                 )
                 consumeOutput(OverviewOutput.NavigateToHomeworkEditor(config))
             }
+
             is OverviewEvent.ClickEditTodo -> with(event) {
                 val config = EditorConfig.Todo(todoId = todo?.uid)
                 consumeOutput(OverviewOutput.NavigateToTodoEditor(config))
             }
+
             is OverviewEvent.AddHomeworkInEditor -> with(state()) {
                 val currentTime = dateManager.fetchCurrentInstant()
-                val activeClass = if (activeSchedule != null && activeSchedule.classes.isNotEmpty()) {
-                    val dailyTimeRange = TimeRange(
-                        from = activeSchedule.classes.first().timeRange.from,
-                        to = activeSchedule.classes.last().timeRange.to.shiftMinutes(10),
-                    )
-                    if (dailyTimeRange.containsTime(currentTime)) {
-                        activeSchedule.classes.findLast { classModel ->
-                            val firstFilter = classModel.timeRange.to.dateTime().time < currentTime.dateTime().time
-                            val secondFilter = classModel.timeRange.containsTime(currentTime)
-                            return@findLast firstFilter || secondFilter
+                val activeClass =
+                    if (activeSchedule != null && activeSchedule.classes.isNotEmpty()) {
+                        val dailyTimeRange = TimeRange(
+                            from = activeSchedule.classes.first().timeRange.from,
+                            to = activeSchedule.classes.last().timeRange.to.shiftMinutes(10),
+                        )
+                        if (dailyTimeRange.containsTime(currentTime)) {
+                            activeSchedule.classes.findLast { classModel ->
+                                val firstFilter =
+                                    classModel.timeRange.to.dateTime().time < currentTime.dateTime().time
+                                val secondFilter = classModel.timeRange.containsTime(currentTime)
+                                return@findLast firstFilter || secondFilter
+                            }
+                        } else {
+                            null
                         }
                     } else {
                         null
                     }
-                } else {
-                    null
-                }
                 val config = EditorConfig.Homework(
                     homeworkId = null,
                     date = null,
@@ -222,18 +238,22 @@ internal class OverviewComposeStore(
                 )
                 consumeOutput(OverviewOutput.NavigateToHomeworkEditor(config))
             }
+
             is OverviewEvent.ClickHomework -> with(event) {
                 val targetDate = homework?.deadline?.startThisDay()?.toEpochMilliseconds()
                 consumeOutput(OverviewOutput.NavigateToHomeworks(targetDate))
             }
+
             is OverviewEvent.ClickShowAllSharedHomeworks -> {
                 consumeOutput(OverviewOutput.NavigateToShareHomeworks)
             }
+
             is OverviewEvent.ClickShowAllTodo -> {
                 consumeOutput(OverviewOutput.NavigateToTodo)
             }
-            is OverviewEvent.ClickPaidFunction -> {
-                consumeOutput(OverviewOutput.NavigateToBilling)
+
+            is OverviewEvent.ClickAnalytics -> {
+                consumeOutput(OverviewOutput.NavigateToAnalytics)
             }
         }
     }
@@ -247,46 +267,48 @@ internal class OverviewComposeStore(
             homeworksScope = action.homeworkScope,
             isLoadingHomeworks = false,
         )
+
         is OverviewAction.UpdateTodos -> currentState.copy(
             groupedTodos = action.groupedTodos,
             isLoadingTasks = false,
         )
+
         is OverviewAction.UpdateGoals -> currentState.copy(
             selectedGoalsDate = action.selectedGoalsDate,
             dailyGoals = action.dailyGoals,
             goalsProgress = action.goalsProgress,
             isLoadingGoals = false,
         )
+
         is OverviewAction.UpdateHomeworksProgress -> currentState.copy(
             homeworksProgress = action.homeworkProgress,
             isLoadingHomeworksProgress = false,
         )
-        is OverviewAction.UpdateSharedHomeworks -> currentState.copy(
-            sharedHomeworks = action.homeworks,
-            friends = action.friends,
-            isLoadingShare = false,
+
+        is OverviewAction.UpdateHomeworkShareLink -> currentState.copy(
+            homeworkShareLink = action.link,
         )
+
         is OverviewAction.UpdateActiveSchedule -> currentState.copy(
             activeSchedule = action.activeSchedule,
         )
+
         is OverviewAction.UpdateCurrentDate -> currentState.copy(
             currentDate = action.date,
         )
-        is OverviewAction.UpdateUserPaidStatus -> currentState.copy(
-            isPaidUser = action.isPaidUser,
-        )
+
         is OverviewAction.UpdateHomeworksLoading -> currentState.copy(
             isLoadingHomeworks = action.isLoading,
         )
+
         is OverviewAction.UpdateHomeworksProgressLoading -> currentState.copy(
             isLoadingHomeworksProgress = action.isLoading,
         )
+
         is OverviewAction.UpdateTasksLoading -> currentState.copy(
             isLoadingTasks = action.isLoading,
         )
-        is OverviewAction.UpdateShareLoading -> currentState.copy(
-            isLoadingShare = action.isLoading,
-        )
+
         is OverviewAction.UpdateGoalsLoading -> currentState.copy(
             isLoadingGoals = action.isLoading,
         )
@@ -296,32 +318,30 @@ internal class OverviewComposeStore(
         LOAD_HOMEWORKS,
         LOAD_ACTIVE_SCHEDULE,
         LOAD_GOALS,
-        LOAD_SHARE,
         LOAD_PROGRESS,
         LOAD_TASKS,
-        LOAD_PAID_USER_STATUS,
         GOAL_ACTION,
         TASK_ACTION,
     }
 
-     class Factory(
-         private val todoWorkProcessor: TodoWorkProcessor,
-         private val goalWorkProcessor: GoalWorkProcessor,
-         private val homeworksWorkProcessor: HomeworksWorkProcessor,
-         private val dateManager: DateManager,
-         private val coroutineManager: CoroutineManager,
-     ) : BaseOnlyOutComposeStore.Factory<OverviewComposeStore, OverviewState> {
+    class Factory(
+        private val todoWorkProcessor: TodoWorkProcessor,
+        private val goalWorkProcessor: GoalWorkProcessor,
+        private val homeworksWorkProcessor: HomeworksWorkProcessor,
+        private val dateManager: DateManager,
+        private val coroutineManager: CoroutineManager,
+    ) : BaseOnlyOutComposeStore.Factory<OverviewComposeStore, OverviewState> {
 
-         override fun create(savedState: OverviewState): OverviewComposeStore {
-             return OverviewComposeStore(
-                 todoWorkProcessor = todoWorkProcessor,
-                 goalWorkProcessor = goalWorkProcessor,
-                 homeworksWorkProcessor = homeworksWorkProcessor,
-                 dateManager = dateManager,
-                 stateCommunicator = StateCommunicator.Default(savedState),
-                 effectCommunicator = EffectCommunicator.Default(),
-                 coroutineManager = coroutineManager,
-             )
-         }
-     }
+        override fun create(savedState: OverviewState): OverviewComposeStore {
+            return OverviewComposeStore(
+                todoWorkProcessor = todoWorkProcessor,
+                goalWorkProcessor = goalWorkProcessor,
+                homeworksWorkProcessor = homeworksWorkProcessor,
+                dateManager = dateManager,
+                stateCommunicator = StateCommunicator.Default(savedState),
+                effectCommunicator = EffectCommunicator.Default(),
+                coroutineManager = coroutineManager,
+            )
+        }
+    }
 }

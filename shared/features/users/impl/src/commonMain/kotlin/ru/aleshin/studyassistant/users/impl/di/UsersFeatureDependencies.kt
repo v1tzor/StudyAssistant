@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,11 @@
 
 package ru.aleshin.studyassistant.users.impl.di
 
-import dev.tmapps.konnection.Konnection
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
-import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.
@@ -35,13 +28,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 public interface UsersFeatureDependencies : BaseFeatureDependencies {
     public val subjectsRepository: SubjectsRepository
     public val employeeRepository: EmployeeRepository
-    public val friendRequestsRepository: FriendRequestsRepository
-    public val shareSchedulesRepository: ShareSchedulesRepository
-    public val shareHomeworksRepository: ShareHomeworksRepository
-    public val usersRepository: UsersRepository
-    public val messageRepository: MessageRepository
-    public val dateManager: DateManager
-    public val connectionManager: Konnection
     public val coroutineManager: CoroutineManager
     public val crashlyticsService: CrashlyticsService
 }

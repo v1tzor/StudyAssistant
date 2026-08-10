@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesRemind
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
+import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -32,12 +33,11 @@ import ru.aleshin.studyassistant.core.domain.repositories.DailyAiStatisticsRepos
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -45,6 +45,8 @@ import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 public interface ChatFeatureDependencies : BaseFeatureDependencies {
     public val baseScheduleRepository: BaseScheduleRepository
     public val aiAssistantRepository: AiAssistantRepository
+    public val aiSettingsRepository: AiSettingsRepository
+    public val profileRepository: ProfileRepository
     public val dailyAiStatisticsRepository: DailyAiStatisticsRepository
     public val customScheduleRepository: CustomScheduleRepository
     public val employeeRepository: EmployeeRepository
@@ -58,8 +60,6 @@ public interface ChatFeatureDependencies : BaseFeatureDependencies {
     public val startClassesReminderManager: StartClassesReminderManager
     public val endClassesReminderManager: EndClassesReminderManager
     public val todoReminderManager: TodoReminderManager
-    public val usersRepository: UsersRepository
-    public val manageUserRepository: ManageUserRepository
     public val dateManager: DateManager
     public val overlayManager: TimeOverlayManager
     public val coroutineManager: CoroutineManager

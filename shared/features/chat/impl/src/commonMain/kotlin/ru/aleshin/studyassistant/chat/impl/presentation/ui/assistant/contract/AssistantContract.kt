@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ internal sealed class AssistantEvent : StoreEvent {
     data object RetryAttempt : AssistantEvent()
     data object ClearUnsendMessage : AssistantEvent()
     data object ClearHistory : AssistantEvent()
-    data object ClickPaidFunction : AssistantEvent()
+    data object OpenAiSettings : AssistantEvent()
 }
 
 internal sealed class AssistantEffect : StoreEffect {
@@ -63,5 +63,5 @@ internal sealed class AssistantAction : StoreAction {
 }
 
 internal sealed class AssistantOutput : BaseOutput {
-    data object NavigateToBilling : AssistantOutput()
+    data object NavigateToAiSettings : AssistantOutput()
 }

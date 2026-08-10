@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,28 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.mappers
 
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
+import org.jetbrains.compose.resources.getString
+import ru.aleshin.studyassistant.core.domain.entities.share.ShareException
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.tokens.TasksStrings
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.other_error_message
+import ru.aleshin.studyassistant.tasks.impl.resources.share_daily_limit_message
+import ru.aleshin.studyassistant.tasks.impl.resources.share_item_limit_message
+import ru.aleshin.studyassistant.tasks.impl.resources.share_payload_limit_message
+import ru.aleshin.studyassistant.tasks.impl.resources.share_rate_limit_message
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.network_error_message as core_network_error_message
 
 /**
  * @author Stanislav Aleshin on 29.06.2024.
  */
-internal fun TasksFailures.mapToMessage(
-    strings: TasksStrings,
-    coreStrings: StudyAssistantStrings
-) = when (this) {
-    is TasksFailures.InternetError -> coreStrings.networkErrorMessage
-    is TasksFailures.OtherError -> strings.otherErrorMessage
+internal suspend fun TasksFailures.mapToMessage() = when (this) {
+    is TasksFailures.InternetError -> getString(CoreRes.string.core_network_error_message)
+    is TasksFailures.OtherError -> when (throwable) {
+        is ShareException.RateLimit -> getString(Res.string.share_rate_limit_message)
+        is ShareException.ShareLimit -> getString(Res.string.share_daily_limit_message)
+        is ShareException.ItemLimit -> getString(Res.string.share_item_limit_message)
+        is ShareException.PayloadTooLarge -> getString(Res.string.share_payload_limit_message)
+        else -> getString(Res.string.other_error_message)
+    }
 }

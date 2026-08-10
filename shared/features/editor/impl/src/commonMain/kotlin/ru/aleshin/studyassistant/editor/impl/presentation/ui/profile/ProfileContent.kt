@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,27 +35,25 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.SocialNetworkUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.BirthdayInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.store.ProfileComponent
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.AppUserEmailInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.CityInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.DescriptionInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.GenderInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.ProfileTopBar
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.ProfileTopSheet
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.SocialNetworksInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.UsernameInfoField
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.exceeding_limit_image_size_message as core_exceeding_limit_image_size_message
 
 /**
  * @author Stanislav Aleshin on 28.07.2024.
@@ -67,8 +65,7 @@ internal fun ProfileContent(
 ) {
     val store = profileComponent.store
     val state by store.stateAsState()
-    val strings = EditorThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
+    val coreExceedingLimitImageSizeMessage = stringResource(CoreRes.string.core_exceeding_limit_image_size_message)
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
 
@@ -83,28 +80,22 @@ internal fun ProfileContent(
                 onUpdateBirthday = { store.dispatchEvent(ProfileEvent.UpdateBirthday(it)) },
                 onUpdateGender = { store.dispatchEvent(ProfileEvent.UpdateGender(it)) },
                 onUpdateCity = { store.dispatchEvent(ProfileEvent.UpdateCity(it)) },
-                onUpdateSocialNetworks = { store.dispatchEvent(ProfileEvent.UpdateSocialNetworks(it)) },
             )
         },
         topBar = {
             Column {
                 ProfileTopBar(
                     onBackClick = { store.dispatchEvent(ProfileEvent.NavigateToBack) },
-                    onChangePassword = { old, new ->
-                        store.dispatchEvent(ProfileEvent.UpdatePassword(old, new))
-                    },
                 )
                 ProfileTopSheet(
                     isLoading = state.isLoading,
-                    isPaidUser = state.isPaidUser,
-                    appUser = state.appUser,
+                    profile = state.profile,
                     onUpdateAvatar = { file -> store.dispatchEvent(ProfileEvent.UpdateAvatar(file)) },
                     onDeleteAvatar = { store.dispatchEvent(ProfileEvent.DeleteAvatar) },
-                    onOpenBillingScreen = { store.dispatchEvent(ProfileEvent.NavigateToBillingScreen) },
                     onExceedingLimit = {
                         coroutineScope.launch {
                             snackbarState.showSnackbar(
-                                message = coreStrings.exceedingLimitImageSizeMessage,
+                                message = coreExceedingLimitImageSizeMessage,
                                 withDismissAction = true,
                             )
                         }
@@ -124,7 +115,7 @@ internal fun ProfileContent(
         when (effect) {
             is ProfileEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -142,7 +133,6 @@ private fun BaseProfileContent(
     onUpdateBirthday: (String?) -> Unit,
     onUpdateGender: (Gender?) -> Unit,
     onUpdateCity: (String?) -> Unit,
-    onUpdateSocialNetworks: (List<SocialNetworkUi>) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxSize().verticalScroll(scrollState).padding(top = 24.dp),
@@ -150,37 +140,28 @@ private fun BaseProfileContent(
     ) {
         UsernameInfoField(
             isLoading = state.isLoading,
-            username = state.appUser?.username ?: "",
+            username = state.profile?.username ?: "",
             onUpdateName = onUpdateName,
         )
         DescriptionInfoField(
             isLoading = state.isLoading,
-            description = state.appUser?.description,
+            description = state.profile?.description,
             onUpdateDescription = onUpdateDescription,
-        )
-        AppUserEmailInfoField(
-            isLoading = state.isLoading,
-            email = state.appUser?.email ?: "",
         )
         BirthdayInfoField(
             isLoading = state.isLoading,
-            birthday = state.appUser?.birthday,
+            birthday = state.profile?.birthday,
             onSelected = onUpdateBirthday,
         )
         GenderInfoField(
             isLoading = state.isLoading,
-            gender = state.appUser?.gender,
+            gender = state.profile?.gender,
             onUpdateGender = onUpdateGender,
         )
         CityInfoField(
             isLoading = state.isLoading,
-            city = state.appUser?.city,
+            city = state.profile?.city,
             onUpdateCity = onUpdateCity,
-        )
-        SocialNetworksInfoFields(
-            isLoading = state.isLoading,
-            socialNetworks = state.appUser?.socialNetworks ?: emptyList(),
-            onUpdateSocialNetworks = onUpdateSocialNetworks,
         )
         Spacer(modifier = Modifier.height(60.dp))
     }

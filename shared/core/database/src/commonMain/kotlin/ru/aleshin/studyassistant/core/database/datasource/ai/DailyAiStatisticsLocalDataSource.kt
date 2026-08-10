@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,23 @@
 
 package ru.aleshin.studyassistant.core.database.datasource.ai
 
-import app.cash.sqldelight.async.coroutines.awaitAsList
 import kotlinx.coroutines.flow.Flow
-import ru.aleshin.studyassistant.core.common.architecture.data.MetadataModel
-import ru.aleshin.studyassistant.core.common.extensions.mapToListFlow
 import ru.aleshin.studyassistant.core.common.extensions.mapToOneOrNullFlow
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.database.mappers.ai.mapToBase
 import ru.aleshin.studyassistant.core.database.mappers.ai.mapToEntity
 import ru.aleshin.studyassistant.core.database.models.ai.BaseDailyAiResponsesEntity
-import ru.aleshin.studyassistant.core.database.utils.LocalDataSource
 import ru.aleshin.studyassistant.sqldelight.ai.DailyAiResponsesQueries
 import kotlin.coroutines.CoroutineContext
 
 /**
  * @author Stanislav Aleshin on 01.08.2025.
  */
-interface DailyAiStatisticsLocalDataSource : LocalDataSource.FullSynced.MultipleDocuments<BaseDailyAiResponsesEntity> {
+interface DailyAiStatisticsLocalDataSource {
 
+    suspend fun addOrUpdateStatistics(statistics: BaseDailyAiResponsesEntity)
     suspend fun fetchStatisticsByDate(date: Long): Flow<BaseDailyAiResponsesEntity?>
+    suspend fun deleteStatisticsById(id: String)
 
     class Base(
         private val dailyAiResponsesQuery: DailyAiResponsesQueries,
@@ -44,12 +42,8 @@ interface DailyAiStatisticsLocalDataSource : LocalDataSource.FullSynced.Multiple
         private val coroutineContext: CoroutineContext
             get() = coroutineManager.ioDispatcher
 
-        override suspend fun addOrUpdateItem(item: BaseDailyAiResponsesEntity) {
-            dailyAiResponsesQuery.addOrUpdateStatistics(item.mapToEntity()).await()
-        }
-
-        override suspend fun addOrUpdateItems(items: List<BaseDailyAiResponsesEntity>) {
-            items.forEach { item -> addOrUpdateItem(item) }
+        override suspend fun addOrUpdateStatistics(statistics: BaseDailyAiResponsesEntity) {
+            dailyAiResponsesQuery.addOrUpdateStatistics(statistics.mapToEntity()).await()
         }
 
         override suspend fun fetchStatisticsByDate(date: Long): Flow<BaseDailyAiResponsesEntity?> {
@@ -57,27 +51,8 @@ interface DailyAiStatisticsLocalDataSource : LocalDataSource.FullSynced.Multiple
             return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }
         }
 
-        override suspend fun fetchItemById(id: String): Flow<BaseDailyAiResponsesEntity?> {
-            val query = dailyAiResponsesQuery.fetchStatisticsById(id)
-            return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }
-        }
-
-        override suspend fun fetchItemsById(ids: List<String>): Flow<List<BaseDailyAiResponsesEntity>> {
-            val query = dailyAiResponsesQuery.fetchStatisticsByIds(ids)
-            return query.mapToListFlow(coroutineContext) { it.mapToBase() }
-        }
-
-        override suspend fun fetchAllMetadata(): List<MetadataModel> {
-            val metadata = dailyAiResponsesQuery.fetchStatisticsMetadata().awaitAsList()
-            return metadata.map { MetadataModel(it.id, it.updated_at) }
-        }
-
-        override suspend fun deleteItemsById(ids: List<String>) {
-            dailyAiResponsesQuery.deleteStatisticsByIds(ids).await()
-        }
-
-        override suspend fun deleteAllItems() {
-            dailyAiResponsesQuery.deleteAllStatistics().await()
+        override suspend fun deleteStatisticsById(id: String) {
+            dailyAiResponsesQuery.deleteStatisticsByIds(listOf(id)).await()
         }
     }
 }

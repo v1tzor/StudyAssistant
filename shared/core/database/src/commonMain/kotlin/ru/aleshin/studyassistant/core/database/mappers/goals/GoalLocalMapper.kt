@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ fun GoalEntity.mapToBase() = BaseGoalEntity(
     isDone = is_done,
     completeDate = complete_date,
     updatedAt = updated_at,
-    isCacheData = is_cache_data,
 )
 
 fun BaseGoalEntity.mapToEntity() = GoalEntity(
@@ -64,7 +63,6 @@ fun BaseGoalEntity.mapToEntity() = GoalEntity(
     is_done = isDone,
     complete_date = completeDate,
     updated_at = updatedAt,
-    is_cache_data = isCacheData,
 )
 
 fun BaseGoalEntity.mapToDetails(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,4 +22,5 @@ import androidx.compose.runtime.Composable
  * @author Stanislav Aleshin on 25.04.2024.
  */
 @Composable
-internal actual fun NavigationBarColor(isDarkTheme: Boolean) {}
+internal actual fun NavigationBarColor(isDarkTheme: Boolean) {
+}

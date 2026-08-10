@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,15 +27,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
 import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.employee_post_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.employee_post_field_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.employee_post_selector_header
+import ru.aleshin.studyassistant.editor.impl.resources.employee_post_selector_title
+import ru.aleshin.studyassistant.editor.impl.resources.ic_employee_post
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -53,10 +58,10 @@ internal fun EmployeePostInfoField(
         onClick = { employeePostSelectorState = true },
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
-        value = post?.mapToString(StudyAssistantRes.strings),
-        label = EditorThemeRes.strings.employeePostFieldLabel,
-        placeholder = EditorThemeRes.strings.employeePostFieldPlaceholder,
-        infoIcon = painterResource(EditorThemeRes.icons.employeePost),
+        value = post?.mapToString(),
+        label = stringResource(Res.string.employee_post_field_label),
+        placeholder = stringResource(Res.string.employee_post_field_placeholder),
+        infoIcon = painterResource(Res.drawable.ic_employee_post),
         trailingIcon = {
             ExpandedIcon(
                 isExpanded = employeePostSelectorState,
@@ -91,13 +96,13 @@ internal fun EmployeePostSelectorBottomSheet(
         modifier = modifier,
         selected = selectedPost,
         items = EmployeePost.entries,
-        header = EditorThemeRes.strings.employeePostSelectorHeader,
-        title = EditorThemeRes.strings.employeePostSelectorTitle,
+        header = stringResource(Res.string.employee_post_selector_header),
+        title = stringResource(Res.string.employee_post_selector_title),
         itemView = { post ->
             SelectorItemView(
                 onClick = { selectedPost = post },
                 selected = post == selectedPost,
-                title = post.mapToString(StudyAssistantRes.strings),
+                title = post.mapToString(),
                 label = null,
             )
         },

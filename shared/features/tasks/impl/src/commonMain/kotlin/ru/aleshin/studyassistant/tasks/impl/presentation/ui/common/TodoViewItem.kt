@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents.Formats
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
@@ -60,9 +61,19 @@ import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
 import ru.aleshin.studyassistant.core.ui.views.shortDayMonthTimeFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_alert_triangular
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_calendar_goto
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_deadline
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_timer_play
+import ru.aleshin.studyassistant.tasks.impl.resources.none_deadline_title
+import ru.aleshin.studyassistant.tasks.impl.resources.none_todos_title
+import ru.aleshin.studyassistant.tasks.impl.resources.overdue_deadline_title
+import ru.aleshin.studyassistant.tasks.impl.resources.until_deadline_date_suffix
 import kotlin.time.DurationUnit.MILLISECONDS
 import kotlin.time.toDuration
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
 
 /**
  * @author Stanislav Aleshin on 01.07.2024.
@@ -157,7 +168,7 @@ private fun TodoViewHeader(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = priority.mapToString(StudyAssistantRes.strings),
+                text = priority.mapToString(),
                 color = when (priority) {
                     STANDARD -> MaterialTheme.colorScheme.onSurfaceVariant
                     MEDIUM -> StudyAssistantRes.colors.accents.orange
@@ -220,10 +231,10 @@ private fun TodoViewFooter(
             ) {
                 when (status) {
                     TodoStatus.IN_PROGRESS -> {
-                        val deadlineDateFormat = Formats.dayMonthFormat(StudyAssistantRes.strings)
+                        val deadlineDateFormat = Formats.dayMonthFormat()
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            painter = painterResource(TasksThemeRes.icons.deadline),
+                            painter = painterResource(Res.drawable.ic_deadline),
                             contentDescription = null,
                             tint = if (deadline != null) {
                                 MaterialTheme.colorScheme.error
@@ -234,10 +245,10 @@ private fun TodoViewFooter(
                         Text(
                             text = buildString {
                                 if (deadline != null) {
-                                    append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
+                                    append(stringResource(Res.string.until_deadline_date_suffix), " ")
                                     append(deadline.formatByTimeZone(deadlineDateFormat))
                                 } else {
-                                    append(TasksThemeRes.strings.noneDeadlineTitle)
+                                    append(stringResource(Res.string.none_deadline_title))
                                 }
                             },
                             color = if (deadline != null) {
@@ -262,20 +273,20 @@ private fun TodoViewFooter(
                     }
 
                     TodoStatus.COMPLETE -> {
-                        val deadlineDateFormat = Formats.dayMonthFormat(StudyAssistantRes.strings)
+                        val deadlineDateFormat = Formats.dayMonthFormat()
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            painter = painterResource(TasksThemeRes.icons.deadline),
+                            painter = painterResource(Res.drawable.ic_deadline),
                             contentDescription = null,
                             tint = StudyAssistantRes.colors.accents.green,
                         )
                         Text(
                             text = buildString {
                                 if (deadline != null) {
-                                    append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
+                                    append(stringResource(Res.string.until_deadline_date_suffix), " ")
                                     append(deadline.formatByTimeZone(deadlineDateFormat))
                                 } else {
-                                    append(TasksThemeRes.strings.noneDeadlineTitle)
+                                    append(stringResource(Res.string.none_deadline_title))
                                 }
                             },
                             color = StudyAssistantRes.colors.accents.green,
@@ -296,18 +307,21 @@ private fun TodoViewFooter(
                     }
 
                     TodoStatus.NOT_COMPLETE -> {
-                        val deadlineDateFormat = Formats.dayMonthFormat(StudyAssistantRes.strings)
+                        val deadlineDateFormat = Formats.dayMonthFormat()
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            painter = painterResource(TasksThemeRes.icons.homeworkError),
+                            painter = painterResource(Res.drawable.ic_alert_triangular),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.error,
                         )
                         Text(
                             color = MaterialTheme.colorScheme.error,
                             text = buildString {
-                                append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
-                                append(deadline?.formatByTimeZone(deadlineDateFormat) ?: TasksThemeRes.strings.noneDeadlineTitle)
+                                append(stringResource(Res.string.until_deadline_date_suffix), " ")
+                                append(
+                                    deadline?.formatByTimeZone(deadlineDateFormat)
+                                        ?: stringResource(Res.string.none_deadline_title)
+                                )
                             },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -315,7 +329,7 @@ private fun TodoViewFooter(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = TasksThemeRes.strings.overdueDeadlineTitle,
+                            text = stringResource(Res.string.overdue_deadline_title),
                             color = MaterialTheme.colorScheme.error,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -352,7 +366,7 @@ private fun TodoViewFooter(
                 ) {
                     Icon(
                         modifier = Modifier.wrapContentSize(Alignment.Center).size(24.dp),
-                        painter = painterResource(TasksThemeRes.icons.calendarGoto),
+                        painter = painterResource(Res.drawable.ic_calendar_goto),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSecondaryContainer,
                     )
@@ -367,7 +381,7 @@ private fun TodoViewFooter(
                 ) {
                     Icon(
                         modifier = Modifier.wrapContentSize(Alignment.Center).size(24.dp),
-                        painter = painterResource(TasksThemeRes.icons.timerPlay),
+                        painter = painterResource(Res.drawable.ic_timer_play),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                     )
@@ -395,12 +409,12 @@ internal fun TodoViewNoneItem(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    painter = painterResource(StudyAssistantRes.icons.practicalTasks),
+                    painter = painterResource(CoreRes.drawable.core_ic_tasks_circular),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = TasksThemeRes.strings.noneTodosTitle,
+                    text = stringResource(Res.string.none_todos_title),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelLarge,
                 )

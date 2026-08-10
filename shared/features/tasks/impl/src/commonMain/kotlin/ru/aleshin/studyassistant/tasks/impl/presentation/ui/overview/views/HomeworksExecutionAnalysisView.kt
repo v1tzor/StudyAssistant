@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworksCompleteProgressUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.homework_execution_analysis_header
 
 /**
  * @author Stanislav Aleshin on 26.03.2025.
@@ -70,7 +72,7 @@ internal fun HomeworksExecutionAnalysisView(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = TasksThemeRes.strings.homeworkExecutionAnalysisHeader,
+                    text = stringResource(Res.string.homework_execution_analysis_header),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall,
@@ -82,9 +84,11 @@ internal fun HomeworksExecutionAnalysisView(
             ) {
                 ComingHomeworksExecutionAnalysisView(
                     isLoading = isLoading,
-                    comingHomeworksExecution = completeProgress?.comingHomeworksExecution ?: emptyList(),
+                    comingHomeworksExecution = completeProgress?.comingHomeworksExecution
+                        ?: emptyList(),
                     comingHomeworksProgress = completeProgress?.comingHomeworksProgress ?: 0f,
-                    weekHomeworksExecution = completeProgress?.weekHomeworksExecution ?: emptyList(),
+                    weekHomeworksExecution = completeProgress?.weekHomeworksExecution
+                        ?: emptyList(),
                     weekHomeworksProgress = completeProgress?.weekHomeworksProgress ?: 0f,
                 )
                 AllHomeworksExecutionAnalysisView(

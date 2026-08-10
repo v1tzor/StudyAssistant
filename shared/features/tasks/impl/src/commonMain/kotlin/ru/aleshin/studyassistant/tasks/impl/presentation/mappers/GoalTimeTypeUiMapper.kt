@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,19 @@
 package ru.aleshin.studyassistant.tasks.impl.presentation.mappers
 
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_time_type_none
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_time_type_stopwatch
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_time_type_timer
 
 /**
  * @author Stanislav Aleshin on 11.06.2025.
  */
 @Composable
 internal fun GoalTime.Type.mapToString() = when (this) {
-    GoalTime.Type.TIMER -> TasksThemeRes.strings.goalSheetTimeTypeTimer
-    GoalTime.Type.STOPWATCH -> TasksThemeRes.strings.goalSheetTimeTypeStopwatch
-    GoalTime.Type.NONE -> TasksThemeRes.strings.goalSheetTimeTypeNone
+    GoalTime.Type.TIMER -> stringResource(Res.string.goal_sheet_time_type_timer)
+    GoalTime.Type.STOPWATCH -> stringResource(Res.string.goal_sheet_time_type_stopwatch)
+    GoalTime.Type.NONE -> stringResource(Res.string.goal_sheet_time_type_none)
 }

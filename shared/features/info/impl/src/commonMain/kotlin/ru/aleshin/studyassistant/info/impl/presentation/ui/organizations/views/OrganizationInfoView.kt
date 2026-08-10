@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,12 +42,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
 import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationClassesInfoUi
-import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationUi
-import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
+import ru.aleshin.studyassistant.info.impl.resources.Res
+import ru.aleshin.studyassistant.info.impl.resources.classes_duration_in_week_label
+import ru.aleshin.studyassistant.info.impl.resources.ic_star_circular
+import ru.aleshin.studyassistant.info.impl.resources.main_organization_status
+import ru.aleshin.studyassistant.info.impl.resources.none_organization_title
+import ru.aleshin.studyassistant.info.impl.resources.number_of_classes_in_week_label
+import ru.aleshin.studyassistant.info.impl.resources.organization_status_label
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_class as core_ic_class
+import ru.aleshin.studyassistant.core.ui.resources.ic_duration as core_ic_duration
 
 /**
  * @author Stanislav Aleshin on 17.06.2024.
@@ -83,7 +92,7 @@ internal fun OrganizationView(
                 )
                 Column {
                     Text(
-                        text = organizationData.type.mapToSting(StudyAssistantRes.strings),
+                        text = organizationData.type.mapToSting(),
                         color = MaterialTheme.colorScheme.primary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -106,9 +115,9 @@ internal fun OrganizationView(
             ) {
                 if (organizationData.isMain) {
                     OrganizationInfoViewItem(
-                        icon = painterResource(InfoThemeRes.icons.mainOrganization),
-                        label = InfoThemeRes.strings.organizationStatusLabel,
-                        text = InfoThemeRes.strings.mainOrganizationStatus
+                        icon = painterResource(Res.drawable.ic_star_circular),
+                        label = stringResource(Res.string.organization_status_label),
+                        text = stringResource(Res.string.main_organization_status)
                     )
                 }
                 if (organizationData.isMain && classesInfo != null) {
@@ -116,14 +125,14 @@ internal fun OrganizationView(
                 }
                 if (classesInfo != null) {
                     OrganizationInfoViewItem(
-                        icon = painterResource(StudyAssistantRes.icons.duration),
-                        label = InfoThemeRes.strings.classesDurationInWeekLabel,
+                        icon = painterResource(CoreRes.drawable.core_ic_duration),
+                        label = stringResource(Res.string.classes_duration_in_week_label),
                         text = remember(classesInfo) { classesInfo.classesDurationString() },
                     )
                     VerticalDivider(modifier = Modifier.padding(top = 12.dp))
                     OrganizationInfoViewItem(
-                        icon = painterResource(StudyAssistantRes.icons.classes),
-                        label = InfoThemeRes.strings.numberOfClassesInWeekLabel,
+                        icon = painterResource(CoreRes.drawable.core_ic_class),
+                        label = stringResource(Res.string.number_of_classes_in_week_label),
                         text = remember(classesInfo) { classesInfo.numberOfClassesString() },
                     )
                 }
@@ -152,7 +161,7 @@ internal fun NoneOrganizationView(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = InfoThemeRes.strings.noneOrganizationTitle,
+                    text = stringResource(Res.string.none_organization_title),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.titleMedium,
                 )

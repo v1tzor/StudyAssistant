@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
  * @author Stanislav Aleshin on 21.06.2025.
  */
 @Serializable
-data class ChatCompletionRequest(
+data class ChatCompletionRequestPojo(
     val messages: List<ChatMessagePojo>,
     @SerialName("model") val model: String,
     val frequencyPenalty: Double? = null,
@@ -37,9 +37,3 @@ data class ChatCompletionRequest(
     val logprobs: Boolean? = null,
     val topLogprobs: Int? = null,
 )
-
-enum class ChatModel(val model: String) {
-    DEEPSEEK_CHAT("deepseek-chat"),
-
-    DEEPSEEK_REASONER("deepseek-reasoner"),
-}

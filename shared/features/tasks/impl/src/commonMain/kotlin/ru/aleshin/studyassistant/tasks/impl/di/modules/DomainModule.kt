@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.tasks.impl.di.modules
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.domain.interactors.TodoCompletionInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksErrorHandler
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.GoalsInteractor
@@ -28,7 +29,6 @@ import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ScheduleInteracto
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ShareHomeworksInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.SubjectsInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.TodoInteractor
-import ru.aleshin.studyassistant.tasks.impl.domain.interactors.UsersInteractor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -36,13 +36,15 @@ import ru.aleshin.studyassistant.tasks.impl.domain.interactors.UsersInteractor
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<TasksErrorHandler> { TasksErrorHandler.Base() }
     bindSingleton<TasksEitherWrapper> { TasksEitherWrapper.Base(instance(), instance()) }
+    bindSingleton<TodoCompletionInteractor> {
+        TodoCompletionInteractor.Base(instance(), instance(), instance(), instance())
+    }
 
-    bindSingleton<HomeworksInteractor> { HomeworksInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<UsersInteractor> { UsersInteractor.Base(instance(), instance()) }
+    bindSingleton<HomeworksInteractor> {  HomeworksInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance())  }
     bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance()) }
-    bindSingleton<ScheduleInteractor> { ScheduleInteractor.Base(instance(), instance(), instance(), instance()) }
-    bindSingleton<ShareHomeworksInteractor> { ShareHomeworksInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<GoalsInteractor> { GoalsInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ScheduleInteractor> {  ScheduleInteractor.Base(instance(), instance(), instance(), instance())  }
+    bindSingleton<ShareHomeworksInteractor> { ShareHomeworksInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<GoalsInteractor> {  GoalsInteractor.Base(instance(), instance(), instance(), instance(), instance())  }
     bindSingleton<SubjectsInteractor> { SubjectsInteractor.Base(instance(), instance()) }
     bindSingleton<TodoInteractor> { TodoInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
 }

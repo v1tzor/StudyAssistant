@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@ import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkTasksDetailsUi
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
@@ -36,9 +37,9 @@ internal data class HomeworkDetailsUi(
     val deadline: Instant,
     val subject: SubjectUi? = null,
     val organization: OrganizationShortUi,
-    val theoreticalTasks: HomeworkTasksUi,
-    val practicalTasks: HomeworkTasksUi,
-    val presentationTasks: HomeworkTasksUi,
+    val theoreticalTasks: HomeworkTasksDetailsUi,
+    val practicalTasks: HomeworkTasksDetailsUi,
+    val presentationTasks: HomeworkTasksDetailsUi,
     val test: String? = null,
     val priority: TaskPriority = TaskPriority.STANDARD,
     val isDone: Boolean = false,

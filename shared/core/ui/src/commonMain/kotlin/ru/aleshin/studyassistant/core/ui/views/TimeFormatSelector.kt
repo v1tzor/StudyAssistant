@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.TimeFormat
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.topSide
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.am_format_title as core_am_format_title
+import ru.aleshin.studyassistant.core.ui.resources.pm_format_title as core_pm_format_title
 
 /**
  * @author Stanislav Aleshin on 26.05.2024.
@@ -59,7 +62,7 @@ fun TimeFormatSelector(
                 ),
             ) {
                 Text(
-                    text = StudyAssistantRes.strings.amFormatTitle,
+                    text = stringResource(CoreRes.string.core_am_format_title),
                     color = when (format) {
                         TimeFormat.AM -> MaterialTheme.colorScheme.onPrimaryContainer
                         TimeFormat.PM -> MaterialTheme.colorScheme.onSurfaceVariant
@@ -80,7 +83,7 @@ fun TimeFormatSelector(
                 ),
             ) {
                 Text(
-                    text = StudyAssistantRes.strings.pmFormatTitle,
+                    text = stringResource(CoreRes.string.core_pm_format_title),
                     color = when (format) {
                         TimeFormat.AM -> MaterialTheme.colorScheme.onSurfaceVariant
                         TimeFormat.PM -> MaterialTheme.colorScheme.onPrimaryContainer

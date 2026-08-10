@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,41 +17,25 @@
 package ru.aleshin.studyassistant.core.common.architecture.component
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.essenty.instancekeeper.InstanceKeeper
-import com.arkivanov.essenty.instancekeeper.getOrCreate
-import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
-import ru.aleshin.studyassistant.core.common.inject.StartFeatureConfig
 
 /**
  * @author Stanislav Aleshin on 20.08.2025.
  */
 abstract class BaseComponent(
     componentContext: ComponentContext
-) : ComponentContext by componentContext {
-
-    private val componentDestroyer = instanceKeeper.getOrCreate(key = this.toString()) {
-        object : InstanceKeeper.Instance {
-            override fun onDestroy() {
-                super.onDestroy()
-                onDestroyInstance()
-            }
-        }
-    }
-
-    open fun onDestroyInstance() {}
-}
+) : ComponentContext by componentContext
 
 abstract class ChildComponent(
     componentContext: ComponentContext
 ) : BaseComponent(componentContext)
 
 abstract class FeatureComponent<C, O : BaseOutput>(
-    protected val componentContext: ComponentContext,
-    protected val startConfig: StartFeatureConfig<C>,
-    protected val outputConsumer: OutputConsumer<O>,
+    componentContext: ComponentContext,
 ) : BaseComponent(componentContext) {
-
-    abstract val contentProvider: FeatureContentProvider
-
     abstract fun navigateToBack()
 }
+
+data class FeatureComponentDeps<C, O : BaseOutput>(
+    val startConfig: C,
+    val outputConsumer: OutputConsumer<O>,
+)

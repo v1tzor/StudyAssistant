@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,11 @@ internal interface OrganizationInteractor {
     suspend fun fetchShortOrganizationById(uid: UID): FlowDomainResult<EditorFailures, OrganizationShort>
     suspend fun fetchAllShortOrganizations(): FlowDomainResult<EditorFailures, List<OrganizationShort>>
     suspend fun updateShortOrganization(organization: OrganizationShort): UnitDomainResult<EditorFailures>
-    suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile): DomainResult<EditorFailures, String>
+    suspend fun uploadAvatar(
+        oldAvatarUrl: String?,
+        file: InputFile
+    ): DomainResult<EditorFailures, String>
+
     suspend fun deleteAvatar(avatarUrl: String): UnitDomainResult<EditorFailures>
 
     class Base(
@@ -50,11 +54,12 @@ internal interface OrganizationInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : OrganizationInteractor {
 
-        override suspend fun addOrUpdateOrganization(organization: Organization) = eitherWrapper.wrap {
-            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-            val updatedOrganization = organization.copy(updatedAt = updatedAt)
-            organizationsRepository.addOrUpdateOrganization(updatedOrganization)
-        }
+        override suspend fun addOrUpdateOrganization(organization: Organization) =
+            eitherWrapper.wrap {
+                val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+                val updatedOrganization = organization.copy(updatedAt = updatedAt)
+                organizationsRepository.addOrUpdateOrganization(updatedOrganization)
+            }
 
         override suspend fun fetchOrganizationById(uid: UID) = eitherWrapper.wrapFlow {
             organizationsRepository.fetchOrganizationById(uid).map { organization ->
@@ -74,18 +79,22 @@ internal interface OrganizationInteractor {
             }
         }
 
-        override suspend fun updateShortOrganization(organization: OrganizationShort) = eitherWrapper.wrapUnit {
-            val baseUid = organization.uid
-            val baseModel = organizationsRepository.fetchOrganizationById(baseUid).first()
-            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-            val updatedModel = organization.convertToBase(checkNotNull(baseModel)).copy(updatedAt = updatedAt)
+        override suspend fun updateShortOrganization(organization: OrganizationShort) =
+            eitherWrapper.wrapUnit {
+                val baseUid = organization.uid
+                val baseModel = organizationsRepository.fetchOrganizationById(baseUid).first()
+                val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+                val updatedModel =
+                    organization.convertToBase(checkNotNull(baseModel)).copy(updatedAt = updatedAt)
 
-            organizationsRepository.addOrUpdateOrganization(updatedModel)
-        }
+                organizationsRepository.addOrUpdateOrganization(updatedModel)
+            }
 
-        override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) = eitherWrapper.wrap {
-            organizationsRepository.uploadAvatar(oldAvatarUrl, file)
-        }
+        override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) =
+            eitherWrapper.wrap {
+                organizationsRepository.uploadAvatar(oldAvatarUrl, file)
+            }
+
         override suspend fun deleteAvatar(avatarUrl: String) = eitherWrapper.wrap {
             organizationsRepository.deleteAvatar(avatarUrl)
         }

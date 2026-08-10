@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import ru.aleshin.studyassistant.core.database.models.subjects.SubjectDetailsEnt
 import ru.aleshin.studyassistant.core.database.models.tasks.BaseHomeworkEntity
 import ru.aleshin.studyassistant.core.database.models.tasks.HomeworkDetailsEntity
 import ru.aleshin.studyassistant.sqldelight.tasks.FetchActiveAndLinkedHomeworks
+import ru.aleshin.studyassistant.sqldelight.tasks.FetchCompletedHomeworksByTimeRange
 import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkEntity
 
 /**
@@ -40,7 +41,22 @@ fun HomeworkEntity.mapToBase() = BaseHomeworkEntity(
     isDone = is_done,
     completeDate = complete_date,
     updatedAt = updated_at,
-    isCacheData = is_cache_data,
+)
+
+fun FetchCompletedHomeworksByTimeRange.mapToBase() = BaseHomeworkEntity(
+    uid = uid,
+    classId = class_id,
+    deadline = deadline,
+    subjectId = subject_id,
+    organizationId = organization_id,
+    theoreticalTasks = theoretical_tasks,
+    practicalTasks = practical_tasks,
+    presentations = presentations,
+    test = test,
+    priority = priority,
+    isDone = is_done,
+    completeDate = complete_date,
+    updatedAt = updated_at,
 )
 
 fun BaseHomeworkEntity.mapToEntity() = HomeworkEntity(
@@ -57,7 +73,6 @@ fun BaseHomeworkEntity.mapToEntity() = HomeworkEntity(
     is_done = isDone,
     complete_date = completeDate,
     updated_at = updatedAt,
-    is_cache_data = isCacheData,
 )
 
 fun HomeworkDetailsEntity.mapToBase() = HomeworkEntity(
@@ -74,7 +89,6 @@ fun HomeworkDetailsEntity.mapToBase() = HomeworkEntity(
     is_done = if (isDone) 1L else 0L,
     complete_date = completeDate,
     updated_at = updatedAt,
-    is_cache_data = 0L,
 )
 
 fun BaseHomeworkEntity.mapToDetails(
@@ -110,5 +124,4 @@ fun FetchActiveAndLinkedHomeworks.mapToEntity() = BaseHomeworkEntity(
     isDone = is_done,
     completeDate = complete_date,
     updatedAt = updated_at,
-    isCacheData = is_cache_data,
 )

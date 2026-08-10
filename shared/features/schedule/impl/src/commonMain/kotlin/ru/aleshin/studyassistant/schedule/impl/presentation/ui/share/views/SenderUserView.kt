@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.mappers.toLanguageString
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.ago_suffix
 import kotlin.time.Duration
 
 /**
@@ -93,7 +95,7 @@ internal fun SenderUserView(
             Text(
                 text = buildString {
                     append(leftTime.toLanguageString(), " ")
-                    append(ScheduleThemeRes.strings.agoSuffix)
+                    append(stringResource(Res.string.ago_suffix))
                 },
                 color = MaterialTheme.colorScheme.secondary,
                 overflow = TextOverflow.Ellipsis,

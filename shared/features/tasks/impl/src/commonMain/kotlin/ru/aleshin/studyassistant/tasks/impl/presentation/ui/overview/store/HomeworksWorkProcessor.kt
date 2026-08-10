@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.store
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.datetime.Instant
@@ -31,14 +30,15 @@ import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.presentation.mappers.tasks.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkUi
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.HomeworksInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ScheduleInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.ShareHomeworksInteractor
-import ru.aleshin.studyassistant.tasks.impl.domain.interactors.UsersInteractor
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
+import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToHomeworkUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.HomeworkShareSelectionUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewAction
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEffect
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewOutput
@@ -53,19 +53,16 @@ internal interface HomeworksWorkProcessor :
         private val homeworksInteractor: HomeworksInteractor,
         private val shareInteractor: ShareHomeworksInteractor,
         private val scheduleInteractor: ScheduleInteractor,
-        private val usersInteractor: UsersInteractor,
     ) : HomeworksWorkProcessor {
 
         override suspend fun work(command: HomeworksWorkCommand) = when (command) {
             is HomeworksWorkCommand.LoadHomeworks -> loadHomeworksWork(command.currentDate)
             is HomeworksWorkCommand.LoadHomeworksProgress -> loadHomeworksProgressWork(command.currentDate)
-            is HomeworksWorkCommand.LoadSharedHomeworks -> loadSharedHomeworksWork()
             is HomeworksWorkCommand.LoadActiveSchedule -> loadActiveScheduleWork(command.currentDate)
-            is HomeworksWorkCommand.LoadPaidUserStatus -> loadUserPaidStatusWork()
             is HomeworksWorkCommand.DoHomework -> doHomeworkWork(command.homework)
             is HomeworksWorkCommand.RepeatHomework -> repeatHomeworkWork(command.homework)
             is HomeworksWorkCommand.SkipHomework -> skipHomeworkWork(command.homework)
-            is HomeworksWorkCommand.ShareHomeworks -> shareHomeworksWork(command.sentMediatedHomeworks)
+            is HomeworksWorkCommand.ShareHomeworks -> shareHomeworksWork(command.selection)
         }
 
         private fun loadHomeworksWork(currentDate: Instant) = flow<OverviewWorkResult> {
@@ -96,38 +93,12 @@ internal interface HomeworksWorkProcessor :
             emit(ActionResult(OverviewAction.UpdateHomeworksProgressLoading(true)))
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private fun loadSharedHomeworksWork() = flow {
-            val sharedHomeworksFlow = shareInteractor.fetchSharedHomeworksDetails()
-            val friendsFlow = usersInteractor.fetchAllFriends()
-
-            sharedHomeworksFlow.combineWithResult(
-                secondFlow = friendsFlow,
-                onError = { OverviewEffect.ShowError(it) },
-                onData = { homeworks, friends ->
-                    val allFriends = friends.map { it.mapToUi() }
-                    OverviewAction.UpdateSharedHomeworks(homeworks.mapToUi(), allFriends)
-                },
-            ).collect { workResult ->
-                emit(workResult)
-            }
-        }.onStart {
-            emit(ActionResult(OverviewAction.UpdateShareLoading(true)))
-        }
-
         private fun loadActiveScheduleWork(currentDate: Instant) = flow<OverviewWorkResult> {
             scheduleInteractor.fetchScheduleByDate(currentDate).collectAndHandle(
                 onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
                 onRightAction = { schedule ->
                     emit(ActionResult(OverviewAction.UpdateActiveSchedule(schedule.mapToUi())))
                 },
-            )
-        }
-
-        private fun loadUserPaidStatusWork() = flow {
-            usersInteractor.fetchAppUserPaidStatus().collectAndHandle(
-                onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
-                onRightAction = { emit(ActionResult(OverviewAction.UpdateUserPaidStatus(it))) },
             )
         }
 
@@ -150,9 +121,15 @@ internal interface HomeworksWorkProcessor :
             )
         }
 
-        private fun shareHomeworksWork(sentMediatedHomeworks: SentMediatedHomeworksDetailsUi) = flow {
-            shareInteractor.shareHomeworks(sentMediatedHomeworks.mapToDomain()).handle(
-                onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) }
+        private fun shareHomeworksWork(selection: HomeworkShareSelectionUi) = flow {
+            shareInteractor.createShare(
+                date = selection.date,
+                homeworks = selection.homeworks.map { homework -> homework.mapToDomain() },
+            ).handle(
+                onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
+                onRightAction = { link ->
+                    emit(ActionResult(OverviewAction.UpdateHomeworkShareLink(link.mapToHomeworkUi())))
+                },
             )
         }
     }
@@ -160,12 +137,10 @@ internal interface HomeworksWorkProcessor :
 
 internal sealed class HomeworksWorkCommand : WorkCommand {
     data class LoadHomeworks(val currentDate: Instant) : HomeworksWorkCommand()
-    data object LoadSharedHomeworks : HomeworksWorkCommand()
     data class LoadActiveSchedule(val currentDate: Instant) : HomeworksWorkCommand()
     data class LoadHomeworksProgress(val currentDate: Instant) : HomeworksWorkCommand()
-    data object LoadPaidUserStatus : HomeworksWorkCommand()
     data class DoHomework(val homework: HomeworkUi) : HomeworksWorkCommand()
     data class SkipHomework(val homework: HomeworkUi) : HomeworksWorkCommand()
     data class RepeatHomework(val homework: HomeworkUi) : HomeworksWorkCommand()
-    data class ShareHomeworks(val sentMediatedHomeworks: SentMediatedHomeworksDetailsUi) : HomeworksWorkCommand()
+    data class ShareHomeworks(val selection: HomeworkShareSelectionUi) : HomeworksWorkCommand()
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
@@ -37,39 +38,45 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.core.ui.views.ShareQrCode
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.HomeworkShareSelectionUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksEffect
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksEvent
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksState
@@ -79,6 +86,12 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.Dail
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.HomeworksTopBar
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.HomeworksTopSheet
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.ShareHomeworksBottomSheet
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.copy_share_link_title
+import ru.aleshin.studyassistant.tasks.impl.resources.homework_share_expires_at_label
+import ru.aleshin.studyassistant.tasks.impl.resources.homework_share_ready_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
 
 /**
  * @author Stanislav Aleshin on 03.07.2024
@@ -90,8 +103,7 @@ internal fun HomeworksContent(
 ) {
     val store = homeworksComponent.store
     val state by store.stateAsState()
-    val strings = TasksThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
+    val coreCancelTitle = stringResource(CoreRes.string.core_cancel_title)
     val listState = rememberLazyListState()
     val snackbarState = remember { SnackbarHostState() }
 
@@ -126,9 +138,6 @@ internal fun HomeworksContent(
                 onDeleteGoal = {
                     store.dispatchEvent(HomeworksEvent.DeleteGoal(it))
                 },
-                onPaidFunctionClick = {
-                    store.dispatchEvent(HomeworksEvent.ClickPaidFunction)
-                },
             )
         },
         topBar = {
@@ -145,7 +154,8 @@ internal fun HomeworksContent(
                     isLoading = state.isLoading,
                     selectedTimeRange = state.selectedTimeRange,
                     progressList = remember(state.homeworks) {
-                        val allHomeworks = state.homeworks.map { it.value.fetchAllHomeworks() }.extractAllItem()
+                        val allHomeworks =
+                            state.homeworks.map { it.value.fetchAllHomeworks() }.extractAllItem()
                         allHomeworks.map { it.completeDate != null }
                     },
                     onNextTimeRangeClick = {
@@ -179,14 +189,46 @@ internal fun HomeworksContent(
         contentWindowInsets = WindowInsets.statusBars,
     )
 
+    state.homeworkShareLink?.let { link ->
+        val clipboard = LocalClipboardManager.current
+        AlertDialog(
+            onDismissRequest = { store.dispatchEvent(HomeworksEvent.ClearHomeworkShareLink) },
+            title = { Text(stringResource(Res.string.homework_share_ready_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(link.code, style = MaterialTheme.typography.headlineSmall)
+                    ShareQrCode(
+                        content = link.deepLink,
+                        modifier = Modifier.align(Alignment.CenterHorizontally).size(200.dp),
+                    )
+                    Text(
+                        "${stringResource(Res.string.homework_share_expires_at_label)}: ${link.expiresAt}",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = { clipboard.setText(AnnotatedString(link.deepLink)) }) {
+                    Text(stringResource(Res.string.copy_share_link_title))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { store.dispatchEvent(HomeworksEvent.ClearHomeworkShareLink) }) {
+                    Text(coreCancelTitle)
+                }
+            },
+        )
+    }
+
     store.handleEffects { effect ->
         when (effect) {
             is HomeworksEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
+
             is HomeworksEffect.ScrollToDate -> {
                 delay(100L)
                 val selectedDateIndex = state.homeworks.toList().indexOfFirst {
@@ -211,10 +253,9 @@ private fun BaseHomeworksContent(
     onDoHomework: (HomeworkDetailsUi) -> Unit,
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
     onRepeatHomework: (HomeworkDetailsUi) -> Unit,
-    onShareHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
+    onShareHomeworks: (HomeworkShareSelectionUi) -> Unit,
     onScheduleGoal: (GoalCreateModelUi) -> Unit,
     onDeleteGoal: (GoalShortUi) -> Unit,
-    onPaidFunctionClick: () -> Unit,
 ) {
     Crossfade(
         modifier = modifier.padding(top = 12.dp),
@@ -246,7 +287,6 @@ private fun BaseHomeworksContent(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         var isShowSharedHomeworksSheet by remember { mutableStateOf(false) }
                         DailyHomeworksDetailsView(
-                            isPaidUser = state.isPaidUser,
                             date = homeworksEntry.first,
                             currentDate = state.currentDate,
                             isPassed = homeworksEntry.first < state.currentDate,
@@ -259,17 +299,14 @@ private fun BaseHomeworksContent(
                             onShareHomeworks = { isShowSharedHomeworksSheet = true },
                             onScheduleGoal = onScheduleGoal,
                             onDeleteGoal = onDeleteGoal,
-                            onOpenBillingScreen = onPaidFunctionClick,
                         )
 
                         DailyHomeworksDetailsVerticalDivider()
 
                         if (isShowSharedHomeworksSheet) {
                             ShareHomeworksBottomSheet(
-                                currentTime = Clock.System.now(),
                                 targetDate = homeworksEntry.first,
                                 homeworks = homeworksEntry.second.fetchAllHomeworks(),
-                                allFriends = state.friends,
                                 onDismissRequest = { isShowSharedHomeworksSheet = false },
                                 onConfirm = {
                                     onShareHomeworks(it)

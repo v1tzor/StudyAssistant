@@ -257,15 +257,21 @@ class RealtimeService(
             if (frame is Frame.Text) {
                 if (reconnectAttempts > 0) reconnectAttempts = 0
                 val rawData = frame.readText()
-                val response = rawData.tryFromJson(RealtimeResponse.serializer(JsonElement.serializer()))
+                val response =
+                    rawData.tryFromJson(RealtimeResponse.serializer(JsonElement.serializer()))
                 when (response?.type) {
                     TYPE_ERROR -> {
                         val exception = response.data.jsonCast(
                             serializer = JsonElement.serializer(),
                             deserializer = AppwriteException.serializer()
                         )
-                        crashlyticsService.recordException(ERROR_TAG, response.data.toString(), exception)
+                        crashlyticsService.recordException(
+                            ERROR_TAG,
+                            response.data.toString(),
+                            exception
+                        )
                     }
+
                     TYPE_EVENT -> {
                         val event = response.data.jsonCast(
                             serializer = JsonElement.serializer(),

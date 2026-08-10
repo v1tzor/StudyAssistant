@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.presentation.ui
 
 import android.os.Bundle
-import io.github.vinceglb.filekit.core.FileKit
 import ru.aleshin.studyassistant.android.R
 import ru.aleshin.studyassistant.core.common.platform.PlatformActivity
 
@@ -29,6 +28,5 @@ abstract class FlavorMainActivity : PlatformActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.Theme_StudyAssistant)
         super.onCreate(savedInstanceState)
-        FileKit.init(this)
     }
 }

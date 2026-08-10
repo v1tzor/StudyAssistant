@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,16 +40,19 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.forEachWith
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.tokens.monthNames
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.SmallInfoBadge
+import ru.aleshin.studyassistant.core.ui.views.monthNames
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.CommonClassView
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.empty_classes_title
+import ru.aleshin.studyassistant.schedule.impl.resources.test_label
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
@@ -63,11 +66,11 @@ internal fun CommonScheduleView(
     classes: List<ClassDetailsUi>,
     onClassClick: (ClassDetailsUi) -> Unit,
 ) {
-    val coreStrings = StudyAssistantRes.strings
+    val localizedMonthNames = monthNames()
     val dateFormat = LocalDate.Format {
         dayOfMonth()
         char(' ')
-        monthName(coreStrings.monthNames())
+        monthName(localizedMonthNames)
     }
     Surface(
         modifier = modifier.fillMaxWidth().animateContentSize(),
@@ -76,7 +79,7 @@ internal fun CommonScheduleView(
     ) {
         Column {
             CommonScheduleViewHeader(
-                dayOfWeek = date.dayOfWeek.mapToSting(coreStrings),
+                dayOfWeek = date.dayOfWeek.mapToSting(),
                 date = date.format(dateFormat),
                 isCurrentDay = isCurrentDay,
             )
@@ -201,7 +204,7 @@ private fun CommonScheduleViewContent(
                                 contentColor = StudyAssistantRes.colors.accents.onRedContainer,
                                 content = {
                                     Text(
-                                        text = ScheduleThemeRes.strings.testLabel,
+                                        text = stringResource(Res.string.test_label),
                                         overflow = TextOverflow.Ellipsis,
                                         maxLines = 1,
                                     )
@@ -229,7 +232,7 @@ private fun EmptyClassesView(
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = ScheduleThemeRes.strings.emptyClassesTitle,
+                text = stringResource(Res.string.empty_classes_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelMedium,
             )

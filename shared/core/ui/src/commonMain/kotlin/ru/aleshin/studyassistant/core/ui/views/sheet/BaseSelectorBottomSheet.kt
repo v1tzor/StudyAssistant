@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
+import ru.aleshin.studyassistant.core.ui.resources.select_confirm_title as core_select_confirm_title
 
 /**
  * @author Stanislav Aleshin on 04.09.2024.
@@ -143,14 +146,14 @@ fun <T> BaseSelectorBottomSheet(
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     ),
                 ) {
-                    Text(text = StudyAssistantRes.strings.cancelTitle)
+                    Text(text = stringResource(CoreRes.string.core_cancel_title))
                 }
                 Button(
                     onClick = { onConfirm(selected) },
                     modifier = Modifier.weight(1f),
                     enabled = confirmEnabled
                 ) {
-                    Text(text = StudyAssistantRes.strings.selectConfirmTitle)
+                    Text(text = stringResource(CoreRes.string.core_select_confirm_title))
                 }
             }
 

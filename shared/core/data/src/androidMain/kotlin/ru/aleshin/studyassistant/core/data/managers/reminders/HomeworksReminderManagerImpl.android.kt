@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,12 @@ import androidx.work.BackoffPolicy
 import androidx.work.ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.data.workers.HomeworksReminderWorker
 import ru.aleshin.studyassistant.core.data.workers.HomeworksReminderWorker.Companion.WORK_KEY
-import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
 import java.util.concurrent.TimeUnit
 
@@ -37,14 +35,10 @@ import java.util.concurrent.TimeUnit
 actual class HomeworksReminderManagerImpl(
     private val workManager: WorkManager,
     private val dateManager: DateManager,
+    private val notificationScheduler: NotificationScheduler,
 ) : HomeworksReminderManager {
 
-    actual override suspend fun fetchWorkStatus(): RepeatWorkStatus {
-        val workInfo = workManager.getWorkInfosForUniqueWorkFlow(WORK_KEY).first()
-        return workInfo.firstOrNull()?.state.mapToWorkStatus()
-    }
-
-    actual override fun startOrRetryReminderService(time: Instant) {
+    actual override suspend fun startOrRetryReminderService(time: Instant) {
         val currentTime = dateManager.fetchCurrentInstant()
         val delayDuration = currentTime.setHoursAndMinutes(time) - currentTime
         val delay = if (delayDuration.isPositive()) {
@@ -64,7 +58,8 @@ actual class HomeworksReminderManagerImpl(
         workManager.enqueueUniquePeriodicWork(WORK_KEY, CANCEL_AND_REENQUEUE, workRequest)
     }
 
-    actual override fun stopReminderService() {
+    actual override suspend fun stopReminderService() {
         workManager.cancelUniqueWork(WORK_KEY)
+        notificationScheduler.cancelNotification(HomeworksReminderWorker.HOMEWORKS_NOTIFICATION_ID)
     }
 }

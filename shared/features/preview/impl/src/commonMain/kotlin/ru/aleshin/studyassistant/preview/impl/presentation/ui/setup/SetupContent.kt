@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -44,19 +46,18 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationUi
+import ru.aleshin.studyassistant.core.presentation.models.settings.CalendarSettingsUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ProfileUi
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.views.AdaptiveContent
+import ru.aleshin.studyassistant.core.ui.utils.useLargeLayout
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEffect
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEvent
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupState
@@ -68,6 +69,11 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.Profil
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SchedulePageInfo
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupPage
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupTopBar
+import ru.aleshin.studyassistant.preview.impl.resources.Res
+import ru.aleshin.studyassistant.preview.impl.resources.schedule_start_button_label
+import ru.aleshin.studyassistant.preview.impl.resources.step_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.exceeding_limit_image_size_message as core_exceeding_limit_image_size_message
 
 /**
  * @author Stanislav Aleshin on 17.04.2024
@@ -79,35 +85,51 @@ internal fun SetupContent(
 ) {
     val store = setupComponent.store
     val state by store.stateAsState()
-    val strings = PreviewThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
+    val coreExceedingLimitImageSizeMessage = stringResource(CoreRes.string.core_exceeding_limit_image_size_message)
+    val adaptiveInfo = currentWindowAdaptiveInfoV2()
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            AdaptiveContent {
-                BaseSetupContent(
+            Box(
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                contentAlignment = Alignment.TopCenter,
+            ) {
+                SetupLayout(
                     state = state,
-                    modifier = Modifier.padding(paddingValues),
+                    modifier = Modifier.fillMaxSize().widthIn(
+                        max = if (adaptiveInfo.useLargeLayout) 960.dp else 720.dp,
+                    ),
                     onUpdateProfile = { store.dispatchEvent(SetupEvent.UpdateProfile(it)) },
                     onUpdateOrganization = { store.dispatchEvent(SetupEvent.UpdateOrganization(it)) },
-                    onUpdateCalendarSettings = { store.dispatchEvent(SetupEvent.UpdateCalendarSettings(it)) },
+                    onUpdateCalendarSettings = {
+                        store.dispatchEvent(
+                            SetupEvent.UpdateCalendarSettings(
+                                it
+                            )
+                        )
+                    },
                     onSaveProfile = { store.dispatchEvent(SetupEvent.ClickSaveProfileInfo) },
                     onUpdateProfileAvatar = { store.dispatchEvent(SetupEvent.UpdateProfileAvatar(it)) },
                     onDeleteProfileAvatar = { store.dispatchEvent(SetupEvent.DeleteProfileAvatar) },
                     onSaveOrganization = { store.dispatchEvent(SetupEvent.ClickSaveOrganizationInfo) },
-                    onUpdateOrganizationAvatar = { store.dispatchEvent(SetupEvent.UpdateOrganizationAvatar(it)) },
+                    onUpdateOrganizationAvatar = {
+                        store.dispatchEvent(
+                            SetupEvent.UpdateOrganizationAvatar(
+                                it
+                            )
+                        )
+                    },
                     onDeleteOrganizationAvatar = { store.dispatchEvent(SetupEvent.DeleteOrganizationAvatar) },
                     onSaveCalendar = { store.dispatchEvent(SetupEvent.ClickSaveCalendarInfo) },
                     onFillOutSchedule = { store.dispatchEvent(SetupEvent.ClickEditWeekSchedule) },
                     onStartUsing = { store.dispatchEvent(SetupEvent.ClickGoToApp) },
-                    onPaidFunctionClick = { store.dispatchEvent(SetupEvent.ClickPaidFunction) },
                     onExceedingAvatarSizeLimit = {
                         coroutineScope.launch {
                             snackbarState.showSnackbar(
-                                message = coreStrings.exceedingLimitImageSizeMessage,
+                                message = coreExceedingLimitImageSizeMessage,
                                 withDismissAction = true,
                             )
                         }
@@ -134,7 +156,7 @@ internal fun SetupContent(
         when (effect) {
             is SetupEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -143,10 +165,10 @@ internal fun SetupContent(
 }
 
 @Composable
-private fun BaseSetupContent(
+private fun SetupLayout(
     state: SetupState,
     modifier: Modifier,
-    onUpdateProfile: (AppUserUi) -> Unit,
+    onUpdateProfile: (ProfileUi) -> Unit,
     onUpdateOrganization: (OrganizationUi) -> Unit,
     onUpdateCalendarSettings: (CalendarSettingsUi) -> Unit,
     onSaveProfile: () -> Unit,
@@ -159,7 +181,6 @@ private fun BaseSetupContent(
     onExceedingAvatarSizeLimit: (Int) -> Unit,
     onFillOutSchedule: () -> Unit,
     onStartUsing: () -> Unit,
-    onPaidFunctionClick: () -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -169,7 +190,6 @@ private fun BaseSetupContent(
             modifier = Modifier.weight(1f),
             currentPage = state.currentPage,
             profile = state.profile,
-            isPaidUser = state.isPaidUser,
             actionWithProfileAvatar = state.actionWithProfileAvatar,
             organization = state.organization,
             actionWithOrganizationAvatar = state.actionWithOrganizationAvatar,
@@ -182,7 +202,6 @@ private fun BaseSetupContent(
             onDeleteOrganizationAvatar = onDeleteOrganizationAvatar,
             onUpdateCalendarSettings = onUpdateCalendarSettings,
             onExceedingAvatarSizeLimit = onExceedingAvatarSizeLimit,
-            onOpenBillingScreen = onPaidFunctionClick,
         )
         SetupPageNavigationSection(
             enabledSaveProfile = state.profile?.username?.isNotBlank() == true,
@@ -201,13 +220,12 @@ private fun BaseSetupContent(
 private fun SetupPageInfoSection(
     modifier: Modifier = Modifier,
     currentPage: SetupPage,
-    profile: AppUserUi?,
-    isPaidUser: Boolean,
+    profile: ProfileUi?,
     actionWithProfileAvatar: ActionWithAvatar,
     organization: OrganizationUi?,
     actionWithOrganizationAvatar: ActionWithAvatar,
     calendarSettings: CalendarSettingsUi?,
-    onUpdateProfile: (AppUserUi) -> Unit,
+    onUpdateProfile: (ProfileUi) -> Unit,
     onUpdateProfileAvatar: (PlatformFile) -> Unit,
     onDeleteProfileAvatar: () -> Unit,
     onUpdateOrganization: (OrganizationUi) -> Unit,
@@ -215,8 +233,6 @@ private fun SetupPageInfoSection(
     onDeleteOrganizationAvatar: () -> Unit,
     onUpdateCalendarSettings: (CalendarSettingsUi) -> Unit,
     onExceedingAvatarSizeLimit: (Int) -> Unit,
-    onOpenBillingScreen: () -> Unit,
-
 ) {
     AnimatedContent(
         targetState = if (profile != null) currentPage else null,
@@ -242,7 +258,6 @@ private fun SetupPageInfoSection(
                         SetupPage.PROFILE -> if (profile != null) {
                             ProfilePageInfo(
                                 profile = profile,
-                                isPaidUser = isPaidUser,
                                 avatar = when (actionWithProfileAvatar) {
                                     is ActionWithAvatar.None -> actionWithProfileAvatar.uri
                                     is ActionWithAvatar.Set -> actionWithProfileAvatar.file.uri
@@ -252,13 +267,12 @@ private fun SetupPageInfoSection(
                                 onUpdateAvatar = onUpdateProfileAvatar,
                                 onDeleteAvatar = onDeleteProfileAvatar,
                                 onExceedingLimit = onExceedingAvatarSizeLimit,
-                                onOpenBillingScreen = onOpenBillingScreen,
                             )
                         }
+
                         SetupPage.ORGANIZATION -> if (organization != null) {
                             OrganizationPageInfo(
                                 organization = organization,
-                                isPaidUser = isPaidUser,
                                 avatar = when (actionWithOrganizationAvatar) {
                                     is ActionWithAvatar.None -> actionWithOrganizationAvatar.uri
                                     is ActionWithAvatar.Set -> actionWithOrganizationAvatar.file.uri
@@ -268,15 +282,16 @@ private fun SetupPageInfoSection(
                                 onUpdateAvatar = onUpdateOrganizationAvatar,
                                 onDeleteAvatar = onDeleteOrganizationAvatar,
                                 onExceedingLimit = onExceedingAvatarSizeLimit,
-                                onOpenBillingScreen = onOpenBillingScreen,
                             )
                         }
+
                         SetupPage.CALENDAR -> if (calendarSettings != null) {
                             CalendarPageInfo(
                                 calendarSettings = calendarSettings,
                                 onUpdateCalendarSettings = onUpdateCalendarSettings,
                             )
                         }
+
                         SetupPage.SCHEDULE -> SchedulePageInfo()
                     }
                 }
@@ -301,7 +316,7 @@ private fun SetupStepHeader(
     ) {
         Text(
             text = buildAnnotatedString {
-                append(PreviewThemeRes.strings.stepTitle)
+                append(stringResource(Res.string.step_title))
                 append(currentStep.toString())
                 append('/')
                 append(maxSteps.toString())
@@ -333,7 +348,8 @@ private fun SetupPageNavigationSection(
     onStartUsing: () -> Unit,
 ) {
     Column(
-        modifier = modifier.padding(start = 24.dp, end = 24.dp, bottom = 36.dp, top = 16.dp).animateContentSize(),
+        modifier = modifier.padding(start = 24.dp, end = 24.dp, bottom = 36.dp, top = 16.dp)
+            .animateContentSize(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         when (currentPage) {
@@ -342,15 +358,18 @@ private fun SetupPageNavigationSection(
                 onClick = onSaveProfile,
                 navigationLabel = currentPage.buttonLabel,
             )
+
             SetupPage.ORGANIZATION -> NavigationPageButton(
                 enabled = enabledSaveOrganization,
                 onClick = onSaveOrganization,
                 navigationLabel = currentPage.buttonLabel,
             )
+
             SetupPage.CALENDAR -> NavigationPageButton(
                 onClick = onSaveCalendar,
                 navigationLabel = currentPage.buttonLabel,
             )
+
             SetupPage.SCHEDULE -> {
                 NavigationPageButton(
                     onClick = onFillOutSchedule,
@@ -358,7 +377,7 @@ private fun SetupPageNavigationSection(
                 )
                 NavigationPageButton(
                     onClick = onStartUsing,
-                    navigationLabel = PreviewThemeRes.strings.scheduleStartButtonLabel,
+                    navigationLabel = stringResource(Res.string.schedule_start_button_label),
                     isTonal = true,
                 )
             }

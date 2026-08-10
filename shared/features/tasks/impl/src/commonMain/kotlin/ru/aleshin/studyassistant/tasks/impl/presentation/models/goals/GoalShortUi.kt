@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,12 +55,14 @@ internal fun GoalDetailsUi.convertToShort() = GoalShortUi(
             startTimePoint = time.startTimePoint,
             isActive = time.isActive,
         )
+
         is GoalTimeDetailsUi.Timer -> GoalTimeUi.Timer(
             targetTime = time.targetTime,
             pastStopTime = time.pastStopTime,
             startTimePoint = time.startTimePoint,
             isActive = time.isActive,
         )
+
         is GoalTimeDetailsUi.None -> GoalTimeUi.None
     },
     completeAfterTimeElapsed = completeAfterTimeElapsed,

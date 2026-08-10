@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.communicators.St
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract.TodoAction
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract.TodoEffect
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract.TodoEvent
@@ -58,16 +58,19 @@ internal class TodoComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is TodoEvent.UpdateTodoDone -> with(event) {
                 launchBackgroundWork(BackgroundKey.TODO_ACTION) {
                     val command = TodoDetailsWorkCommand.UpdateTodoDone(todo)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is TodoEvent.ClickTodoTask -> with(event) {
                 val config = EditorConfig.Todo(todoId = todo?.uid)
                 consumeOutput(TodoOutput.NavigateToTodoEditor(config))
             }
+
             is TodoEvent.ClickBack -> {
                 consumeOutput(TodoOutput.NavigateToBack)
             }
@@ -82,6 +85,7 @@ internal class TodoComposeStore(
             completedTodos = action.todos,
             isLoading = false,
         )
+
         is TodoAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )

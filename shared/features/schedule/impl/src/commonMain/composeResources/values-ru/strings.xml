@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="overview_header">Обзор</string>
+    <string name="details_header">Расписание</string>
+    <string name="share_header">Обмен расписанием</string>
+    <string name="current_week_title">Текущая неделя</string>
+    <string name="previous_week_title">Предыдущая неделя</string>
+    <string name="next_week_title">Следующая неделя</string>
+    <string name="common_schedule_view_type">Общий вид</string>
+    <string name="vertical_schedule_view_type">Вертикальный вид</string>
+    <string name="test_label">Тест</string>
+    <string name="empty_classes_title">Занятия отсутствуют</string>
+    <string name="until_end_class_title">До конца занятия</string>
+    <string name="until_start_class_title">До начала занятия</string>
+    <string name="tasks_progress_title">Выполнено заданий</string>
+    <string name="complete_schedule_title">Нету ближайших событий</string>
+    <string name="analysis_day_title">Анализ дня</string>
+    <string name="analysis_homeworks_label">Задания</string>
+    <string name="analysis_tests_label">Тесты</string>
+    <string name="analysis_classes_label">Занятия</string>
+    <string name="analysis_movement_label">Перемещения</string>
+    <string name="analysis_tasks_label">Задачи</string>
+    <string name="class_sheet_task_title">Задание</string>
+    <string name="none_homework_title">Задание отсутствует</string>
+    <string name="homework_is_complete_title">Выполнено</string>
+    <string name="homework_is_complete_short_title">ДЗ готово</string>
+    <string name="homework_in_progress_title">Выполняется\u0020</string>
+    <string name="homework_in_progress_short_title">ДЗ в процессе</string>
+    <string name="homework_is_set_title">Задание задано</string>
+    <string name="homework_is_set_short_title">ДЗ задано</string>
+    <string name="homework_is_not_complete_title">Задание не выполнено</string>
+    <string name="homework_is_not_complete_short_title">ДЗ не выполнено</string>
+    <string name="homework_is_skipped_title">Задание пропущено</string>
+    <string name="homework_is_skipped_short_title">ДЗ пропущено</string>
+    <string name="again_homework_title">Заново</string>
+    <string name="complete_homework_title">Выполнить</string>
+    <string name="add_homework_title">Добавить задание</string>
+    <string name="shared_schedule_sender_header">Отправитель</string>
+    <string name="shared_schedule_header">Расписание</string>
+    <string name="new_and_linked_data_section_label">Новые и привязанные данные</string>
+    <string name="shared_organization_header">Организации</string>
+    <string name="organization_linker_dialog_header">Организации</string>
+    <string name="organization_linker_dialog_title">Если организация уже создана, выберите её, чтобы привязать</string>
+    <string name="shared_subjects_header">Предметы</string>
+    <string name="subject_linker_dialog_header">Предметы</string>
+    <string name="subject_linker_dialog_title">Если предмет уже создан, выберите его, чтобы привязать</string>
+    <string name="shared_employees_header">Сотрудники</string>
+    <string name="employee_linker_dialog_header">Сотрудники</string>
+    <string name="employee_linker_dialog_title">Если профиль сотрудника уже создан, выберите его, чтобы привязать</string>
+    <string name="link_button_title">Привязать</string>
+    <string name="unlink_button_title">Отвязать</string>
+    <string name="first_week_title">1 неделя</string>
+    <string name="second_week_title">2 неделя</string>
+    <string name="thirty_week_title">3 неделя</string>
+    <string name="accept_shared_schedule_button_title">Принять</string>
+    <string name="reject_shared_schedule_button_title">Отклонить</string>
+    <string name="create_share_title">Передать расписание</string>
+    <string name="create_share_description">Создайте временный код. В него войдут расписание и связанные учебные данные без профиля и аккаунта.</string>
+    <string name="create_share_button_title">Создать код</string>
+    <string name="receive_share_title">Получить расписание</string>
+    <string name="share_code_label">Код обмена</string>
+    <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>
+    <string name="receive_share_button_title">Открыть</string>
+    <string name="scan_qr_button_title">Сканировать QR-код</string>
+    <string name="share_code_ready_title">Код готов</string>
+    <string name="share_expires_at_label">Действует до</string>
+    <string name="copy_link_button_title">Копировать ссылку</string>
+    <string name="new_share_button_title">Создать новый код</string>
+    <string name="share_import_success_title">Расписание импортировано</string>
+    <string name="share_invalid_title">Код не найден или введён неверно</string>
+    <string name="share_expired_title">Срок действия кода истёк</string>
+    <string name="share_claimed_title">Расписание сейчас импортируется на другом устройстве</string>
+    <string name="share_consumed_title">Это расписание уже было принято</string>
+    <string name="share_offline_title">Для обмена нужно подключение к интернету</string>
+    <string name="share_rate_limit_message">Слишком много попыток. Попробуйте позже</string>
+    <string name="share_daily_limit_message">Достигнут лимит публикаций. Попробуйте через сутки</string>
+    <string name="share_item_limit_message">За раз можно передать не более 20 записей расписания</string>
+    <string name="share_payload_limit_message">Расписание занимает слишком много места</string>
+    <string name="try_again_button_title">Попробовать снова</string>
+    <string name="ago_suffix">назад</string>
+    <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
+</resources>

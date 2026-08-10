@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,27 +20,32 @@ import kotlinx.coroutines.flow.flow
 import ru.aleshin.studyassistant.core.common.architecture.store.work.ActionResult
 import ru.aleshin.studyassistant.core.common.architecture.store.work.EffectResult
 import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.store.work.OutputResult
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.firstHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.firstOrNullHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.functional.handleAndGet
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.settings.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.settings.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToUi
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationUi
+import ru.aleshin.studyassistant.core.presentation.models.settings.CalendarSettingsUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ProfileUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToDomain
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
-import ru.aleshin.studyassistant.preview.impl.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.CalendarSettingsInteractor
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.GeneralSettingsInteractor
 import ru.aleshin.studyassistant.preview.impl.domain.interactors.OrganizationsInteractor
-import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToDomain
-import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
+import ru.aleshin.studyassistant.preview.impl.domain.interactors.ProfileInteractor
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupAction
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEffect
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupOutput
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupPage
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
@@ -49,7 +54,7 @@ internal interface SetupWorkProcessor :
     FlowWorkProcessor<SetupWorkCommand, SetupAction, SetupEffect, SetupOutput> {
 
     class Base(
-        private val appUserInteractor: AppUserInteractor,
+        private val profileInteractor: ProfileInteractor,
         private val organizationsInteractor: OrganizationsInteractor,
         private val generalSettingsInteractor: GeneralSettingsInteractor,
         private val calendarSettingsInteractor: CalendarSettingsInteractor,
@@ -57,40 +62,46 @@ internal interface SetupWorkProcessor :
 
         override suspend fun work(command: SetupWorkCommand) = when (command) {
             is SetupWorkCommand.LoadAllData -> fetchAllDataWork()
-            is SetupWorkCommand.LoadPaidUserStatus -> loadUserPaidStatusWork()
-            is SetupWorkCommand.UpdateUserProfile -> updateProfileWork(
-                user = command.user,
+            is SetupWorkCommand.UpdateProfile -> updateProfileWork(
+                profile = command.profile,
                 actionWithAvatar = command.actionWithAvatar,
             )
+
             is SetupWorkCommand.UpdateOrganization -> updateOrganizationWork(
                 organization = command.organization,
                 actionWithAvatar = command.actionWithAvatar,
             )
+
             is SetupWorkCommand.UpdateCalendarSettings -> updateCalendarSettingsWork(
                 settings = command.settings,
             )
-            is SetupWorkCommand.FinishSetup -> finishSetupWork()
+
+            is SetupWorkCommand.FinishSetup -> finishSetupWork(command.destination)
         }
 
         private fun fetchAllDataWork() = flow {
-            appUserInteractor.fetchAppUser().firstHandleAndGet(
+            profileInteractor.fetchProfile().firstHandleAndGet(
                 onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))) },
-                onRightAction = { user ->
-                    val createdUser = user.mapToUi()
-                    val mainOrganization = organizationsInteractor.fetchAllOrganization().firstOrNullHandleAndGet(
-                        onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
-                        onRightAction = { organizations ->
-                            val mainOrganization = organizations.find { it.isMain }
-                            val createdOrganization = mainOrganization ?: organizations.getOrNull(0)
-                            return@firstOrNullHandleAndGet createdOrganization?.mapToUi()?.copy(isMain = true)
-                        }
-                    )
-                    val calendarSettings = calendarSettingsInteractor.fetchCalendarSettings().firstHandleAndGet(
-                        onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
-                        onRightAction = { calendarSettings -> calendarSettings.mapToUi() },
-                    )
+                onRightAction = { profile ->
+                    val createdProfile = profile.mapToUi()
+                    val mainOrganization =
+                        organizationsInteractor.fetchAllOrganization().firstOrNullHandleAndGet(
+                            onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
+                            onRightAction = { organizations ->
+                                val mainOrganization = organizations.find { it.isMain }
+                                val createdOrganization =
+                                    mainOrganization ?: organizations.getOrNull(0)
+                                return@firstOrNullHandleAndGet createdOrganization?.mapToUi()
+                                    ?.copy(isMain = true)
+                            }
+                        )
+                    val calendarSettings =
+                        calendarSettingsInteractor.fetchCalendarSettings().firstHandleAndGet(
+                            onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
+                            onRightAction = { calendarSettings -> calendarSettings.mapToUi() },
+                        )
                     val action = SetupAction.UpdateAll(
-                        profile = createdUser,
+                        profile = createdProfile,
                         organization = mainOrganization ?: OrganizationUi.createMainOrganization(),
                         calendarSettings = calendarSettings ?: CalendarSettingsUi.createEmpty(),
                     )
@@ -99,41 +110,38 @@ internal interface SetupWorkProcessor :
             )
         }
 
-        private fun loadUserPaidStatusWork() = flow {
-            appUserInteractor.fetchAppUserPaidStatus().collectAndHandle(
-                onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))) },
-                onRightAction = { emit(ActionResult(SetupAction.UpdateUserPaidStatus(it))) },
-            )
-        }
-
         private fun updateProfileWork(
-            user: AppUserUi,
+            profile: ProfileUi,
             actionWithAvatar: ActionWithAvatar,
         ) = flow {
             val avatar = when (actionWithAvatar) {
                 is ActionWithAvatar.Set -> {
-                    appUserInteractor.uploadAvatar(user.avatar, actionWithAvatar.file.mapToDomain()).handleAndGet(
-                        onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
-                        onRightAction = { it },
-                    )
+                    profileInteractor.uploadAvatar(profile.avatar, actionWithAvatar.file.mapToDomain())
+                        .handleAndGet(
+                            onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
+                            onRightAction = { it },
+                        )
                 }
+
                 is ActionWithAvatar.Delete -> {
-                    appUserInteractor.deleteAvatar(user.avatar ?: "").handleAndGet(
+                    profileInteractor.deleteAvatar(profile.avatar ?: "").handleAndGet(
                         onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
                         onRightAction = { null },
                     )
                 }
+
                 is ActionWithAvatar.None -> actionWithAvatar.uri
             }
 
-            val updatedUser = user.copy(avatar = avatar)
+            val updatedProfile = profile.copy(avatar = avatar)
 
-            appUserInteractor.updateUser(updatedUser.mapToDomain()).handle(
+            profileInteractor.updateProfile(updatedProfile.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))) },
                 onRightAction = {
                     val avatarAction = ActionWithAvatar.None(avatar)
                     emit(ActionResult(SetupAction.UpdateActionWithProfileAvatar(avatarAction)))
-                    emit(ActionResult(SetupAction.UpdateUserProfile(updatedUser)))
+                    emit(ActionResult(SetupAction.UpdateUserProfile(updatedProfile)))
+                    emit(ActionResult(SetupAction.UpdatePage(SetupPage.ORGANIZATION)))
                 },
             )
         }
@@ -154,37 +162,57 @@ internal interface SetupWorkProcessor :
                         onRightAction = { it },
                     )
                 }
+
                 is ActionWithAvatar.Delete -> {
                     organizationsInteractor.deleteAvatar(organization.avatar ?: "").handleAndGet(
                         onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))).let { null } },
                         onRightAction = { null },
                     )
                 }
+
                 is ActionWithAvatar.None -> actionWithAvatar.uri
             }
 
             val updatedOrganization = organization.copy(uid = uid, avatar = avatar)
 
-            organizationsInteractor.addOrUpdateOrganization(updatedOrganization.mapToDomain()).handle(
-                onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))) },
-                onRightAction = {
-                    val avatarAction = ActionWithAvatar.None(avatar)
-                    emit(ActionResult(SetupAction.UpdateActionWithOrganizationAvatar(avatarAction)))
-                    emit(ActionResult(SetupAction.UpdateOrganization(updatedOrganization)))
-                },
-            )
+            organizationsInteractor.addOrUpdateOrganization(updatedOrganization.mapToDomain())
+                .handle(
+                    onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))) },
+                    onRightAction = {
+                        val avatarAction = ActionWithAvatar.None(avatar)
+                        emit(
+                            ActionResult(
+                                SetupAction.UpdateActionWithOrganizationAvatar(
+                                    avatarAction
+                                )
+                            )
+                        )
+                        emit(ActionResult(SetupAction.UpdateOrganization(updatedOrganization)))
+                        emit(ActionResult(SetupAction.UpdatePage(SetupPage.CALENDAR)))
+                    },
+                )
         }
 
         private fun updateCalendarSettingsWork(settings: CalendarSettingsUi) = flow {
             calendarSettingsInteractor.updateCalendarSettings(settings.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))) },
-                onRightAction = { emit(ActionResult(SetupAction.UpdateCalendarSettings(settings))) },
+                onRightAction = {
+                    emit(ActionResult(SetupAction.UpdateCalendarSettings(settings)))
+                    emit(ActionResult(SetupAction.UpdatePage(SetupPage.SCHEDULE)))
+                },
             )
         }
 
-        private fun finishSetupWork() = flow {
-            generalSettingsInteractor.updateSetupStatus(null).handle(
+        private fun finishSetupWork(destination: SetupDestination) = flow {
+            generalSettingsInteractor.completeOnboarding().handle(
                 onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))) },
+                onRightAction = {
+                    val output = when (destination) {
+                        SetupDestination.APP -> SetupOutput.NavigateToApp
+                        SetupDestination.WEEK_SCHEDULE -> SetupOutput.NavigateToWeekScheduleEditor
+                    }
+                    emit(OutputResult(output))
+                },
             )
         }
     }
@@ -192,12 +220,19 @@ internal interface SetupWorkProcessor :
 
 internal sealed class SetupWorkCommand : WorkCommand {
     data object LoadAllData : SetupWorkCommand()
-    data object LoadPaidUserStatus : SetupWorkCommand()
-    data class UpdateUserProfile(val user: AppUserUi, val actionWithAvatar: ActionWithAvatar) : SetupWorkCommand()
+    data class UpdateProfile(val profile: ProfileUi, val actionWithAvatar: ActionWithAvatar) :
+        SetupWorkCommand()
+
     data class UpdateOrganization(
         val organization: OrganizationUi,
         val actionWithAvatar: ActionWithAvatar
     ) : SetupWorkCommand()
+
     data class UpdateCalendarSettings(val settings: CalendarSettingsUi) : SetupWorkCommand()
-    data object FinishSetup : SetupWorkCommand()
+    data class FinishSetup(val destination: SetupDestination) : SetupWorkCommand()
+}
+
+internal enum class SetupDestination {
+    APP,
+    WEEK_SCHEDULE,
 }

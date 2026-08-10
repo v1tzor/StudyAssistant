@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,8 +47,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ResponseStatus
-import ru.aleshin.studyassistant.chat.impl.presentation.theme.ChatThemeRes
+import ru.aleshin.studyassistant.chat.impl.resources.Res
+import ru.aleshin.studyassistant.chat.impl.resources.assistant_chat_text_field_placeholder
 import ru.aleshin.studyassistant.core.common.extensions.pxToDp
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.theme.material.topSide
@@ -93,7 +95,7 @@ internal fun AssistantBottomBar(
                 shape = MaterialTheme.shapes.full,
                 placeholder = {
                     Text(
-                        text = ChatThemeRes.strings.assistantChatTextFieldPlaceholder,
+                        text = stringResource(Res.string.assistant_chat_text_field_placeholder),
                         maxLines = 1,
                     )
                 },
@@ -110,9 +112,9 @@ internal fun AssistantBottomBar(
             IconButton(
                 modifier = Modifier.size(32.dp),
                 enabled = !isLoadingChat &&
-                    responseStatus == ResponseStatus.SUCCESS &&
-                    !isQuotaExpired &&
-                    textFieldState.text.isNotBlank(),
+                        responseStatus == ResponseStatus.SUCCESS &&
+                        !isQuotaExpired &&
+                        textFieldState.text.isNotBlank(),
                 onClick = {
                     onSendMessage(textFieldState.text)
                     textFieldState = TextFieldValue()

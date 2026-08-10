@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,17 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.EffectResul
 import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.store.work.OutputResult
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
-import ru.aleshin.studyassistant.core.common.extensions.equalsDay
-import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
-import ru.aleshin.studyassistant.core.common.extensions.shiftMillis
-import ru.aleshin.studyassistant.core.common.functional.Constants.Class
-import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.firstHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.handle
-import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.schedules.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToUi
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.api.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.api.mapToDomain
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.BaseClassInteractor
@@ -46,10 +47,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.EditClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.convertToBase
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.convertToEditModel
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.ScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassOutput
@@ -68,7 +66,6 @@ internal interface ClassWorkProcessor :
         private val organizationInteractor: OrganizationInteractor,
         private val subjectsInteractor: SubjectInteractor,
         private val employeeInteractor: EmployeeInteractor,
-        private val overlayManager: TimeOverlayManager,
     ) : ClassWorkProcessor {
 
         override suspend fun work(command: ClassWorkCommand) = when (command) {
@@ -79,25 +76,31 @@ internal interface ClassWorkProcessor :
                 isCustom = command.isCustomSchedule,
                 weekDay = command.weekDay,
             )
+
             is ClassWorkCommand.LoadOrganizations -> loadOrganizationsWork()
             is ClassWorkCommand.LoadFreeClasses -> loadFreeClassesWork(
                 organization = command.organization,
                 schedule = command.schedule,
             )
+
             is ClassWorkCommand.LoadEmployees -> loadEmployeesWork(
                 organizationId = command.organizationId,
             )
+
             is ClassWorkCommand.LoadSubjects -> loadSubjectsWork(
                 organizationId = command.organizationId,
             )
+
             is ClassWorkCommand.UpdateOffices -> updateOfficesWork(
                 organization = command.organization,
                 offices = command.offices,
             )
+
             is ClassWorkCommand.UpdateLocations -> updateLocationsWork(
                 organization = command.organization,
                 locations = command.locations,
             )
+
             is ClassWorkCommand.SaveEditModel -> saveEditModelWork(
                 editModel = command.editModel,
                 schedule = command.schedule,
@@ -146,9 +149,9 @@ internal interface ClassWorkProcessor :
             )
             val classModel = scheduleClasses?.find { it.uid == classId }
 
-            val freeTimeRanges = calculateFreeClassTimeRanges(
-                timeIntervals = classOrganization?.scheduleTimeIntervals,
-                existClasses = scheduleClasses?.map { it.timeRange },
+            val freeTimeRanges = baseClassInteractor.calculateFreeTimeRanges(
+                timeIntervals = classOrganization?.scheduleTimeIntervals?.mapToDomain(),
+                occupiedTimeRanges = scheduleClasses?.map { it.timeRange }.orEmpty(),
             )
 
             val editModel = classModel?.convertToEditModel() ?: EditClassUi.createEditModel(
@@ -189,9 +192,9 @@ internal interface ClassWorkProcessor :
                 onCustomSchedule = { customSchedule -> customSchedule?.classes },
             )
 
-            val freeTimeRanges = calculateFreeClassTimeRanges(
-                timeIntervals = organization.scheduleTimeIntervals,
-                existClasses = scheduleClasses?.map { it.timeRange },
+            val freeTimeRanges = baseClassInteractor.calculateFreeTimeRanges(
+                timeIntervals = organization.scheduleTimeIntervals.mapToDomain(),
+                occupiedTimeRanges = scheduleClasses?.map { it.timeRange }.orEmpty(),
             )
 
             emit(ActionResult(ClassAction.UpdateFreeClasses(freeTimeRanges)))
@@ -228,9 +231,10 @@ internal interface ClassWorkProcessor :
             offices: List<String>
         ) = flow {
             val updatedOrganization = organization.copy(offices = offices)
-            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain()).handle(
-                onLeftAction = { emit(EffectResult(ClassEffect.ShowError(it))) },
-            )
+            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain())
+                .handle(
+                    onLeftAction = { emit(EffectResult(ClassEffect.ShowError(it))) },
+                )
         }
 
         private fun updateLocationsWork(
@@ -238,9 +242,10 @@ internal interface ClassWorkProcessor :
             locations: List<ContactInfoUi>
         ) = flow {
             val updatedOrganization = organization.copy(locations = locations)
-            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain()).handle(
-                onLeftAction = { emit(EffectResult(ClassEffect.ShowError(it))) },
-            )
+            organizationInteractor.updateShortOrganization(updatedOrganization.mapToDomain())
+                .handle(
+                    onLeftAction = { emit(EffectResult(ClassEffect.ShowError(it))) },
+                )
         }
 
         private fun saveEditModelWork(
@@ -289,43 +294,6 @@ internal interface ClassWorkProcessor :
             }
         }
 
-        private fun calculateFreeClassTimeRanges(
-            timeIntervals: ScheduleTimeIntervalsUi?,
-            existClasses: List<TimeRange>?,
-        ): Map<TimeRange, Boolean>? {
-            val firstClassTime = timeIntervals?.firstClassTime
-            val classDuration = timeIntervals?.baseClassDuration
-            val breakDuration = timeIntervals?.baseBreakDuration
-
-            if (firstClassTime == null || classDuration == null || breakDuration == null) return null
-
-            val date = existClasses?.getOrNull(0)?.from
-            val startRange = date?.setHoursAndMinutes(firstClassTime) ?: firstClassTime
-
-            return mutableMapOf<TimeRange, Boolean>().apply {
-                repeat(Class.MAX_NUMBER) { number ->
-                    val lastEnd = maxOfOrNull { it.key.to }
-                    val startClassTime = lastEnd?.shiftMillis(
-                        amount = timeIntervals.specificBreakDuration.find { numberedDuration ->
-                            numberedDuration.number == number
-                        }?.duration ?: breakDuration
-                    ) ?: startRange
-                    val endClassTime = startClassTime.shiftMillis(
-                        amount = timeIntervals.specificClassDuration.find { numberedDuration ->
-                            numberedDuration.number == number + 1
-                        }?.duration ?: classDuration
-                    )
-                    if (endClassTime.equalsDay(startRange)) {
-                        val classTimeRange = TimeRange(startClassTime, endClassTime)
-                        val isOverlay = overlayManager.isOverlay(
-                            classTimeRange,
-                            existClasses ?: emptyList()
-                        ).isOverlay
-                        put(classTimeRange, !isOverlay)
-                    }
-                }
-            }
-        }
     }
 }
 

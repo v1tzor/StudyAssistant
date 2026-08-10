@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
-import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
+import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkDetails
 
 /**
  * @author Stanislav Aleshin on 01.05.2024.
@@ -40,10 +40,11 @@ data class ClassDetails(
     val location: ContactInfo?,
     val timeRange: TimeRange,
     val notification: Boolean = false,
-    val homework: Homework? = null,
+    val homework: HomeworkDetails? = null,
+    val number: Int = 0,
 )
 
-fun Class.convertToDetails(homework: Homework?) = ClassDetails(
+fun Class.convertToDetails(homework: HomeworkDetails?) = ClassDetails(
     uid = uid,
     scheduleId = scheduleId,
     organization = organization,
@@ -55,4 +56,5 @@ fun Class.convertToDetails(homework: Homework?) = ClassDetails(
     location = location,
     timeRange = timeRange,
     homework = homework,
+    number = number,
 )

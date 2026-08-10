@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.models.share
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.MediatedOrganizationUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
 
 /**
  * @author Stanislav Aleshin on 15.08.2024.

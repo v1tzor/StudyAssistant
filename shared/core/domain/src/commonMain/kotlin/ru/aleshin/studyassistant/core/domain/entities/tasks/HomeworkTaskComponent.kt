@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,12 @@ sealed class HomeworkTaskComponent {
     data class Tasks(val taskList: List<String>) : HomeworkTaskComponent()
 }
 
-data class HomeworkTasksDetails(
-    val origin: String,
-    val components: List<HomeworkTaskComponent>,
-)
-
 typealias HomeworkTasks = List<HomeworkTaskComponent>
+
+fun String.toHomeworkTasksDetails() = HomeworkTasksDetails(
+    origin = this,
+    components = toHomeworkComponents(),
+)
 
 fun HomeworkTasks.fetchAllTasks(): List<String> {
     val tasks = map { taskComponent ->

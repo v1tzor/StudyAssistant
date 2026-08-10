@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEv
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeDetailsUi
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.EditSubjectUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeDetailsUi
 
 /**
  * @author Stanislav Aleshin on 04.06.2024

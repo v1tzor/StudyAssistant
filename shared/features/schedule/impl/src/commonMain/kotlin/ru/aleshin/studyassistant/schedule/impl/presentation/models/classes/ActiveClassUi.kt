@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.Progress
 
 /**
  * @author Stanislav Aleshin on 13.06.2024.
@@ -30,6 +29,6 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views.Pr
 internal data class ActiveClassUi(
     val uid: UID,
     val isStarted: Boolean,
-    val progress: Progress,
+    val progress: Float?,
     val duration: Millis,
 )

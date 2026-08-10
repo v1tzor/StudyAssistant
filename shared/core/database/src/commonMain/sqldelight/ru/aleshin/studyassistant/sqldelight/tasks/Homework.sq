@@ -11,62 +11,48 @@ CREATE TABLE homeworkEntity (
     priority TEXT NOT NULL,
     is_done INTEGER NOT NULL,
     complete_date INTEGER,
-    updated_at INTEGER NOT NULL,
-    is_cache_data INTEGER NOT NULL
+    updated_at INTEGER NOT NULL
 );
 
 addOrUpdateHomework:
-INSERT OR REPLACE INTO homeworkEntity (uid, class_id, deadline, subject_id, organization_id, theoretical_tasks, practical_tasks, presentations, test, priority, is_done, complete_date, updated_at, is_cache_data)
+INSERT OR REPLACE INTO homeworkEntity (uid, class_id, deadline, subject_id, organization_id, theoretical_tasks, practical_tasks, presentations, test, priority, is_done, complete_date, updated_at)
 VALUES ?;
 
 fetchHomeworkById:
 SELECT *
 FROM homeworkEntity
-WHERE uid = ? AND is_cache_data = ?;
-
-fetchHomeworksById:
-SELECT *
-FROM homeworkEntity
-WHERE uid IN ? AND is_cache_data = ?;
+WHERE uid = ?;
 
 fetchHomeworksByTimeRange:
 SELECT *
 FROM homeworkEntity
-WHERE (deadline BETWEEN ? AND ?) AND is_cache_data = ?
+WHERE (deadline BETWEEN ? AND ?)
 ORDER BY deadline DESC;
 
 fetchActiveAndLinkedHomeworks:
 SELECT *
 FROM homeworkEntity
-WHERE (deadline >= ? AND is_done = 0 AND class_id IS NOT NULL) AND is_cache_data = ?
+WHERE (deadline >= ? AND is_done = 0 AND class_id IS NOT NULL)
 ORDER BY deadline DESC;
 
 fetchOverdueHomeworks:
 SELECT *
 FROM homeworkEntity
-WHERE (deadline < ? AND is_done = 0 AND complete_date IS NULL) AND is_cache_data = ?
+WHERE (deadline < ? AND is_done = 0 AND complete_date IS NULL)
 ORDER BY deadline DESC;
 
 fetchCompletedHomeworksCount:
 SELECT COUNT(*)
 FROM homeworkEntity
-WHERE (is_done = 1 AND complete_date IS NOT NULL) AND is_cache_data = ?
+WHERE (is_done = 1 AND complete_date IS NOT NULL)
 ORDER BY deadline DESC;
 
-fetchAllHomeworks:
+fetchCompletedHomeworksByTimeRange:
 SELECT *
 FROM homeworkEntity
-WHERE is_cache_data = ?;
-
-fetchEmptyHomeworks:
-SELECT uid, updated_at
-FROM homeworkEntity
-WHERE is_cache_data = 1;
+WHERE (is_done = 1 AND complete_date IS NOT NULL AND complete_date BETWEEN ? AND ?)
+ORDER BY complete_date DESC;
 
 deleteHomeworks:
 DELETE FROM homeworkEntity
-WHERE uid IN ? AND is_cache_data = ?;
-
-deleteAllHomeworks:
-DELETE FROM homeworkEntity
-WHERE is_cache_data = ?;
+WHERE uid IN ?;

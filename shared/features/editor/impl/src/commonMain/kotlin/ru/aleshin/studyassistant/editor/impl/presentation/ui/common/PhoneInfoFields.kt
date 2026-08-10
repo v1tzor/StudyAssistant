@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_phone as core_ic_phone
+import ru.aleshin.studyassistant.editor.impl.resources.*
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,12 +38,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.dialog.ContactInfoEditorDialog
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 
 /**
  * @author Stanislav Aleshin on 06.06.2024.
@@ -61,7 +63,7 @@ internal fun PhoneInfoFields(
         Box(modifier = Modifier.height(61.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(StudyAssistantRes.icons.phone),
+                painter = painterResource(CoreRes.drawable.core_ic_phone),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -81,8 +83,8 @@ internal fun PhoneInfoFields(
                     enabled = !isLoading,
                     modifier = Modifier.height(61.dp).weight(1f),
                     value = mainPhone?.value,
-                    label = EditorThemeRes.strings.phoneFieldLabel,
-                    placeholder = EditorThemeRes.strings.phoneFieldPlaceholder,
+                    label = stringResource(Res.string.phone_field_label),
+                    placeholder = stringResource(Res.string.phone_field_placeholder),
                     trailingIcon = {
                         ExpandedIcon(
                             isExpanded = contactInfoEditorDialogState,
@@ -109,7 +111,7 @@ internal fun PhoneInfoFields(
                         modifier = Modifier.height(61.dp).weight(1f),
                         value = additionalPhone.value,
                         label = null,
-                        placeholder = EditorThemeRes.strings.phoneFieldPlaceholder,
+                        placeholder = stringResource(Res.string.phone_field_placeholder),
                         trailingIcon = {
                             ExpandedIcon(
                                 isExpanded = contactInfoEditorDialogState,
@@ -133,7 +135,7 @@ internal fun PhoneInfoFields(
 
     if (contactInfoEditorDialogState) {
         ContactInfoEditorDialog(
-            header = EditorThemeRes.strings.phoneFieldLabel,
+            header = stringResource(Res.string.phone_field_label),
             label = editableContactInfo?.label,
             value = editableContactInfo?.value,
             onDismiss = {

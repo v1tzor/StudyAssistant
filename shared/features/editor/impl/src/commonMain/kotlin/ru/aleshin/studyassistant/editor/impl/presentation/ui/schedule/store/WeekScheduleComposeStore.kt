@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.communicators.St
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleEvent
@@ -64,6 +64,7 @@ internal class WeekScheduleComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is WeekScheduleEvent.Refresh -> with(state()) {
                 launchBackgroundWork(BackgroundKey.FETCH_ORGANIZATIONS) {
                     val command = WeekScheduleWorkCommand.LoadOrganizationsData
@@ -74,6 +75,7 @@ internal class WeekScheduleComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is WeekScheduleEvent.ChangeWeek -> {
                 sendAction(WeekScheduleAction.UpdateSelectedWeek(event.numberOfWeek))
                 launchBackgroundWork(BackgroundKey.FETCH_SCHEDULE) {
@@ -81,18 +83,22 @@ internal class WeekScheduleComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is WeekScheduleEvent.UpdateOrganization -> {
                 launchBackgroundWork(BackgroundKey.UPDATE_ORGANIZATION) {
                     val command = WeekScheduleWorkCommand.UpdateOrganization(event.organization)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is WeekScheduleEvent.DeleteClass -> {
                 launchBackgroundWork(BackgroundKey.DELETE_CLASS) {
-                    val command = WeekScheduleWorkCommand.DeleteClass(event.targetId, event.schedule)
+                    val command =
+                        WeekScheduleWorkCommand.DeleteClass(event.targetId, event.schedule)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is WeekScheduleEvent.CreateClassInEditor -> with(event) {
                 val config = EditorConfig.Class(
                     classId = null,
@@ -103,6 +109,7 @@ internal class WeekScheduleComposeStore(
                 )
                 consumeOutput(WeekScheduleOutput.NavigateToClassEditor(config))
             }
+
             is WeekScheduleEvent.EditClassInEditor -> with(event) {
                 val config = EditorConfig.Class(
                     classId = editClass.uid,
@@ -113,10 +120,12 @@ internal class WeekScheduleComposeStore(
                 )
                 consumeOutput(WeekScheduleOutput.NavigateToClassEditor(config))
             }
+
             is WeekScheduleEvent.NavigateToOrganizationEditor -> {
                 val config = EditorConfig.Organization(null)
                 consumeOutput(WeekScheduleOutput.NavigateToOrganizationEditor(config))
             }
+
             is WeekScheduleEvent.NavigateToBack -> {
                 consumeOutput(WeekScheduleOutput.NavigateToBack)
             }
@@ -132,13 +141,16 @@ internal class WeekScheduleComposeStore(
             weekSchedule = action.schedule,
             isLoading = false,
         )
+
         is WeekScheduleAction.UpdateOrganizationData -> currentState.copy(
             organizations = action.organizations,
             calendarSettings = action.settings,
         )
+
         is WeekScheduleAction.UpdateSelectedWeek -> currentState.copy(
             selectedWeek = action.week,
         )
+
         is WeekScheduleAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )

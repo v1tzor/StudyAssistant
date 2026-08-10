@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
+import ru.aleshin.studyassistant.core.ui.resources.select_confirm_title as core_select_confirm_title
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -53,7 +56,7 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 fun DialogButtons(
     modifier: Modifier = Modifier,
     enabledConfirm: Boolean = true,
-    confirmTitle: String = StudyAssistantRes.strings.selectConfirmTitle,
+    confirmTitle: String = stringResource(CoreRes.string.core_select_confirm_title),
     onCancelClick: () -> Unit,
     onConfirmClick: () -> Unit,
 ) {
@@ -64,7 +67,7 @@ fun DialogButtons(
         Spacer(modifier = Modifier.weight(1f))
         TextButton(onClick = onCancelClick) {
             Text(
-                text = StudyAssistantRes.strings.cancelTitle,
+                text = stringResource(CoreRes.string.core_cancel_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -114,7 +117,7 @@ fun DialogButtons(
         Spacer(modifier = Modifier.weight(1f))
         TextButton(onClick = onCancelClick) {
             Text(
-                text = StudyAssistantRes.strings.cancelTitle,
+                text = stringResource(CoreRes.string.core_cancel_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 style = MaterialTheme.typography.labelLarge,
@@ -138,7 +141,7 @@ fun DialogButtons(
 fun DialogAlertButtons(
     modifier: Modifier = Modifier,
     enabledConfirm: Boolean = true,
-    confirmTitle: String = StudyAssistantRes.strings.selectConfirmTitle,
+    confirmTitle: String = stringResource(CoreRes.string.core_select_confirm_title),
     onCancelClick: () -> Unit,
     onConfirmClick: () -> Unit,
 ) {
@@ -149,7 +152,7 @@ fun DialogAlertButtons(
         Spacer(modifier = Modifier.weight(1f))
         TextButton(onClick = onCancelClick) {
             Text(
-                text = StudyAssistantRes.strings.cancelTitle,
+                text = stringResource(CoreRes.string.core_cancel_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -175,7 +178,12 @@ fun DialogHeader(
     modifier: Modifier = Modifier,
     header: String,
     title: String? = null,
-    paddingValues: PaddingValues = PaddingValues(top = 24.dp, bottom = 12.dp, start = 24.dp, end = 24.dp),
+    paddingValues: PaddingValues = PaddingValues(
+        top = 24.dp,
+        bottom = 12.dp,
+        start = 24.dp,
+        end = 24.dp
+    ),
     headerColor: Color = MaterialTheme.colorScheme.onSurface,
     titleColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {

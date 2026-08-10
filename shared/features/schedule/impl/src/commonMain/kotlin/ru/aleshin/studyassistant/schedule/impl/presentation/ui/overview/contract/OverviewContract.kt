@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
@@ -25,13 +24,14 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEf
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.analysis.DailyAnalysisUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.ScheduleDetailsUi
+import kotlin.time.Clock
 
 /**
  * @author Stanislav Aleshin on 09.06.2024
@@ -64,10 +64,12 @@ internal sealed class OverviewEffect : StoreEffect {
 }
 
 internal sealed class OverviewAction : StoreAction {
-    data class UpdateSchedule(val schedule: ScheduleDetailsUi) : OverviewAction()
+    data class UpdateSchedule(
+        val schedule: ScheduleDetailsUi,
+        val activeClass: ActiveClassUi?,
+    ) : OverviewAction()
     data class UpdateAnalysis(val weekAnalysis: List<DailyAnalysisUi>) : OverviewAction()
     data class UpdateSelectedDate(val date: Instant) : OverviewAction()
-    data class UpdateActiveClass(val activeClass: ActiveClassUi?) : OverviewAction()
     data class UpdateScheduleLoading(val isLoading: Boolean) : OverviewAction()
     data class UpdateAnalyticsLoading(val isLoading: Boolean) : OverviewAction()
 }

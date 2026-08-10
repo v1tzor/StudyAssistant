@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,11 @@ import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 internal interface EmployeeInteractor {
 
     suspend fun addOrUpdateEmployee(employee: Employee): DomainResult<EditorFailures, UID>
-    suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile): DomainResult<EditorFailures, String>
+    suspend fun uploadAvatar(
+        oldAvatarUrl: String?,
+        file: InputFile
+    ): DomainResult<EditorFailures, String>
+
     suspend fun fetchAllDetailsEmployee(organizationId: UID): FlowDomainResult<EditorFailures, List<EmployeeDetails>>
     suspend fun fetchEmployeeById(uid: UID): FlowDomainResult<EditorFailures, Employee?>
     suspend fun deleteAvatar(avatarUrl: String): UnitDomainResult<EditorFailures>
@@ -57,9 +61,10 @@ internal interface EmployeeInteractor {
             employeeRepository.addOrUpdateEmployee(updatedEmployee)
         }
 
-        override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) = eitherWrapper.wrap {
-            employeeRepository.uploadAvatar(oldAvatarUrl, file)
-        }
+        override suspend fun uploadAvatar(oldAvatarUrl: String?, file: InputFile) =
+            eitherWrapper.wrap {
+                employeeRepository.uploadAvatar(oldAvatarUrl, file)
+            }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchAllDetailsEmployee(organizationId: UID) = eitherWrapper.wrapFlow {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,45 @@
 
 package ru.aleshin.studyassistant.core.ui.mappers
 
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantIcons
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.additional_education_organization_type as core_additional_education_organization_type
+import ru.aleshin.studyassistant.core.ui.resources.college_organization_type as core_college_organization_type
+import ru.aleshin.studyassistant.core.ui.resources.courses_organization_type as core_courses_organization_type
+import ru.aleshin.studyassistant.core.ui.resources.gymnasium_organization_type as core_gymnasium_organization_type
+import ru.aleshin.studyassistant.core.ui.resources.ic_additional_organization as core_ic_additional_organization
+import ru.aleshin.studyassistant.core.ui.resources.ic_church as core_ic_church
+import ru.aleshin.studyassistant.core.ui.resources.ic_class as core_ic_class
+import ru.aleshin.studyassistant.core.ui.resources.ic_university as core_ic_university
+import ru.aleshin.studyassistant.core.ui.resources.lyceum_organization_type as core_lyceum_organization_type
+import ru.aleshin.studyassistant.core.ui.resources.school_organization_type as core_school_organization_type
+import ru.aleshin.studyassistant.core.ui.resources.seminary_organization_type as core_seminary_organization_type
+import ru.aleshin.studyassistant.core.ui.resources.university_organization_type as core_university_organization_type
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
  */
-fun OrganizationType.mapToSting(strings: StudyAssistantStrings) = when (this) {
-    OrganizationType.SCHOOL -> strings.schoolOrganizationType
-    OrganizationType.LYCEUM -> strings.lyceumOrganizationType
-    OrganizationType.GYMNASIUM -> strings.gymnasiumOrganizationType
-    OrganizationType.SEMINARY -> strings.seminaryOrganizationType
-    OrganizationType.COLLEGE -> strings.collegeOrganizationType
-    OrganizationType.UNIVERSITY -> strings.universityOrganizationType
-    OrganizationType.ADDITIONAL_EDUCATION -> strings.additionalEducationOrganizationType
-    OrganizationType.COURSES -> strings.coursesOrganizationType
+@Composable
+fun OrganizationType.mapToSting() = when (this) {
+    OrganizationType.SCHOOL -> stringResource(CoreRes.string.core_school_organization_type)
+    OrganizationType.LYCEUM -> stringResource(CoreRes.string.core_lyceum_organization_type)
+    OrganizationType.GYMNASIUM -> stringResource(CoreRes.string.core_gymnasium_organization_type)
+    OrganizationType.SEMINARY -> stringResource(CoreRes.string.core_seminary_organization_type)
+    OrganizationType.COLLEGE -> stringResource(CoreRes.string.core_college_organization_type)
+    OrganizationType.UNIVERSITY -> stringResource(CoreRes.string.core_university_organization_type)
+    OrganizationType.ADDITIONAL_EDUCATION -> stringResource(CoreRes.string.core_additional_education_organization_type)
+    OrganizationType.COURSES -> stringResource(CoreRes.string.core_courses_organization_type)
 }
 
-fun OrganizationType.mapToIcon(icons: StudyAssistantIcons) = when (this) {
-    OrganizationType.SCHOOL -> icons.classes
-    OrganizationType.LYCEUM -> icons.classes
-    OrganizationType.GYMNASIUM -> icons.classes
-    OrganizationType.SEMINARY -> icons.seminary
-    OrganizationType.COLLEGE -> icons.university
-    OrganizationType.UNIVERSITY -> icons.university
-    OrganizationType.ADDITIONAL_EDUCATION -> icons.additionalEducation
-    OrganizationType.COURSES -> icons.additionalEducation
+fun OrganizationType.mapToIcon() = when (this) {
+    OrganizationType.SCHOOL -> CoreRes.drawable.core_ic_class
+    OrganizationType.LYCEUM -> CoreRes.drawable.core_ic_class
+    OrganizationType.GYMNASIUM -> CoreRes.drawable.core_ic_class
+    OrganizationType.SEMINARY -> CoreRes.drawable.core_ic_church
+    OrganizationType.COLLEGE -> CoreRes.drawable.core_ic_university
+    OrganizationType.UNIVERSITY -> CoreRes.drawable.core_ic_university
+    OrganizationType.ADDITIONAL_EDUCATION -> CoreRes.drawable.core_ic_additional_organization
+    OrganizationType.COURSES -> CoreRes.drawable.core_ic_additional_organization
 }

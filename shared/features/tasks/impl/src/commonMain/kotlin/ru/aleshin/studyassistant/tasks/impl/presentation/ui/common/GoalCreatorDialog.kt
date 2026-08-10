@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
@@ -51,8 +52,8 @@ import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalType
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkUi
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesAndHoursTitle
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
 import ru.aleshin.studyassistant.core.ui.views.DialogHeader
@@ -60,9 +61,16 @@ import ru.aleshin.studyassistant.core.ui.views.dialog.BaseDatePickerDialog
 import ru.aleshin.studyassistant.core.ui.views.dialog.DurationPickerDialog
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_creator_confirm_title
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_creator_date_field_placeholder
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_creator_date_field_title
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_creator_desired_time_field_title
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_creator_headline
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_creator_title
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_desired_time_picker_title
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_timer
 
 /**
  * @author Stanislav Aleshin on 04.06.2025.
@@ -91,8 +99,8 @@ internal fun GoalCreatorDialog(
         ) {
             Column {
                 DialogHeader(
-                    header = TasksThemeRes.strings.goalCreatorHeadline,
-                    title = TasksThemeRes.strings.goalCreatorTitle,
+                    header = stringResource(Res.string.goal_creator_headline),
+                    title = stringResource(Res.string.goal_creator_title),
                 )
                 HorizontalDivider()
                 Column(
@@ -102,13 +110,11 @@ internal fun GoalCreatorDialog(
                     ClickableTextField(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = { datePickerState = true },
-                        label = TasksThemeRes.strings.goalCreatorDateFieldTitle,
+                        label = stringResource(Res.string.goal_creator_date_field_title),
                         value = selectedDate?.formatByTimeZone(
-                            format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(
-                                StudyAssistantRes.strings
-                            )
+                            format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat()
                         ),
-                        placeholder = TasksThemeRes.strings.goalCreatorDateFieldPlaceholder,
+                        placeholder = stringResource(Res.string.goal_creator_date_field_placeholder),
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.CalendarToday,
@@ -128,12 +134,12 @@ internal fun GoalCreatorDialog(
                     ClickableTextField(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = { durationPickerState = true },
-                        label = TasksThemeRes.strings.goalCreatorDesiredTimeFieldTitle,
+                        label = stringResource(Res.string.goal_creator_desired_time_field_title),
                         value = desiredTime?.toMinutesAndHoursTitle(),
                         placeholder = 0L.toMinutesAndHoursTitle(),
                         leadingIcon = {
                             Icon(
-                                painter = painterResource(TasksThemeRes.icons.timer),
+                                painter = painterResource(Res.drawable.ic_timer),
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurface,
                             )
@@ -150,7 +156,7 @@ internal fun GoalCreatorDialog(
                 }
                 DialogButtons(
                     enabledConfirm = selectedDate != null,
-                    confirmTitle = TasksThemeRes.strings.goalCreatorConfirmTitle,
+                    confirmTitle = stringResource(Res.string.goal_creator_confirm_title),
                     onCancelClick = onDismiss,
                     onConfirmClick = {
                         val createModel = GoalCreateModelUi(
@@ -188,7 +194,7 @@ internal fun GoalCreatorDialog(
 
         if (durationPickerState) {
             DurationPickerDialog(
-                headerTitle = TasksThemeRes.strings.goalSheetDesiredTimePickerTitle,
+                headerTitle = stringResource(Res.string.goal_sheet_desired_time_picker_title),
                 duration = desiredTime,
                 onDismiss = { durationPickerState = false },
                 onSelectedDuration = {

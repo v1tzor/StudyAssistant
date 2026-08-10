@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="app_name">Study Assistant</string>
+    <string name="cancel_title">Отменить</string>
+    <string name="add_title">Добавить</string>
+    <string name="select_confirm_title">Выбрать</string>
+    <string name="create_confirm_title">Создать</string>
+    <string name="save_confirm_title">Сохранить</string>
+    <string name="change_confirm_title">Изменить</string>
+    <string name="ok_confirm_title">ОК</string>
+    <string name="delete_confirm_title">Удалить</string>
+    <string name="hide_title">Скрыть</string>
+    <string name="time_picker_dialog_header">Выберите время</string>
+    <string name="date_picker_dialog_header">Выберите дату</string>
+    <string name="warning_dialog_title">Предупреждение!</string>
+    <string name="warning_delete_confirm_title">Удалить</string>
+    <string name="minute_suffix">м</string>
+    <string name="hour_suffix">ч</string>
+    <string name="day_suffix">д</string>
+    <string name="separator">:</string>
+    <string name="am_format_title">AM</string>
+    <string name="pm_format_title">PM</string>
+    <string name="clear_search_bar_desk">Очистить поиск</string>
+    <string name="back_title">Назад</string>
+    <string name="none_title">Нету</string>
+    <string name="absent_title">Отсутствует</string>
+    <string name="warning_granted_permission_message">Доступ к отправке оповещений запрещён!</string>
+    <string name="schedule_bottom_item">Расписание</string>
+    <string name="tasks_bottom_item">Задания</string>
+    <string name="chat_bottom_item">Ассистент</string>
+    <string name="info_bottom_item">Информация</string>
+    <string name="profile_bottom_item">Профиль</string>
+    <string name="back_icon_desc">Назад</string>
+    <string name="none_gender">Не выбран</string>
+    <string name="male_gender">Мужской</string>
+    <string name="female_gender">Женский</string>
+    <string name="one_week_plural">1 неделя</string>
+    <string name="two_week_plural">2 недели</string>
+    <string name="three_week_plural">3 недели</string>
+    <string name="january_title">Января</string>
+    <string name="february_title">Февраля</string>
+    <string name="march_title">Марта</string>
+    <string name="april_title">Апреля</string>
+    <string name="may_title">Мая</string>
+    <string name="june_title">Июня</string>
+    <string name="july_title">Июля</string>
+    <string name="august_title">Августа</string>
+    <string name="september_title">Сентября</string>
+    <string name="october_title">Октября</string>
+    <string name="november_title">Ноября</string>
+    <string name="december_title">Декабря</string>
+    <string name="monday_title">Понедельник</string>
+    <string name="monday_short_title">Пон</string>
+    <string name="tuesday_title">Вторник</string>
+    <string name="tuesday_short_title">Вто</string>
+    <string name="wednesday_title">Среда</string>
+    <string name="wednesday_short_title">Сре</string>
+    <string name="thursday_title">Четверг</string>
+    <string name="thursday_short_title">Чет</string>
+    <string name="friday_title">Пятница</string>
+    <string name="friday_short_title">Пят</string>
+    <string name="saturday_title">Суббота</string>
+    <string name="saturday_short_title">Суб</string>
+    <string name="sunday_title">Воскресенье</string>
+    <string name="sunday_short_title">Вос</string>
+    <string name="school_organization_type">Школа</string>
+    <string name="lyceum_organization_type">Лицей</string>
+    <string name="seminary_organization_type">Семинария</string>
+    <string name="gymnasium_organization_type">Гимназия</string>
+    <string name="college_organization_type">Колледж</string>
+    <string name="university_organization_type">Университет</string>
+    <string name="additional_education_organization_type">Доп. образование</string>
+    <string name="courses_organization_type">Образовательные курсы</string>
+    <string name="pcs_unit_suffix">шт.</string>
+    <string name="specify_title">Укажите</string>
+    <string name="hours_title">Часы</string>
+    <string name="minutes_title">Минуты</string>
+    <string name="event_type_lesson">Урок</string>
+    <string name="event_type_lecture">Лекция</string>
+    <string name="event_type_practice">Практика</string>
+    <string name="event_type_seminar">Семинар</string>
+    <string name="event_type_class">Занятие</string>
+    <string name="event_type_online_class">Онлайн занятие</string>
+    <string name="event_type_webinar">Вебинар</string>
+    <string name="post_employee">Сотрудник</string>
+    <string name="post_teacher">Преподаватель</string>
+    <string name="post_director">Директор</string>
+    <string name="post_mentor">Наставник</string>
+    <string name="post_tutor">Куратор</string>
+    <string name="post_manager">Менеджер</string>
+    <string name="not_selected_title">Не выбрано</string>
+    <string name="avatar_desc">Выбрать фото профиля</string>
+    <string name="contact_info_label">Название</string>
+    <string name="contact_info_value">Данные *</string>
+    <string name="standard_priority_title">Обычно</string>
+    <string name="medium_priority_title">Важно</string>
+    <string name="high_priority_title">Очень важно</string>
+    <string name="theoretical_tasks_title">Теория</string>
+    <string name="practical_tasks_title">Практика</string>
+    <string name="presentations_tasks_title">Доклад</string>
+    <string name="no_result_title">Нет результатов</string>
+    <string name="today_title">Сегодня</string>
+    <string name="tomorrow_title">Завтра</string>
+    <string name="default_title">По умолчанию</string>
+    <string name="english_language_title">English</string>
+    <string name="russian_language_title">Русский</string>
+    <string name="light_theme_title">Светлая</string>
+    <string name="dark_theme_title">Тёмная</string>
+    <string name="exceeding_limit_image_size_message">Изображение должно быть &lt;5 MB</string>
+    <string name="homeworks_reminder_title">Дедлайн домашних заданий близок!</string>
+    <string name="homeworks_reminder_body_prefix">Вот предметы, которые вам ещё предстоит выполнить:</string>
+    <string name="homeworks_recommendation_title">На завтра заданий нету!</string>
+    <string name="homeworks_recommendation_body_prefix">Однако послезавтра тебе предстоит выполнить:\u0020</string>
+    <string name="homeworks_recommendation_body_suffix">заданий. Ты мог выполнить их сегодня или сделать часть их них</string>
+    <string name="start_classes_reminder_title_suffix">\u0020у тебя начнутся занятия!</string>
+    <string name="start_classes_reminder_title_prefix">Через\u0020</string>
+    <string name="end_classes_reminder_title">Занятия закончились! Осталось выполнить заданные задания</string>
+    <string name="ongoing_class_reminder_body">Занятие идёт · %1$s</string>
+    <string name="ongoing_class_reminder_unknown_title">Текущее занятие</string>
+    <string name="high_workload_warning_title">Предупреждение! Завтра будет сложный день.</string>
+    <string name="high_workload_warning_body">Тебе следует набраться сил и быть готовым на все 100%!</string>
+    <string name="todo_reminder_title_suffix">Дедлайн задачи заканчивается через:\u0020</string>
+    <string name="network_error_message">Отсутствует подключение к интернету! Повторите попытку позже</string>
+    <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
+    <string name="voice_input_promt">Говорите...</string>
+</resources>

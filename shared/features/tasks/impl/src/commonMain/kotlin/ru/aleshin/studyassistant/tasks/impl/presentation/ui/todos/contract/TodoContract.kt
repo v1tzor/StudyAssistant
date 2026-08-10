@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAc
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.TasksFailures
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoUi
 
 /**
  * @author Stanislav Aleshin on 28.07.2024

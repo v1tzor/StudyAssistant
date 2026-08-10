@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,13 @@ import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
+import org.jetbrains.compose.resources.getString
 import org.kodein.di.DI
 import org.kodein.di.DirectDIAware
 import org.kodein.di.bindProvider
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.di.coreCommonModule
 import ru.aleshin.studyassistant.core.common.extensions.endThisDay
-import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
-import ru.aleshin.studyassistant.core.common.extensions.generateDigitCode
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.Constants
@@ -47,9 +46,12 @@ import ru.aleshin.studyassistant.core.data.R
 import ru.aleshin.studyassistant.core.data.di.coreDataModule
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.homeworks_recommendation_body_prefix as core_homeworks_recommendation_body_prefix
+import ru.aleshin.studyassistant.core.ui.resources.homeworks_recommendation_body_suffix as core_homeworks_recommendation_body_suffix
+import ru.aleshin.studyassistant.core.ui.resources.homeworks_recommendation_title as core_homeworks_recommendation_title
+import ru.aleshin.studyassistant.core.ui.resources.homeworks_reminder_body_prefix as core_homeworks_reminder_body_prefix
+import ru.aleshin.studyassistant.core.ui.resources.homeworks_reminder_title as core_homeworks_reminder_title
 
 /**
  * @author Stanislav Aleshin on 22.08.2024.
@@ -64,9 +66,6 @@ class HomeworksReminderWorker(
         bindProvider<CrashlyticsService> { CrashlyticsService.Empty() }
         importAll(coreCommonModule, coreDataModule)
     }
-    private val coreStrings: StudyAssistantStrings
-        get() = fetchCoreStrings(fetchAppLanguage(applicationContext.fetchCurrentLanguage()))
-
     private val dateManager = instance<DateManager>()
     private val notificationCreator = instance<NotificationCreator>()
     private val homeworksRepository = instance<HomeworksRepository>()
@@ -78,35 +77,41 @@ class HomeworksReminderWorker(
         val targetTimeRange = TimeRange(from = today, to = afterTomorrow.endThisDay())
 
         val homeworks = homeworksRepository.fetchHomeworksByTimeRange(targetTimeRange).first()
-        val groupedHomeworks = homeworks.groupBy { it.deadline.startThisDay() }.mapValues { entry ->
-            entry.value.map { homework -> Pair(homework, homework.completeDate == null) }
-        }
+            .filterNot { it.isDone }
+        val groupedHomeworks = homeworks.groupBy { it.deadline.startThisDay() }
 
-        val nearestHomeworks = (groupedHomeworks[today] ?: emptyList()) + (groupedHomeworks[tomorrow] ?: emptyList())
+        val nearestHomeworks =
+            (groupedHomeworks[today] ?: emptyList()) + (groupedHomeworks[tomorrow] ?: emptyList())
         val afterTomorrowHomeworks = groupedHomeworks[afterTomorrow] ?: emptyList()
 
+        notificationCreator.cancelNotify(HOMEWORKS_NOTIFICATION_ID)
         showReminderNotification(nearestHomeworks, afterTomorrowHomeworks)
 
         return Result.success()
     }
 
-    private fun showReminderNotification(
-        nearestHomeworks: List<Pair<Homework, Boolean>>,
-        afterTomorrowHomeworks: List<Pair<Homework, Boolean>>,
+    private suspend fun showReminderNotification(
+        nearestHomeworks: List<Homework>,
+        afterTomorrowHomeworks: List<Homework>,
     ) {
+        val reminderTitle = getString(CoreRes.string.core_homeworks_reminder_title)
+        val reminderBodyPrefix = getString(CoreRes.string.core_homeworks_reminder_body_prefix)
+        val recommendationTitle = getString(CoreRes.string.core_homeworks_recommendation_title)
+        val recommendationBodyPrefix = getString(CoreRes.string.core_homeworks_recommendation_body_prefix)
+        val recommendationBodySuffix = getString(CoreRes.string.core_homeworks_recommendation_body_suffix)
         val mainActivityUri = Constants.App.OPEN_APP_DEEPLINK.toUri()
         val contentIntent = Intent(ACTION_VIEW, mainActivityUri)
-        val requestCode = generateDigitCode().toInt()
-        val pContentIntent = PendingIntent.getActivity(context, requestCode, contentIntent, FLAG_IMMUTABLE)
-        if (nearestHomeworks.count { it.second } != 0) {
-            val subjects = nearestHomeworks.mapNotNull { it.first.subject?.name }
+        val pContentIntent =
+            PendingIntent.getActivity(context, HOMEWORKS_NOTIFICATION_ID, contentIntent, FLAG_IMMUTABLE)
+        if (nearestHomeworks.isNotEmpty()) {
+            val subjects = nearestHomeworks.mapNotNull { it.subject?.name }.distinct()
             val notify = notificationCreator.createNotify(
                 channelId = Constants.Notification.CHANNEL_ID,
-                title = coreStrings.homeworksReminderTitle,
+                title = reminderTitle,
                 text = "",
                 style = NotificationStyles.BigTextStyle(
                     text = buildString {
-                        appendLine(coreStrings.homeworksReminderBodyPrefix)
+                        appendLine(reminderBodyPrefix)
                         subjects.forEachIndexed { index, name ->
                             appendLine(index.inc().toString() + ") " + name)
                         }
@@ -118,18 +123,17 @@ class HomeworksReminderWorker(
                 contentIntent = pContentIntent,
             )
 
-            notificationCreator.showNotify(notify)
-        } else if (afterTomorrowHomeworks.count { it.second } != 0) {
-            val subjects = afterTomorrowHomeworks.mapNotNull { it.first.subject?.name }
+            notificationCreator.showNotify(notify, HOMEWORKS_NOTIFICATION_ID)
+        } else if (afterTomorrowHomeworks.isNotEmpty()) {
             val notify = notificationCreator.createNotify(
                 channelId = Constants.Notification.CHANNEL_ID,
-                title = coreStrings.homeworksRecommendationTitle,
+                title = recommendationTitle,
                 text = "",
                 style = NotificationStyles.BigTextStyle(
                     text = buildString {
-                        append(coreStrings.homeworksRecommendationBodyPrefix)
-                        append(subjects.size)
-                        append(coreStrings.homeworksRecommendationBodySuffix)
+                        append(recommendationBodyPrefix)
+                        append(afterTomorrowHomeworks.size)
+                        append(recommendationBodySuffix)
                     },
                 ),
                 smallIcon = R.drawable.ic_launcher_notification,
@@ -138,11 +142,12 @@ class HomeworksReminderWorker(
                 contentIntent = pContentIntent,
             )
 
-            notificationCreator.showNotify(notify)
+            notificationCreator.showNotify(notify, HOMEWORKS_NOTIFICATION_ID)
         }
     }
 
     companion object {
         const val WORK_KEY = "HOMEWORKS_REMINDER_SERVICE"
+        const val HOMEWORKS_NOTIFICATION_ID = 2481
     }
 }

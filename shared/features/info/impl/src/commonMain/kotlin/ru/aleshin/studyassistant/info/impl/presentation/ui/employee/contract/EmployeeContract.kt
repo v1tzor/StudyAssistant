@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEf
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
-import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.info.impl.presentation.models.users.EmployeeAndSubjectsUi
-import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
+import ru.aleshin.studyassistant.users.api.UsersConfig
 
 /**
  * @author Stanislav Aleshin on 17.06.2024
@@ -58,7 +58,8 @@ internal sealed class EmployeeEffect : StoreEffect {
 }
 
 internal sealed class EmployeeAction : StoreAction {
-    data class UpdateEmployees(val employees: Map<Char, List<EmployeeAndSubjectsUi>>) : EmployeeAction()
+    data class UpdateEmployees(val employees: Map<Char, List<EmployeeAndSubjectsUi>>) :
+        EmployeeAction()
 
     data class UpdateOrganizations(
         val selectedOrganization: UID?,

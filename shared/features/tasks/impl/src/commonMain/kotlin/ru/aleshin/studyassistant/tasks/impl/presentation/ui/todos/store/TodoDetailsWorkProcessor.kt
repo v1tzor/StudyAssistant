@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkResult
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.presentation.mappers.tasks.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.tasks.mapToUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.TodoInteractor
-import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToDomain
-import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract.TodoAction
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract.TodoEffect
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract.TodoOutput

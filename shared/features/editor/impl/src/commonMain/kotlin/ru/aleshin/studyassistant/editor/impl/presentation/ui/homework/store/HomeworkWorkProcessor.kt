@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,15 @@ import ru.aleshin.studyassistant.core.common.functional.firstOrNullHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.firstRightOrNull
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.schedules.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.tasks.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.tasks.mapToUi
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.HomeworkInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.LinkingClassInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.SubjectInteractor
-import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
-import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.EditHomeworkUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.convertToBase
 import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.convertToEdit
@@ -66,17 +69,21 @@ internal interface HomeworkWorkProcessor :
                 subjectId = command.subjectId,
                 organizationId = command.organizationId,
             )
+
             is HomeworkWorkCommand.LoadOrganizations -> loadOrganizationsWork()
             is HomeworkWorkCommand.LoadSubjects -> loadSubjectsWork(
                 organizationId = command.organizationId,
             )
+
             is HomeworkWorkCommand.LoadClassesForLinked -> loadClassesForLinkedWork(
                 subjectId = command.subjectId,
                 date = command.date,
             )
+
             is HomeworkWorkCommand.DeleteHomework -> deleteHomeworkWork(
                 editModel = command.editModel,
             )
+
             is HomeworkWorkCommand.SaveHomework -> saveHomeworkWork(
                 editModel = command.editModel,
             )
@@ -103,10 +110,11 @@ internal interface HomeworkWorkProcessor :
                     )
                 }
                 val homeworkOrganization = organizationId?.let { organizationId ->
-                    organizationInteractor.fetchShortOrganizationById(organizationId).firstOrNullHandleAndGet(
-                        onLeftAction = { emit(EffectResult(HomeworkEffect.ShowError(it))).let { null } },
-                        onRightAction = { organization -> organization.mapToUi() },
-                    )
+                    organizationInteractor.fetchShortOrganizationById(organizationId)
+                        .firstOrNullHandleAndGet(
+                            onLeftAction = { emit(EffectResult(HomeworkEffect.ShowError(it))).let { null } },
+                            onRightAction = { organization -> organization.mapToUi() },
+                        )
                 }
 
                 EditHomeworkUi.createEditModel(
@@ -150,15 +158,16 @@ internal interface HomeworkWorkProcessor :
                 return@flow emit(ActionResult(HomeworkAction.UpdateClassesForLinked(emptyMap())))
             }
             val targetDate = date ?: dateManager.fetchBeginningCurrentInstant()
-            linkingClassInteractor.fetchFreeClassesForHomework(subjectId, targetDate).collectAndHandle(
-                onLeftAction = { emit(OutputResult(HomeworkOutput.NavigateToBack)) },
-                onRightAction = { classes ->
-                    val classesForLinked = classes.mapValues { entry ->
-                        entry.value.map { it.second.mapToUi(number = it.first) }
-                    }
-                    emit(ActionResult(HomeworkAction.UpdateClassesForLinked(classesForLinked)))
-                },
-            )
+            linkingClassInteractor.fetchFreeClassesForHomework(subjectId, targetDate)
+                .collectAndHandle(
+                    onLeftAction = { emit(OutputResult(HomeworkOutput.NavigateToBack)) },
+                    onRightAction = { classes ->
+                        val classesForLinked = classes.mapValues { entry ->
+                            entry.value.map { it.mapToUi() }
+                        }
+                        emit(ActionResult(HomeworkAction.UpdateClassesForLinked(classesForLinked)))
+                    },
+                )
         }.onStart {
             emit(ActionResult(HomeworkAction.UpdateClassesLoading(true)))
         }

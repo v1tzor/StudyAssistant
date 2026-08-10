@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.settings.impl.domain.common
 
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
-import ru.aleshin.studyassistant.core.common.platform.services.iap.IapServiceError
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
 
 /**
@@ -25,9 +24,6 @@ import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
  */
 internal interface SettingsErrorHandler : ErrorHandler<SettingsFailures> {
     class Base : SettingsErrorHandler {
-        override fun handle(throwable: Throwable) = when (throwable) {
-            is IapServiceError -> SettingsFailures.IapError(throwable.type)
-            else -> SettingsFailures.OtherError(throwable)
-        }
+        override fun handle(throwable: Throwable) = SettingsFailures.OtherError(throwable)
     }
 }

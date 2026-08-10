@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,24 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.open_analytics_desc
+import ru.aleshin.studyassistant.tasks.impl.resources.overview_header
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_analytics_details as core_ic_analytics_details
 
 /**
  * @author Stanislav Aleshin on 29.06.2024.
@@ -32,10 +42,20 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun OverviewTopBar(
     modifier: Modifier = Modifier,
+    onAnalyticsClick: () -> Unit,
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
-        title = { Text(text = TasksThemeRes.strings.overviewHeader) },
+        title = { Text(text = stringResource(Res.string.overview_header)) },
+        actions = {
+            IconButton(onClick = onAnalyticsClick) {
+                Icon(
+                    painter = painterResource(CoreRes.drawable.core_ic_analytics_details),
+                    contentDescription = stringResource(Res.string.open_analytics_desc),
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.background
         ),

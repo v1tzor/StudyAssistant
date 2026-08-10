@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,8 @@ class AppwriteHeadersProviderApple : AppwriteHeadersProvider {
         val model = UIDevice.currentDevice.model
         val osVersion = NSProcessInfo.processInfo.operatingSystemVersionString
         val bundle = NSBundle.mainBundle
-        val version = bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String ?: ""
+        val version =
+            bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String ?: ""
         val device = "$model; $systemName/$systemVersion ($osVersion)"
         return "${bundle.bundleIdentifier ?: ""}/$version $device"
     }

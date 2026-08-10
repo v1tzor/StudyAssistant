@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,14 @@
 
 package ru.aleshin.studyassistant.core.ui.mappers
 
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.settings.LanguageType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.default_title as core_default_title
+import ru.aleshin.studyassistant.core.ui.resources.english_language_title as core_english_language_title
+import ru.aleshin.studyassistant.core.ui.resources.russian_language_title as core_russian_language_title
 
 /**
  * @author Stanislav Aleshin on 25.04.2024.
@@ -35,8 +40,9 @@ fun LanguageUiType.mapToDomain() = when (this) {
     LanguageUiType.RU -> LanguageType.RU
 }
 
-fun LanguageUiType.mapToString(strings: StudyAssistantStrings) = when (this) {
-    LanguageUiType.DEFAULT -> strings.defaultTitle
-    LanguageUiType.EN -> strings.englishLanguageTitle
-    LanguageUiType.RU -> strings.russianLanguageTitle
+@Composable
+fun LanguageUiType.mapToString() = when (this) {
+    LanguageUiType.DEFAULT -> stringResource(CoreRes.string.core_default_title)
+    LanguageUiType.EN -> stringResource(CoreRes.string.core_english_language_title)
+    LanguageUiType.RU -> stringResource(CoreRes.string.core_russian_language_title)
 }

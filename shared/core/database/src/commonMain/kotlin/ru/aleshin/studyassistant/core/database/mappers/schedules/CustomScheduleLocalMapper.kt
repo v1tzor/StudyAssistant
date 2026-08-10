@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ fun CustomScheduleEntity.mapToEntity() = LocalCustomScheduleEntity(
     date = date,
     classes = classes,
     updated_at = updatedAt,
-    is_cache_data = isCacheData,
 )
 
 fun LocalCustomScheduleEntity.mapToBase() = CustomScheduleEntity(
@@ -40,7 +39,6 @@ fun LocalCustomScheduleEntity.mapToBase() = CustomScheduleEntity(
     date = date,
     classes = classes,
     updatedAt = updated_at,
-    isCacheData = is_cache_data,
 )
 
 fun CustomScheduleDetailsEntity.mapToBase() = CustomScheduleEntity(
@@ -48,7 +46,6 @@ fun CustomScheduleDetailsEntity.mapToBase() = CustomScheduleEntity(
     date = date,
     classes = classes.map { it.mapToBase().toJson<ClassEntity>() },
     updatedAt = updatedAt,
-    isCacheData = 0L,
 )
 
 suspend fun CustomScheduleEntity.mapToDetails(

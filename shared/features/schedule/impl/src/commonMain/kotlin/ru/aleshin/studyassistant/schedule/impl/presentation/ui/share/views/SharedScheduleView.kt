@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,12 +41,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DayOfWeek
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.presentation.models.schedules.ClassUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.CommonClassView
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.empty_classes_title
 
 /**
  * @author Stanislav Aleshin on 16.08.2024.
@@ -64,7 +65,7 @@ internal fun SharedScheduleView(
     ) {
         Column {
             CommonScheduleViewHeader(
-                dayOfWeek = dayOfWeek.mapToSting(StudyAssistantRes.strings)
+                dayOfWeek = dayOfWeek.mapToSting()
             )
             CommonScheduleViewContent(
                 modifier = Modifier.weight(1f),
@@ -180,7 +181,7 @@ private fun EmptyClassesView(
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = ScheduleThemeRes.strings.emptyClassesTitle,
+                text = stringResource(Res.string.empty_classes_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelMedium,
             )

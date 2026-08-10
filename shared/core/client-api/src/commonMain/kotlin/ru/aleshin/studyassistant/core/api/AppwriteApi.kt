@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,9 +174,9 @@ object AppwriteApi {
         const val DATE = "date"
     }
 
-    object SharedHomeworks {
-        const val DATABASE_ID = "686052b2001b25f5a09f"
-        const val COLLECTION_ID = "686a7b8c0027dd5f1cad"
+    object Functions {
+        const val SHARING = "sharing"
+        const val AI_ASSISTANT = "ai-assistant"
     }
 
     object SharedSchedules {

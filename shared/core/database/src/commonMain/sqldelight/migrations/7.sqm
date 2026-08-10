@@ -1,0 +1,16 @@
+DROP TABLE IF EXISTS currentSharedHomeworksEntity;
+
+DROP TABLE IF EXISTS homeworkShareReceiptEntity_new;
+
+CREATE TABLE homeworkShareReceiptEntity_new (
+  share_code TEXT PRIMARY KEY NOT NULL,
+  imported_at INTEGER NOT NULL
+);
+
+INSERT INTO homeworkShareReceiptEntity_new (share_code, imported_at)
+SELECT code_hash, imported_at
+FROM homeworkShareReceiptEntity;
+
+DROP TABLE homeworkShareReceiptEntity;
+
+ALTER TABLE homeworkShareReceiptEntity_new RENAME TO homeworkShareReceiptEntity;

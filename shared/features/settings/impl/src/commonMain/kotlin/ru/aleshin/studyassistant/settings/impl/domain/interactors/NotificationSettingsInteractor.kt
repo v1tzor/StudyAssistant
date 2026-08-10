@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,11 +64,7 @@ internal interface NotificationSettingsInteractor {
 
             settingsRepository.updateSettings(settings)
 
-            if (settings.beginningOfClasses != null) {
-                startClassesReminderManager.startOrRetryReminderService()
-            } else {
-                startClassesReminderManager.stopReminderService(organizationIds)
-            }
+            startClassesReminderManager.startOrRetryReminderService()
             if (settings.endOfClasses) {
                 endClassesReminderManager.startOrRetryReminderService()
             } else {

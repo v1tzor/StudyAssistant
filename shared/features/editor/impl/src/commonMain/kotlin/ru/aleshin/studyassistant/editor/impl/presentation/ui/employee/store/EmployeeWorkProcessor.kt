@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,13 @@ import ru.aleshin.studyassistant.core.common.functional.firstHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.firstOrNullHandleAndGet
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.functional.handleAndGet
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToDomain
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.EmployeeInteractor
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.OrganizationInteractor
-import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
-import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EditEmployeeUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.convertToBase
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.convertToEdit
@@ -53,16 +54,24 @@ internal interface EmployeeWorkProcessor :
     ) : EmployeeWorkProcessor {
 
         override suspend fun work(command: EmployeeWorkCommand) = when (command) {
-            is EmployeeWorkCommand.LoadEditModel -> loadEditModelWork(command.employeeId, command.organizationId)
+            is EmployeeWorkCommand.LoadEditModel -> loadEditModelWork(
+                command.employeeId,
+                command.organizationId
+            )
+
             is EmployeeWorkCommand.LoadOrganization -> loadOrganizationWork(command.organizationId)
-            is EmployeeWorkCommand.SaveEditModel -> saveEditModelWork(command.editModel, command.actionWithAvatar)
+            is EmployeeWorkCommand.SaveEditModel -> saveEditModelWork(
+                command.editModel,
+                command.actionWithAvatar
+            )
         }
 
         private fun loadEditModelWork(employeeId: UID?, organizationId: UID) = flow {
-            val employee = employeeInteractor.fetchEmployeeById(employeeId ?: "").firstOrNullHandleAndGet(
-                onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))).let { null } },
-                onRightAction = { employee -> employee?.mapToUi() },
-            )
+            val employee =
+                employeeInteractor.fetchEmployeeById(employeeId ?: "").firstOrNullHandleAndGet(
+                    onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))).let { null } },
+                    onRightAction = { employee -> employee?.mapToUi() },
+                )
             val editModel = employee?.convertToEdit() ?: EditEmployeeUi.createEditModel(
                 uid = employeeId,
                 organizationId = organizationId,
@@ -87,17 +96,22 @@ internal interface EmployeeWorkProcessor :
 
             val avatar = when (actionWithAvatar) {
                 is ActionWithAvatar.Set -> {
-                    employeeInteractor.uploadAvatar(editModel.avatar, actionWithAvatar.file.mapToDomain()).handleAndGet(
+                    employeeInteractor.uploadAvatar(
+                        editModel.avatar,
+                        actionWithAvatar.file.mapToDomain()
+                    ).handleAndGet(
                         onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))).let { null } },
                         onRightAction = { it },
                     )
                 }
+
                 is ActionWithAvatar.Delete -> {
                     employeeInteractor.deleteAvatar(editModel.avatar ?: "").handleAndGet(
                         onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))).let { null } },
                         onRightAction = { null },
                     )
                 }
+
                 is ActionWithAvatar.None -> actionWithAvatar.uri
             }
 

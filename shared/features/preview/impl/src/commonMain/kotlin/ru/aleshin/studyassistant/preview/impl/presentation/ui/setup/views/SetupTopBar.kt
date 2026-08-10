@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarButton
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarEmptyButton
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.back_icon_desc as core_back_icon_desc
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
@@ -66,7 +68,7 @@ internal fun SetupTopBar(
             TopAppBarButton(
                 enabled = enabled,
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                imageDescription = StudyAssistantRes.strings.backIconDesc,
+                imageDescription = stringResource(CoreRes.string.core_back_icon_desc),
                 onButtonClick = onBackPressed,
             )
         },

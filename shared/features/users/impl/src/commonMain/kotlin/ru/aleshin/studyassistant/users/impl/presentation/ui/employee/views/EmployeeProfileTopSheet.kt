@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,18 +51,21 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeDetailsUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
 import ru.aleshin.studyassistant.core.ui.views.shortTimeFormat
-import ru.aleshin.studyassistant.users.impl.presentation.models.ContactInfoUi
-import ru.aleshin.studyassistant.users.impl.presentation.models.EmployeeDetailsUi
-import ru.aleshin.studyassistant.users.impl.presentation.theme.UsersThemeRes
+import ru.aleshin.studyassistant.users.impl.resources.Res
+import ru.aleshin.studyassistant.users.impl.resources.employee_birthday_label
+import ru.aleshin.studyassistant.users.impl.resources.employee_post_label
+import ru.aleshin.studyassistant.users.impl.resources.employee_work_time_label
 
 /**
  * @author Stanislav Aleshin on 10.07.2024.
@@ -282,8 +285,8 @@ private fun EmployeeTopSheetFooter(
         item {
             EmployeeInfoView(
                 icon = Icons.Outlined.PersonOutline,
-                label = UsersThemeRes.strings.employeePostLabel,
-                title = post.mapToString(StudyAssistantRes.strings),
+                label = stringResource(Res.string.employee_post_label),
+                title = post.mapToString(),
             )
         }
         if (workTimeStart != null || workTimeEnd != null) {
@@ -291,7 +294,7 @@ private fun EmployeeTopSheetFooter(
             item {
                 EmployeeInfoView(
                     icon = Icons.Outlined.WorkOutline,
-                    label = UsersThemeRes.strings.employeeWorkTimeLabel,
+                    label = stringResource(Res.string.employee_work_time_label),
                     title = buildString {
                         if (workTimeStart != null) {
                             append(workTimeStart.formatByTimeZone(DateTimeComponents.Formats.shortTimeFormat()))
@@ -311,7 +314,7 @@ private fun EmployeeTopSheetFooter(
             item {
                 EmployeeInfoView(
                     icon = Icons.Outlined.Cake,
-                    label = UsersThemeRes.strings.employeeBirthdayLabel,
+                    label = stringResource(Res.string.employee_birthday_label),
                     title = birthday,
                 )
             }

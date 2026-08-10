@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,5 +23,11 @@ import ru.aleshin.studyassistant.core.common.functional.DomainFailures
  */
 internal sealed class ChatFailures : DomainFailures {
     data object ChatAssistantError : ChatFailures()
+    data object QuotaExceeded : ChatFailures()
+    data object InvalidKey : ChatFailures()
+    data object InsufficientBalance : ChatFailures()
+    data object Offline : ChatFailures()
+    data object RateLimited : ChatFailures()
+    data object ServerUnavailable : ChatFailures()
     data class OtherError(val throwable: Throwable) : ChatFailures()
 }

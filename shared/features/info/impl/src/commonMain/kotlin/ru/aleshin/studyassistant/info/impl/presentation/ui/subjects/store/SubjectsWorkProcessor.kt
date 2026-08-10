@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,11 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToUi
+import ru.aleshin.studyassistant.info.impl.domain.entities.SubjectSortedType
 import ru.aleshin.studyassistant.info.impl.domain.interactors.OrganizationsInteractor
 import ru.aleshin.studyassistant.info.impl.domain.interactors.SubjectsInteractor
-import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectSortedType
-import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsAction
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsEffect
 import ru.aleshin.studyassistant.info.impl.presentation.ui.subjects.contract.SubjectsOutput
@@ -47,8 +47,17 @@ internal interface SubjectsWorkProcessor :
     ) : SubjectsWorkProcessor {
         override suspend fun work(command: SubjectsWorkCommand) = when (command) {
             is SubjectsWorkCommand.LoadOrganizations -> loadOrganizationsWork(command.organization)
-            is SubjectsWorkCommand.LoadSubjects -> loadSubjectsWork(command.organization, command.sortedType)
-            is SubjectsWorkCommand.SearchSubjects -> searchSubjectsWork(command.query, command.organization, command.sortedType)
+            is SubjectsWorkCommand.LoadSubjects -> loadSubjectsWork(
+                command.organization,
+                command.sortedType
+            )
+
+            is SubjectsWorkCommand.SearchSubjects -> searchSubjectsWork(
+                command.query,
+                command.organization,
+                command.sortedType
+            )
+
             is SubjectsWorkCommand.DeleteSubject -> deleteSubjectWork(command.targetId)
         }
 
@@ -57,34 +66,55 @@ internal interface SubjectsWorkProcessor :
                 onLeftAction = { emit(EffectResult(SubjectsEffect.ShowError(it))) },
                 onRightAction = { organizationList ->
                     val organizations = organizationList.map { it.mapToUi() }
-                    emit(ActionResult(SubjectsAction.UpdateOrganizations(selectedOrganization, organizations)))
+                    emit(
+                        ActionResult(
+                            SubjectsAction.UpdateOrganizations(
+                                selectedOrganization,
+                                organizations
+                            )
+                        )
+                    )
                 },
             )
         }
 
-        private fun loadSubjectsWork(organization: UID, sortedType: SubjectSortedType) = flow<SubjectsWorkResult> {
-            subjectsInteractor.fetchSubjectsByOrganization(organization).collectAndHandle(
-                onLeftAction = { emit(EffectResult(SubjectsEffect.ShowError(it))) },
-                onRightAction = { subjectList ->
-                    val subjects = subjectList.map { it.mapToUi() }
-                    val sortedSubjects = subjects.sortSubjectsByType(sortedType)
-                    emit(ActionResult(SubjectsAction.UpdateSubjects(sortedSubjects, sortedType)))
-                },
-            )
-        }.onStart {
-            emit(ActionResult(SubjectsAction.UpdateLoading(true)))
-        }
+        private fun loadSubjectsWork(organization: UID, sortedType: SubjectSortedType) =
+            flow<SubjectsWorkResult> {
+                subjectsInteractor.fetchSubjectsByOrganization(
+                    organization,
+                    sortedType = sortedType,
+                ).collectAndHandle(
+                    onLeftAction = { emit(EffectResult(SubjectsEffect.ShowError(it))) },
+                    onRightAction = { subjectList ->
+                        val subjects = subjectList.map { it.mapToUi() }
+                        emit(
+                            ActionResult(
+                                SubjectsAction.UpdateSubjects(
+                                    subjects,
+                                    sortedType
+                                )
+                            )
+                        )
+                    },
+                )
+            }.onStart {
+                emit(ActionResult(SubjectsAction.UpdateLoading(true)))
+            }
 
-        private fun searchSubjectsWork(query: String, organization: UID, sortedType: SubjectSortedType) = flow {
-            subjectsInteractor.fetchSubjectsByOrganization(organization).collectAndHandle(
+        private fun searchSubjectsWork(
+            query: String,
+            organization: UID,
+            sortedType: SubjectSortedType
+        ) = flow {
+            subjectsInteractor.fetchSubjectsByOrganization(
+                organization,
+                query,
+                sortedType,
+            ).collectAndHandle(
                 onLeftAction = { emit(EffectResult(SubjectsEffect.ShowError(it))) },
                 onRightAction = { subjectList ->
                     val subjects = subjectList.map { it.mapToUi() }
-                    val searchedSubjects = subjects.filter { subject ->
-                        if (query.isNotBlank()) subject.name.contains(query, true) else true
-                    }
-                    val sortedSubjects = searchedSubjects.sortSubjectsByType(sortedType)
-                    emit(ActionResult(SubjectsAction.UpdateSubjects(sortedSubjects, sortedType)))
+                    emit(ActionResult(SubjectsAction.UpdateSubjects(subjects, sortedType)))
                 },
             )
         }
@@ -94,23 +124,20 @@ internal interface SubjectsWorkProcessor :
                 onLeftAction = { emit(EffectResult(SubjectsEffect.ShowError(it))) },
             )
         }
-
-        private fun List<SubjectUi>.sortSubjectsByType(type: SubjectSortedType) = sortedBy { subject ->
-            when (type) {
-                SubjectSortedType.ALPHABETIC -> subject.name
-                SubjectSortedType.TEACHER -> subject.teacher?.uid
-                SubjectSortedType.EVENT_TYPE -> subject.eventType.toString()
-                SubjectSortedType.OFFICE -> subject.office
-                SubjectSortedType.LOCATION -> subject.location?.value
-            }
-        }
     }
 }
 
 internal sealed class SubjectsWorkCommand : WorkCommand {
     data class LoadOrganizations(val organization: UID) : SubjectsWorkCommand()
-    data class LoadSubjects(val organization: UID, val sortedType: SubjectSortedType) : SubjectsWorkCommand()
-    data class SearchSubjects(val query: String, val organization: UID, val sortedType: SubjectSortedType) : SubjectsWorkCommand()
+    data class LoadSubjects(val organization: UID, val sortedType: SubjectSortedType) :
+        SubjectsWorkCommand()
+
+    data class SearchSubjects(
+        val query: String,
+        val organization: UID,
+        val sortedType: SubjectSortedType
+    ) : SubjectsWorkCommand()
+
     data class DeleteSubject(val targetId: UID) : SubjectsWorkCommand()
 }
 

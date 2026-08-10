@@ -1,0 +1,11 @@
+{
+  "name": "studyassistant-appwrite-functions",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "node-appwrite": "27.1.0"
+  }
+}

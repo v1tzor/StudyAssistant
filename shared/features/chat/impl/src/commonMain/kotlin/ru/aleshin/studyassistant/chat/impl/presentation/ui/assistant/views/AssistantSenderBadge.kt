@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.chat.impl.presentation.theme.ChatThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.chat.impl.resources.Res
+import ru.aleshin.studyassistant.chat.impl.resources.assistant_sender_badge
+import ru.aleshin.studyassistant.chat.impl.resources.ic_ai_sender
 
 /**
  * @author Stanislav Aleshin on 01.08.2025.
@@ -52,12 +55,12 @@ internal fun AssistantSenderBadge(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                painter = painterResource(ChatThemeRes.icons.aiAssistant),
+                painter = painterResource(Res.drawable.ic_ai_sender),
                 contentDescription = null,
                 tint = iconColor,
             )
             Text(
-                text = ChatThemeRes.strings.assistantSenderBadge,
+                text = stringResource(Res.string.assistant_sender_badge),
                 color = textColor,
                 maxLines = 1,
                 style = MaterialTheme.typography.labelLarge,

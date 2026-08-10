@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,18 +48,28 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.presentation.models.organizations.NumberedDurationUi
+import ru.aleshin.studyassistant.core.presentation.models.organizations.ScheduleTimeIntervalsUi
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
 import ru.aleshin.studyassistant.core.ui.views.DialogHeader
 import ru.aleshin.studyassistant.core.ui.views.dialog.TimePickerDialog
 import ru.aleshin.studyassistant.core.ui.views.timeFormat
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.NumberedDurationsList
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.breaks_title
+import ru.aleshin.studyassistant.editor.impl.resources.classes_title
+import ru.aleshin.studyassistant.editor.impl.resources.ic_break
+import ru.aleshin.studyassistant.editor.impl.resources.schedule_intervals_dialog_header
+import ru.aleshin.studyassistant.editor.impl.resources.start_of_classes_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.start_of_classes_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_class as core_ic_class
+import ru.aleshin.studyassistant.core.ui.resources.ic_clock_outline as core_ic_clock_outline
+import ru.aleshin.studyassistant.core.ui.resources.save_confirm_title as core_save_confirm_title
 
 /**
  * @author Stanislav Aleshin on 26.05.2024.
@@ -84,7 +94,7 @@ internal fun ScheduleIntervalsDialog(
         ) {
             Column {
                 DialogHeader(
-                    header = EditorThemeRes.strings.scheduleIntervalsDialogHeader,
+                    header = stringResource(Res.string.schedule_intervals_dialog_header),
                     title = organization,
                     titleColor = MaterialTheme.colorScheme.primary,
                 )
@@ -97,7 +107,8 @@ internal fun ScheduleIntervalsDialog(
                         modifier = Modifier.padding(top = 12.dp),
                         startOfClassTime = editableIntervals.value.firstClassTime,
                         onChangeTime = {
-                            editableIntervals.value = editableIntervals.value.copy(firstClassTime = it)
+                            editableIntervals.value =
+                                editableIntervals.value.copy(firstClassTime = it)
                         }
                     )
                     ClassesAndBreaksIntervalsView(
@@ -110,21 +121,25 @@ internal fun ScheduleIntervalsDialog(
                             derivedStateOf { editableIntervals.value.specificBreakDuration }
                         },
                         onChangeBaseClassDuration = {
-                            editableIntervals.value = editableIntervals.value.copy(baseClassDuration = it)
+                            editableIntervals.value =
+                                editableIntervals.value.copy(baseClassDuration = it)
                         },
                         onChangeSpecificClassDurations = {
-                            editableIntervals.value = editableIntervals.value.copy(specificClassDuration = it)
+                            editableIntervals.value =
+                                editableIntervals.value.copy(specificClassDuration = it)
                         },
                         onChangeBaseBreakDuration = {
-                            editableIntervals.value = editableIntervals.value.copy(baseBreakDuration = it)
+                            editableIntervals.value =
+                                editableIntervals.value.copy(baseBreakDuration = it)
                         },
                         onChangeSpecificBreakDurations = {
-                            editableIntervals.value = editableIntervals.value.copy(specificBreakDuration = it)
+                            editableIntervals.value =
+                                editableIntervals.value.copy(specificBreakDuration = it)
                         },
                     )
                 }
                 DialogButtons(
-                    confirmTitle = StudyAssistantRes.strings.saveConfirmTitle,
+                    confirmTitle = stringResource(CoreRes.string.core_save_confirm_title),
                     onCancelClick = onDismiss,
                     onConfirmClick = {
                         onConfirm(editableIntervals.value)
@@ -147,12 +162,12 @@ internal fun StartOfClassesField(
         ClickableTextField(
             onClick = { isOpenTimePickerDialog = true },
             value = startOfClassTime?.formatByTimeZone(DateTimeComponents.Formats.timeFormat()),
-            label = EditorThemeRes.strings.startOfClassesTitle,
-            placeholder = EditorThemeRes.strings.startOfClassesPlaceholder,
+            label = stringResource(Res.string.start_of_classes_title),
+            placeholder = stringResource(Res.string.start_of_classes_placeholder),
             leadingIcon = {
                 Icon(
                     modifier = Modifier.size(24.dp),
-                    painter = painterResource(StudyAssistantRes.icons.timeOutline),
+                    painter = painterResource(CoreRes.drawable.core_ic_clock_outline),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -230,12 +245,12 @@ private fun ClassIntervalsView(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    painter = painterResource(StudyAssistantRes.icons.classes),
+                    painter = painterResource(CoreRes.drawable.core_ic_class),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = EditorThemeRes.strings.classesTitle,
+                    text = stringResource(Res.string.classes_title),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     style = MaterialTheme.typography.titleSmall,
@@ -276,12 +291,12 @@ private fun BreakIntervalsView(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    painter = painterResource(EditorThemeRes.icons.breaks),
+                    painter = painterResource(Res.drawable.ic_break),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = EditorThemeRes.strings.breaksTitle,
+                    text = stringResource(Res.string.breaks_title),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     style = MaterialTheme.typography.titleSmall,

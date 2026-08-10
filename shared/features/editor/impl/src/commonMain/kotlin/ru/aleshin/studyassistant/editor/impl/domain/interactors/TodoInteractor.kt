@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,8 @@ internal interface TodoInteractor {
                 )
                 val linkedGoal = goalsRepository.fetchGoalByContentId(updatedTodo.uid).first()
                 if (linkedGoal != null) {
-                    val updatedGoal = linkedGoal.copy(contentTodo = updatedTodo, updatedAt = updatedAt)
+                    val updatedGoal =
+                        linkedGoal.copy(contentTodo = updatedTodo, updatedAt = updatedAt)
                     goalsRepository.addOrUpdateGoal(updatedGoal)
                 }
             }

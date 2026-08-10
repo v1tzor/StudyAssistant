@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ import ru.aleshin.studyassistant.core.database.mappers.ai.mapToDetails
 import ru.aleshin.studyassistant.core.database.mappers.ai.mapToShort
 import ru.aleshin.studyassistant.core.database.models.ai.AiChatEntity
 import ru.aleshin.studyassistant.core.database.models.ai.AiChatHistoryEntityDetails
-import ru.aleshin.studyassistant.core.database.utils.LocalDataSource
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatHistoryEntity
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatHistoryQueries
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatMessageEntity
@@ -42,7 +41,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * @author Stanislav Aleshin on 21.06.2025.
  */
-interface AiLocalDataSource : LocalDataSource.OnlyOffline {
+interface AiLocalDataSource {
 
     suspend fun fetchAllChats(): Flow<List<AiChatEntity>>
     suspend fun fetchChatHistoryById(uid: UID): Flow<AiChatHistoryEntityDetails?>
@@ -77,8 +76,10 @@ interface AiLocalDataSource : LocalDataSource.OnlyOffline {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchChatHistoryById(uid: UID): Flow<AiChatHistoryEntityDetails?> {
-            val chatHistoryFlow = chatQueries.fetchChatById(uid).asFlow().mapToOneOrNull(coroutineContext)
-            val messagesFlow = messagesQueries.fetchAllMessagesByChatId(uid).asFlow().mapToList(coroutineContext)
+            val chatHistoryFlow =
+                chatQueries.fetchChatById(uid).asFlow().mapToOneOrNull(coroutineContext)
+            val messagesFlow =
+                messagesQueries.fetchAllMessagesByChatId(uid).asFlow().mapToList(coroutineContext)
             return chatHistoryFlow.flatMapLatest { chat ->
                 messagesFlow.map { messages ->
                     chat?.let { AiChatHistoryEntity(it) }?.mapToDetails(messages = messages)

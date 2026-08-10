@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,43 +20,37 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
-import ru.aleshin.studyassistant.core.common.di.withDirectDI
+import org.kodein.di.DI
 import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
 import ru.aleshin.studyassistant.core.common.navigation.backAnimation
-import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureManager
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewTheme
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.IntroContent
-import ru.aleshin.studyassistant.preview.impl.presentation.ui.root.InternalPreviewFeatureComponent.Child
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.SetupContent
 
 /**
  * @author Stanislav Aleshin on 25.08.2025.
  */
-public class PreviewContentProvider internal constructor(
-    private val component: InternalPreviewFeatureComponent,
-) : FeatureContentProvider {
+internal class PreviewContentProvider(
+    di: DI,
+    private val component: PreviewFeatureComponent,
+) : FeatureContentProvider(di) {
 
     @Composable
     @OptIn(ExperimentalDecomposeApi::class)
-    override fun invoke(modifier: Modifier) {
-        withDirectDI(directDI = { PreviewFeatureManager.fetchDI() }) {
-            PreviewTheme {
-                ChildStack(
-                    modifier = modifier,
-                    stack = component.stack,
-                    animation = backAnimation(
-                        backHandler = component.backHandler,
-                        onBack = component::navigateToBack
-                    )
-                ) { child ->
-                    when (val instance = child.instance) {
-                        is Child.IntroChild -> {
-                            IntroContent(instance.component)
-                        }
-                        is Child.SetupChild -> {
-                            SetupContent(instance.component)
-                        }
-                    }
+    override fun RootContent(modifier: Modifier) {
+        ChildStack(
+            modifier = modifier,
+            stack = component.stack,
+            animation = backAnimation(
+                backHandler = component.backHandler,
+                onBack = component::navigateToBack,
+            ),
+        ) { child ->
+            when (val instance = child.instance) {
+                is PreviewFeatureComponent.Child.IntroChild -> {
+                    IntroContent(instance.component)
+                }
+                is PreviewFeatureComponent.Child.SetupChild -> {
+                    SetupContent(instance.component)
                 }
             }
         }

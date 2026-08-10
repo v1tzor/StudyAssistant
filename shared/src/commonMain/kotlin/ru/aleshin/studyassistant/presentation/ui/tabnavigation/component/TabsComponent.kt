@@ -23,38 +23,34 @@ import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.value.Value
-import com.arkivanov.essenty.backhandler.BackCallback
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.auth.api.AuthFeatureComponent.AuthConfig
-import ru.aleshin.studyassistant.billing.api.BillingFeatureComponent.BillingConfig
-import ru.aleshin.studyassistant.chat.api.ChatFeatureComponent
-import ru.aleshin.studyassistant.chat.api.ChatFeatureComponent.ChatOutput
-import ru.aleshin.studyassistant.chat.api.ChatFeatureStarter
+import ru.aleshin.studyassistant.chat.api.ChatConfig
+import ru.aleshin.studyassistant.chat.api.ChatDecomposeFeatureFactory
+import ru.aleshin.studyassistant.chat.api.ChatOutput
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
 import ru.aleshin.studyassistant.core.common.architecture.component.ChildComponent
 import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
-import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.inject.StartFeatureConfig
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
-import ru.aleshin.studyassistant.info.api.InfoFeatureComponent
-import ru.aleshin.studyassistant.info.api.InfoFeatureComponent.InfoOutput
-import ru.aleshin.studyassistant.info.api.InfoFeatureStarter
-import ru.aleshin.studyassistant.profile.api.ProfileFeatureComponent
-import ru.aleshin.studyassistant.profile.api.ProfileFeatureComponent.ProfileOutput
-import ru.aleshin.studyassistant.profile.api.ProfileFeatureComponent.ProfileOutput.NavigateToSettings
-import ru.aleshin.studyassistant.profile.api.ProfileFeatureStarter
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureComponent
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureComponent.ScheduleOutput
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureComponent.ScheduleOutput.NavigateToEditor
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureStarter
-import ru.aleshin.studyassistant.settings.api.SettingsFeatureComponent.SettingsConfig
-import ru.aleshin.studyassistant.tasks.api.TasksFeatureComponent
-import ru.aleshin.studyassistant.tasks.api.TasksFeatureComponent.TasksOutput
-import ru.aleshin.studyassistant.tasks.api.TasksFeatureComponent.TasksOutput.NavigateToEditor.Homework
-import ru.aleshin.studyassistant.tasks.api.TasksFeatureComponent.TasksOutput.NavigateToEditor.Subject
-import ru.aleshin.studyassistant.tasks.api.TasksFeatureComponent.TasksOutput.NavigateToEditor.Todo
-import ru.aleshin.studyassistant.tasks.api.TasksFeatureStarter
-import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
+import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
+import ru.aleshin.studyassistant.editor.api.EditorConfig
+import ru.aleshin.studyassistant.info.api.InfoConfig
+import ru.aleshin.studyassistant.info.api.InfoDecomposeFeatureFactory
+import ru.aleshin.studyassistant.info.api.InfoOutput
+import ru.aleshin.studyassistant.profile.api.ProfileConfig
+import ru.aleshin.studyassistant.profile.api.ProfileDecomposeFeatureFactory
+import ru.aleshin.studyassistant.profile.api.ProfileOutput
+import ru.aleshin.studyassistant.profile.api.ProfileOutput.NavigateToSettings
+import ru.aleshin.studyassistant.schedule.api.ScheduleConfig
+import ru.aleshin.studyassistant.schedule.api.ScheduleDecomposeFeatureFactory
+import ru.aleshin.studyassistant.schedule.api.ScheduleOutput
+import ru.aleshin.studyassistant.schedule.api.ScheduleOutput.NavigateToEditor
+import ru.aleshin.studyassistant.settings.api.SettingsConfig
+import ru.aleshin.studyassistant.tasks.api.TasksConfig
+import ru.aleshin.studyassistant.tasks.api.TasksDecomposeFeatureFactory
+import ru.aleshin.studyassistant.tasks.api.TasksOutput
+import ru.aleshin.studyassistant.tasks.api.TasksOutput.NavigateToEditor.Homework
+import ru.aleshin.studyassistant.tasks.api.TasksOutput.NavigateToEditor.Subject
+import ru.aleshin.studyassistant.tasks.api.TasksOutput.NavigateToEditor.Todo
+import ru.aleshin.studyassistant.users.api.UsersConfig
 
 /**
  * @author Stanislav Aleshin on 26.08.2025.
@@ -74,21 +70,21 @@ abstract class TabsComponent(
     abstract fun clickProfileTab()
 
     sealed class TabsChild {
-        data class ScheduleChild(val component: ScheduleFeatureComponent) : TabsChild()
-        data class TasksChild(val component: TasksFeatureComponent) : TabsChild()
-        data class ChatChild(val component: ChatFeatureComponent) : TabsChild()
-        data class InfoChild(val component: InfoFeatureComponent) : TabsChild()
-        data class ProfileChild(val component: ProfileFeatureComponent) : TabsChild()
+        data class ScheduleChild(val contentProvider: FeatureContentProvider) : TabsChild()
+        data class TasksChild(val contentProvider: FeatureContentProvider) : TabsChild()
+        data class ChatChild(val contentProvider: FeatureContentProvider) : TabsChild()
+        data class InfoChild(val contentProvider: FeatureContentProvider) : TabsChild()
+        data class ProfileChild(val contentProvider: FeatureContentProvider) : TabsChild()
     }
 
     @Serializable
     sealed class TabsConfig {
 
         @Serializable
-        data object Schedule : TabsConfig()
+        data class Schedule(val startConfig: ScheduleConfig? = null) : TabsConfig()
 
         @Serializable
-        data object Tasks : TabsConfig()
+        data class Tasks(val startConfig: TasksConfig? = null) : TabsConfig()
 
         @Serializable
         data object Chat : TabsConfig()
@@ -102,23 +98,22 @@ abstract class TabsComponent(
 
     sealed class TabsOutput : BaseOutput {
         data class NavigateToEditor(val config: EditorConfig) : TabsOutput()
-        data class NavigateToBilling(val config: BillingConfig) : TabsOutput()
         data class NavigateToUsers(val config: UsersConfig) : TabsOutput()
         data class NavigateToSettings(val config: SettingsConfig) : TabsOutput()
-        data class NavigateToAuth(val config: AuthConfig) : TabsOutput()
-        data class NavigateToSharedSchedule(val receivedShareId: UID) : TabsOutput()
+        data object NavigateToAnalytics : TabsOutput()
+        data object NavigateToScheduleSharing : TabsOutput()
         data object NavigateToBack : TabsOutput()
     }
 
     class Default(
         componentContext: ComponentContext,
-        startConfig: StartFeatureConfig<TabsConfig>,
+        startConfig: TabsConfig,
         private val outputConsumer: OutputConsumer<TabsOutput>,
-        private val scheduleFeatureStarter: ScheduleFeatureStarter,
-        private val tasksFeatureStarter: TasksFeatureStarter,
-        private val chatFeatureStarter: ChatFeatureStarter,
-        private val infoFeatureStarter: InfoFeatureStarter,
-        private val profileFeatureStarter: ProfileFeatureStarter,
+        private val scheduleFeatureFactory: ScheduleDecomposeFeatureFactory,
+        private val tasksFeatureFactory: TasksDecomposeFeatureFactory,
+        private val chatFeatureFactory: ChatDecomposeFeatureFactory,
+        private val infoFeatureFactory: InfoDecomposeFeatureFactory,
+        private val profileFeatureFactory: ProfileDecomposeFeatureFactory,
     ) : TabsComponent(
         componentContext = componentContext,
     ) {
@@ -128,32 +123,22 @@ abstract class TabsComponent(
         override val stack = childStack(
             source = stackNavigation,
             serializer = TabsConfig.serializer(),
-            initialStack = { startConfig.backstack ?: listOf(TabsConfig.Schedule) },
+            initialConfiguration = startConfig,
             key = STACK_KEY,
-            handleBackButton = false,
+            handleBackButton = true,
             childFactory = ::childFactory
         )
-
-        private val backCallback = BackCallback {
-            stackNavigation.pop { isPop ->
-                if (!isPop) outputConsumer.consume(TabsOutput.NavigateToBack)
-            }
-        }
 
         private companion object {
             const val STACK_KEY = "TABS_STACK"
         }
 
-        init {
-            backHandler.register(backCallback)
-        }
-
         override fun clickScheduleTab() {
-            stackNavigation.bringToFront(TabsConfig.Schedule)
+            stackNavigation.bringToFront(TabsConfig.Schedule())
         }
 
         override fun clickTasksTab() {
-            stackNavigation.bringToFront(TabsConfig.Tasks)
+            stackNavigation.bringToFront(TabsConfig.Tasks())
         }
 
         override fun clickChatTab() {
@@ -170,41 +155,51 @@ abstract class TabsComponent(
 
         private fun childFactory(config: TabsConfig, componentContext: ComponentContext): TabsChild {
             return when (config) {
-                is TabsConfig.Schedule -> TabsChild.ScheduleChild(
-                    component = scheduleFeatureStarter.createOrGetFeature().componentFactory().createComponent(
+                is TabsConfig.Schedule -> {
+                    val api = scheduleFeatureFactory.createOrGetFeature(componentContext)
+                    val provider = api.contentProviderFactory().createProvider(
+                        startConfig = config.startConfig ?: ScheduleConfig.Overview,
+                        outputConsumer = scheduleOutputConsumer(),
                         componentContext = componentContext,
-                        startConfig = StartFeatureConfig(null),
-                        outputConsumer = scheduleOutputConsumer()
                     )
-                )
-                is TabsConfig.Tasks -> TabsChild.TasksChild(
-                    component = tasksFeatureStarter.createOrGetFeature().componentFactory().createComponent(
+                    TabsChild.ScheduleChild(contentProvider = provider)
+                }
+                is TabsConfig.Tasks -> {
+                    val api = tasksFeatureFactory.createOrGetFeature(componentContext)
+                    val provider = api.contentProviderFactory().createProvider(
+                        startConfig = config.startConfig ?: TasksConfig.Overview,
+                        outputConsumer = tasksOutputConsumer(),
                         componentContext = componentContext,
-                        startConfig = StartFeatureConfig(null),
-                        outputConsumer = tasksOutputConsumer()
                     )
-                )
-                is TabsConfig.Chat -> TabsChild.ChatChild(
-                    component = chatFeatureStarter.createOrGetFeature().componentFactory().createComponent(
+                    TabsChild.TasksChild(contentProvider = provider)
+                }
+                is TabsConfig.Chat -> {
+                    val api = chatFeatureFactory.createOrGetFeature(componentContext)
+                    val provider = api.contentProviderFactory().createProvider(
+                        startConfig = ChatConfig.Assistant,
+                        outputConsumer = chatOutputConsumer(),
                         componentContext = componentContext,
-                        startConfig = StartFeatureConfig(null),
-                        outputConsumer = chatOutputConsumer()
                     )
-                )
-                is TabsConfig.Info -> TabsChild.InfoChild(
-                    component = infoFeatureStarter.createOrGetFeature().componentFactory().createComponent(
+                    TabsChild.ChatChild(contentProvider = provider)
+                }
+                is TabsConfig.Info -> {
+                    val api = infoFeatureFactory.createOrGetFeature(componentContext)
+                    val provider = api.contentProviderFactory().createProvider(
+                        startConfig = InfoConfig.Organizations,
+                        outputConsumer = infoOutputConsumer(),
                         componentContext = componentContext,
-                        startConfig = StartFeatureConfig(null),
-                        outputConsumer = infoOutputConsumer()
                     )
-                )
-                is TabsConfig.Profile -> TabsChild.ProfileChild(
-                    component = profileFeatureStarter.createOrGetFeature().componentFactory().createComponent(
+                    TabsChild.InfoChild(contentProvider = provider)
+                }
+                is TabsConfig.Profile -> {
+                    val api = profileFeatureFactory.createOrGetFeature(componentContext)
+                    val provider = api.contentProviderFactory().createProvider(
+                        startConfig = ProfileConfig.Profile,
+                        outputConsumer = profileOutputConsumer(),
                         componentContext = componentContext,
-                        startConfig = StartFeatureConfig(null),
-                        outputConsumer = profileOutputConsumer()
                     )
-                )
+                    TabsChild.ProfileChild(contentProvider = provider)
+                }
             }
         }
 
@@ -228,10 +223,6 @@ abstract class TabsComponent(
                         )
                     }
                     outputConsumer.consume(TabsOutput.NavigateToEditor(config))
-                }
-                is ScheduleOutput.NavigateToUserProfile -> {
-                    val config = UsersConfig.UserProfile(userId = output.userId)
-                    outputConsumer.consume(TabsOutput.NavigateToUsers(config))
                 }
                 is ScheduleOutput.NavigateToBack -> {
                     stackNavigation.pop()
@@ -259,23 +250,19 @@ abstract class TabsComponent(
                     }
                     outputConsumer.consume(TabsOutput.NavigateToEditor(config))
                 }
-                is TasksOutput.NavigateToBilling -> {
-                    outputConsumer.consume(TabsOutput.NavigateToBilling(BillingConfig.Subscription))
-                }
-                is TasksOutput.NavigateToUserProfile -> {
-                    val config = UsersConfig.UserProfile(userId = output.userId)
-                    outputConsumer.consume(TabsOutput.NavigateToUsers(config))
-                }
                 is TasksOutput.NavigateToBack -> {
                     stackNavigation.pop()
+                }
+                is TasksOutput.NavigateToAnalytics -> {
+                    outputConsumer.consume(TabsOutput.NavigateToAnalytics)
                 }
             }
         }
 
         private fun chatOutputConsumer() = OutputConsumer<ChatOutput> { output ->
             when (output) {
-                is ChatOutput.NavigateToBilling -> {
-                    outputConsumer.consume(TabsOutput.NavigateToBilling(BillingConfig.Subscription))
+                is ChatOutput.NavigateToAiSettings -> {
+                    outputConsumer.consume(TabsOutput.NavigateToSettings(SettingsConfig.Ai))
                 }
                 is ChatOutput.NavigateToBack -> {
                     stackNavigation.pop()
@@ -305,9 +292,6 @@ abstract class TabsComponent(
                     val config = UsersConfig.EmployeeProfile(employeeId = output.employeeId)
                     outputConsumer.consume(TabsOutput.NavigateToUsers(config))
                 }
-                is InfoOutput.NavigateToBilling -> {
-                    outputConsumer.consume(TabsOutput.NavigateToBilling(BillingConfig.Subscription))
-                }
                 is InfoOutput.NavigateToBack -> {
                     stackNavigation.pop()
                 }
@@ -316,31 +300,31 @@ abstract class TabsComponent(
 
         private fun profileOutputConsumer() = OutputConsumer<ProfileOutput> { output ->
             when (output) {
-                is ProfileOutput.NavigateToAuth -> {
-                    val config = AuthConfig.Login
-                    outputConsumer.consume(TabsOutput.NavigateToAuth(config))
-                }
-                is ProfileOutput.NavigateToFriends -> {
-                    val config = UsersConfig.Friends
-                    outputConsumer.consume(TabsOutput.NavigateToUsers(config))
-                }
                 is ProfileOutput.NavigateToProfileEditor -> {
                     val config = EditorConfig.Profile
                     outputConsumer.consume(TabsOutput.NavigateToEditor(config))
                 }
-                is NavigateToSettings -> {
-                    val config = when (output) {
-                        NavigateToSettings.AboutApp -> SettingsConfig.AboutApp
-                        NavigateToSettings.Calendar -> SettingsConfig.Calendar
-                        NavigateToSettings.General -> SettingsConfig.General
-                        NavigateToSettings.Notification -> SettingsConfig.Notification
-                        NavigateToSettings.Subscription -> SettingsConfig.Subscription
-                    }
-                    outputConsumer.consume(TabsOutput.NavigateToSettings(config))
+                is ProfileOutput.NavigateToScheduleSharing -> {
+                    outputConsumer.consume(TabsOutput.NavigateToScheduleSharing)
                 }
-                is ProfileOutput.NavigateToSharedSchedule -> {
-                    val outputData = TabsOutput.NavigateToSharedSchedule(output.receivedShareId)
-                    outputConsumer.consume(outputData)
+                is NavigateToSettings -> {
+                    when (output) {
+                        NavigateToSettings.AboutApp -> {
+                            outputConsumer.consume(TabsOutput.NavigateToSettings(SettingsConfig.AboutApp))
+                        }
+                        NavigateToSettings.Calendar -> {
+                            outputConsumer.consume(TabsOutput.NavigateToSettings(SettingsConfig.Calendar))
+                        }
+                        NavigateToSettings.General -> {
+                            outputConsumer.consume(TabsOutput.NavigateToSettings(SettingsConfig.General))
+                        }
+                        NavigateToSettings.Notification -> {
+                            outputConsumer.consume(TabsOutput.NavigateToSettings(SettingsConfig.Notification))
+                        }
+                        NavigateToSettings.Ai -> {
+                            outputConsumer.consume(TabsOutput.NavigateToSettings(SettingsConfig.Ai))
+                        }
+                    }
                 }
                 is ProfileOutput.NavigateToBack -> {
                     stackNavigation.pop()

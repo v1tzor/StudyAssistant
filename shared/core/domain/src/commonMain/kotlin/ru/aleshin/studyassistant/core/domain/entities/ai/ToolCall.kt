@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,4 @@ data class ToolCall(
     val id: String,
     val type: ToolCallType,
     val function: FunctionResponse,
-)
-
-enum class ToolCallType {
-    FUNCTION
-}
-
-data class FunctionResponse(
-    val name: String,
-    val arguments: Map<String, String>?,
 )

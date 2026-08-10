@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import ru.aleshin.studyassistant.core.presentation.models.users.ProfileUi
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.core.ui.views.UserCodeView
 import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
-import ru.aleshin.studyassistant.profile.impl.presentation.models.users.AppUserUi
 
 /**
  * @author Stanislav Aleshin on 21.04.2024
@@ -45,7 +44,7 @@ import ru.aleshin.studyassistant.profile.impl.presentation.models.users.AppUserU
 internal fun ProfileInfoSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    profile: AppUserUi?,
+    profile: ProfileUi?,
 ) {
     Crossfade(
         targetState = isLoading,
@@ -75,7 +74,6 @@ internal fun ProfileInfoSection(
                 )
                 ContactInfoView(
                     username = profile.username,
-                    code = profile.code,
                 )
             }
         }
@@ -86,7 +84,6 @@ internal fun ProfileInfoSection(
 internal fun ContactInfoView(
     modifier: Modifier = Modifier,
     username: String?,
-    code: String?,
 ) {
     Column(
         modifier = modifier,
@@ -100,7 +97,6 @@ internal fun ContactInfoView(
                 fontWeight = FontWeight.Bold,
             ),
         )
-        UserCodeView(code = code ?: "-")
     }
 }
 
@@ -126,12 +122,6 @@ internal fun ContactInfoViewPlaceholder(
     ) {
         PlaceholderBox(
             modifier = Modifier.size(200.dp, 26.dp),
-            highlight = null,
-        )
-        PlaceholderBox(
-            modifier = Modifier.size(93.dp, 24.dp),
-            shape = MaterialTheme.shapes.full,
-            color = MaterialTheme.colorScheme.secondary,
             highlight = null,
         )
     }

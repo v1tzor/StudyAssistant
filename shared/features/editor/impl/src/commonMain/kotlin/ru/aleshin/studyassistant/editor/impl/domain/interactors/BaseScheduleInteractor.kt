@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,10 @@ internal interface BaseScheduleInteractor {
 
     suspend fun fetchScheduleById(uid: UID): FlowDomainResult<EditorFailures, BaseSchedule?>
 
-    suspend fun fetchWeekScheduleByVersion(timeRange: TimeRange, week: NumberOfRepeatWeek): FlowDomainResult<EditorFailures, BaseWeekSchedule>
+    suspend fun fetchWeekScheduleByVersion(
+        timeRange: TimeRange,
+        week: NumberOfRepeatWeek
+    ): FlowDomainResult<EditorFailures, BaseWeekSchedule>
 
     class Base(
         private val scheduleRepository: BaseScheduleRepository,
@@ -45,7 +48,9 @@ internal interface BaseScheduleInteractor {
 
         override suspend fun fetchScheduleById(uid: UID) = eitherWrapper.wrapFlow {
             scheduleRepository.fetchScheduleById(uid).map { schedule ->
-                schedule?.copy(classes = schedule.classes.sortedBy { it.timeRange.from.dateTime().time })
+                schedule?.copy(
+                    classes = schedule.classes.sortedBy { it.timeRange.from.dateTime().time },
+                )?.withClassNumbers()
             }
         }
 
@@ -60,7 +65,7 @@ internal interface BaseScheduleInteractor {
                 rawSchedules.forEach { schedule ->
                     weekDaySchedules[schedule.dayOfWeek] = schedule.copy(
                         classes = schedule.classes.sortedBy { it.timeRange.from.dateTime().time },
-                    )
+                    ).withClassNumbers()
                 }
 
                 BaseWeekSchedule(
@@ -70,6 +75,18 @@ internal interface BaseScheduleInteractor {
                     weekDaySchedules = weekDaySchedules,
                 )
             }
+        }
+
+        private fun BaseSchedule.withClassNumbers(): BaseSchedule {
+            val organizationNumbers = mutableMapOf<UID, Int>()
+            return copy(
+                classes = classes.map { classModel ->
+                    val organizationId = classModel.organization.uid
+                    val number = organizationNumbers.getOrElse(organizationId) { 0 } + 1
+                    organizationNumbers[organizationId] = number
+                    classModel.copy(number = number)
+                },
+            )
         }
     }
 }

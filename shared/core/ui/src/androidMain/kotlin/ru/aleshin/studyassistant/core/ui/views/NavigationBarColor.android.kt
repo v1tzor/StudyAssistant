@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ internal actual fun NavigationBarColor(isDarkTheme: Boolean) {
     val window = (view.context as Activity).window
 
     LaunchedEffect(isDarkTheme) {
-        WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !isDarkTheme
+        WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars =
+            !isDarkTheme
         WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDarkTheme
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,8 @@ data class DocumentPojo<T>(
 )
 
 fun <T> JsonElement.asDocument(deserializer: DeserializationStrategy<T>): DocumentPojo<T> {
-    val keys = listOf("\$collectionId", "\$databaseId", "\$createdAt", "\$updatedAt", "\$permissions")
+    val keys =
+        listOf("\$collectionId", "\$databaseId", "\$createdAt", "\$updatedAt", "\$permissions")
     val dataObject = buildJsonObject {
         jsonObject.entries.forEach {
             if (!keys.contains(it.key)) {

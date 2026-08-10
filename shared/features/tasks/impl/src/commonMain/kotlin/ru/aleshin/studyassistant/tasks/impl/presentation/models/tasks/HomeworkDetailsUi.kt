@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,10 @@ import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkTasksDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.

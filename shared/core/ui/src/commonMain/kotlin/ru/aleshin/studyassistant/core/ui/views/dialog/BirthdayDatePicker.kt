@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
+import ru.aleshin.studyassistant.core.ui.resources.date_picker_dialog_header as core_date_picker_dialog_header
+import ru.aleshin.studyassistant.core.ui.resources.select_confirm_title as core_select_confirm_title
 
 /**
  * @author Stanislav Aleshin on 27.04.2024
@@ -61,12 +65,12 @@ fun BirthdayDatePicker(
                     val birthday = selectedDate.mapEpochTimeToInstant().formatByTimeZone(dateFormat)
                     onSelectedDate.invoke(birthday)
                 },
-                content = { Text(text = StudyAssistantRes.strings.selectConfirmTitle) }
+                content = { Text(text = stringResource(CoreRes.string.core_select_confirm_title)) }
             )
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = StudyAssistantRes.strings.cancelTitle)
+                Text(text = stringResource(CoreRes.string.core_cancel_title))
             }
         },
     ) {
@@ -75,7 +79,7 @@ fun BirthdayDatePicker(
             title = {
                 Text(
                     modifier = Modifier.padding(start = 24.dp, top = 24.dp),
-                    text = StudyAssistantRes.strings.datePickerDialogHeader,
+                    text = stringResource(CoreRes.string.core_date_picker_dialog_header),
                 )
             },
             headline = {

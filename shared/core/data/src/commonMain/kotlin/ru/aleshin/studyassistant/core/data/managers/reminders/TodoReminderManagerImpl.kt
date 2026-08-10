@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,24 @@
 package ru.aleshin.studyassistant.core.data.managers.reminders
 
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
+import org.jetbrains.compose.resources.getString
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoNotificationType
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoNotifications
 import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.todo_reminder_title_suffix as core_todo_reminder_title_suffix
 
 /**
  * @author Stanislav Aleshin on 31.08.2024.
  */
 class TodoReminderManagerImpl(
     private val notificationScheduler: NotificationScheduler,
-    private val deviceInfoProvider: DeviceInfoProvider,
     private val dateManager: DateManager,
 ) : TodoReminderManager {
 
-    override fun scheduleReminders(
+    override suspend fun scheduleReminders(
         targetId: UID,
         name: String,
         deadline: Instant?,
@@ -44,14 +43,12 @@ class TodoReminderManagerImpl(
         clearAllReminders(targetId)
         if (deadline != null) {
             val currentTime = dateManager.fetchCurrentInstant()
-            val deviceLanguage = deviceInfoProvider.fetchDeviceLanguage()
-            val coreStrings = fetchCoreStrings(fetchAppLanguage(deviceLanguage))
+            val reminderTitle = getString(CoreRes.string.core_todo_reminder_title_suffix)
             notifications.toTypes().forEach { type ->
                 val time = type.fetchNotifyTrigger(deadline)
                 if (time > currentTime) {
                     val id = targetId.hashCode() + type.idAmount
-                    val title = coreStrings.todoReminderTitleSuffix
-                    notificationScheduler.scheduleNotification(id.toInt(), title, name, time)
+                    notificationScheduler.scheduleNotification(id.toInt(), reminderTitle, name, time)
                 }
             }
         }

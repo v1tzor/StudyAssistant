@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,10 @@ import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.ContactInfoType
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.share.OrganizationLinkData
+import ru.aleshin.studyassistant.core.presentation.models.organizations.ScheduleTimeIntervalsUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.MediatedSubjectUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.convertToBase
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.MediatedEmployeeUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.convertToBase
 
 /**
  * @author Stanislav Aleshin on 27.04.2024.
@@ -55,29 +53,4 @@ internal data class MediatedOrganizationUi(
         putAll(locations.sortedBy { it.label }.map { Pair(it, ContactInfoType.LOCATION) })
         putAll(webs.sortedBy { it.label }.map { Pair(it, ContactInfoType.WEBSITE) })
     }
-}
-
-internal fun MediatedOrganizationUi.prepareLinkData() = OrganizationLinkData(sharedOrganization = this)
-
-internal fun MediatedOrganizationUi.covertToBase(): OrganizationUi {
-    val employee = employee.map { it.convertToBase() }
-    return OrganizationUi(
-        uid = uid,
-        isMain = isMain,
-        shortName = shortName,
-        fullName = fullName,
-        type = type,
-        avatar = null,
-        scheduleTimeIntervals = scheduleTimeIntervals,
-        subjects = subjects.map { mediatedSubject ->
-            mediatedSubject.convertToBase { teacherId -> employee.find { it.uid == teacherId } }
-        },
-        employee = employee,
-        emails = emails,
-        phones = phones,
-        locations = locations,
-        webs = webs,
-        offices = offices,
-        isHide = false,
-    )
 }

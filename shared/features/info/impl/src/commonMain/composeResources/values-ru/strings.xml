@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="organizations_header">Организации</string>
+    <string name="new_organization_bottom_title">Новая организация</string>
+    <string name="none_organization_title">Добавьте организацию</string>
+    <string name="add_organization_title">Добавить</string>
+    <string name="edit_organization_title">Редактировать</string>
+    <string name="organization_status_label">Статус</string>
+    <string name="main_organization_status">Главная</string>
+    <string name="classes_duration_in_week_label">Часов в неделю</string>
+    <string name="number_of_classes_in_week_label">Занятий в неделю</string>
+    <string name="contact_info_section_title">Общая информация</string>
+    <string name="website_title">Сайт</string>
+    <string name="employees_section_title">Сотрудники</string>
+    <string name="subjects_section_title">Предметы</string>
+    <string name="copy_message">Данные скопированы!</string>
+    <string name="none_employee_subject_title">Занятия отсутствуют</string>
+    <string name="subjects_search_bar_placeholder">Поиск предметов</string>
+    <string name="employee_search_bar_placeholder">Поиск преподавателей</string>
+    <string name="alphabetic_sorted_type">По алфавиту</string>
+    <string name="teacher_sorted_type">По преподавателям</string>
+    <string name="event_type_sorted_type">По событиям</string>
+    <string name="office_sorted_type">По кабинетам</string>
+    <string name="location_sorted_type">По местам</string>
+    <string name="organization_selector_header">Организация</string>
+    <string name="organization_selector_title">Выберите необходимую организацию</string>
+    <string name="subject_sorted_type_selector_header">Сортировка</string>
+    <string name="subject_sorted_type_selector_title">Выберите тип сортировки</string>
+    <string name="delete_subject_warning_title">Вы уверены что хотите удалить данный предмет? После этого некоторые занятия могут показывать некорректно</string>
+    <string name="delete_employee_warning_title">Вы уверены что хотите удалить данного сотрудника? После этого некоторые занятия могут показывать некорректно</string>
+    <string name="show_all_items_title">Показать все</string>
+    <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
+</resources>

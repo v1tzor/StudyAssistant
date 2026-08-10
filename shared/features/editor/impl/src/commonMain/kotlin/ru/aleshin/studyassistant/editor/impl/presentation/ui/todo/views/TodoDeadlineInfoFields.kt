@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,15 +41,27 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.dialog.TimePickerDialog
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.core.ui.views.timeFormat
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.todo_deadline_date_picker_headline
+import ru.aleshin.studyassistant.editor.impl.resources.todo_deadline_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.todo_deadline_field_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.todo_time_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.todo_time_field_placeholder
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
+import ru.aleshin.studyassistant.core.ui.resources.date_picker_dialog_header as core_date_picker_dialog_header
+import ru.aleshin.studyassistant.core.ui.resources.ic_calendar_today as core_ic_calendar_today
+import ru.aleshin.studyassistant.core.ui.resources.ic_clock_outline as core_ic_clock_outline
+import ru.aleshin.studyassistant.core.ui.resources.ic_select_date as core_ic_select_date
+import ru.aleshin.studyassistant.core.ui.resources.select_confirm_title as core_select_confirm_title
 
 /**
  * @author Stanislav Aleshin on 26.07.2024.
@@ -72,14 +84,14 @@ internal fun TodoDeadlineInfoFields(
             onClick = { datePickerState = true },
             enabled = !isLoading,
             value = deadline?.formatByTimeZone(
-                format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings)
+                format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat()
             ),
-            infoIcon = painterResource(StudyAssistantRes.icons.calendarToday),
-            label = EditorThemeRes.strings.todoDeadlineFieldLabel,
-            placeholder = EditorThemeRes.strings.todoDeadlineFieldPlaceholder,
+            infoIcon = painterResource(CoreRes.drawable.core_ic_calendar_today),
+            label = stringResource(Res.string.todo_deadline_field_label),
+            placeholder = stringResource(Res.string.todo_deadline_field_placeholder),
             trailingIcon = {
                 Icon(
-                    painter = painterResource(StudyAssistantRes.icons.selectDate),
+                    painter = painterResource(CoreRes.drawable.core_ic_select_date),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -90,9 +102,9 @@ internal fun TodoDeadlineInfoFields(
             onClick = { timePickerState = true },
             enabled = !isLoading,
             value = deadline?.formatByTimeZone(DateTimeComponents.Formats.timeFormat()),
-            infoIcon = painterResource(StudyAssistantRes.icons.timeOutline),
-            label = EditorThemeRes.strings.todoTimeFieldLabel,
-            placeholder = EditorThemeRes.strings.todoTimeFieldPlaceholder,
+            infoIcon = painterResource(CoreRes.drawable.core_ic_clock_outline),
+            label = stringResource(Res.string.todo_time_field_label),
+            placeholder = stringResource(Res.string.todo_time_field_placeholder),
             trailingIcon = {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowRight,
@@ -156,12 +168,12 @@ private fun TodoDatePicker(
                     }
                     onSelectedDate.invoke(targetDeadline)
                 },
-                content = { Text(text = StudyAssistantRes.strings.selectConfirmTitle) }
+                content = { Text(text = stringResource(CoreRes.string.core_select_confirm_title)) }
             )
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = StudyAssistantRes.strings.cancelTitle)
+                Text(text = stringResource(CoreRes.string.core_cancel_title))
             }
         },
     ) {
@@ -170,13 +182,13 @@ private fun TodoDatePicker(
             title = {
                 Text(
                     modifier = Modifier.padding(start = 24.dp, top = 24.dp),
-                    text = StudyAssistantRes.strings.datePickerDialogHeader,
+                    text = stringResource(CoreRes.string.core_date_picker_dialog_header),
                 )
             },
             headline = {
                 Text(
                     modifier = Modifier.padding(start = 24.dp),
-                    text = EditorThemeRes.strings.todoDeadlineDatePickerHeadline,
+                    text = stringResource(Res.string.todo_deadline_date_picker_headline),
                 )
             },
         )

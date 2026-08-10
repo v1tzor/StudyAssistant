@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.classes.ClassesForLinkedMap
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.associateWithDates
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -68,28 +69,36 @@ internal interface LinkingClassInteractor {
             val customSchedulesFlow = customScheduleRepository.fetchSchedulesByTimeRange(
                 timeRange = searchedTimeRange,
             )
-            val baseSchedulesFlow = baseScheduleRepository.fetchSchedulesByTimeRange(
-                timeRange = searchedTimeRange,
-                maxNumberOfWeek = maxNumberOfWeek,
-            )
+            val baseSchedulesFlow = baseScheduleRepository.fetchSchedulesByVersion(
+                version = searchedTimeRange,
+                numberOfWeek = null,
+            ).map { schedules ->
+                schedules.associateWithDates(searchedTimeRange, maxNumberOfWeek)
+            }
 
             return@wrapFlow customSchedulesFlow.flatMapLatest { customSchedules ->
                 baseSchedulesFlow.map { baseSchedules ->
-                    buildMap<Instant, List<Pair<Int, Class>>> {
+                    buildMap<Instant, List<Class>> {
                         customSchedules.forEach { customSchedule ->
                             if (customSchedule.classes.isNotEmpty()) {
-                                val groupedClasses = customSchedule.classes.groupBy { it.organization.uid }.mapValues {
-                                    it.value.sortedBy { classModel -> classModel.timeRange.from.dateTime().time }
-                                }
-                                val classesWithTargetSubject = customSchedule.classes.filter { classModel ->
-                                    val subjectFilter = classModel.subject?.uid == subject
-                                    return@filter subjectFilter
-                                }
-                                val numberedClassesWithTargetSubject = classesWithTargetSubject.map { classModel ->
-                                    val organizationClasses = groupedClasses[classModel.organization.uid]
-                                    val number = organizationClasses?.indexOf(classModel)?.inc() ?: 0
-                                    Pair(number, classModel)
-                                }
+                                val groupedClasses =
+                                    customSchedule.classes.groupBy { it.organization.uid }
+                                        .mapValues {
+                                            it.value.sortedBy { classModel -> classModel.timeRange.from.dateTime().time }
+                                        }
+                                val classesWithTargetSubject =
+                                    customSchedule.classes.filter { classModel ->
+                                        val subjectFilter = classModel.subject?.uid == subject
+                                        return@filter subjectFilter
+                                    }
+                                val numberedClassesWithTargetSubject =
+                                    classesWithTargetSubject.map { classModel ->
+                                        val organizationClasses =
+                                            groupedClasses[classModel.organization.uid]
+                                        val number =
+                                            organizationClasses?.indexOf(classModel)?.inc() ?: 0
+                                        classModel.copy(number = number)
+                                    }
                                 put(customSchedule.date, numberedClassesWithTargetSubject)
                             }
                         }
@@ -98,19 +107,24 @@ internal interface LinkingClassInteractor {
 
                         availableBaseSchedules.toList().forEach { baseScheduleEntry ->
                             val baseSchedule = baseScheduleEntry.second
-                            if (baseSchedule?.classes?.isNotEmpty() == true) {
-                                val groupedClasses = baseSchedule.classes.groupBy { it.organization.uid }.mapValues {
-                                    it.value.sortedBy { classModel -> classModel.timeRange.from.dateTime().time }
-                                }
-                                val classesWithTargetSubject = baseSchedule.classes.filter { classModel ->
-                                    val subjectFilter = classModel.subject?.uid == subject
-                                    return@filter subjectFilter
-                                }
-                                val numberedClassesWithTargetSubject = classesWithTargetSubject.map { classModel ->
-                                    val organizationClasses = groupedClasses[classModel.organization.uid]
-                                    val number = organizationClasses?.indexOf(classModel)?.inc() ?: 0
-                                    Pair(number, classModel)
-                                }
+                            if (baseSchedule.classes.isNotEmpty()) {
+                                val groupedClasses =
+                                    baseSchedule.classes.groupBy { it.organization.uid }.mapValues {
+                                        it.value.sortedBy { classModel -> classModel.timeRange.from.dateTime().time }
+                                    }
+                                val classesWithTargetSubject =
+                                    baseSchedule.classes.filter { classModel ->
+                                        val subjectFilter = classModel.subject?.uid == subject
+                                        return@filter subjectFilter
+                                    }
+                                val numberedClassesWithTargetSubject =
+                                    classesWithTargetSubject.map { classModel ->
+                                        val organizationClasses =
+                                            groupedClasses[classModel.organization.uid]
+                                        val number =
+                                            organizationClasses?.indexOf(classModel)?.inc() ?: 0
+                                        classModel.copy(number = number)
+                                    }
                                 put(baseScheduleEntry.first, numberedClassesWithTargetSubject)
                             }
                         }

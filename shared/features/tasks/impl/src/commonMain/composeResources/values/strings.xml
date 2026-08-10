@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="overview_header">Task overview</string>
+    <string name="homeworks_header">Tasks</string>
+    <string name="todos_header">Todos</string>
+    <string name="daily_goals_section_header">Daily goals</string>
+    <string name="goals_view_progress_title">Progress</string>
+    <string name="goals_view_progress_homework_label">Homework</string>
+    <string name="goals_view_progress_todo_label">Tasks</string>
+    <string name="goals_view_closest_title">Upcoming Goals</string>
+    <string name="goals_view_list_title">Goals List</string>
+    <string name="goals_view_list_empty_title">The list of goals is empty</string>
+    <string name="delete_goal_warning_title">Warning!</string>
+    <string name="delete_goal_warning_text">Are you sure you want to delete the daily goal?</string>
+    <string name="goal_creator_headline">Planning</string>
+    <string name="goal_creator_title">Set a daily goal</string>
+    <string name="goal_creator_date_field_title">Date</string>
+    <string name="goal_creator_date_field_placeholder">Select date</string>
+    <string name="goal_creator_desired_time_field_title">Desired duration</string>
+    <string name="goal_creator_confirm_title">Schedule</string>
+    <string name="goal_sheet_time_control_title">Time Control</string>
+    <string name="goal_sheet_desired_time_label">Desired</string>
+    <string name="goal_sheet_desired_time_picker_title">Desired time</string>
+    <string name="goal_sheet_real_time_label">Actual</string>
+    <string name="goal_sheet_time_type_stopwatch">Stopwatch</string>
+    <string name="goal_sheet_time_type_timer">Timer</string>
+    <string name="goal_sheet_time_type_none">No Control</string>
+    <string name="goal_sheet_left_time_label">Left</string>
+    <string name="goal_sheet_elapsed_time_label">Time passed</string>
+    <string name="goal_sheet_homework_tasks_title">Tasks</string>
+    <string name="goal_sheet_delete_action_label">Delete</string>
+    <string name="goal_sheet_complete_action_label">Complete</string>
+    <string name="goal_sheet_cancel_action_label">Cancel</string>
+    <string name="homeworks_tasks_tab">Homeworks</string>
+    <string name="todos_tasks_tab">Todos</string>
+    <string name="share_homeworks_header">Task exchange</string>
+    <string name="share_homeworks_button_title">Share</string>
+    <string name="tasks_progress_tomorrow_label">For tomorrow</string>
+    <string name="tasks_progress_in_the_week_label">In the week</string>
+    <string name="homework_errors_title">Errors</string>
+    <string name="homeworks_completed_title">Completed</string>
+    <string name="homework_execution_analysis_header">Execution analysis</string>
+    <string name="coming_homeworks_execution_analysis_title">Coming time</string>
+    <string name="all_homeworks_execution_analysis_title">For all the time</string>
+    <string name="scope_of_homeworks_header">Scope of tasks</string>
+    <string name="homeworks_section_header">Review of homeworks</string>
+    <string name="add_homework_title">Add homework</string>
+    <string name="show_all_title">Show all</string>
+    <string name="homeworks_section_subtitle">Current week</string>
+    <string name="none_tasks_title">Tasks are missing</string>
+    <string name="none_todos_title">Todos is missing</string>
+    <string name="theoretical_tasks_bar_name">Theory</string>
+    <string name="practical_tasks_bar_name">Practice</string>
+    <string name="presentations_tasks_bar_name">Presentations</string>
+    <string name="in_progress_todos_section_header">In progress</string>
+    <string name="error_todos_section_header">Skipped</string>
+    <string name="completed_todos_section_header">Completed in a week</string>
+    <string name="show_all_todos_title">Show all</string>
+    <string name="until_deadline_date_suffix">Until</string>
+    <string name="none_deadline_title">No deadline</string>
+    <string name="overdue_deadline_title">Overdue</string>
+    <string name="overall_homeworks_progress">Overall progress</string>
+    <string name="homework_test_label">Test</string>
+    <string name="overdue_homeworks_header">Missed tasks</string>
+    <string name="detached_active_homeworks_header">Active detached tasks</string>
+    <string name="overdue_todos_header">Missed todos</string>
+    <string name="none_errors_title">There are no errors</string>
+    <string name="accept_homework_title">Accept</string>
+    <string name="ago_suffix">ago</string>
+    <string name="apply_shared_homeworks_title">Add</string>
+    <string name="homeworks_linked_header">Adding tasks</string>
+    <string name="homeworks_linked_label">Link subjects and classes by name</string>
+    <string name="target_user_subjects_title">User</string>
+    <string name="current_user_subjects_title">You</string>
+    <string name="specify_subject_label">Specify</string>
+    <string name="classes_not_found_label">Classes not found</string>
+    <string name="subject_selector_header">Subject</string>
+    <string name="subject_selector_title">Select the appropriate subject</string>
+    <string name="linked_class_selector_header">Class</string>
+    <string name="linked_class_selector_title">Select the appropriate class</string>
+    <string name="number_of_class_suffix">class</string>
+    <string name="attach_classes_label">Attach an class</string>
+    <string name="selection_subject_step_header">1. Selection of subjects</string>
+    <string name="selection_subject_step_label">Select the subjects you want to share</string>
+    <string name="create_share_code_title">Create code</string>
+    <string name="homework_share_ready_title">Homework code is ready</string>
+    <string name="homework_share_expires_at_label">Expires at</string>
+    <string name="copy_share_link_title">Copy link</string>
+    <string name="receive_homework_share_title">Receive homework</string>
+    <string name="share_code_label">Sharing code</string>
+    <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>
+    <string name="open_share_title">Open</string>
+    <string name="scan_qr_button_title">Scan QR code</string>
+    <string name="homework_share_imported_title">Homework added</string>
+    <string name="homework_share_subject_item">• %1$s</string>
+    <string name="duplicate_homework_share_title">This homework was already added on this device</string>
+    <string name="invalid_homework_share_title">The code was not found or is invalid</string>
+    <string name="expired_homework_share_title">The code has expired</string>
+    <string name="share_rate_limit_message">Too many attempts. Try again later</string>
+    <string name="share_daily_limit_message">Publication limit reached. Try again in a day</string>
+    <string name="share_item_limit_message">You can share up to 20 homework items at once</string>
+    <string name="share_payload_limit_message">The selected homework data is too large</string>
+    <string name="current_time_range_desc">Display current dates</string>
+    <string name="test_label">Тест</string>
+    <string name="other_error_message">Error! Contact the developer!</string>
+    <string name="open_analytics_desc">Open analytics</string>
+</resources>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
@@ -26,12 +25,13 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEv
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.WeekScheduleDetailsUi
+import kotlin.time.Clock
 
 /**
  * @author Stanislav Aleshin on 09.06.2024
@@ -65,9 +65,11 @@ internal sealed class DetailsEffect : StoreEffect {
 }
 
 internal sealed class DetailsAction : StoreAction {
-    data class UpdateWeekSchedule(val schedule: WeekScheduleDetailsUi) : DetailsAction()
+    data class UpdateWeekSchedule(
+        val schedule: WeekScheduleDetailsUi,
+        val activeClass: ActiveClassUi?,
+    ) : DetailsAction()
     data class UpdateSelectedWeek(val week: TimeRange?) : DetailsAction()
-    data class UpdateActiveClass(val activeClass: ActiveClassUi?) : DetailsAction()
     data class UpdateViewType(val scheduleView: WeekScheduleViewType) : DetailsAction()
     data class UpdateLoading(val isLoading: Boolean) : DetailsAction()
 }

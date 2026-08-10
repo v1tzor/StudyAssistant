@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,20 +34,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.settings.impl.presentation.theme.SettingsThemeRes
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.common.SettingsSelectorView
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralEffect
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralEvent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralState
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.store.GeneralComponent
+import ru.aleshin.studyassistant.settings.impl.resources.Res
+import ru.aleshin.studyassistant.settings.impl.resources.ic_language
+import ru.aleshin.studyassistant.settings.impl.resources.ic_palette
+import ru.aleshin.studyassistant.settings.impl.resources.language_chooser_view_title
+import ru.aleshin.studyassistant.settings.impl.resources.theme_chooser_view_title
 
 /**
  * @author Stanislav Aleshin on 10.07.2024
@@ -59,8 +63,6 @@ internal fun GeneralContent(
 ) {
     val store = generalComponent.store
     val state by store.stateAsState()
-    val strings = SettingsThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -86,7 +88,7 @@ internal fun GeneralContent(
         when (effect) {
             is GeneralEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -111,18 +113,18 @@ private fun BaseGeneralContent(
             modifier = Modifier.padding(horizontal = 16.dp),
             selected = state.settings?.languageType,
             allItems = remember { LanguageUiType.entries.toList() },
-            icon = painterResource(SettingsThemeRes.icons.language),
-            title = SettingsThemeRes.strings.languageChooserViewTitle,
-            itemName = { it.mapToString(StudyAssistantRes.strings) },
+            icon = painterResource(Res.drawable.ic_language),
+            title = stringResource(Res.string.language_chooser_view_title),
+            itemName = { it.mapToString() },
         )
         SettingsSelectorView(
             onSelect = onSelectedTheme,
             modifier = Modifier.padding(horizontal = 16.dp),
             selected = state.settings?.themeType,
             allItems = remember { ThemeUiType.entries.toList() },
-            icon = painterResource(SettingsThemeRes.icons.theme),
-            title = SettingsThemeRes.strings.themeChooserViewTitle,
-            itemName = { it.mapToString(StudyAssistantRes.strings) },
+            icon = painterResource(Res.drawable.ic_palette),
+            title = stringResource(Res.string.theme_chooser_view_title),
+            itemName = { it.mapToString() },
         )
     }
 }

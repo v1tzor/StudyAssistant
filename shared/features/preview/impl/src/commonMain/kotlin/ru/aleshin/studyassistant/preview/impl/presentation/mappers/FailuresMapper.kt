@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,14 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.mappers
 
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
+import org.jetbrains.compose.resources.getString
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.tokens.PreviewStrings
+import ru.aleshin.studyassistant.preview.impl.resources.Res
+import ru.aleshin.studyassistant.preview.impl.resources.other_error_message
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-internal fun PreviewFailures.mapToMessage(
-    strings: PreviewStrings,
-    coreStrings: StudyAssistantStrings,
-) = when (this) {
-    is PreviewFailures.InternetError -> coreStrings.networkErrorMessage
-    is PreviewFailures.OtherError -> strings.otherErrorMessage
+internal suspend fun PreviewFailures.mapToMessage() = when (this) {
+    is PreviewFailures.OtherError -> getString(Res.string.other_error_message)
 }

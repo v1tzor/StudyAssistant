@@ -19,22 +19,12 @@ addOrUpdateMessage:
 INSERT OR REPLACE INTO aiChatMessageEntity (uid, chat_id, name, type, content, prefix, reasoning_content, tool_call_id, tool_calls, time)
 VALUES ?;
 
-fetchMessageById:
-SELECT *
-FROM aiChatMessageEntity
-WHERE uid = ?;
-
 fetchLastMessagesByChatId:
 SELECT *
 FROM aiChatMessageEntity
 WHERE chat_id = ?
 ORDER BY time DESC
 LIMIT 1;
-
-fetchMessageByIds:
-SELECT *
-FROM aiChatMessageEntity
-WHERE uid IN ?;
 
 fetchAllMessagesByChatId:
 SELECT *

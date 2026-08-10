@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.common.extensions.pxToDp
+import ru.aleshin.studyassistant.core.ui.views.adaptive.currentScreenSize
 
 /**
  * @author Stanislav Aleshin on 17.07.2025.

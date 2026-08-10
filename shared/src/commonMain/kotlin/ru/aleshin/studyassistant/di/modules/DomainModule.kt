@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,8 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.domain.common.MainEitherWrapper
 import ru.aleshin.studyassistant.domain.common.MainErrorHandler
-import ru.aleshin.studyassistant.domain.interactors.AppUserInteractor
 import ru.aleshin.studyassistant.domain.interactors.GeneralSettingsInteractor
 import ru.aleshin.studyassistant.domain.interactors.ReminderInteractor
-import ru.aleshin.studyassistant.domain.interactors.SyncInteractor
 
 /**
  * @author Stanislav Aleshin on 25.04.2024.
@@ -33,8 +31,6 @@ val domainModule = DI.Module("DomainModule") {
     bindSingleton<MainErrorHandler> { MainErrorHandler.Base() }
     bindSingleton<MainEitherWrapper> { MainEitherWrapper.Base(instance(), instance()) }
 
-    bindSingleton<AppUserInteractor> { AppUserInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<GeneralSettingsInteractor> { GeneralSettingsInteractor.Base(instance(), instance()) }
     bindSingleton<ReminderInteractor> { ReminderInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<SyncInteractor> { SyncInteractor.Base(instance(), instance(), instance(), instance()) }
 }

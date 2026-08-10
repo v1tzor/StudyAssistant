@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +85,7 @@ private fun getShiftedProximity(progress: Float, totalCircles: Int, indexCircle:
     fun getDotCenterPosition(total: Int, index: Int): Float {
         return (index * 2 * total + total) / (2f * total * total)
     }
+
     val dotArea = 1f / totalCircles
     val center = getDotCenterPosition(totalCircles, indexCircle)
     val proximity = (1 - kotlin.math.abs(progress - center) / dotArea).coerceIn(0f, 1f)
@@ -96,11 +97,18 @@ private fun getShiftedProximity(progress: Float, totalCircles: Int, indexCircle:
 
     val shifted = when {
         indexCircle == 0 && isNearEnd -> {
-            1 - (1 - kotlin.math.abs(progress - getDotCenterPosition(totalCircles, totalCircles - 1)) / dotArea)
+            1 - (1 - kotlin.math.abs(
+                progress - getDotCenterPosition(
+                    totalCircles,
+                    totalCircles - 1
+                )
+            ) / dotArea)
         }
+
         indexCircle == totalCircles - 1 && isNearStart -> {
             1 - (1 - kotlin.math.abs(progress - getDotCenterPosition(totalCircles, 0)) / dotArea)
         }
+
         else -> 0f
     }
     return (proximity + shifted).coerceIn(0f, 1f)

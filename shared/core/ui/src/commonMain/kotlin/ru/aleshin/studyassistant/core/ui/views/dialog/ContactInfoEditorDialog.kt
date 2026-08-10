@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,10 +36,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
 import ru.aleshin.studyassistant.core.ui.views.DialogHeader
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.contact_info_label as core_contact_info_label
+import ru.aleshin.studyassistant.core.ui.resources.contact_info_value as core_contact_info_value
+import ru.aleshin.studyassistant.core.ui.resources.delete_confirm_title as core_delete_confirm_title
+import ru.aleshin.studyassistant.core.ui.resources.save_confirm_title as core_save_confirm_title
 
 /**
  * @author Stanislav Aleshin on 06.06.2024.
@@ -83,7 +88,7 @@ fun ContactInfoEditorDialog(
                                 editableLabel = text
                             }
                         },
-                        label = { Text(text = StudyAssistantRes.strings.contactInfoLabel) },
+                        label = { Text(text = stringResource(CoreRes.string.core_contact_info_label)) },
                         singleLine = true,
                         shape = MaterialTheme.shapes.large,
                     )
@@ -95,7 +100,7 @@ fun ContactInfoEditorDialog(
                                 editableValue = text
                             }
                         },
-                        label = { Text(text = StudyAssistantRes.strings.contactInfoValue) },
+                        label = { Text(text = stringResource(CoreRes.string.core_contact_info_value)) },
                         singleLine = true,
                         shape = MaterialTheme.shapes.large,
                     )
@@ -103,8 +108,8 @@ fun ContactInfoEditorDialog(
                 DialogButtons(
                     enabledConfirmFirst = editableValue?.isNotEmpty() == true,
                     enabledConfirmSecond = value != null,
-                    confirmFirstTitle = StudyAssistantRes.strings.saveConfirmTitle,
-                    confirmSecondTitle = StudyAssistantRes.strings.deleteConfirmTitle,
+                    confirmFirstTitle = stringResource(CoreRes.string.core_save_confirm_title),
+                    confirmSecondTitle = stringResource(CoreRes.string.core_delete_confirm_title),
                     onCancelClick = onDismiss,
                     onConfirmFirstClick = {
                         if (editableValue != null) onConfirm(editableLabel, editableValue!!)

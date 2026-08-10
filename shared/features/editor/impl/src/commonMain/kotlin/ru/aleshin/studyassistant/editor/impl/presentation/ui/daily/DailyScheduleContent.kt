@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,17 +60,17 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.navigationBarsInDp
 import ru.aleshin.studyassistant.core.common.extensions.safeNavigationBarsInPx
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
+import ru.aleshin.studyassistant.core.presentation.models.schedules.ClassUi
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.sheet.BottomSheetScaffold
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleState
@@ -81,6 +81,11 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.views.DailySc
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.views.DetailsClassViewItem
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.views.DetailsClassViewPlaceholder
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.views.SwapClassesDropdownMenu
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.ic_clear_circular
+import ru.aleshin.studyassistant.editor.impl.resources.none_classes_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_book_study as core_ic_book_study
 
 /**
  * @author Stanislav Aleshin on 14.07.2024.
@@ -93,10 +98,9 @@ internal fun DailyScheduleContent(
 ) {
     val store = dailyScheduleComponent.store
     val state by store.stateAsState()
-    val strings = EditorThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
     val snackbarState = remember { SnackbarHostState() }
-    val sheetState = rememberStandardBottomSheetState(confirmValueChange = { it != SheetValue.Hidden })
+    val sheetState =
+        rememberStandardBottomSheetState(confirmValueChange = { it != SheetValue.Hidden })
     val scaffoldState = rememberBottomSheetScaffoldState(sheetState, snackbarState)
     var layoutHeight by rememberSaveable { mutableIntStateOf(0) }
     val navBar = WindowInsets.safeNavigationBarsInPx(LocalDensity.current)
@@ -115,9 +119,27 @@ internal fun DailyScheduleContent(
                     onEditClick = { store.dispatchEvent(DailyScheduleEvent.CreateCustomSchedule) },
                     onSaveClick = { store.dispatchEvent(DailyScheduleEvent.NavigateToBack) },
                     onReturnScheduleClick = { store.dispatchEvent(DailyScheduleEvent.DeleteCustomSchedule) },
-                    onEditStartOfDay = { store.dispatchEvent(DailyScheduleEvent.FastEditStartOfDay(it)) },
-                    onEditClassesDuration = { store.dispatchEvent(DailyScheduleEvent.FastEditClassesDuration(it)) },
-                    onEditBreaksDuration = { store.dispatchEvent(DailyScheduleEvent.FastEditBreaksDuration(it)) },
+                    onEditStartOfDay = {
+                        store.dispatchEvent(
+                            DailyScheduleEvent.FastEditStartOfDay(
+                                it
+                            )
+                        )
+                    },
+                    onEditClassesDuration = {
+                        store.dispatchEvent(
+                            DailyScheduleEvent.FastEditClassesDuration(
+                                it
+                            )
+                        )
+                    },
+                    onEditBreaksDuration = {
+                        store.dispatchEvent(
+                            DailyScheduleEvent.FastEditBreaksDuration(
+                                it
+                            )
+                        )
+                    },
                 )
             },
             content = { paddingValues ->
@@ -127,7 +149,14 @@ internal fun DailyScheduleContent(
                     onEditClass = { store.dispatchEvent(DailyScheduleEvent.EditClassInEditor(it)) },
                     onCreateClass = { store.dispatchEvent(DailyScheduleEvent.CreateClassInEditor) },
                     onDeleteClass = { store.dispatchEvent(DailyScheduleEvent.DeleteClass(it.uid)) },
-                    onSwapClasses = { from, to -> store.dispatchEvent(DailyScheduleEvent.SwapClasses(from, to)) },
+                    onSwapClasses = { from, to ->
+                        store.dispatchEvent(
+                            DailyScheduleEvent.SwapClasses(
+                                from,
+                                to
+                            )
+                        )
+                    },
                 )
             },
             topBar = {
@@ -154,7 +183,7 @@ internal fun DailyScheduleContent(
         when (effect) {
             is DailyScheduleEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -205,7 +234,7 @@ private fun BaseDailyScheduleContent(
                                     onClick = { onDeleteClass(classModel) },
                                 ) {
                                     Icon(
-                                        painter = painterResource(EditorThemeRes.icons.clearCircular),
+                                        painter = painterResource(Res.drawable.ic_clear_circular),
                                         tint = MaterialTheme.colorScheme.error,
                                         contentDescription = null
                                     )
@@ -297,12 +326,12 @@ internal fun NoneClassesView(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    painter = painterResource(StudyAssistantRes.icons.theoreticalTasks),
+                    painter = painterResource(CoreRes.drawable.core_ic_book_study),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = EditorThemeRes.strings.noneClassesTitle,
+                    text = stringResource(Res.string.none_classes_title),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelLarge,
                 )

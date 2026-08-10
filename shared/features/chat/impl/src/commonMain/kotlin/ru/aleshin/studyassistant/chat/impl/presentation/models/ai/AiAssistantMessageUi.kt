@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.chat.impl.presentation.models.ai
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage
 
 /**
@@ -33,25 +32,4 @@ internal sealed interface AiAssistantMessageUi {
     val messageType: AiAssistantMessage.Type
 
     val time: Instant
-}
-
-@Immutable
-@Serializable
-internal data class UserMessageUi(
-    override val id: String = randomUUID(),
-    override val content: String?,
-    override val time: Instant,
-    val name: String? = null
-) : AiAssistantMessageUi {
-    override val messageType = AiAssistantMessage.Type.USER
-}
-
-@Immutable
-@Serializable
-internal data class AssistantMessageUi(
-    override val id: String,
-    override val content: String?,
-    override val time: Instant,
-) : AiAssistantMessageUi {
-    override val messageType = AiAssistantMessage.Type.ASSISTANT
 }

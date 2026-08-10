@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.toShortTimeString
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
@@ -68,7 +69,16 @@ import ru.aleshin.studyassistant.core.ui.views.menu.ChooserDropdownMenu
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToString
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalTimeDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_desired_time_label
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_desired_time_picker_title
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_elapsed_time_label
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_left_time_label
+import ru.aleshin.studyassistant.tasks.impl.resources.goal_sheet_real_time_label
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_faster
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_in_progress
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_slower
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_timer
 
 /**
  * @author Stanislav Aleshin on 05.06.2025.
@@ -141,7 +151,7 @@ private fun DesiredTimeView(
         ) {
             Column {
                 Text(
-                    text = TasksThemeRes.strings.goalSheetDesiredTimeLabel,
+                    text = stringResource(Res.string.goal_sheet_desired_time_label),
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     style = MaterialTheme.typography.labelMedium,
@@ -171,7 +181,7 @@ private fun DesiredTimeView(
 
     if (durationPickerState) {
         DurationPickerDialog(
-            headerTitle = TasksThemeRes.strings.goalSheetDesiredTimePickerTitle,
+            headerTitle = stringResource(Res.string.goal_sheet_desired_time_picker_title),
             duration = desiredTime,
             onDismiss = { durationPickerState = false },
             onSelectedDuration = {
@@ -196,7 +206,7 @@ private fun RealTimeView(
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(
-                text = TasksThemeRes.strings.goalSheetRealTimeLabel,
+                text = stringResource(Res.string.goal_sheet_real_time_label),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 style = MaterialTheme.typography.labelMedium,
@@ -216,7 +226,7 @@ private fun RealTimeView(
                 if (isActive) {
                     Icon(
                         modifier = Modifier.size(24.dp),
-                        painter = painterResource(TasksThemeRes.icons.inProgress),
+                        painter = painterResource(Res.drawable.ic_in_progress),
                         contentDescription = null,
                         tint = StudyAssistantRes.colors.accents.orange,
                     )
@@ -224,14 +234,14 @@ private fun RealTimeView(
                     if (realTime <= desiredTime) {
                         Icon(
                             modifier = Modifier.size(24.dp),
-                            painter = painterResource(TasksThemeRes.icons.fasterThenDesired),
+                            painter = painterResource(Res.drawable.ic_faster),
                             contentDescription = null,
                             tint = StudyAssistantRes.colors.accents.green,
                         )
                     } else {
                         Icon(
                             modifier = Modifier.size(24.dp),
-                            painter = painterResource(TasksThemeRes.icons.slowerThenDesired),
+                            painter = painterResource(Res.drawable.ic_slower),
                             contentDescription = null,
                             tint = StudyAssistantRes.colors.accents.red,
                         )
@@ -272,7 +282,7 @@ private fun TimeControlContent(
                 leadingIcon = {
                     when (goalTime.type) {
                         GoalTime.Type.TIMER -> Icon(
-                            painter = painterResource(TasksThemeRes.icons.timer),
+                            painter = painterResource(Res.drawable.ic_timer),
                             contentDescription = null,
                         )
 
@@ -347,7 +357,7 @@ private fun GoalTimeTypeChooserMenu(
         leadingIcon = { action ->
             when (action) {
                 GoalTime.Type.TIMER -> Icon(
-                    painter = painterResource(TasksThemeRes.icons.timer),
+                    painter = painterResource(Res.drawable.ic_timer),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                 )
@@ -405,9 +415,9 @@ private fun TimerStopwatchView(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = when (goalTime.type) {
-                            GoalTime.Type.TIMER -> TasksThemeRes.strings.goalSheetLeftTimeLabel
-                            GoalTime.Type.STOPWATCH -> TasksThemeRes.strings.goalSheetElapsedTimeLabel
-                            GoalTime.Type.NONE -> TasksThemeRes.strings.goalSheetLeftTimeLabel
+                            GoalTime.Type.TIMER -> stringResource(Res.string.goal_sheet_left_time_label)
+                            GoalTime.Type.STOPWATCH -> stringResource(Res.string.goal_sheet_elapsed_time_label)
+                            GoalTime.Type.NONE -> stringResource(Res.string.goal_sheet_left_time_label)
                         },
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -458,6 +468,7 @@ private fun StartStopTimeButton(
                 containerColor = StudyAssistantRes.colors.accents.orange,
                 contentColor = StudyAssistantRes.colors.accents.onOrange,
             )
+
             false -> ButtonDefaults.buttonColors(
                 containerColor = StudyAssistantRes.colors.accents.green,
                 contentColor = StudyAssistantRes.colors.accents.onGreen,

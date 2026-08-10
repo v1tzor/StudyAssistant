@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,21 +69,29 @@ internal interface AssistantWorkProcessor :
                     onRightAction = { chats ->
                         val targetChatId = chats.firstOrNull()?.uid
                         if (targetChatId != null) {
-                            aiAssistantInteractor.fetchChatHistory(targetChatId).map { chatHistoryEither ->
-                                chatHistoryEither.handleAndGet(
-                                    onLeftAction = { EffectResult(AssistantEffect.ShowError(it)) },
-                                    onRightAction = { chatHistory ->
-                                        if (!isInit) {
-                                            if (chatHistory.messages.firstOrNull() is AiAssistantMessage.UserMessage) {
-                                                val action = AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE)
-                                                send(ActionResult(action))
+                            aiAssistantInteractor.fetchChatHistory(targetChatId)
+                                .map { chatHistoryEither ->
+                                    chatHistoryEither.handleAndGet(
+                                        onLeftAction = { EffectResult(AssistantEffect.ShowError(it)) },
+                                        onRightAction = { chatHistory ->
+                                            if (!isInit) {
+                                                if (chatHistory.messages.firstOrNull() is AiAssistantMessage.UserMessage) {
+                                                    val action =
+                                                        AssistantAction.UpdateResponseStatus(
+                                                            ResponseStatus.FAILURE
+                                                        )
+                                                    send(ActionResult(action))
+                                                }
+                                                isInit = true
                                             }
-                                            isInit = true
+                                            ActionResult(
+                                                AssistantAction.UpdateChatHistory(
+                                                    chatHistory.mapToUi()
+                                                )
+                                            )
                                         }
-                                        ActionResult(AssistantAction.UpdateChatHistory(chatHistory.mapToUi()))
-                                    }
-                                )
-                            }
+                                    )
+                                }
                         } else {
                             if (!isChatCreate) {
                                 aiAssistantInteractor.addChat().handle(
@@ -121,6 +129,7 @@ internal interface AssistantWorkProcessor :
                     onLeftAction = {
                         val action = AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE)
                         emit(ActionResult(action))
+                        emit(EffectResult(AssistantEffect.ShowError(it)))
                     },
                     onRightAction = {
                         val action = AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)
@@ -138,6 +147,7 @@ internal interface AssistantWorkProcessor :
                     onLeftAction = {
                         val action = AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE)
                         emit(ActionResult(action))
+                        emit(EffectResult(AssistantEffect.ShowError(it)))
                     },
                     onRightAction = {
                         val action = AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)

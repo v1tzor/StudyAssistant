@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.navigation.backAnimation
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantTheme
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.presentation.mappers.mapToMessage
@@ -58,7 +57,6 @@ fun MainScreen(
         themeType = state.value.generalSettings.themeType,
         languageType = state.value.generalSettings.languageType,
     ) {
-        val coreStrings = StudyAssistantRes.strings
         val snackbarState = remember { SnackbarHostState() }
 
         Scaffold(
@@ -89,33 +87,30 @@ fun MainScreen(
                     is MainComponent.Child.TabNavigationChild -> {
                         TabsContent(instance.component)
                     }
-                    is MainComponent.Child.AuthChild -> {
-                        instance.component.contentProvider.invoke(Modifier)
+                    is MainComponent.Child.PreviewChild -> {
+                        instance.contentProvider.Content(Modifier)
                     }
                     is MainComponent.Child.EditorChild -> {
-                        instance.component.contentProvider.invoke(Modifier)
-                    }
-                    is MainComponent.Child.PreviewChild -> {
-                        instance.component.contentProvider.invoke(Modifier)
+                        instance.contentProvider.Content(Modifier)
                     }
                     is MainComponent.Child.ScheduleChild -> {
-                        instance.component.contentProvider.invoke(Modifier)
-                    }
-                    is MainComponent.Child.BillingChild -> {
-                        instance.component.contentProvider.invoke(Modifier)
+                        instance.contentProvider.Content(Modifier)
                     }
                     is MainComponent.Child.SettingsChild -> {
-                        instance.component.contentProvider.invoke(Modifier)
+                        instance.contentProvider.Content(Modifier)
+                    }
+                    is MainComponent.Child.AnalyticsChild -> {
+                        instance.contentProvider.Content(Modifier)
                     }
                     is MainComponent.Child.UsersChild -> {
-                        instance.component.contentProvider.invoke(Modifier)
+                        instance.contentProvider.Content(Modifier)
                     }
                 }
 
                 store.handleEffects { effect ->
                     when (effect) {
                         is MainEffect.ShowError -> snackbarState.showSnackbar(
-                            message = effect.failures.mapToMessage(coreStrings),
+                            message = effect.failures.mapToMessage(),
                             duration = SnackbarDuration.Indefinite,
                         )
                     }

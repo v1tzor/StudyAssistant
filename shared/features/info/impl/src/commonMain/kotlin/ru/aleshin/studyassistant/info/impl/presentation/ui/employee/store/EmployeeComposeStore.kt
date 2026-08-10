@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ import ru.aleshin.studyassistant.core.common.architecture.store.communicators.St
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeAction
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeEffect
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeEvent
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeInput
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeOutput
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeState
-import ru.aleshin.studyassistant.users.api.UsersFeatureComponent.UsersConfig
+import ru.aleshin.studyassistant.users.api.UsersConfig
 
 /**
  * @author Stanislav Aleshin on 17.06.2024
@@ -63,6 +63,7 @@ internal class EmployeeComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is EmployeeEvent.SearchEmployee -> with(state()) {
                 launchBackgroundWork(BackgroundKey.LOAD_EMPLOYEES) {
                     val organization = checkNotNull(selectedOrganization)
@@ -70,6 +71,7 @@ internal class EmployeeComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is EmployeeEvent.SelectedOrganization -> {
                 sendAction(EmployeeAction.UpdateSelectedOrganization(event.organization))
                 launchBackgroundWork(BackgroundKey.LOAD_EMPLOYEES) {
@@ -77,21 +79,25 @@ internal class EmployeeComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is EmployeeEvent.ClickDeleteEmployee -> {
                 launchBackgroundWork(BackgroundKey.DELETE_EMPLOYEE) {
                     val command = EmployeeWorkCommand.DeleteEmployee(event.employeeId)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is EmployeeEvent.ClickEditEmployee -> with(state()) {
                 val organization = checkNotNull(selectedOrganization)
                 val config = EditorConfig.Employee(event.employeeId, organization)
                 consumeOutput(EmployeeOutput.NavigateToEmployeeEditor(config))
             }
+
             is EmployeeEvent.ClickEmployeeProfile -> {
                 val config = UsersConfig.EmployeeProfile(event.employeeId)
                 consumeOutput(EmployeeOutput.NavigateToEmployeeProfile(config))
             }
+
             is EmployeeEvent.BackClick -> {
                 consumeOutput(EmployeeOutput.NavigateToBack)
             }
@@ -106,13 +112,16 @@ internal class EmployeeComposeStore(
             employees = action.employees,
             isLoading = false,
         )
+
         is EmployeeAction.UpdateOrganizations -> currentState.copy(
             organizations = action.organizations,
             selectedOrganization = action.selectedOrganization,
         )
+
         is EmployeeAction.UpdateSelectedOrganization -> currentState.copy(
             selectedOrganization = action.organization,
         )
+
         is EmployeeAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )

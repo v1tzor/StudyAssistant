@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.ui.employee.store
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import ru.aleshin.studyassistant.core.common.architecture.store.work.ActionResult
@@ -27,11 +26,10 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
 import ru.aleshin.studyassistant.info.impl.domain.interactors.EmployeesInteractor
 import ru.aleshin.studyassistant.info.impl.domain.interactors.OrganizationsInteractor
-import ru.aleshin.studyassistant.info.impl.domain.interactors.SubjectsInteractor
 import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.info.impl.presentation.models.users.convertWithSubjects
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeAction
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeEffect
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeOutput
@@ -44,13 +42,16 @@ internal interface EmployeeWorkProcessor :
 
     class Base(
         private val employeesInteractor: EmployeesInteractor,
-        private val subjectsInteractor: SubjectsInteractor,
         private val organizationsInteractor: OrganizationsInteractor,
     ) : EmployeeWorkProcessor {
         override suspend fun work(command: EmployeeWorkCommand) = when (command) {
             is EmployeeWorkCommand.LoadOrganizations -> loadOrganizationsWork(command.organization)
             is EmployeeWorkCommand.LoadEmployees -> loadEmployeesWork(command.organization)
-            is EmployeeWorkCommand.SearchEmployees -> searchEmployeesWork(command.query, command.organization)
+            is EmployeeWorkCommand.SearchEmployees -> searchEmployeesWork(
+                command.query,
+                command.organization
+            )
+
             is EmployeeWorkCommand.DeleteEmployee -> deleteEmployeeWork(command.targetId)
         }
 
@@ -59,67 +60,42 @@ internal interface EmployeeWorkProcessor :
                 onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))) },
                 onRightAction = { organizationList ->
                     val organizations = organizationList.map { it.mapToUi() }
-                    emit(ActionResult(EmployeeAction.UpdateOrganizations(selectedOrganization, organizations)))
+                    emit(
+                        ActionResult(
+                            EmployeeAction.UpdateOrganizations(
+                                selectedOrganization,
+                                organizations
+                            )
+                        )
+                    )
                 },
             )
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private fun loadEmployeesWork(organization: UID) = flow {
-            val subjectsFlow = subjectsInteractor.fetchSubjectsByOrganization(organization)
-            val employeesFlow = employeesInteractor.fetchEmployeesByOrganization(organization)
-
-            employeesFlow.combineWithResult(
-                secondFlow = subjectsFlow,
-                onError = { EmployeeEffect.ShowError(it) },
-                onData = { employeeList, subjectsList ->
-                    val subjects = subjectsList.map { it.mapToUi() }
-                    val employees = employeeList.map { employee ->
-                        val foundedSubjects = subjects.filter { it.teacher?.uid == employee.uid }
-                        employee.mapToUi().convertWithSubjects(foundedSubjects)
+        private fun loadEmployeesWork(organization: UID) = flow<EmployeeWorkResult> {
+            employeesInteractor.fetchEmployeesByOrganization(organization).collectAndHandle(
+                onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))) },
+                onRightAction = { groupedEmployees ->
+                    val employees = groupedEmployees.mapValues { (_, employee) ->
+                        employee.map { it.mapToUi() }
                     }
-                    val sortedEmployees = employees.sortedBy { it.data.firstName }
-                    val groupedEmployees = sortedEmployees.groupBy { it.data.firstName.first() }
-                    EmployeeAction.UpdateEmployees(groupedEmployees)
+                    emit(ActionResult(EmployeeAction.UpdateEmployees(employees)))
                 },
-            ).collect { workResult ->
-                emit(workResult)
-            }
+            )
         }.onStart {
             emit(ActionResult(EmployeeAction.UpdateLoading(true)))
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
         private fun searchEmployeesWork(query: String, organization: UID) = flow {
-            val subjectsFlow = subjectsInteractor.fetchSubjectsByOrganization(organization)
-            val employeesFlow = employeesInteractor.fetchEmployeesByOrganization(organization)
-
-            employeesFlow.combineWithResult(
-                secondFlow = subjectsFlow,
-                onError = { EmployeeEffect.ShowError(it) },
-                onData = { employeeList, subjectsList ->
-                    val subjects = subjectsList.map { it.mapToUi() }
-                    val employees = employeeList.map { employee ->
-                        val foundedSubjects = subjects.filter { it.teacher?.uid == employee.uid }
-                        employee.mapToUi().convertWithSubjects(foundedSubjects)
+            employeesInteractor.fetchEmployeesByOrganization(organization, query).collectAndHandle(
+                onLeftAction = { emit(EffectResult(EmployeeEffect.ShowError(it))) },
+                onRightAction = { groupedEmployees ->
+                    val employees = groupedEmployees.mapValues { (_, employee) ->
+                        employee.map { it.mapToUi() }
                     }
-                    val searchedEmployees = employees.filter { employee ->
-                        if (query.isNotBlank()) {
-                            val firstNameFilter = employee.data.firstName.contains(query, true)
-                            val secondNameFilter = employee.data.secondName?.contains(query, true) ?: false
-                            val patronymicFilter = employee.data.patronymic?.contains(query, true) ?: false
-                            firstNameFilter or secondNameFilter or patronymicFilter
-                        } else {
-                            true
-                        }
-                    }
-                    val sortedEmployees = searchedEmployees.sortedBy { it.data.firstName }
-                    val groupedEmployees = sortedEmployees.groupBy { it.data.firstName.first() }
-                    EmployeeAction.UpdateEmployees(groupedEmployees)
+                    emit(ActionResult(EmployeeAction.UpdateEmployees(employees)))
                 },
-            ).collect { workResult ->
-                emit(workResult)
-            }
+            )
         }
 
         private fun deleteEmployeeWork(targetId: UID) = flow {

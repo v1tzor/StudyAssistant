@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,26 @@
 
 package ru.aleshin.studyassistant.core.ui.mappers
 
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.post_director as core_post_director
+import ru.aleshin.studyassistant.core.ui.resources.post_employee as core_post_employee
+import ru.aleshin.studyassistant.core.ui.resources.post_manager as core_post_manager
+import ru.aleshin.studyassistant.core.ui.resources.post_mentor as core_post_mentor
+import ru.aleshin.studyassistant.core.ui.resources.post_teacher as core_post_teacher
+import ru.aleshin.studyassistant.core.ui.resources.post_tutor as core_post_tutor
 
 /**
  * @author Stanislav Aleshin on 02.06.2024.
  */
-fun EmployeePost.mapToString(strings: StudyAssistantStrings) = when (this) {
-    EmployeePost.EMPLOYEE -> strings.postEmployee
-    EmployeePost.TEACHER -> strings.postTeacher
-    EmployeePost.DIRECTOR -> strings.postDirector
-    EmployeePost.TUTOR -> strings.postTutor
-    EmployeePost.MENTOR -> strings.postMentor
-    EmployeePost.MANAGER -> strings.postManager
+@Composable
+fun EmployeePost.mapToString() = when (this) {
+    EmployeePost.EMPLOYEE -> stringResource(CoreRes.string.core_post_employee)
+    EmployeePost.TEACHER -> stringResource(CoreRes.string.core_post_teacher)
+    EmployeePost.DIRECTOR -> stringResource(CoreRes.string.core_post_director)
+    EmployeePost.TUTOR -> stringResource(CoreRes.string.core_post_tutor)
+    EmployeePost.MENTOR -> stringResource(CoreRes.string.core_post_mentor)
+    EmployeePost.MANAGER -> stringResource(CoreRes.string.core_post_manager)
 }

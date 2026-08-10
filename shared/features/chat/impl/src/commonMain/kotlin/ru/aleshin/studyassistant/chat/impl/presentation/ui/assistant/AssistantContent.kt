@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,28 +65,34 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.markdownAnimations
 import com.mikepenz.markdown.model.rememberMarkdownState
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.chat.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.AiChatHistoryUi
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.AssistantMessageUi
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ChatSuggestions
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ResponseStatus
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.UserMessageUi
-import ru.aleshin.studyassistant.chat.impl.presentation.theme.ChatThemeRes
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEffect
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEvent
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantState
-import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.store.AssistantComponent
+import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.store.ChatFeatureComponent
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AssistantBottomBar
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AssistantSenderBadge
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AssistantTopBar
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.ChatSuggestionsView
+import ru.aleshin.studyassistant.chat.impl.resources.Res
+import ru.aleshin.studyassistant.chat.impl.resources.ai_settings_button
+import ru.aleshin.studyassistant.chat.impl.resources.assistant_empty_chat_title
+import ru.aleshin.studyassistant.chat.impl.resources.failure_response_text
+import ru.aleshin.studyassistant.chat.impl.resources.personal_key_suggestion_text
+import ru.aleshin.studyassistant.chat.impl.resources.quota_expired_title
+import ru.aleshin.studyassistant.chat.impl.resources.try_again_button
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
@@ -100,12 +106,11 @@ import ru.aleshin.studyassistant.core.ui.views.TypingDots
  */
 @Composable
 internal fun AssistantContent(
-    assistantComponent: AssistantComponent,
+    assistantComponent: ChatFeatureComponent,
     modifier: Modifier = Modifier,
 ) {
     val store = assistantComponent.store
     val state by store.stateAsState()
-    val strings = ChatThemeRes.strings
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -117,13 +122,13 @@ internal fun AssistantContent(
                 onSendMessageSuggestion = { store.dispatchEvent(AssistantEvent.SendMessage(it)) },
                 onTryAgain = { store.dispatchEvent(AssistantEvent.RetryAttempt) },
                 onDeleteMessage = { store.dispatchEvent(AssistantEvent.ClearUnsendMessage) },
-                onPaidFunctionClick = { store.dispatchEvent(AssistantEvent.ClickPaidFunction) },
+                onOpenAiSettings = { store.dispatchEvent(AssistantEvent.OpenAiSettings) },
             )
         },
         topBar = {
             AssistantTopBar(
                 isVisibleClearButton = state.responseStatus != ResponseStatus.LOADING &&
-                    !state.chatHistory?.messages.isNullOrEmpty(),
+                        !state.chatHistory?.messages.isNullOrEmpty(),
                 onClearChatHistory = { store.dispatchEvent(AssistantEvent.ClearHistory) },
             )
         },
@@ -150,7 +155,7 @@ internal fun AssistantContent(
             is AssistantEffect.ShowError -> {
                 store.dispatchEvent(AssistantEvent.StopResponseLoading)
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -166,7 +171,7 @@ private fun BaseAssistantContent(
     onSendMessageSuggestion: (String) -> Unit,
     onTryAgain: () -> Unit,
     onDeleteMessage: () -> Unit,
-    onPaidFunctionClick: () -> Unit,
+    onOpenAiSettings: () -> Unit,
 ) {
     Crossfade(
         modifier = modifier.fillMaxSize(),
@@ -197,7 +202,7 @@ private fun BaseAssistantContent(
                         chatHistory = state.chatHistory,
                         onTryAgain = onTryAgain,
                         onDeleteMessage = onDeleteMessage,
-                        navigateToBilling = onPaidFunctionClick,
+                        openAiSettings = onOpenAiSettings,
                     )
                 }
             }
@@ -218,7 +223,7 @@ private fun EmptyAssistantChat(
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = ChatThemeRes.strings.assistantEmptyChatTitle,
+                text = stringResource(Res.string.assistant_empty_chat_title),
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -242,7 +247,7 @@ private fun AssistantChat(
     chatHistory: AiChatHistoryUi,
     onTryAgain: () -> Unit,
     onDeleteMessage: () -> Unit,
-    navigateToBilling: () -> Unit,
+    openAiSettings: () -> Unit,
 ) {
     val clipboardManager = LocalClipboardManager.current
     val coroutineScope = rememberCoroutineScope()
@@ -263,11 +268,13 @@ private fun AssistantChat(
                     ResponseStatus.LOADING -> AssistantLoadingMessageItem(
                         modifier = Modifier.animateItem(placementSpec = null),
                     )
+
                     ResponseStatus.FAILURE -> AssistantErrorMessageItem(
                         modifier = Modifier.animateItem(placementSpec = null),
                         onTryAgain = onTryAgain,
                         onDeleteMessage = onDeleteMessage,
                     )
+
                     ResponseStatus.SUCCESS -> Unit
                 }
             }
@@ -275,7 +282,7 @@ private fun AssistantChat(
             item(key = "isQuotaExpired", contentType = "quota") {
                 QuotaExpiredItem(
                     modifier = Modifier.animateItem(placementSpec = null),
-                    navigateToBilling = navigateToBilling
+                    openAiSettings = openAiSettings,
                 )
             }
         }
@@ -290,6 +297,7 @@ private fun AssistantChat(
                         },
                     )
                 }
+
                 is UserMessageUi -> {
                     UserMessageItem(
                         message = message,
@@ -338,10 +346,6 @@ private fun LazyItemScope.AssistantMessageItem(
                             ordered = MaterialTheme.typography.bodyLarge,
                             bullet = MaterialTheme.typography.bodyLarge,
                             list = MaterialTheme.typography.bodyLarge,
-                            link = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                textDecoration = TextDecoration.Underline
-                            ),
                         ),
                         animations = markdownAnimations { this },
                         loading = { internalModifier ->
@@ -397,7 +401,7 @@ private fun LazyItemScope.AssistantErrorMessageItem(
                 )
                 Text(
                     modifier = Modifier,
-                    text = ChatThemeRes.strings.failureResponseText,
+                    text = stringResource(Res.string.failure_response_text),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.titleSmall,
                 )
@@ -414,7 +418,7 @@ private fun LazyItemScope.AssistantErrorMessageItem(
                         ),
                         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
                     ) {
-                        Text(text = ChatThemeRes.strings.tryAgainButton, maxLines = 1)
+                        Text(text = stringResource(Res.string.try_again_button), maxLines = 1)
                     }
                     IconButton(
                         modifier = Modifier.size(40.dp),
@@ -487,7 +491,7 @@ private fun LazyItemScope.UserMessageItem(
 @Composable
 private fun LazyItemScope.QuotaExpiredItem(
     modifier: Modifier = Modifier,
-    navigateToBilling: () -> Unit,
+    openAiSettings: () -> Unit,
 ) {
     Box(
         modifier = modifier.padding(start = 8.dp, end = 12.dp),
@@ -503,22 +507,22 @@ private fun LazyItemScope.QuotaExpiredItem(
             ) {
                 AssistantSenderBadge()
                 Text(
-                    text = ChatThemeRes.strings.quotaExpiredTitle,
+                    text = stringResource(Res.string.quota_expired_title),
                     color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.titleSmall,
                 )
                 Text(
-                    text = ChatThemeRes.strings.subscriptionSuggestionText,
+                    text = stringResource(Res.string.personal_key_suggestion_text),
                     color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                 )
                 FilledTonalButton(
                     modifier = Modifier.height(40.dp),
-                    onClick = navigateToBilling,
+                    onClick = openAiSettings,
                     contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
                 ) {
-                    Text(text = ChatThemeRes.strings.subscriptionInfoButton, maxLines = 1)
+                    Text(text = stringResource(Res.string.ai_settings_button), maxLines = 1)
                 }
             }
         }

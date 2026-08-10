@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,24 @@
 
 package ru.aleshin.studyassistant.core.common.di
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
+import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
 
 /**
  * @author Stanislav Aleshin on 24.08.2024.
  */
 actual val corePlatformModule = DI.Module("CoreCommonPlatform") {
+    bindSingleton<AppDispatchers> {
+        AppDispatchers(
+            default = Dispatchers.Default,
+            io = Dispatchers.IO,
+            ui = Dispatchers.Main,
+        )
+    }
     bindSingleton<DeviceInfoProvider> { DeviceInfoProvider(instance()) }
 }

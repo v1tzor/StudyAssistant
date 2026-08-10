@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="assistant_top_bar_title">Ассистент (Beta)</string>
+    <string name="assistant_sender_badge">Ассистент</string>
+    <string name="chat_assistant_error_message">Ошибка при работе ассистента</string>
+    <string name="functional_chat_suggestion">Что ты умеешь?</string>
+    <string name="homework_chat_suggestion">Что задали на завтра?</string>
+    <string name="assistant_chat_text_field_placeholder">Отправьте любой запрос</string>
+    <string name="assistant_empty_chat_title">Чем я пому помочь вам?</string>
+    <string name="failure_response_text">К сожалению, не удалось выполнить запрос</string>
+    <string name="quota_expired_title">Бесплатная дневная квота истекла.\nДоступ возобновится только завтра.</string>
+    <string name="personal_key_suggestion_text">Можно продолжить без лимита с собственным ключом DeepSeek.</string>
+    <string name="ai_settings_button">Настроить AI</string>
+    <string name="quota_error_message">Дневная квота из 25 сообщений исчерпана</string>
+    <string name="invalid_key_error_message">DeepSeek отклонил API key. Проверьте ключ в настройках AI</string>
+    <string name="insufficient_balance_error_message">На DeepSeek-аккаунте недостаточно средств</string>
+    <string name="offline_error_message">Нет подключения к интернету</string>
+    <string name="rate_limit_error_message">Слишком много запросов. Попробуйте немного позже</string>
+    <string name="server_unavailable_error_message">AI-сервис временно недоступен</string>
+    <string name="try_again_button">Повторить попытку</string>
+    <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
+</resources>

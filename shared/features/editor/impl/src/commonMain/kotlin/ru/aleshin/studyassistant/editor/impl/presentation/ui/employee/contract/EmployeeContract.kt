@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.contract
 
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
@@ -27,10 +27,10 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEv
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EditEmployeeUi
 
 /**
@@ -48,7 +48,9 @@ internal sealed class EmployeeEvent : StoreEvent {
     data class Started(val inputData: EmployeeInput) : EmployeeEvent()
     data class UpdateAvatar(val image: PlatformFile) : EmployeeEvent()
     data object DeleteAvatar : EmployeeEvent()
-    data class UpdateName(val first: String?, val second: String?, val patronymic: String?) : EmployeeEvent()
+    data class UpdateName(val first: String?, val second: String?, val patronymic: String?) :
+        EmployeeEvent()
+
     data class UpdatePost(val post: EmployeePost?) : EmployeeEvent()
     data class UpdateWorkTime(val start: Instant?, val end: Instant?) : EmployeeEvent()
     data class UpdateBirthday(val date: String?) : EmployeeEvent()

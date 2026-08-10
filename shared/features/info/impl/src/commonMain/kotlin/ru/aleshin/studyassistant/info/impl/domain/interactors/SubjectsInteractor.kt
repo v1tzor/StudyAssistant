@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.info.impl.domain.interactors
 
+import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
@@ -23,13 +24,18 @@ import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.info.impl.domain.common.InfoEitherWrapper
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
+import ru.aleshin.studyassistant.info.impl.domain.entities.SubjectSortedType
 
 /**
  * @author Stanislav Aleshin on 17.06.2024.
  */
 internal interface SubjectsInteractor {
 
-    suspend fun fetchSubjectsByOrganization(organizationId: UID): FlowDomainResult<InfoFailures, List<Subject>>
+    suspend fun fetchSubjectsByOrganization(
+        organizationId: UID,
+        query: String = "",
+        sortedType: SubjectSortedType = SubjectSortedType.ALPHABETIC,
+    ): FlowDomainResult<InfoFailures, List<Subject>>
 
     suspend fun deleteSubjectById(targetId: UID): UnitDomainResult<InfoFailures>
 
@@ -38,9 +44,26 @@ internal interface SubjectsInteractor {
         private val eitherWrapper: InfoEitherWrapper,
     ) : SubjectsInteractor {
 
-        override suspend fun fetchSubjectsByOrganization(organizationId: UID) = eitherWrapper.wrapFlow {
-            subjectsRepository.fetchAllSubjectsByOrganization(organizationId)
-        }
+        override suspend fun fetchSubjectsByOrganization(
+            organizationId: UID,
+            query: String,
+            sortedType: SubjectSortedType,
+        ) =
+            eitherWrapper.wrapFlow {
+                subjectsRepository.fetchAllSubjectsByOrganization(organizationId).map { subjects ->
+                    subjects.filter { subject ->
+                        query.isBlank() || subject.name.contains(query, true)
+                    }.sortedBy { subject ->
+                        when (sortedType) {
+                            SubjectSortedType.ALPHABETIC -> subject.name
+                            SubjectSortedType.TEACHER -> subject.teacher?.uid
+                            SubjectSortedType.EVENT_TYPE -> subject.eventType.toString()
+                            SubjectSortedType.OFFICE -> subject.office
+                            SubjectSortedType.LOCATION -> subject.location?.value
+                        }
+                    }
+                }
+            }
 
         override suspend fun deleteSubjectById(targetId: UID) = eitherWrapper.wrap {
             subjectsRepository.deleteSubject(targetId)

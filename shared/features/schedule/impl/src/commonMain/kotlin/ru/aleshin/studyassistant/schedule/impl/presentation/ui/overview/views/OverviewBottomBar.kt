@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,6 @@ import ru.aleshin.studyassistant.core.common.functional.Constants.Date.OVERVIEW_
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date.OVERVIEW_PREVIOUS_DAYS
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.topSide
 
 /**
@@ -154,7 +153,7 @@ private fun ScheduleDateItem(
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
-                text = date.dateTime().dayOfWeek.mapToSting(StudyAssistantRes.strings),
+                text = date.dateTime().dayOfWeek.mapToSting(),
                 color = if (selected) {
                     MaterialTheme.colorScheme.onSecondaryContainer
                 } else {

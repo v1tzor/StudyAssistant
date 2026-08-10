@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="25dp"
+    android:height="24dp"
+    android:viewportWidth="25"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M20.2,17V11.452C20.2,10.918 20.2,10.651 20.135,10.402C20.077,10.182 19.983,9.973 19.855,9.785C19.71,9.572 19.51,9.396 19.108,9.044L14.308,4.844C13.561,4.191 13.188,3.864 12.768,3.74C12.397,3.63 12.003,3.63 11.633,3.74C11.213,3.864 10.84,4.19 10.095,4.842L5.293,9.044C4.891,9.396 4.69,9.572 4.546,9.785C4.418,9.973 4.323,10.182 4.265,10.402C4.2,10.651 4.2,10.918 4.2,11.452V17C4.2,17.932 4.2,18.398 4.352,18.765C4.555,19.255 4.945,19.645 5.435,19.848C5.802,20 6.268,20 7.2,20C8.132,20 8.598,20 8.966,19.848C9.456,19.645 9.845,19.256 10.048,18.765C10.2,18.398 10.2,17.932 10.2,17V16C10.2,14.896 11.096,14 12.2,14C13.305,14 14.2,14.896 14.2,16V17C14.2,17.932 14.2,18.398 14.352,18.765C14.555,19.256 14.944,19.645 15.435,19.848C15.802,20 16.268,20 17.2,20C18.132,20 18.598,20 18.966,19.848C19.456,19.645 19.845,19.255 20.048,18.765C20.2,18.398 20.2,17.932 20.2,17Z"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:strokeColor="#F5F5F6"
+        android:strokeLineCap="round" />
+</vector>

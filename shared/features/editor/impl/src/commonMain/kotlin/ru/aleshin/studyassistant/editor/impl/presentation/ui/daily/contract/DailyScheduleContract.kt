@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,13 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEf
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.core.presentation.models.schedules.BaseScheduleUi
+import ru.aleshin.studyassistant.core.presentation.models.schedules.ClassUi
+import ru.aleshin.studyassistant.core.presentation.models.schedules.CustomScheduleUi
+import ru.aleshin.studyassistant.core.presentation.models.settings.CalendarSettingsUi
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
-import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.FastEditDurations
-import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.CustomScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.settings.CalendarSettingsUi
 
 /**
  * @author Stanislav Aleshin on 14.07.2024
@@ -84,5 +84,6 @@ internal data class DailyScheduleInput(
 internal sealed class DailyScheduleOutput : BaseOutput {
     data object NavigateToBack : DailyScheduleOutput()
     data class NavigateToClassEditor(val config: EditorConfig.Class) : DailyScheduleOutput()
-    data class NavigateToOrganizationEditor(val config: EditorConfig.Organization) : DailyScheduleOutput()
+    data class NavigateToOrganizationEditor(val config: EditorConfig.Organization) :
+        DailyScheduleOutput()
 }

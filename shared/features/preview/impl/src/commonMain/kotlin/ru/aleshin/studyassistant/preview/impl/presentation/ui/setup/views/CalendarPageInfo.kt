@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.presentation.models.settings.CalendarSettingsUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
 
 /**
  * @author Stanislav Aleshin on 27.04.2024
@@ -93,7 +92,7 @@ internal fun NumberOfWeekView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = week.mapToSting(StudyAssistantRes.strings),
+                text = week.mapToSting(),
                 color = animateColorAsState(
                     animationSpec = tween(300),
                     targetValue = when (selected) {

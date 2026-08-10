@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants.Text.TEST_TOPIC_MAX_LENGTH
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.InfoTextField
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.test_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.test_field_placeholder
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_alert_circle_outline as core_ic_alert_circle_outline
 
 /**
  * @author Stanislav Aleshin on 23.06.2024.
@@ -75,9 +80,9 @@ internal fun HomeworkTestInfoField(
                 editableTestTopicTheory = it
                 onTestChange(isTest, it)
             },
-            label = EditorThemeRes.strings.testFieldLabel,
-            leadingInfoIcon = painterResource(StudyAssistantRes.icons.testsOutline),
-            placeholder = { Text(text = EditorThemeRes.strings.testFieldPlaceholder) },
+            label = stringResource(Res.string.test_field_label),
+            leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_alert_circle_outline),
+            placeholder = { Text(text = stringResource(Res.string.test_field_placeholder)) },
             trailingIcon = {
                 if (testInteraction.collectIsFocusedAsState().value) {
                     IconButton(onClick = { focusManager.clearFocus() }) {

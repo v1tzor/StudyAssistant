@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.mappers
 
+import org.jetbrains.compose.resources.getString
 import ru.aleshin.studyassistant.info.impl.domain.entities.InfoFailures
-import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.tokens.InfoStrings
+import ru.aleshin.studyassistant.info.impl.resources.Res
+import ru.aleshin.studyassistant.info.impl.resources.other_error_message
 
 /**
  * @author Stanislav Aleshin on 16.06.2024.
  */
-internal fun InfoFailures.mapToMessage(strings: InfoStrings) = when (this) {
-    is InfoFailures.OtherError -> strings.otherErrorMessage
+internal suspend fun InfoFailures.mapToMessage() = when (this) {
+    is InfoFailures.OtherError -> getString(Res.string.other_error_message)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,18 +56,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.common.ContactInfoType
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
 import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.link_button_title
+import ru.aleshin.studyassistant.schedule.impl.resources.organization_linker_dialog_header
+import ru.aleshin.studyassistant.schedule.impl.resources.organization_linker_dialog_title
+import ru.aleshin.studyassistant.schedule.impl.resources.unlink_button_title
 
 /**
  * @author Stanislav Aleshin on 16.08.2024.
@@ -98,7 +102,7 @@ internal fun SharedOrganizationView(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = type.mapToSting(StudyAssistantRes.strings),
+                        text = type.mapToSting(),
                         color = MaterialTheme.colorScheme.primary,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
@@ -148,7 +152,7 @@ internal fun SharedOrganizationView(
                                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    Text(text = ScheduleThemeRes.strings.unlinkButtonTitle, maxLines = 1)
+                                    Text(text = stringResource(Res.string.unlink_button_title), maxLines = 1)
                                     Icon(imageVector = Icons.Default.Close, contentDescription = null)
                                 }
                             } else {
@@ -156,7 +160,7 @@ internal fun SharedOrganizationView(
                                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    Text(text = ScheduleThemeRes.strings.linkButtonTitle, maxLines = 1)
+                                    Text(text = stringResource(Res.string.link_button_title), maxLines = 1)
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Default.ArrowRight,
                                         contentDescription = null
@@ -194,7 +198,7 @@ internal fun SharedOrganizationView(
                             }
                         },
                         isExpanded = contactInfoEntry.key == expandedContactInfo,
-                        icon = painterResource(contactInfoEntry.value.mapToIcon(StudyAssistantRes.icons)),
+                        icon = painterResource(contactInfoEntry.value.mapToIcon()),
                         contactInfo = contactInfoEntry.key,
                     )
                 }
@@ -231,9 +235,9 @@ private fun OrganizationContactInfoItem(
             )
             if (isExpanded) {
                 Column(modifier = Modifier.widthIn(max = 175.dp)) {
-                    if (contactInfo.label != null) {
+                    contactInfo.label?.let { label ->
                         Text(
-                            text = contactInfo.label,
+                            text = label,
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -279,14 +283,14 @@ internal fun OrganizationLinkerBottomSheet(
         modifier = modifier,
         selected = selectedOrganization,
         items = organizations,
-        header = ScheduleThemeRes.strings.organizationLinkerDialogHeader,
-        title = ScheduleThemeRes.strings.organizationLinkerDialogTitle,
+        header = stringResource(Res.string.organization_linker_dialog_header),
+        title = stringResource(Res.string.organization_linker_dialog_title),
         itemView = { organization ->
             SelectorItemView(
                 onClick = { selectedOrganization = organization },
                 selected = organization.uid == selectedOrganization?.uid,
                 title = organization.shortName,
-                label = organization.type.mapToSting(StudyAssistantRes.strings),
+                label = organization.type.mapToSting(),
             )
         },
         notSelectedItem = {

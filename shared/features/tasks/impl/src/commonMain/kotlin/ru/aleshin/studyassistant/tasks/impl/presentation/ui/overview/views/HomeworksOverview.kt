@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,15 +53,17 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.HomeworkShareSelectionUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.homeworks_section_header
+import ru.aleshin.studyassistant.tasks.impl.resources.homeworks_section_subtitle
+import ru.aleshin.studyassistant.tasks.impl.resources.show_all_title
 
 /**
  * @author Stanislav Aleshin on 26.03.2025.
@@ -72,13 +74,12 @@ internal fun HomeworksOverview(
     isLoadingHomeworks: Boolean,
     currentDate: Instant,
     homeworks: Map<Instant, DailyHomeworksUi>,
-    allFriends: List<AppUserUi>,
     onShowAllHomeworkTasks: () -> Unit,
     onOpenHomeworkTasks: (HomeworkDetailsUi) -> Unit,
     onDoHomework: (HomeworkDetailsUi) -> Unit,
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
     onRepeatHomework: (HomeworkDetailsUi) -> Unit,
-    onShareHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
+    onShareHomeworks: (HomeworkShareSelectionUi) -> Unit,
 ) {
     Surface(
         modifier = modifier.height(400.dp),
@@ -97,7 +98,6 @@ internal fun HomeworksOverview(
                 isLoadingHomeworks = isLoadingHomeworks,
                 currentDate = currentDate,
                 homeworks = homeworks,
-                allFriends = allFriends,
                 onOpenHomeworkTasks = onOpenHomeworkTasks,
                 onDoHomework = onDoHomework,
                 onSkipHomework = onSkipHomework,
@@ -120,14 +120,14 @@ private fun HomeworksOverviewHeader(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = TasksThemeRes.strings.homeworksSectionHeader,
+                text = stringResource(Res.string.homeworks_section_header),
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 style = MaterialTheme.typography.titleSmall,
             )
             Text(
-                text = TasksThemeRes.strings.homeworksSectionSubtitle,
+                text = stringResource(Res.string.homeworks_section_subtitle),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 style = MaterialTheme.typography.bodySmall,
@@ -139,7 +139,7 @@ private fun HomeworksOverviewHeader(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         ) {
             Text(
-                text = TasksThemeRes.strings.showAllTitle,
+                text = stringResource(Res.string.show_all_title),
                 style = MaterialTheme.typography.labelMedium,
             )
         }
@@ -153,12 +153,11 @@ private fun HomeworksOverviewContent(
     isLoadingHomeworks: Boolean,
     currentDate: Instant,
     homeworks: Map<Instant, DailyHomeworksUi>,
-    allFriends: List<AppUserUi>,
     onOpenHomeworkTasks: (HomeworkDetailsUi) -> Unit,
     onDoHomework: (HomeworkDetailsUi) -> Unit,
     onSkipHomework: (HomeworkDetailsUi) -> Unit,
     onRepeatHomework: (HomeworkDetailsUi) -> Unit,
-    onShareHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
+    onShareHomeworks: (HomeworkShareSelectionUi) -> Unit,
 ) {
     var isShowedTargetDay by rememberSaveable { mutableStateOf(true) }
     Crossfade(
@@ -205,10 +204,8 @@ private fun HomeworksOverviewContent(
 
                         if (isShowSharedHomeworksSheet) {
                             ShareHomeworksBottomSheet(
-                                currentTime = Clock.System.now(),
                                 targetDate = homeworksEntry.first,
                                 homeworks = homeworksEntry.second.fetchAllHomeworks(),
-                                allFriends = allFriends,
                                 onDismissRequest = { isShowSharedHomeworksSheet = false },
                                 onConfirm = {
                                     onShareHomeworks(it)

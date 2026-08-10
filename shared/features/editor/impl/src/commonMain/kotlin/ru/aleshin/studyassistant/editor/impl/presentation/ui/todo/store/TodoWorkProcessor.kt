@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,9 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.firstRightOrNull
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.editor.impl.domain.interactors.AppUserInteractor
+import ru.aleshin.studyassistant.core.presentation.mappers.tasks.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.tasks.mapToUi
 import ru.aleshin.studyassistant.editor.impl.domain.interactors.TodoInteractor
-import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToDomain
-import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.EditTodoUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.convertToBase
 import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.convertToEdit
@@ -42,11 +41,11 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.contract.TodoO
 /**
  * @author Stanislav Aleshin on 26.07.2024.
  */
-internal interface TodoWorkProcessor : FlowWorkProcessor<TodoWorkCommand, TodoAction, TodoEffect, TodoOutput> {
+internal interface TodoWorkProcessor :
+    FlowWorkProcessor<TodoWorkCommand, TodoAction, TodoEffect, TodoOutput> {
 
     class Base(
         private val todoInteractor: TodoInteractor,
-        private val usersInteractor: AppUserInteractor,
         private val dateManager: DateManager,
     ) : TodoWorkProcessor {
 
@@ -57,20 +56,17 @@ internal interface TodoWorkProcessor : FlowWorkProcessor<TodoWorkCommand, TodoAc
         }
 
         private fun loadEditModelWork(todoId: UID?) = flow {
-            val isPaidUser = usersInteractor.fetchAppUserPaidStatus().firstRightOrNull {
-                emit(EffectResult(TodoEffect.ShowError(it)))
-            } ?: false
             val todoModel = todoInteractor.fetchTodoById(todoId ?: "").firstRightOrNull {
                 emit(EffectResult(TodoEffect.ShowError(it)))
             }
 
             val editModel = todoModel?.mapToUi()?.convertToEdit() ?: EditTodoUi.createEditModel(
                 uid = todoId,
-                enableNotifications = isPaidUser,
+                enableNotifications = true,
                 createdAt = dateManager.fetchCurrentInstant(),
             )
 
-            emit(ActionResult(TodoAction.SetupEditModel(editModel, isPaidUser)))
+            emit(ActionResult(TodoAction.SetupEditModel(editModel)))
         }
 
         private fun saveTodoWork(todo: EditTodoUi) = flow<TodoWorkResult> {

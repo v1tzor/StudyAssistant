@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@
 package ru.aleshin.studyassistant.core.data.managers.reminders
 
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
 
 /**
  * @author Stanislav Aleshin on 22.08.2024.
  */
 expect class HomeworksReminderManagerImpl : HomeworksReminderManager {
-    override suspend fun fetchWorkStatus(): RepeatWorkStatus
-    override fun startOrRetryReminderService(time: Instant)
-    override fun stopReminderService()
+    override suspend fun startOrRetryReminderService(time: Instant)
+    override suspend fun stopReminderService()
 }

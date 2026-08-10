@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.goals.Goal
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalShort
 
@@ -38,5 +37,4 @@ interface DailyGoalsRepository {
     suspend fun fetchOverdueDailyGoals(currentDate: Instant): Flow<List<Goal>>
     suspend fun fetchDailyGoalsByDate(date: Instant): Flow<List<Goal>>
     suspend fun deleteGoal(uid: UID)
-    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

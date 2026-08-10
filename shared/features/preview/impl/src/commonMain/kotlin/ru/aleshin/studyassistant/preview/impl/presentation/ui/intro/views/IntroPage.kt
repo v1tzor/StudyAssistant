@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,49 +16,48 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views
 
-import androidx.compose.runtime.Composable
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
+import org.jetbrains.compose.resources.StringResource
+import ru.aleshin.studyassistant.preview.impl.resources.Res
+import ru.aleshin.studyassistant.preview.impl.resources.analytics_intro_body
+import ru.aleshin.studyassistant.preview.impl.resources.analytics_intro_title
+import ru.aleshin.studyassistant.preview.impl.resources.il_analytics
+import ru.aleshin.studyassistant.preview.impl.resources.il_organizations
+import ru.aleshin.studyassistant.preview.impl.resources.il_sharing
+import ru.aleshin.studyassistant.preview.impl.resources.il_study
+import ru.aleshin.studyassistant.preview.impl.resources.organization_intro_body
+import ru.aleshin.studyassistant.preview.impl.resources.organization_intro_title
+import ru.aleshin.studyassistant.preview.impl.resources.sharing_intro_body
+import ru.aleshin.studyassistant.preview.impl.resources.sharing_intro_title
+import ru.aleshin.studyassistant.preview.impl.resources.study_intro_body
+import ru.aleshin.studyassistant.preview.impl.resources.study_intro_title
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
-@OptIn(ExperimentalResourceApi::class)
-internal enum class IntroPage : IntroPageData {
-    STUDY {
-        override val id get() = 0
-        override val headline @Composable get() = PreviewThemeRes.strings.studyIntroTitle
-        override val body @Composable get() = PreviewThemeRes.strings.studyIntroBody
-        override val illustration @Composable get() = PreviewThemeRes.icons.studyIllustration
-    },
-    ANALYTICS {
-        override val id get() = 1
-        override val headline @Composable get() = PreviewThemeRes.strings.analyticsIntroTitle
-        override val body @Composable get() = PreviewThemeRes.strings.analyticsIntroBody
-        override val illustration @Composable get() = PreviewThemeRes.icons.analyticsIllustration
-    },
-    ORGANIZATIONS {
-        override val id get() = 2
-        override val headline @Composable get() = PreviewThemeRes.strings.organizationIntroTitle
-        override val body @Composable get() = PreviewThemeRes.strings.organizationIntroBody
-        override val illustration @Composable get() = PreviewThemeRes.icons.organizationIllustration
-    },
-    FRIENDS {
-        override val id get() = 3
-        override val headline @Composable get() = PreviewThemeRes.strings.friendsIntroTitle
-        override val body @Composable get() = PreviewThemeRes.strings.friendsIntroBody
-        override val illustration @Composable get() = PreviewThemeRes.icons.friendsIllustration
-    };
-
-    companion object {
-        fun fetchByIndex(index: Int) = entries.find { it.id == index }
-    }
-}
-
-internal interface IntroPageData {
-    val id: Int
-    val headline: String @Composable get
-    val body: String @Composable get
-    val illustration: DrawableResource @Composable get
+internal enum class IntroPage(
+    val headline: StringResource,
+    val body: StringResource,
+    val illustration: DrawableResource,
+) {
+    STUDY(
+        headline = Res.string.study_intro_title,
+        body = Res.string.study_intro_body,
+        illustration = Res.drawable.il_study,
+    ),
+    ANALYTICS(
+        headline = Res.string.analytics_intro_title,
+        body = Res.string.analytics_intro_body,
+        illustration = Res.drawable.il_analytics,
+    ),
+    ORGANIZATIONS(
+        headline = Res.string.organization_intro_title,
+        body = Res.string.organization_intro_body,
+        illustration = Res.drawable.il_organizations,
+    ),
+    SHARING(
+        headline = Res.string.sharing_intro_title,
+        body = Res.string.sharing_intro_body,
+        illustration = Res.drawable.il_sharing,
+    ),
 }

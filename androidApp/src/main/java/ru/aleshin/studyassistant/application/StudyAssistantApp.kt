@@ -1,3 +1,19 @@
+/*
+ * Copyright 2026 Stanislav Aleshin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.aleshin.studyassistant.application
 
 import android.app.NotificationChannel
@@ -11,6 +27,7 @@ import com.github.panpf.sketch.PlatformContext
 import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.fetch.supportKtorHttpUri
+import ru.aleshin.studyassistant.android.R
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationDefaults
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationImportance
@@ -28,9 +45,19 @@ class StudyAssistantApp : BaseFlavorApplication(), SingletonSketch.Factory {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotifyChannel(
                 channelId = Constants.Notification.CHANNEL_ID,
-                channelName = Constants.Notification.CHANNEL_NAME,
+                channelName = getString(R.string.notification_channel_common),
                 importance = NotificationImportance.MAX,
                 defaults = NotificationDefaults()
+            )
+            createNotifyChannel(
+                channelId = Constants.Notification.ONGOING_CHANNEL_ID,
+                channelName = getString(R.string.notification_channel_ongoing_classes),
+                importance = NotificationImportance.LOW,
+                defaults = NotificationDefaults(
+                    isSound = false,
+                    isVibrate = false,
+                    isLights = false,
+                ),
             )
         }
     }
@@ -95,7 +122,8 @@ class StudyAssistantApp : BaseFlavorApplication(), SingletonSketch.Factory {
         val channel = NotificationChannel(channelId, channelName, importance.importance).apply {
             enableLights(defaults.isLights)
             enableVibration(defaults.isVibrate)
-            vibrationPattern = longArrayOf(500, 500, 500)
+            if (defaults.isVibrate) vibrationPattern = longArrayOf(500, 500, 500)
+            if (!defaults.isSound) setSound(null, null)
         }
         notificationManager.createNotificationChannel(channel)
     }

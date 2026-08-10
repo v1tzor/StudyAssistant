@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@ import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -39,8 +40,7 @@ internal data class EditSubjectUi(
     val location: ContactInfoUi? = null,
 ) {
 
-    fun isValid() = eventType != null && name.isNotEmpty() &&
-        teacher != null && office != null && color != null
+    fun isValid() = eventType != null && name.isNotEmpty() && color != null
 
     companion object {
         fun createEditModel(
@@ -70,7 +70,7 @@ internal fun EditSubjectUi.convertToBase() = SubjectUi(
     eventType = checkNotNull(eventType),
     name = name,
     teacher = teacher,
-    office = checkNotNull(office),
+    office = office.orEmpty(),
     color = checkNotNull(color),
     location = location,
 )

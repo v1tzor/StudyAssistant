@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.InfoTextField
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.ic_subject_name
+import ru.aleshin.studyassistant.editor.impl.resources.subject_name_field_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.subject_name_required_field_label
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -62,9 +66,9 @@ internal fun SubjectNameInfoField(
             editableName = it
             onNameChange(it)
         },
-        label = EditorThemeRes.strings.subjectNameFieldLabel,
-        leadingInfoIcon = painterResource(EditorThemeRes.icons.name),
-        placeholder = { Text(text = EditorThemeRes.strings.subjectNameFieldPlaceholder) },
+        label = stringResource(Res.string.subject_name_required_field_label),
+        leadingInfoIcon = painterResource(Res.drawable.ic_subject_name),
+        placeholder = { Text(text = stringResource(Res.string.subject_name_field_placeholder)) },
         trailingIcon = {
             if (nameInteraction.collectIsFocusedAsState().value) {
                 IconButton(onClick = { focusManager.clearFocus() }) {

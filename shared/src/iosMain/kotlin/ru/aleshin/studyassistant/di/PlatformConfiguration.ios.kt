@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,15 @@ package ru.aleshin.studyassistant.di
 
 import ru.aleshin.studyassistant.core.common.platform.IosUUIDProvider
 import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
-import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
-import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
 import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
-import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
-import ru.aleshin.studyassistant.core.remote.api.message.MessagingServiceImpl
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 actual data class PlatformConfiguration(
-    actual val appService: AppService,
     actual val analyticsService: AnalyticsService,
     actual val crashlyticsService: CrashlyticsService,
     actual val reviewService: ReviewService,
-    actual val iapService: IapService,
-    val serviceTokenProvider: PlatformGoogleAuthTokenProvider,
     val uuidProvider: IosUUIDProvider,
-) {
-    actual val messagingService: MessagingService = MessagingServiceImpl()
-}
+)

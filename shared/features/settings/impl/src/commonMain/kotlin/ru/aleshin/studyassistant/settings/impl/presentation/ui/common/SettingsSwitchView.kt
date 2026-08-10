@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 internal fun SettingsSwitchView(
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
-    isPaidUser: Boolean = false,
+    isPaidUser: Boolean = true,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     title: String,

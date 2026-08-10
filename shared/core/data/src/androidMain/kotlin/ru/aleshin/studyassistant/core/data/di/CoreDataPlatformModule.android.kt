@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,29 +23,54 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.data.datasources.AiSecureDataSource
+import ru.aleshin.studyassistant.core.data.datasources.AndroidAiSecureDataSource
+import ru.aleshin.studyassistant.core.data.datasources.AndroidAvatarLocalDataSource
+import ru.aleshin.studyassistant.core.data.datasources.AndroidInstallationSecureDataSource
+import ru.aleshin.studyassistant.core.data.datasources.AndroidSecureStorage
+import ru.aleshin.studyassistant.core.data.datasources.AvatarLocalDataSource
+import ru.aleshin.studyassistant.core.data.datasources.InstallationSecureDataSource
 import ru.aleshin.studyassistant.core.data.managers.reminders.EndClassesReminderManagerImpl
 import ru.aleshin.studyassistant.core.data.managers.reminders.HomeworksReminderManagerImpl
 import ru.aleshin.studyassistant.core.data.managers.reminders.NotificationScheduler
 import ru.aleshin.studyassistant.core.data.managers.reminders.StartClassesReminderManagerImpl
 import ru.aleshin.studyassistant.core.data.managers.reminders.WorkloadWarningManagerImpl
-import ru.aleshin.studyassistant.core.data.managers.sync.SyncWorkManagerImpl
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
-import ru.aleshin.studyassistant.core.domain.managers.sync.SyncWorkManager
 
 /**
  * @author Stanislav Aleshin on 22.08.2024.
  */
 actual val coreDataPlatformModule = DI.Module("CoreDataPlatform") {
+    bindSingleton<AndroidSecureStorage> { AndroidSecureStorage(instance()) }
+    bindSingleton<AiSecureDataSource> { AndroidAiSecureDataSource(instance()) }
+    bindSingleton<InstallationSecureDataSource> {
+        AndroidInstallationSecureDataSource(instance())
+    }
+    bindSingleton<AvatarLocalDataSource> { AndroidAvatarLocalDataSource(instance()) }
     bindSingleton<WorkManager> { WorkManager.getInstance(instance<Context>()) }
     bindSingleton<AlarmManager> { instance<Context>().getSystemService(AlarmManager::class.java) }
-    bindProvider<WorkloadWarningManager> { WorkloadWarningManagerImpl(instance(), instance()) }
-    bindProvider<HomeworksReminderManager> { HomeworksReminderManagerImpl(instance(), instance()) }
-    bindProvider<StartClassesReminderManager> { StartClassesReminderManagerImpl(instance(), instance(), instance(), instance()) }
-    bindProvider<EndClassesReminderManager> { EndClassesReminderManagerImpl(instance(), instance(), instance(), instance()) }
+    bindProvider<WorkloadWarningManager> {
+        WorkloadWarningManagerImpl(instance(), instance(), instance())
+    }
+    bindProvider<HomeworksReminderManager> {
+        HomeworksReminderManagerImpl(instance(), instance(), instance())
+    }
+    bindProvider<StartClassesReminderManager> {
+        StartClassesReminderManagerImpl(
+            instance(),
+            instance(),
+            instance(),
+        )
+    }
+    bindProvider<EndClassesReminderManager> {
+        EndClassesReminderManagerImpl(
+            instance(),
+            instance(),
+            instance(),
+        )
+    }
     bindSingleton<NotificationScheduler> { NotificationScheduler(instance(), instance()) }
-
-    bindProvider<SyncWorkManager> { SyncWorkManagerImpl(instance()) }
 }

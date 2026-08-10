@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract
 
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationUi
+import ru.aleshin.studyassistant.core.presentation.models.settings.CalendarSettingsUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ProfileUi
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
-import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.settings.CalendarSettingsUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupPage
 
 /**
@@ -35,8 +35,7 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupP
  */
 @Serializable
 internal data class SetupState(
-    val profile: AppUserUi? = null,
-    val isPaidUser: Boolean = false,
+    val profile: ProfileUi? = null,
     val currentPage: SetupPage = SetupPage.PROFILE,
     val actionWithProfileAvatar: ActionWithAvatar = ActionWithAvatar.None(null),
     val organization: OrganizationUi? = null,
@@ -47,7 +46,7 @@ internal data class SetupState(
 internal sealed class SetupEvent : StoreEvent {
     data class Started(val isRestore: Boolean) : SetupEvent()
     data object ClickBackPage : SetupEvent()
-    data class UpdateProfile(val userProfile: AppUserUi) : SetupEvent()
+    data class UpdateProfile(val profile: ProfileUi) : SetupEvent()
     data class UpdateProfileAvatar(val image: PlatformFile) : SetupEvent()
     data object DeleteProfileAvatar : SetupEvent()
     data class UpdateOrganization(val organization: OrganizationUi) : SetupEvent()
@@ -58,7 +57,6 @@ internal sealed class SetupEvent : StoreEvent {
     data object ClickSaveOrganizationInfo : SetupEvent()
     data object ClickSaveCalendarInfo : SetupEvent()
     data object ClickEditWeekSchedule : SetupEvent()
-    data object ClickPaidFunction : SetupEvent()
     data object ClickGoToApp : SetupEvent()
     data object ClickBack : SetupEvent()
 }
@@ -70,12 +68,12 @@ internal sealed class SetupEffect : StoreEffect {
 internal sealed class SetupAction : StoreAction {
     data class UpdatePage(val page: SetupPage) : SetupAction()
     data class UpdateAll(
-        val profile: AppUserUi,
+        val profile: ProfileUi,
         val organization: OrganizationUi,
         val calendarSettings: CalendarSettingsUi
     ) : SetupAction()
-    data class UpdateUserProfile(val profile: AppUserUi) : SetupAction()
-    data class UpdateUserPaidStatus(val isPaid: Boolean) : SetupAction()
+
+    data class UpdateUserProfile(val profile: ProfileUi) : SetupAction()
     data class UpdateActionWithProfileAvatar(val action: ActionWithAvatar) : SetupAction()
     data class UpdateOrganization(val organization: OrganizationUi) : SetupAction()
     data class UpdateActionWithOrganizationAvatar(val action: ActionWithAvatar) : SetupAction()
@@ -85,6 +83,5 @@ internal sealed class SetupAction : StoreAction {
 internal sealed class SetupOutput : BaseOutput {
     data object NavigateToBack : SetupOutput()
     data object NavigateToApp : SetupOutput()
-    data object NavigateToBilling : SetupOutput()
     data object NavigateToWeekScheduleEditor : SetupOutput()
 }

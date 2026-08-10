@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ internal interface EditorErrorHandler : ErrorHandler<EditorFailures> {
             } else {
                 EditorFailures.OtherError(throwable)
             }
+
             is ShiftTimeError -> EditorFailures.ShiftTimeError
             else -> EditorFailures.OtherError(throwable)
         }

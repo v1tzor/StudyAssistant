@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -37,6 +36,7 @@ import ru.aleshin.studyassistant.core.common.functional.Constants.Date
 import ru.aleshin.studyassistant.core.common.functional.Constants.Date.DAYS_IN_WEEK
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -408,7 +408,7 @@ fun LocalDate.isoWeekNumber(): Int {
 
     val currentCalendarWeek = start.until(this, DateTimeUnit.WEEK) + 1
 
-    return currentCalendarWeek
+    return currentCalendarWeek.toInt()
 }
 
 private fun firstWeekInYearStart(year: Int): LocalDate {

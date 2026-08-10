@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,15 +27,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
 import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.org_type_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.org_type_field_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.org_type_selector_header
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_organization_type as core_ic_organization_type
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -53,10 +58,10 @@ internal fun OrganizationTypeInfoField(
         onClick = { openOrganizationTypeSelector = true },
         modifier = modifier.padding(start = 16.dp, end = 24.dp),
         enabled = !isLoading,
-        value = type?.mapToSting(StudyAssistantRes.strings),
-        label = EditorThemeRes.strings.orgTypeFieldLabel,
-        placeholder = EditorThemeRes.strings.orgTypeFieldPlaceholder,
-        infoIcon = painterResource(StudyAssistantRes.icons.organizationType),
+        value = type?.mapToSting(),
+        label = stringResource(Res.string.org_type_field_label),
+        placeholder = stringResource(Res.string.org_type_field_placeholder),
+        infoIcon = painterResource(CoreRes.drawable.core_ic_organization_type),
         trailingIcon = {
             ExpandedIcon(
                 isExpanded = openOrganizationTypeSelector,
@@ -91,13 +96,13 @@ internal fun OrganizationTypeSelectorBottomSheet(
         modifier = modifier,
         selected = selectedType,
         items = OrganizationType.entries,
-        header = EditorThemeRes.strings.orgTypeSelectorHeader,
+        header = stringResource(Res.string.org_type_selector_header),
         title = null,
         itemView = { type ->
             SelectorItemView(
                 onClick = { selectedType = type },
                 selected = type == selectedType,
-                title = type.mapToSting(StudyAssistantRes.strings),
+                title = type.mapToSting(),
                 label = null,
             )
         },

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
-import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.EmployeeSubjectView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.NoneEmployeeSubjectView
 
@@ -81,7 +80,7 @@ internal fun ShortEmployeeView(
             ) {
                 Column {
                     Text(
-                        text = post.mapToString(StudyAssistantRes.strings),
+                        text = post.mapToString(),
                         color = MaterialTheme.colorScheme.primary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,

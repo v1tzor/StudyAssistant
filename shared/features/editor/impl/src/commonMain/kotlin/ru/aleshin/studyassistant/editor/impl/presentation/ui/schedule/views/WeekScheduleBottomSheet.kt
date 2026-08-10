@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,18 +56,30 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.organizations.ScheduleTimeIntervalsUi
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.SegmentedButtons
 import ru.aleshin.studyassistant.core.ui.views.sheet.StickyBottomSheet
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.ScheduleTimeIntervalsUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseWeekScheduleUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.NumberOfWeekItem
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.toItem
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.add_title
+import ru.aleshin.studyassistant.editor.impl.resources.breaks_title
+import ru.aleshin.studyassistant.editor.impl.resources.classes_title
+import ru.aleshin.studyassistant.editor.impl.resources.ic_break
+import ru.aleshin.studyassistant.editor.impl.resources.number_of_classes_label
+import ru.aleshin.studyassistant.editor.impl.resources.save_button_title
+import ru.aleshin.studyassistant.editor.impl.resources.standard_time_interval_header
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_class as core_ic_class
+import ru.aleshin.studyassistant.core.ui.resources.ic_organization_geo as core_ic_organization_geo
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
+import ru.aleshin.studyassistant.core.ui.resources.pcs_unit_suffix as core_pcs_unit_suffix
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -141,7 +153,7 @@ private fun WeekScheduleBottomSheetHeader(
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Text(
-                text = EditorThemeRes.strings.numberOfClassesLabel,
+                text = stringResource(Res.string.number_of_classes_label),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -153,7 +165,7 @@ private fun WeekScheduleBottomSheetHeader(
             ) { loading ->
                 if (!loading) {
                     Text(
-                        text = "$numberOfClasses ${StudyAssistantRes.strings.pcsUnitSuffix}",
+                        text = "$numberOfClasses ${stringResource(CoreRes.string.core_pcs_unit_suffix)}",
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontSize = 18.sp,
@@ -195,7 +207,7 @@ private fun WeekScheduleBottomSheetContent(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            text = EditorThemeRes.strings.standardTimeIntervalHeader,
+            text = stringResource(Res.string.standard_time_interval_header),
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.labelMedium,
         )
@@ -260,7 +272,7 @@ private fun WeekScheduleBottomSheetFooter(
             enabled = enabled,
             modifier = Modifier.fillMaxWidth(1f),
         ) {
-            Text(text = EditorThemeRes.strings.saveButtonTitle)
+            Text(text = stringResource(Res.string.save_button_title))
         }
     }
 }
@@ -287,7 +299,7 @@ private fun ScheduleTimeIntervalsItem(
             ) {
                 Icon(
                     modifier = Modifier.size(18.dp),
-                    painter = painterResource(StudyAssistantRes.icons.organizationGeo),
+                    painter = painterResource(CoreRes.drawable.core_ic_organization_geo),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                 )
@@ -304,7 +316,7 @@ private fun ScheduleTimeIntervalsItem(
                 ) {
                     Icon(
                         modifier = Modifier.size(24.dp),
-                        painter = painterResource(StudyAssistantRes.icons.classes),
+                        painter = painterResource(CoreRes.drawable.core_ic_class),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
@@ -316,13 +328,16 @@ private fun ScheduleTimeIntervalsItem(
                             intervals.maxClassDuration()
                         }
                         Text(
-                            text = EditorThemeRes.strings.classesTitle,
+                            text = stringResource(Res.string.classes_title),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.labelMedium,
                         )
                         Text(
                             text = buildAnnotatedString {
-                                append(minDuration?.toMinutesOrHoursTitle() ?: StudyAssistantRes.strings.noneTitle)
+                                append(
+                                    minDuration?.toMinutesOrHoursTitle()
+                                        ?: stringResource(CoreRes.string.core_none_title)
+                                )
                                 if (maxDuration != null && maxDuration != minDuration) {
                                     append(" - " + maxDuration.toMinutesOrHoursTitle())
                                 }
@@ -338,7 +353,7 @@ private fun ScheduleTimeIntervalsItem(
                 ) {
                     Icon(
                         modifier = Modifier.size(24.dp),
-                        painter = painterResource(EditorThemeRes.icons.breaks),
+                        painter = painterResource(Res.drawable.ic_break),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
@@ -346,13 +361,16 @@ private fun ScheduleTimeIntervalsItem(
                         val minDuration = remember(intervals) { intervals.minBreakDuration() }
                         val maxDuration = remember(intervals) { intervals.maxBreakDuration() }
                         Text(
-                            text = EditorThemeRes.strings.breaksTitle,
+                            text = stringResource(Res.string.breaks_title),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.labelMedium,
                         )
                         Text(
                             text = buildAnnotatedString {
-                                append(minDuration?.toMinutesOrHoursTitle() ?: StudyAssistantRes.strings.noneTitle)
+                                append(
+                                    minDuration?.toMinutesOrHoursTitle()
+                                        ?: stringResource(CoreRes.string.core_none_title)
+                                )
                                 if (maxDuration != null && maxDuration != minDuration) {
                                     append(" - " + maxDuration.toMinutesOrHoursTitle())
                                 }
@@ -390,7 +408,7 @@ private fun ScheduleTimeIntervalsAddItem(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = EditorThemeRes.strings.addTitle,
+                    text = stringResource(Res.string.add_title),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,231 +18,228 @@ package ru.aleshin.studyassistant.di.modules
 
 import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
-import org.kodein.di.bindEagerSingleton
+import org.kodein.di.bind
+import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.auth.api.AuthFeatureStarter
-import ru.aleshin.studyassistant.auth.impl.di.AuthFeatureDependencies
-import ru.aleshin.studyassistant.auth.impl.navigation.DefaultAuthFeatureStarter
-import ru.aleshin.studyassistant.billing.api.BillingFeatureStarter
-import ru.aleshin.studyassistant.billing.impl.di.BillingFeatureDependencies
-import ru.aleshin.studyassistant.billing.impl.navigation.DefaultBillingFeatureStarter
-import ru.aleshin.studyassistant.chat.api.ChatFeatureStarter
+import org.kodein.di.scoped
+import org.kodein.di.singleton
+import ru.aleshin.studyassistant.analytics.api.AnalyticsDecomposeFeatureFactory
+import ru.aleshin.studyassistant.analytics.impl.di.AnalyticsFeatureDependencies
+import ru.aleshin.studyassistant.analytics.impl.di.holder.AnalyticsFeatureController
+import ru.aleshin.studyassistant.analytics.impl.navigation.DefaultAnalyticsFeatureFactory
+import ru.aleshin.studyassistant.chat.api.ChatDecomposeFeatureFactory
 import ru.aleshin.studyassistant.chat.impl.di.ChatFeatureDependencies
-import ru.aleshin.studyassistant.chat.impl.navigation.DefaultChatFeatureStarter
-import ru.aleshin.studyassistant.core.api.auth.AccountService
+import ru.aleshin.studyassistant.chat.impl.di.holder.ChatFeatureController
+import ru.aleshin.studyassistant.chat.impl.navigation.DefaultChatFeatureFactory
+import ru.aleshin.studyassistant.core.common.di.scope.FeatureControllerScope
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
-import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
-import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
-import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
-import ru.aleshin.studyassistant.core.domain.managers.sync.SourceSyncFacade
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
-import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
+import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.DailyAiStatisticsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
-import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.HomeworkShareRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
-import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ShareHomeworksRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ScheduleShareRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.SubscriptionsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
-import ru.aleshin.studyassistant.editor.api.EditorFeatureStarter
+import ru.aleshin.studyassistant.editor.api.EditorDecomposeFeatureFactory
 import ru.aleshin.studyassistant.editor.impl.di.EditorFeatureDependencies
-import ru.aleshin.studyassistant.editor.impl.navigation.DefaultEditorFeatureStarter
-import ru.aleshin.studyassistant.info.api.InfoFeatureStarter
+import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureController
+import ru.aleshin.studyassistant.editor.impl.navigation.DefaultEditorFeatureFactory
+import ru.aleshin.studyassistant.info.api.InfoDecomposeFeatureFactory
 import ru.aleshin.studyassistant.info.impl.di.InfoFeatureDependencies
-import ru.aleshin.studyassistant.info.impl.navigation.DefaultInfoFeatureStarter
-import ru.aleshin.studyassistant.preview.api.PreviewFeatureStarter
+import ru.aleshin.studyassistant.info.impl.di.holder.InfoFeatureController
+import ru.aleshin.studyassistant.info.impl.navigation.DefaultInfoFeatureFactory
+import ru.aleshin.studyassistant.preview.api.PreviewDecomposeFeatureFactory
 import ru.aleshin.studyassistant.preview.impl.di.PreviewFeatureDependencies
-import ru.aleshin.studyassistant.preview.impl.navigation.DefaultPreviewFeatureStarter
-import ru.aleshin.studyassistant.profile.api.ProfileFeatureStarter
+import ru.aleshin.studyassistant.preview.impl.di.holder.PreviewFeatureController
+import ru.aleshin.studyassistant.preview.impl.navigation.DefaultPreviewFeatureFactory
+import ru.aleshin.studyassistant.profile.api.ProfileDecomposeFeatureFactory
 import ru.aleshin.studyassistant.profile.impl.di.ProfileFeatureDependencies
-import ru.aleshin.studyassistant.profile.impl.navigation.DefaultProfileFeatureStarter
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureStarter
+import ru.aleshin.studyassistant.profile.impl.di.holder.ProfileFeatureController
+import ru.aleshin.studyassistant.profile.impl.navigation.DefaultProfileFeatureFactory
+import ru.aleshin.studyassistant.schedule.api.ScheduleDecomposeFeatureFactory
 import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
-import ru.aleshin.studyassistant.schedule.impl.navigation.DefaultScheduleFeatureStarter
-import ru.aleshin.studyassistant.settings.api.SettingsFeatureStarter
+import ru.aleshin.studyassistant.schedule.impl.di.holder.ScheduleFeatureController
+import ru.aleshin.studyassistant.schedule.impl.navigation.DefaultScheduleFeatureFactory
+import ru.aleshin.studyassistant.settings.api.SettingsDecomposeFeatureFactory
 import ru.aleshin.studyassistant.settings.impl.di.SettingsFeatureDependencies
-import ru.aleshin.studyassistant.settings.impl.navigation.DefaultSettingsFeatureStarter
-import ru.aleshin.studyassistant.tasks.api.TasksFeatureStarter
+import ru.aleshin.studyassistant.settings.impl.di.holder.SettingsFeatureController
+import ru.aleshin.studyassistant.settings.impl.navigation.DefaultSettingsFeatureFactory
+import ru.aleshin.studyassistant.tasks.api.TasksDecomposeFeatureFactory
 import ru.aleshin.studyassistant.tasks.impl.di.TasksFeatureDependencies
-import ru.aleshin.studyassistant.tasks.impl.navigation.DefaultTasksFeatureStarter
-import ru.aleshin.studyassistant.users.api.UsersFeatureStarter
+import ru.aleshin.studyassistant.tasks.impl.di.holder.TasksFeatureController
+import ru.aleshin.studyassistant.tasks.impl.navigation.DefaultTasksFeatureFactory
+import ru.aleshin.studyassistant.users.api.UsersDecomposeFeatureFactory
 import ru.aleshin.studyassistant.users.impl.di.UsersFeatureDependencies
-import ru.aleshin.studyassistant.users.impl.navigation.DefaultUsersFeatureStarter
+import ru.aleshin.studyassistant.users.impl.di.holder.UsersFeatureController
+import ru.aleshin.studyassistant.users.impl.navigation.DefaultUsersFeatureFactory
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 val featureModule = DI.Module("Feature") {
-    bindEagerSingleton<PreviewFeatureDependencies> {
+    bindProvider<AnalyticsFeatureDependencies> {
+        object : AnalyticsFeatureDependencies {
+            override val baseScheduleRepository = instance<BaseScheduleRepository>()
+            override val customScheduleRepository = instance<CustomScheduleRepository>()
+            override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
+            override val homeworksRepository = instance<HomeworksRepository>()
+            override val todoRepository = instance<TodoRepository>()
+            override val goalsRepository = instance<DailyGoalsRepository>()
+            override val dateManager = instance<DateManager>()
+            override val coroutineManager = instance<CoroutineManager>()
+            override val crashlyticsService = instance<CrashlyticsService>()
+        }
+    }
+    bind<AnalyticsFeatureController>() with scoped(FeatureControllerScope).singleton {
+        AnalyticsFeatureController(dependencies = instance())
+    }
+    bindSingleton<AnalyticsDecomposeFeatureFactory> {
+        DefaultAnalyticsFeatureFactory(di)
+    }
+
+    bindProvider<PreviewFeatureDependencies> {
         object : PreviewFeatureDependencies {
-            override val usersRepository = instance<UsersRepository>()
+            override val profileRepository = instance<ProfileRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
-            override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val coroutineManager = instance<CoroutineManager>()
             override val dateManager = instance<DateManager>()
+            override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindSingleton<PreviewFeatureStarter> {
-        DefaultPreviewFeatureStarter { instance<PreviewFeatureDependencies>() }
+    bind<PreviewFeatureController>() with scoped(FeatureControllerScope).singleton {
+        PreviewFeatureController(dependencies = instance())
+    }
+    bindSingleton<PreviewDecomposeFeatureFactory> {
+        DefaultPreviewFeatureFactory(di)
     }
 
-    bindEagerSingleton<AuthFeatureDependencies> {
-        object : AuthFeatureDependencies {
-            override val authRepository = instance<AuthRepository>()
-            override val usersRepository = instance<UsersRepository>()
-            override val generalSettingsRepository = instance<GeneralSettingsRepository>()
-            override val messageRepository = instance<MessageRepository>()
-            override val manageUserRepository = instance<ManageUserRepository>()
-            override val subscriptionsRepository = instance<SubscriptionsRepository>()
-            override val accountService = instance<AccountService>()
-            override val deviceInfoProvider = instance<DeviceInfoProvider>()
-            override val coroutineManager = instance<CoroutineManager>()
-            override val sourceSyncFacade = instance<SourceSyncFacade>()
-            override val appService = instance<AppService>()
-            override val dateManager = instance<DateManager>()
-            override val crashlyticsService = instance<CrashlyticsService>()
-        }
-    }
-    bindSingleton<AuthFeatureStarter> {
-        DefaultAuthFeatureStarter { instance<AuthFeatureDependencies>() }
-    }
-
-    bindEagerSingleton<ScheduleFeatureDependencies> {
+    bindProvider<ScheduleFeatureDependencies> {
         object : ScheduleFeatureDependencies {
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
-            override val shareSchedulesRepository = instance<ShareSchedulesRepository>()
+            override val scheduleShareRepository = instance<ScheduleShareRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
             override val employeeRepository = instance<EmployeeRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
+            override val profileRepository = instance<ProfileRepository>()
             override val homeworkRepository = instance<HomeworksRepository>()
             override val todoRepository = instance<TodoRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
             override val startClassesReminderManager = instance<StartClassesReminderManager>()
             override val endClassesReminderManager = instance<EndClassesReminderManager>()
-            override val usersRepository = instance<UsersRepository>()
             override val connectionManager = instance<Konnection>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindSingleton<ScheduleFeatureStarter> {
-        DefaultScheduleFeatureStarter { instance<ScheduleFeatureDependencies>() }
+    bind<ScheduleFeatureController>() with scoped(FeatureControllerScope).singleton {
+        ScheduleFeatureController(dependencies = instance())
+    }
+    bindSingleton<ScheduleDecomposeFeatureFactory> {
+        DefaultScheduleFeatureFactory(di)
     }
 
-    bindEagerSingleton<TasksFeatureDependencies> {
+    bindProvider<TasksFeatureDependencies> {
         object : TasksFeatureDependencies {
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
+            override val profileRepository = instance<ProfileRepository>()
             override val homeworkRepository = instance<HomeworksRepository>()
             override val goalsRepository = instance<DailyGoalsRepository>()
-            override val shareHomeworksRepository = instance<ShareHomeworksRepository>()
-            override val messageRepository = instance<MessageRepository>()
+            override val homeworkShareRepository = instance<HomeworkShareRepository>()
             override val todoRepository = instance<TodoRepository>()
             override val todoReminderManager = instance<TodoReminderManager>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
-            override val usersRepository = instance<UsersRepository>()
             override val connectionManager = instance<Konnection>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindSingleton<TasksFeatureStarter> {
-        DefaultTasksFeatureStarter { instance<TasksFeatureDependencies>() }
+    bind<TasksFeatureController>() with scoped(FeatureControllerScope).singleton {
+        TasksFeatureController(dependencies = instance())
+    }
+    bindSingleton<TasksDecomposeFeatureFactory> {
+        DefaultTasksFeatureFactory(di)
     }
 
-    bindEagerSingleton<InfoFeatureDependencies> {
+    bindProvider<InfoFeatureDependencies> {
         object : InfoFeatureDependencies {
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
             override val employeeRepository = instance<EmployeeRepository>()
-            override val usersRepository = instance<UsersRepository>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindSingleton<InfoFeatureStarter> {
-        DefaultInfoFeatureStarter { instance<InfoFeatureDependencies>() }
+    bind<InfoFeatureController>() with scoped(FeatureControllerScope).singleton {
+        InfoFeatureController(dependencies = instance())
+    }
+    bindSingleton<InfoDecomposeFeatureFactory> {
+        DefaultInfoFeatureFactory(di)
     }
 
-    bindEagerSingleton<ProfileFeatureDependencies> {
+    bindProvider<ProfileFeatureDependencies> {
         object : ProfileFeatureDependencies {
-            override val authRepository = instance<AuthRepository>()
-            override val shareSchedulesRepository = instance<ShareSchedulesRepository>()
-            override val usersRepository = instance<UsersRepository>()
-            override val messageRepository = instance<MessageRepository>()
-            override val organizationsRepository = instance<OrganizationsRepository>()
-            override val baseSchedulesRepository = instance<BaseScheduleRepository>()
-            override val sourceSyncFacade = instance<SourceSyncFacade>()
-            override val friendRequestsRepository = instance<FriendRequestsRepository>()
-            override val deviceInfoProvider = instance<DeviceInfoProvider>()
-            override val startClassesReminderManager = instance<StartClassesReminderManager>()
-            override val endClassesReminderManager = instance<EndClassesReminderManager>()
-            override val homeworksReminderManager = instance<HomeworksReminderManager>()
-            override val workloadWarningManager = instance<WorkloadWarningManager>()
+            override val profileRepository = instance<ProfileRepository>()
             override val coroutineManager = instance<CoroutineManager>()
-            override val connectionManager = instance<Konnection>()
-            override val dateManager = instance<DateManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindSingleton<ProfileFeatureStarter> {
-        DefaultProfileFeatureStarter { instance<ProfileFeatureDependencies>() }
+    bind<ProfileFeatureController>() with scoped(FeatureControllerScope).singleton {
+        ProfileFeatureController(dependencies = instance())
+    }
+    bindSingleton<ProfileDecomposeFeatureFactory> {
+        DefaultProfileFeatureFactory(di)
     }
 
-    bindEagerSingleton<UsersFeatureDependencies> {
+    bindProvider<UsersFeatureDependencies> {
         object : UsersFeatureDependencies {
             override val employeeRepository = instance<EmployeeRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
-            override val friendRequestsRepository = instance<FriendRequestsRepository>()
-            override val shareSchedulesRepository = instance<ShareSchedulesRepository>()
-            override val shareHomeworksRepository = instance<ShareHomeworksRepository>()
-            override val usersRepository = instance<UsersRepository>()
-            override val messageRepository = instance<MessageRepository>()
-            override val dateManager = instance<DateManager>()
-            override val connectionManager = instance<Konnection>()
             override val coroutineManager = instance<CoroutineManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindSingleton<UsersFeatureStarter> {
-        DefaultUsersFeatureStarter { instance<UsersFeatureDependencies>() }
+    bind<UsersFeatureController>() with scoped(FeatureControllerScope).singleton {
+        UsersFeatureController(dependencies = instance())
+    }
+    bindSingleton<UsersDecomposeFeatureFactory> {
+        DefaultUsersFeatureFactory(di)
     }
 
-    bindEagerSingleton<EditorFeatureDependencies> {
+    bindProvider<EditorFeatureDependencies> {
         object : EditorFeatureDependencies {
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
@@ -257,27 +254,29 @@ val featureModule = DI.Module("Feature") {
             override val startClassesReminderManager = instance<StartClassesReminderManager>()
             override val endClassesReminderManager = instance<EndClassesReminderManager>()
             override val todoReminderManager = instance<TodoReminderManager>()
-            override val usersRepository = instance<UsersRepository>()
-            override val manageUserRepository = instance<ManageUserRepository>()
+            override val profileRepository = instance<ProfileRepository>()
             override val dateManager = instance<DateManager>()
             override val overlayManager = instance<TimeOverlayManager>()
             override val coroutineManager = instance<CoroutineManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindSingleton<EditorFeatureStarter> {
-        DefaultEditorFeatureStarter { instance<EditorFeatureDependencies>() }
+    bind<EditorFeatureController>() with scoped(FeatureControllerScope).singleton {
+        EditorFeatureController(dependencies = instance())
+    }
+    bindSingleton<EditorDecomposeFeatureFactory> {
+        DefaultEditorFeatureFactory(di)
     }
 
-    bindEagerSingleton<SettingsFeatureDependencies> {
+    bindProvider<SettingsFeatureDependencies> {
         object : SettingsFeatureDependencies {
-            override val subscriptionsRepository = instance<SubscriptionsRepository>()
+            override val aiAssistantRepository = instance<AiAssistantRepository>()
+            override val aiSettingsRepository = instance<AiSettingsRepository>()
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
             override val goalsRepository = instance<DailyGoalsRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
-            override val usersRepository = instance<UsersRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
             override val employeeRepository = instance<EmployeeRepository>()
             override val homeworksRepository = instance<HomeworksRepository>()
@@ -292,34 +291,20 @@ val featureModule = DI.Module("Feature") {
             override val coroutineManager = instance<CoroutineManager>()
             override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val crashlyticsService = instance<CrashlyticsService>()
-            override val iapService = instance<IapService>()
         }
     }
-    bindSingleton<SettingsFeatureStarter> {
-        DefaultSettingsFeatureStarter { instance<SettingsFeatureDependencies>() }
+    bind<SettingsFeatureController>() with scoped(FeatureControllerScope).singleton {
+        SettingsFeatureController(dependencies = instance())
+    }
+    bindSingleton<SettingsDecomposeFeatureFactory> {
+        DefaultSettingsFeatureFactory(di)
     }
 
-    bindEagerSingleton<BillingFeatureDependencies> {
-        object : BillingFeatureDependencies {
-            override val usersRepository = instance<UsersRepository>()
-            override val subscriptionsRepository = instance<SubscriptionsRepository>()
-            override val manageUserRepository = instance<ManageUserRepository>()
-            override val dateManager = instance<DateManager>()
-            override val deviceInfoProvider = instance<DeviceInfoProvider>()
-            override val coroutineManager = instance<CoroutineManager>()
-            override val connectionManager = instance<Konnection>()
-            override val iapService = instance<IapService>()
-            override val crashlyticsService = instance<CrashlyticsService>()
-            override val analyticsService = instance<AnalyticsService>()
-        }
-    }
-    bindSingleton<BillingFeatureStarter> {
-        DefaultBillingFeatureStarter { instance<BillingFeatureDependencies>() }
-    }
-
-    bindEagerSingleton<ChatFeatureDependencies> {
+    bindProvider<ChatFeatureDependencies> {
         object : ChatFeatureDependencies {
             override val aiAssistantRepository = instance<AiAssistantRepository>()
+            override val aiSettingsRepository = instance<AiSettingsRepository>()
+            override val profileRepository = instance<ProfileRepository>()
             override val dailyAiStatisticsRepository = instance<DailyAiStatisticsRepository>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
@@ -334,15 +319,16 @@ val featureModule = DI.Module("Feature") {
             override val startClassesReminderManager = instance<StartClassesReminderManager>()
             override val endClassesReminderManager = instance<EndClassesReminderManager>()
             override val todoReminderManager = instance<TodoReminderManager>()
-            override val usersRepository = instance<UsersRepository>()
-            override val manageUserRepository = instance<ManageUserRepository>()
             override val dateManager = instance<DateManager>()
             override val overlayManager = instance<TimeOverlayManager>()
             override val coroutineManager = instance<CoroutineManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
-    bindSingleton<ChatFeatureStarter> {
-        DefaultChatFeatureStarter { instance<ChatFeatureDependencies>() }
+    bind<ChatFeatureController>() with scoped(FeatureControllerScope).singleton {
+        ChatFeatureController(dependencies = instance())
+    }
+    bindSingleton<ChatDecomposeFeatureFactory> {
+        DefaultChatFeatureFactory(di)
     }
 }

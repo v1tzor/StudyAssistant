@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,17 @@
 package ru.aleshin.studyassistant.core.database.models.schedule
 
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.database.utils.BaseLocalEntity
 
 /**
  * @author Stanislav Aleshin on 25.07.2025.
  */
 @Serializable
 data class BaseScheduleEntity(
-    override val uid: String,
+    val uid: String,
     val dateVersionFrom: Long,
     val dateVersionTo: Long,
     val weekDayOfWeek: String,
     val week: String,
     val classes: List<String>,
-    override val updatedAt: Long,
-    val isCacheData: Long,
-) : BaseLocalEntity()
+    val updatedAt: Long,
+)

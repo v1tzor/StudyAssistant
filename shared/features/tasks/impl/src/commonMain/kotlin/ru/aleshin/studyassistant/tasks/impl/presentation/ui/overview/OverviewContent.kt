@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,13 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -43,6 +45,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,33 +54,33 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
+import ru.aleshin.studyassistant.core.ui.views.ShareQrCode
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.DailyGoalsProgressUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.convertToShort
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SentMediatedHomeworksDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.SharedHomeworksDetailsUi
+import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.HomeworkShareSelectionUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DetailsGroupedTodosUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworksCompleteProgressUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.OverviewTasksTab
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToBase
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.users.AppUserUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEffect
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewEvent
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.contract.OverviewState
@@ -90,7 +93,17 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.Overv
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.OverviewTodosInProgressSection
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.OverviewTopBar
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.ScopeOfHomeworksView
-import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.ShareHomeworksView
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.copy_share_link_title
+import ru.aleshin.studyassistant.tasks.impl.resources.daily_goals_section_header
+import ru.aleshin.studyassistant.tasks.impl.resources.homework_share_expires_at_label
+import ru.aleshin.studyassistant.tasks.impl.resources.homework_share_ready_title
+import ru.aleshin.studyassistant.tasks.impl.resources.homeworks_tasks_tab
+import ru.aleshin.studyassistant.tasks.impl.resources.receive_homework_share_title
+import ru.aleshin.studyassistant.tasks.impl.resources.show_all_todos_title
+import ru.aleshin.studyassistant.tasks.impl.resources.todos_tasks_tab
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
 
 /**
  * @author Stanislav Aleshin on 29.06.2024
@@ -102,8 +115,7 @@ internal fun OverviewContent(
 ) {
     val store = overviewComponent.store
     val state by store.stateAsState()
-    val strings = TasksThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
+    val coreCancelTitle = stringResource(CoreRes.string.core_cancel_title)
     val overviewTasksTab = rememberSaveable { mutableStateOf(OverviewTasksTab.HOMEWORKS) }
     val snackbarState = remember { SnackbarHostState() }
 
@@ -175,13 +187,14 @@ internal fun OverviewContent(
                 onChangeTodoDone = { task, done ->
                     store.dispatchEvent(OverviewEvent.UpdateTodoDone(task, done))
                 },
-                onPaidFunctionClick = {
-                    store.dispatchEvent(OverviewEvent.ClickPaidFunction)
-                },
             )
         },
         topBar = {
-            OverviewTopBar()
+            OverviewTopBar(
+                onAnalyticsClick = {
+                    store.dispatchEvent(OverviewEvent.ClickAnalytics)
+                },
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -190,6 +203,7 @@ internal fun OverviewContent(
                         OverviewTasksTab.HOMEWORKS -> {
                             store.dispatchEvent(OverviewEvent.AddHomeworkInEditor)
                         }
+
                         OverviewTasksTab.TODO -> {
                             store.dispatchEvent(OverviewEvent.ClickEditTodo(null))
                         }
@@ -214,11 +228,42 @@ internal fun OverviewContent(
         contentWindowInsets = WindowInsets.statusBars,
     )
 
+    state.homeworkShareLink?.let { link ->
+        val clipboard = LocalClipboardManager.current
+        AlertDialog(
+            onDismissRequest = { store.dispatchEvent(OverviewEvent.ClearHomeworkShareLink) },
+            title = { Text(stringResource(Res.string.homework_share_ready_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(link.code, style = MaterialTheme.typography.headlineSmall)
+                    ShareQrCode(
+                        content = link.deepLink,
+                        modifier = Modifier.align(Alignment.CenterHorizontally).size(200.dp),
+                    )
+                    Text(
+                        "${stringResource(Res.string.homework_share_expires_at_label)}: ${link.expiresAt}",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = { clipboard.setText(AnnotatedString(link.deepLink)) }) {
+                    Text(stringResource(Res.string.copy_share_link_title))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { store.dispatchEvent(OverviewEvent.ClearHomeworkShareLink) }) {
+                    Text(coreCancelTitle)
+                }
+            },
+        )
+    }
+
     store.handleEffects { effect ->
         when (effect) {
             is OverviewEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }
@@ -239,7 +284,7 @@ private fun BaseOverviewContent(
     onDoHomework: (HomeworkUi) -> Unit,
     onSkipHomework: (HomeworkUi) -> Unit,
     onRepeatHomework: (HomeworkUi) -> Unit,
-    onShareHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
+    onShareHomeworks: (HomeworkShareSelectionUi) -> Unit,
     onSelectGoalsDate: (Instant) -> Unit,
     onChangeGoalNumbers: (List<GoalDetailsUi>) -> Unit,
     onCompleteGoal: (GoalDetailsUi) -> Unit,
@@ -253,7 +298,6 @@ private fun BaseOverviewContent(
     onShowAllTodoClick: () -> Unit,
     onEditTodoClick: (TodoUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
-    onPaidFunctionClick: () -> Unit,
 ) {
     Column(
         modifier = modifier.padding(top = 8.dp).verticalScroll(scrollState),
@@ -282,16 +326,12 @@ private fun BaseOverviewContent(
             currentTab = overviewTasksTab,
             isLoadingHomeworks = state.isLoadingHomeworks,
             isLoadingHomeworksProgress = state.isLoadingHomeworksProgress,
-            isLoadingShare = state.isLoadingShare,
             isLoadingTasks = state.isLoadingTasks,
-            isPaidUser = state.isPaidUser,
             currentDate = state.currentDate,
             groupedTodos = state.groupedTodos,
             dailyHomeworks = state.homeworks,
-            sharedHomeworks = state.sharedHomeworks,
             homeworksScope = state.homeworksScope,
             homeworksProgress = state.homeworksProgress,
-            allFriends = state.friends,
             onChangeTab = onChangeTab,
             onHomeworkClick = onHomeworkClick,
             onShowAllSharedHomeworksClick = onShowAllSharedHomeworksClick,
@@ -300,7 +340,6 @@ private fun BaseOverviewContent(
             onSkipHomework = onSkipHomework,
             onRepeatHomework = onRepeatHomework,
             onShareHomeworks = onShareHomeworks,
-            onOpenBillingScreen = onPaidFunctionClick,
             onShowAllTodoTasks = onShowAllTodoClick,
             onOpenTodoTask = { onEditTodoClick(it.convertToBase()) },
             onChangeTodoDone = onChangeTodoDone,
@@ -316,16 +355,12 @@ private fun OverviewContentDetails(
     currentTab: OverviewTasksTab,
     isLoadingHomeworks: Boolean,
     isLoadingHomeworksProgress: Boolean,
-    isLoadingShare: Boolean,
     isLoadingTasks: Boolean,
-    isPaidUser: Boolean,
     currentDate: Instant,
     groupedTodos: DetailsGroupedTodosUi?,
     dailyHomeworks: Map<Instant, DailyHomeworksUi>,
-    sharedHomeworks: SharedHomeworksDetailsUi?,
     homeworksScope: HomeworkScopeUi?,
     homeworksProgress: HomeworksCompleteProgressUi?,
-    allFriends: List<AppUserUi>,
     onChangeTab: (OverviewTasksTab) -> Unit,
     onShowAllSharedHomeworksClick: () -> Unit,
     onShowAllHomeworksClick: () -> Unit,
@@ -333,8 +368,7 @@ private fun OverviewContentDetails(
     onDoHomework: (HomeworkUi) -> Unit,
     onSkipHomework: (HomeworkUi) -> Unit,
     onRepeatHomework: (HomeworkUi) -> Unit,
-    onShareHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
-    onOpenBillingScreen: () -> Unit,
+    onShareHomeworks: (HomeworkShareSelectionUi) -> Unit,
     onShowAllTodoTasks: () -> Unit,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
@@ -358,13 +392,10 @@ private fun OverviewContentDetails(
                 OverviewTasksTab.HOMEWORKS -> HomeworksSection(
                     isLoadingHomeworks = isLoadingHomeworks,
                     isLoadingProgress = isLoadingHomeworksProgress,
-                    isLoadingShare = isLoadingShare,
                     currentDate = currentDate,
                     dailyHomeworks = dailyHomeworks,
-                    sharedHomeworks = sharedHomeworks,
                     homeworksScope = homeworksScope,
                     completeProgress = homeworksProgress,
-                    allFriends = allFriends,
                     onHomeworkClick = onHomeworkClick,
                     onShowAllSharedHomeworksClick = onShowAllSharedHomeworksClick,
                     onShowAllHomeworkTasks = onShowAllHomeworksClick,
@@ -373,12 +404,11 @@ private fun OverviewContentDetails(
                     onRepeatHomework = onRepeatHomework,
                     onShareHomeworks = onShareHomeworks,
                 )
+
                 OverviewTasksTab.TODO -> TodosSection(
                     isLoadingTasks = isLoadingTasks,
-                    isPaidUser = isPaidUser,
                     groupedTodos = groupedTodos,
                     currentDate = currentDate,
-                    onOpenBillingScreen = onOpenBillingScreen,
                     onShowAllTodoTasks = onShowAllTodoTasks,
                     onOpenTodoTask = onOpenTodoTask,
                     onChangeTodoDone = onChangeTodoDone,
@@ -417,7 +447,7 @@ private fun DailyGoalsSection(
     ) {
         Text(
             modifier = Modifier.padding(16.dp),
-            text = TasksThemeRes.strings.dailyGoalsSectionHeader,
+            text = stringResource(Res.string.daily_goals_section_header),
             color = MaterialTheme.colorScheme.onBackground,
             maxLines = 1,
             style = MaterialTheme.typography.titleMedium,
@@ -460,8 +490,8 @@ private fun OverviewTasksTabSelector(
                 onClick = { onChangeTab(tab) },
                 isSelected = tab == currentTab,
                 text = when (tab) {
-                    OverviewTasksTab.HOMEWORKS -> TasksThemeRes.strings.homeworksTasksTab
-                    OverviewTasksTab.TODO -> TasksThemeRes.strings.todosTasksTab
+                    OverviewTasksTab.HOMEWORKS -> stringResource(Res.string.homeworks_tasks_tab)
+                    OverviewTasksTab.TODO -> stringResource(Res.string.todos_tasks_tab)
                 }
             )
         }
@@ -509,20 +539,17 @@ private fun HomeworksSection(
     modifier: Modifier = Modifier,
     isLoadingHomeworks: Boolean,
     isLoadingProgress: Boolean,
-    isLoadingShare: Boolean,
     currentDate: Instant,
     dailyHomeworks: Map<Instant, DailyHomeworksUi>,
-    sharedHomeworks: SharedHomeworksDetailsUi?,
     homeworksScope: HomeworkScopeUi?,
     completeProgress: HomeworksCompleteProgressUi?,
-    allFriends: List<AppUserUi>,
     onShowAllSharedHomeworksClick: () -> Unit,
     onShowAllHomeworkTasks: () -> Unit,
     onHomeworkClick: (HomeworkUi) -> Unit,
     onDoHomework: (HomeworkUi) -> Unit,
     onSkipHomework: (HomeworkUi) -> Unit,
     onRepeatHomework: (HomeworkUi) -> Unit,
-    onShareHomeworks: (SentMediatedHomeworksDetailsUi) -> Unit,
+    onShareHomeworks: (HomeworkShareSelectionUi) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -539,7 +566,6 @@ private fun HomeworksSection(
             isLoadingHomeworks = isLoadingHomeworks,
             currentDate = currentDate,
             homeworks = dailyHomeworks,
-            allFriends = allFriends,
             onOpenHomeworkTasks = { onHomeworkClick(it.convertToBase()) },
             onShowAllHomeworkTasks = onShowAllHomeworkTasks,
             onDoHomework = { onDoHomework(it.convertToBase()) },
@@ -552,11 +578,12 @@ private fun HomeworksSection(
             currentDate = currentDate,
             homeworksScope = homeworksScope,
         )
-        ShareHomeworksView(
-            isLoadingShare = isLoadingShare,
-            sharedHomeworks = sharedHomeworks,
-            onSharedHomeworkClick = onShowAllSharedHomeworksClick,
-        )
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onShowAllSharedHomeworksClick,
+        ) {
+            Text(text = stringResource(Res.string.receive_homework_share_title))
+        }
     }
 }
 
@@ -564,10 +591,8 @@ private fun HomeworksSection(
 private fun TodosSection(
     modifier: Modifier = Modifier,
     isLoadingTasks: Boolean,
-    isPaidUser: Boolean,
     currentDate: Instant,
     groupedTodos: DetailsGroupedTodosUi?,
-    onOpenBillingScreen: () -> Unit,
     onShowAllTodoTasks: () -> Unit,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
@@ -580,10 +605,8 @@ private fun TodosSection(
     ) {
         OverviewTodosInProgressSection(
             isLoading = isLoadingTasks,
-            isPaidUser = isPaidUser,
             currentDate = currentDate,
             todos = groupedTodos?.runningTodos ?: emptyList(),
-            onOpenBillingScreen = onOpenBillingScreen,
             onOpenTodoTask = onOpenTodoTask,
             onChangeTodoDone = onChangeTodoDone,
             onScheduleGoal = onScheduleGoal,
@@ -591,10 +614,8 @@ private fun TodosSection(
         )
         OverviewTodosErrorSection(
             isLoading = isLoadingTasks,
-            isPaidUser = isPaidUser,
             currentDate = currentDate,
             todos = groupedTodos?.errorTodos ?: emptyList(),
-            onOpenBillingScreen = onOpenBillingScreen,
             onOpenTodoTask = onOpenTodoTask,
             onChangeTodoDone = onChangeTodoDone,
             onScheduleGoal = onScheduleGoal,
@@ -610,7 +631,7 @@ private fun TodosSection(
             modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
             onClick = onShowAllTodoTasks
         ) {
-            Text(text = TasksThemeRes.strings.showAllTodosTitle)
+            Text(text = stringResource(Res.string.show_all_todos_title))
         }
     }
 }

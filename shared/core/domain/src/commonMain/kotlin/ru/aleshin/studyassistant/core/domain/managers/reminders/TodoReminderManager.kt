@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,12 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoNotifications
  * @author Stanislav Aleshin on 31.08.2024.
  */
 interface TodoReminderManager {
-    fun scheduleReminders(targetId: UID, name: String, deadline: Instant?, notifications: TodoNotifications)
+    suspend fun scheduleReminders(
+        targetId: UID,
+        name: String,
+        deadline: Instant?,
+        notifications: TodoNotifications
+    )
+
     fun clearAllReminders(targetId: UID)
 }

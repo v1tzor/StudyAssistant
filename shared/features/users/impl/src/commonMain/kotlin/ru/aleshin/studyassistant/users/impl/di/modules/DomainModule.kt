@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.users.impl.domain.common.UsersEitherWrapper
 import ru.aleshin.studyassistant.users.impl.domain.common.UsersErrorHandler
 import ru.aleshin.studyassistant.users.impl.domain.interactors.EmployeeInteractor
-import ru.aleshin.studyassistant.users.impl.domain.interactors.FriendRequestsInteractor
-import ru.aleshin.studyassistant.users.impl.domain.interactors.UsersInteractor
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -33,6 +31,4 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<UsersEitherWrapper> { UsersEitherWrapper.Base(instance(), instance()) }
 
     bindSingleton<EmployeeInteractor> { EmployeeInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<FriendRequestsInteractor> { FriendRequestsInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<UsersInteractor> { UsersInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 }

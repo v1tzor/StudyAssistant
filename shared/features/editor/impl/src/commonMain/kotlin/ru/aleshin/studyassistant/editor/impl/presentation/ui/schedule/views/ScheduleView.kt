@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,14 +39,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DayOfWeek
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.forEachWith
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
+import ru.aleshin.studyassistant.core.presentation.models.schedules.BaseScheduleUi
+import ru.aleshin.studyassistant.core.presentation.models.schedules.ClassUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseScheduleUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.add_title
+import ru.aleshin.studyassistant.editor.impl.resources.ic_clear_circular
+import ru.aleshin.studyassistant.editor.impl.resources.quantity_of_classes_title
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -142,14 +145,14 @@ private fun ScheduleViewHeader(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
         ) {
             Text(
-                text = weekDayOfWeek.mapToSting(StudyAssistantRes.strings),
+                text = weekDayOfWeek.mapToSting(),
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
                 modifier = Modifier.animateContentSize(),
                 text = buildString {
-                    append(EditorThemeRes.strings.quantityOfClassesTitle)
+                    append(stringResource(Res.string.quantity_of_classes_title))
                     append(" ", numberOfClasses.toString())
                 },
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -191,7 +194,7 @@ private fun ScheduleViewContent(
                     ) {
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            painter = painterResource(EditorThemeRes.icons.clearCircular),
+                            painter = painterResource(Res.drawable.ic_clear_circular),
                             tint = MaterialTheme.colorScheme.error,
                             contentDescription = null
                         )
@@ -222,7 +225,7 @@ private fun ScheduleViewFooter(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = EditorThemeRes.strings.addTitle,
+                text = stringResource(Res.string.add_title),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

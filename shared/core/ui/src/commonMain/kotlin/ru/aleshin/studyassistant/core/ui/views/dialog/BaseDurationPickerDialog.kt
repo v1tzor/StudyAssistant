@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.hoursToMillis
 import ru.aleshin.studyassistant.core.common.extensions.minutesToMillis
 import ru.aleshin.studyassistant.core.common.extensions.toHorses
@@ -62,7 +63,13 @@ import ru.aleshin.studyassistant.core.common.extensions.toMinutesInHours
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
 import ru.aleshin.studyassistant.core.ui.models.StandardDuration
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
+import ru.aleshin.studyassistant.core.ui.resources.hours_title as core_hours_title
+import ru.aleshin.studyassistant.core.ui.resources.ic_clock_outline as core_ic_clock_outline
+import ru.aleshin.studyassistant.core.ui.resources.minutes_title as core_minutes_title
+import ru.aleshin.studyassistant.core.ui.resources.select_confirm_title as core_select_confirm_title
+import ru.aleshin.studyassistant.core.ui.resources.separator as core_separator
 
 /**
  * @author Stanislav Aleshin on 26.05.2024.
@@ -124,7 +131,8 @@ fun DurationPickerDialog(
                                     minute = it.minute
                                 },
                                 label = {
-                                    val millis = it.hour.hoursToMillis() + it.minute.minutesToMillis()
+                                    val millis =
+                                        it.hour.hoursToMillis() + it.minute.minutesToMillis()
                                     Text(text = millis.toMinutesOrHoursTitle())
                                 },
                                 border = AssistChipDefaults.assistChipBorder(
@@ -171,9 +179,11 @@ internal fun DurationPickerHourMinuteSelector(
             if (value.length == 2 && value.toIntOrNull() in 0..23) requester.requestFocus()
         },
         shape = MaterialTheme.shapes.small,
-        supportingText = if (isEnableSupportText) { {
-            Text(StudyAssistantRes.strings.hoursTitle)
-        } } else {
+        supportingText = if (isEnableSupportText) {
+            {
+                Text(stringResource(CoreRes.string.core_hours_title))
+            }
+        } else {
             null
         },
         singleLine = true,
@@ -187,7 +197,7 @@ internal fun DurationPickerHourMinuteSelector(
     )
     Text(
         modifier = Modifier.width(24.dp),
-        text = StudyAssistantRes.strings.separator,
+        text = stringResource(CoreRes.string.core_separator),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.displayLarge,
         color = MaterialTheme.colorScheme.onSurface,
@@ -198,9 +208,11 @@ internal fun DurationPickerHourMinuteSelector(
         textStyle = MaterialTheme.typography.displayMedium.copy(textAlign = TextAlign.Center),
         onValueChange = onHoursChanges,
         shape = MaterialTheme.shapes.small,
-        supportingText = if (isEnableSupportText) { {
-            Text(StudyAssistantRes.strings.minutesTitle)
-        } } else {
+        supportingText = if (isEnableSupportText) {
+            {
+                Text(stringResource(CoreRes.string.core_minutes_title))
+            }
+        } else {
             null
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -244,7 +256,7 @@ internal fun DurationPickerActions(
     if (showCurrentTimeSelector && onCurrentTimeChoose != null) {
         IconButton(onClick = onCurrentTimeChoose) {
             Icon(
-                painter = painterResource(StudyAssistantRes.icons.timeOutline),
+                painter = painterResource(CoreRes.drawable.core_ic_clock_outline),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface,
             )
@@ -253,13 +265,13 @@ internal fun DurationPickerActions(
     Spacer(modifier = Modifier.weight(1f))
     TextButton(onClick = onDismiss) {
         Text(
-            text = StudyAssistantRes.strings.cancelTitle,
+            text = stringResource(CoreRes.string.core_cancel_title),
             maxLines = 1,
         )
     }
     TextButton(enabled = enabled, onClick = onConfirm) {
         Text(
-            text = StudyAssistantRes.strings.selectConfirmTitle,
+            text = stringResource(CoreRes.string.core_select_confirm_title),
             maxLines = 1,
         )
     }

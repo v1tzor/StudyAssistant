@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.core.database.models.settings
 
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.core.database.utils.BaseLocalEntity
 import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
 
@@ -26,13 +25,11 @@ import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewT
  */
 @Serializable
 data class BaseCalendarSettingsEntity(
-    override val uid: String = "2",
     val numberOfWeek: String = NumberOfRepeatWeek.ONE.name,
     val weekScheduleViewType: String = WeekScheduleViewType.COMMON.name,
     val holidays: List<String>? = emptyList(),
-    override val updatedAt: Long = 0,
-    val isCacheData: Long = 1L,
-) : BaseLocalEntity() {
+    val updatedAt: Long = 0,
+) {
     companion object {
         fun default() = BaseCalendarSettingsEntity()
     }

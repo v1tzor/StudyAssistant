@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,9 +45,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants.Text.DEFAULT_MAX_TEXT_LENGTH
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.first_name_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.ic_subject_name
+import ru.aleshin.studyassistant.editor.impl.resources.patronymic_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.second_name_field_label
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -75,7 +80,7 @@ internal fun EmployeeNameInfoField(
         Box(modifier = Modifier.height(56.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(EditorThemeRes.icons.name),
+                painter = painterResource(Res.drawable.ic_subject_name),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -95,7 +100,7 @@ internal fun EmployeeNameInfoField(
                         onUpdateFirstName(text)
                     }
                 },
-                label = { Text(text = EditorThemeRes.strings.firstNameFieldLabel) },
+                label = { Text(text = stringResource(Res.string.first_name_field_label)) },
                 trailingIcon = {
                     if (firstNameInteraction.collectIsFocusedAsState().value) {
                         IconButton(onClick = { focusManager.clearFocus() }) {
@@ -136,7 +141,7 @@ internal fun EmployeeNameInfoField(
                     }
                 },
                 interactionSource = patronymicInteraction,
-                label = { Text(text = EditorThemeRes.strings.patronymicFieldLabel) },
+                label = { Text(text = stringResource(Res.string.patronymic_field_label)) },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
@@ -153,7 +158,7 @@ internal fun EmployeeNameInfoField(
                         onUpdateSecondName(text)
                     }
                 },
-                label = { Text(text = EditorThemeRes.strings.secondNameFieldLabel) },
+                label = { Text(text = stringResource(Res.string.second_name_field_label)) },
                 trailingIcon = {
                     if (secondNameInteraction.collectIsFocusedAsState().value) {
                         IconButton(onClick = { focusManager.clearFocus() }) {

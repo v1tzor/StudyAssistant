@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.isoWeekNumber
@@ -48,7 +49,14 @@ import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewT
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.theme.material.topSide
 import ru.aleshin.studyassistant.core.ui.views.shortDayMonthFormat
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.common_schedule_view_type
+import ru.aleshin.studyassistant.schedule.impl.resources.current_week_title
+import ru.aleshin.studyassistant.schedule.impl.resources.ic_format_columns
+import ru.aleshin.studyassistant.schedule.impl.resources.ic_format_grid
+import ru.aleshin.studyassistant.schedule.impl.resources.next_week_title
+import ru.aleshin.studyassistant.schedule.impl.resources.previous_week_title
+import ru.aleshin.studyassistant.schedule.impl.resources.vertical_schedule_view_type
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
@@ -122,10 +130,10 @@ internal fun WeekPickerView(
             }
             Text(
                 text = when {
-                    currentWeek == null || selectedWeek == null -> ScheduleThemeRes.strings.currentWeekTitle
-                    currentWeek == selectedWeek -> ScheduleThemeRes.strings.currentWeekTitle
-                    currentWeekNumber.inc() == selectedWeekNumber -> ScheduleThemeRes.strings.nextWeekTitle
-                    currentWeekNumber.dec() == selectedWeekNumber -> ScheduleThemeRes.strings.previousWeekTitle
+                    currentWeek == null || selectedWeek == null -> stringResource(Res.string.current_week_title)
+                    currentWeek == selectedWeek -> stringResource(Res.string.current_week_title)
+                    currentWeekNumber.inc() == selectedWeekNumber -> stringResource(Res.string.next_week_title)
+                    currentWeekNumber.dec() == selectedWeekNumber -> stringResource(Res.string.previous_week_title)
                     else -> buildString {
                         append(selectedWeek.from.formatByTimeZone(shortDateFormat))
                         append(" - ")
@@ -180,8 +188,8 @@ internal fun ScheduleViewTypePicker(
                 if (this@BoxWithConstraints.maxWidth > 158.dp) {
                     Text(
                         text = when (selectedType) {
-                            WeekScheduleViewType.COMMON -> ScheduleThemeRes.strings.commonScheduleViewType
-                            WeekScheduleViewType.VERTICAL -> ScheduleThemeRes.strings.verticalScheduleViewType
+                            WeekScheduleViewType.COMMON -> stringResource(Res.string.common_schedule_view_type)
+                            WeekScheduleViewType.VERTICAL -> stringResource(Res.string.vertical_schedule_view_type)
                         },
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
@@ -191,8 +199,8 @@ internal fun ScheduleViewTypePicker(
                 Icon(
                     modifier = Modifier.size(18.dp),
                     painter = when (selectedType) {
-                        WeekScheduleViewType.COMMON -> painterResource(ScheduleThemeRes.icons.formatGrid)
-                        WeekScheduleViewType.VERTICAL -> painterResource(ScheduleThemeRes.icons.formatColumns)
+                        WeekScheduleViewType.COMMON -> painterResource(Res.drawable.ic_format_grid)
+                        WeekScheduleViewType.VERTICAL -> painterResource(Res.drawable.ic_format_columns)
                     },
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurface,

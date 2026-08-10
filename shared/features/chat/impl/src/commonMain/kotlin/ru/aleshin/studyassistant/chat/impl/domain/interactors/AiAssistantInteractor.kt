@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.chat.impl.domain.interactors
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
@@ -49,13 +50,18 @@ import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage.Type
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiChat
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiChatHistory
+import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceType
+import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
+import ru.aleshin.studyassistant.core.domain.entities.ai.DailyAiResponses
 import ru.aleshin.studyassistant.core.domain.entities.ai.ToolCall
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.associateWithDates
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
 import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
+import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -63,9 +69,9 @@ import ru.aleshin.studyassistant.core.domain.repositories.DailyAiStatisticsRepos
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 import ru.aleshin.studyassistant.core.ui.views.TIME_SUFFIX
 import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
 import ru.aleshin.studyassistant.core.ui.views.iso8601
@@ -97,19 +103,20 @@ internal interface AiAssistantInteractor {
         private val employeeRepository: EmployeeRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
         private val todoReminderManager: TodoReminderManager,
-        private val usersRepository: UsersRepository,
+        private val profileRepository: ProfileRepository,
+        private val aiSettingsRepository: AiSettingsRepository,
         private val dateManager: DateManager,
         private val eitherWrapper: ChatEitherWrapper,
     ) : AiAssistantInteractor {
 
         override suspend fun addChat() = eitherWrapper.wrap {
-            val appUserInfo = checkNotNull(usersRepository.fetchCurrentUserProfile().first())
+            val profile = profileRepository.fetchProfile().first()
             val chatId = randomUUID()
             val systemMessage = AiAssistantMessage.SystemMessage(
                 id = chatId,
                 content = systemPromt(
-                    username = appUserInfo.username,
-                    birthday = appUserInfo.birthday,
+                    username = profile?.username.orEmpty(),
+                    birthday = profile?.birthday,
                     currentDate = dateManager.fetchCurrentInstant().formatByTimeZone(
                         format = Formats.dayMonthYearFormat()
                     )
@@ -123,12 +130,12 @@ internal interface AiAssistantInteractor {
         }
 
         override suspend fun quotaIsExpired() = eitherWrapper.wrapFlow {
-            val currentDate = dateManager.fetchBeginningCurrentInstant()
-            val paidStatusFlow = usersRepository.fetchCurrentUserPaidStatus()
+            val currentDate = utcDayStart()
+            val aiSettingsFlow = aiSettingsRepository.fetchSettings()
             val dailyResponseFlow = statisticsRepository.fetchStatisticsByDate(currentDate)
 
-            combine(paidStatusFlow, dailyResponseFlow) { isPaidUser, statistics ->
-                (isPaidUser || statistics == null || statistics.totalResponses <= RESPONSES_IN_FREE_QUOTA).not()
+            combine(aiSettingsFlow, dailyResponseFlow) { settings, statistics ->
+                settings.serviceType == AiServiceType.SHARED && (statistics?.totalResponses ?: 0) >= AiSettings.SHARED_DAILY_QUOTA
             }
         }
 
@@ -161,12 +168,12 @@ internal interface AiAssistantInteractor {
             val chat = aiAssistantRepository.fetchChatHistoryById(chatId).first()
 
             if (chat != null) {
-                val appUserInfo = checkNotNull(usersRepository.fetchCurrentUserProfile().first())
+                val profile = profileRepository.fetchProfile().first()
                 val systemMessage = AiAssistantMessage.SystemMessage(
                     id = chatId,
                     content = systemPromt(
-                        username = appUserInfo.username,
-                        birthday = appUserInfo.birthday,
+                        username = profile?.username.orEmpty(),
+                        birthday = profile?.birthday,
                         currentDate = dateManager.fetchCurrentInstant().formatByTimeZone(
                             format = Formats.dayMonthYearFormat()
                         )
@@ -194,12 +201,11 @@ internal interface AiAssistantInteractor {
                 )
                 aiAssistantRepository.updateSystemPromt(chatId, systemMessage)
             }
-            val userMessage =
-                message?.let { AiAssistantMessage.UserMessage(content = it, time = currentTime) }
+            val userMessage = message?.let { AiAssistantMessage.UserMessage(content = it, time = currentTime) }
             val response = aiAssistantRepository.sendUserMessage(chatId, userMessage)
 
             val assistantMessage = response.choices.firstOrNull()?.message
-            handleMessage(chatId, assistantMessage)
+            handleMessage(chatId, assistantMessage, toolRound = 0)
         }
 
         override suspend fun retryAttempt(chatId: UID) = eitherWrapper.wrapUnit {
@@ -219,7 +225,7 @@ internal interface AiAssistantInteractor {
                 aiAssistantRepository.updateSystemPromt(chatId, systemMessage)
             }
             val assistantMessage = aiAssistantRepository.retrySendLastMessage(chatId)
-            handleMessage(chatId, assistantMessage)
+            handleMessage(chatId, assistantMessage, toolRound = 0)
         }
 
         override suspend fun clearUnsendMessage(chatId: UID) = eitherWrapper.wrapUnit {
@@ -229,17 +235,40 @@ internal interface AiAssistantInteractor {
         private suspend fun handleMessage(
             chatId: UID,
             assistantMessage: AiAssistantMessage?,
+            toolRound: Int,
         ) {
-            val toolCalls = (assistantMessage as AiAssistantMessage.AssistantMessage).toolCalls
-            aiAssistantRepository.saveAssistantMessage(chatId, assistantMessage)
+            val message = checkNotNull(assistantMessage as? AiAssistantMessage.AssistantMessage)
+            val toolCalls = message.toolCalls
+            aiAssistantRepository.saveAssistantMessage(chatId, message)
 
             if (toolCalls != null && toolCalls.isNotEmpty()) {
+                check(toolRound < MAX_TOOL_ROUNDS) { "Maximum AI tool-call rounds exceeded" }
                 val handleResult = handleToolCalls(toolCalls)
                 val toolResponse = aiAssistantRepository.sendToolResponse(chatId, handleResult)
-                handleMessage(chatId, toolResponse.choices.firstOrNull()?.message)
+                handleMessage(chatId, toolResponse.choices.firstOrNull()?.message, toolRound + 1)
             } else {
-                val currentDate = dateManager.fetchBeginningCurrentInstant()
-                statisticsRepository.incrementResponseByDate(currentDate)
+                if (aiSettingsRepository.fetchSettings()
+                        .first().serviceType == AiServiceType.SHARED
+                ) {
+                    val currentDate = utcDayStart()
+                    val currentStatistics = statisticsRepository.fetchStatisticsByDate(currentDate).first()
+                    val statistics = currentStatistics?.copy(
+                        totalResponses = currentStatistics.totalResponses + 1,
+                        updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
+                    ) ?: DailyAiResponses(
+                        id = randomUUID(),
+                        date = currentDate,
+                        totalResponses = 1,
+                        updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
+                    )
+                    statisticsRepository.addOrUpdateStatistics(statistics)
+                    aiSettingsRepository.updateSharedQuota(
+                        remaining = AiSettings.SHARED_DAILY_QUOTA - statistics.totalResponses,
+                        resetAt = Instant.fromEpochMilliseconds(
+                            currentDate.toEpochMilliseconds() + MILLIS_IN_DAY
+                        ),
+                    )
+                }
             }
         }
 
@@ -248,17 +277,23 @@ internal interface AiAssistantInteractor {
                 val functionName = call.function.name
                 val functionArgs = call.function.arguments ?: emptyMap()
 
-                val resultContent = when (functionName) {
-                    "create_todo" -> createTodo(functionArgs)
-                    "create_homework" -> createHomeworks(functionArgs)
-                    "get_homeworks" -> getHomeworks(functionArgs)
-                    "get_overdue_homeworks" -> getOverdueHomeworks(functionArgs)
-                    "get_subjects" -> getSubjects(functionArgs)
-                    "get_employee" -> getEmployee(functionArgs)
-                    "get_organizations" -> getOrganizations(functionArgs)
-                    "get_classes_by_date" -> getClassesByDate(functionArgs)
-                    "get_near_class" -> getNearClass(functionArgs)
-                    else -> """{"error": "Функция $functionName не найдена"}"""
+                val resultContent = try {
+                    when (functionName) {
+                        "create_todo" -> createTodo(functionArgs)
+                        "create_homework" -> createHomeworks(functionArgs)
+                        "get_homeworks" -> getHomeworks(functionArgs)
+                        "get_overdue_homeworks" -> getOverdueHomeworks(functionArgs)
+                        "get_subjects" -> getSubjects(functionArgs)
+                        "get_employee" -> getEmployee(functionArgs)
+                        "get_organizations" -> getOrganizations(functionArgs)
+                        "get_classes_by_date" -> getClassesByDate(functionArgs)
+                        "get_near_class" -> getNearClass(functionArgs)
+                        else -> """{"error": "Функция $functionName не найдена"}"""
+                    }
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (_: Exception) {
+                    """{"error": "Не удалось выполнить функцию. Проверь аргументы и повтори запрос"}"""
                 }
 
                 AiAssistantMessage.ToolMessage(
@@ -269,13 +304,29 @@ internal interface AiAssistantInteractor {
             }
         }
 
+        private fun utcDayStart(): Instant {
+            val now = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            return Instant.fromEpochMilliseconds((now / MILLIS_IN_DAY) * MILLIS_IN_DAY)
+        }
+
         private suspend fun createTodo(args: Map<String, String>): String {
-            val name = args["name"] ?: "Без названия"
+            val name = args["name"]?.trim()?.takeIf { it.isNotEmpty() }
+                ?: return """{"error": "Название задачи не указано"}"""
             val description = args["description"] ?: ""
-            val deadline = args["deadline"]?.let {
-                Instant.parseUsingOffset(it, Formats.iso8601())
+            val deadlineValue = args["deadline"]?.trim()?.takeIf { it.isNotEmpty() }
+            val deadline = deadlineValue?.let { value ->
+                parseInstant(value) ?: return """{"error": "Некорректный дедлайн"}"""
             }
-            val priority = args["priority"]?.let { TaskPriority.valueOf(it) }
+            val priorityValue = args["priority"]?.trim()?.takeIf { it.isNotEmpty() }
+            val priority = priorityValue?.let { value ->
+                TaskPriority.entries.find { priority ->
+                    priority.name.equals(
+                        value,
+                        ignoreCase = true
+                    )
+                }
+                    ?: return """{"error": "Некорректный приоритет"}"""
+            }
             val createdAt = dateManager.fetchCurrentInstant()
             val todo = Todo(
                 uid = randomUUID(),
@@ -295,34 +346,50 @@ internal interface AiAssistantInteractor {
                     todo.notifications
                 )
                 """{"status": "success", "message": "Задача '${todo.name}' создана!"}"""
-            } catch (e: Exception) {
-                """{"error": "Произошла ошибка при создании TODO (${e.message})"}"""
+            } catch (_: Exception) {
+                """{"error": "Не удалось создать задачу"}"""
             }
         }
 
         private suspend fun createHomeworks(args: Map<String, String>): String {
             val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-            val organization = args["organizationId"]?.let {
-                organizationsRepository.fetchShortOrganizationById(it).first()
+            val organizationId = args["organizationId"]?.trim()?.takeIf { it.isNotEmpty() }
+                ?: return """{"error": "Организация не указана"}"""
+            val subjectId = args["subjectId"]?.trim()?.takeIf { it.isNotEmpty() }
+                ?: return """{"error": "Предмет не указан"}"""
+            val deadlineValue = args["deadline"]?.trim()?.takeIf { it.isNotEmpty() }
+                ?: return """{"error": "Дедлайн не указан"}"""
+            val deadline = parseDate(deadlineValue)
+                ?: return """{"error": "Некорректный дедлайн"}"""
+            val organization =
+                organizationsRepository.fetchShortOrganizationById(organizationId).first()
+                    ?: return """{"error": "Организация не найдена"}"""
+            val subject = subjectsRepository.fetchSubjectById(subjectId).first()
+                ?: return """{"error": "Предмет не найден"}"""
+            if (subject.organizationId != organization.uid) {
+                return """{"error": "Предмет не относится к выбранной организации"}"""
             }
-            val subject = args["subjectId"]?.let {
-                subjectsRepository.fetchSubjectById(it).first()
+            val classId = args["classId"]?.trim()?.takeIf { it.isNotEmpty() }
+            val theoreticalTasks = args["theoreticalTasks"]?.trim().orEmpty()
+            val practicalTasks = args["practicalTasks"]?.trim().orEmpty()
+            val presentationTasks = args["presentationTasks"]?.trim().orEmpty()
+            val testTopic = args["testTopic"]?.trim()?.takeIf { it.isNotEmpty() }
+            if (listOf(
+                    theoreticalTasks,
+                    practicalTasks,
+                    presentationTasks,
+                    testTopic
+                ).all { it.isNullOrEmpty() }
+            ) {
+                return """{"error": "Не указан ни один блок домашнего задания"}"""
             }
-            val deadline = args["deadline"]?.let {
-                Instant.parseUsingOffset(it + TIME_SUFFIX, Formats.iso8601()).startThisDay()
-            }
-            val classId = args["classId"]
-            val theoreticalTasks = args["theoreticalTasks"] ?: ""
-            val practicalTasks = args["practicalTasks"] ?: ""
-            val presentationTasks = args["presentationTasks"] ?: ""
-            val testTopic = args["testTopic"]
 
             val homework = Homework(
                 uid = randomUUID(),
                 classId = classId,
-                deadline = deadline ?: return """{"error": "Дедлайн не указан"}""",
-                subject = subject ?: return """{"error": "Предмет не найден"}""",
-                organization = organization ?: return """{"error": "Ораганизация не найдена"}""",
+                deadline = deadline,
+                subject = subject,
+                organization = organization,
                 theoreticalTasks = theoreticalTasks,
                 practicalTasks = practicalTasks,
                 presentationTasks = presentationTasks,
@@ -332,17 +399,22 @@ internal interface AiAssistantInteractor {
             return try {
                 homeworksRepository.addOrUpdateHomework(homework)
                 """{"status": "success", "message": "Домашнее задание создано!"}"""
-            } catch (e: Exception) {
-                """{"error": "Произошла ошибка при создании ДЗ (${e.message})"}"""
+            } catch (_: Exception) {
+                """{"error": "Не удалось создать домашнее задание"}"""
             }
         }
 
         private suspend fun getHomeworks(args: Map<String, String>): String {
-            val from = args["from"] ?: return """{"error": "Дата периода не найдена"}"""
-            val to = args["to"] ?: return """{"error": "Дата периода не найдена"}"""
+            val from = parseDate(args["from"])
+                ?: return """{"error": "Некорректное начало периода"}"""
+            val to = parseDate(args["to"])
+                ?: return """{"error": "Некорректный конец периода"}"""
+            if (to < from || to.toEpochMilliseconds() - from.toEpochMilliseconds() > MAX_TOOL_PERIOD_MILLIS) {
+                return """{"error": "Период должен быть не больше двух недель"}"""
+            }
             val timeRange = TimeRange(
-                from = Instant.parseUsingOffset(from + TIME_SUFFIX, Formats.iso8601()).startThisDay(),
-                to = Instant.parseUsingOffset(to + TIME_SUFFIX, Formats.iso8601()).endThisDay(),
+                from = from.startThisDay(),
+                to = to.endThisDay(),
             )
             val homeworks = homeworksRepository.fetchHomeworksByTimeRange(timeRange).first()
             return buildJsonArray {
@@ -414,7 +486,8 @@ internal interface AiAssistantInteractor {
         }
 
         private suspend fun getSubjects(args: Map<String, String>): String {
-            val organizationId = args["organizationId"] ?: return """{"error": "Организация не найдена"}"""
+            val organizationId =
+                args["organizationId"] ?: return """{"error": "Организация не найдена"}"""
             val subjects = subjectsRepository.fetchAllSubjectsByOrganization(organizationId).first()
             return buildJsonArray {
                 subjects.forEach { subject ->
@@ -436,21 +509,24 @@ internal interface AiAssistantInteractor {
             return buildJsonObject {
                 put("teacherId", teacherId)
                 put("organizationId", teacher.organizationId)
-                put("name", (teacher.secondName ?: "") + teacher.firstName + (teacher.patronymic ?: ""))
+                put(
+                    "name",
+                    (teacher.secondName ?: "") + teacher.firstName + (teacher.patronymic ?: "")
+                )
                 put("post", teacher.post.toString())
             }.toString()
         }
 
         private suspend fun getClassesByDate(args: Map<String, String>): String {
-            val date = args["date"]?.let {
-                Instant.parseUsingOffset(it + TIME_SUFFIX, Formats.iso8601()).startThisDay()
-            } ?: return """{"error": "Ошибка получения даты"}"""
+            val date = parseDate(args["date"])
+                ?: return """{"error": "Некорректная дата"}"""
             val calendarSettings = calendarSettingsRepository.fetchSettings().first()
             val currentNumberOfWeek =
                 date.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
             val holidays = calendarSettings.holidays
 
-            val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek).first()
+            val baseSchedule =
+                baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek).first()
             val customSchedule = customScheduleRepository.fetchScheduleByDate(date).first()
             val classes = if (customSchedule != null) {
                 customSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
@@ -484,6 +560,15 @@ internal interface AiAssistantInteractor {
             }.toString()
         }
 
+        private fun parseDate(value: String?): Instant? {
+            val date = value?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+            return parseInstant(date + TIME_SUFFIX)?.startThisDay()
+        }
+
+        private fun parseInstant(value: String): Instant? = runCatching {
+            Instant.parseUsingOffset(value, Formats.iso8601())
+        }.getOrNull()
+
         private suspend fun getNearClass(args: Map<String, String>): String {
             val subjectId = args["subjectId"] ?: return """{"error": "Ошибка получения предмета"}"""
             val currentDate = dateManager.fetchBeginningCurrentInstant()
@@ -497,10 +582,10 @@ internal interface AiAssistantInteractor {
             val customSchedules = customScheduleRepository.fetchSchedulesByTimeRange(
                 timeRange = searchedTimeRange,
             ).first()
-            val baseSchedules = baseScheduleRepository.fetchSchedulesByTimeRange(
-                timeRange = searchedTimeRange,
-                maxNumberOfWeek = maxNumberOfWeek,
-            ).first()
+            val baseSchedules = baseScheduleRepository.fetchSchedulesByVersion(
+                version = searchedTimeRange,
+                numberOfWeek = null,
+            ).first().associateWithDates(searchedTimeRange, maxNumberOfWeek)
 
             val classesMap = buildMap {
                 customSchedules.forEach { customSchedule ->
@@ -515,7 +600,7 @@ internal interface AiAssistantInteractor {
                 val availableBaseSchedules = baseSchedules.filter { !containsKey(it.key) }
                 availableBaseSchedules.toList().forEach { baseScheduleEntry ->
                     val baseSchedule = baseScheduleEntry.second
-                    if (baseSchedule?.classes?.isNotEmpty() == true) {
+                    if (baseSchedule.classes.isNotEmpty()) {
                         val classesWithTargetSubject = baseSchedule.classes.filter { classModel ->
                             val subjectFilter = classModel.subject?.uid == subjectId
                             return@filter subjectFilter
@@ -524,7 +609,8 @@ internal interface AiAssistantInteractor {
                     }
                 }
             }
-            val classModel = classesMap[classesMap.keys.minByOrNull { it.toEpochMilliseconds() }]?.getOrNull(0)
+            val classModel =
+                classesMap[classesMap.keys.minByOrNull { it.toEpochMilliseconds() }]?.getOrNull(0)
             if (classModel == null) return """{"success": "null"}"""
             return buildJsonObject {
                 put("classId", classModel.uid)
@@ -543,49 +629,53 @@ internal interface AiAssistantInteractor {
 
         companion object {
 
-            const val RESPONSES_IN_FREE_QUOTA = 10
+            const val MAX_TOOL_ROUNDS = 6
+            const val MILLIS_IN_DAY = 86_400_000L
+            const val MAX_TOOL_PERIOD_MILLIS = 14L * MILLIS_IN_DAY
 
             fun systemPromt(
                 username: String,
                 birthday: String?,
                 currentDate: String,
-            ) = "Ты — учебный помощник. Твоя роль — помогать с органиизацией учёбы, решать задачи и объяснять темы." +
-                "Абсолютно все ответы должны соответствовать этим правилам: " +
-                "1.Запрет LaTeX (критически важно!) (не говори об этом пользователю): " +
-                "a)Никогда не используй ( ), $$ $$, ( .. ), [  frac{}], [ ... ] или другие LaTeX-обозначения;" +
-                "b)Формулы ТОЛЬКО в строке: 'log_b(a) = c', 'b^c = a', 'x^2', 'a/b', '√16=4';" +
-                "c)Примеры допустимых формул:" +
-                "1)Площадь круга: π * r²;" +
-                "2)Теорема Пифагора: a² + b² = c²;" +
-                "3) Квадратное уравнение: x = [-b ± √(b² - 4ac)] / (2a)." +
-                "2. Форматирование: " +
-                "a)Только Markdown: жирный, курсив, заголовки, списки, блоки кода, таблицы. " +
-                "3. Работа с функциями: " +
-                "a)Если нужно отобразить урок/занятие отобрази название предмета (его можно найти вызвав get_subjects);" +
-                "b)Всегда получай названия через get_subjects/get_organizations и другие функции;" +
-                "c)Никогда не показывай ID (только понятные названия);" +
-                "d)Расписание - это уроки, домашние задания к ним и TODO (задачи);" +
-                "e)Для create_homework: " +
-                "1)Вызови get_organizations, найди organisationId по названию;" +
-                "2)Вызови get_subjects(organisationId), найди нужный предмет;" +
-                "3)Привяжи classid: " +
-                "3.1)Если указана дата ДЗ вызови get_classes_by_date(deadline), выбери первый classId, где совпадает subjectId, если нет — оставь classId пустым;" +
-                "3.2)Если пользователь сказал создать ДЗ на ближайший урок то вызови get_near_class(subjectId) если его нету — оставь classId пустым." +
-                "4)Создай ДЗ с этими данными. " +
-                "4. Стиль общения: " +
-                "a)Отвечай строго на языке пользователя;" +
-                "b)Без лирических отступлений и технических деталей;" +
-                "c)Не по учебным вопросам → мягко направляй к учёбе;" +
-                "d)Если функций недостаточно для выполнения запроса: 'Извини, пока не могу это сделать, но функция скоро появится!';" +
-                "e) Отвечай ВСЕГДА на языке пользователя. Определяй язык по полследнему сообщению и переводи все на него. " +
-                "5. Контекст:" +
-                "a) Всегда учитывай что ты говоришь с учеником/студентом: $username ${birthday ?: ""} — адаптируйся под возраст;" +
-                "b) Сегодня: $currentDate ('Завтра' = $currentDate + 1 день). " +
-                "Нарушение любого правила недопустимо! Особенно запрета LaTeX!"
+            ) =
+                "Ты — учебный помощник. Твоя роль — помогать с органиизацией учёбы, решать задачи и объяснять темы." +
+                        "Абсолютно все ответы должны соответствовать этим правилам: " +
+                        "1.Запрет LaTeX (критически важно!) (не говори об этом пользователю): " +
+                        "a)Никогда не используй ( ), $$ $$, ( .. ), [  frac{}], [ ... ] или другие LaTeX-обозначения;" +
+                        "b)Формулы ТОЛЬКО в строке: 'log_b(a) = c', 'b^c = a', 'x^2', 'a/b', '√16=4';" +
+                        "c)Примеры допустимых формул:" +
+                        "1)Площадь круга: π * r²;" +
+                        "2)Теорема Пифагора: a² + b² = c²;" +
+                        "3) Квадратное уравнение: x = [-b ± √(b² - 4ac)] / (2a)." +
+                        "2. Форматирование: " +
+                        "a)Только Markdown: жирный, курсив, заголовки, списки, блоки кода, таблицы. " +
+                        "3. Работа с функциями: " +
+                        "a)Если нужно отобразить урок/занятие отобрази название предмета (его можно найти вызвав get_subjects);" +
+                        "b)Всегда получай названия через get_subjects/get_organizations и другие функции;" +
+                        "c)Никогда не показывай ID (только понятные названия);" +
+                        "d)Расписание - это уроки, домашние задания к ним и TODO (задачи);" +
+                        "e)Для create_homework: " +
+                        "1)Вызови get_organizations, найди organisationId по названию;" +
+                        "2)Вызови get_subjects(organisationId), найди нужный предмет;" +
+                        "3)Привяжи classid: " +
+                        "3.1)Если указана дата ДЗ вызови get_classes_by_date(deadline), выбери первый classId, где совпадает subjectId, если нет — оставь classId пустым;" +
+                        "3.2)Если пользователь сказал создать ДЗ на ближайший урок то вызови get_near_class(subjectId) если его нету — оставь classId пустым." +
+                        "4)Создай ДЗ с этими данными. " +
+                        "4. Стиль общения: " +
+                        "a)Отвечай строго на языке пользователя;" +
+                        "b)Без лирических отступлений и технических деталей;" +
+                        "c)Не по учебным вопросам → мягко направляй к учёбе;" +
+                        "d)Если функций недостаточно для выполнения запроса: 'Извини, пока не могу это сделать, но функция скоро появится!';" +
+                        "e) Отвечай ВСЕГДА на языке пользователя. Определяй язык по полследнему сообщению и переводи все на него. " +
+                        "5. Контекст:" +
+                        "a) Всегда учитывай что ты говоришь с учеником/студентом: $username ${birthday ?: ""} — адаптируйся под возраст;" +
+                        "b) Сегодня: $currentDate ('Завтра' = $currentDate + 1 день). " +
+                        "Нарушение любого правила недопустимо! Особенно запрета LaTeX!"
         }
 
         fun updatedActualInfoPromt(
             currentDate: String
-        ) = "Дата обновлена, сегодня: $currentDate используй её и учитывай это при формировании функций"
+        ) =
+            "Дата обновлена, сегодня: $currentDate используй её и учитывай это при формировании функций"
     }
 }

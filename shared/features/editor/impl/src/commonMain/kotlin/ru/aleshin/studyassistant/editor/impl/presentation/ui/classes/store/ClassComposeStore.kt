@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import ru.aleshin.studyassistant.core.common.architecture.store.communicators.St
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.convertToBase
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToEmployee
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEvent
@@ -127,7 +127,7 @@ internal class ClassComposeStore(
                 sendAction(ClassAction.UpdateEditModel(updatedClass))
             }
             is ClassEvent.UpdateTeacher -> with(state()) {
-                val updatedClass = editableClass?.copy(teacher = event.teacher?.convertToBase())
+                val updatedClass = editableClass?.copy(teacher = event.teacher?.mapToEmployee())
                 sendAction(ClassAction.UpdateEditModel(updatedClass))
             }
             is ClassEvent.UpdateLocation -> with(state()) {

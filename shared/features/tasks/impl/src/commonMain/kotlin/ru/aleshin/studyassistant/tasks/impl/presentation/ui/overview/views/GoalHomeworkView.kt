@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,12 +38,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkTaskComponentUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkTasksDetailsUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTaskComponentUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTasksDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.test_label
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_alert_circle as core_ic_alert_circle
+import ru.aleshin.studyassistant.core.ui.resources.ic_book_study as core_ic_book_study
+import ru.aleshin.studyassistant.core.ui.resources.ic_presentation as core_ic_presentation
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
+import ru.aleshin.studyassistant.core.ui.resources.practical_tasks_title as core_practical_tasks_title
+import ru.aleshin.studyassistant.core.ui.resources.presentations_tasks_title as core_presentations_tasks_title
+import ru.aleshin.studyassistant.core.ui.resources.theoretical_tasks_title as core_theoretical_tasks_title
 
 /**
  * @author Stanislav Aleshin on 21.06.2024.
@@ -67,8 +77,8 @@ internal fun GoalHomeworkTasksView(
         ) {
             if (!theoreticalTasks?.components.isNullOrEmpty()) {
                 HomeworkTaskView(
-                    icon = painterResource(StudyAssistantRes.icons.theoreticalTasks),
-                    title = StudyAssistantRes.strings.theoreticalTasksTitle,
+                    icon = painterResource(CoreRes.drawable.core_ic_book_study),
+                    title = stringResource(CoreRes.string.core_theoretical_tasks_title),
                     priority = priority,
                     tasks = theoreticalTasks,
                 )
@@ -78,8 +88,8 @@ internal fun GoalHomeworkTasksView(
             }
             if (!practicalTasks?.components.isNullOrEmpty()) {
                 HomeworkTaskView(
-                    icon = painterResource(StudyAssistantRes.icons.practicalTasks),
-                    title = StudyAssistantRes.strings.practicalTasksTitle,
+                    icon = painterResource(CoreRes.drawable.core_ic_tasks_circular),
+                    title = stringResource(CoreRes.string.core_practical_tasks_title),
                     priority = priority,
                     tasks = practicalTasks,
                 )
@@ -91,8 +101,8 @@ internal fun GoalHomeworkTasksView(
             }
             if (!presentationTasks?.components.isNullOrEmpty()) {
                 HomeworkTaskView(
-                    icon = painterResource(StudyAssistantRes.icons.presentationTasks),
-                    title = StudyAssistantRes.strings.presentationsTasksTitle,
+                    icon = painterResource(CoreRes.drawable.core_ic_presentation),
+                    title = stringResource(CoreRes.string.core_presentations_tasks_title),
                     priority = priority,
                     tasks = presentationTasks,
                 )
@@ -117,12 +127,12 @@ internal fun TestHomeworkView(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                painter = painterResource(StudyAssistantRes.icons.test),
+                painter = painterResource(CoreRes.drawable.core_ic_alert_circle),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.error,
             )
             Text(
-                text = TasksThemeRes.strings.testLabel,
+                text = stringResource(Res.string.test_label),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.titleMedium,
             )
@@ -168,7 +178,7 @@ private fun HomeworkTaskView(
             )
             if (priority == TaskPriority.MEDIUM || priority == TaskPriority.HIGH) {
                 Text(
-                    text = priority.mapToString(StudyAssistantRes.strings),
+                    text = priority.mapToString(),
                     color = if (priority == TaskPriority.MEDIUM) {
                         StudyAssistantRes.colors.accents.orange
                     } else {
@@ -203,6 +213,7 @@ private fun HomeworkTaskRow(
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }
+
                 is HomeworkTaskComponentUi.Tasks -> homeworkTask.taskList.forEach { taskText ->
                     Surface(
                         shape = RoundedCornerShape(6.dp),

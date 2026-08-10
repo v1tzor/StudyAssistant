@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,17 @@ package ru.aleshin.studyassistant.tasks.impl.domain.interactors
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.domain.entities.goals.Goal
-import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.tasks.DetailsGroupedTodos
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TodoStatus
 import ru.aleshin.studyassistant.core.domain.entities.tasks.convertToDetails
-import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.interactors.TodoCompletionInteractor
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
@@ -48,172 +45,98 @@ internal interface TodoInteractor {
 
     class Base(
         private val todoRepository: TodoRepository,
-        private val todoReminderManager: TodoReminderManager,
         private val goalsRepository: DailyGoalsRepository,
         private val dateManager: DateManager,
+        private val todoCompletionInteractor: TodoCompletionInteractor,
         private val eitherWrapper: TasksEitherWrapper,
     ) : TodoInteractor {
 
         @OptIn(ExperimentalCoroutinesApi::class)
-        override suspend fun fetchWeekGroupedTodosByTimeRange(timeRange: TimeRange) = eitherWrapper.wrapFlow {
-            val ticker = dateManager.secondTicker()
-            val shortGoalsFlow = goalsRepository.fetchShortActiveDailyGoals()
-            val weekCompletedTodosFlow = todoRepository.fetchCompletedTodos(timeRange).map { todos ->
-                todos.sortedBy { it.deadline }
-            }
-            val activeTodosFlow = todoRepository.fetchActiveTodos().map { todos ->
-                todos.sortedBy { it.deadline }
-            }
-
-            return@wrapFlow combine(
-                weekCompletedTodosFlow,
-                activeTodosFlow,
-                shortGoalsFlow,
-                ticker,
-            ) { completedTodos, activeTodos, goals, _ ->
-                val currentTime = dateManager.fetchCurrentInstant()
-                val runningTodos = mutableListOf<Todo>()
-                val errorTodos = mutableListOf<Todo>()
-                activeTodos.forEach { todo ->
-                    val deadline = todo.deadline
-                    if (deadline != null) {
-                        if (deadline >= currentTime) runningTodos.add(todo) else errorTodos.add(todo)
-                    } else {
-                        runningTodos.add(todo)
+        override suspend fun fetchWeekGroupedTodosByTimeRange(timeRange: TimeRange) =
+            eitherWrapper.wrapFlow {
+                val ticker = dateManager.secondTicker()
+                val shortGoalsFlow = goalsRepository.fetchShortActiveDailyGoals()
+                val weekCompletedTodosFlow =
+                    todoRepository.fetchCompletedTodos(timeRange).map { todos ->
+                        todos.sortedBy { it.deadline }
                     }
+                val activeTodosFlow = todoRepository.fetchActiveTodos().map { todos ->
+                    todos.sortedBy { it.deadline }
                 }
 
-                DetailsGroupedTodos(
-                    completedTodos = completedTodos.map { todo ->
-                        todo.convertToDetails(
-                            deadlineTimeLeft = null,
-                            status = TodoStatus.COMPLETE,
-                            progress = 1f,
-                            linkedGoal = null,
-                        )
-                    },
-                    runningTodos = runningTodos.map { todo ->
-                        val createdAt = todo.createdAt.toEpochMilliseconds()
-                        val currentTime = currentTime.toEpochMilliseconds()
-                        val deadline = todo.deadline?.toEpochMilliseconds()
-
-                        val leftTime = if (deadline != null) deadline - currentTime else null
-
-                        val progress = if (deadline != null) {
-                            ((currentTime - createdAt).toFloat() / (deadline - createdAt).toFloat()).coerceIn(0f, 1f)
+                return@wrapFlow combine(
+                    weekCompletedTodosFlow,
+                    activeTodosFlow,
+                    shortGoalsFlow,
+                    ticker,
+                ) { completedTodos, activeTodos, goals, _ ->
+                    val currentTime = dateManager.fetchCurrentInstant()
+                    val runningTodos = mutableListOf<Todo>()
+                    val errorTodos = mutableListOf<Todo>()
+                    activeTodos.forEach { todo ->
+                        val deadline = todo.deadline
+                        if (deadline != null) {
+                            if (deadline >= currentTime) runningTodos.add(todo) else errorTodos.add(
+                                todo
+                            )
                         } else {
-                            0f
+                            runningTodos.add(todo)
                         }
+                    }
 
-                        todo.convertToDetails(
-                            deadlineTimeLeft = leftTime?.let { it - it % 10000 },
-                            status = TodoStatus.IN_PROGRESS,
-                            progress = progress,
-                            linkedGoal = goals.find { it.contentId == todo.uid },
-                        )
-                    },
-                    errorTodos = errorTodos.map { todo ->
-                        val expiredTime = todo.deadline?.let { deadline ->
-                            deadline.toEpochMilliseconds() - currentTime.toEpochMilliseconds()
-                        }
-                        todo.convertToDetails(
-                            deadlineTimeLeft = expiredTime?.let { it - it % 10000 },
-                            status = TodoStatus.NOT_COMPLETE,
-                            progress = 0f,
-                            linkedGoal = goals.find { it.contentId == todo.uid },
-                        )
-                    },
-                )
+                    DetailsGroupedTodos(
+                        completedTodos = completedTodos.map { todo ->
+                            todo.convertToDetails(
+                                deadlineTimeLeft = null,
+                                status = TodoStatus.COMPLETE,
+                                progress = 1f,
+                                linkedGoal = null,
+                            )
+                        },
+                        runningTodos = runningTodos.map { todo ->
+                            val createdAt = todo.createdAt.toEpochMilliseconds()
+                            val currentTime = currentTime.toEpochMilliseconds()
+                            val deadline = todo.deadline?.toEpochMilliseconds()
+
+                            val leftTime = if (deadline != null) deadline - currentTime else null
+
+                            val progress = if (deadline != null) {
+                                ((currentTime - createdAt).toFloat() / (deadline - createdAt).toFloat()).coerceIn(
+                                    0f,
+                                    1f
+                                )
+                            } else {
+                                0f
+                            }
+
+                            todo.convertToDetails(
+                                deadlineTimeLeft = leftTime?.let { it - it % 10000 },
+                                status = TodoStatus.IN_PROGRESS,
+                                progress = progress,
+                                linkedGoal = goals.find { it.contentId == todo.uid },
+                            )
+                        },
+                        errorTodos = errorTodos.map { todo ->
+                            val expiredTime = todo.deadline?.let { deadline ->
+                                deadline.toEpochMilliseconds() - currentTime.toEpochMilliseconds()
+                            }
+                            todo.convertToDetails(
+                                deadlineTimeLeft = expiredTime?.let { it - it % 10000 },
+                                status = TodoStatus.NOT_COMPLETE,
+                                progress = 0f,
+                                linkedGoal = goals.find { it.contentId == todo.uid },
+                            )
+                        },
+                    )
+                }.distinctUntilChanged()
             }
-        }
 
         override suspend fun fetchCompletedTodos() = eitherWrapper.wrapFlow {
             todoRepository.fetchCompletedTodos(null)
         }
 
         override suspend fun updateTodoDone(todo: Todo) = eitherWrapper.wrapUnit {
-            val currentTime = dateManager.fetchCurrentInstant()
-            val linkedGoal = goalsRepository.fetchGoalByContentId(todo.uid).first()
-            if (todo.isDone) {
-                val canceledTodo = todo.copy(
-                    isDone = false,
-                    completeDate = null,
-                    updatedAt = currentTime.toEpochMilliseconds(),
-                )
-                if (linkedGoal != null && linkedGoal.targetDate >= currentTime.startThisDay()) {
-                    cancelLinkedGoal(linkedGoal)
-                }
-
-                todoRepository.addOrUpdateTodo(canceledTodo)
-                todoReminderManager.clearAllReminders(todo.uid)
-            } else {
-                val completedTodo = todo.copy(
-                    isDone = true,
-                    completeDate = currentTime,
-                    updatedAt = currentTime.toEpochMilliseconds(),
-                )
-                if (linkedGoal != null && !linkedGoal.isDone) completeLinkedGoal(linkedGoal)
-
-                todoRepository.addOrUpdateTodo(completedTodo)
-                todoReminderManager.scheduleReminders(
-                    todo.uid,
-                    todo.name,
-                    todo.deadline,
-                    todo.notifications
-                )
-            }
-        }
-
-        private suspend fun completeLinkedGoal(linkedGoal: Goal) {
-            val currentTime = dateManager.fetchCurrentInstant()
-            val updatedGoal = linkedGoal.copy(
-                time = when (linkedGoal.time) {
-                    is GoalTime.Stopwatch -> with(linkedGoal.time as GoalTime.Stopwatch) {
-                        val stopTime = startTimePoint.toEpochMilliseconds()
-                        val timeAfterStop = currentTime.toEpochMilliseconds() - stopTime
-                        return@with copy(
-                            pastStopTime = pastStopTime + timeAfterStop,
-                            isActive = false,
-                        )
-                    }
-                    is GoalTime.Timer -> with(linkedGoal.time as GoalTime.Timer) {
-                        val stopTime = startTimePoint.toEpochMilliseconds()
-                        val timeAfterStop = currentTime.toEpochMilliseconds() - stopTime
-                        return@with copy(
-                            pastStopTime = pastStopTime + timeAfterStop,
-                            isActive = false,
-                        )
-                    }
-                    is GoalTime.None -> GoalTime.None
-                },
-                isDone = true,
-                completeDate = currentTime,
-                updatedAt = currentTime.toEpochMilliseconds(),
-            )
-            goalsRepository.addOrUpdateGoal(updatedGoal)
-        }
-
-        private suspend fun cancelLinkedGoal(linkedGoal: Goal) {
-            val currentTime = dateManager.fetchCurrentInstant()
-            val canceledGoal = linkedGoal.copy(
-                time = when (linkedGoal.time) {
-                    is GoalTime.Stopwatch -> (linkedGoal.time as GoalTime.Stopwatch).copy(
-                        pastStopTime = 0L,
-                        startTimePoint = currentTime,
-                        isActive = false,
-                    )
-                    is GoalTime.Timer -> (linkedGoal.time as GoalTime.Timer).copy(
-                        pastStopTime = 0L,
-                        startTimePoint = currentTime,
-                        isActive = false,
-                    )
-                    is GoalTime.None -> GoalTime.None
-                },
-                isDone = false,
-                completeDate = null,
-                updatedAt = currentTime.toEpochMilliseconds(),
-            )
-            goalsRepository.addOrUpdateGoal(canceledGoal)
+            todoCompletionInteractor.setDone(todo.uid, !todo.isDone)
         }
     }
 }

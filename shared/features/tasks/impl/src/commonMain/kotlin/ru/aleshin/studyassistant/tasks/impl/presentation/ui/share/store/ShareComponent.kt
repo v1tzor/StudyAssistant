@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,12 @@ import com.arkivanov.decompose.ComponentContext
 import ru.aleshin.studyassistant.core.common.architecture.component.ChildComponent
 import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
 import ru.aleshin.studyassistant.core.common.architecture.component.saveableStore
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareInput
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareOutput
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareState
 
 /**
- * @author Stanislav Aleshin on 25.08.2025
+ * @author Stanislav Aleshin on 25.08.2025.
  */
 internal abstract class ShareComponent(
     componentContext: ComponentContext
@@ -36,6 +37,7 @@ internal abstract class ShareComponent(
         storeFactory: ShareComposeStore.Factory,
         componentContext: ComponentContext,
         outputConsumer: OutputConsumer<ShareOutput>,
+        inputData: ShareInput,
     ) : ShareComponent(componentContext) {
 
         private companion object Companion {
@@ -46,6 +48,7 @@ internal abstract class ShareComponent(
             storeFactory = storeFactory,
             defaultState = ShareState(),
             stateSerializer = ShareState.serializer(),
+            input = inputData,
             outputConsumer = outputConsumer,
             storeKey = COMPONENT_KEY,
         )

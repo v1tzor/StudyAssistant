@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,11 +80,13 @@ fun Any?.toJsonElement(): JsonElement = when (this) {
         val map = this as? Map<String, Any?> ?: error("Only Map<String, Any?> is supported")
         map.toJsonObject()
     }
+
     is List<*> -> buildJsonArray {
         this@toJsonElement.forEach {
             add(it.toJsonElement())
         }
     }
+
     is String -> JsonPrimitive(this)
     else -> {
         JsonPrimitive(this.toString())

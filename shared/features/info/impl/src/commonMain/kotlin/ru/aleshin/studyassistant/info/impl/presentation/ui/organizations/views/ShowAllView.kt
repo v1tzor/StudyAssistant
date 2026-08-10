@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.info.impl.resources.Res
+import ru.aleshin.studyassistant.info.impl.resources.show_all_items_title
 
 /**
  * @author Stanislav Aleshin on 05.09.2024.
@@ -61,7 +63,7 @@ internal fun ShowAllItemView(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = InfoThemeRes.strings.showAllItemsTitle,
+                    text = stringResource(Res.string.show_all_items_title),
                     color = contentColor,
                     maxLines = 1,
                     style = MaterialTheme.typography.titleMedium,

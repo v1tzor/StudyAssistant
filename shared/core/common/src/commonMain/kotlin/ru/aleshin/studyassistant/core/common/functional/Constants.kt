@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,7 @@ object Constants {
         const val WEBSITE_URI = "https://studyassistant-app.ru/home"
         const val ISSUES_URI = "https://github.com/v1tzor/StudyAssistant/issues"
         const val PERMISSION_TAG = "Notification_Permission"
-        const val DEEPLINK_SCHEME = "https"
-        const val PAY_DEEPLINK_SCHEME = "ru.aleshin.studyassistant.pay"
-        const val DEEPLINK_HOST = "studyassistant-app.ru"
         const val OPEN_APP_DEEPLINK = "studyassistant://openMain"
-        const val RECOVERY_PASSWORD_URL = "https://studyassistant-app.ru/recovery"
-        const val VERIFY_EMAIL_URL = "https://studyassistant-app.ru/verify"
     }
 
     object Database {
@@ -52,7 +47,8 @@ object Constants {
         const val TEXT_AND_NUMBERS = "^[a-zA-Z0-9]+$"
         const val ONLY_TEXT = "^[\\p{L}\\p{M}\\p{Pd}.'’\\s]{1,50}$"
         const val NUMBERS = "\\d+"
-        const val PASSWORD = "^[A-Za-z0-9\\!\\\"\\#\\$\\%\\&\\'\\(\\)\\*\\+\\,\\-\\.\\/\\:\\;\\<\\>\\=\\?\\@\\[\\]\\{\\}\\\\\\^\\_\\`\\~]+$"
+        const val PASSWORD =
+            "^[A-Za-z0-9\\!\\\"\\#\\$\\%\\&\\'\\(\\)\\*\\+\\,\\-\\.\\/\\:\\;\\<\\>\\=\\?\\@\\[\\]\\{\\}\\\\\\^\\_\\`\\~]+$"
     }
 
     object Text {
@@ -76,7 +72,8 @@ object Constants {
 
     object Notification {
         const val CHANNEL_ID = "studyAssistantAlarmChannel"
-        const val CHANNEL_NAME = "Common"
+        const val ONGOING_CHANNEL_ID = "studyAssistantOngoingChannel"
+        const val ONGOING_TAG = "ongoing_class"
     }
 
     object Alarm {
@@ -102,8 +99,6 @@ object Constants {
         const val FULL_FRIEND_REQUESTS = 10
         const val FRIENDS = 10
         const val SOCIAL_NETWORKS = 4
-        const val SHARED_HOMEWORKS = 4
-        const val SHARED_HOMEWORK_SUBJECTS = 4
         const val PRODUCT = 2
     }
 

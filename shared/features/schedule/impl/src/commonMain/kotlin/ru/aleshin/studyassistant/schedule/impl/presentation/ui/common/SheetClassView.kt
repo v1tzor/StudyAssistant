@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,13 +39,18 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.organization.OrganizationShortUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_employee as core_ic_employee
+import ru.aleshin.studyassistant.core.ui.resources.ic_map_marker as core_ic_map_marker
+import ru.aleshin.studyassistant.core.ui.resources.ic_organization as core_ic_organization
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
 
 /**
  * @author Stanislav Aleshin on 21.06.2024.
@@ -96,29 +101,31 @@ private fun SheetClassViewHeader(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = eventType.mapToString(StudyAssistantRes.strings),
+                text = eventType.mapToString(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 style = MaterialTheme.typography.labelSmall,
             )
             Text(
-                text = subject?.name ?: StudyAssistantRes.strings.noneTitle,
+                text = subject?.name ?: stringResource(CoreRes.string.core_none_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.titleMedium,
             )
         }
-        Surface(
-            shape = MaterialTheme.shapes.small,
-            color = MaterialTheme.colorScheme.surfaceVariant,
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                text = office,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelMedium,
-            )
+        if (office.isNotBlank()) {
+            Surface(
+                shape = MaterialTheme.shapes.small,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                    text = office,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
         }
     }
 }
@@ -139,19 +146,19 @@ private fun SheetClassViewFooter(
     ) {
         if (teacher != null) {
             SheetClassViewFooterItem(
-                icon = painterResource(StudyAssistantRes.icons.employee),
+                icon = painterResource(CoreRes.drawable.core_ic_employee),
                 text = teacher.officialName()
             )
         }
         if (organization?.isMain == false) {
             SheetClassViewFooterItem(
-                icon = painterResource(StudyAssistantRes.icons.organization),
+                icon = painterResource(CoreRes.drawable.core_ic_organization),
                 text = organization.shortName,
             )
         }
         if (location != null) {
             SheetClassViewFooterItem(
-                icon = painterResource(StudyAssistantRes.icons.location),
+                icon = painterResource(CoreRes.drawable.core_ic_map_marker),
                 text = location.label ?: location.value,
             )
         }

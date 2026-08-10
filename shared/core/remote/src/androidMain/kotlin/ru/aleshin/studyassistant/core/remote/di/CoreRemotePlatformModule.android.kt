@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,10 @@ import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.remote.api.message.GoogleAuthTokenProvider
-import ru.aleshin.studyassistant.core.remote.api.message.GoogleAuthTokenProviderImpl
 
 /**
  * @author Stanislav Aleshin on 08.08.2024.
  */
 actual val coreRemotePlatformModule = DI.Module("CoreRemotePlatform") {
-    bindSingleton<GoogleAuthTokenProvider> { GoogleAuthTokenProviderImpl(instance()) }
     bindSingleton<Konnection> { Konnection.createInstance(instance<Context>()) }
 }

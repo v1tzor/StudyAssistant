@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,12 +37,18 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.dialog.TimePickerDialog
 import ru.aleshin.studyassistant.core.ui.views.timeFormat
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.end_time_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.end_time_field_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.ic_worktime
+import ru.aleshin.studyassistant.editor.impl.resources.start_time_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.start_time_field_placeholder
 
 /**
  * @author Stanislav Aleshin on 06.06.2024.
@@ -66,7 +72,7 @@ internal fun WorkTimeInfoField(
         Box(modifier = Modifier.height(61.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(EditorThemeRes.icons.workTime),
+                painter = painterResource(Res.drawable.ic_worktime),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -78,8 +84,8 @@ internal fun WorkTimeInfoField(
                     enabled = !isLoading,
                     modifier = Modifier.weight(1f),
                     value = startTime?.formatByTimeZone(DateTimeComponents.Formats.timeFormat()),
-                    label = EditorThemeRes.strings.startTimeFieldLabel,
-                    placeholder = EditorThemeRes.strings.startTimeFieldPlaceholder,
+                    label = stringResource(Res.string.start_time_field_label),
+                    placeholder = stringResource(Res.string.start_time_field_placeholder),
                     trailingIcon = {
                         ExpandedIcon(
                             isExpanded = isOpenStartTimePicker,
@@ -91,8 +97,8 @@ internal fun WorkTimeInfoField(
                     modifier = Modifier.weight(1f),
                     enabled = !isLoading,
                     value = endTime?.formatByTimeZone(DateTimeComponents.Formats.timeFormat()),
-                    label = EditorThemeRes.strings.endTimeFieldLabel,
-                    placeholder = EditorThemeRes.strings.endTimeFieldPlaceholder,
+                    label = stringResource(Res.string.end_time_field_label),
+                    placeholder = stringResource(Res.string.end_time_field_placeholder),
                     trailingIcon = {
                         ExpandedIcon(
                             isExpanded = isOpenEndTimePicker,

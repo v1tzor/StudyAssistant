@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.contarct.HomeworkAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.contarct.HomeworkEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.contarct.HomeworkEvent
@@ -77,7 +77,8 @@ internal class HomeworkComposeStore(
                         workProcessor.work(command).collectAndHandleWork()
                     }
                     launchBackgroundWork(BackgroundKey.LOAD_CLASSES) {
-                        val command = HomeworkWorkCommand.LoadClassesForLinked(inputData.subjectId, date)
+                        val command =
+                            HomeworkWorkCommand.LoadClassesForLinked(inputData.subjectId, date)
                         workProcessor.work(command).collectAndHandleWork()
                     }
                 } else {
@@ -95,6 +96,7 @@ internal class HomeworkComposeStore(
                     }
                 }
             }
+
             is HomeworkEvent.UpdateOrganization -> with(state()) {
                 val updatedHomework = editableHomework?.copy(
                     organization = event.organization,
@@ -111,6 +113,7 @@ internal class HomeworkComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworkEvent.UpdateSubject -> with(state()) {
                 val updatedHomework = editableHomework?.copy(
                     subject = event.subject,
@@ -124,6 +127,7 @@ internal class HomeworkComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworkEvent.UpdateDate -> with(state()) {
                 val updatedHomework = editableHomework?.copy(
                     deadline = event.date,
@@ -137,6 +141,7 @@ internal class HomeworkComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworkEvent.UpdateLinkedClass -> with(state()) {
                 val updatedHomework = editableHomework?.copy(
                     classId = event.classId,
@@ -144,6 +149,7 @@ internal class HomeworkComposeStore(
                 )
                 sendAction(HomeworkAction.UpdateEditModel(updatedHomework))
             }
+
             is HomeworkEvent.UpdateTask -> with(state()) {
                 val updatedHomework = editableHomework?.copy(
                     theoreticalTasks = event.theory,
@@ -152,6 +158,7 @@ internal class HomeworkComposeStore(
                 )
                 sendAction(HomeworkAction.UpdateEditModel(updatedHomework))
             }
+
             is HomeworkEvent.UpdateTestTopic -> with(state()) {
                 val updatedHomework = editableHomework?.copy(
                     isTest = event.isTest,
@@ -159,12 +166,14 @@ internal class HomeworkComposeStore(
                 )
                 sendAction(HomeworkAction.UpdateEditModel(updatedHomework))
             }
+
             is HomeworkEvent.UpdatePriority -> with(state()) {
                 val updatedHomework = editableHomework?.copy(
                     priority = event.priority,
                 )
                 sendAction(HomeworkAction.UpdateEditModel(updatedHomework))
             }
+
             is HomeworkEvent.DeleteHomework -> with(state()) {
                 launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
                     val homework = checkNotNull(editableHomework)
@@ -172,6 +181,7 @@ internal class HomeworkComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworkEvent.SaveHomework -> with(state()) {
                 launchBackgroundWork(BackgroundKey.HOMEWORK_ACTION) {
                     val homework = checkNotNull(editableHomework)
@@ -179,15 +189,18 @@ internal class HomeworkComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is HomeworkEvent.NavigateToOrganizationEditor -> {
                 val config = EditorConfig.Organization(event.organizationId)
                 consumeOutput(HomeworkOutput.NavigateToOrganizationEditor(config))
             }
+
             is HomeworkEvent.NavigateToSubjectEditor -> with(state()) {
                 val organizationId = checkNotNull(editableHomework?.organization).uid
                 val config = EditorConfig.Subject(event.subjectId, organizationId)
                 consumeOutput(HomeworkOutput.NavigateToSubjectEditor(config))
             }
+
             is HomeworkEvent.NavigateToBack -> {
                 consumeOutput(HomeworkOutput.NavigateToBack)
             }
@@ -203,28 +216,36 @@ internal class HomeworkComposeStore(
             showDeleteAction = action.showDeleteAction,
             isLoading = false,
         )
+
         is HomeworkAction.UpdateEditModel -> currentState.copy(
             editableHomework = action.editModel,
         )
+
         is HomeworkAction.UpdateOrganizations -> currentState.copy(
             organizations = action.organizations,
         )
+
         is HomeworkAction.UpdateSubjects -> currentState.copy(
             subjects = action.subjects,
         )
+
         is HomeworkAction.UpdateClassesForLinked -> currentState.copy(
             classesForLinking = action.classes,
             isClassesLoading = false,
         )
+
         is HomeworkAction.UpdateCurrentDate -> currentState.copy(
             currentDate = action.date,
         )
+
         is HomeworkAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )
+
         is HomeworkAction.UpdateLoadingSave -> currentState.copy(
             isLoadingSave = action.isLoading,
         )
+
         is HomeworkAction.UpdateClassesLoading -> currentState.copy(
             isClassesLoading = action.isLoading,
         )

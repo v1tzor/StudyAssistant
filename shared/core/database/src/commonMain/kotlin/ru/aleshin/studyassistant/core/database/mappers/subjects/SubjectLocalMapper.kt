@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ fun SubjectEntity.mapToBase() = BaseSubjectEntity(
     color = color,
     location = location,
     updatedAt = updated_at,
-    isCacheData = is_cache_data,
 )
 
 fun BaseSubjectEntity.mapToEntity() = SubjectEntity(
@@ -50,7 +49,6 @@ fun BaseSubjectEntity.mapToEntity() = SubjectEntity(
     color = color,
     location = location,
     updated_at = updatedAt,
-    is_cache_data = isCacheData,
 )
 
 fun SubjectDetailsEntity.mapToBase() = BaseSubjectEntity(
@@ -63,7 +61,6 @@ fun SubjectDetailsEntity.mapToBase() = BaseSubjectEntity(
     color = color.toLong(),
     location = location?.tryToJson<ContactInfoEntity>(),
     updatedAt = updatedAt,
-    isCacheData = 0L,
 )
 
 fun BaseSubjectEntity.mapToDetails(

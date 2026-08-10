@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,8 @@ class GeneralSettingsRepositoryImpl(
 ) : GeneralSettingsRepository {
 
     override suspend fun fetchSettings(): Flow<GeneralSettings> {
-        return localDataSource.fetchSettings().map { settingsEntity -> settingsEntity.mapToDomain() }
+        return localDataSource.fetchSettings()
+            .map { settingsEntity -> settingsEntity.mapToDomain() }
     }
 
     override suspend fun updateSettings(settings: GeneralSettings) {

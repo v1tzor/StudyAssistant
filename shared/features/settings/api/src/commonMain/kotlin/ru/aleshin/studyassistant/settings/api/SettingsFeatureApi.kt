@@ -22,5 +22,5 @@ import ru.aleshin.studyassistant.core.common.inject.BaseFeatureApi
  * @author Stanislav Aleshin on 08.07.2024.
  */
 public interface SettingsFeatureApi : BaseFeatureApi {
-    public fun componentFactory(): SettingsFeatureComponentFactory
+    public fun contentProviderFactory(): SettingsContentProviderFactory
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,14 +55,12 @@ import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.WeekScheduleDetailsUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.ClassBottomSheet
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEvent
@@ -83,8 +81,6 @@ internal fun DetailsContent(
 ) {
     val store = detailsComponent.store
     val state by store.stateAsState()
-    val strings = ScheduleThemeRes.strings
-    val coreStrings = StudyAssistantRes.strings
     val snackbarState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -148,7 +144,7 @@ internal fun DetailsContent(
         when (effect) {
             is DetailsEffect.ShowError -> {
                 snackbarState.showSnackbar(
-                    message = effect.failures.mapToMessage(strings, coreStrings),
+                    message = effect.failures.mapToMessage(),
                     withDismissAction = true,
                 )
             }

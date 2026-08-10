@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
+import ru.aleshin.studyassistant.core.ui.resources.date_picker_dialog_header as core_date_picker_dialog_header
+import ru.aleshin.studyassistant.core.ui.resources.select_confirm_title as core_select_confirm_title
 
 /**
  * @author Stanislav Aleshin on 09.08.2023.
@@ -41,8 +45,8 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 fun BaseDatePickerDialog(
     modifier: Modifier = Modifier,
     state: DatePickerState = rememberDatePickerState(),
-    headline: String = StudyAssistantRes.strings.datePickerDialogHeader,
-    title: String = StudyAssistantRes.strings.datePickerDialogHeader,
+    headline: String = stringResource(CoreRes.string.core_date_picker_dialog_header),
+    title: String = stringResource(CoreRes.string.core_date_picker_dialog_header),
     onDismiss: () -> Unit,
     onConfirmDate: (Instant?) -> Unit,
 ) {
@@ -51,10 +55,14 @@ fun BaseDatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(
-                onClick = { onConfirmDate(state.selectedDateMillis?.mapEpochTimeToInstant()?.startThisDay()) }
+                onClick = {
+                    onConfirmDate(
+                        state.selectedDateMillis?.mapEpochTimeToInstant()?.startThisDay()
+                    )
+                }
             ) {
                 Text(
-                    text = StudyAssistantRes.strings.selectConfirmTitle,
+                    text = stringResource(CoreRes.string.core_select_confirm_title),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge,
                 )
@@ -63,7 +71,7 @@ fun BaseDatePickerDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text(
-                    text = StudyAssistantRes.strings.cancelTitle,
+                    text = stringResource(CoreRes.string.core_cancel_title),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge,
                 )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,13 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handleAndGet
-import ru.aleshin.studyassistant.info.impl.domain.interactors.AppUserInteractor
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
 import ru.aleshin.studyassistant.info.impl.domain.interactors.ClassesInfoInteractor
 import ru.aleshin.studyassistant.info.impl.domain.interactors.OrganizationsInteractor
-import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsAction
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsEffect
 import ru.aleshin.studyassistant.info.impl.presentation.ui.organizations.contract.OrganizationsOutput
+import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToUi as mapClassesInfoToUi
 
 /**
  * @author Stanislav Aleshin on 16.06.2024.
@@ -42,22 +42,11 @@ internal interface OrganizationsWorkProcessor :
     class Base(
         private val organizationsInteractor: OrganizationsInteractor,
         private val classesInfoInteractor: ClassesInfoInteractor,
-        private val appUserInteractor: AppUserInteractor,
     ) : OrganizationsWorkProcessor {
 
         override suspend fun work(command: OrganizationsWorkCommand) = when (command) {
             is OrganizationsWorkCommand.LoadShortOrganizations -> loadShortOrganizationsWork()
-            is OrganizationsWorkCommand.LoadPaidUserStatus -> loadPaidUserStatusWork()
             is OrganizationsWorkCommand.LoadOrganizationData -> loadOrganizationDataWork(command.organizationId)
-        }
-
-        private fun loadPaidUserStatusWork() = flow {
-            appUserInteractor.fetchAppUserPaidStatus().collectAndHandle(
-                onLeftAction = { emit(EffectResult(OrganizationsEffect.ShowError(it))) },
-                onRightAction = {
-                    emit(ActionResult(OrganizationsAction.UpdatePaidUserStatus(it)))
-                }
-            )
         }
 
         private fun loadShortOrganizationsWork() = flow {
@@ -72,7 +61,14 @@ internal interface OrganizationsWorkProcessor :
 
         private fun loadOrganizationDataWork(organizationId: UID?) = flow<OrganizationWorkResult> {
             if (organizationId.isNullOrEmpty()) {
-                return@flow emit(ActionResult(OrganizationsAction.UpdateOrganizationData(null, null)))
+                return@flow emit(
+                    ActionResult(
+                        OrganizationsAction.UpdateOrganizationData(
+                            null,
+                            null
+                        )
+                    )
+                )
             } else {
                 emit(ActionResult(OrganizationsAction.UpdateLoading(true)))
             }
@@ -80,15 +76,19 @@ internal interface OrganizationsWorkProcessor :
                 onLeftAction = { emit(EffectResult(OrganizationsEffect.ShowError(it))) },
                 onRightAction = { organizationModel ->
                     val organization = organizationModel?.mapToUi()
-                    val compactOrganization = organization?.copy(
-                        subjects = organization.subjects.sortedBy { it.name },
-                        employee = organization.employee.sortedBy { it.firstName },
+                    val classesInfo =
+                        classesInfoInteractor.fetchClassesInfo(organizationId).handleAndGet(
+                            onLeftAction = { emit(EffectResult(OrganizationsEffect.ShowError(it))).let { null } },
+                            onRightAction = { classesInfo -> classesInfo.mapClassesInfoToUi() },
+                        )
+                    emit(
+                        ActionResult(
+                            OrganizationsAction.UpdateOrganizationData(
+                                organization,
+                                classesInfo
+                            )
+                        )
                     )
-                    val classesInfo = classesInfoInteractor.fetchClassesInfo(organizationId).handleAndGet(
-                        onLeftAction = { emit(EffectResult(OrganizationsEffect.ShowError(it))).let { null } },
-                        onRightAction = { classesInfo -> classesInfo.mapToUi() },
-                    )
-                    emit(ActionResult(OrganizationsAction.UpdateOrganizationData(compactOrganization, classesInfo)))
                 },
             )
         }
@@ -97,7 +97,6 @@ internal interface OrganizationsWorkProcessor :
 
 internal sealed class OrganizationsWorkCommand : WorkCommand {
     data object LoadShortOrganizations : OrganizationsWorkCommand()
-    data object LoadPaidUserStatus : OrganizationsWorkCommand()
     data class LoadOrganizationData(val organizationId: UID?) : OrganizationsWorkCommand()
 }
 

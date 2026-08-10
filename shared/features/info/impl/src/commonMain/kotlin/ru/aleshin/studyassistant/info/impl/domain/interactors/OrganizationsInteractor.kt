@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,12 @@ internal interface OrganizationsInteractor {
     ) : OrganizationsInteractor {
 
         override suspend fun fetchOrganizationById(organizationId: UID) = eitherWrapper.wrapFlow {
-            organizationsRepository.fetchOrganizationById(organizationId)
+            organizationsRepository.fetchOrganizationById(organizationId).map { organization ->
+                organization?.copy(
+                    subjects = organization.subjects.sortedBy { it.name },
+                    employee = organization.employee.sortedBy { it.firstName },
+                )
+            }
         }
 
         override suspend fun fetchAllShortOrganizations() = eitherWrapper.wrapFlow {

@@ -1,21 +1,45 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+/*
+ * Copyright 2026 Stanislav Aleshin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import com.codingfeline.buildkonfig.compiler.FieldSpec
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.library)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.kotlin.atomic)
     alias(libs.plugins.konfig)
 }
 
 kotlin {
     jvmToolchain(17)
 
-    androidTarget()
+    android {
+        namespace = "ru.aleshin.studyassistant.core.api"
+        compileSdk = libs.versions.compileSdk.get().toInt()
+        minSdk = libs.versions.minSdk.get().toInt()
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+
+        withHostTest {}
+    }
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach {
@@ -29,12 +53,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
 
-            implementation(libs.rustore.universalpush.core)
             implementation(libs.androidx.browser)
-
-            implementation(project.dependencies.platform(libs.google.oauth.bom.android))
-            implementation(libs.google.oauth.android)
-            implementation(libs.google.oauth.credentials.android)
         }
         commonMain.dependencies {
             implementation(project(":shared:core:common"))
@@ -54,40 +73,21 @@ kotlin {
             implementation(libs.settings.core)
             implementation(libs.settings.noargs)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
     }
 
-    task("testClasses")
-}
-
-android {
-    namespace = "ru.aleshin.studyassistant.core.api"
-    compileSdk = libs.versions.compileSdk.get().toIntOrNull()
-
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
-
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toIntOrNull()
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
 }
 
 buildkonfig {
     packageName = "ru.aleshin.studyassistant.core.api"
 
     val isDebug = gradle.startParameter.taskNames.any { it.contains("debug", ignoreCase = true) }
-    val appwriteKey = gradleLocalProperties(rootDir, providers).getProperty("appwriteServerKey")
-
     defaultConfigs {
-        buildConfigField(FieldSpec.Type.STRING, "APPWRITE_SERVER_KEY", appwriteKey)
         buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", isDebug.toString())
     }
 }

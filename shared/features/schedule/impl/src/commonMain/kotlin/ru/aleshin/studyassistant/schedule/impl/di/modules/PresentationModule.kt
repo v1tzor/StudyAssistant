@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,20 @@
 package ru.aleshin.studyassistant.schedule.impl.di.modules
 
 import org.kodein.di.DI
+import org.kodein.di.bind
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureComponentFactory
-import ru.aleshin.studyassistant.schedule.impl.navigation.DefaultScheduleComponentFactory
+import org.kodein.di.multiton
+import org.kodein.di.scoped
+import ru.aleshin.studyassistant.core.common.di.scope.FeatureComponentScope
+import ru.aleshin.studyassistant.schedule.api.ScheduleContentProviderFactory
+import ru.aleshin.studyassistant.schedule.impl.navigation.DefaultScheduleContentProviderFactory
+import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleComponentDeps
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.store.DetailsComposeStore
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.store.DetailsWorkProcessor
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.store.OverviewComposeStore
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.store.OverviewWorkProcessor
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.root.ScheduleFeatureComponent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.store.ShareComposeStore
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.store.ShareWorkProcessor
 
@@ -32,7 +38,17 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.store.Share
  * @author Stanislav Aleshin on 21.04.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<ScheduleFeatureComponentFactory> { DefaultScheduleComponentFactory(instance(), instance(), instance()) }
+    bind<ScheduleFeatureComponent>() with scoped(FeatureComponentScope).multiton { deps: ScheduleComponentDeps ->
+        ScheduleFeatureComponent.Default(
+            componentContext = context,
+            startConfig = deps.startConfig,
+            outputConsumer = deps.outputConsumer,
+            overviewStoreFactory = instance(),
+            detailsStoreFactory = instance(),
+            shareStoreFactory = instance(),
+        )
+    }
+    bindSingleton<ScheduleContentProviderFactory> { DefaultScheduleContentProviderFactory(di) }
 
     bindSingleton<OverviewWorkProcessor> { OverviewWorkProcessor.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<OverviewComposeStore.Factory> { OverviewComposeStore.Factory(instance(), instance(), instance()) }
@@ -40,6 +56,6 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<DetailsWorkProcessor> { DetailsWorkProcessor.Base(instance(), instance(), instance()) }
     bindSingleton<DetailsComposeStore.Factory> { DetailsComposeStore.Factory(instance(), instance(), instance()) }
 
-    bindSingleton<ShareWorkProcessor> { ShareWorkProcessor.Base(instance(), instance(), instance()) }
+    bindSingleton<ShareWorkProcessor> { ShareWorkProcessor.Base(instance()) }
     bindSingleton<ShareComposeStore.Factory> { ShareComposeStore.Factory(instance(), instance(), instance()) }
 }

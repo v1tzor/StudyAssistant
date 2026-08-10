@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,18 +44,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalType
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.DeleteGoalWarningDialog
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.GoalCreatorDialog
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewItem
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewItemPlaceholder
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewNoneItem
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.completed_todos_section_header
+import ru.aleshin.studyassistant.tasks.impl.resources.error_todos_section_header
+import ru.aleshin.studyassistant.tasks.impl.resources.in_progress_todos_section_header
 
 /**
  * @author Stanislav Aleshin on 12.06.2025.
@@ -64,10 +68,8 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewNoneI
 internal fun OverviewTodosInProgressSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    isPaidUser: Boolean,
     currentDate: Instant,
     todos: List<TodoDetailsUi>,
-    onOpenBillingScreen: () -> Unit,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
     onScheduleGoal: (GoalCreateModelUi) -> Unit,
@@ -84,7 +86,7 @@ internal fun OverviewTodosInProgressSection(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = TasksThemeRes.strings.inProgressTodosSectionHeader,
+                text = stringResource(Res.string.in_progress_todos_section_header),
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.titleMedium,
             )
@@ -133,9 +135,7 @@ internal fun OverviewTodosInProgressSection(
                                 priority = todo.priority,
                                 completeTime = todo.completeDate,
                                 onChangeDone = { onChangeTodoDone(todo, it) },
-                                onScheduleGoal = {
-                                    if (isPaidUser) goalCreatorState = true else onOpenBillingScreen()
-                                },
+                                onScheduleGoal = { goalCreatorState = true },
                                 onDeleteGoal = { deleteWarningDialogState = true }
                             )
 
@@ -187,10 +187,8 @@ internal fun OverviewTodosInProgressSection(
 internal fun OverviewTodosErrorSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    isPaidUser: Boolean,
     currentDate: Instant,
     todos: List<TodoDetailsUi>,
-    onOpenBillingScreen: () -> Unit,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
     onScheduleGoal: (GoalCreateModelUi) -> Unit,
@@ -207,7 +205,7 @@ internal fun OverviewTodosErrorSection(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = TasksThemeRes.strings.errorTodosSectionHeader,
+                text = stringResource(Res.string.error_todos_section_header),
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.titleMedium,
             )
@@ -256,9 +254,7 @@ internal fun OverviewTodosErrorSection(
                                 priority = todo.priority,
                                 completeTime = todo.completeDate,
                                 onChangeDone = { onChangeTodoDone(todo, it) },
-                                onScheduleGoal = {
-                                    if (isPaidUser) goalCreatorState = true else onOpenBillingScreen()
-                                },
+                                onScheduleGoal = { goalCreatorState = true },
                                 onDeleteGoal = { deleteWarningDialogState = true },
                             )
 
@@ -325,7 +321,7 @@ internal fun OverviewTodosCompletedSection(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = TasksThemeRes.strings.completedTodosSectionHeader,
+                text = stringResource(Res.string.completed_todos_section_header),
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.titleMedium,
             )

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="settings_header">Настройки</string>
+    <string name="general_tab_header">Общие</string>
+    <string name="notifications_tab_header">Уведомления</string>
+    <string name="calendar_tab_header">Каленарь</string>
+    <string name="ai_tab_header">AI</string>
+    <string name="about_app_tab_header">О приложении</string>
+    <string name="language_chooser_view_title">Язык приложения</string>
+    <string name="theme_chooser_view_title">Тема</string>
+    <string name="number_of_repeat_week_view_title">Недель в расписании</string>
+    <string name="begging_of_classes_notify_title">Уведомлять о начале занятий</string>
+    <string name="begging_of_classes_notify_description">Напоминания о начале занятий для выбранных организаций</string>
+    <string name="end_of_classes_notify_title">Уведомлять о конце занятий</string>
+    <string name="end_of_classes_notify_description">Оповещение когда закончатся занятия для выбранных организаций</string>
+    <string name="before_time_prefix">За\u0020</string>
+    <string name="unfinished_homeworks_notify_title">Напоминание о домашнем задании</string>
+    <string name="unfinished_homeworks_notify_description">Вы будете получать напоминания о невыполненном домашнем задании, а также некоторые рекомендации</string>
+    <string name="reminder_time_prefix">В\u0020</string>
+    <string name="high_workload_warning_notify_title">Предупреждение о высокой загруженности</string>
+    <string name="high_workload_warning_notify_description">Отправляется после анализа следующего дня при достижении критической отметки</string>
+    <string name="exception_organizations_dialog_header">Организации</string>
+    <string name="exception_organizations_dialog_title">Выберите организации для которых вы не хотите получать уведомления</string>
+    <string name="add_exception_chip_label">Добавить исключение</string>
+    <string name="exceptions_chip_label_prefix">Исключения:\u0020</string>
+    <string name="holidays_view_title">Каникулы</string>
+    <string name="holidays_editor_header">Каникулы</string>
+    <string name="holidays_start_label">Начало</string>
+    <string name="holidays_end_label">Конец</string>
+    <string name="holidays_date_placeholder">Укажите дату</string>
+    <string name="holidays_organizations_placeholder">Укажите организации</string>
+    <string name="holidays_organizations_label">Организации</string>
+    <string name="holidays_date_picker_headline">Дата</string>
+    <string name="holidays_organizations_selector_header">Организации</string>
+    <string name="ai_settings_title">AI-ассистент</string>
+    <string name="ai_settings_description">Используйте общую квоту или свой ключ DeepSeek. Ключ хранится только в защищённом хранилище устройства.</string>
+    <string name="shared_ai_title">Общий режим</string>
+    <string name="shared_ai_description">25 сообщений в сутки, без регистрации</string>
+    <string name="shared_quota_title">Осталось сообщений сегодня: %d</string>
+    <string name="personal_ai_title">Свой ключ DeepSeek</string>
+    <string name="personal_ai_description">Без ограничений приложения; расходы учитываются в вашем DeepSeek-аккаунте</string>
+    <string name="personal_ai_key_label">API key</string>
+    <string name="personal_ai_key_description">Ключ не сохраняется в базе и никуда отправляется</string>
+    <string name="test_ai_key_title">Проверить</string>
+    <string name="save_ai_key_title">Сохранить</string>
+    <string name="delete_ai_key_title">Удалить ключ</string>
+    <string name="ai_key_tested_title">Ключ работает и готов к сохранению</string>
+    <string name="ai_key_saved_title">Ключ сохранён</string>
+    <string name="about_app_header">О приложении</string>
+    <string name="version_name_title">Версия</string>
+    <string name="version_code_title">Номер сборки</string>
+    <string name="developer_title">Разработчик</string>
+    <string name="license_title">Лицензия</string>
+    <string name="github_title">Github</string>
+    <string name="ask_question_title">Задать вопрос</string>
+    <string name="website_title">Веб-сайт приложения</string>
+    <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
+</resources>

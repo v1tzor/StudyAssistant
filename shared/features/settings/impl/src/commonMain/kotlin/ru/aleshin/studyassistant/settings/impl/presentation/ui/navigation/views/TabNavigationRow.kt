@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.SettingsTabItem
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.root.SettingsTabItem
 
 /**
  * @author Stanislav Aleshin on 08.07.2024.

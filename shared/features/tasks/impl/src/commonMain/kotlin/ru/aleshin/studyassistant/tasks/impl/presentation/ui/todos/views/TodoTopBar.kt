@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.todos_header
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.back_icon_desc as core_back_icon_desc
 
 /**
  * @author Stanislav Aleshin on 28.07.2024.
@@ -41,12 +44,12 @@ internal fun TodoTopBar(
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
-        title = { Text(text = TasksThemeRes.strings.todosHeader) },
+        title = { Text(text = stringResource(Res.string.todos_header)) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = StudyAssistantRes.strings.backIconDesc,
+                    contentDescription = stringResource(CoreRes.string.core_back_icon_desc),
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
             }

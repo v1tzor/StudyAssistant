@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToOne
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.core.database.utils.LocalDataSource
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralSettingsEntity
 import kotlin.coroutines.CoroutineContext
@@ -28,7 +27,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * @author Stanislav Aleshin on 24.04.2024.
  */
-interface GeneralSettingsLocalDataSource : LocalDataSource.OnlyOffline {
+interface GeneralSettingsLocalDataSource {
 
     fun fetchSettings(): Flow<GeneralSettingsEntity>
 

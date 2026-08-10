@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.views.menu.ChooserDropdownMenu
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_account_file_outline
+import ru.aleshin.studyassistant.tasks.impl.resources.share_homeworks_header
 
 /**
  * @author Stanislav Aleshin on 04.06.2025.
@@ -43,7 +46,7 @@ internal fun DailyHomeworksDetailsMenu(
         text = { action ->
             Text(
                 text = when (action) {
-                    DailyHomeworksMenuActions.SHARE -> TasksThemeRes.strings.shareHomeworksHeader
+                    DailyHomeworksMenuActions.SHARE -> stringResource(Res.string.share_homeworks_header)
                 },
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
@@ -53,7 +56,7 @@ internal fun DailyHomeworksDetailsMenu(
             Icon(
                 painter = when (action) {
                     DailyHomeworksMenuActions.SHARE -> {
-                        painterResource(TasksThemeRes.icons.sharedHomeworks)
+                        painterResource(Res.drawable.ic_account_file_outline)
                     }
                 },
                 contentDescription = null,

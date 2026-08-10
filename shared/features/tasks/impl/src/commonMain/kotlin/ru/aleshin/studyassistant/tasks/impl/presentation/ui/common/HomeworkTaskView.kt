@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,8 +44,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTaskComponentUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkTaskComponentUi
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.homework_test_label
 
 /**
  * @author Stanislav Aleshin on 20.07.2024.
@@ -72,7 +74,7 @@ internal fun HomeworkTaskTestView(
                 tint = MaterialTheme.colorScheme.error,
             )
             Text(
-                text = TasksThemeRes.strings.homeworkTestLabel,
+                text = stringResource(Res.string.homework_test_label),
                 color = MaterialTheme.colorScheme.error,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
@@ -119,6 +121,7 @@ internal fun CompactHomeworkTaskView(
                             append(homeworkTask.text)
                             append(' ')
                         }
+
                         is HomeworkTaskComponentUi.Tasks -> withStyle(
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.Bold,
@@ -186,6 +189,7 @@ internal fun HomeworkTaskView(
                             style = MaterialTheme.typography.labelLarge,
                         )
                     }
+
                     is HomeworkTaskComponentUi.Tasks -> homeworkTask.taskList.forEach { taskText ->
                         Surface(
                             shape = RoundedCornerShape(6.dp),

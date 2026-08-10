@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,11 @@ interface FlowEitherWrapper<F : DomainFailures> : EitherWrapper<F> {
         private val errorHandler: ErrorHandler<F>,
         private val crashlyticsService: CrashlyticsService,
         private val ignoreExceptions: (Throwable) -> Boolean = { it is InternetConnectionException },
-    ) : FlowEitherWrapper<F>, EitherWrapper.Abstract<F>(errorHandler, crashlyticsService) {
+    ) : FlowEitherWrapper<F>, EitherWrapper.Abstract<F>(
+        errorHandler = errorHandler,
+        crashlyticsService = crashlyticsService,
+        ignoreExceptions = ignoreExceptions,
+    ) {
 
         override suspend fun <O> wrapFlow(block: suspend () -> Flow<O>) = flow {
             block.invoke().catch { error ->

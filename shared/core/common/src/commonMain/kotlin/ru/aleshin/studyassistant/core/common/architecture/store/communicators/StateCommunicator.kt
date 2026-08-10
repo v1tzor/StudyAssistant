@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreSt
 /**
  * @author Stanislav Aleshin on 12.06.2023.
  */
-abstract class StateCommunicator<S : StoreState>(defaultState: S) : Communicator.AbstractStateFlow<S>(
-    defaultValue = defaultState
-) {
+abstract class StateCommunicator<S : StoreState>(defaultState: S) :
+    Communicator.AbstractStateFlow<S>(
+        defaultValue = defaultState
+    ) {
     class Default<S : StoreState>(defaultState: S) : StateCommunicator<S>(defaultState)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,11 @@ import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleReposito
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ManageUserRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -54,8 +53,7 @@ public interface EditorFeatureDependencies : BaseFeatureDependencies {
     public val startClassesReminderManager: StartClassesReminderManager
     public val endClassesReminderManager: EndClassesReminderManager
     public val todoReminderManager: TodoReminderManager
-    public val usersRepository: UsersRepository
-    public val manageUserRepository: ManageUserRepository
+    public val profileRepository: ProfileRepository
     public val dateManager: DateManager
     public val overlayManager: TimeOverlayManager
     public val coroutineManager: CoroutineManager

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,14 @@
 package ru.aleshin.studyassistant.di
 
 import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
-import ru.aleshin.studyassistant.core.common.platform.services.AppService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
-import ru.aleshin.studyassistant.core.common.platform.services.MessagingService
 import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
-import ru.aleshin.studyassistant.core.common.platform.services.iap.IapService
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 expect class PlatformConfiguration {
-    val appService: AppService
     val analyticsService: AnalyticsService
     val crashlyticsService: CrashlyticsService
-    val messagingService: MessagingService
     val reviewService: ReviewService
-    val iapService: IapService
 }

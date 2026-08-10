@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
@@ -54,8 +55,21 @@ import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorSwipeItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorTextField
 import ru.aleshin.studyassistant.core.ui.views.dialog.WarningAlertDialog
 import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.delete_location_warning_title
+import ru.aleshin.studyassistant.editor.impl.resources.delete_office_warning_title
+import ru.aleshin.studyassistant.editor.impl.resources.location_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.location_field_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.location_selector_header
+import ru.aleshin.studyassistant.editor.impl.resources.location_selector_title
+import ru.aleshin.studyassistant.editor.impl.resources.office_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.office_field_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.office_selector_header
+import ru.aleshin.studyassistant.editor.impl.resources.office_selector_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_map_marker as core_ic_map_marker
+import ru.aleshin.studyassistant.core.ui.resources.warning_delete_confirm_title as core_warning_delete_confirm_title
+import ru.aleshin.studyassistant.core.ui.resources.warning_dialog_title as core_warning_dialog_title
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -84,7 +98,7 @@ internal fun LocationInfoField(
     ) {
         Icon(
             modifier = Modifier.size(24.dp),
-            painter = painterResource(StudyAssistantRes.icons.location),
+            painter = painterResource(CoreRes.drawable.core_ic_map_marker),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -94,8 +108,8 @@ internal fun LocationInfoField(
                 modifier = Modifier.weight(0.6f),
                 onClick = { openLocationSelectorSheet = true },
                 value = (location?.label ?: location?.value)?.ifEmpty { null },
-                label = EditorThemeRes.strings.locationFieldLabel,
-                placeholder = EditorThemeRes.strings.locationFieldPlaceholder,
+                label = stringResource(Res.string.location_field_label),
+                placeholder = stringResource(Res.string.location_field_placeholder),
                 trailingIcon = {
                     ExpandedIcon(
                         isExpanded = openLocationSelectorSheet,
@@ -108,8 +122,8 @@ internal fun LocationInfoField(
                 modifier = Modifier.weight(0.4f),
                 onClick = { openOfficeSelectorSheet = true },
                 value = office,
-                label = EditorThemeRes.strings.officeFieldLabel,
-                placeholder = EditorThemeRes.strings.officeFieldPlaceholder,
+                label = stringResource(Res.string.office_field_label),
+                placeholder = stringResource(Res.string.office_field_placeholder),
                 trailingIcon = {
                     ExpandedIcon(
                         isExpanded = openOfficeSelectorSheet,
@@ -169,8 +183,8 @@ internal fun LocationSelectorBottomSheet(
         selected = selectedLocation,
         items = locations,
         itemKeys = { it.value },
-        header = EditorThemeRes.strings.locationSelectorHeader,
-        title = EditorThemeRes.strings.locationSelectorTitle,
+        header = stringResource(Res.string.location_selector_header),
+        title = stringResource(Res.string.location_selector_title),
         itemView = { location ->
             var deleteWarningDialogStatus by remember { mutableStateOf(false) }
             val dismissState = rememberSwipeToDismissBoxState(
@@ -179,6 +193,7 @@ internal fun LocationSelectorBottomSheet(
                         SwipeToDismissBoxValue.StartToEnd -> {
                             deleteWarningDialogStatus = true
                         }
+
                         SwipeToDismissBoxValue.EndToStart -> Unit
                         SwipeToDismissBoxValue.Settled -> Unit
                     }
@@ -215,9 +230,9 @@ internal fun LocationSelectorBottomSheet(
                             tint = MaterialTheme.colorScheme.error
                         )
                     },
-                    title = { Text(text = StudyAssistantRes.strings.warningDialogTitle) },
-                    text = { Text(text = EditorThemeRes.strings.deleteLocationWarningTitle) },
-                    confirmTitle = StudyAssistantRes.strings.warningDeleteConfirmTitle,
+                    title = { Text(text = stringResource(CoreRes.string.core_warning_dialog_title)) },
+                    text = { Text(text = stringResource(Res.string.delete_location_warning_title)) },
+                    confirmTitle = stringResource(CoreRes.string.core_warning_delete_confirm_title),
                     onDismiss = { deleteWarningDialogStatus = false },
                     onConfirm = {
                         val updatedLocations = locations.toMutableList().apply { remove(location) }
@@ -245,7 +260,7 @@ internal fun LocationSelectorBottomSheet(
 
     if (contactInfoEditorDialogState) {
         ContactInfoEditorDialog(
-            header = EditorThemeRes.strings.locationFieldLabel,
+            header = stringResource(Res.string.location_field_label),
             label = editableContactInfo?.label,
             value = editableContactInfo?.value,
             onDismiss = {
@@ -303,8 +318,8 @@ internal fun OfficeSelectorBottomSheet(
         selected = selectedOffice,
         items = offices.sortedBy { it },
         itemKeys = { it },
-        header = EditorThemeRes.strings.officeSelectorHeader,
-        title = EditorThemeRes.strings.officeSelectorTitle,
+        header = stringResource(Res.string.office_selector_header),
+        title = stringResource(Res.string.office_selector_title),
         itemView = { office ->
             var deleteWarningDialogStatus by remember { mutableStateOf(false) }
             val dismissState = rememberSwipeToDismissBoxState(
@@ -313,6 +328,7 @@ internal fun OfficeSelectorBottomSheet(
                         SwipeToDismissBoxValue.StartToEnd -> {
                             deleteWarningDialogStatus = true
                         }
+
                         SwipeToDismissBoxValue.EndToStart -> Unit
                         SwipeToDismissBoxValue.Settled -> Unit
                     }
@@ -349,9 +365,9 @@ internal fun OfficeSelectorBottomSheet(
                             tint = MaterialTheme.colorScheme.error
                         )
                     },
-                    title = { Text(text = StudyAssistantRes.strings.warningDialogTitle) },
-                    text = { Text(text = EditorThemeRes.strings.deleteOfficeWarningTitle) },
-                    confirmTitle = StudyAssistantRes.strings.warningDeleteConfirmTitle,
+                    title = { Text(text = stringResource(CoreRes.string.core_warning_dialog_title)) },
+                    text = { Text(text = stringResource(Res.string.delete_office_warning_title)) },
+                    confirmTitle = stringResource(CoreRes.string.core_warning_delete_confirm_title),
                     onDismiss = { deleteWarningDialogStatus = false },
                     onConfirm = {
                         val updatedOffices = offices.toMutableList().apply { remove(office) }
@@ -381,7 +397,8 @@ internal fun OfficeSelectorBottomSheet(
                         },
                         maxLines = 1,
                         onConfirm = {
-                            val updatedOffices = offices.toMutableList().apply { add(editableOffice) }
+                            val updatedOffices =
+                                offices.toMutableList().apply { add(editableOffice) }
                             onUpdateOffices(updatedOffices)
                             editableOffice = ""
                             isEdited = false

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import io.github.koalaplot.core.legend.LegendLocation
 import io.github.koalaplot.core.style.Axis
@@ -39,14 +40,9 @@ import ru.aleshin.studyassistant.core.ui.theme.material.toColorScheme
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantColors
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantElevations
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantIcons
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantLanguage
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantStrings
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantColors
 import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppElevations
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreIcons
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
 import ru.aleshin.studyassistant.core.ui.views.NavigationBarColor
 
 /**
@@ -58,35 +54,29 @@ fun StudyAssistantTheme(
     languageType: LanguageUiType = LanguageUiType.DEFAULT,
     content: @Composable () -> Unit,
 ) {
-    val appLanguage = remember(languageType) {
-        fetchAppLanguage(languageType)
+    val currentLanguage = Locale.current.language
+    val appLanguage = remember(languageType, currentLanguage) {
+        applyApplicationLanguage(languageType)
     }
-    val appElevations = remember {
-        fetchAppElevations()
-    }
-    val appIcons = remember {
-        fetchCoreIcons()
-    }
-    val isDark = themeType.isDarkTheme()
-    val colorAccents = themeType.toColorAccents()
-    val coreColors = remember(isDark, colorAccents) {
-        StudyAssistantColors(isDark, colorAccents)
-    }
-    val coreStrings = remember(appLanguage) {
-        fetchCoreStrings(appLanguage)
-    }
+    val typography = baseTypography
+    val colorScheme = themeType.toColorScheme()
+    val shapes = baseShapes
 
     MaterialTheme(
-        colorScheme = themeType.toColorScheme(),
-        shapes = remember { baseShapes },
-        typography = remember { baseTypography },
+        colorScheme = colorScheme,
+        shapes = shapes,
+        typography = typography,
     ) {
+        val appElevations = remember { fetchAppElevations() }
+        val isDark = themeType.isDarkTheme()
+        val colorAccents = themeType.toColorAccents()
+        val coreColors = remember(isDark, colorAccents) {
+            StudyAssistantColors(isDark, colorAccents)
+        }
         CompositionLocalProvider(
             LocalStudyAssistantLanguage provides appLanguage,
-            LocalStudyAssistantColors provides coreColors,
             LocalStudyAssistantElevations provides appElevations,
-            LocalStudyAssistantStrings provides coreStrings,
-            LocalStudyAssistantIcons provides appIcons,
+            LocalStudyAssistantColors provides coreColors,
         ) {
             KoalaPlotTheme(
                 sizes = Sizes(),

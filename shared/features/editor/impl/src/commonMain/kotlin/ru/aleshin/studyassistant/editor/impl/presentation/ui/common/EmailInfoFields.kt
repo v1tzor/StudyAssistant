@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,12 +35,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.ui.views.ClickableTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
 import ru.aleshin.studyassistant.core.ui.views.dialog.ContactInfoEditorDialog
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.email_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.email_field_placeholder
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_email as core_ic_email
 
 /**
  * @author Stanislav Aleshin on 06.06.2024.
@@ -63,7 +67,7 @@ internal fun EmailInfoFields(
         Box(modifier = Modifier.height(61.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(StudyAssistantRes.icons.email),
+                painter = painterResource(CoreRes.drawable.core_ic_email),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -83,8 +87,8 @@ internal fun EmailInfoFields(
                     enabled = !isLoading,
                     modifier = Modifier.height(61.dp).weight(1f),
                     value = mainEmail?.value,
-                    label = EditorThemeRes.strings.emailFieldLabel,
-                    placeholder = EditorThemeRes.strings.emailFieldPlaceholder,
+                    label = stringResource(Res.string.email_field_label),
+                    placeholder = stringResource(Res.string.email_field_placeholder),
                     trailingIcon = {
                         ExpandedIcon(
                             isExpanded = contactInfoEditorDialogState,
@@ -111,7 +115,7 @@ internal fun EmailInfoFields(
                         modifier = Modifier.height(61.dp).weight(1f),
                         value = additionalEmail.value,
                         label = null,
-                        placeholder = EditorThemeRes.strings.emailFieldPlaceholder,
+                        placeholder = stringResource(Res.string.email_field_placeholder),
                         trailingIcon = {
                             ExpandedIcon(
                                 isExpanded = contactInfoEditorDialogState,
@@ -135,7 +139,7 @@ internal fun EmailInfoFields(
 
     if (contactInfoEditorDialogState) {
         ContactInfoEditorDialog(
-            header = EditorThemeRes.strings.emailFieldLabel,
+            header = stringResource(Res.string.email_field_label),
             label = editableContactInfo?.label,
             value = editableContactInfo?.value,
             onDismiss = {

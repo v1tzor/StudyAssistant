@@ -17,15 +17,14 @@
 package ru.aleshin.studyassistant.presentation.ui.main.store
 
 import com.arkivanov.decompose.ComponentContext
-import ru.aleshin.studyassistant.auth.api.AuthFeatureStarter
-import ru.aleshin.studyassistant.billing.api.BillingFeatureStarter
+import ru.aleshin.studyassistant.analytics.api.AnalyticsDecomposeFeatureFactory
 import ru.aleshin.studyassistant.core.common.navigation.DeepLinkUrl
-import ru.aleshin.studyassistant.editor.api.EditorFeatureStarter
+import ru.aleshin.studyassistant.editor.api.EditorDecomposeFeatureFactory
 import ru.aleshin.studyassistant.presentation.ui.tabnavigation.component.TabsComponentFactory
-import ru.aleshin.studyassistant.preview.api.PreviewFeatureStarter
-import ru.aleshin.studyassistant.schedule.api.ScheduleFeatureStarter
-import ru.aleshin.studyassistant.settings.api.SettingsFeatureStarter
-import ru.aleshin.studyassistant.users.api.UsersFeatureStarter
+import ru.aleshin.studyassistant.preview.api.PreviewDecomposeFeatureFactory
+import ru.aleshin.studyassistant.schedule.api.ScheduleDecomposeFeatureFactory
+import ru.aleshin.studyassistant.settings.api.SettingsDecomposeFeatureFactory
+import ru.aleshin.studyassistant.users.api.UsersDecomposeFeatureFactory
 
 /**
  * @author Stanislav Aleshin on 26.08.2025.
@@ -39,13 +38,12 @@ interface MainComponentFactory {
 
     class Default(
         private val storeFactory: MainComposeStore.Factory,
-        private val previewFeatureStarter: PreviewFeatureStarter,
-        private val authFeatureStarter: AuthFeatureStarter,
-        private val scheduleFeatureStarter: ScheduleFeatureStarter,
-        private val editorFeatureStarter: EditorFeatureStarter,
-        private val billingFeatureStarter: BillingFeatureStarter,
-        private val settingsFeatureStarter: SettingsFeatureStarter,
-        private val usersFeatureStarter: UsersFeatureStarter,
+        private val previewFeatureFactory: PreviewDecomposeFeatureFactory,
+        private val scheduleFeatureFactory: ScheduleDecomposeFeatureFactory,
+        private val editorFeatureFactory: EditorDecomposeFeatureFactory,
+        private val settingsFeatureFactory: SettingsDecomposeFeatureFactory,
+        private val analyticsFeatureFactory: AnalyticsDecomposeFeatureFactory,
+        private val usersFeatureFactory: UsersDecomposeFeatureFactory,
         private val tabsComponentFactory: TabsComponentFactory,
     ) : MainComponentFactory {
 
@@ -57,13 +55,12 @@ interface MainComponentFactory {
                 storeFactory = storeFactory,
                 componentContext = componentContext,
                 deepLink = deepLink,
-                previewFeatureStarter = previewFeatureStarter,
-                authFeatureStarter = authFeatureStarter,
-                scheduleFeatureStarter = scheduleFeatureStarter,
-                editorFeatureStarter = editorFeatureStarter,
-                billingFeatureStarter = billingFeatureStarter,
-                settingsFeatureStarter = settingsFeatureStarter,
-                usersFeatureStarter = usersFeatureStarter,
+                previewFeatureFactory = previewFeatureFactory,
+                scheduleFeatureFactory = scheduleFeatureFactory,
+                editorFeatureFactory = editorFeatureFactory,
+                settingsFeatureFactory = settingsFeatureFactory,
+                analyticsFeatureFactory = analyticsFeatureFactory,
+                usersFeatureFactory = usersFeatureFactory,
                 tabsComponentFactory = tabsComponentFactory,
             )
         }

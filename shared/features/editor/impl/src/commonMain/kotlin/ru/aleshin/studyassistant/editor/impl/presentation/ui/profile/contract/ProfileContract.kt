@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract
 
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
@@ -24,9 +24,8 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEf
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
+import ru.aleshin.studyassistant.core.presentation.models.users.ProfileUi
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.AppUserUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.SocialNetworkUi
 
 /**
  * @author Stanislav Aleshin on 26.07.2024
@@ -34,8 +33,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.users.SocialNet
 @Serializable
 internal data class ProfileState(
     val isLoading: Boolean = true,
-    val isPaidUser: Boolean? = false,
-    val appUser: AppUserUi? = null,
+    val profile: ProfileUi? = null,
 ) : StoreState
 
 internal sealed class ProfileEvent : StoreEvent {
@@ -47,9 +45,6 @@ internal sealed class ProfileEvent : StoreEvent {
     data class UpdateBirthday(val text: String?) : ProfileEvent()
     data class UpdateGender(val gender: Gender?) : ProfileEvent()
     data class UpdateCity(val city: String?) : ProfileEvent()
-    data class UpdateSocialNetworks(val socialNetworks: List<SocialNetworkUi>) : ProfileEvent()
-    data class UpdatePassword(val oldPassword: String?, val newPassword: String) : ProfileEvent()
-    data object NavigateToBillingScreen : ProfileEvent()
     data object NavigateToBack : ProfileEvent()
 }
 
@@ -58,12 +53,10 @@ internal sealed class ProfileEffect : StoreEffect {
 }
 
 internal sealed class ProfileAction : StoreAction {
-    data class SetupAppUser(val user: AppUserUi) : ProfileAction()
+    data class SetupProfile(val profile: ProfileUi) : ProfileAction()
     data class UpdateLoading(val isLoading: Boolean) : ProfileAction()
-    data class UpdatePaidUserStatus(val isPaidUser: Boolean) : ProfileAction()
 }
 
 internal sealed class ProfileOutput : BaseOutput {
     data object NavigateToBack : ProfileOutput()
-    data object NavigateToBilling : ProfileOutput()
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.preview.impl.domain.common
 
-import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
 
@@ -27,9 +26,6 @@ internal interface PreviewErrorHandler : ErrorHandler<PreviewFailures> {
 
     class Base : PreviewErrorHandler {
 
-        override fun handle(throwable: Throwable) = when (throwable) {
-            is InternetConnectionException -> PreviewFailures.InternetError
-            else -> PreviewFailures.OtherError(throwable)
-        }
+        override fun handle(throwable: Throwable) = PreviewFailures.OtherError(throwable)
     }
 }

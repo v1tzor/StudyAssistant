@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import ru.aleshin.studyassistant.core.common.architecture.store.communicators.St
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
-import ru.aleshin.studyassistant.editor.impl.presentation.models.users.convertToBase
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToEmployee
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectAction
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectEvent
@@ -82,40 +82,53 @@ internal class SubjectComposeStore(
                     }
                 }
             }
+
             is SubjectEvent.SelectEventType -> with(state()) {
                 val updatedSubject = editableSubject?.copy(eventType = event.type)
                 sendAction(SubjectAction.UpdateEditModel(updatedSubject))
             }
+
             is SubjectEvent.EditName -> with(state()) {
                 val updatedSubject = editableSubject?.copy(name = event.name)
                 sendAction(SubjectAction.UpdateEditModel(updatedSubject))
             }
+
             is SubjectEvent.UpdateColor -> with(state()) {
                 val updatedSubject = editableSubject?.copy(color = event.color)
                 sendAction(SubjectAction.UpdateEditModel(updatedSubject))
             }
+
             is SubjectEvent.UpdateTeacher -> with(state()) {
-                val updatedSubject = editableSubject?.copy(teacher = event.teacher?.convertToBase())
+                val updatedSubject = editableSubject?.copy(teacher = event.teacher?.mapToEmployee())
                 sendAction(SubjectAction.UpdateEditModel(updatedSubject))
             }
+
             is SubjectEvent.UpdateLocation -> with(state()) {
-                val updatedSubject = editableSubject?.copy(location = event.location, office = event.office)
+                val updatedSubject =
+                    editableSubject?.copy(location = event.location, office = event.office)
                 sendAction(SubjectAction.UpdateEditModel(updatedSubject))
             }
+
             is SubjectEvent.UpdateOrganizationOffices -> with(state()) {
                 launchBackgroundWork(BackgroundKey.UPDATE_LOCATIONS) {
                     val organization = checkNotNull(organization)
-                    val command = SubjectWorkCommand.UpdateOrganizationOffices(organization, event.offices)
+                    val command =
+                        SubjectWorkCommand.UpdateOrganizationOffices(organization, event.offices)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is SubjectEvent.UpdateOrganizationLocations -> with(state()) {
                 launchBackgroundWork(BackgroundKey.UPDATE_LOCATIONS) {
                     val organization = checkNotNull(organization)
-                    val command = SubjectWorkCommand.UpdateOrganizationLocations(organization, event.locations)
+                    val command = SubjectWorkCommand.UpdateOrganizationLocations(
+                        organization,
+                        event.locations
+                    )
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is SubjectEvent.SaveSubject -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SAVE_SUBJECT) {
                     val subject = checkNotNull(editableSubject)
@@ -123,11 +136,13 @@ internal class SubjectComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is SubjectEvent.NavigateToEmployeeEditor -> with(state()) {
                 val organization = checkNotNull(organization)
                 val config = EditorConfig.Employee(event.employeeId, organization.uid)
                 consumeOutput(SubjectOutput.NavigateToEmployeeEditor(config))
             }
+
             is SubjectEvent.NavigateToBack -> {
                 consumeOutput(SubjectOutput.NavigateToBack)
             }
@@ -142,15 +157,19 @@ internal class SubjectComposeStore(
             editableSubject = action.editModel,
             isLoading = false,
         )
+
         is SubjectAction.UpdateOrganization -> currentState.copy(
             organization = action.organization,
         )
+
         is SubjectAction.UpdateEditModel -> currentState.copy(
             editableSubject = action.editModel,
         )
+
         is SubjectAction.UpdateEmployees -> currentState.copy(
             employees = action.employees,
         )
+
         is SubjectAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )

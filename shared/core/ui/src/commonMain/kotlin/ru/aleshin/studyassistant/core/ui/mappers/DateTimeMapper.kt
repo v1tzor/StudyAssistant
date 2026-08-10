@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,46 +18,42 @@ package ru.aleshin.studyassistant.core.ui.mappers
 import androidx.compose.runtime.Composable
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DateTimeFormat
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.toMinutesAndHoursSuffixString
 import ru.aleshin.studyassistant.core.common.extensions.toMinutesOrHoursSuffixString
 import ru.aleshin.studyassistant.core.common.extensions.toString
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 import ru.aleshin.studyassistant.core.ui.views.timeFormat
 import kotlin.time.Duration
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.day_suffix as core_day_suffix
+import ru.aleshin.studyassistant.core.ui.resources.hour_suffix as core_hour_suffix
+import ru.aleshin.studyassistant.core.ui.resources.minute_suffix as core_minute_suffix
 
 /**
  * @author Stanislav Aleshin on 13.04.2024.
  */
-fun Duration.toLanguageString(strings: StudyAssistantStrings, showAbsoluteValue: Boolean = true): String {
-    val daySuffix = strings.daySuffix
-    val minuteSuffix = strings.minuteSuffix
-    val hourSuffix = strings.hourSuffix
-
-    return this.toString(daySuffix, minuteSuffix, hourSuffix, showAbsoluteValue)
-}
-
 @Composable
 fun Duration.toLanguageString(showAbsoluteValue: Boolean = true): String {
-    return toLanguageString(StudyAssistantRes.strings, showAbsoluteValue)
+    val daySuffix = stringResource(CoreRes.string.core_day_suffix)
+    val minuteSuffix = stringResource(CoreRes.string.core_minute_suffix)
+    val hourSuffix = stringResource(CoreRes.string.core_hour_suffix)
+    return toString(daySuffix, minuteSuffix, hourSuffix, showAbsoluteValue)
 }
 
 @Composable
 fun Long.toMinutesOrHoursTitle(): String {
-    val minuteSuffix = StudyAssistantRes.strings.minuteSuffix
-    val hoursSuffix = StudyAssistantRes.strings.hourSuffix
-
-    return this.toMinutesOrHoursSuffixString(minuteSuffix, hoursSuffix)
+    val minuteSuffix = stringResource(CoreRes.string.core_minute_suffix)
+    val hoursSuffix = stringResource(CoreRes.string.core_hour_suffix)
+    return toMinutesOrHoursSuffixString(minuteSuffix, hoursSuffix)
 }
 
 @Composable
 fun Long.toMinutesAndHoursTitle(): String {
-    val minuteSuffix = StudyAssistantRes.strings.minuteSuffix
-    val hoursSuffix = StudyAssistantRes.strings.hourSuffix
-
-    return this.toMinutesAndHoursSuffixString(minuteSuffix, hoursSuffix)
+    val minuteSuffix = stringResource(CoreRes.string.core_minute_suffix)
+    val hoursSuffix = stringResource(CoreRes.string.core_hour_suffix)
+    return toMinutesAndHoursSuffixString(minuteSuffix, hoursSuffix)
 }
 
 @Composable

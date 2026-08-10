@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
@@ -83,6 +84,8 @@ import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalType
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkTaskComponentUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
@@ -90,15 +93,20 @@ import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
 import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalCreateModelUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalShortUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.DailyHomeworksUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTaskComponentUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToBase
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.fetchAllTasks
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.CompactHomeworkTaskView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.DeleteGoalWarningDialog
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.GoalCreatorDialog
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_book_study as core_ic_book_study
+import ru.aleshin.studyassistant.core.ui.resources.ic_presentation as core_ic_presentation
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
+import ru.aleshin.studyassistant.core.ui.resources.today_title as core_today_title
+import ru.aleshin.studyassistant.core.ui.resources.tomorrow_title as core_tomorrow_title
 
 /**
  * @author Stanislav Aleshin on 29.06.2024.
@@ -107,7 +115,6 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.GoalCreatorDi
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun DailyHomeworksDetailsView(
     modifier: Modifier = Modifier,
-    isPaidUser: Boolean,
     date: Instant,
     currentDate: Instant,
     isPassed: Boolean,
@@ -120,7 +127,6 @@ internal fun DailyHomeworksDetailsView(
     onScheduleGoal: (GoalCreateModelUi) -> Unit,
     onDeleteGoal: (GoalShortUi) -> Unit,
     onShareHomeworks: () -> Unit,
-    onOpenBillingScreen: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxHeight().width(182.dp),
@@ -129,11 +135,11 @@ internal fun DailyHomeworksDetailsView(
         val homeworks = dailyHomeworks.homeworks
         val completedHomeworks = remember(homeworks) {
             homeworks.getOrElse(HomeworkStatus.COMPLETE) { emptyList() } +
-                homeworks.getOrElse(HomeworkStatus.SKIPPED) { emptyList() }
+                    homeworks.getOrElse(HomeworkStatus.SKIPPED) { emptyList() }
         }
         val runningHomeworks = remember(homeworks) {
             homeworks.getOrElse(HomeworkStatus.WAIT) { emptyList() } +
-                homeworks.getOrElse(HomeworkStatus.IN_FUTURE) { emptyList() }
+                    homeworks.getOrElse(HomeworkStatus.IN_FUTURE) { emptyList() }
         }
         val errorHomeworks = remember(homeworks) {
             homeworks.getOrElse(HomeworkStatus.NOT_COMPLETE) { emptyList() }
@@ -187,9 +193,7 @@ internal fun DailyHomeworksDetailsView(
                         onSkip = { onSkipHomework(homework) },
                         onRepeat = { onRepeatHomework(homework) },
                         onDeleteGoal = { deleteWarningDialogState = true },
-                        onScheduleGoal = {
-                            if (isPaidUser) goalCreatorState = true else onOpenBillingScreen()
-                        },
+                        onScheduleGoal = { goalCreatorState = true },
                     )
 
                     if (deleteWarningDialogState) {
@@ -238,9 +242,7 @@ internal fun DailyHomeworksDetailsView(
                         onSkip = { onSkipHomework(homework) },
                         onRepeat = { onRepeatHomework(homework) },
                         onDeleteGoal = { deleteWarningDialogState = true },
-                        onScheduleGoal = {
-                            if (isPaidUser) goalCreatorState = true else onOpenBillingScreen()
-                        },
+                        onScheduleGoal = { goalCreatorState = true },
                     )
 
                     if (deleteWarningDialogState) {
@@ -324,7 +326,7 @@ private fun DailyHomeworksViewHeader(
                         fontWeight = FontWeight.Bold,
                     ).toSpanStyle()
                 ) {
-                    append(targetDate.dateTime().dayOfWeek.mapToSting(StudyAssistantRes.strings))
+                    append(targetDate.dateTime().dayOfWeek.mapToSting())
                 }
                 withStyle(
                     style = MaterialTheme.typography.labelLarge.copy(
@@ -337,12 +339,12 @@ private fun DailyHomeworksViewHeader(
                 ) {
                     append(" • ")
                     if (targetDate.equalsDay(currentDate)) {
-                        append(StudyAssistantRes.strings.todayTitle)
+                        append(stringResource(CoreRes.string.core_today_title))
                     } else if (targetDate.equalsDay(currentDate.shiftDay(1))) {
-                        append(StudyAssistantRes.strings.tomorrowTitle)
+                        append(stringResource(CoreRes.string.core_tomorrow_title))
                     } else {
                         val format =
-                            DateTimeComponents.Formats.dayMonthFormat(StudyAssistantRes.strings)
+                            DateTimeComponents.Formats.dayMonthFormat()
                         append(targetDate.formatByTimeZone(format))
                     }
                 }
@@ -526,7 +528,7 @@ private fun ShortHomeworkViewContent(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = subject ?: StudyAssistantRes.strings.noneTitle,
+                text = subject ?: stringResource(CoreRes.string.core_none_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2,
@@ -544,24 +546,28 @@ private fun ShortHomeworkViewContent(
                         StudyAssistantRes.colors.accents.green
                     },
                 )
+
                 HomeworkStatus.WAIT -> Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Default.AccessTime,
                     contentDescription = null,
                     tint = StudyAssistantRes.colors.accents.orange,
                 )
+
                 HomeworkStatus.IN_FUTURE -> Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Default.AccessTime,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                 )
+
                 HomeworkStatus.NOT_COMPLETE -> Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Default.Error,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.error,
                 )
+
                 HomeworkStatus.SKIPPED -> Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Default.Close,
@@ -577,15 +583,15 @@ private fun ShortHomeworkViewContent(
         if (status == HomeworkStatus.COMPLETE || status == HomeworkStatus.SKIPPED) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 ShortHomeworkTaskCountView(
-                    painter = painterResource(StudyAssistantRes.icons.theoreticalTasks),
+                    painter = painterResource(CoreRes.drawable.core_ic_book_study),
                     count = theoreticalTasks.fetchAllTasks().size,
                 )
                 ShortHomeworkTaskCountView(
-                    painter = painterResource(StudyAssistantRes.icons.practicalTasks),
+                    painter = painterResource(CoreRes.drawable.core_ic_tasks_circular),
                     count = practicalTasks.fetchAllTasks().size,
                 )
                 ShortHomeworkTaskCountView(
-                    painter = painterResource(StudyAssistantRes.icons.presentationTasks),
+                    painter = painterResource(CoreRes.drawable.core_ic_presentation),
                     count = presentationTasks.fetchAllTasks().size,
                 )
             }
@@ -593,19 +599,19 @@ private fun ShortHomeworkViewContent(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (theoreticalTasks.isNotEmpty()) {
                     CompactHomeworkTaskView(
-                        icon = painterResource(StudyAssistantRes.icons.theoreticalTasks),
+                        icon = painterResource(CoreRes.drawable.core_ic_book_study),
                         tasks = theoreticalTasks,
                     )
                 }
                 if (practicalTasks.isNotEmpty()) {
                     CompactHomeworkTaskView(
-                        icon = painterResource(StudyAssistantRes.icons.practicalTasks),
+                        icon = painterResource(CoreRes.drawable.core_ic_tasks_circular),
                         tasks = practicalTasks,
                     )
                 }
                 if (presentationTasks.isNotEmpty()) {
                     CompactHomeworkTaskView(
-                        icon = painterResource(StudyAssistantRes.icons.presentationTasks),
+                        icon = painterResource(CoreRes.drawable.core_ic_presentation),
                         tasks = presentationTasks,
                     )
                 }

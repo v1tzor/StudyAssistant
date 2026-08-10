@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,7 @@
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,34 +25,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.koalaplot.core.Symbol
 import io.github.koalaplot.core.bar.StackedVerticalBarPlot
-import io.github.koalaplot.core.bar.solidBar
+import io.github.koalaplot.core.bar.verticalSolidBar
+import io.github.koalaplot.core.gestures.GestureConfig
 import io.github.koalaplot.core.legend.FlowLegend
-import io.github.koalaplot.core.style.KoalaPlotTheme
-import io.github.koalaplot.core.style.LineStyle
 import io.github.koalaplot.core.util.ExperimentalKoalaPlotApi
-import io.github.koalaplot.core.util.VerticalRotation
-import io.github.koalaplot.core.util.rotateVertically
-import io.github.koalaplot.core.xygraph.AxisModel
-import io.github.koalaplot.core.xygraph.AxisStyle
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
+import io.github.koalaplot.core.xygraph.CategoryAxisOffset
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import io.github.koalaplot.core.xygraph.XYGraph
-import io.github.koalaplot.core.xygraph.XYGraphScope
-import io.github.koalaplot.core.xygraph.rememberAxisStyle
+import io.github.koalaplot.core.xygraph.rememberAxisContent
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkScopeUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.practical_tasks_bar_name
+import ru.aleshin.studyassistant.tasks.impl.resources.presentations_tasks_bar_name
+import ru.aleshin.studyassistant.tasks.impl.resources.theoretical_tasks_bar_name
 
 /**
  * @author Stanislav Aleshin on 30.06.2024.
@@ -68,9 +64,9 @@ internal fun HomeworkTasksChart(
     homeworkScope: HomeworkScopeUi?,
 ) {
     val taskTypes = listOf(
-        TasksThemeRes.strings.theoreticalTasksBarName,
-        TasksThemeRes.strings.practicalTasksBarName,
-        TasksThemeRes.strings.presentationsTasksBarName,
+        stringResource(Res.string.theoretical_tasks_bar_name),
+        stringResource(Res.string.practical_tasks_bar_name),
+        stringResource(Res.string.presentations_tasks_bar_name),
     )
     val taskTypeColors = listOf(
         StudyAssistantRes.colors.accents.green,
@@ -117,8 +113,7 @@ internal fun HomeworkTasksChart(
             xAxisModel = remember(homeworkScope) {
                 CategoryAxisModel(
                     categories = dateList,
-                    firstCategoryIsZero = true,
-                    minimumMajorTickSpacing = 8.dp,
+                    categoryAxisOffset = CategoryAxisOffset.None,
                 )
             },
             yAxisModel = remember(homeworkScope) {
@@ -132,37 +127,45 @@ internal fun HomeworkTasksChart(
                 )
             },
             modifier = Modifier.weight(1f),
-            xAxisLabels = { date ->
-                Text(
-                    text = date?.dateTime()?.dayOfMonth?.toString() ?: "",
-                    color = if (date?.equalsDay(currentDate) == true) {
-                        StudyAssistantRes.colors.accents.red
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 1,
-                    softWrap = false,
-                    overflow = TextOverflow.Visible,
-                    modifier = Modifier.padding(top = 2.dp)
-                )
-            },
-            yAxisLabels = {
-                Text(
-                    text = it.toString(),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 1,
-                    modifier = Modifier.padding(top = 2.dp)
-                )
-            },
-            xAxisTitle = {},
-            yAxisTitle = {},
+            xAxisContent = rememberAxisContent(
+                labels = { date ->
+                    Text(
+                        text = date?.dateTime()?.dayOfMonth?.toString() ?: "",
+                        color = if (date?.equalsDay(currentDate) == true) {
+                            StudyAssistantRes.colors.accents.red
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Visible,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                },
+            ),
+            yAxisContent = rememberAxisContent(
+                labels = { value ->
+                    Text(
+                        text = value.toString(),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                },
+            ),
+            gestureConfig = GestureConfig(
+                panXEnabled = true,
+                panYEnabled = true,
+                zoomXEnabled = true,
+                zoomYEnabled = true,
+            ),
         ) {
             if (!isLoading && homeworkScope != null) {
                 StackedVerticalBarPlot(barWidth = 0.9f) {
                     taskTypes.forEachIndexed { typeIndex, _ ->
-                        series(defaultBar = solidBar(taskTypeColors[typeIndex])) {
+                        series(defaultBar = verticalSolidBar(taskTypeColors[typeIndex])) {
                             dateList.forEachIndexed { dateIndex, date ->
                                 item(date, numberOfTasks[typeIndex][dateIndex])
                             }
@@ -188,77 +191,4 @@ internal fun HomeworkTasksChart(
             },
         )
     }
-}
-
-@Composable
-public fun <X, Y> XYGraph(
-    xAxisModel: AxisModel<X>,
-    yAxisModel: AxisModel<Y>,
-    modifier: Modifier = Modifier,
-    xAxisStyle: AxisStyle = rememberAxisStyle(),
-    xAxisLabels: (X) -> String = { it.toString() },
-    xAxisTitle: String? = null,
-    yAxisStyle: AxisStyle = rememberAxisStyle(),
-    yAxisLabels: (Y) -> String = { it.toString() },
-    yAxisTitle: String? = null,
-    horizontalMajorGridLineStyle: LineStyle? = KoalaPlotTheme.axis.majorGridlineStyle,
-    horizontalMinorGridLineStyle: LineStyle? = KoalaPlotTheme.axis.minorGridlineStyle,
-    verticalMajorGridLineStyle: LineStyle? = KoalaPlotTheme.axis.majorGridlineStyle,
-    verticalMinorGridLineStyle: LineStyle? = KoalaPlotTheme.axis.minorGridlineStyle,
-    panZoomEnabled: Boolean = true,
-    content: @Composable XYGraphScope<X, Y>.() -> Unit
-) {
-    XYGraph(
-        xAxisModel = xAxisModel,
-        yAxisModel = yAxisModel,
-        modifier = modifier,
-        xAxisStyle = rememberAxisStyle(),
-        xAxisLabels = {
-            Text(
-                xAxisLabels(it),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 2.dp)
-            )
-        },
-        xAxisTitle = {
-            if (xAxisTitle != null) {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text(
-                        xAxisTitle,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-            }
-        },
-        yAxisStyle = rememberAxisStyle(),
-        yAxisLabels = {
-            Text(
-                yAxisLabels(it),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 2.dp)
-            )
-        },
-        yAxisTitle = {
-            if (yAxisTitle != null) {
-                Box(modifier = Modifier.fillMaxHeight(), contentAlignment = Alignment.Center) {
-                    Text(
-                        yAxisTitle,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.rotateVertically(VerticalRotation.COUNTER_CLOCKWISE)
-                            .padding(bottom = KoalaPlotTheme.sizes.gap),
-                    )
-                }
-            }
-        },
-        horizontalMajorGridLineStyle = KoalaPlotTheme.axis.majorGridlineStyle,
-        horizontalMinorGridLineStyle = KoalaPlotTheme.axis.minorGridlineStyle,
-        verticalMajorGridLineStyle = KoalaPlotTheme.axis.majorGridlineStyle,
-        verticalMinorGridLineStyle = KoalaPlotTheme.axis.minorGridlineStyle,
-        panZoomEnabled = true,
-        content = content,
-    )
 }

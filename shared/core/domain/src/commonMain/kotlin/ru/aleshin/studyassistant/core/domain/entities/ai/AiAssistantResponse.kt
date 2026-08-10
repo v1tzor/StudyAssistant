@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,30 +26,4 @@ data class AiAssistantResponse(
     val model: String,
     val systemFingerprint: String? = null,
     val usage: AiChatUsage,
-)
-
-data class AiAssistantResponseChoice(
-    val index: Int,
-    val message: AiAssistantMessage,
-    val finishReason: AiAssistantFinishReason?,
-)
-
-enum class AiAssistantFinishReason(val reason: String) {
-    STOP("stop"),
-    LENGTH("length"),
-    CONTENT_FILTER("content_filter"),
-    TOOL_CALLS("tool_calls"),
-    INSUFFICIENT_SYSTEM_RESOURCE("insufficient_system_resource");
-
-    companion object {
-        fun fromString(reason: String): AiAssistantFinishReason? {
-            return entries.find { it.reason == reason }
-        }
-    }
-}
-
-data class AiChatUsage(
-    val promptTokens: Int,
-    val completionTokens: Int,
-    val totalTokens: Int
 )

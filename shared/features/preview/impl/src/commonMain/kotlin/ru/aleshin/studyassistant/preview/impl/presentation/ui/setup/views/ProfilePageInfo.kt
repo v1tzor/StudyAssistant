@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,28 +40,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
+import ru.aleshin.studyassistant.core.presentation.models.users.ProfileUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
-import ru.aleshin.studyassistant.core.ui.views.FreeOrPaidContent
 import ru.aleshin.studyassistant.core.ui.views.GenderDropdownMenu
 import ru.aleshin.studyassistant.core.ui.views.InfoTextField
 import ru.aleshin.studyassistant.core.ui.views.dialog.BirthdayDatePicker
-import ru.aleshin.studyassistant.core.ui.views.menu.ClickableAvatarView
 import ru.aleshin.studyassistant.core.ui.views.menu.SelectableAvatarView
-import ru.aleshin.studyassistant.preview.impl.presentation.models.users.AppUserUi
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
+import ru.aleshin.studyassistant.preview.impl.resources.Res
+import ru.aleshin.studyassistant.preview.impl.resources.birthday_label
+import ru.aleshin.studyassistant.preview.impl.resources.birthday_placeholder
+import ru.aleshin.studyassistant.preview.impl.resources.gender_label
+import ru.aleshin.studyassistant.preview.impl.resources.gender_placeholder
+import ru.aleshin.studyassistant.preview.impl.resources.ic_textbox
+import ru.aleshin.studyassistant.preview.impl.resources.profile_description_label
+import ru.aleshin.studyassistant.preview.impl.resources.username_label
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_birthday as core_ic_birthday
+import ru.aleshin.studyassistant.core.ui.resources.ic_description as core_ic_description
+import ru.aleshin.studyassistant.core.ui.resources.ic_gender as core_ic_gender
+import ru.aleshin.studyassistant.core.ui.resources.ic_select_date as core_ic_select_date
 
 /**
  * @author Stanislav Aleshin on 27.04.2024
@@ -71,55 +77,28 @@ import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
 @Composable
 internal fun ProfilePageInfo(
     modifier: Modifier = Modifier,
-    profile: AppUserUi,
-    isPaidUser: Boolean,
+    profile: ProfileUi,
     avatar: String?,
     scrollState: ScrollState = rememberScrollState(),
-    onUpdateProfile: (AppUserUi) -> Unit,
+    onUpdateProfile: (ProfileUi) -> Unit,
     onUpdateAvatar: (PlatformFile) -> Unit,
     onDeleteAvatar: () -> Unit,
     onExceedingLimit: (Int) -> Unit,
-    onOpenBillingScreen: () -> Unit,
 ) = with(profile) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            FreeOrPaidContent(
-                isPaidUser = isPaidUser,
-                modifier = modifier,
-                paidContent = {
-                    SelectableAvatarView(
-                        onSelect = onUpdateAvatar,
-                        onDelete = onDeleteAvatar,
-                        onExceedingLimit = onExceedingLimit,
-                        modifier = Modifier.size(90.dp),
-                        firstName = profile.username.split(' ').getOrNull(0) ?: "-",
-                        secondName = profile.username.split(' ').getOrNull(1),
-                        imageUrl = avatar,
-                        style = MaterialTheme.typography.displaySmall,
-                    )
-                },
-                freeContent = {
-                    ClickableAvatarView(
-                        onClick = onOpenBillingScreen,
-                        modifier = Modifier.size(90.dp),
-                        imageUrl = avatar,
-                        sideIcon = {
-                            Icon(
-                                modifier = Modifier.clip(MaterialTheme.shapes.full),
-                                imageVector = Icons.Default.Stars,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        },
-                        firstName = username.split(' ').getOrNull(0) ?: "-",
-                        secondName = username.split(' ').getOrNull(1),
-                        style = MaterialTheme.typography.displaySmall,
-                        iconOffset = DpOffset((-4).dp, (-4).dp),
-                    )
-                },
+            SelectableAvatarView(
+                onSelect = onUpdateAvatar,
+                onDelete = onDeleteAvatar,
+                onExceedingLimit = onExceedingLimit,
+                modifier = Modifier.size(90.dp),
+                firstName = profile.username.split(' ').getOrNull(0) ?: "-",
+                secondName = profile.username.split(' ').getOrNull(1),
+                imageUrl = avatar,
+                style = MaterialTheme.typography.displaySmall,
             )
         }
         Column(
@@ -130,7 +109,13 @@ internal fun ProfilePageInfo(
             var isExpandedGenderMenu by remember { mutableStateOf(false) }
             var datePickerDialogState by remember { mutableStateOf(false) }
             var editableUsername by remember { mutableStateOf(TextFieldValue(username)) }
-            var editableDescription by remember { mutableStateOf(TextFieldValue(description ?: "")) }
+            var editableDescription by remember {
+                mutableStateOf(
+                    TextFieldValue(
+                        description ?: ""
+                    )
+                )
+            }
             val usernameInteraction = remember { MutableInteractionSource() }
             val descriptionInteraction = remember { MutableInteractionSource() }
 
@@ -140,17 +125,19 @@ internal fun ProfilePageInfo(
                     editableUsername = it
                     onUpdateProfile(profile.copy(username = it.text))
                 },
-                label = PreviewThemeRes.strings.usernameLabel,
-                leadingInfoIcon = painterResource(PreviewThemeRes.icons.name),
-                trailingIcon = if (usernameInteraction.collectIsFocusedAsState().value) { {
-                    IconButton(onClick = { focusManager.clearFocus() }) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            tint = StudyAssistantRes.colors.accents.green,
-                        )
+                label = stringResource(Res.string.username_label),
+                leadingInfoIcon = painterResource(Res.drawable.ic_textbox),
+                trailingIcon = if (usernameInteraction.collectIsFocusedAsState().value) {
+                    {
+                        IconButton(onClick = { focusManager.clearFocus() }) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = StudyAssistantRes.colors.accents.green,
+                            )
+                        }
                     }
-                } } else {
+                } else {
                     null
                 },
                 interactionSource = usernameInteraction,
@@ -162,43 +149,34 @@ internal fun ProfilePageInfo(
                     onUpdateProfile(profile.copy(description = it.text.ifEmpty { null }))
                 },
                 maxLength = Constants.Text.MAX_PROFILE_DESC_LENGTH,
-                label = PreviewThemeRes.strings.profileDescriptionLabel,
-                leadingInfoIcon = painterResource(StudyAssistantRes.icons.userDescription),
-                trailingIcon = if (descriptionInteraction.collectIsFocusedAsState().value) {{
-                    IconButton(onClick = { focusManager.clearFocus() }) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            tint = StudyAssistantRes.colors.accents.green,
-                        )
+                label = stringResource(Res.string.profile_description_label),
+                leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_description),
+                trailingIcon = if (descriptionInteraction.collectIsFocusedAsState().value) {
+                    {
+                        IconButton(onClick = { focusManager.clearFocus() }) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = StudyAssistantRes.colors.accents.green,
+                            )
+                        }
                     }
-                } } else {
+                } else {
                     null
                 },
                 singleLine = false,
                 maxLines = 4,
                 interactionSource = descriptionInteraction,
             )
-            InfoTextField(
-                enabled = false,
-                value = email,
-                onValueChange = {},
-                label = PreviewThemeRes.strings.emailLabel,
-                leadingInfoIcon = painterResource(StudyAssistantRes.icons.email),
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledBorderColor = MaterialTheme.colorScheme.outline,
-                )
-            )
-
             ClickableInfoTextField(
                 value = profile.birthday,
                 onClick = { datePickerDialogState = true },
-                label = PreviewThemeRes.strings.birthdayLabel,
-                placeholder = PreviewThemeRes.strings.birthdayPlaceholder,
-                infoIcon = painterResource(StudyAssistantRes.icons.birthday),
+                label = stringResource(Res.string.birthday_label),
+                placeholder = stringResource(Res.string.birthday_placeholder),
+                infoIcon = painterResource(CoreRes.drawable.core_ic_birthday),
                 trailingIcon = {
                     Icon(
-                        painter = painterResource(StudyAssistantRes.icons.selectDate),
+                        painter = painterResource(CoreRes.drawable.core_ic_select_date),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -206,7 +184,7 @@ internal fun ProfilePageInfo(
             )
             if (datePickerDialogState) {
                 BirthdayDatePicker(
-                    label = PreviewThemeRes.strings.birthdayLabel,
+                    label = stringResource(Res.string.birthday_label),
                     onDismiss = { datePickerDialogState = false },
                     onSelectedDate = { birthday ->
                         onUpdateProfile(profile.copy(birthday = birthday))
@@ -216,11 +194,11 @@ internal fun ProfilePageInfo(
             }
 
             ClickableInfoTextField(
-                value = profile.gender?.mapToSting(StudyAssistantRes.strings),
+                value = profile.gender?.mapToSting(),
                 onClick = { isExpandedGenderMenu = true },
-                label = PreviewThemeRes.strings.genderLabel,
-                placeholder = PreviewThemeRes.strings.genderPlaceholder,
-                infoIcon = painterResource(StudyAssistantRes.icons.gender),
+                label = stringResource(Res.string.gender_label),
+                placeholder = stringResource(Res.string.gender_placeholder),
+                infoIcon = painterResource(CoreRes.drawable.core_ic_gender),
                 trailingIcon = {
                     ExpandedIcon(
                         isExpanded = isExpandedGenderMenu,

@@ -19,8 +19,10 @@ package ru.aleshin.studyassistant.presentation.ui.main.store
 import ru.aleshin.studyassistant.core.common.architecture.store.BaseComposeStore
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.EffectCommunicator
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.StateCommunicator
+import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.navigation.DeepLinkUrl
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEvent
@@ -42,43 +44,40 @@ class MainComposeStore(
     coroutineManager = coroutineManager,
 ) {
 
+    private var initialDeepLinkUrl: DeepLinkUrl? = null
+
     override fun initialize(input: MainInput, isRestore: Boolean) {
-        dispatchEvent(MainEvent.StartBackgroundWork)
+        initialDeepLinkUrl = input.deepLinkUrl
+        dispatchEvent(MainEvent.Init)
     }
 
     override suspend fun WorkScope<MainState, MainAction, MainEffect, MainOutput>.handleEvent(
         event: MainEvent,
     ) {
         when (event) {
-            is MainEvent.StartBackgroundWork -> {
-                launchBackgroundWork(MainWorkCommand.LoadThemeSettings) {
+            is MainEvent.Init -> {
+                launchBackgroundWork(BackgroundKey.THEME) {
                     val command = MainWorkCommand.LoadThemeSettings
                     workProcessor.work(command).collectAndHandleWork()
                 }
-                launchBackgroundWork(MainWorkCommand.UpdatePushToken) {
-                    val command = MainWorkCommand.UpdatePushToken
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-                launchBackgroundWork(MainWorkCommand.UpdateReminderServices) {
+                launchBackgroundWork(BackgroundKey.REMINDERS) {
                     val command = MainWorkCommand.UpdateReminderServices
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-                launchBackgroundWork(MainWorkCommand.UpdateSubscriptionInfo) {
-                    val command = MainWorkCommand.UpdateSubscriptionInfo
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-                launchBackgroundWork(MainWorkCommand.PerformSourceSync) {
-                    val command = MainWorkCommand.PerformSourceSync
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
             is MainEvent.ExecuteNavigation -> {
-                launchBackgroundWork(MainWorkCommand.InitialNavigation) {
-                    val command = MainWorkCommand.InitialNavigation
+                launchBackgroundWork(BackgroundKey.NAVIGATION) {
+                    val command = MainWorkCommand.InitialNavigation(initialDeepLinkUrl)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
         }
+    }
+
+    private enum class BackgroundKey : BackgroundWorkKey {
+        THEME,
+        REMINDERS,
+        NAVIGATION,
     }
 
     override suspend fun reduce(

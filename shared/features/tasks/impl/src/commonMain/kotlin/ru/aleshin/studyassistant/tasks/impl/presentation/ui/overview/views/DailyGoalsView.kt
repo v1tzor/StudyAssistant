@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,7 @@ import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.alphaByEnabled
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
@@ -83,16 +84,27 @@ import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.tokens.contentColorFor
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.DailyGoalsProgressUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.DeleteGoalWarningDialog
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.goals_view_closest_title
+import ru.aleshin.studyassistant.tasks.impl.resources.goals_view_list_title
+import ru.aleshin.studyassistant.tasks.impl.resources.goals_view_progress_homework_label
+import ru.aleshin.studyassistant.tasks.impl.resources.goals_view_progress_title
+import ru.aleshin.studyassistant.tasks.impl.resources.goals_view_progress_todo_label
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
+import ru.aleshin.studyassistant.core.ui.resources.date_picker_dialog_header as core_date_picker_dialog_header
+import ru.aleshin.studyassistant.core.ui.resources.select_confirm_title as core_select_confirm_title
+import ru.aleshin.studyassistant.core.ui.resources.today_title as core_today_title
+import ru.aleshin.studyassistant.core.ui.resources.tomorrow_title as core_tomorrow_title
 
 /**
  * @author Stanislav Aleshin on 26.03.2025.
@@ -202,10 +214,10 @@ private fun DailyGoalsViewHeader(
                 .weight(1f)
                 .clickable(enabled = enabled) { datePickerDialogState = true },
             text = when {
-                currentDate.equalsDay(selectedDate) -> StudyAssistantRes.strings.todayTitle
-                currentDate.isNextDay(selectedDate) -> StudyAssistantRes.strings.tomorrowTitle
+                currentDate.equalsDay(selectedDate) -> stringResource(CoreRes.string.core_today_title)
+                currentDate.isNextDay(selectedDate) -> stringResource(CoreRes.string.core_tomorrow_title)
                 else -> selectedDate.formatByTimeZone(
-                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings)
+                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat()
                 )
             },
             color = MaterialTheme.colorScheme.onSurface,
@@ -255,7 +267,7 @@ private fun DailyGoalsViewProgressSection(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
-                text = TasksThemeRes.strings.goalsViewProgressTitle,
+                text = stringResource(Res.string.goals_view_progress_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 style = MaterialTheme.typography.labelSmall,
@@ -288,12 +300,12 @@ private fun DailyGoalsViewProgressSection(
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     GoalsByTypeProgressView(
                         isLoading = isLoading,
-                        typeLabel = TasksThemeRes.strings.goalsViewProgressHomeworkLabel,
+                        typeLabel = stringResource(Res.string.goals_view_progress_homework_label),
                         progress = currentGoalsProgress?.homeworkGoals ?: emptyList(),
                     )
                     GoalsByTypeProgressView(
                         isLoading = isLoading,
-                        typeLabel = TasksThemeRes.strings.goalsViewProgressTodoLabel,
+                        typeLabel = stringResource(Res.string.goals_view_progress_todo_label),
                         progress = currentGoalsProgress?.todoGoals ?: emptyList(),
                     )
                 }
@@ -304,7 +316,7 @@ private fun DailyGoalsViewProgressSection(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = TasksThemeRes.strings.goalsViewClosestTitle,
+                text = stringResource(Res.string.goals_view_closest_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 style = MaterialTheme.typography.labelSmall,
@@ -435,9 +447,7 @@ private fun DateGoalRateView(
             ) {
                 Text(
                     text = date.formatByTimeZone(
-                        format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(
-                            StudyAssistantRes.strings
-                        )
+                        format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat()
                     ),
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
@@ -480,7 +490,7 @@ private fun GoalListDivider(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = TasksThemeRes.strings.goalsViewListTitle,
+            text = stringResource(Res.string.goals_view_list_title),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             style = MaterialTheme.typography.labelSmall,
@@ -549,7 +559,10 @@ internal fun DailyGoalsViewContent(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     if (goalItems.isNotEmpty()) {
-                        items(goalItems, key = { it.uid }, contentType = { it.contentType }) { goal ->
+                        items(
+                            goalItems,
+                            key = { it.uid },
+                            contentType = { it.contentType }) { goal ->
                             var goalBottomSheetViewerStatus by remember { mutableStateOf(false) }
                             var deleteWarningDialogState by remember { mutableStateOf(false) }
 
@@ -608,7 +621,7 @@ internal fun DailyGoalsViewContent(
                                     onDelete = {
                                         goalBottomSheetViewerStatus = false
                                         onDeleteGoal(goal)
-                                   },
+                                    },
                                     onDismissRequest = { goalBottomSheetViewerStatus = false }
                                 )
                             }
@@ -663,12 +676,12 @@ private fun GoalDatePicker(
                     val selectedDate = datePickerState.selectedDateMillis ?: return@TextButton
                     onSelectedDate.invoke(selectedDate.mapEpochTimeToInstant().startThisDay())
                 },
-                content = { Text(text = StudyAssistantRes.strings.selectConfirmTitle) }
+                content = { Text(text = stringResource(CoreRes.string.core_select_confirm_title)) }
             )
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = StudyAssistantRes.strings.cancelTitle)
+                Text(text = stringResource(CoreRes.string.core_cancel_title))
             }
         },
     ) {
@@ -677,7 +690,7 @@ private fun GoalDatePicker(
             title = {
                 Text(
                     modifier = Modifier.padding(start = 24.dp, top = 24.dp),
-                    text = StudyAssistantRes.strings.datePickerDialogHeader,
+                    text = stringResource(CoreRes.string.core_date_picker_dialog_header),
                 )
             },
         )

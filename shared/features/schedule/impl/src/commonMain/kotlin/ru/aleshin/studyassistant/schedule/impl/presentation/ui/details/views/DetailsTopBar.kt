@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarButton
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarEmptyButton
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.details_header
+import ru.aleshin.studyassistant.schedule.impl.resources.ic_table_edit
+import ru.aleshin.studyassistant.schedule.impl.resources.ic_view_dashboard
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_calendar_today as core_ic_calendar_today
 
 /**
  * @author Stanislav Aleshin on 09.06.2024.
@@ -46,14 +51,14 @@ internal fun DetailsTopBar(
         modifier = modifier,
         title = {
             TopAppBarTitle(
-                header = ScheduleThemeRes.strings.detailsHeader,
+                header = stringResource(Res.string.details_header),
                 textAlign = TextAlign.Center,
             )
         },
         navigationIcon = {
             Row {
                 TopAppBarButton(
-                    imagePainter = painterResource(ScheduleThemeRes.icons.editTable),
+                    imagePainter = painterResource(Res.drawable.ic_table_edit),
                     imageDescription = null,
                     onButtonClick = onEditClick,
                 )
@@ -63,12 +68,12 @@ internal fun DetailsTopBar(
         actions = {
             Row {
                 TopAppBarButton(
-                    imagePainter = painterResource(StudyAssistantRes.icons.calendarToday),
+                    imagePainter = painterResource(CoreRes.drawable.core_ic_calendar_today),
                     imageDescription = null,
                     onButtonClick = onCurrentWeekSelected,
                 )
                 TopAppBarButton(
-                    imagePainter = painterResource(ScheduleThemeRes.icons.openOverview),
+                    imagePainter = painterResource(Res.drawable.ic_view_dashboard),
                     imageDescription = null,
                     onButtonClick = onOverviewClick,
                 )

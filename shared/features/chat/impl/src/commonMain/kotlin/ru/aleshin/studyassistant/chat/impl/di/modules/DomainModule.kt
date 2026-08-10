@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,5 +30,5 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<ChatErrorHandler> { ChatErrorHandler.Base() }
     bindSingleton<ChatEitherWrapper> { ChatEitherWrapper.Base(instance(), instance()) }
 
-    bindSingleton<AiAssistantInteractor> { AiAssistantInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<AiAssistantInteractor> {  AiAssistantInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance())  }
 }

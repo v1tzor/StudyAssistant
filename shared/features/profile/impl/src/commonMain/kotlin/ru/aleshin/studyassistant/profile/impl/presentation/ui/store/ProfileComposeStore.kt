@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.communicators.St
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.profile.api.ProfileFeatureComponent.ProfileOutput
+import ru.aleshin.studyassistant.profile.api.ProfileOutput
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileAction
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileEffect
 import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileEvent
@@ -35,7 +34,6 @@ import ru.aleshin.studyassistant.profile.impl.presentation.ui.contract.ProfileSt
  */
 internal class ProfileComposeStore(
     private val workProcessor: ProfileWorkProcessor,
-    private val dateManager: DateManager,
     stateCommunicator: StateCommunicator<ProfileState>,
     effectCommunicator: EffectCommunicator<ProfileEffect>,
     coroutineManager: CoroutineManager,
@@ -54,43 +52,10 @@ internal class ProfileComposeStore(
     ) {
         when (event) {
             is ProfileEvent.Started -> {
-                sendAction(ProfileAction.UpdateCurrentTime(dateManager.fetchCurrentInstant()))
-                launchBackgroundWork(BackgroundKey.LOAD_PROFILE_INFO) {
-                    val command = ProfileWorkCommand.LoadProfileInfo
+                launchBackgroundWork(BackgroundKey.PROFILE) {
+                    val command = ProfileWorkCommand.FetchProfile
                     workProcessor.work(command).collectAndHandleWork()
                 }
-                launchBackgroundWork(BackgroundKey.LOAD_SHARED_SCHEDULES) {
-                    val command = ProfileWorkCommand.LoadSharedSchedules
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-                launchBackgroundWork(BackgroundKey.LOAD_FRIENDS) {
-                    val command = ProfileWorkCommand.LoadFriends
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-            }
-            is ProfileEvent.SendSharedSchedule -> {
-                launchBackgroundWork(BackgroundKey.SEND_SCHEDULE) {
-                    val command = ProfileWorkCommand.SendSharedSchedule(event.sendData)
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-            }
-            is ProfileEvent.CancelSentSchedule -> {
-                launchBackgroundWork(BackgroundKey.DATA_ACTION) {
-                    val command = ProfileWorkCommand.CancelSentSharedSchedule(event.schedule)
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-            }
-            is ProfileEvent.ClickSignOut -> {
-                launchBackgroundWork(BackgroundKey.DATA_ACTION) {
-                    val command = ProfileWorkCommand.SignOut
-                    workProcessor.work(command).collectAndHandleWork()
-                }
-            }
-            is ProfileEvent.ClickSharedSchedule -> {
-                consumeOutput(ProfileOutput.NavigateToSharedSchedule(event.shareId))
-            }
-            is ProfileEvent.ClickFriends -> {
-                consumeOutput(ProfileOutput.NavigateToFriends)
             }
             is ProfileEvent.ClickGeneralSettings -> {
                 consumeOutput(ProfileOutput.NavigateToSettings.General)
@@ -101,8 +66,11 @@ internal class ProfileComposeStore(
             is ProfileEvent.ClickCalendarSettings -> {
                 consumeOutput(ProfileOutput.NavigateToSettings.Calendar)
             }
-            is ProfileEvent.ClickPaymentsSettings -> {
-                consumeOutput(ProfileOutput.NavigateToSettings.Subscription)
+            is ProfileEvent.ClickAiSettings -> {
+                consumeOutput(ProfileOutput.NavigateToSettings.Ai)
+            }
+            is ProfileEvent.ClickShareSchedule -> {
+                consumeOutput(ProfileOutput.NavigateToScheduleSharing)
             }
             is ProfileEvent.ClickAboutApp -> {
                 consumeOutput(ProfileOutput.NavigateToSettings.AboutApp)
@@ -117,47 +85,27 @@ internal class ProfileComposeStore(
         action: ProfileAction,
         currentState: ProfileState,
     ) = when (action) {
-        is ProfileAction.UpdateProfileInfo -> currentState.copy(
-            appUserProfile = action.profile,
-            friendRequest = action.requests,
+        is ProfileAction.UpdateProfile -> currentState.copy(
+            profile = action.profile,
             isLoading = false,
-        )
-        is ProfileAction.UpdateSharedSchedules -> currentState.copy(
-            sharedSchedules = action.schedules,
-            allOrganizations = action.organizations,
-            isLoadingShare = false,
-        )
-        is ProfileAction.UpdateFriends -> currentState.copy(
-            allFriends = action.friends,
-        )
-        is ProfileAction.UpdateCurrentTime -> currentState.copy(
-            currentTime = action.time,
         )
         is ProfileAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )
-        is ProfileAction.UpdateLoadingSend -> currentState.copy(
-            isLoadingSend = action.isLoading,
-        )
-        is ProfileAction.UpdateLoadingShared -> currentState.copy(
-            isLoadingShare = action.isLoading,
-        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_PROFILE_INFO, LOAD_SHARED_SCHEDULES, LOAD_FRIENDS, SEND_SCHEDULE, DATA_ACTION
+        PROFILE
     }
 
     class Factory(
         private val workProcessor: ProfileWorkProcessor,
-        private val dateManager: DateManager,
         private val coroutineManager: CoroutineManager
     ) : BaseOnlyOutComposeStore.Factory<ProfileComposeStore, ProfileState> {
 
         override fun create(savedState: ProfileState): ProfileComposeStore {
             return ProfileComposeStore(
                 workProcessor = workProcessor,
-                dateManager = dateManager,
                 coroutineManager = coroutineManager,
                 stateCommunicator = StateCommunicator.Default(savedState),
                 effectCommunicator = EffectCommunicator.Default(),

@@ -1,21 +1,43 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import com.codingfeline.buildkonfig.compiler.FieldSpec
+/*
+ * Copyright 2026 Stanislav Aleshin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.library)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.konfig)
-    alias(libs.plugins.kotlin.atomic)
 }
 
 kotlin {
     jvmToolchain(17)
 
-    androidTarget()
+    android {
+        namespace = "ru.aleshin.studyassistant.core.remote"
+        compileSdk = libs.versions.compileSdk.get().toInt()
+        minSdk = libs.versions.minSdk.get().toInt()
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+
+        withHostTest {}
+    }
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach {
@@ -28,13 +50,6 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
-
-            implementation(libs.rustore.universalpush.core)
-            implementation(libs.androidx.browser)
-
-            implementation(project.dependencies.platform(libs.google.oauth.bom.android))
-            implementation(libs.google.oauth.android)
-            implementation(libs.google.oauth.credentials.android)
         }
         commonMain.dependencies {
             implementation(project(":shared:core:common"))
@@ -45,8 +60,6 @@ kotlin {
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.ktor.auth)
-            implementation(libs.ktor.websockets)
 
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
@@ -58,56 +71,12 @@ kotlin {
             implementation(libs.settings.core)
             implementation(libs.settings.noargs)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
     }
 
-    task("testClasses")
-}
-
-android {
-    namespace = "ru.aleshin.studyassistant.core.remote"
-    compileSdk = libs.versions.compileSdk.get().toIntOrNull()
-
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
-
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toIntOrNull()
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
-
-buildkonfig {
-    packageName = "ru.aleshin.studyassistant.core.remote"
-
-    val isDebug = gradle.startParameter.taskNames.any { it.contains("debug", ignoreCase = true) }
-    val firebaseProjectId = gradleLocalProperties(rootDir, providers).getProperty("firebaseProjectId")
-    val rustoreProjectId = gradleLocalProperties(rootDir, providers).getProperty("rustoreProjectId")
-    val rustoreAuthToken = gradleLocalProperties(rootDir, providers).getProperty("rustoreServiceAuthToken")
-    val hmsAppId = gradleLocalProperties(rootDir, providers).getProperty("hmsAppId")
-    val hmsProjectId = gradleLocalProperties(rootDir, providers).getProperty("hmsProjectId")
-    val hmsClientSecret = gradleLocalProperties(rootDir, providers).getProperty("hmsClientSecret")
-    val deepSeekKey = gradleLocalProperties(rootDir, providers).getProperty("deepSeekKey")
-    val rustoreApiKeyId = gradleLocalProperties(rootDir, providers).getProperty("rustoreApiKeyId")
-    val rustoreApiKeyPrivate = gradleLocalProperties(rootDir, providers).getProperty("rustoreApiKeyPrivate")
-
-    defaultConfigs {
-        buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", isDebug.toString())
-        buildConfigField(FieldSpec.Type.STRING, "FIREBASE_PROJECT_ID", firebaseProjectId)
-        buildConfigField(FieldSpec.Type.STRING, "RUSTORE_PROJECT_ID", rustoreProjectId)
-        buildConfigField(FieldSpec.Type.STRING, "RUSTORE_SERVICE_AUTH_TOKEN", rustoreAuthToken)
-        buildConfigField(FieldSpec.Type.STRING, "HMS_PROJECT_ID", hmsProjectId)
-        buildConfigField(FieldSpec.Type.STRING, "HMS_APP_ID", hmsAppId)
-        buildConfigField(FieldSpec.Type.STRING, "HMS_CLIENT_SECRET", hmsClientSecret)
-        buildConfigField(FieldSpec.Type.STRING, "DEEP_SEEK_KEY", deepSeekKey)
-        buildConfigField(FieldSpec.Type.STRING, "RU_STORE_API_KEY_ID", rustoreApiKeyId)
-        buildConfigField(FieldSpec.Type.STRING, "RU_STORE_API_KEY_PRIVATE", rustoreApiKeyPrivate)
-    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,10 +61,12 @@ internal class OrganizationComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OrganizationEvent.UpdateAvatar -> with(event) {
                 val inputFile = image.convertToInputFile()
                 sendAction(OrganizationAction.UpdateActionWithAvatar(ActionWithAvatar.Set(inputFile)))
             }
+
             is OrganizationEvent.DeleteAvatar -> with(state()) {
                 val action = if (editableOrganization?.avatar != null) {
                     ActionWithAvatar.Delete
@@ -73,10 +75,12 @@ internal class OrganizationComposeStore(
                 }
                 sendAction(OrganizationAction.UpdateActionWithAvatar(action))
             }
+
             is OrganizationEvent.UpdateType -> with(state()) {
                 val updatedOrganization = editableOrganization?.copy(type = event.organizationType)
                 sendAction(OrganizationAction.UpdateEditModel(updatedOrganization))
             }
+
             is OrganizationEvent.UpdateName -> with(state()) {
                 val updatedOrganization = editableOrganization?.copy(
                     shortName = event.shortName,
@@ -84,26 +88,32 @@ internal class OrganizationComposeStore(
                 )
                 sendAction(OrganizationAction.UpdateEditModel(updatedOrganization))
             }
+
             is OrganizationEvent.UpdateEmails -> with(state()) {
                 val updatedOrganization = editableOrganization?.copy(emails = event.emails)
                 sendAction(OrganizationAction.UpdateEditModel(updatedOrganization))
             }
+
             is OrganizationEvent.UpdateLocations -> with(state()) {
                 val updatedOrganization = editableOrganization?.copy(locations = event.locations)
                 sendAction(OrganizationAction.UpdateEditModel(updatedOrganization))
             }
+
             is OrganizationEvent.UpdatePhones -> with(state()) {
                 val updatedOrganization = editableOrganization?.copy(phones = event.phones)
                 sendAction(OrganizationAction.UpdateEditModel(updatedOrganization))
             }
+
             is OrganizationEvent.UpdateWebs -> with(state()) {
                 val updatedOrganization = editableOrganization?.copy(webs = event.webs)
                 sendAction(OrganizationAction.UpdateEditModel(updatedOrganization))
             }
+
             is OrganizationEvent.UpdateStatus -> with(state()) {
                 val updatedOrganization = editableOrganization?.copy(isMain = event.isMain)
                 sendAction(OrganizationAction.UpdateEditModel(updatedOrganization))
             }
+
             is OrganizationEvent.SaveOrganization -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SAVE_ORGANIZATION) {
                     val editModel = checkNotNull(editableOrganization)
@@ -111,6 +121,7 @@ internal class OrganizationComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OrganizationEvent.HideOrganization -> with(state()) {
                 launchBackgroundWork(BackgroundKey.HIDE_ORGANIZATION) {
                     val editModel = checkNotNull(editableOrganization)
@@ -118,6 +129,7 @@ internal class OrganizationComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is OrganizationEvent.NavigateToBack -> {
                 consumeOutput(OrganizationOutput.NavigateToBack)
             }
@@ -133,12 +145,15 @@ internal class OrganizationComposeStore(
             actionWithAvatar = ActionWithAvatar.None(action.editModel.avatar),
             isLoading = false,
         )
+
         is OrganizationAction.UpdateEditModel -> currentState.copy(
             editableOrganization = action.editModel,
         )
+
         is OrganizationAction.UpdateActionWithAvatar -> currentState.copy(
             actionWithAvatar = action.action,
         )
+
         is OrganizationAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )

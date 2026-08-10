@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,15 +41,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.theme.material.topSide
-import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationUi
-import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
+import ru.aleshin.studyassistant.info.impl.resources.Res
+import ru.aleshin.studyassistant.info.impl.resources.new_organization_bottom_title
 
 /**
  * @author Stanislav Aleshin on 16.06.2024.
@@ -120,7 +121,7 @@ private fun OrganizationBottomItem(
                 Box(modifier = Modifier.fillMaxSize()) {
                     Icon(
                         modifier = Modifier.align(Alignment.Center),
-                        painter = painterResource(type.mapToIcon(StudyAssistantRes.icons)),
+                        painter = painterResource(type.mapToIcon()),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSecondary,
                     )
@@ -128,7 +129,7 @@ private fun OrganizationBottomItem(
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = type.mapToSting(StudyAssistantRes.strings),
+                    text = type.mapToSting(),
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -158,7 +159,7 @@ private fun NewOrganizationBottomItem(
         Box(modifier = Modifier.fillMaxSize()) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
-                text = InfoThemeRes.strings.newOrganizationBottomTitle,
+                text = stringResource(Res.string.new_organization_bottom_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge,
             )

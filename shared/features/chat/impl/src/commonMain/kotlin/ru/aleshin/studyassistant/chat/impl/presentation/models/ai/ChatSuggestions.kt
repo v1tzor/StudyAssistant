@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 package ru.aleshin.studyassistant.chat.impl.presentation.models.ai
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
-import ru.aleshin.studyassistant.chat.impl.presentation.theme.ChatThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.chat.impl.resources.Res
+import ru.aleshin.studyassistant.chat.impl.resources.functional_chat_suggestion
+import ru.aleshin.studyassistant.chat.impl.resources.homework_chat_suggestion
 
 /**
  * @author Stanislav Aleshin on 22.06.2025.
@@ -28,15 +30,10 @@ import ru.aleshin.studyassistant.chat.impl.presentation.theme.ChatThemeRes
 internal enum class ChatSuggestions : ChatSuggestion {
     FUNCTIONAL {
         override val content: String
-            @Composable get() = ChatThemeRes.strings.functionalChatSuggestion
+            @Composable get() = stringResource(Res.string.functional_chat_suggestion)
     },
     HOMEWORK {
         override val content: String
-            @Composable get() = ChatThemeRes.strings.homeworkChatSuggestion
+            @Composable get() = stringResource(Res.string.homework_chat_suggestion)
     }
-}
-
-@Immutable
-internal interface ChatSuggestion {
-    val content: String @Composable get
 }

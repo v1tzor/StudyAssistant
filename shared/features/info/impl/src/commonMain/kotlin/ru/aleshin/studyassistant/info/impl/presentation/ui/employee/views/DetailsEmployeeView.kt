@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,16 +48,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
 import ru.aleshin.studyassistant.core.ui.views.dialog.WarningAlertDialog
 import ru.aleshin.studyassistant.core.ui.views.menu.AvatarView
-import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.EmployeeSubjectView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.NoneEmployeeSubjectView
-import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
+import ru.aleshin.studyassistant.info.impl.resources.Res
+import ru.aleshin.studyassistant.info.impl.resources.delete_employee_warning_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_email as core_ic_email
+import ru.aleshin.studyassistant.core.ui.resources.ic_phone as core_ic_phone
+import ru.aleshin.studyassistant.core.ui.resources.ic_web as core_ic_web
+import ru.aleshin.studyassistant.core.ui.resources.warning_delete_confirm_title as core_warning_delete_confirm_title
+import ru.aleshin.studyassistant.core.ui.resources.warning_dialog_title as core_warning_dialog_title
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.
@@ -87,9 +95,11 @@ internal fun DetailsEmployeeViewItem(
                 SwipeToDismissBoxValue.EndToStart -> {
                     onEdit()
                 }
+
                 SwipeToDismissBoxValue.StartToEnd -> {
                     deleteWarningDialogStatus = true
                 }
+
                 SwipeToDismissBoxValue.Settled -> Unit
             }
             return@rememberSwipeToDismissBoxState false
@@ -144,9 +154,9 @@ internal fun DetailsEmployeeViewItem(
                     tint = MaterialTheme.colorScheme.error
                 )
             },
-            title = { Text(text = StudyAssistantRes.strings.warningDialogTitle) },
-            text = { Text(text = InfoThemeRes.strings.deleteEmployeeWarningTitle) },
-            confirmTitle = StudyAssistantRes.strings.warningDeleteConfirmTitle,
+            title = { Text(text = stringResource(CoreRes.string.core_warning_dialog_title)) },
+            text = { Text(text = stringResource(Res.string.delete_employee_warning_title)) },
+            confirmTitle = stringResource(CoreRes.string.core_warning_delete_confirm_title),
             onDismiss = { deleteWarningDialogStatus = false },
             onConfirm = {
                 onDelete()
@@ -223,7 +233,7 @@ private fun DetailsEmployeeViewContent(
     ) {
         Column {
             Text(
-                text = post.mapToString(StudyAssistantRes.strings),
+                text = post.mapToString(),
                 color = MaterialTheme.colorScheme.primary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -277,7 +287,7 @@ private fun DetailsEmployeeViewTrailing(
         if (isHavePhone) {
             Icon(
                 modifier = Modifier.size(18.dp),
-                painter = painterResource(StudyAssistantRes.icons.phone),
+                painter = painterResource(CoreRes.drawable.core_ic_phone),
                 contentDescription = null,
                 tint = StudyAssistantRes.colors.accents.green,
             )
@@ -285,7 +295,7 @@ private fun DetailsEmployeeViewTrailing(
         if (isHaveEmail) {
             Icon(
                 modifier = Modifier.size(18.dp),
-                painter = painterResource(StudyAssistantRes.icons.email),
+                painter = painterResource(CoreRes.drawable.core_ic_email),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
             )
@@ -293,7 +303,7 @@ private fun DetailsEmployeeViewTrailing(
         if (isHaveWebsite) {
             Icon(
                 modifier = Modifier.size(18.dp),
-                painter = painterResource(StudyAssistantRes.icons.website),
+                painter = painterResource(CoreRes.drawable.core_ic_web),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.secondary,
             )

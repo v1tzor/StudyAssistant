@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,43 +16,42 @@
 
 package ru.aleshin.studyassistant.core.data.workers
 
-import android.app.AlarmManager
-import android.app.AlarmManager.RTC_WAKEUP
-import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_CANCEL_CURRENT
-import android.app.PendingIntent.FLAG_MUTABLE
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.getString
 import org.kodein.di.DI
 import org.kodein.di.DirectDIAware
 import org.kodein.di.bindProvider
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.di.coreCommonModule
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
-import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.common.extensions.shiftMillis
+import ru.aleshin.studyassistant.core.common.extensions.toString
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.common.messages.LocalNotificationReceiver
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.data.di.coreDataModule
+import ru.aleshin.studyassistant.core.data.managers.reminders.NotificationScheduler
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.ui.mappers.toLanguageString
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.day_suffix as core_day_suffix
+import ru.aleshin.studyassistant.core.ui.resources.hour_suffix as core_hour_suffix
+import ru.aleshin.studyassistant.core.ui.resources.minute_suffix as core_minute_suffix
+import ru.aleshin.studyassistant.core.ui.resources.ongoing_class_reminder_body as core_ongoing_class_reminder_body
+import ru.aleshin.studyassistant.core.ui.resources.ongoing_class_reminder_unknown_title as core_ongoing_class_reminder_unknown_title
+import ru.aleshin.studyassistant.core.ui.resources.start_classes_reminder_title_prefix as core_start_classes_reminder_title_prefix
+import ru.aleshin.studyassistant.core.ui.resources.start_classes_reminder_title_suffix as core_start_classes_reminder_title_suffix
 
 /**
  * @author Stanislav Aleshin on 22.08.2024.
@@ -67,63 +66,95 @@ class StartClassesReminderWorker(
         bindProvider<CrashlyticsService> { CrashlyticsService.Empty() }
         importAll(coreCommonModule, coreDataModule)
     }
-    private val coreStrings: StudyAssistantStrings
-        get() = fetchCoreStrings(fetchAppLanguage(applicationContext.fetchCurrentLanguage()))
-
-    private val alarmManager by lazy { context.getSystemService(AlarmManager::class.java) }
+    private val notificationScheduler = instance<NotificationScheduler>()
     private val dateManager = instance<DateManager>()
     private val calendarSettingsRepository = instance<CalendarSettingsRepository>()
     private val notificationSettingRepository = instance<NotificationSettingsRepository>()
     private val baseScheduleRepository = instance<BaseScheduleRepository>()
     private val customScheduleRepository = instance<CustomScheduleRepository>()
-    private val organizationsRepository = instance<OrganizationsRepository>()
 
     override suspend fun doWork(): Result {
+        val titlePrefix = getString(CoreRes.string.core_start_classes_reminder_title_prefix)
+        val titleSuffix = getString(CoreRes.string.core_start_classes_reminder_title_suffix)
+        val daySuffix = getString(CoreRes.string.core_day_suffix)
+        val minuteSuffix = getString(CoreRes.string.core_minute_suffix)
+        val hourSuffix = getString(CoreRes.string.core_hour_suffix)
+        val ongoingBody = getString(CoreRes.string.core_ongoing_class_reminder_body)
+        val unknownClassTitle = getString(CoreRes.string.core_ongoing_class_reminder_unknown_title)
         val notificationSettings = notificationSettingRepository.fetchSettings().first()
         val holidays = calendarSettingsRepository.fetchSettings().first().holidays
-        val beforeDelay = notificationSettings.beginningOfClasses ?: return Result.failure()
+        val beforeDelay = notificationSettings.beginningOfClasses
 
         val currentDate = dateManager.fetchBeginningCurrentInstant()
         val schedule = fetchScheduleByDate(currentDate)
-        val groupedClasses = schedule.mapToValue(
-            onBaseSchedule = { it?.classes?.groupBy { classModel -> classModel.organization } },
-            onCustomSchedule = { it?.classes?.groupBy { classModel -> classModel.organization } },
-        )?.mapValues { entry ->
-            entry.value.filter { classModel ->
-                holidays.none {
-                    val dateFilter = TimeRange(it.start, it.end).containsDate(currentDate)
-                    val orgFilter = it.organizations.contains(classModel.organization.uid)
-                    return@none dateFilter && orgFilter
-                }
+        val classes = schedule.mapToValue(
+            onBaseSchedule = { it?.classes },
+            onCustomSchedule = { it?.classes },
+        ).orEmpty().filter { classModel ->
+            holidays.none {
+                val dateFilter = TimeRange(it.start, it.end).containsDate(currentDate)
+                val orgFilter = it.organizations.contains(classModel.organization.uid)
+                return@none dateFilter && orgFilter
             }
-        }?.filter { classesEntry ->
-            notificationSettings.exceptionsForBeginningOfClasses.contains(classesEntry.key.uid).not() &&
-                classesEntry.value.isNotEmpty()
+        }.sortedBy { it.timeRange.from.dateTime().time }
+        val groupedClasses = classes.groupBy { classModel -> classModel.organization }.filter { classesEntry ->
+            classesEntry.value.isNotEmpty()
         }
 
-        clearOldNotifications()
-
-        groupedClasses?.forEach { classesEntry ->
-            val currentTime = dateManager.fetchCurrentInstant()
-            val startClassesTime = classesEntry.value[0].timeRange.from
-            val targetTime = currentDate.setHoursAndMinutes(startClassesTime).shiftMillis(-beforeDelay)
-
-            if (targetTime > currentTime) {
-                val title = buildString {
-                    append(coreStrings.startClassesReminderTitlePrefix)
-                    append(beforeDelay.toDuration(DurationUnit.MILLISECONDS).toLanguageString(coreStrings))
-                    append(coreStrings.startClassesReminderTitleSuffix)
+        val currentTime = dateManager.fetchCurrentInstant()
+        val notificationIds = buildList {
+            if (beforeDelay != null) {
+                groupedClasses.filter { classesEntry ->
+                    notificationSettings.exceptionsForBeginningOfClasses.contains(classesEntry.key.uid).not()
+                }.forEach { classesEntry ->
+                    val targetTime = currentDate
+                        .setHoursAndMinutes(classesEntry.value.first().timeRange.from)
+                        .shiftMillis(-beforeDelay)
+                    if (targetTime > currentTime) {
+                        val title = buildString {
+                            append(titlePrefix)
+                            append(
+                                beforeDelay.toDuration(DurationUnit.MILLISECONDS)
+                                    .toString(daySuffix, minuteSuffix, hourSuffix)
+                            )
+                            append(titleSuffix)
+                        }
+                        val id = classesEntry.key.uid.hashCode() + START_NOTIFICATION_ID_APPEND
+                        add(id)
+                        notificationScheduler.scheduleNotification(
+                            id = id,
+                            title = title,
+                            body = classesEntry.key.shortName,
+                            time = targetTime,
+                        )
+                    }
                 }
-                val body = classesEntry.key.shortName
+            }
 
-                val id = classesEntry.key.uid.hashCode() + NOTIFICATION_ID_APPEND
-                val intent = LocalNotificationReceiver.createIntent(applicationContext, title, body)
-                val flag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
-                val pendingIntent = PendingIntent.getBroadcast(applicationContext, id, intent, flag)
-                val time = targetTime.toEpochMilliseconds()
-                alarmManager.setExactAndAllowWhileIdle(RTC_WAKEUP, time, pendingIntent)
+            classes.forEach { classModel ->
+                val startTime = currentDate.setHoursAndMinutes(classModel.timeRange.from)
+                val endTime = currentDate.setHoursAndMinutes(classModel.timeRange.to)
+                if (endTime > currentTime) {
+                    val id = classModel.uid.hashCode() + ONGOING_NOTIFICATION_ID_APPEND
+                    val title = classModel.subject?.name
+                        ?: classModel.customData
+                        ?: unknownClassTitle
+                    val details = buildList {
+                        add(classModel.organization.shortName)
+                        classModel.office.takeIf(String::isNotBlank)?.let(::add)
+                    }.joinToString(separator = " · ")
+                    add(id)
+                    notificationScheduler.scheduleOngoingNotification(
+                        id = id,
+                        title = title,
+                        body = ongoingBody.replace("%1\$s", details),
+                        time = if (startTime > currentTime) startTime else currentTime,
+                        endTime = endTime,
+                    )
+                }
             }
         }
+        notificationScheduler.updateNotificationGroup(NOTIFICATION_GROUP, notificationIds)
 
         return Result.success()
     }
@@ -132,7 +163,8 @@ class StartClassesReminderWorker(
         val maxNumberOfWeek = calendarSettingsRepository.fetchSettings().first().numberOfWeek
         val currentNumberOfWeek = date.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
 
-        val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek).first()
+        val baseSchedule =
+            baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek).first()
         val customSchedule = customScheduleRepository.fetchScheduleByDate(date).first()
 
         return if (customSchedule != null) {
@@ -148,23 +180,11 @@ class StartClassesReminderWorker(
         }
     }
 
-    private suspend fun clearOldNotifications() {
-        val organizations = organizationsRepository.fetchAllShortOrganization().first()
-        organizations.forEach { organization ->
-            val id = organization.uid.hashCode() + NOTIFICATION_ID_APPEND
-            val intent = LocalNotificationReceiver.createCancelIntent(applicationContext)
-            val cancelFlag = FLAG_CANCEL_CURRENT or FLAG_MUTABLE
-            val cancelPendingIntent = PendingIntent.getBroadcast(applicationContext, id, intent, cancelFlag)
-            if (cancelPendingIntent != null) {
-                alarmManager.cancel(cancelPendingIntent)
-                cancelPendingIntent.cancel()
-            }
-        }
-    }
-
     companion object {
         const val WORK_KEY = "START_CLASSES_REMINDER_SCHEDULER"
         const val REPEAT_WORK_KEY = "START_CLASSES_REMINDER_SCHEDULER_REPEAT"
-        const val NOTIFICATION_ID_APPEND = -321
+        const val NOTIFICATION_GROUP = "START_AND_ONGOING_CLASSES_REMINDERS"
+        const val START_NOTIFICATION_ID_APPEND = -321
+        const val ONGOING_NOTIFICATION_ID_APPEND = 1417
     }
 }

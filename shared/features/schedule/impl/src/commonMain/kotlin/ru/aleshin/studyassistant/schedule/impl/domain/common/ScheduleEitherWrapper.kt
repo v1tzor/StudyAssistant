@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.common
 
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
+import ru.aleshin.studyassistant.core.domain.entities.share.ShareException
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 
 /**
@@ -31,5 +33,8 @@ internal interface ScheduleEitherWrapper : FlowEitherWrapper<ScheduleFailures> {
     ) : ScheduleEitherWrapper, FlowEitherWrapper.Abstract<ScheduleFailures>(
         errorHandler = errorHandler,
         crashlyticsService = crashlyticsService,
+        ignoreExceptions = { error ->
+            error is InternetConnectionException || error is ShareException
+        },
     )
 }

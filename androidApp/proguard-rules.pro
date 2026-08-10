@@ -4,9 +4,6 @@
 -keep class com.google.api.client.** { *; }
 -keep class com.google.auth.** { *; }
 
--keep class ru.aleshin.studyassistant.core.api.auth.** { *; }
--keep class ru.aleshin.studyassistant.core.api.auth.WebAuthComponent$Companion { *; }
--keep class ru.aleshin.studyassistant.core.api.auth.KeepAliveService { *; }
 -keep class * implements java.util.concurrent.Flow { *; }
 -keep class android.net.Uri { *; }
 -keep class java.net.URL { *; }
@@ -28,7 +25,3 @@
 -dontwarn org.slf4j.impl.StaticMarkerBinder
 -dontwarn kotlin.native.HiddenFromObjC
 -dontwarn kotlin.native.ObjCName
-
--keep class com.hianalytics.android.**{*;}
--keep class com.huawei.updatesdk.**{*;}
--keep class com.huawei.hms.**{*;}

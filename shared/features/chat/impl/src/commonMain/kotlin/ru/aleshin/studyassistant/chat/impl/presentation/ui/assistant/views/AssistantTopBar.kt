@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ru.aleshin.studyassistant.chat.impl.presentation.theme.ChatThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.chat.impl.resources.Res
+import ru.aleshin.studyassistant.chat.impl.resources.assistant_top_bar_title
 
 /**
  * @author Stanislav Aleshin on 20.06.2025.
@@ -43,7 +45,7 @@ internal fun AssistantTopBar(
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = {
-            Text(text = ChatThemeRes.strings.assistantTopBarTitle)
+            Text(text = stringResource(Res.string.assistant_top_bar_title))
         },
         actions = {
             AnimatedVisibility(visible = isVisibleClearButton) {

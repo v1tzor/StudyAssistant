@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.dialog.WarningAlertDialog
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.hide_title as core_hide_title
+import ru.aleshin.studyassistant.core.ui.resources.warning_dialog_title as core_warning_dialog_title
 
 /**
  * @author Stanislav Aleshin on 18.08.2024.
@@ -83,7 +86,7 @@ internal fun HideButton(
                 contentDescription = null,
             )
             Text(
-                text = StudyAssistantRes.strings.hideTitle,
+                text = stringResource(CoreRes.string.core_hide_title),
                 maxLines = 1,
             )
         }
@@ -98,9 +101,9 @@ internal fun HideButton(
                     tint = MaterialTheme.colorScheme.error
                 )
             },
-            title = { Text(text = StudyAssistantRes.strings.warningDialogTitle) },
+            title = { Text(text = stringResource(CoreRes.string.core_warning_dialog_title)) },
             text = { Text(text = warningMessage) },
-            confirmTitle = StudyAssistantRes.strings.hideTitle,
+            confirmTitle = stringResource(CoreRes.string.core_hide_title),
             onDismiss = { warningDialogStatus = false },
             onConfirm = {
                 onHide()

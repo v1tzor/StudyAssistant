@@ -1,0 +1,20 @@
+CREATE TABLE profileEntity (
+  id INTEGER PRIMARY KEY NOT NULL,
+  uid TEXT NOT NULL,
+  username TEXT NOT NULL,
+  avatar TEXT,
+  description TEXT,
+  city TEXT,
+  birthday TEXT,
+  sex TEXT,
+  updated_at INTEGER NOT NULL
+);
+
+addOrUpdateProfile:
+INSERT OR REPLACE INTO profileEntity (id, uid, username, avatar, description, city, birthday, sex, updated_at)
+VALUES ?;
+
+fetchProfile:
+SELECT *
+FROM profileEntity
+WHERE id = 1;

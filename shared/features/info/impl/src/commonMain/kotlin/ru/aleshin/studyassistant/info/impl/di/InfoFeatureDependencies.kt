@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsReposi
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
 
 /**
  * @author Stanislav Aleshin on 16.06.2024.
@@ -36,7 +35,6 @@ public interface InfoFeatureDependencies : BaseFeatureDependencies {
     public val calendarSettingsRepository: CalendarSettingsRepository
     public val subjectsRepository: SubjectsRepository
     public val employeeRepository: EmployeeRepository
-    public val usersRepository: UsersRepository
     public val dateManager: DateManager
     public val coroutineManager: CoroutineManager
     public val crashlyticsService: CrashlyticsService

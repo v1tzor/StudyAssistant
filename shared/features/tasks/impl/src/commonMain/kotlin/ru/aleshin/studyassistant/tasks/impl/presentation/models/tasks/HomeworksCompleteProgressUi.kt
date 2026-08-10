@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks
 
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkUi
 
 /**
  * @author Stanislav Aleshin on 27.06.2024.

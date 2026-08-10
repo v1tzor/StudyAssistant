@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,6 @@ package ru.aleshin.studyassistant.core.remote.ktor
  * @author Stanislav Aleshin on 01.08.2024.
  */
 object StudyAssistantKtor {
-
-    object UniversalMessaging {
-        const val HOST = "https://vkpns-universal.rustore.ru/v1/"
-        const val SEND_TOKENS = "send"
-        const val SEND_TOPIC = "send/topic"
-    }
 
     object DeepSeek {
         const val HOST = "https://api.deepseek.com"

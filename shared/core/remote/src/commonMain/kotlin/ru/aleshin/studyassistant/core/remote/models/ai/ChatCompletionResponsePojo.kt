@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.core.remote.models.ai
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -31,28 +30,4 @@ data class ChatCompletionResponsePojo(
     val systemFingerprint: String? = null,
     val `object`: String,
     val usage: ChatUsagePojo,
-)
-
-@Serializable
-data class ChatCompletionChoicePojo(
-    @SerialName("index")
-    val index: Int,
-
-    @SerialName("message")
-    val message: ChatMessagePojo,
-
-    @SerialName("finish_reason")
-    val finishReason: String? // "stop", "length", "content_filter", etc.
-)
-
-@Serializable
-data class ChatUsagePojo(
-    @SerialName("prompt_tokens")
-    val promptTokens: Int,
-
-    @SerialName("completion_tokens")
-    val completionTokens: Int,
-
-    @SerialName("total_tokens")
-    val totalTokens: Int
 )

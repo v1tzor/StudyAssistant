@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,15 +41,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
+import ru.aleshin.studyassistant.info.impl.domain.entities.SubjectSortedType
 import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToString
-import ru.aleshin.studyassistant.info.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.info.impl.presentation.models.subjects.SubjectSortedType
 import ru.aleshin.studyassistant.info.impl.presentation.ui.common.OrganizationPicker
-import ru.aleshin.studyassistant.info.impl.presentation.ui.theme.InfoThemeRes
+import ru.aleshin.studyassistant.info.impl.resources.Res
+import ru.aleshin.studyassistant.info.impl.resources.subject_sorted_type_selector_header
+import ru.aleshin.studyassistant.info.impl.resources.subject_sorted_type_selector_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_sorted_type as core_ic_sorted_type
 
 /**
  * @author Stanislav Aleshin on 18.06.2024.
@@ -113,14 +117,14 @@ private fun SubjectSortedTypePicker(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = sortedType.mapToString(InfoThemeRes.strings),
+            text = sortedType.mapToString(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.titleSmall,
         )
         Icon(
-            painter = painterResource(StudyAssistantRes.icons.sortedType),
+            painter = painterResource(CoreRes.drawable.core_ic_sorted_type),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -151,13 +155,13 @@ private fun SortedTypePickerDialog(
         modifier = modifier,
         selected = selectedSortedType,
         items = SubjectSortedType.entries,
-        header = InfoThemeRes.strings.subjectSortedTypeSelectorHeader,
-        title = InfoThemeRes.strings.subjectSortedTypeSelectorTitle,
+        header = stringResource(Res.string.subject_sorted_type_selector_header),
+        title = stringResource(Res.string.subject_sorted_type_selector_title),
         itemView = { sortedType ->
             SelectorItemView(
                 onClick = { selectedSortedType = sortedType },
                 selected = sortedType == selectedSortedType,
-                title = sortedType.mapToString(InfoThemeRes.strings),
+                title = sortedType.mapToString(),
                 label = null,
             )
         },

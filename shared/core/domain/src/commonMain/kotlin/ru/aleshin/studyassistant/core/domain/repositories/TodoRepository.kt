@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
 
 /**
@@ -35,5 +34,4 @@ interface TodoRepository {
     suspend fun fetchOverdueTodos(currentDate: Instant): Flow<List<Todo>>
     suspend fun fetchTodosByDate(date: Instant): Flow<List<Todo>>
     suspend fun deleteTodo(uid: UID)
-    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

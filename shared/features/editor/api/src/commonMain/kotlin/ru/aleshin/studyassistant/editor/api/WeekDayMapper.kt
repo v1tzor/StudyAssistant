@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ import ru.aleshin.studyassistant.core.domain.entities.common.DayOfNumberedWeek
 /**
  * @author Stanislav Aleshin on 31.05.2024.
  */
-public fun DayOfNumberedWeek.mapToUi() = DayOfNumberedWeekUi(
+public fun DayOfNumberedWeek.mapToUi(): DayOfNumberedWeekUi = DayOfNumberedWeekUi(
     dayOfWeek = dayOfWeek,
     week = week,
 )
 
-public fun DayOfNumberedWeekUi.mapToDomain() = DayOfNumberedWeek(
+public fun DayOfNumberedWeekUi.mapToDomain(): DayOfNumberedWeek = DayOfNumberedWeek(
     dayOfWeek = dayOfWeek,
     week = week,
 )

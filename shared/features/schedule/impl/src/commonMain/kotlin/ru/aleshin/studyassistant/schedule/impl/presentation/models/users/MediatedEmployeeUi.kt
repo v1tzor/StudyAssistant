@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 
 /**
  * @author Stanislav Aleshin on 29.04.2024.
@@ -53,20 +54,3 @@ internal data class MediatedEmployeeUi(
         }
     }
 }
-
-internal fun MediatedEmployeeUi.convertToBase() = EmployeeUi(
-    uid = uid,
-    organizationId = organizationId,
-    firstName = firstName,
-    secondName = secondName,
-    patronymic = patronymic,
-    post = post,
-    avatar = null,
-    birthday = birthday,
-    workTimeStart = workTime?.from,
-    workTimeEnd = workTime?.to,
-    emails = emails,
-    phones = phones,
-    locations = locations,
-    webs = webs,
-)

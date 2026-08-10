@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.add_homework_title
 
 /**
  * @author Stanislav Aleshin on 05.06.2025.
@@ -65,7 +67,7 @@ internal fun AddHomeworkButton(
             )
             Text(
                 modifier = Modifier.weight(1f),
-                text = TasksThemeRes.strings.addHomeworkTitle,
+                text = stringResource(Res.string.add_homework_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 maxLines = 1,

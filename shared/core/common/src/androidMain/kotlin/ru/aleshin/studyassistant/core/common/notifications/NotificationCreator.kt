@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,14 @@ import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import ru.aleshin.studyassistant.core.common.extensions.generateRandomNumber
+import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationCategory
+import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationChronometer
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationDefaults
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationImportance
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationPriority
@@ -52,7 +56,10 @@ interface NotificationCreator {
         category: NotificationCategory? = null,
         notificationDefaults: NotificationDefaults = NotificationDefaults(),
         autoCancel: Boolean = true,
+        silent: Boolean = false,
         ongoing: Boolean = false,
+        chronometer: NotificationChronometer? = null,
+        timeoutAfterMillis: Long? = null,
         style: NotificationStyles? = null,
         color: Int? = null,
         progress: NotificationProgress? = null,
@@ -66,7 +73,13 @@ interface NotificationCreator {
         defaults: NotificationDefaults,
     )
 
-    fun showNotify(notification: Notification, notifyId: Int = generateRandomNumber(), tag: String? = null)
+    fun showNotify(
+        notification: Notification,
+        notifyId: Int = generateRandomNumber(),
+        tag: String? = null
+    )
+
+    fun cancelNotify(notifyId: Int, tag: String? = null)
 
     class Base constructor(
         private val context: Context,
@@ -74,6 +87,9 @@ interface NotificationCreator {
 
         private val notificationManager: NotificationManager
             get() = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        private val notificationManagerCompat: NotificationManagerCompat
+            get() = NotificationManagerCompat.from(context)
 
         override fun createNotify(
             channelId: String,
@@ -89,7 +105,10 @@ interface NotificationCreator {
             category: NotificationCategory?,
             notificationDefaults: NotificationDefaults,
             autoCancel: Boolean,
+            silent: Boolean,
             ongoing: Boolean,
+            chronometer: NotificationChronometer?,
+            timeoutAfterMillis: Long?,
             style: NotificationStyles?,
             color: Int?,
             progress: NotificationProgress?,
@@ -108,12 +127,32 @@ interface NotificationCreator {
                 setSmallIcon(smallIcon)
                 if (largeIcon != null) setLargeIcon(largeIcon)
                 if (contentIntent != null) setContentIntent(contentIntent)
-                setAutoCancel(autoCancel)
+                setAutoCancel(autoCancel && !ongoing)
                 setOngoing(ongoing)
                 if (category != null) setCategory(category.category)
-                if (notificationDefaults.isVibrate) setDefaults(NotificationCompat.DEFAULT_VIBRATE)
-                if (notificationDefaults.isSound) setDefaults(NotificationCompat.DEFAULT_SOUND)
-                if (notificationDefaults.isLights) setDefaults(NotificationCompat.DEFAULT_LIGHTS)
+                if (silent) {
+                    setSilent(true)
+                    setOnlyAlertOnce(true)
+                } else {
+                    var defaults = 0
+                    if (notificationDefaults.isVibrate) defaults = defaults or NotificationCompat.DEFAULT_VIBRATE
+                    if (notificationDefaults.isSound) defaults = defaults or NotificationCompat.DEFAULT_SOUND
+                    if (notificationDefaults.isLights) defaults = defaults or NotificationCompat.DEFAULT_LIGHTS
+                    if (defaults != 0) setDefaults(defaults)
+                }
+                chronometer?.let { value ->
+                    setWhen(value.whenMillis)
+                    setShowWhen(true)
+                    setUsesChronometer(true)
+                    if (value.countDown && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        setChronometerCountDown(true)
+                    }
+                }
+                timeoutAfterMillis?.let { timeout ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        setTimeoutAfter(timeout.coerceAtLeast(0L))
+                    }
+                }
                 if (progress != null) with(progress) { setProgress(max, value, isIndeterminate) }
                 if (style != null) setStyle(style.style)
                 actions.forEach { addAction(it) }
@@ -122,7 +161,16 @@ interface NotificationCreator {
         }
 
         override fun showNotify(notification: Notification, notifyId: Int, tag: String?) {
-            notificationManager.notify(tag, notifyId, notification)
+            if (!notificationManagerCompat.areNotificationsEnabled()) return
+            try {
+                notificationManagerCompat.notify(tag, notifyId, notification)
+            } catch (exception: SecurityException) {
+                Log.e(Constants.App.LOGGER_TAG, "Notification permission is not granted", exception)
+            }
+        }
+
+        override fun cancelNotify(notifyId: Int, tag: String?) {
+            notificationManagerCompat.cancel(tag, notifyId)
         }
 
         @RequiresApi(Build.VERSION_CODES.O)
@@ -135,7 +183,8 @@ interface NotificationCreator {
             val channel = NotificationChannel(channelId, channelName, importance.importance).apply {
                 enableLights(defaults.isLights)
                 enableVibration(defaults.isVibrate)
-                vibrationPattern = longArrayOf(500, 500, 500)
+                if (defaults.isVibrate) vibrationPattern = longArrayOf(500, 500, 500)
+                if (!defaults.isSound) setSound(null, null)
             }
             notificationManager.createNotificationChannel(channel)
         }

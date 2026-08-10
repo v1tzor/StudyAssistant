@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.specify_title as core_specify_title
+import ru.aleshin.studyassistant.editor.impl.resources.*
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ScrollState
@@ -61,14 +65,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.endSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.theme.material.startSide
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
 import ru.aleshin.studyassistant.core.ui.views.dialog.DurationPickerDialog
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.NumberedDurationUi
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.core.presentation.models.organizations.NumberedDurationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.NumberDropdownMenu
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.NumberedDurationCreatorDropdownMenu
 
@@ -165,7 +167,7 @@ internal fun NumberedDurationView(
                 } else {
                     Text(
                         modifier = Modifier.padding(horizontal = 8.dp),
-                        text = StudyAssistantRes.strings.specifyTitle,
+                        text = stringResource(CoreRes.string.core_specify_title),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -189,7 +191,8 @@ internal fun NumberedDurationsList(
     durationContainerColor: Color = MaterialTheme.colorScheme.primaryContainer,
 ) {
     Column(
-        modifier = modifier.animateContentSize(spring()).heightIn(max = 252.dp).verticalScroll(scrollState),
+        modifier = modifier.animateContentSize(spring()).heightIn(max = 252.dp)
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         AllNumberedDurationView(
@@ -241,7 +244,7 @@ private fun AllNumberedDurationView(
 
     NumberedDurationView(
         modifier = modifier,
-        number = EditorThemeRes.strings.allTitle,
+        number = stringResource(Res.string.all_title),
         duration = baseDuration,
         onNumberClick = null,
         onDurationClick = { durationPickerDialogState = true },
@@ -252,7 +255,7 @@ private fun AllNumberedDurationView(
 
     if (durationPickerDialogState) {
         DurationPickerDialog(
-            headerTitle = EditorThemeRes.strings.durationTitle,
+            headerTitle = stringResource(Res.string.duration_title),
             duration = baseDuration,
             onDismiss = { durationPickerDialogState = false },
             onSelectedDuration = {
@@ -305,7 +308,7 @@ private fun SpecificNumberedDurationsSection(
 
                 if (durationPickerDialogState) {
                     DurationPickerDialog(
-                        headerTitle = EditorThemeRes.strings.durationTitle,
+                        headerTitle = stringResource(Res.string.duration_title),
                         duration = numberedDuration.duration,
                         onDismiss = { durationPickerDialogState = false },
                         onSelectedDuration = {
@@ -336,7 +339,7 @@ private fun AddNumberedDurationView(
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = EditorThemeRes.strings.addTitle,
+                    text = stringResource(Res.string.add_title),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelLarge,
                 )
@@ -377,7 +380,7 @@ private fun ExceptLine(
     ) {
         HorizontalDivider(modifier = Modifier.weight(1f))
         Text(
-            text = EditorThemeRes.strings.exceptTitle,
+            text = stringResource(Res.string.except_title),
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.bodySmall,
         )

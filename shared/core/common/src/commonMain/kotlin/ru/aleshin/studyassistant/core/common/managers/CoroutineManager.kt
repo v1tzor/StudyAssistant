@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@ package ru.aleshin.studyassistant.core.common.managers
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,7 +32,10 @@ interface CoroutineManager : WorkDispatchersProvider {
 
     fun runOnUi(scope: CoroutineScope, block: CoroutineBlock): Job
 
-    suspend fun <T> changeFlow(coroutineFlow: CoroutineFlow, block: suspend CoroutineScope.() -> T): T
+    suspend fun <T> changeFlow(
+        coroutineFlow: CoroutineFlow,
+        block: suspend CoroutineScope.() -> T
+    ): T
 
     abstract class Abstract(
         override val ioDispatcher: CoroutineDispatcher,
@@ -67,12 +68,22 @@ interface CoroutineManager : WorkDispatchersProvider {
         }
     }
 
-    class Base : Abstract(
-        ioDispatcher = Dispatchers.IO,
-        defaultDispatcher = Dispatchers.Default,
-        uiDispatcher = Dispatchers.Main,
+    class Base(
+        ioDispatcher: CoroutineDispatcher,
+        defaultDispatcher: CoroutineDispatcher,
+        uiDispatcher: CoroutineDispatcher,
+    ) : Abstract(
+        ioDispatcher = ioDispatcher,
+        defaultDispatcher = defaultDispatcher,
+        uiDispatcher = uiDispatcher,
     )
 }
+
+data class AppDispatchers(
+    val default: CoroutineDispatcher,
+    val io: CoroutineDispatcher,
+    val ui: CoroutineDispatcher,
+)
 
 interface WorkDispatchersProvider {
     val ioDispatcher: CoroutineDispatcher

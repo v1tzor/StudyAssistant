@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.ic_star_circle_outline
+import ru.aleshin.studyassistant.editor.impl.resources.organization_status_body
+import ru.aleshin.studyassistant.editor.impl.resources.organization_status_title
 
 /**
  * @author Stanislav Aleshin on 08.07.2024.
@@ -48,18 +52,18 @@ internal fun OrganizationStatusChooser(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            painter = painterResource(EditorThemeRes.icons.organizationStatus),
+            painter = painterResource(Res.drawable.ic_star_circle_outline),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = EditorThemeRes.strings.organizationStatusTitle,
+                text = stringResource(Res.string.organization_status_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
-                text = EditorThemeRes.strings.organizationStatusBody,
+                text = stringResource(Res.string.organization_status_body),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelMedium,
             )

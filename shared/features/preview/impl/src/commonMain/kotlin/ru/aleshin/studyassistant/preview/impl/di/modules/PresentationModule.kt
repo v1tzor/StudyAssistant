@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,17 @@
 package ru.aleshin.studyassistant.preview.impl.di.modules
 
 import org.kodein.di.DI
+import org.kodein.di.bind
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.preview.api.PreviewFeatureComponentFactory
-import ru.aleshin.studyassistant.preview.impl.navigation.DefaultPreviewComponentFactory
+import org.kodein.di.multiton
+import org.kodein.di.scoped
+import ru.aleshin.studyassistant.core.common.di.scope.FeatureComponentScope
+import ru.aleshin.studyassistant.preview.api.PreviewContentProviderFactory
+import ru.aleshin.studyassistant.preview.impl.navigation.DefaultPreviewContentProviderFactory
+import ru.aleshin.studyassistant.preview.impl.navigation.PreviewComponentDeps
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.store.IntroComposeStore
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.root.PreviewFeatureComponent
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.store.SetupComposeStore
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.store.SetupWorkProcessor
 
@@ -29,10 +35,21 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.store.SetupW
  * @author Stanislav Aleshin on 14.04.2024.
  */
 internal val presentationModule = DI.Module("Presentation") {
-    bindSingleton<PreviewFeatureComponentFactory> { DefaultPreviewComponentFactory(instance(), instance()) }
+    bind<PreviewFeatureComponent>() with scoped(FeatureComponentScope).multiton { deps: PreviewComponentDeps ->
+        PreviewFeatureComponent.Default(
+            componentContext = context,
+            startConfig = deps.startConfig,
+            outputConsumer = deps.outputConsumer,
+            introStoreFactory = instance(),
+            setupStoreFactory = instance(),
+        )
+    }
+    bindSingleton<PreviewContentProviderFactory> { DefaultPreviewContentProviderFactory(di) }
 
     bindSingleton<IntroComposeStore.Factory> { IntroComposeStore.Factory(instance()) }
 
-    bindSingleton<SetupWorkProcessor> { SetupWorkProcessor.Base(instance(), instance(), instance(), instance()) }
+    bindSingleton<SetupWorkProcessor> {
+        SetupWorkProcessor.Base(instance(), instance(), instance(), instance())
+    }
     bindSingleton<SetupComposeStore.Factory> { SetupComposeStore.Factory(instance(), instance()) }
 }

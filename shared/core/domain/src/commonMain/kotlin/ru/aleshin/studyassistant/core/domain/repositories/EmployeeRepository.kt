@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.core.domain.repositories
 
 import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.common.DataTransferDirection
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 
@@ -33,5 +32,4 @@ interface EmployeeRepository {
     suspend fun fetchEmployeeById(uid: UID): Flow<Employee?>
     suspend fun deleteEmployee(targetId: UID)
     suspend fun deleteAvatar(avatarUrl: String)
-    suspend fun transferData(direction: DataTransferDirection, mergeData: Boolean)
 }

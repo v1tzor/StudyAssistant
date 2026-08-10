@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.info.impl.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 
 /**
  * @author Stanislav Aleshin on 17.06.2024.

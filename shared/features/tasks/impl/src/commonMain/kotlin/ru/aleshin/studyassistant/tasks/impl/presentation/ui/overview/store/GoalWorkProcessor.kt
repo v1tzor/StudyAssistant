@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ internal interface GoalWorkProcessor :
     ) : GoalWorkProcessor {
 
         override suspend fun work(command: GoalWorkCommand) = when (command) {
-            is GoalWorkCommand.LoadGoals -> loadGoals(command.selectedDate)
+            is GoalWorkCommand.LoadGoals -> loadGoalsWork(command.selectedDate)
             is GoalWorkCommand.ScheduleGoal -> scheduleGoalWork(command.createModel)
             is GoalWorkCommand.CompleteGoal -> completeGoalWork(command.goals, command.target)
             is GoalWorkCommand.DeleteGoal -> deleteGoalWork(command.goal)
@@ -63,12 +63,19 @@ internal interface GoalWorkProcessor :
             is GoalWorkCommand.StartGoalTime -> startGoalTimeWork(command.goal)
             is GoalWorkCommand.PauseGoalTime -> pauseGoalTimeWork(command.goal)
             is GoalWorkCommand.ResetGoalTime -> resetGoalTimeWork(command.goal)
-            is GoalWorkCommand.ChangeGoalTimeType -> changeGoalTimeTypeWork(command.goal, command.type)
-            is GoalWorkCommand.ChangeGoalDesiredTime -> changeGoalDesiredTimeWork(command.goal, command.time)
+            is GoalWorkCommand.ChangeGoalTimeType -> changeGoalTimeTypeWork(
+                command.goal,
+                command.type
+            )
+
+            is GoalWorkCommand.ChangeGoalDesiredTime -> changeGoalDesiredTimeWork(
+                command.goal,
+                command.time
+            )
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
-        private fun loadGoals(selectedDate: Instant) = flow {
+        private fun loadGoalsWork(selectedDate: Instant) = flow {
             val goalsFlow = goalsInteractor.fetchGoalsByDate(selectedDate).map { goalEither ->
                 goalEither.mapRight { goals -> goals.map { it.mapToUi() } }
             }
@@ -102,6 +109,7 @@ internal interface GoalWorkProcessor :
                 onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) }
             )
         }
+
         private fun deleteGoalWork(goal: GoalShortUi) = flow {
             goalsInteractor.deleteGoal(goal.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) }
@@ -127,10 +135,12 @@ internal interface GoalWorkProcessor :
                         startTimePoint = currentTime,
                         isActive = true,
                     )
+
                     is GoalTimeDetailsUi.Timer -> goal.time.copy(
                         startTimePoint = currentTime,
                         isActive = true,
                     )
+
                     is GoalTimeDetailsUi.None -> GoalTimeDetailsUi.None
                 },
             )
@@ -151,6 +161,7 @@ internal interface GoalWorkProcessor :
                             isActive = false,
                         )
                     }
+
                     is GoalTimeDetailsUi.Timer -> {
                         val stopTime = goal.time.startTimePoint.toEpochMilliseconds()
                         val timeAfterStop = currentTime.toEpochMilliseconds() - stopTime
@@ -159,6 +170,7 @@ internal interface GoalWorkProcessor :
                             isActive = false,
                         )
                     }
+
                     is GoalTimeDetailsUi.None -> GoalTimeDetailsUi.None
                 },
             )
@@ -177,12 +189,14 @@ internal interface GoalWorkProcessor :
                         startTimePoint = currentTime,
                         isActive = false,
                     )
+
                     is GoalTimeDetailsUi.Timer -> goal.time.copy(
                         pastStopTime = 0L,
                         startTimePoint = currentTime,
                         isActive = false,
                         leftTime = goal.time.targetTime,
                     )
+
                     is GoalTimeDetailsUi.None -> GoalTimeDetailsUi.None
                 },
             )
@@ -202,10 +216,12 @@ internal interface GoalWorkProcessor :
                         progress = 0f,
                         isActive = false,
                     )
+
                     GoalTime.Type.STOPWATCH -> GoalTimeDetailsUi.Stopwatch(
                         startTimePoint = currentTime,
                         isActive = false,
                     )
+
                     GoalTime.Type.NONE -> GoalTimeDetailsUi.None
                 },
             )
@@ -221,6 +237,7 @@ internal interface GoalWorkProcessor :
                     is GoalTimeDetailsUi.Timer -> goal.time.copy(
                         targetTime = time ?: goal.time.targetTime
                     )
+
                     is GoalTimeDetailsUi.None -> goal.time
                 },
                 desiredTime = time,
@@ -236,11 +253,15 @@ internal sealed class GoalWorkCommand : WorkCommand {
     data class LoadGoals(val selectedDate: Instant) : GoalWorkCommand()
     data class ScheduleGoal(val createModel: GoalCreateModelUi) : GoalWorkCommand()
     data class SetNewGoalNumbers(val goals: List<GoalDetailsUi>) : GoalWorkCommand()
-    data class CompleteGoal(val goals: List<GoalDetailsUi>, val target: GoalDetailsUi) : GoalWorkCommand()
+    data class CompleteGoal(val goals: List<GoalDetailsUi>, val target: GoalDetailsUi) :
+        GoalWorkCommand()
+
     data class DeleteGoal(val goal: GoalShortUi) : GoalWorkCommand()
     data class StartGoalTime(val goal: GoalDetailsUi) : GoalWorkCommand()
     data class PauseGoalTime(val goal: GoalDetailsUi) : GoalWorkCommand()
     data class ResetGoalTime(val goal: GoalDetailsUi) : GoalWorkCommand()
-    data class ChangeGoalTimeType(val goal: GoalDetailsUi, val type: GoalTime.Type) : GoalWorkCommand()
+    data class ChangeGoalTimeType(val goal: GoalDetailsUi, val type: GoalTime.Type) :
+        GoalWorkCommand()
+
     data class ChangeGoalDesiredTime(val goal: GoalDetailsUi, val time: Millis?) : GoalWorkCommand()
 }

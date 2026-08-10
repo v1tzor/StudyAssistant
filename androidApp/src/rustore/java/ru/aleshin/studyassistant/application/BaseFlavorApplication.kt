@@ -16,26 +16,14 @@
 
 package ru.aleshin.studyassistant.application
 
-import com.google.android.gms.common.GoogleApiAvailability
 import ru.aleshin.studyassistant.PlatformSDK
-import ru.aleshin.studyassistant.android.BuildConfig
-import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.platform.BaseApplication
-import ru.aleshin.studyassistant.core.remote.api.message.MessagingServiceImpl
 import ru.aleshin.studyassistant.data.AnalyticsServiceImpl
-import ru.aleshin.studyassistant.data.AppServiceImpl
 import ru.aleshin.studyassistant.data.CrashlyticsServiceImpl
-import ru.aleshin.studyassistant.data.IapServiceImpl
 import ru.aleshin.studyassistant.data.ReviewServiceImpl
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.ok.tracer.HasTracerConfiguration
-import ru.rustore.sdk.billingclient.RuStoreBillingClientFactory
-import ru.rustore.sdk.pushclient.common.logger.DefaultLogger
 import ru.rustore.sdk.review.RuStoreReviewManagerFactory
-import ru.rustore.sdk.universalpush.RuStoreUniversalPushClient
-import ru.rustore.sdk.universalpush.firebase.provides.FirebasePushProvider
-import ru.rustore.sdk.universalpush.hms.providers.HmsPushProvider
-import ru.rustore.sdk.universalpush.rustore.providers.RuStorePushProvider
 
 /**
  * @author Stanislav Aleshin on 14.04.2025.
@@ -45,45 +33,14 @@ abstract class BaseFlavorApplication : BaseApplication(), HasTracerConfiguration
     override val tracerConfiguration = CrashlyticsServiceImpl.tracerConfiguration
 
     override fun initPlatformServices() {
-        RuStoreUniversalPushClient.init(
-            context = applicationContext,
-            rustore = RuStorePushProvider(
-                application = this,
-                projectId = BuildConfig.PROJECT_ID,
-                logger = DefaultLogger(tag = Constants.App.LOGGER_TAG),
-            ),
-            firebase = FirebasePushProvider(
-                context = applicationContext,
-            ),
-            hms = HmsPushProvider(
-                context = applicationContext,
-                appid = BuildConfig.HMS_APP_ID
-            )
-        )
         PlatformSDK.doInit(
             configuration = PlatformConfiguration(
-                appService = AppServiceImpl(
-                    applicationContext = applicationContext,
-                    googleApiAvailability = GoogleApiAvailability.getInstance(),
-                ),
                 analyticsService = AnalyticsServiceImpl(
                     context = applicationContext
-                ),
-                messagingService = MessagingServiceImpl(
-                    context = applicationContext,
                 ),
                 crashlyticsService = CrashlyticsServiceImpl(),
                 reviewService = ReviewServiceImpl(
                     reviewManager = RuStoreReviewManagerFactory.create(applicationContext)
-                ),
-                iapService = IapServiceImpl(
-                    applicationContext = applicationContext,
-                    billingClient = RuStoreBillingClientFactory.create(
-                        context = applicationContext,
-                        consoleApplicationId = BuildConfig.RUSTORE_CONSOLE_APP_ID,
-                        deeplinkScheme = Constants.App.PAY_DEEPLINK_SCHEME,
-                        debugLogs = BuildConfig.DEBUG,
-                    ),
                 ),
                 applicationContext = applicationContext,
             )

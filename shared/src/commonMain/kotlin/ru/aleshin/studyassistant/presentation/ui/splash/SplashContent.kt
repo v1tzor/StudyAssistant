@@ -40,10 +40,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.onSplash
 import ru.aleshin.studyassistant.core.ui.theme.material.splash
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.app_name as core_app_name
+import ru.aleshin.studyassistant.core.ui.resources.ic_study_assistant as core_ic_study_assistant
 
 /**
  * @author Stanislav Aleshin on 09.02.2024.
@@ -64,8 +67,8 @@ fun SplashContent(modifier: Modifier = Modifier) {
             AnimatedVisibility(visible = isVisibleLogo, enter = fadeIn()) {
                 Image(
                     modifier = Modifier.size(100.dp),
-                    painter = painterResource(StudyAssistantRes.icons.logo),
-                    contentDescription = StudyAssistantRes.strings.appName,
+                    painter = painterResource(CoreRes.drawable.core_ic_study_assistant),
+                    contentDescription = stringResource(CoreRes.string.core_app_name),
                 )
             }
             AnimatedVisibility(visible = isVisibleText, enter = expandHorizontally()) {

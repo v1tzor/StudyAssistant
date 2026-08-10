@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.homework.contarct
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.architecture.component.BaseInput
@@ -28,12 +27,13 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreSt
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.ClassesForLinkedMapUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.orgnizations.OrganizationShortUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.EditHomeworkUi
+import kotlin.time.Clock
 
 /**
  * @author Stanislav Aleshin on 22.06.2024
@@ -58,7 +58,9 @@ internal sealed class HomeworkEvent : StoreEvent {
     data class UpdateSubject(val subject: SubjectUi?) : HomeworkEvent()
     data class UpdateDate(val date: Instant?) : HomeworkEvent()
     data class UpdateLinkedClass(val classId: UID?, val date: Instant?) : HomeworkEvent()
-    data class UpdateTask(val theory: String, val practice: String, val presentations: String) : HomeworkEvent()
+    data class UpdateTask(val theory: String, val practice: String, val presentations: String) :
+        HomeworkEvent()
+
     data class UpdateTestTopic(val isTest: Boolean, val topic: String) : HomeworkEvent()
     data class UpdatePriority(val priority: TaskPriority) : HomeworkEvent()
     data object DeleteHomework : HomeworkEvent()
@@ -73,7 +75,9 @@ internal sealed class HomeworkEffect : StoreEffect {
 }
 
 internal sealed class HomeworkAction : StoreAction {
-    data class SetupEditModel(val editModel: EditHomeworkUi, val showDeleteAction: Boolean) : HomeworkAction()
+    data class SetupEditModel(val editModel: EditHomeworkUi, val showDeleteAction: Boolean) :
+        HomeworkAction()
+
     class UpdateEditModel(val editModel: EditHomeworkUi?) : HomeworkAction()
     data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : HomeworkAction()
     data class UpdateSubjects(val subjects: List<SubjectUi>) : HomeworkAction()
@@ -94,5 +98,6 @@ internal data class HomeworkInput(
 internal sealed class HomeworkOutput : BaseOutput {
     data object NavigateToBack : HomeworkOutput()
     data class NavigateToSubjectEditor(val config: EditorConfig.Subject) : HomeworkOutput()
-    data class NavigateToOrganizationEditor(val config: EditorConfig.Organization) : HomeworkOutput()
+    data class NavigateToOrganizationEditor(val config: EditorConfig.Organization) :
+        HomeworkOutput()
 }

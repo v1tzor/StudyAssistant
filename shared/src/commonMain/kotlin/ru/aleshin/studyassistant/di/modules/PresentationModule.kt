@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,20 @@ import ru.aleshin.studyassistant.presentation.ui.tabnavigation.component.TabsCom
  */
 val presentationModule = DI.Module("Presentation") {
 
-    bindProvider<TabsComponentFactory> { TabsComponentFactory.Default(instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<TabsComponentFactory> {  TabsComponentFactory.Default(instance(), instance(), instance(), instance(), instance())  }
 
-    bindSingleton<MainWorkProcessor> { MainWorkProcessor.Base(instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<MainWorkProcessor> { MainWorkProcessor.Base(instance(), instance()) }
     bindSingleton<MainComposeStore.Factory> { MainComposeStore.Factory(instance(), instance()) }
-    bindProvider<MainComponentFactory> { MainComponentFactory.Default(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindProvider<MainComponentFactory> {
+        MainComponentFactory.Default(
+            storeFactory = instance(),
+            previewFeatureFactory = instance(),
+            scheduleFeatureFactory = instance(),
+            editorFeatureFactory = instance(),
+            settingsFeatureFactory = instance(),
+            analyticsFeatureFactory = instance(),
+            usersFeatureFactory = instance(),
+            tabsComponentFactory = instance(),
+        )
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
+import ru.aleshin.studyassistant.core.ui.resources.save_confirm_title as core_save_confirm_title
 
 /**
  * @author Stanislav Aleshin on 23.06.2024.
@@ -67,10 +70,10 @@ internal fun TodoBottomActions(
         }
         Spacer(modifier = Modifier.weight(1f))
         FilledTonalButton(onClick = onCancelClick) {
-            Text(text = StudyAssistantRes.strings.cancelTitle)
+            Text(text = stringResource(CoreRes.string.core_cancel_title))
         }
         Button(onClick = onSaveClick, enabled = saveEnabled && !isLoadingSave) {
-            Text(text = StudyAssistantRes.strings.saveConfirmTitle)
+            Text(text = stringResource(CoreRes.string.core_save_confirm_title))
         }
     }
 }

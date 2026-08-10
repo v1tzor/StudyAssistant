@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.toMinutesAndHoursString
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
@@ -67,7 +68,16 @@ import ru.aleshin.studyassistant.core.ui.views.sheet.MediumDragHandle
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ClassDetailsUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.homework.HomeworkDetailsUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.add_homework_title
+import ru.aleshin.studyassistant.schedule.impl.resources.again_homework_title
+import ru.aleshin.studyassistant.schedule.impl.resources.class_sheet_task_title
+import ru.aleshin.studyassistant.schedule.impl.resources.complete_homework_title
+import ru.aleshin.studyassistant.schedule.impl.resources.homework_in_progress_title
+import ru.aleshin.studyassistant.schedule.impl.resources.homework_is_complete_title
+import ru.aleshin.studyassistant.schedule.impl.resources.homework_is_not_complete_title
+import ru.aleshin.studyassistant.schedule.impl.resources.homework_is_set_title
+import ru.aleshin.studyassistant.schedule.impl.resources.homework_is_skipped_title
 import kotlin.math.roundToInt
 
 /**
@@ -112,7 +122,7 @@ internal fun ClassBottomSheet(
             ) {
                 HorizontalDivider(modifier = Modifier.weight(1f))
                 Text(
-                    text = ScheduleThemeRes.strings.classSheetTaskTitle,
+                    text = stringResource(Res.string.class_sheet_task_title),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelMedium,
                 )
@@ -269,58 +279,58 @@ private fun ClassBottomSheetActions(
                 HomeworkStatus.COMPLETE -> {
                     ClassBottomSheetActionView(
                         modifier = Modifier.weight(1f),
-                        text = ScheduleThemeRes.strings.homeworkIsCompleteTitle,
+                        text = stringResource(Res.string.homework_is_complete_title),
                         color = StudyAssistantRes.colors.accents.green,
                     )
                     ClassBottomSheetActionButton(
                         onClick = onAgainHomeworkClick,
-                        text = ScheduleThemeRes.strings.againHomeworkTitle,
+                        text = stringResource(Res.string.again_homework_title),
                     )
                 }
                 HomeworkStatus.WAIT -> {
                     ClassBottomSheetActionView(
                         modifier = Modifier.weight(1f),
-                        text = ScheduleThemeRes.strings.homeworkInProgressTitle,
+                        text = stringResource(Res.string.homework_in_progress_title),
                         color = StudyAssistantRes.colors.accents.orange,
                     )
                     ClassBottomSheetActionButton(
                         modifier = Modifier.weight(1f),
                         onClick = onCompleteHomeworkClick,
-                        text = ScheduleThemeRes.strings.completeHomeworkTitle,
+                        text = stringResource(Res.string.complete_homework_title),
                     )
                 }
                 HomeworkStatus.IN_FUTURE -> {
                     ClassBottomSheetActionView(
                         modifier = Modifier.weight(1f),
-                        text = ScheduleThemeRes.strings.homeworkIsSetTitle,
+                        text = stringResource(Res.string.homework_is_set_title),
                         color = StudyAssistantRes.colors.accents.yellow,
                     )
                     ClassBottomSheetActionButton(
                         onClick = onCompleteHomeworkClick,
-                        text = ScheduleThemeRes.strings.completeHomeworkTitle,
+                        text = stringResource(Res.string.complete_homework_title),
                     )
                 }
                 HomeworkStatus.NOT_COMPLETE -> {
                     ClassBottomSheetActionView(
                         modifier = Modifier.weight(1f),
-                        text = ScheduleThemeRes.strings.homeworkIsNotCompleteTitle,
+                        text = stringResource(Res.string.homework_is_not_complete_title),
                         color = StudyAssistantRes.colors.accents.red,
                     )
                     ClassBottomSheetActionButton(
                         onClick = onCompleteHomeworkClick,
-                        text = ScheduleThemeRes.strings.completeHomeworkTitle,
+                        text = stringResource(Res.string.complete_homework_title),
                     )
                 }
                 HomeworkStatus.SKIPPED -> {
                     ClassBottomSheetActionView(
                         modifier = Modifier.weight(1f),
-                        text = ScheduleThemeRes.strings.homeworkIsSkippedTitle,
+                        text = stringResource(Res.string.homework_is_skipped_title),
                         color = MaterialTheme.colorScheme.outlineVariant,
                         contentColor = MaterialTheme.colorScheme.onSurface,
                     )
                     ClassBottomSheetActionButton(
                         onClick = onCompleteHomeworkClick,
-                        text = ScheduleThemeRes.strings.completeHomeworkTitle,
+                        text = stringResource(Res.string.complete_homework_title),
                     )
                 }
             }
@@ -328,7 +338,7 @@ private fun ClassBottomSheetActions(
             ClassBottomSheetActionButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onAddHomeworkClick,
-                text = ScheduleThemeRes.strings.addHomeworkTitle,
+                text = stringResource(Res.string.add_homework_title),
             )
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,44 +16,16 @@
 
 package ru.aleshin.studyassistant.profile.impl.di
 
-import dev.tmapps.konnection.Konnection
-import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
-import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
-import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
-import ru.aleshin.studyassistant.core.domain.managers.sync.SourceSyncFacade
-import ru.aleshin.studyassistant.core.domain.repositories.AuthRepository
-import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
-import ru.aleshin.studyassistant.core.domain.repositories.FriendRequestsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.MessageRepository
-import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ShareSchedulesRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 public interface ProfileFeatureDependencies : BaseFeatureDependencies {
-    public val authRepository: AuthRepository
-    public val usersRepository: UsersRepository
-    public val friendRequestsRepository: FriendRequestsRepository
-    public val baseSchedulesRepository: BaseScheduleRepository
-    public val shareSchedulesRepository: ShareSchedulesRepository
-    public val organizationsRepository: OrganizationsRepository
-    public val messageRepository: MessageRepository
-    public val sourceSyncFacade: SourceSyncFacade
-    public val deviceInfoProvider: DeviceInfoProvider
-    public val startClassesReminderManager: StartClassesReminderManager
-    public val endClassesReminderManager: EndClassesReminderManager
-    public val homeworksReminderManager: HomeworksReminderManager
-    public val workloadWarningManager: WorkloadWarningManager
+    public val profileRepository: ProfileRepository
     public val coroutineManager: CoroutineManager
-    public val connectionManager: Konnection
-    public val dateManager: DateManager
     public val crashlyticsService: CrashlyticsService
 }

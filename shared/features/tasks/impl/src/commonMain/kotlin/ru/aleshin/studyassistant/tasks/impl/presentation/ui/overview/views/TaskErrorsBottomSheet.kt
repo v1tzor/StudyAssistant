@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,17 +57,27 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkTaskComponentUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.sheet.MediumDragHandle
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkTaskComponentUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.fetchAllTasks
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.mapToHomeworkTasks
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.detached_active_homeworks_header
+import ru.aleshin.studyassistant.tasks.impl.resources.none_errors_title
+import ru.aleshin.studyassistant.tasks.impl.resources.overdue_homeworks_header
+import ru.aleshin.studyassistant.tasks.impl.resources.overdue_todos_header
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_book_study as core_ic_book_study
+import ru.aleshin.studyassistant.core.ui.resources.ic_presentation as core_ic_presentation
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
 
 /**
  * @author Stanislav Aleshin on 04.07.2024.
@@ -124,7 +134,7 @@ private fun OverdueTodosBottomSheetSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = TasksThemeRes.strings.overdueTodosHeader,
+                text = stringResource(Res.string.overdue_todos_header),
                 modifier = Modifier.weight(1f),
                 color = StudyAssistantRes.colors.accents.red,
                 fontWeight = FontWeight.Bold,
@@ -199,7 +209,7 @@ private fun OverdueHomeworksBottomSheetSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = TasksThemeRes.strings.overdueHomeworksHeader,
+                text = stringResource(Res.string.overdue_homeworks_header),
                 modifier = Modifier.weight(1f),
                 color = StudyAssistantRes.colors.accents.red,
                 fontWeight = FontWeight.Bold,
@@ -291,7 +301,7 @@ private fun DetachedHomeworksBottomSheetSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = TasksThemeRes.strings.detachedActiveHomeworksHeader,
+                text = stringResource(Res.string.detached_active_homeworks_header),
                 modifier = Modifier.weight(1f),
                 color = StudyAssistantRes.colors.accents.red,
                 fontWeight = FontWeight.Bold,
@@ -405,7 +415,7 @@ private fun ErrorHomeworkViewContent(
         Column {
             Text(
                 text = deadline.formatByTimeZone(
-                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings),
+                    format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(),
                 ),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
@@ -414,7 +424,7 @@ private fun ErrorHomeworkViewContent(
                 style = MaterialTheme.typography.labelSmall,
             )
             Text(
-                text = subject ?: StudyAssistantRes.strings.noneTitle,
+                text = subject ?: stringResource(CoreRes.string.core_none_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2,
@@ -423,15 +433,15 @@ private fun ErrorHomeworkViewContent(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             ErrorHomeworkTaskCountView(
-                painter = painterResource(StudyAssistantRes.icons.theoreticalTasks),
+                painter = painterResource(CoreRes.drawable.core_ic_book_study),
                 count = theoreticalTasks.fetchAllTasks().size,
             )
             ErrorHomeworkTaskCountView(
-                painter = painterResource(StudyAssistantRes.icons.practicalTasks),
+                painter = painterResource(CoreRes.drawable.core_ic_tasks_circular),
                 count = practicalTasks.fetchAllTasks().size,
             )
             ErrorHomeworkTaskCountView(
-                painter = painterResource(StudyAssistantRes.icons.presentationTasks),
+                painter = painterResource(CoreRes.drawable.core_ic_presentation),
                 count = presentationTasks.fetchAllTasks().size,
             )
         }
@@ -490,7 +500,7 @@ private fun ErrorTodoView(
                 if (deadline != null) {
                     Text(
                         text = deadline.formatByTimeZone(
-                            format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings),
+                            format = DateTimeComponents.Formats.shortWeekdayDayMonthFormat(),
                         ),
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
@@ -579,7 +589,7 @@ private fun NoneErrorsView(
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = TasksThemeRes.strings.noneErrorsTitle,
+                text = stringResource(Res.string.none_errors_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelLarge,
             )

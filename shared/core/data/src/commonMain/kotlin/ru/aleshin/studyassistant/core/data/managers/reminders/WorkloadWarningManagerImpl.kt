@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 
 package ru.aleshin.studyassistant.core.data.managers.reminders
 
-import ru.aleshin.studyassistant.core.domain.managers.RepeatWorkStatus
 import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
 
 /**
  * @author Stanislav Aleshin on 24.08.2024.
  */
 expect class WorkloadWarningManagerImpl : WorkloadWarningManager {
-    override suspend fun fetchWorkStatus(): RepeatWorkStatus
-    override fun startOrRetryWarningService()
-    override fun stopWarningService()
+    override suspend fun startOrRetryWarningService()
+    override suspend fun stopWarningService()
 }

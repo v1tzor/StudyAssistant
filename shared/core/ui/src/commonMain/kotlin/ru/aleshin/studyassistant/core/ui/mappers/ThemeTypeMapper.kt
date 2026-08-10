@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,14 @@
 
 package ru.aleshin.studyassistant.core.ui.mappers
 
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.settings.ThemeType
 import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.dark_theme_title as core_dark_theme_title
+import ru.aleshin.studyassistant.core.ui.resources.default_title as core_default_title
+import ru.aleshin.studyassistant.core.ui.resources.light_theme_title as core_light_theme_title
 
 /**
  * @author Stanislav Aleshin on 25.04.2024.
@@ -35,8 +40,9 @@ fun ThemeUiType.mapToDomain() = when (this) {
     ThemeUiType.DARK -> ThemeType.DARK
 }
 
-fun ThemeUiType.mapToString(string: StudyAssistantStrings) = when (this) {
-    ThemeUiType.DEFAULT -> string.defaultTitle
-    ThemeUiType.LIGHT -> string.lightThemeTitle
-    ThemeUiType.DARK -> string.darkThemeTitle
+@Composable
+fun ThemeUiType.mapToString() = when (this) {
+    ThemeUiType.DEFAULT -> stringResource(CoreRes.string.core_default_title)
+    ThemeUiType.LIGHT -> stringResource(CoreRes.string.core_light_theme_title)
+    ThemeUiType.DARK -> stringResource(CoreRes.string.core_dark_theme_title)
 }

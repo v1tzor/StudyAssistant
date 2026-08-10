@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,12 +59,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents.Formats
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.toShortTimeString
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalType
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.HIGH
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.MEDIUM
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority.STANDARD
+import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkUi
+import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
@@ -73,9 +76,14 @@ import ru.aleshin.studyassistant.core.ui.views.dayMonthFormat
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalDetailsUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.goals.GoalTimeDetailsUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.HomeworkUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.TodoUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.goals_view_list_empty_title
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_deadline
+import ru.aleshin.studyassistant.tasks.impl.resources.ic_timer
+import ru.aleshin.studyassistant.tasks.impl.resources.none_deadline_title
+import ru.aleshin.studyassistant.tasks.impl.resources.until_deadline_date_suffix
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
 
 /**
  * @author Stanislav Aleshin on 02.06.2025.
@@ -155,6 +163,7 @@ internal fun GoalViewItem(
                         time = goal.time,
                         isDone = goal.isDone,
                     )
+
                     GoalType.TODO -> TodoGoalView(
                         onClick = onClick,
                         todo = goal.contentTodo,
@@ -185,7 +194,7 @@ internal fun GoalViewEmptyItem(
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = TasksThemeRes.strings.goalsViewListEmptyTitle,
+                text = stringResource(Res.string.goals_view_list_empty_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 style = MaterialTheme.typography.titleSmall,
@@ -229,14 +238,14 @@ internal fun HomeworkGoalView(
             ) {
                 Text(
                     text = homework?.deadline?.formatByTimeZone(
-                        format = Formats.shortWeekdayDayMonthFormat(StudyAssistantRes.strings)
-                    ) ?: StudyAssistantRes.strings.noneTitle,
+                        format = Formats.shortWeekdayDayMonthFormat()
+                    ) ?: stringResource(CoreRes.string.core_none_title),
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     style = MaterialTheme.typography.labelSmall,
                 )
                 Text(
-                    text = homework?.subject?.name ?: StudyAssistantRes.strings.noneTitle,
+                    text = homework?.subject?.name ?: stringResource(CoreRes.string.core_none_title),
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -279,7 +288,8 @@ internal fun TodoGoalView(
             ) {
                 Column {
                     Text(
-                        text = todo?.priority?.mapToString(StudyAssistantRes.strings) ?: StudyAssistantRes.strings.noneTitle,
+                        text = todo?.priority?.mapToString()
+                            ?: stringResource(CoreRes.string.core_none_title),
                         color = when (todo?.priority) {
                             STANDARD -> MaterialTheme.colorScheme.onSurfaceVariant
                             MEDIUM -> StudyAssistantRes.colors.accents.orange
@@ -290,7 +300,7 @@ internal fun TodoGoalView(
                         style = MaterialTheme.typography.labelMedium,
                     )
                     Text(
-                        text = todo?.name ?: StudyAssistantRes.strings.noneTitle,
+                        text = todo?.name ?: stringResource(CoreRes.string.core_none_title),
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
@@ -301,17 +311,20 @@ internal fun TodoGoalView(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    val deadlineDateFormat = Formats.dayMonthFormat(StudyAssistantRes.strings)
+                    val deadlineDateFormat = Formats.dayMonthFormat()
                     Icon(
                         modifier = Modifier.size(18.dp),
-                        painter = painterResource(TasksThemeRes.icons.deadline),
+                        painter = painterResource(Res.drawable.ic_deadline),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
                         text = buildString {
-                            append(TasksThemeRes.strings.untilDeadlineDateSuffix, " ")
-                            append(todo?.deadline?.formatByTimeZone(deadlineDateFormat) ?: TasksThemeRes.strings.noneDeadlineTitle)
+                            append(stringResource(Res.string.until_deadline_date_suffix), " ")
+                            append(
+                                todo?.deadline?.formatByTimeZone(deadlineDateFormat)
+                                    ?: stringResource(Res.string.none_deadline_title)
+                            )
                         },
                         maxLines = 1,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -424,7 +437,7 @@ private fun GoalTimeStatus(
                 ) {
                     Icon(
                         modifier = Modifier.size(18.dp),
-                        painter = painterResource(TasksThemeRes.icons.timer),
+                        painter = painterResource(Res.drawable.ic_timer),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurface,
                     )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.communicators.St
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.editor.api.EditorFeatureComponent.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileAction
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileEffect
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileEvent
@@ -58,11 +58,13 @@ internal class EmployeeProfileComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+
             is EmployeeProfileEvent.ClickEdit -> with(state()) {
                 val employee = checkNotNull(employee)
                 val config = EditorConfig.Employee(employee.uid, employee.organizationId)
                 consumeOutput(EmployeeProfileOutput.NavigateToEmployeeEditor(config))
             }
+
             is EmployeeProfileEvent.ClickBack -> {
                 consumeOutput(EmployeeProfileOutput.NavigateToBack)
             }
@@ -77,6 +79,7 @@ internal class EmployeeProfileComposeStore(
             employee = action.employee,
             isLoading = false,
         )
+
         is EmployeeProfileAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_priority_high as core_ic_priority_high
+import ru.aleshin.studyassistant.editor.impl.resources.*
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,10 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.SegmentedButtonItem
 import ru.aleshin.studyassistant.core.ui.views.SegmentedButtons
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
 
 /**
  * @author Stanislav Aleshin on 23.06.2024.
@@ -52,7 +54,7 @@ internal fun TaskPriorityInfoView(
     ) {
         Icon(
             modifier = Modifier.size(24.dp),
-            painter = painterResource(StudyAssistantRes.icons.priorityHigh),
+            painter = painterResource(CoreRes.drawable.core_ic_priority_high),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -82,7 +84,7 @@ internal fun TaskPriorityView(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = EditorThemeRes.strings.priorityViewTitle,
+                text = stringResource(Res.string.priority_view_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodySmall,
             )
@@ -98,13 +100,13 @@ internal fun TaskPriorityView(
 
 internal enum class TaskPrioritySegmentedItem : SegmentedButtonItem {
     STANDARD {
-        override val title: String @Composable get() = EditorThemeRes.strings.standardPriorityItemTitle
+        override val title: String @Composable get() = stringResource(Res.string.standard_priority_item_title)
     },
     MEDIUM {
-        override val title: String @Composable get() = EditorThemeRes.strings.mediumPriorityItemTitle
+        override val title: String @Composable get() = stringResource(Res.string.medium_priority_item_title)
     },
     HIGH {
-        override val title: String @Composable get() = EditorThemeRes.strings.highPriorityItemTitle
+        override val title: String @Composable get() = stringResource(Res.string.high_priority_item_title)
     }
 }
 

@@ -1,0 +1,4 @@
+CREATE TABLE homeworkShareReceiptEntity (
+  code_hash TEXT PRIMARY KEY NOT NULL,
+  imported_at INTEGER NOT NULL
+);

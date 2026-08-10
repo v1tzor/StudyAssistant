@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,16 +42,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
 import ru.aleshin.studyassistant.core.ui.views.sheet.BaseSelectorBottomSheet
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.users.MediatedEmployeeUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.employee_linker_dialog_header
+import ru.aleshin.studyassistant.schedule.impl.resources.employee_linker_dialog_title
 
 /**
  * @author Stanislav Aleshin on 16.08.2024.
@@ -76,7 +79,7 @@ internal fun LinkedEmployeesView(
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
-                    text = sharedTeacher.post.mapToString(StudyAssistantRes.strings),
+                    text = sharedTeacher.post.mapToString(),
                     color = MaterialTheme.colorScheme.primary,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
@@ -105,7 +108,7 @@ internal fun LinkedEmployeesView(
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
                     Text(
-                        text = linkedTeacher.post.mapToString(StudyAssistantRes.strings),
+                        text = linkedTeacher.post.mapToString(),
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.labelMedium,
                     )
@@ -164,8 +167,8 @@ internal fun EmployeeLinkerBottomSheet(
         modifier = modifier,
         selected = selectedTeacher,
         items = teachers + otherEmployee,
-        header = ScheduleThemeRes.strings.employeeLinkerDialogHeader,
-        title = ScheduleThemeRes.strings.employeeLinkerDialogTitle,
+        header = stringResource(Res.string.employee_linker_dialog_header),
+        title = stringResource(Res.string.employee_linker_dialog_title),
         itemView = { employee ->
             SelectorItemView(
                 onClick = { selectedTeacher = employee },

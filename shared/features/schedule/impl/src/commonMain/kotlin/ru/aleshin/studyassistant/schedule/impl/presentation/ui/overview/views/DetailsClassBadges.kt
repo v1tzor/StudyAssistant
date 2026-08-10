@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.InfoBadge
-import ru.aleshin.studyassistant.schedule.impl.presentation.theme.ScheduleThemeRes
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.homework_in_progress_short_title
+import ru.aleshin.studyassistant.schedule.impl.resources.homework_is_complete_short_title
+import ru.aleshin.studyassistant.schedule.impl.resources.homework_is_not_complete_short_title
+import ru.aleshin.studyassistant.schedule.impl.resources.homework_is_set_short_title
+import ru.aleshin.studyassistant.schedule.impl.resources.homework_is_skipped_short_title
+import ru.aleshin.studyassistant.schedule.impl.resources.test_label
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_alert_circle as core_ic_alert_circle
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_outline as core_ic_tasks_outline
 
 /**
  * @author Stanislav Aleshin on 21.06.2024.
@@ -44,7 +54,7 @@ internal fun DetailsClassHomeworkBadge(
             leadingIcon = {
                 Icon(
                     modifier = Modifier.size(18.dp),
-                    painter = painterResource(StudyAssistantRes.icons.tasksOutline),
+                    painter = painterResource(CoreRes.drawable.core_ic_tasks_outline),
                     contentDescription = null,
                     tint = StudyAssistantRes.colors.accents.green,
                 )
@@ -52,7 +62,7 @@ internal fun DetailsClassHomeworkBadge(
             containerColor = StudyAssistantRes.colors.accents.greenContainer,
             content = {
                 Text(
-                    text = ScheduleThemeRes.strings.homeworkIsCompleteShortTitle,
+                    text = stringResource(Res.string.homework_is_complete_short_title),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
@@ -64,7 +74,7 @@ internal fun DetailsClassHomeworkBadge(
             leadingIcon = {
                 Icon(
                     modifier = Modifier.size(18.dp),
-                    painter = painterResource(StudyAssistantRes.icons.tasksOutline),
+                    painter = painterResource(CoreRes.drawable.core_ic_tasks_outline),
                     contentDescription = null,
                     tint = StudyAssistantRes.colors.accents.orange,
                 )
@@ -72,7 +82,7 @@ internal fun DetailsClassHomeworkBadge(
             containerColor = StudyAssistantRes.colors.accents.orangeContainer,
             content = {
                 Text(
-                    text = ScheduleThemeRes.strings.homeworkInProgressShortTitle,
+                    text = stringResource(Res.string.homework_in_progress_short_title),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
@@ -84,7 +94,7 @@ internal fun DetailsClassHomeworkBadge(
             leadingIcon = {
                 Icon(
                     modifier = Modifier.size(18.dp),
-                    painter = painterResource(StudyAssistantRes.icons.tasksOutline),
+                    painter = painterResource(CoreRes.drawable.core_ic_tasks_outline),
                     contentDescription = null,
                     tint = StudyAssistantRes.colors.accents.yellow,
                 )
@@ -92,7 +102,7 @@ internal fun DetailsClassHomeworkBadge(
             containerColor = StudyAssistantRes.colors.accents.yellowContainer,
             content = {
                 Text(
-                    text = ScheduleThemeRes.strings.homeworkIsSetShortTitle,
+                    text = stringResource(Res.string.homework_is_set_short_title),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
@@ -104,7 +114,7 @@ internal fun DetailsClassHomeworkBadge(
             leadingIcon = {
                 Icon(
                     modifier = Modifier.size(18.dp),
-                    painter = painterResource(StudyAssistantRes.icons.tasksOutline),
+                    painter = painterResource(CoreRes.drawable.core_ic_tasks_outline),
                     contentDescription = null,
                     tint = StudyAssistantRes.colors.accents.red,
                 )
@@ -112,7 +122,7 @@ internal fun DetailsClassHomeworkBadge(
             containerColor = StudyAssistantRes.colors.accents.redContainer,
             content = {
                 Text(
-                    text = ScheduleThemeRes.strings.homeworkIsNotCompleteShortTitle,
+                    text = stringResource(Res.string.homework_is_not_complete_short_title),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
@@ -124,7 +134,7 @@ internal fun DetailsClassHomeworkBadge(
             leadingIcon = {
                 Icon(
                     modifier = Modifier.size(18.dp),
-                    painter = painterResource(StudyAssistantRes.icons.tasksOutline),
+                    painter = painterResource(CoreRes.drawable.core_ic_tasks_outline),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
@@ -132,7 +142,7 @@ internal fun DetailsClassHomeworkBadge(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             content = {
                 Text(
-                    text = ScheduleThemeRes.strings.homeworkIsSkippedShortTitle,
+                    text = stringResource(Res.string.homework_is_skipped_short_title),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
@@ -150,7 +160,7 @@ internal fun DetailsClassTestBadge(
         leadingIcon = {
             Icon(
                 modifier = Modifier.size(18.dp),
-                painter = painterResource(StudyAssistantRes.icons.test),
+                painter = painterResource(CoreRes.drawable.core_ic_alert_circle),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.error,
             )
@@ -158,7 +168,7 @@ internal fun DetailsClassTestBadge(
         containerColor = MaterialTheme.colorScheme.errorContainer,
         content = {
             Text(
-                text = ScheduleThemeRes.strings.testLabel,
+                text = stringResource(Res.string.test_label),
                 softWrap = false,
                 overflow = TextOverflow.Visible,
                 maxLines = 1,

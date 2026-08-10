@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,18 +33,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToString
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.dialog.BaseSelectorDialog
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorAddItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorItemView
 import ru.aleshin.studyassistant.core.ui.views.dialog.SelectorNotSelectedItemView
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.organization.OrganizationShortUi
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.schedules.NumberedClassUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.models.subjects.SubjectUi
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.linked_class_selector_header
+import ru.aleshin.studyassistant.tasks.impl.resources.linked_class_selector_title
+import ru.aleshin.studyassistant.tasks.impl.resources.number_of_class_suffix
+import ru.aleshin.studyassistant.tasks.impl.resources.subject_selector_header
+import ru.aleshin.studyassistant.tasks.impl.resources.subject_selector_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
 
 /**
  * @author Stanislav Aleshin on 24.07.2024.
@@ -68,14 +75,14 @@ internal fun SubjectSelectorDialog(
         modifier = modifier,
         selected = selectedSubject,
         items = subjects,
-        header = TasksThemeRes.strings.subjectSelectorHeader,
-        title = TasksThemeRes.strings.subjectSelectorTitle,
+        header = stringResource(Res.string.subject_selector_header),
+        title = stringResource(Res.string.subject_selector_title),
         itemView = { subject ->
             SelectorItemView(
                 onClick = { selectedSubject = subject },
                 selected = subject.uid == selectedSubject?.uid,
                 title = subject.name,
-                label = subject.eventType.mapToString(StudyAssistantRes.strings),
+                label = subject.eventType.mapToString(),
                 leadingIcon = {
                     Surface(
                         modifier = Modifier.height(IntrinsicSize.Min),
@@ -127,22 +134,23 @@ internal fun LinkedClassSelectorDialog(
         modifier = modifier,
         selected = selectedClass,
         items = classes,
-        header = TasksThemeRes.strings.linkedClassSelectorHeader,
-        title = TasksThemeRes.strings.linkedClassSelectorTitle,
+        header = stringResource(Res.string.linked_class_selector_header),
+        title = stringResource(Res.string.linked_class_selector_title),
         itemView = { classModel ->
             SelectorItemView(
                 onClick = { selectedClass = classModel },
                 selected = classModel.data.uid == selectedClass?.data?.uid,
-                title = classModel.data.subject?.name ?: StudyAssistantRes.strings.noneTitle,
+                title = classModel.data.subject?.name ?: stringResource(CoreRes.string.core_none_title),
                 label = buildString {
                     append(classModel.number)
-                    append(" ", TasksThemeRes.strings.numberOfClassSuffix)
+                    append(" ", stringResource(Res.string.number_of_class_suffix))
                 },
                 leadingIcon = {
                     Surface(
                         modifier = Modifier.height(IntrinsicSize.Min),
                         shape = MaterialTheme.shapes.full,
-                        color = classModel.data.subject?.color?.let { Color(it) } ?: MaterialTheme.colorScheme.outlineVariant,
+                        color = classModel.data.subject?.color?.let { Color(it) }
+                            ?: MaterialTheme.colorScheme.outlineVariant,
                         content = { Box(modifier = Modifier.size(8.dp, 24.dp)) },
                     )
                 },

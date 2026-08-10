@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,10 +45,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants.Text.DEFAULT_MAX_TEXT_LENGTH
 import ru.aleshin.studyassistant.core.common.functional.Constants.Text.FULL_ORG_NAME_LENGTH
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.full_name_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.ic_subject_name
+import ru.aleshin.studyassistant.editor.impl.resources.short_name_field_label
 
 /**
  * @author Stanislav Aleshin on 05.06.2024.
@@ -73,7 +77,7 @@ internal fun OrganizationNameInfoField(
         Box(modifier = Modifier.height(56.dp), contentAlignment = Alignment.Center) {
             Icon(
                 modifier = Modifier.size(24.dp),
-                painter = painterResource(EditorThemeRes.icons.name),
+                painter = painterResource(Res.drawable.ic_subject_name),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -92,7 +96,7 @@ internal fun OrganizationNameInfoField(
                         onUpdateShortName(text)
                     }
                 },
-                label = { Text(text = EditorThemeRes.strings.shortNameFieldLabel) },
+                label = { Text(text = stringResource(Res.string.short_name_field_label)) },
                 trailingIcon = {
                     if (shortNameInteraction.collectIsFocusedAsState().value) {
                         IconButton(onClick = { focusManager.clearFocus() }) {
@@ -133,7 +137,7 @@ internal fun OrganizationNameInfoField(
                     }
                 },
                 interactionSource = fullNameInteraction,
-                label = { Text(text = EditorThemeRes.strings.fullNameFieldLabel) },
+                label = { Text(text = stringResource(Res.string.full_name_field_label)) },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),

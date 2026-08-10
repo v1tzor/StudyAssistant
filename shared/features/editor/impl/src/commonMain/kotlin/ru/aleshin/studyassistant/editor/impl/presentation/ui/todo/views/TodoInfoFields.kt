@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.InfoTextField
-import ru.aleshin.studyassistant.editor.impl.presentation.theme.EditorThemeRes
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.todo_description_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.todo_description_field_placeholder
+import ru.aleshin.studyassistant.editor.impl.resources.todo_name_field_label
+import ru.aleshin.studyassistant.editor.impl.resources.todo_name_field_placeholder
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
 
 /**
  * @author Stanislav Aleshin on 26.07.2024.
@@ -73,9 +80,9 @@ internal fun TodoInfoFields(
                 editableTodoName = it
                 onTodoNameChange(it)
             },
-            label = EditorThemeRes.strings.todoNameFieldLabel,
-            leadingInfoIcon = painterResource(StudyAssistantRes.icons.practicalTasks),
-            placeholder = { Text(text = EditorThemeRes.strings.todoNameFieldPlaceholder) },
+            label = stringResource(Res.string.todo_name_field_label),
+            leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_tasks_circular),
+            placeholder = { Text(text = stringResource(Res.string.todo_name_field_placeholder)) },
             trailingIcon = {
                 if (todoNameInteraction.collectIsFocusedAsState().value) {
                     IconButton(onClick = { focusManager.clearFocus() }) {
@@ -97,9 +104,9 @@ internal fun TodoInfoFields(
                 editableTodoDescription = it
                 onTodoDescriptionChange(it)
             },
-            label = EditorThemeRes.strings.todoDescriptionFieldLabel,
+            label = stringResource(Res.string.todo_description_field_label),
             leadingInfoIcon = Icons.Default.Description,
-            placeholder = { Text(text = EditorThemeRes.strings.todoDescriptionFieldPlaceholder) },
+            placeholder = { Text(text = stringResource(Res.string.todo_description_field_placeholder)) },
             trailingIcon = {
                 if (todoDescriptionInteraction.collectIsFocusedAsState().value) {
                     IconButton(onClick = { focusManager.clearFocus() }) {

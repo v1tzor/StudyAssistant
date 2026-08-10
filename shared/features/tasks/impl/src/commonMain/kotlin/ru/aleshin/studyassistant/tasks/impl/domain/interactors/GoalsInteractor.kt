@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.tasks.impl.domain.interactors
 
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
@@ -52,6 +53,7 @@ internal interface GoalsInteractor {
     suspend fun fetchGoalsProgressByTimeRange(
         timeRange: TimeRange
     ): FlowDomainResult<TasksFailures, Map<Instant, DailyGoalsProgress>>
+
     suspend fun updateGoals(goals: List<Goal>): UnitDomainResult<TasksFailures>
     suspend fun completeOrCancelGoal(goal: Goal): UnitDomainResult<TasksFailures>
     suspend fun deleteGoal(goal: GoalShort): UnitDomainResult<TasksFailures>
@@ -94,7 +96,8 @@ internal interface GoalsInteractor {
                     val goalTimeDetails = when (time) {
                         is GoalTime.Stopwatch -> with(time as GoalTime.Stopwatch) {
                             val elapsedTime = if (isActive) {
-                                val duration = currentTime.toEpochMilliseconds() - startTimePoint.toEpochMilliseconds()
+                                val duration =
+                                    currentTime.toEpochMilliseconds() - startTimePoint.toEpochMilliseconds()
                                 pastStopTime + duration
                             } else {
                                 pastStopTime
@@ -114,7 +117,8 @@ internal interface GoalsInteractor {
 
                         is GoalTime.Timer -> with(time as GoalTime.Timer) {
                             val leftTime = if (isActive) {
-                                val duration = currentTime.toEpochMilliseconds() - startTimePoint.toEpochMilliseconds()
+                                val duration =
+                                    currentTime.toEpochMilliseconds() - startTimePoint.toEpochMilliseconds()
                                 val result = targetTime - (pastStopTime + duration)
                                 if (completeAfterTimeElapsed && result <= 0) makeItDone = true
                                 result
@@ -157,30 +161,31 @@ internal interface GoalsInteractor {
                 }.sortedBy { goal ->
                     goal.number
                 }
-            }
+            }.distinctUntilChanged()
         }
 
-        override suspend fun fetchGoalsProgressByTimeRange(timeRange: TimeRange) = eitherWrapper.wrapFlow {
-            return@wrapFlow goalsRepository.fetchDailyGoalsByTimeRange(timeRange).map { goals ->
-                val goalsByDate = goals.groupBy { it.targetDate.startThisDay() }
-                val goalsProgress = goalsByDate.mapValues { entry ->
-                    val homeworkGoals = entry.value.filter { it.contentType == HOMEWORK }.map {
-                        it.isDone && it.completeDate != null
+        override suspend fun fetchGoalsProgressByTimeRange(timeRange: TimeRange) =
+            eitherWrapper.wrapFlow {
+                return@wrapFlow goalsRepository.fetchDailyGoalsByTimeRange(timeRange).map { goals ->
+                    val goalsByDate = goals.groupBy { it.targetDate.startThisDay() }
+                    val goalsProgress = goalsByDate.mapValues { entry ->
+                        val homeworkGoals = entry.value.filter { it.contentType == HOMEWORK }.map {
+                            it.isDone && it.completeDate != null
+                        }
+                        val todoGoals = entry.value.filter { it.contentType == TODO }.map {
+                            it.isDone && it.completeDate != null
+                        }
+                        val allGoals = homeworkGoals + todoGoals
+                        DailyGoalsProgress(
+                            goalsCount = entry.value.size,
+                            homeworkGoals = homeworkGoals,
+                            todoGoals = todoGoals,
+                            progress = allGoals.count { it }.toFloat() / allGoals.size,
+                        )
                     }
-                    val todoGoals = entry.value.filter { it.contentType == TODO }.map {
-                        it.isDone && it.completeDate != null
-                    }
-                    val allGoals = homeworkGoals + todoGoals
-                    DailyGoalsProgress(
-                        goalsCount = entry.value.size,
-                        homeworkGoals = homeworkGoals,
-                        todoGoals = todoGoals,
-                        progress = allGoals.count { it }.toFloat() / allGoals.size,
-                    )
+                    return@map goalsProgress
                 }
-                return@map goalsProgress
             }
-        }
 
         override suspend fun updateGoals(goals: List<Goal>) = eitherWrapper.wrapUnit {
             val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
@@ -202,6 +207,7 @@ internal interface GoalsInteractor {
                                 isActive = false,
                             )
                         }
+
                         is GoalTime.Timer -> with(goal.time as GoalTime.Timer) {
                             val stopTime = startTimePoint.toEpochMilliseconds()
                             val timeAfterStop = currentTime.toEpochMilliseconds() - stopTime
@@ -210,6 +216,7 @@ internal interface GoalsInteractor {
                                 isActive = false,
                             )
                         }
+
                         is GoalTime.None -> GoalTime.None
                     },
                     isDone = true,
@@ -228,6 +235,7 @@ internal interface GoalsInteractor {
                             homeworksRepository.addOrUpdateHomework(completedHomework)
                         }
                     }
+
                     TODO -> goal.contentTodo?.let { goalTodo ->
                         val actualTodo = todoRepository.fetchTodoById(goalTodo.uid)
                         val completedTodo = actualTodo.first()?.copy(
@@ -249,11 +257,13 @@ internal interface GoalsInteractor {
                             startTimePoint = currentTime,
                             isActive = false,
                         )
+
                         is GoalTime.Timer -> (goal.time as GoalTime.Timer).copy(
                             pastStopTime = 0L,
                             startTimePoint = currentTime,
                             isActive = false,
                         )
+
                         is GoalTime.None -> GoalTime.None
                     },
                     isDone = false,
@@ -272,6 +282,7 @@ internal interface GoalsInteractor {
                             homeworksRepository.addOrUpdateHomework(completedHomework)
                         }
                     }
+
                     TODO -> goal.contentTodo?.let { goalTodo ->
                         val actualTodo = todoRepository.fetchTodoById(goalTodo.uid)
                         val completedTodo = actualTodo.first()?.copy(
@@ -294,7 +305,8 @@ internal interface GoalsInteractor {
             goalsRepository.deleteGoal(goal.uid)
             if (dailyGoals.size > 1) {
                 val updatedGoals = dailyGoals.filter { it.uid != goal.uid }.map { targetGoal ->
-                    val newNumber = if (targetGoal.number < goal.number) targetGoal.number else targetGoal.number - 1
+                    val newNumber =
+                        if (targetGoal.number < goal.number) targetGoal.number else targetGoal.number - 1
                     targetGoal.copy(number = newNumber, updatedAt = updatedAt)
                 }
                 goalsRepository.addDailyDailyGoals(updatedGoals)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,10 @@ package ru.aleshin.studyassistant.core.ui.theme
 import androidx.compose.runtime.Composable
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantColors
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantElevations
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantIcons
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantLanguage
-import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantStrings
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantColors
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantElevations
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantIcons
 import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantLanguage
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
 
 /**
  * @author Stanislav Aleshin on 13.04.2023.
@@ -41,9 +37,4 @@ object StudyAssistantRes {
     val colors: StudyAssistantColors
         @Composable get() = LocalStudyAssistantColors.current
 
-    val strings: StudyAssistantStrings
-        @Composable get() = LocalStudyAssistantStrings.current
-
-    val icons: StudyAssistantIcons
-        @Composable get() = LocalStudyAssistantIcons.current
 }

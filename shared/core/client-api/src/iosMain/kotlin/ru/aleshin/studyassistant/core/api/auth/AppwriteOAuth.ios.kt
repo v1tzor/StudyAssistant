@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,11 @@ actual suspend fun launchOAuth2Url(
                 error != null -> {
                     cont.resumeWith(Result.failure(AppwriteException(error)))
                 }
+
                 callbackUrl == null -> {
                     cont.resumeWith(Result.failure(AppwriteException("Invalid callback URL")))
                 }
+
                 else -> {
                     cont.resumeWith(Result.success(callbackUrl))
                 }

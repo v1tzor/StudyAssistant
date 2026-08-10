@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.mappers
 
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
+import org.jetbrains.compose.resources.getString
 import ru.aleshin.studyassistant.profile.impl.domain.entities.ProfileFailures
-import ru.aleshin.studyassistant.profile.impl.presentation.theme.tokens.ProfileStrings
+import ru.aleshin.studyassistant.profile.impl.resources.Res
+import ru.aleshin.studyassistant.profile.impl.resources.other_error_message
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.network_error_message as core_network_error_message
 
 /**
  * @author Stanislav Aleshin on 16.04.2024.
  */
-internal fun ProfileFailures.mapToMessage(
-    strings: ProfileStrings,
-    coreStrings: StudyAssistantStrings,
-) = when (this) {
-    is ProfileFailures.InternetError -> coreStrings.networkErrorMessage
-    is ProfileFailures.OtherError -> strings.otherErrorMessage
+internal suspend fun ProfileFailures.mapToMessage() = when (this) {
+    is ProfileFailures.InternetError -> getString(CoreRes.string.core_network_error_message)
+    is ProfileFailures.OtherError -> getString(Res.string.other_error_message)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,6 @@
 
 package ru.aleshin.studyassistant.profile.impl.presentation.ui.views
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,425 +26,179 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.views.MediumInfoBadge
-import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
-import ru.aleshin.studyassistant.profile.impl.presentation.models.organization.OrganizationShortUi
-import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.ReceivedMediatedSchedulesShortUi
-import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.SentMediatedSchedulesUi
-import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.ShareSchedulesSendDataUi
-import ru.aleshin.studyassistant.profile.impl.presentation.models.shared.SharedSchedulesShortUi
-import ru.aleshin.studyassistant.profile.impl.presentation.models.users.AppUserUi
-import ru.aleshin.studyassistant.profile.impl.presentation.models.users.FriendRequestsUi
-import ru.aleshin.studyassistant.profile.impl.presentation.theme.ProfileThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.profile.impl.resources.Res
+import ru.aleshin.studyassistant.profile.impl.resources.about_app_title
+import ru.aleshin.studyassistant.profile.impl.resources.ai_settings_title
+import ru.aleshin.studyassistant.profile.impl.resources.calendar_settings_title
+import ru.aleshin.studyassistant.profile.impl.resources.general_settings_title
+import ru.aleshin.studyassistant.profile.impl.resources.ic_calendar
+import ru.aleshin.studyassistant.profile.impl.resources.ic_notifications
+import ru.aleshin.studyassistant.profile.impl.resources.ic_settings_common
+import ru.aleshin.studyassistant.profile.impl.resources.ic_table
+import ru.aleshin.studyassistant.profile.impl.resources.notify_settings_title
+import ru.aleshin.studyassistant.profile.impl.resources.shared_schedules_view_title
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
  */
 @Composable
 internal fun ProfileActionsSection(
+    columns: Int,
     modifier: Modifier = Modifier,
-    isLoading: Boolean,
-    isLoadingShare: Boolean,
-    isLoadingSend: Boolean,
-    currentTime: Instant,
-    profile: AppUserUi?,
-    requests: FriendRequestsUi?,
-    sharedSchedules: SharedSchedulesShortUi?,
-    allOrganizations: List<OrganizationShortUi>,
-    allFriends: List<AppUserUi>,
-    onFriendsClick: () -> Unit,
     onAboutAppClick: () -> Unit,
     onGeneralSettingsClick: () -> Unit,
     onNotifySettingsClick: () -> Unit,
     onCalendarSettingsClick: () -> Unit,
-    onPaymentsSettingsClick: () -> Unit,
-    onShowScheduleClick: (ReceivedMediatedSchedulesShortUi) -> Unit,
-    onCancelSentScheduleClick: (SentMediatedSchedulesUi) -> Unit,
-    onShareScheduleClick: (ShareSchedulesSendDataUi) -> Unit,
+    onAiSettingsClick: () -> Unit,
+    onShareScheduleClick: () -> Unit,
 ) {
     LazyVerticalGrid(
-        modifier = modifier.fillMaxSize().padding(start = 16.dp, end = 16.dp, top = 24.dp),
-        columns = GridCells.Fixed(2),
+        columns = GridCells.Fixed(columns),
+        modifier = modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 24.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item(key = "Friends") {
+        item(
+            key = "ShareSchedule",
+            span = { GridItemSpan(maxLineSpan) },
+        ) {
             ProfileActionViewItem(
-                onClick = onFriendsClick,
-                icon = painterResource(ProfileThemeRes.icons.friends),
-                title = ProfileThemeRes.strings.friendsTitle,
-                value = {
-                    Crossfade(
-                        targetState = isLoading,
-                        animationSpec = spring(
-                            stiffness = Spring.StiffnessMediumLow,
-                            visibilityThreshold = Spring.DefaultDisplacementThreshold,
-                        )
-                    ) { loading ->
-                        if (loading) {
-                            PlaceholderBox(
-                                modifier = Modifier.size(40.dp, 26.dp),
-                                shape = MaterialTheme.shapes.small,
-                                highlight = null,
-                            )
-                        } else if (profile != null) {
-                            Text(
-                                text = profile.friends.size.toString(),
-                                maxLines = 1,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.Bold,
-                                ),
-                            )
-                        }
-                    }
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onShareScheduleClick,
+                title = stringResource(Res.string.shared_schedules_view_title),
+                icon = {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_table),
+                        contentDescription = null,
+                    )
                 },
-                badge = if (requests?.received?.isNotEmpty() == true) {
-                    {
-                        NewFriendBadge(count = requests.received.size)
-                    }
-                } else {
-                    null
-                }
             )
         }
         item(key = "GeneralSettings") {
             ProfileActionViewItem(
                 onClick = onGeneralSettingsClick,
-                icon = painterResource(ProfileThemeRes.icons.generalSettings),
-                title = ProfileThemeRes.strings.generalSettingsTitle,
+                title = stringResource(Res.string.general_settings_title),
+                icon = {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_settings_common),
+                        contentDescription = null,
+                    )
+                },
             )
         }
         item(key = "NotifySettings") {
             ProfileActionViewItem(
                 onClick = onNotifySettingsClick,
-                icon = painterResource(ProfileThemeRes.icons.notifySettings),
-                title = ProfileThemeRes.strings.notifySettingsTitle,
+                title = stringResource(Res.string.notify_settings_title),
+                icon = {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_notifications),
+                        contentDescription = null,
+                    )
+                },
             )
         }
         item(key = "CalendarSettings") {
             ProfileActionViewItem(
                 onClick = onCalendarSettingsClick,
-                icon = painterResource(ProfileThemeRes.icons.calendarSettings),
-                title = ProfileThemeRes.strings.calendarSettingsTitle,
+                title = stringResource(Res.string.calendar_settings_title),
+                icon = {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_calendar),
+                        contentDescription = null,
+                    )
+                },
             )
         }
-        item(key = "PaymentsSettings") {
+        item(key = "AiSettings") {
             ProfileActionViewItem(
-                onClick = onPaymentsSettingsClick,
-                icon = painterResource(ProfileThemeRes.icons.paymentsSettings),
-                title = ProfileThemeRes.strings.paymentsSettingsTitle,
+                onClick = onAiSettingsClick,
+                title = stringResource(Res.string.ai_settings_title),
+                icon = {
+                    Icon(
+                        imageVector = Icons.Outlined.AutoAwesome,
+                        contentDescription = null,
+                    )
+                },
             )
         }
-        item(key = "AboutApp") {
+        item(
+            key = "AboutApp",
+            span = { GridItemSpan(maxLineSpan) },
+        ) {
             ProfileActionViewItem(
-                modifier = Modifier,
                 onClick = onAboutAppClick,
-                icon = Icons.Outlined.Info,
-                title = ProfileThemeRes.strings.aboutAppTitle,
-            )
-        }
-        item(key = "SharedSchedules", span = { GridItemSpan(2) }) {
-            ShareScheduleView(
-                isLoadingShare = isLoadingShare,
-                isLoadingSend = isLoadingSend,
-                currentTime = currentTime,
-                sharedSchedules = sharedSchedules,
-                allOrganizations = allOrganizations,
-                allFriends = allFriends,
-                onShowScheduleClick = onShowScheduleClick,
-                onCancelSentScheduleClick = onCancelSentScheduleClick,
-                onShareScheduleClick = onShareScheduleClick,
+                title = stringResource(Res.string.about_app_title),
+                icon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = null,
+                    )
+                },
             )
         }
     }
 }
 
 @Composable
-internal fun ProfileActionViewItem(
-    modifier: Modifier = Modifier,
+private fun ProfileActionViewItem(
     onClick: () -> Unit,
-    icon: Painter,
     title: String,
-    value: (@Composable () -> Unit)? = null,
-    badge: (@Composable () -> Unit)? = null,
-    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
-    shape: Shape = MaterialTheme.shapes.large,
+    icon: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.height(110.dp),
-        shape = shape,
-        color = backgroundColor,
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    painter = icon,
-                    contentDescription = title,
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                badge?.invoke()
-            }
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-                    Text(
-                        text = title,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = if (value != null) 1 else 2,
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-                value?.invoke()
-            }
-        }
-    }
-}
-
-@Composable
-internal fun ProfileActionViewItem(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    icon: ImageVector,
-    title: String,
-    value: (@Composable () -> Unit)? = null,
-    badge: (@Composable () -> Unit)? = null,
-    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
-    shape: Shape = MaterialTheme.shapes.large,
-) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier.height(110.dp),
-        shape = shape,
-        color = backgroundColor,
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    imageVector = icon,
-                    contentDescription = title,
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                badge?.invoke()
-            }
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-                    Text(
-                        text = title,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = if (value != null) 1 else 2,
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-                value?.invoke()
-            }
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-internal fun ShareScheduleView(
-    modifier: Modifier = Modifier,
-    isLoadingShare: Boolean,
-    isLoadingSend: Boolean,
-    currentTime: Instant,
-    allOrganizations: List<OrganizationShortUi>,
-    allFriends: List<AppUserUi>,
-    sharedSchedules: SharedSchedulesShortUi?,
-    onShowScheduleClick: (ReceivedMediatedSchedulesShortUi) -> Unit,
-    onCancelSentScheduleClick: (SentMediatedSchedulesUi) -> Unit,
-    onShareScheduleClick: (ShareSchedulesSendDataUi) -> Unit,
-) {
-    var openSharedSchedulesSheet by remember { mutableStateOf(false) }
-    var openSchedulesSenderSheet by remember { mutableStateOf(false) }
-
-    Surface(
-        modifier = modifier.animateContentSize(),
+        modifier = modifier.height(104.dp),
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
-                    painter = painterResource(ProfileThemeRes.icons.shareSchedule),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                )
+                Box(
+                    modifier = Modifier.size(24.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    androidx.compose.runtime.CompositionLocalProvider(
+                        androidx.compose.material3.LocalContentColor provides MaterialTheme.colorScheme.primary,
+                        content = icon,
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+            }
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterStart,
+            ) {
                 Text(
-                    modifier = Modifier.weight(1f),
-                    text = ProfileThemeRes.strings.sharedSchedulesViewTitle,
+                    text = title,
                     color = MaterialTheme.colorScheme.onSurface,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
+                    maxLines = 2,
                     style = MaterialTheme.typography.titleMedium,
                 )
-                Crossfade(
-                    targetState = isLoadingShare,
-                    animationSpec = spring(
-                        stiffness = Spring.StiffnessMediumLow,
-                        visibilityThreshold = Spring.DefaultDisplacementThreshold,
-                    )
-                ) { loading ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        if (!loading) {
-                            if (!sharedSchedules?.sent.isNullOrEmpty()) {
-                                MediumInfoBadge(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.primary,
-                                ) {
-                                    Text(text = (sharedSchedules?.sent?.size ?: 0).toString(), maxLines = 1)
-                                }
-                            } else {
-                                Spacer(modifier = Modifier.width(20.dp))
-                            }
-                            MediumInfoBadge(
-                                containerColor = StudyAssistantRes.colors.accents.orangeContainer,
-                                contentColor = StudyAssistantRes.colors.accents.orange,
-                            ) {
-                                Text(text = (sharedSchedules?.received?.size ?: 0).toString(), maxLines = 1)
-                            }
-                        } else {
-                            PlaceholderBox(
-                                modifier = Modifier.size(20.dp),
-                                shape = RoundedCornerShape(6.dp),
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                            )
-                            PlaceholderBox(
-                                modifier = Modifier.size(20.dp),
-                                shape = RoundedCornerShape(6.dp),
-                                color = StudyAssistantRes.colors.accents.orangeContainer,
-                            )
-                        }
-                    }
-                }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(
-                    enabled = !isLoadingShare,
-                    modifier = Modifier.weight(1f),
-                    onClick = { openSharedSchedulesSheet = true },
-                ) {
-                    Text(
-                        text = ProfileThemeRes.strings.openSentSchedulesButtonTitle,
-                        maxLines = 1,
-                    )
-                }
-                FilledTonalButton(
-                    enabled = !isLoadingShare,
-                    onClick = { openSchedulesSenderSheet = true }
-                ) {
-                    Text(
-                        text = ProfileThemeRes.strings.sendScheduleButtonTitle,
-                        maxLines = 1,
-                    )
-                }
             }
         }
-    }
-
-    if (openSharedSchedulesSheet && sharedSchedules != null) {
-        SharedSchedulesBottomSheet(
-            sharedSchedules = sharedSchedules,
-            currentTime = currentTime,
-            onDismissRequest = { openSharedSchedulesSheet = false },
-            onShowScheduleClick = {
-                onShowScheduleClick(it)
-                openSharedSchedulesSheet = false
-            },
-            onCancelSentScheduleClick = onCancelSentScheduleClick,
-        )
-    }
-
-    if (openSchedulesSenderSheet) {
-        ScheduleSenderBottomSheet(
-            isLoadingSend = isLoadingSend,
-            allOrganizations = allOrganizations,
-            allFriends = allFriends,
-            onDismissRequest = { openSchedulesSenderSheet = false },
-            onShareScheduleClick = onShareScheduleClick,
-        )
-    }
-}
-
-@Composable
-internal fun NewFriendBadge(
-    modifier: Modifier = Modifier,
-    count: Int,
-) {
-    Surface(
-        modifier = modifier.height(16.dp),
-        shape = RoundedCornerShape(6.dp),
-        color = MaterialTheme.colorScheme.error,
-    ) {
-        Text(
-            modifier = Modifier.padding(horizontal = 6.dp),
-            text = "+$count",
-            color = MaterialTheme.colorScheme.onError,
-            style = MaterialTheme.typography.labelSmall,
-        )
     }
 }

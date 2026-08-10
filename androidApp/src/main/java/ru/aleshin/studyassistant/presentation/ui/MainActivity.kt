@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package ru.aleshin.studyassistant.presentation.ui
 
 import android.Manifest
-import android.app.ComponentCaller
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
@@ -32,17 +31,21 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import com.arkivanov.decompose.defaultComponentContext
+import org.jetbrains.compose.resources.stringResource
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.di.MainDependenciesGraph
-import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
 import ru.aleshin.studyassistant.core.common.extensions.isAllowPermission
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
+import ru.aleshin.studyassistant.core.common.navigation.DeepLinkUrl
+import ru.aleshin.studyassistant.core.ui.resources.Res
+import ru.aleshin.studyassistant.core.ui.resources.warning_granted_permission_message
+import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponentFactory
+import ru.aleshin.studyassistant.widget.presentation.work.WidgetsUpdateScheduler
 
 class MainActivity : FlavorMainActivity() {
 
     private val componentFactory = MainDependenciesGraph.fetchDI().instance<MainComponentFactory>()
+    private lateinit var mainComponent: MainComponent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,24 +55,24 @@ class MainActivity : FlavorMainActivity() {
             navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
         )
 
-        val mainComponent = componentFactory.createComponent(
+        mainComponent = componentFactory.createComponent(
             componentContext = defaultComponentContext(),
-            deepLink = null,
+            deepLink = intent.dataString?.let(DeepLinkUrl::fromString),
         )
 
         setContent {
+            AppScreen(mainComponent)
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 RequestNotificationPermission()
             }
-            AppScreen(mainComponent)
         }
     }
 
     @Composable
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun RequestNotificationPermission() {
-        val coreStrings = fetchCoreStrings(fetchAppLanguage(fetchCurrentLanguage()))
-        val warningMessage = coreStrings.warningGrantedPermissionMessage
+        val warningMessage = stringResource(Res.string.warning_granted_permission_message)
         val permissionLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission()
         ) { isGranted ->
@@ -85,7 +88,20 @@ class MainActivity : FlavorMainActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
-        super.onNewIntent(intent, caller)
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleDeepLink(intent)
+    }
+
+    override fun onPause() {
+        WidgetsUpdateScheduler.enqueueImmediate(this)
+        super.onPause()
+    }
+
+    private fun handleDeepLink(intent: Intent) {
+        if (::mainComponent.isInitialized) {
+            intent.dataString?.let(DeepLinkUrl::fromString)?.let(mainComponent::handleDeepLink)
+        }
     }
 }

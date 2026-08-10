@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="organizations_header">Organizations</string>
+    <string name="new_organization_bottom_title">New organization</string>
+    <string name="none_organization_title">Add an organization</string>
+    <string name="add_organization_title">Add</string>
+    <string name="edit_organization_title">Edit</string>
+    <string name="organization_status_label">Status</string>
+    <string name="main_organization_status">Main</string>
+    <string name="classes_duration_in_week_label">Hours per week</string>
+    <string name="number_of_classes_in_week_label">Classes per week</string>
+    <string name="contact_info_section_title">Contact info</string>
+    <string name="website_title">Website</string>
+    <string name="employees_section_title">Employees</string>
+    <string name="subjects_section_title">Subjects</string>
+    <string name="copy_message">The data has been successfully copied!</string>
+    <string name="none_employee_subject_title">There are no classes</string>
+    <string name="subjects_search_bar_placeholder">Search for subjects</string>
+    <string name="employee_search_bar_placeholder">Search for teachers</string>
+    <string name="alphabetic_sorted_type">By alphabetical</string>
+    <string name="teacher_sorted_type">By teachers</string>
+    <string name="event_type_sorted_type">By events</string>
+    <string name="office_sorted_type">By offices</string>
+    <string name="location_sorted_type">By locations</string>
+    <string name="organization_selector_header">Organization</string>
+    <string name="organization_selector_title">Select the desired organization</string>
+    <string name="subject_sorted_type_selector_header">Sorting</string>
+    <string name="subject_sorted_type_selector_title">Select the sort type</string>
+    <string name="delete_subject_warning_title">Are you sure you want to delete this subject? After that, some classes may not be displayed correctly</string>
+    <string name="delete_employee_warning_title">Are you sure you want to delete this employee? After that, some classes may not be displayed correctly</string>
+    <string name="show_all_items_title">Show all</string>
+    <string name="other_error_message">Error! Contact the developer!</string>
+</resources>

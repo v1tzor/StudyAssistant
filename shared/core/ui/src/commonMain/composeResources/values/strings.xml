@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="app_name">Study Assistant</string>
+    <string name="cancel_title">Cancel</string>
+    <string name="add_title">Add</string>
+    <string name="select_confirm_title">Select</string>
+    <string name="create_confirm_title">Create</string>
+    <string name="save_confirm_title">Save</string>
+    <string name="change_confirm_title">Change</string>
+    <string name="ok_confirm_title">OK</string>
+    <string name="delete_confirm_title">Delete</string>
+    <string name="hide_title">Hide</string>
+    <string name="time_picker_dialog_header">Selected time</string>
+    <string name="date_picker_dialog_header">Selected date</string>
+    <string name="warning_dialog_title">Warning!</string>
+    <string name="warning_delete_confirm_title">Delete</string>
+    <string name="minute_suffix">m</string>
+    <string name="hour_suffix">h</string>
+    <string name="day_suffix">d</string>
+    <string name="separator">:</string>
+    <string name="am_format_title">AM</string>
+    <string name="pm_format_title">PM</string>
+    <string name="clear_search_bar_desk">Clear search</string>
+    <string name="back_title">Back</string>
+    <string name="none_title">None</string>
+    <string name="absent_title">Absent</string>
+    <string name="warning_granted_permission_message">Access to sending notifications is prohibited!</string>
+    <string name="schedule_bottom_item">Schedule</string>
+    <string name="tasks_bottom_item">Tasks</string>
+    <string name="chat_bottom_item">Assistant</string>
+    <string name="info_bottom_item">Info</string>
+    <string name="profile_bottom_item">Profile</string>
+    <string name="back_icon_desc">Go back</string>
+    <string name="none_gender">Not stated</string>
+    <string name="male_gender">Male</string>
+    <string name="female_gender">Female</string>
+    <string name="one_week_plural">1 week</string>
+    <string name="two_week_plural">2 week</string>
+    <string name="three_week_plural">3 week</string>
+    <string name="january_title">January</string>
+    <string name="february_title">February</string>
+    <string name="march_title">March</string>
+    <string name="april_title">April</string>
+    <string name="may_title">May</string>
+    <string name="june_title">June</string>
+    <string name="july_title">July</string>
+    <string name="august_title">August</string>
+    <string name="september_title">September</string>
+    <string name="october_title">October</string>
+    <string name="november_title">November</string>
+    <string name="december_title">December</string>
+    <string name="monday_title">Monday</string>
+    <string name="monday_short_title">Mon</string>
+    <string name="tuesday_title">Tuesday</string>
+    <string name="tuesday_short_title">Tue</string>
+    <string name="wednesday_title">Wednesday</string>
+    <string name="wednesday_short_title">Wed</string>
+    <string name="thursday_title">Thursday</string>
+    <string name="thursday_short_title">Thu</string>
+    <string name="friday_title">Friday</string>
+    <string name="friday_short_title">Fri</string>
+    <string name="saturday_title">Saturday</string>
+    <string name="saturday_short_title">Sat</string>
+    <string name="sunday_title">Sunday</string>
+    <string name="sunday_short_title">Sun</string>
+    <string name="school_organization_type">School</string>
+    <string name="lyceum_organization_type">Lyceum</string>
+    <string name="seminary_organization_type">Seminary</string>
+    <string name="gymnasium_organization_type">Gymnasium</string>
+    <string name="college_organization_type">College</string>
+    <string name="university_organization_type">University</string>
+    <string name="additional_education_organization_type">Additional education</string>
+    <string name="courses_organization_type">Educational courses</string>
+    <string name="pcs_unit_suffix">pcs.</string>
+    <string name="specify_title">Specify</string>
+    <string name="hours_title">Hours</string>
+    <string name="minutes_title">Minutes</string>
+    <string name="event_type_lesson">Lesson</string>
+    <string name="event_type_lecture">Lecture</string>
+    <string name="event_type_practice">Practice</string>
+    <string name="event_type_seminar">Seminar</string>
+    <string name="event_type_class">Class</string>
+    <string name="event_type_online_class">Online class</string>
+    <string name="event_type_webinar">Webinar</string>
+    <string name="post_employee">Employee</string>
+    <string name="post_teacher">Teacher</string>
+    <string name="post_director">Director</string>
+    <string name="post_mentor">Mentor</string>
+    <string name="post_tutor">Tutor</string>
+    <string name="post_manager">Manager</string>
+    <string name="not_selected_title">Not selected</string>
+    <string name="avatar_desc">Select profile photo</string>
+    <string name="contact_info_label">Name</string>
+    <string name="contact_info_value">Data *</string>
+    <string name="standard_priority_title">Usually</string>
+    <string name="medium_priority_title">Important</string>
+    <string name="high_priority_title">Very important</string>
+    <string name="theoretical_tasks_title">Theory</string>
+    <string name="practical_tasks_title">Practice</string>
+    <string name="presentations_tasks_title">Presentation</string>
+    <string name="no_result_title">No results</string>
+    <string name="today_title">Today</string>
+    <string name="tomorrow_title">Tomorrow</string>
+    <string name="default_title">By default</string>
+    <string name="english_language_title">English</string>
+    <string name="russian_language_title">Русский</string>
+    <string name="light_theme_title">Light</string>
+    <string name="dark_theme_title">Dark</string>
+    <string name="exceeding_limit_image_size_message">The image must be &lt;5 MB</string>
+    <string name="homeworks_reminder_title">The deadline for homework is close!</string>
+    <string name="homeworks_reminder_body_prefix">Here are the subjects that you still need to complete:</string>
+    <string name="homeworks_recommendation_title">There are no tasks for tomorrow!</string>
+    <string name="homeworks_recommendation_body_prefix">However, the day after tomorrow you will have to complete:\u0020</string>
+    <string name="homeworks_recommendation_body_suffix">\u0020tasks. You could have completed them today or made a part of them.</string>
+    <string name="start_classes_reminder_title_suffix">!</string>
+    <string name="start_classes_reminder_title_prefix">Your classes will start in\u0020</string>
+    <string name="end_classes_reminder_title">Classes are over! It remains to complete the assigned tasks</string>
+    <string name="ongoing_class_reminder_body">Class is in progress · %1$s</string>
+    <string name="ongoing_class_reminder_unknown_title">Current class</string>
+    <string name="high_workload_warning_title">Warning! Tomorrow will be a difficult day.</string>
+    <string name="high_workload_warning_body">You should gain strength and be fully prepared!</string>
+    <string name="todo_reminder_title_suffix">The deadline for the TODO ends in:\u0020</string>
+    <string name="network_error_message">There is no internet connection! Please try again later</string>
+    <string name="other_error_message">Error! Contact the developer!</string>
+    <string name="voice_input_promt">Speak...</string>
+</resources>

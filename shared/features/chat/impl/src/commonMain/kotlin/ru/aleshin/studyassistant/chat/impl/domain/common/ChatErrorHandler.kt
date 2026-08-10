@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@
 package ru.aleshin.studyassistant.chat.impl.domain.common
 
 import ru.aleshin.studyassistant.chat.impl.domain.entities.ChatFailures
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
+import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceException
 
 /**
  * @author Stanislav Aleshin on 27.05.2024
@@ -25,6 +27,12 @@ import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 internal interface ChatErrorHandler : ErrorHandler<ChatFailures> {
     class Base : ChatErrorHandler {
         override fun handle(throwable: Throwable) = when (throwable) {
+            is AiServiceException.QuotaExceeded -> ChatFailures.QuotaExceeded
+            is AiServiceException.InvalidKey -> ChatFailures.InvalidKey
+            is AiServiceException.InsufficientBalance -> ChatFailures.InsufficientBalance
+            is AiServiceException.RateLimited -> ChatFailures.RateLimited
+            is AiServiceException.ServerUnavailable -> ChatFailures.ServerUnavailable
+            is InternetConnectionException -> ChatFailures.Offline
             else -> ChatFailures.OtherError(throwable)
         }
     }

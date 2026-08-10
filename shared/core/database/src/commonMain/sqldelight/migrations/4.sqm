@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS `profileEntity` (
+  `id` INTEGER PRIMARY KEY NOT NULL,
+  `document_id` TEXT NOT NULL,
+  `username` TEXT NOT NULL,
+  `avatar` TEXT,
+  `description` TEXT,
+  `city` TEXT,
+  `birthday` TEXT,
+  `sex` TEXT,
+  `updated_at` INTEGER NOT NULL
+);

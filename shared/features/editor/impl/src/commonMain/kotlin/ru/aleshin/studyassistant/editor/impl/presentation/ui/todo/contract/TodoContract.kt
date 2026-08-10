@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEv
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
+import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoNotificationsUi
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.EditTodoUi
-import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.TodoNotificationsUi
 
 /**
  * @author Stanislav Aleshin on 26.07.2024
@@ -37,7 +37,6 @@ import ru.aleshin.studyassistant.editor.impl.presentation.models.tasks.TodoNotif
 internal data class TodoState(
     val isLoading: Boolean = true,
     val isLoadingSave: Boolean = false,
-    val isPaidUser: Boolean = false,
     val editableTodo: EditTodoUi? = null,
 ) : StoreState
 
@@ -50,7 +49,6 @@ internal sealed class TodoEvent : StoreEvent {
     data class UpdateNotifications(val notifications: TodoNotificationsUi) : TodoEvent()
     data object DeleteTodo : TodoEvent()
     data object SaveTodo : TodoEvent()
-    data object NavigateToBilling : TodoEvent()
     data object NavigateToBack : TodoEvent()
 }
 
@@ -59,7 +57,7 @@ internal sealed class TodoEffect : StoreEffect {
 }
 
 internal sealed class TodoAction : StoreAction {
-    data class SetupEditModel(val editModel: EditTodoUi, val isPaidUser: Boolean) : TodoAction()
+    data class SetupEditModel(val editModel: EditTodoUi) : TodoAction()
     data class UpdateEditModel(val editModel: EditTodoUi?) : TodoAction()
     data class UpdateLoading(val isLoading: Boolean) : TodoAction()
     data class UpdateLoadingSave(val isLoading: Boolean) : TodoAction()
@@ -71,5 +69,4 @@ internal data class TodoInput(
 
 internal sealed class TodoOutput : BaseOutput {
     data object NavigateToBack : TodoOutput()
-    data object NavigateToBilling : TodoOutput()
 }

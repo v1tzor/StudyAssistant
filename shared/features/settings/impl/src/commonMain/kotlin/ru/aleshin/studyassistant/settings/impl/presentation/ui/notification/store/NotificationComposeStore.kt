@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,10 +61,6 @@ internal class NotificationComposeStore(
                     val command = NotificationWorkCommand.LoadOrganizations
                     workProcessor.work(command).collectAndHandleWork()
                 }
-                launchBackgroundWork(BackgroundKey.LOAD_PAID_USER_STATUS) {
-                    val command = NotificationWorkCommand.LoadPaidUserStatus
-                    workProcessor.work(command).collectAndHandleWork()
-                }
             }
             is NotificationEvent.UpdateBeggingOfClassesNotify -> with(state()) {
                 val settings = checkNotNull(settings)
@@ -120,9 +116,6 @@ internal class NotificationComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-            is NotificationEvent.NavigateToBilling -> {
-                consumeOutput(NotificationOutput.NavigateToBilling)
-            }
         }
     }
 
@@ -136,13 +129,10 @@ internal class NotificationComposeStore(
         is NotificationAction.UpdateOrganizations -> currentState.copy(
             allOrganizations = action.organizations,
         )
-        is NotificationAction.UpdatePaidUserStatus -> currentState.copy(
-            isPaidUser = action.isPaidUser,
-        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_SETTINGS, LOAD_PAID_USER_STATUS, LOAD_ORGANIZATIONS, SETTINGS_ACTION
+        LOAD_SETTINGS, LOAD_ORGANIZATIONS, SETTINGS_ACTION
     }
 
     class Factory(

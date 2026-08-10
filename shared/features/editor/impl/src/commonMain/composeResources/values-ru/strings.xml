@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="week_schedule_editor_header">Редактор расписания</string>
+    <string name="daily_schedule_editor_header">Редактор дня</string>
+    <string name="class_editor_header">Редактор событий</string>
+    <string name="subject_editor_header">Редактор предметов</string>
+    <string name="employee_editor_header">Редактор сотрудника</string>
+    <string name="organization_editor_header">Редактор организации</string>
+    <string name="homework_editor_header">Редактор заданий</string>
+    <string name="profile_editor_header">Профиль</string>
+    <string name="todo_editor_header">Редактор задач</string>
+    <string name="save_button_title">Сохранить</string>
+    <string name="number_of_classes_label">Количество занятий</string>
+    <string name="standard_time_interval_header">Стандартные значения</string>
+    <string name="classes_title">Занятия</string>
+    <string name="breaks_title">Перерывы</string>
+    <string name="schedule_intervals_dialog_header">Стандартные значения</string>
+    <string name="start_of_classes_title">Начало занятий</string>
+    <string name="start_of_classes_placeholder">Введите нужное время</string>
+    <string name="except_title">Кроме</string>
+    <string name="all_title">Все</string>
+    <string name="add_title">Добавить</string>
+    <string name="quantity_of_classes_title">Кол-во:</string>
+    <string name="number_of_class_title">Номер</string>
+    <string name="duration_title">Длительность</string>
+    <string name="organization_field_label">Организация</string>
+    <string name="organization_required_field_label">Организация *</string>
+    <string name="organization_field_placeholder">Выберите организацию</string>
+    <string name="organization_selector_header">Организация</string>
+    <string name="organization_selector_title">Выберите необходимую организацию</string>
+    <string name="event_type_field_label">Событие</string>
+    <string name="event_type_required_field_label">Событие *</string>
+    <string name="event_type_field_placeholder">Выберите формат проведения</string>
+    <string name="event_type_selector_header">Событие</string>
+    <string name="event_type_selector_title">Выберите формат проведения</string>
+    <string name="subject_field_label">Предмет</string>
+    <string name="subject_required_field_label">Предмет *</string>
+    <string name="subject_field_placeholder">Выберите предмет</string>
+    <string name="subject_selector_header">Предмет</string>
+    <string name="subject_selector_title">Выберите необходимый предмет</string>
+    <string name="teacher_field_label">Преподаватель</string>
+    <string name="teacher_field_placeholder">Выберите преподавателя</string>
+    <string name="teacher_selector_header">Преподаватель</string>
+    <string name="teacher_selector_title">Выберите преподавателя занятия</string>
+    <string name="location_field_label">Место</string>
+    <string name="location_field_placeholder">Укажите место</string>
+    <string name="location_selector_header">Место</string>
+    <string name="location_selector_title">Укажите место проведения</string>
+    <string name="office_field_label">Кабинет</string>
+    <string name="office_field_placeholder">000</string>
+    <string name="office_selector_header">Кабинет</string>
+    <string name="office_selector_title">Укажите кабинет</string>
+    <string name="start_time_field_label">Начало</string>
+    <string name="start_time_required_field_label">Начало *</string>
+    <string name="start_time_field_placeholder">00:00</string>
+    <string name="end_time_field_label">Конец</string>
+    <string name="end_time_required_field_label">Конец *</string>
+    <string name="end_time_field_placeholder">23:59</string>
+    <string name="standard_time_values_warning_data">Необходимо настроить стандартные значения</string>
+    <string name="subject_name_field_label">Название</string>
+    <string name="subject_name_required_field_label">Название *</string>
+    <string name="subject_name_field_placeholder">Введите название предмета</string>
+    <string name="color_picker_label">Цвет</string>
+    <string name="color_picker_required_label">Цвет *</string>
+    <string name="first_name_field_label">Имя *</string>
+    <string name="second_name_field_label">Фамилия</string>
+    <string name="patronymic_field_label">Отчество</string>
+    <string name="employee_post_field_label">Должность *</string>
+    <string name="employee_post_field_placeholder">Выберите должность</string>
+    <string name="employee_post_selector_header">Должность</string>
+    <string name="employee_post_selector_title">Выберите должность сотрудника</string>
+    <string name="birthday_field_label">День рождения</string>
+    <string name="birthday_field_placeholder">Укажите день рождения</string>
+    <string name="email_field_label">Email</string>
+    <string name="email_field_placeholder">example@example.com</string>
+    <string name="phone_field_label">Телефон</string>
+    <string name="phone_field_placeholder">0-000-000-00-00</string>
+    <string name="web_field_label">Сайт</string>
+    <string name="web_field_placeholder">www.example.com</string>
+    <string name="contact_info_section_header">Связь и данные</string>
+    <string name="homework_date_picker_headline">День расписания</string>
+    <string name="homework_date_field_label">Дата</string>
+    <string name="homework_date_field_placeholder">Укажите дату дедлайна</string>
+    <string name="link_class_view_title">Привязка занятия</string>
+    <string name="link_class_view_empty_title">Выберите предмет чтобы продолжить</string>
+    <string name="theory_field_label">Теория</string>
+    <string name="theory_field_placeholder">Заголовок: a, b; Заголовок: c</string>
+    <string name="practice_field_label">Практика</string>
+    <string name="practice_field_placeholder">Заголовок: a, b. Заголовок: c</string>
+    <string name="presentations_field_label">Доклады</string>
+    <string name="presentations_field_placeholder">Заголовок: a, b | Заголовок: c</string>
+    <string name="test_field_label">Тест</string>
+    <string name="test_field_placeholder">Введите тему работы</string>
+    <string name="priority_view_title">Приоритет</string>
+    <string name="standard_priority_item_title">Обычный</string>
+    <string name="medium_priority_item_title">Средний</string>
+    <string name="high_priority_item_title">Макс.</string>
+    <string name="number_of_class_suffix">занятие</string>
+    <string name="task_title">Задание</string>
+    <string name="short_name_field_label">Краткое название *</string>
+    <string name="full_name_field_label">Полное название</string>
+    <string name="org_type_field_label">Вид организации *</string>
+    <string name="org_type_selector_header">Вид организации</string>
+    <string name="org_type_field_placeholder">Укажите вид организации</string>
+    <string name="organization_status_title">Основная организация</string>
+    <string name="organization_status_body">Выключает постояннный показ организации у занятий</string>
+    <string name="fast_edit_daily_schedule_header">Быстрое редактирование</string>
+    <string name="fast_edit_start_of_day_label">Начало дня</string>
+    <string name="start_of_day_dialog_header">Начало дня</string>
+    <string name="start_of_day_dialog_title">Сдвиг всех занятий относительно 1 занятия</string>
+    <string name="fast_edit_classes_duration_label">Длительность занятий</string>
+    <string name="classes_duration_dialog_header">Занятия</string>
+    <string name="classes_duration_dialog_title">Измените длительность занятий</string>
+    <string name="fast_edit_breaks_duration_label">Длительность перерывов</string>
+    <string name="breaks_duration_dialog_header">Перерывы</string>
+    <string name="breaks_duration_dialog_title">Измените длительность перерывов</string>
+    <string name="return_schedule_title">Вернуть</string>
+    <string name="edit_custom_schedule_title">Начать редактировать</string>
+    <string name="none_classes_title">Занятия отсутствуют</string>
+    <string name="custom_schedule_date_title">Дата</string>
+    <string name="shift_time_error">Ошибка сдвига занятий! Нарушение временных рамок</string>
+    <string name="todo_name_field_label">Задача *</string>
+    <string name="todo_name_field_placeholder">Введите вашу задачу</string>
+    <string name="todo_description_field_label">Описание</string>
+    <string name="todo_description_field_placeholder">Введите описание</string>
+    <string name="todo_deadline_field_label">Дата</string>
+    <string name="todo_deadline_field_placeholder">Укажите дату дедлайна</string>
+    <string name="todo_deadline_date_picker_headline">Дедлайн задачи</string>
+    <string name="todo_time_field_label">Время</string>
+    <string name="todo_time_field_placeholder">Укажите время дедлайна</string>
+    <string name="todo_notification_title">Уведомления</string>
+    <string name="todo_notification_label">Уведомлять за настроенный промежуток времени</string>
+    <string name="todo_notify_params_before_start">В момент окончания</string>
+    <string name="todo_notify_params_before_fifteen_minutes">За 15 минут</string>
+    <string name="todo_notify_params_before_one_hour">За 1 час</string>
+    <string name="todo_notify_params_before_three_hour">За 3 часа</string>
+    <string name="todo_notify_params_before_one_day">За 1 день</string>
+    <string name="todo_notify_params_before_one_week">За 1 неделю</string>
+    <string name="username_field_label">Отображаемое имя *</string>
+    <string name="username_field_placeholder">Имя Фамилия</string>
+    <string name="user_description_field_label">Описание профиля</string>
+    <string name="user_description_field_placeholder">Введите описание профиля</string>
+    <string name="user_gender_field_label">Пол</string>
+    <string name="user_gender_field_placeholder">Укажите ваш пол</string>
+    <string name="city_field_label">Город</string>
+    <string name="city_field_placeholder">Введите ваш город</string>
+    <string name="change_password_action_label">Изменить пароль</string>
+    <string name="password_changer_label">Пароль</string>
+    <string name="old_password_field_label">Старый пароль</string>
+    <string name="password_field_placeholder">Мин. 6 символов (a-Z)(0-9)</string>
+    <string name="credentials_error_message">Данные пользователя, неверны или неполны!</string>
+    <string name="hide_organization_warning">Вы уверены что хотите скрыть организацию? После этого вы больше не сможете её использовать</string>
+    <string name="delete_office_warning_title">Вы уверены что хотите удалить данный кабинет?</string>
+    <string name="delete_location_warning_title">Вы уверены что хотите удалить данную локацию?</string>
+    <string name="subjects_search_bar_placeholder">Поиск предметов</string>
+    <string name="employee_search_bar_placeholder">Поиск преподавателей</string>
+    <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
+</resources>

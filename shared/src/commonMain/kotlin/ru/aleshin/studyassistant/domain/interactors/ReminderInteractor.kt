@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,11 +51,11 @@ interface ReminderInteractor {
 
         override suspend fun startOrRetryAvailableReminders() = eitherWrapper.wrapUnit {
             notificationSettingsRepository.fetchSettings().first().apply {
-                if (beginningOfClasses != null) {
-                    startClassesReminderManager.startOrRetryReminderService()
-                }
+                startClassesReminderManager.startOrRetryReminderService()
                 if (endOfClasses) {
                     endClassesReminderManager.startOrRetryReminderService()
+                } else {
+                    endClassesReminderManager.stopReminderService(emptyList())
                 }
                 if (unfinishedHomeworks != null) {
                     val currentTime = dateManager.fetchCurrentInstant()
@@ -65,9 +65,13 @@ interface ReminderInteractor {
                     )
                     val targetInstant = targetDateTime.toInstant(TimeZone.currentSystemDefault())
                     homeworksReminderManager.startOrRetryReminderService(targetInstant)
+                } else {
+                    homeworksReminderManager.stopReminderService()
                 }
                 if (highWorkload != null) {
                     workloadWarningManager.startOrRetryWarningService()
+                } else {
+                    workloadWarningManager.stopWarningService()
                 }
             }
         }

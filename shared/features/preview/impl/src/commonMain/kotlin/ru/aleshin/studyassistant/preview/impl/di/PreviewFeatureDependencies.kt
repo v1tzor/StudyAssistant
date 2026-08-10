@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,18 +24,18 @@ import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsServic
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.UsersRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
 
 /**
  * @author Stanislav Aleshin on 14.04.2024.
  */
 public interface PreviewFeatureDependencies : BaseFeatureDependencies {
-    public val usersRepository: UsersRepository
+    public val profileRepository: ProfileRepository
     public val organizationsRepository: OrganizationsRepository
     public val generalSettingsRepository: GeneralSettingsRepository
     public val calendarSettingsRepository: CalendarSettingsRepository
-    public val deviceInfoProvider: DeviceInfoProvider
     public val coroutineManager: CoroutineManager
     public val dateManager: DateManager
+    public val deviceInfoProvider: DeviceInfoProvider
     public val crashlyticsService: CrashlyticsService
 }

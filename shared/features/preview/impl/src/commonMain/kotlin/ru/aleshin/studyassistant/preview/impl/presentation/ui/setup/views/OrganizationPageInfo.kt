@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,27 +39,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationUi
+import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
-import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.ExpandedIcon
-import ru.aleshin.studyassistant.core.ui.views.FreeOrPaidContent
 import ru.aleshin.studyassistant.core.ui.views.VerticalInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.dialog.ContactInfoEditorDialog
-import ru.aleshin.studyassistant.core.ui.views.menu.ClickableAvatarView
 import ru.aleshin.studyassistant.core.ui.views.menu.OrganizationTypeDropdownMenu
 import ru.aleshin.studyassistant.core.ui.views.menu.SelectableAvatarView
-import ru.aleshin.studyassistant.preview.impl.presentation.models.organizations.OrganizationUi
-import ru.aleshin.studyassistant.preview.impl.presentation.models.users.ContactInfoUi
-import ru.aleshin.studyassistant.preview.impl.presentation.theme.PreviewThemeRes
+import ru.aleshin.studyassistant.preview.impl.resources.Res
+import ru.aleshin.studyassistant.preview.impl.resources.email_label
+import ru.aleshin.studyassistant.preview.impl.resources.ic_textbox
+import ru.aleshin.studyassistant.preview.impl.resources.organization_type_label
+import ru.aleshin.studyassistant.preview.impl.resources.organization_type_placeholder
+import ru.aleshin.studyassistant.preview.impl.resources.phone_number_label
+import ru.aleshin.studyassistant.preview.impl.resources.short_name_label
+import ru.aleshin.studyassistant.preview.impl.resources.short_name_placeholder
+import ru.aleshin.studyassistant.preview.impl.resources.website_label
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.ic_email as core_ic_email
+import ru.aleshin.studyassistant.core.ui.resources.ic_organization_type as core_ic_organization_type
+import ru.aleshin.studyassistant.core.ui.resources.ic_phone as core_ic_phone
+import ru.aleshin.studyassistant.core.ui.resources.ic_web as core_ic_web
 
 /**
  * @author Stanislav Aleshin on 27.04.2024
@@ -70,13 +78,11 @@ internal fun OrganizationPageInfo(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     organization: OrganizationUi,
-    isPaidUser: Boolean,
     avatar: String?,
     onUpdateOrganization: (OrganizationUi) -> Unit,
     onUpdateAvatar: (PlatformFile) -> Unit,
     onDeleteAvatar: () -> Unit,
     onExceedingLimit: (Int) -> Unit,
-    onOpenBillingScreen: () -> Unit,
 ) = with(organization) {
     Column(
         modifier = modifier,
@@ -91,42 +97,16 @@ internal fun OrganizationPageInfo(
             var editableShortName by remember { mutableStateOf(TextFieldValue(shortName)) }
             val shortNameInteraction = remember { MutableInteractionSource() }
 
-            FreeOrPaidContent(
-                isPaidUser = isPaidUser,
-                modifier = modifier,
-                paidContent = {
-                    SelectableAvatarView(
-                        onSelect = onUpdateAvatar,
-                        onDelete = onDeleteAvatar,
-                        onExceedingLimit = onExceedingLimit,
-                        modifier = Modifier.size(90.dp),
-                        firstName = organization.shortName.split(' ').getOrNull(0) ?: "*",
-                        secondName = organization.shortName.split(' ').getOrNull(1),
-                        imageUrl = avatar,
-                        shape = RoundedCornerShape(32.dp),
-                        style = MaterialTheme.typography.displaySmall,
-                    )
-                },
-                freeContent = {
-                    ClickableAvatarView(
-                        onClick = onOpenBillingScreen,
-                        modifier = Modifier.size(90.dp),
-                        imageUrl = avatar,
-                        sideIcon = {
-                            Icon(
-                                modifier = Modifier.clip(MaterialTheme.shapes.full),
-                                imageVector = Icons.Default.Stars,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        },
-                        firstName = organization.shortName.split(' ').getOrNull(0) ?: "-",
-                        secondName = organization.shortName.split(' ').getOrNull(1),
-                        shape = RoundedCornerShape(32.dp),
-                        style = MaterialTheme.typography.displaySmall,
-                        iconOffset = DpOffset((-4).dp, (-4).dp),
-                    )
-                },
+            SelectableAvatarView(
+                onSelect = onUpdateAvatar,
+                onDelete = onDeleteAvatar,
+                onExceedingLimit = onExceedingLimit,
+                modifier = Modifier.size(90.dp),
+                firstName = organization.shortName.split(' ').getOrNull(0) ?: "*",
+                secondName = organization.shortName.split(' ').getOrNull(1),
+                imageUrl = avatar,
+                shape = RoundedCornerShape(32.dp),
+                style = MaterialTheme.typography.displaySmall,
             )
             VerticalInfoTextField(
                 value = editableShortName,
@@ -134,18 +114,20 @@ internal fun OrganizationPageInfo(
                     editableShortName = it
                     onUpdateOrganization(organization.copy(shortName = it.text))
                 },
-                labelText = PreviewThemeRes.strings.shortNameLabel,
-                placeholder = PreviewThemeRes.strings.shortNamePlaceholder,
-                infoIcon = painterResource(PreviewThemeRes.icons.name),
-                trailingIcon = if (shortNameInteraction.collectIsFocusedAsState().value) { {
-                    IconButton(onClick = { focusManager.clearFocus() }) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            tint = StudyAssistantRes.colors.accents.green,
-                        )
+                labelText = stringResource(Res.string.short_name_label),
+                placeholder = stringResource(Res.string.short_name_placeholder),
+                infoIcon = painterResource(Res.drawable.ic_textbox),
+                trailingIcon = if (shortNameInteraction.collectIsFocusedAsState().value) {
+                    {
+                        IconButton(onClick = { focusManager.clearFocus() }) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = StudyAssistantRes.colors.accents.green,
+                            )
+                        }
                     }
-                } } else {
+                } else {
                     null
                 },
                 interactionSource = shortNameInteraction,
@@ -162,10 +144,10 @@ internal fun OrganizationPageInfo(
 
             ClickableInfoTextField(
                 onClick = { isExpandedTypeMenu = true },
-                value = type.mapToSting(StudyAssistantRes.strings),
-                label = PreviewThemeRes.strings.organizationTypeLabel,
-                placeholder = PreviewThemeRes.strings.organizationTypePlaceholder,
-                infoIcon = painterResource(StudyAssistantRes.icons.organizationType),
+                value = type.mapToSting(),
+                label = stringResource(Res.string.organization_type_label),
+                placeholder = stringResource(Res.string.organization_type_placeholder),
+                infoIcon = painterResource(CoreRes.drawable.core_ic_organization_type),
                 trailingIcon = {
                     ExpandedIcon(
                         isExpanded = isExpandedTypeMenu,
@@ -186,13 +168,13 @@ internal fun OrganizationPageInfo(
             ClickableInfoTextField(
                 onClick = { emailInfoEditorDialogState = true },
                 value = emails.getOrNull(0)?.value,
-                label = PreviewThemeRes.strings.emailLabel,
-                placeholder = PreviewThemeRes.strings.emailLabel,
-                infoIcon = painterResource(StudyAssistantRes.icons.email),
+                label = stringResource(Res.string.email_label),
+                placeholder = stringResource(Res.string.email_label),
+                infoIcon = painterResource(CoreRes.drawable.core_ic_email),
             )
             if (emailInfoEditorDialogState) {
                 ContactInfoEditorDialog(
-                    header = PreviewThemeRes.strings.emailLabel,
+                    header = stringResource(Res.string.email_label),
                     label = emails.getOrNull(0)?.label,
                     value = emails.getOrNull(0)?.value,
                     onDismiss = { emailInfoEditorDialogState = false },
@@ -222,13 +204,13 @@ internal fun OrganizationPageInfo(
             ClickableInfoTextField(
                 onClick = { phoneInfoEditorDialogState = true },
                 value = phones.getOrNull(0)?.value,
-                label = PreviewThemeRes.strings.phoneNumberLabel,
-                placeholder = PreviewThemeRes.strings.phoneNumberLabel,
-                infoIcon = painterResource(StudyAssistantRes.icons.phone),
+                label = stringResource(Res.string.phone_number_label),
+                placeholder = stringResource(Res.string.phone_number_label),
+                infoIcon = painterResource(CoreRes.drawable.core_ic_phone),
             )
             if (phoneInfoEditorDialogState) {
                 ContactInfoEditorDialog(
-                    header = PreviewThemeRes.strings.phoneNumberLabel,
+                    header = stringResource(Res.string.phone_number_label),
                     label = phones.getOrNull(0)?.label,
                     value = phones.getOrNull(0)?.value,
                     onDismiss = { phoneInfoEditorDialogState = false },
@@ -258,13 +240,13 @@ internal fun OrganizationPageInfo(
             ClickableInfoTextField(
                 onClick = { webInfoEditorDialogState = true },
                 value = webs.getOrNull(0)?.value,
-                label = PreviewThemeRes.strings.websiteLabel,
-                placeholder = PreviewThemeRes.strings.websiteLabel,
-                infoIcon = painterResource(StudyAssistantRes.icons.website),
+                label = stringResource(Res.string.website_label),
+                placeholder = stringResource(Res.string.website_label),
+                infoIcon = painterResource(CoreRes.drawable.core_ic_web),
             )
             if (webInfoEditorDialogState) {
                 ContactInfoEditorDialog(
-                    header = PreviewThemeRes.strings.websiteLabel,
+                    header = stringResource(Res.string.website_label),
                     label = webs.getOrNull(0)?.label,
                     value = webs.getOrNull(0)?.value,
                     onDismiss = { webInfoEditorDialogState = false },

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +26,16 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.getString
 import org.kodein.di.DI
 import org.kodein.di.DirectDIAware
 import org.kodein.di.bindProvider
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.di.coreCommonModule
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
-import ru.aleshin.studyassistant.core.common.extensions.fetchCurrentLanguage
-import ru.aleshin.studyassistant.core.common.extensions.generateDigitCode
+import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.functional.Constants
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.notifications.NotificationCreator
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationCategory
@@ -42,28 +43,17 @@ import ru.aleshin.studyassistant.core.common.notifications.parameters.Notificati
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.data.R
 import ru.aleshin.studyassistant.core.data.di.coreDataModule
-import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.CLASS_MINUTE_DURATION_RATE
-import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.MAX_RATE
-import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.MOVEMENT_RATE
-import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.PRACTICE_RATE
-import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.PRESENTATION_RATE
-import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.TEST_RATE
-import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.THEORY_RATE
-import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.TODO_PRIORITY_RATE
-import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyAnalysis.Companion.TODO_RATE
+import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyWorkload
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
-import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
-import ru.aleshin.studyassistant.core.domain.entities.tasks.fetchAllTasks
-import ru.aleshin.studyassistant.core.domain.entities.tasks.toHomeworkComponents
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.ui.theme.tokens.StudyAssistantStrings
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchAppLanguage
-import ru.aleshin.studyassistant.core.ui.theme.tokens.fetchCoreStrings
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.high_workload_warning_body as core_high_workload_warning_body
+import ru.aleshin.studyassistant.core.ui.resources.high_workload_warning_title as core_high_workload_warning_title
 
 /**
  * @author Stanislav Aleshin on 22.08.2024.
@@ -78,9 +68,6 @@ class WorkloadWarningWorker(
         bindProvider<CrashlyticsService> { CrashlyticsService.Empty() }
         importAll(coreCommonModule, coreDataModule)
     }
-    private val coreStrings: StudyAssistantStrings
-        get() = fetchCoreStrings(fetchAppLanguage(applicationContext.fetchCurrentLanguage()))
-
     private val dateManager = instance<DateManager>()
     private val notificationCreator = instance<NotificationCreator>()
     private val calendarSettingsRepository = instance<CalendarSettingsRepository>()
@@ -91,88 +78,57 @@ class WorkloadWarningWorker(
     private val customScheduleRepository = instance<CustomScheduleRepository>()
 
     override suspend fun doWork(): Result {
-        val coreStrings = fetchCoreStrings(fetchAppLanguage(applicationContext.fetchCurrentLanguage()))
-        val currentDate = dateManager.fetchBeginningCurrentInstant()
+        val warningTitle = getString(CoreRes.string.core_high_workload_warning_title)
+        val warningBody = getString(CoreRes.string.core_high_workload_warning_body)
+        val targetDate = dateManager.fetchBeginningCurrentInstant().shiftDay(1)
 
         val notificationSettings = notificationSettingsRepository.fetchSettings().first()
-        val maxWorkloadValue = notificationSettings.highWorkload ?: return Result.failure()
+        val maxWorkloadValue = notificationSettings.highWorkload ?: return Result.success()
 
-        val value = fetchDailyWorkload(currentDate)
-        if (value.toInt() >= maxWorkloadValue) {
+        val value = fetchDailyWorkload(targetDate)
+        notificationCreator.cancelNotify(WORKLOAD_NOTIFICATION_ID)
+        if (value.isHigh(maxWorkloadValue)) {
             val mainActivityUri = Constants.App.OPEN_APP_DEEPLINK.toUri()
             val contentIntent = Intent(ACTION_VIEW, mainActivityUri)
-            val requestCode = generateDigitCode().toInt()
-            val pContentIntent = PendingIntent.getActivity(context, requestCode, contentIntent, FLAG_IMMUTABLE)
+            val pContentIntent =
+                PendingIntent.getActivity(context, WORKLOAD_NOTIFICATION_ID, contentIntent, FLAG_IMMUTABLE)
             val notify = notificationCreator.createNotify(
                 channelId = Constants.Notification.CHANNEL_ID,
-                title = coreStrings.highWorkloadWarningTitle,
-                text = coreStrings.highWorkloadWarningBody,
+                title = warningTitle,
+                text = warningBody,
                 smallIcon = R.drawable.ic_launcher_notification,
                 category = NotificationCategory.CATEGORY_REMINDER,
                 priority = NotificationPriority.MAX,
                 contentIntent = pContentIntent,
             )
 
-            notificationCreator.showNotify(notify)
+            notificationCreator.showNotify(notify, WORKLOAD_NOTIFICATION_ID)
         }
         return Result.success()
     }
 
-    private suspend fun fetchDailyWorkload(date: Instant): Float {
-        val maxNumberOfWeek = calendarSettingsRepository.fetchSettings().first().numberOfWeek
-        val week = date.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
+    private suspend fun fetchDailyWorkload(date: Instant): DailyWorkload {
+        val calendarSettings = calendarSettingsRepository.fetchSettings().first()
+        val week = date.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
 
         val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, week).first()
         val customSchedule = customScheduleRepository.fetchScheduleByDate(date).first()
         val todos = todoRepository.fetchTodosByDate(date).first()
         val homeworks = homeworksRepository.fetchHomeworksByDate(date).first()
 
-        val classes = customSchedule?.classes ?: baseSchedule?.classes
-        val movementMap = classes?.groupBy { it.organization }?.mapValues { classEntry ->
-            classEntry.value.map { it.location }.toSet()
+        val classes = (customSchedule?.classes ?: baseSchedule?.classes).orEmpty().filter { classModel ->
+            calendarSettings.holidays.none { holiday ->
+                val dateFilter = TimeRange(holiday.start, holiday.end).containsDate(date)
+                val organizationFilter = holiday.organizations.contains(classModel.organization.uid)
+                dateFilter && organizationFilter
+            }
         }
 
-        val testsRate = homeworks.count { it.test != null } * TEST_RATE
-
-        val classesDuration = classes?.map { it.timeRange.periodDuration() }?.sumOf { it.minutes } ?: 0
-        val classesRate = classesDuration * CLASS_MINUTE_DURATION_RATE
-
-        val movementsRate = (movementMap?.toList()?.sumOf { it.second.size } ?: 0) * MOVEMENT_RATE
-
-        val theoriesTasksRate = homeworks.sumOf { homework ->
-            homework.theoreticalTasks.toHomeworkComponents().fetchAllTasks().size
-        }.let { numberOfTheories ->
-            numberOfTheories * THEORY_RATE
-        }
-        val practicesTasksRate = homeworks.sumOf { homework ->
-            homework.practicalTasks.toHomeworkComponents().fetchAllTasks().size
-        }.let { numberOfPractices ->
-            numberOfPractices * PRACTICE_RATE
-        }
-        val presentationsTasksRate = homeworks.sumOf { homework ->
-            homework.presentationTasks.toHomeworkComponents().fetchAllTasks().size
-        }.let { numberOfPresentations ->
-            numberOfPresentations * PRESENTATION_RATE
-        }
-        val homeworksRate = theoriesTasksRate + practicesTasksRate + presentationsTasksRate
-
-        val todosRate = todos.sumOf { todo ->
-            if (todo.priority == TaskPriority.STANDARD) TODO_RATE else TODO_PRIORITY_RATE
-        }.toFloat()
-
-        val rateList = listOf(
-            classesRate,
-            testsRate,
-            movementsRate,
-            homeworksRate,
-            todosRate,
-        )
-        val generalAssessment = rateList.sum() / MAX_RATE
-
-        return generalAssessment
+        return DailyWorkload.calculate(classes, homeworks, todos)
     }
 
     companion object {
         const val WORK_KEY = "WORKLOAD_WARNING_SERVICE"
+        const val WORKLOAD_NOTIFICATION_ID = 2482
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ru.aleshin.studyassistant.tasks.impl.presentation.theme.TasksThemeRes
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.tasks.impl.resources.Res
+import ru.aleshin.studyassistant.tasks.impl.resources.share_homeworks_header
 
 /**
  * @author Stanislav Aleshin on 18.07.2024.
@@ -40,7 +42,7 @@ internal fun ShareTopBar(
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
-        title = { Text(text = TasksThemeRes.strings.shareHomeworksHeader) },
+        title = { Text(text = stringResource(Res.string.share_homeworks_header)) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(

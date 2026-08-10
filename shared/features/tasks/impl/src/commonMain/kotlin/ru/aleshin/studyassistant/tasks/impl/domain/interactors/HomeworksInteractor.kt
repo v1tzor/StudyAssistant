@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Stanislav Aleshin
+ * Copyright 2026 Stanislav Aleshin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.tasks.impl.domain.interactors
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
@@ -80,56 +81,63 @@ internal interface HomeworksInteractor {
             homeworksRepository.addHomeworksGroup(updatedHomeworks)
         }
 
-        override suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange) = eitherWrapper.wrapFlow {
-            val ticker = dateManager.secondTicker()
-            val goalsTimeRange = TimeRange(timeRange.from, timeRange.to.shiftDay(21))
-            val shortGoalsFlow = goalsRepository.fetchShortDailyGoalsByTimeRange(goalsTimeRange)
-            val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(timeRange)
+        override suspend fun fetchHomeworksByTimeRange(timeRange: TimeRange) =
+            eitherWrapper.wrapFlow {
+                val ticker = dateManager.secondTicker()
+                val goalsTimeRange = TimeRange(timeRange.from, timeRange.to.shiftDay(21))
+                val shortGoalsFlow = goalsRepository.fetchShortDailyGoalsByTimeRange(goalsTimeRange)
+                val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(timeRange)
 
-            return@wrapFlow combine(homeworksFlow, shortGoalsFlow, ticker) { homeworks, goals, _ ->
-                val currentTime = dateManager.fetchCurrentInstant()
-                val detailsHomeworks = homeworks.map { homework ->
-                    val status = HomeworkStatus.calculate(
-                        isDone = homework.isDone,
-                        completeDate = homework.completeDate,
-                        deadline = homework.deadline,
-                        currentTime = currentTime,
-                    )
-                    return@map homework.convertToDetails(
-                        status = status,
-                        linkedGoal = goals.find { it.contentId == homework.uid },
-                    )
-                }
-                val groupedDetailsHomeworks = detailsHomeworks.groupBy { homework ->
-                    homework.deadline.startThisDay()
-                }
-                val dailyHomeworksMap = buildMap {
-                    timeRange.periodDates().forEach { date ->
-                        val homeworksByDate = groupedDetailsHomeworks[date] ?: emptyList()
-                        val dailyHomeworks = DailyHomeworks(
-                            dailyStatus = DailyHomeworksStatus.calculate(
-                                targetDate = date,
-                                currentDate = currentTime.startThisDay(),
-                                homeworkStatuses = homeworksByDate.map { it.status }
-                            ),
-                            homeworks = homeworksByDate.groupBy { it.status },
+                return@wrapFlow combine(
+                    homeworksFlow,
+                    shortGoalsFlow,
+                    ticker
+                ) { homeworks, goals, _ ->
+                    val currentTime = dateManager.fetchCurrentInstant()
+                    val detailsHomeworks = homeworks.map { homework ->
+                        val status = HomeworkStatus.calculate(
+                            isDone = homework.isDone,
+                            completeDate = homework.completeDate,
+                            deadline = homework.deadline,
+                            currentTime = currentTime,
                         )
-                        put(date, dailyHomeworks)
+                        return@map homework.convertToDetails(
+                            status = status,
+                            linkedGoal = goals.find { it.contentId == homework.uid },
+                        )
                     }
-                }
-                return@combine dailyHomeworksMap
+                    val groupedDetailsHomeworks = detailsHomeworks.groupBy { homework ->
+                        homework.deadline.startThisDay()
+                    }
+                    val dailyHomeworksMap = buildMap {
+                        timeRange.periodDates().forEach { date ->
+                            val homeworksByDate = groupedDetailsHomeworks[date] ?: emptyList()
+                            val dailyHomeworks = DailyHomeworks(
+                                dailyStatus = DailyHomeworksStatus.calculate(
+                                    targetDate = date,
+                                    currentDate = currentTime.startThisDay(),
+                                    homeworkStatuses = homeworksByDate.map { it.status }
+                                ),
+                                homeworks = homeworksByDate.groupBy { it.status },
+                            )
+                            put(date, dailyHomeworks)
+                        }
+                    }
+                    return@combine dailyHomeworksMap
+                }.distinctUntilChanged()
             }
-        }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchHomeworksProgress(targetDate: Instant) = eitherWrapper.wrapFlow {
             val maxNumberOfWeek = calendarSettingsRepository.fetchSettings().first().numberOfWeek
 
-            val targetTimeRange = TimeRange(targetDate.startOfWeek(), targetDate.endOfWeek().shiftDay(1))
+            val targetTimeRange =
+                TimeRange(targetDate.startOfWeek(), targetDate.endOfWeek().shiftDay(1))
             val homeworksFlow = homeworksRepository.fetchHomeworksByTimeRange(targetTimeRange)
             val completedHomeworksFlow = homeworksRepository.fetchCompletedHomeworksCount()
             val overdueHomeworksFlow = homeworksRepository.fetchOverdueHomeworks(targetDate)
-            val activeLinkedHomeworksFlow = homeworksRepository.fetchActiveLinkedHomeworks(targetDate)
+            val activeLinkedHomeworksFlow =
+                homeworksRepository.fetchActiveLinkedHomeworks(targetDate)
 
             return@wrapFlow combine(
                 completedHomeworksFlow,
@@ -158,8 +166,10 @@ internal interface HomeworksInteractor {
                 val detachedActiveTasks = buildList {
                     activeLinkedHomeworks.forEach { homework ->
                         val homeworkDate = homework.deadline.startThisDay()
-                        val homeworkNumberOfWeek = homeworkDate.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
-                        val customScheduleByDate = customScheduleRepository.fetchScheduleByDate(homeworkDate).first()
+                        val homeworkNumberOfWeek =
+                            homeworkDate.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
+                        val customScheduleByDate =
+                            customScheduleRepository.fetchScheduleByDate(homeworkDate).first()
                         val classesByDate = if (customScheduleByDate?.classes != null) {
                             customScheduleByDate.classes
                         } else {
@@ -221,19 +231,22 @@ internal interface HomeworksInteractor {
         override fun calculateHomeworkScope(homeworksMap: Map<Instant, DailyHomeworks>): HomeworkScope {
             return HomeworkScope(
                 theoreticalTasks = homeworksMap.mapValues { homeworkEntry ->
-                    homeworkEntry.value.homeworks.values.toList().extractAllItem().sumOf { homework ->
-                        return@sumOf homework.theoreticalTasks.components.fetchAllTasks().size
-                    }
+                    homeworkEntry.value.homeworks.values.toList().extractAllItem()
+                        .sumOf { homework ->
+                            return@sumOf homework.theoreticalTasks.components.fetchAllTasks().size
+                        }
                 },
                 practicalTasks = homeworksMap.mapValues { homeworkEntry ->
-                    homeworkEntry.value.homeworks.values.toList().extractAllItem().sumOf { homework ->
-                        return@sumOf homework.practicalTasks.components.fetchAllTasks().size
-                    }
+                    homeworkEntry.value.homeworks.values.toList().extractAllItem()
+                        .sumOf { homework ->
+                            return@sumOf homework.practicalTasks.components.fetchAllTasks().size
+                        }
                 },
                 presentationTasks = homeworksMap.mapValues { homeworkEntry ->
-                    homeworkEntry.value.homeworks.values.toList().extractAllItem().sumOf { homework ->
-                        return@sumOf homework.presentationTasks.components.fetchAllTasks().size
-                    }
+                    homeworkEntry.value.homeworks.values.toList().extractAllItem()
+                        .sumOf { homework ->
+                            return@sumOf homework.presentationTasks.components.fetchAllTasks().size
+                        }
                 },
             )
         }
@@ -250,6 +263,7 @@ internal interface HomeworksInteractor {
                             isActive = false,
                         )
                     }
+
                     is GoalTime.Timer -> with(linkedGoal.time as GoalTime.Timer) {
                         val stopTime = startTimePoint.toEpochMilliseconds()
                         val timeAfterStop = currentTime.toEpochMilliseconds() - stopTime
@@ -258,6 +272,7 @@ internal interface HomeworksInteractor {
                             isActive = false,
                         )
                     }
+
                     is GoalTime.None -> GoalTime.None
                 },
                 isDone = true,
