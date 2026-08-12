@@ -87,7 +87,14 @@ interface BaseScheduleLocalDataSource {
         }
 
         override suspend fun addOrUpdateSchedules(items: List<BaseScheduleEntity>) {
-            items.forEach { item -> addOrUpdateSchedule(item) }
+            scheduleQueries.transaction {
+                items.forEach { item ->
+                    val uid = item.uid.ifEmpty { randomUUID() }
+                    scheduleQueries.addOrUpdateSchedule(
+                        item.copy(uid = uid).mapToEntity(),
+                    )
+                }
+            }
         }
 
         override suspend fun fetchScheduleDetailsById(uid: UID): Flow<BaseScheduleDetailsEntity?> {

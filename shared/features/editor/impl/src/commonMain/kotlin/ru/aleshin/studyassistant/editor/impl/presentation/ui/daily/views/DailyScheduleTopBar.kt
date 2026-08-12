@@ -50,7 +50,7 @@ internal fun DailyScheduleTopBar(
                 Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
             }
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
         )
     )

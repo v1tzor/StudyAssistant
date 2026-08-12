@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 internal data class SubjectAnalytics(
     val subject: Subject?,
     val plannedDuration: Long,
+    val workloadProgress: Float,
     val classesCount: Int,
     val homeworkCount: Int,
     val testsCount: Int,

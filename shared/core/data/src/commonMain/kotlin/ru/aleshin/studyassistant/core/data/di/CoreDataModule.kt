@@ -20,7 +20,6 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.api.di.coreClintApiModule
 import ru.aleshin.studyassistant.core.data.datasources.AiPreferencesLocalDataSource
 import ru.aleshin.studyassistant.core.data.handlers.AiCompletionHandler
 import ru.aleshin.studyassistant.core.data.handlers.AiConversationHandler
@@ -32,7 +31,6 @@ import ru.aleshin.studyassistant.core.data.repositories.AiSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.BaseScheduleRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.CalendarSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.CustomScheduleRepositoryImpl
-import ru.aleshin.studyassistant.core.data.repositories.DailyAiStatisticsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.DailyGoalsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.EmployeeRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.GeneralSettingsRepositoryImpl
@@ -41,6 +39,7 @@ import ru.aleshin.studyassistant.core.data.repositories.HomeworksRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.NotificationSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.OrganizationsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ProfileRepositoryImpl
+import ru.aleshin.studyassistant.core.data.repositories.ScheduleImportRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.ScheduleShareRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.SubjectsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.TodoRepositoryImpl
@@ -52,7 +51,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
-import ru.aleshin.studyassistant.core.domain.repositories.DailyAiStatisticsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
@@ -61,6 +59,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ScheduleImportRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ScheduleShareRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
@@ -70,7 +69,7 @@ import ru.aleshin.studyassistant.core.remote.di.coreRemoteModule
  * @author Stanislav Aleshin on 22.04.2024.
  */
 val coreDataModule = DI.Module("CoreData") {
-    importAll(coreDataPlatformModule, coreDatabaseModule, coreRemoteModule, coreClintApiModule)
+    importAll(coreDataPlatformModule, coreDatabaseModule, coreRemoteModule)
 
     bindProvider<TodoRepository> { TodoRepositoryImpl(instance()) }
     bindProvider<EmployeeRepository> { EmployeeRepositoryImpl(instance(), instance()) }
@@ -81,26 +80,33 @@ val coreDataModule = DI.Module("CoreData") {
     bindProvider<HomeworksRepository> { HomeworksRepositoryImpl(instance()) }
     bindProvider<DailyGoalsRepository> { DailyGoalsRepositoryImpl(instance()) }
     bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance()) }
-    bindSingleton<DailyAiStatisticsRepository> { DailyAiStatisticsRepositoryImpl(instance()) }
     bindSingleton<ProfileRepository> { ProfileRepositoryImpl(instance(), instance()) }
 
-    bindSingleton<InstallationIdProvider> { InstallationIdProviderImpl(instance()) }
+    bindSingleton<InstallationIdProvider> {
+        InstallationIdProviderImpl(
+            secureDataSource = instance(),
+            remoteDataSource = instance(),
+        )
+    }
     bindProvider<ScheduleShareRepository> {
         ScheduleShareRepositoryImpl(instance(), instance(), instance())
     }
     bindProvider<HomeworkShareRepository> {
         HomeworkShareRepositoryImpl(instance(), instance(), instance(), instance())
     }
+    bindProvider<ScheduleImportRepository> {
+        ScheduleImportRepositoryImpl(instance(), instance(), instance())
+    }
 
     bindSingleton<AiPreferencesLocalDataSource> {
-        AiPreferencesLocalDataSource.Base(instance(), instance())
+        AiPreferencesLocalDataSource.Base(instance())
     }
     bindSingleton<AiSettingsHandler> { AiSettingsHandler.Base(instance(), instance()) }
     bindSingleton<AiCompletionHandler> {
         AiCompletionHandler.Base(instance(), instance(), instance())
     }
     bindSingleton<AiConversationHandler> {
-        AiConversationHandler.Base(instance(), instance(), instance())
+        AiConversationHandler.Base(instance(), instance(), instance(), instance())
     }
     bindSingleton<AiSettingsRepository> { AiSettingsRepositoryImpl(instance()) }
     bindSingleton<AiAssistantRepository> {

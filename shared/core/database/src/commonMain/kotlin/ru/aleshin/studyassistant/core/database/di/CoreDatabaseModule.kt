@@ -26,7 +26,6 @@ import ru.aleshin.studyassistant.core.data.Database
 import ru.aleshin.studyassistant.core.database.datasource.DriverFactory
 import ru.aleshin.studyassistant.core.database.datasource.ai.AiLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.ai.AiSettingsLocalDataSource
-import ru.aleshin.studyassistant.core.database.datasource.ai.DailyAiStatisticsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.employee.EmployeeLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.goals.DailyGoalsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.listOfIntAdapter
@@ -47,7 +46,6 @@ import ru.aleshin.studyassistant.sqldelight.ai.AiChatHistoryQueries
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatMessageEntity
 import ru.aleshin.studyassistant.sqldelight.ai.AiChatMessageQueries
 import ru.aleshin.studyassistant.sqldelight.ai.AiSettingsQueries
-import ru.aleshin.studyassistant.sqldelight.ai.DailyAiResponsesQueries
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeEntity
 import ru.aleshin.studyassistant.sqldelight.employee.EmployeeQueries
 import ru.aleshin.studyassistant.sqldelight.goals.GoalQueries
@@ -120,10 +118,8 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
     bindSingleton<AiChatHistoryQueries> { instance<Database>().aiChatHistoryQueries }
     bindSingleton<AiChatMessageQueries> { instance<Database>().aiChatMessageQueries }
     bindSingleton<AiSettingsQueries> { instance<Database>().aiSettingsQueries }
-    bindSingleton<DailyAiResponsesQueries> { instance<Database>().dailyAiResponsesQueries }
     bindSingleton<AiLocalDataSource> { AiLocalDataSource.Base(instance(), instance(), instance()) }
     bindSingleton<AiSettingsLocalDataSource> { AiSettingsLocalDataSource.Base(instance(), instance()) }
-    bindSingleton<DailyAiStatisticsLocalDataSource> { DailyAiStatisticsLocalDataSource.Base(instance(), instance()) }
 
     bindSingleton<GeneralQueries> { instance<Database>().generalQueries }
     bindSingleton<GeneralSettingsLocalDataSource> { GeneralSettingsLocalDataSource.Base(instance(), instance()) }

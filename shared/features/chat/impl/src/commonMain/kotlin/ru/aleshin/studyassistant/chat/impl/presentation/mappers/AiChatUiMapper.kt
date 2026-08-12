@@ -16,19 +16,27 @@
 
 package ru.aleshin.studyassistant.chat.impl.presentation.mappers
 
+import ru.aleshin.studyassistant.chat.impl.domain.entities.AssistantChatData
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.AiChatHistoryUi
+import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.AiToolConfirmationUi
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.AssistantMessageUi
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.UserMessageUi
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage
-import ru.aleshin.studyassistant.core.domain.entities.ai.AiChatHistory
 
 /**
  * @author Stanislav Aleshin on 22.06.2025.
  */
-internal suspend fun AiChatHistory.mapToUi() = AiChatHistoryUi(
-    uid = uid,
-    messages = messages.map { it.mapToUi() },
-    lastMessage = lastMessage?.mapToUi()
+internal suspend fun AssistantChatData.mapToUi() = AiChatHistoryUi(
+    uid = history.uid,
+    messages = history.messages.map { it.mapToUi() },
+    lastMessage = history.lastMessage?.mapToUi(),
+    pendingMutations = pendingMutations.map { call ->
+        AiToolConfirmationUi(
+            id = call.call.id,
+            name = call.call.function.name,
+            arguments = call.preview,
+        )
+    },
 )
 
 internal suspend fun AiAssistantMessage.mapToUi() = when (this) {

@@ -65,11 +65,7 @@ internal interface AnalyticsGoalCalculator {
                 todoGoals = filteredGoals.count { it.contentType == GoalType.TODO },
                 desiredDuration = desiredDuration,
                 actualDuration = actualDuration,
-                completionRate = if (desiredDuration == 0L) {
-                    null
-                } else {
-                    actualDuration.toFloat() / desiredDuration
-                },
+                completionRate = (filteredGoals.count { it.isDone }.toFloat() / filteredGoals.size).coerceIn(0f..1f),
                 hasActiveTimer = filteredGoals.any { goal -> goal.time.isActive() },
             )
         }

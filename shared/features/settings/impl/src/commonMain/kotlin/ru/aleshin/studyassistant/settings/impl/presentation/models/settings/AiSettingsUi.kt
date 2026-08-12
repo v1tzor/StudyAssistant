@@ -23,7 +23,5 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 internal data class AiSettingsUi(
-    val serviceType: AiServiceTypeUi,
-    val hasPersonalKey: Boolean,
-    val sharedQuotaRemaining: Int,
+    val quotaRemaining: Int,
 )

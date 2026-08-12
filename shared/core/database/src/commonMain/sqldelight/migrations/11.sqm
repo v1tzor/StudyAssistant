@@ -1,0 +1,20 @@
+CREATE TABLE aiSettingsEntity_new (
+  id INTEGER PRIMARY KEY NOT NULL,
+  quota_remaining INTEGER NOT NULL,
+  quota_reset_at INTEGER DEFAULT NULL
+);
+
+INSERT INTO aiSettingsEntity_new (
+  id,
+  quota_remaining,
+  quota_reset_at
+)
+SELECT
+  id,
+  shared_quota_remaining,
+  shared_quota_reset_at
+FROM aiSettingsEntity;
+
+DROP TABLE aiSettingsEntity;
+
+ALTER TABLE aiSettingsEntity_new RENAME TO aiSettingsEntity;

@@ -82,6 +82,7 @@ import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.As
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEvent
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantState
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.store.ChatFeatureComponent
+import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AiToolConfirmationCard
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AssistantBottomBar
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AssistantSenderBadge
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AssistantTopBar
@@ -90,8 +91,8 @@ import ru.aleshin.studyassistant.chat.impl.resources.Res
 import ru.aleshin.studyassistant.chat.impl.resources.ai_settings_button
 import ru.aleshin.studyassistant.chat.impl.resources.assistant_empty_chat_title
 import ru.aleshin.studyassistant.chat.impl.resources.failure_response_text
-import ru.aleshin.studyassistant.chat.impl.resources.personal_key_suggestion_text
 import ru.aleshin.studyassistant.chat.impl.resources.quota_expired_title
+import ru.aleshin.studyassistant.chat.impl.resources.quota_reset_suggestion_text
 import ru.aleshin.studyassistant.chat.impl.resources.try_again_button
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
@@ -123,6 +124,9 @@ internal fun AssistantContent(
                 onTryAgain = { store.dispatchEvent(AssistantEvent.RetryAttempt) },
                 onDeleteMessage = { store.dispatchEvent(AssistantEvent.ClearUnsendMessage) },
                 onOpenAiSettings = { store.dispatchEvent(AssistantEvent.OpenAiSettings) },
+                onResolveToolCall = { toolCallId, approved ->
+                    store.dispatchEvent(AssistantEvent.ResolveToolCall(toolCallId, approved))
+                },
             )
         },
         topBar = {
@@ -130,6 +134,9 @@ internal fun AssistantContent(
                 isVisibleClearButton = state.responseStatus != ResponseStatus.LOADING &&
                         !state.chatHistory?.messages.isNullOrEmpty(),
                 onClearChatHistory = { store.dispatchEvent(AssistantEvent.ClearHistory) },
+                onScheduleImport = {
+                    store.dispatchEvent(AssistantEvent.OpenScheduleImport)
+                },
             )
         },
         bottomBar = {
@@ -137,6 +144,7 @@ internal fun AssistantContent(
                 isLoadingChat = state.isLoadingChat,
                 responseStatus = state.responseStatus,
                 isQuotaExpired = state.isQuotaExpired,
+                isInputEnabled = state.chatHistory?.pendingMutations.isNullOrEmpty(),
                 userQuery = state.userQuery.query,
                 onUpdateUserQuery = { store.dispatchEvent(AssistantEvent.UpdateUserQuery(it)) },
                 onSendMessage = { store.dispatchEvent(AssistantEvent.SendMessage(it)) },
@@ -172,6 +180,7 @@ private fun BaseAssistantContent(
     onTryAgain: () -> Unit,
     onDeleteMessage: () -> Unit,
     onOpenAiSettings: () -> Unit,
+    onResolveToolCall: (String, Boolean) -> Unit,
 ) {
     Crossfade(
         modifier = modifier.fillMaxSize(),
@@ -203,6 +212,7 @@ private fun BaseAssistantContent(
                         onTryAgain = onTryAgain,
                         onDeleteMessage = onDeleteMessage,
                         openAiSettings = onOpenAiSettings,
+                        onResolveToolCall = onResolveToolCall,
                     )
                 }
             }
@@ -248,6 +258,7 @@ private fun AssistantChat(
     onTryAgain: () -> Unit,
     onDeleteMessage: () -> Unit,
     openAiSettings: () -> Unit,
+    onResolveToolCall: (String, Boolean) -> Unit,
 ) {
     val clipboardManager = LocalClipboardManager.current
     val coroutineScope = rememberCoroutineScope()
@@ -261,6 +272,19 @@ private fun AssistantChat(
     ) {
         item(key = "spacer", contentType = "spacer") {
             Spacer(modifier = Modifier.height(16.dp))
+        }
+        items(
+            items = chatHistory.pendingMutations,
+            key = { confirmation -> "tool-confirmation-${confirmation.id}" },
+            contentType = { "tool-confirmation" },
+        ) { confirmation ->
+            AiToolConfirmationCard(
+                modifier = Modifier.padding(horizontal = 12.dp).animateItem(placementSpec = null),
+                confirmation = confirmation,
+                enabled = responseStatus != ResponseStatus.LOADING,
+                onConfirm = { onResolveToolCall(confirmation.id, true) },
+                onReject = { onResolveToolCall(confirmation.id, false) },
+            )
         }
         if (!isQuotaExpired && responseStatus != ResponseStatus.SUCCESS) {
             item(key = "response status", contentType = responseStatus.name) {
@@ -512,10 +536,9 @@ private fun LazyItemScope.QuotaExpiredItem(
                     style = MaterialTheme.typography.titleSmall,
                 )
                 Text(
-                    text = stringResource(Res.string.personal_key_suggestion_text),
+                    text = stringResource(Res.string.quota_reset_suggestion_text),
                     color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
                 )
                 FilledTonalButton(
                     modifier = Modifier.height(40.dp),

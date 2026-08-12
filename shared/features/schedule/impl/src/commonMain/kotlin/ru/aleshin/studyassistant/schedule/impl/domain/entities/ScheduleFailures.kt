@@ -23,5 +23,13 @@ import ru.aleshin.studyassistant.core.common.functional.DomainFailures
  */
 internal sealed class ScheduleFailures : DomainFailures {
     object InternetError : ScheduleFailures()
+    object QuotaExceeded : ScheduleFailures()
+    object RateLimited : ScheduleFailures()
+    object InvalidImport : ScheduleFailures()
+    object InvalidImage : ScheduleFailures()
+    object ImageTooLarge : ScheduleFailures()
+    object NoTextRecognized : ScheduleFailures()
+    object TextRecognitionUnavailable : ScheduleFailures()
+    object ServerUnavailable : ScheduleFailures()
     data class OtherError(val throwable: Throwable) : ScheduleFailures()
 }

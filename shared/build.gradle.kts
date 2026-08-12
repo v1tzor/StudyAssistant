@@ -86,7 +86,6 @@ kotlin {
             api(project(":shared:core:data"))
             api(project(":shared:core:database"))
             api(project(":shared:core:remote"))
-            api(project(":shared:core:client-api"))
 
             api(libs.bundles.decompose)
             api(libs.bundles.essenty)

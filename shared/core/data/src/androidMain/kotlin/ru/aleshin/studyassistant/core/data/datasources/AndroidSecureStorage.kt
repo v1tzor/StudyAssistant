@@ -35,11 +35,32 @@ internal class AndroidSecureStorage(
 
     private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
 
+    init {
+        runCatching {
+            context
+                .getSharedPreferences(LEGACY_PREFERENCES_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .commit()
+            KeyStore
+                .getInstance(ANDROID_KEY_STORE)
+                .apply { load(null) }
+                .takeIf { keyStore -> keyStore.containsAlias(LEGACY_KEY_ALIAS) }
+                ?.deleteEntry(LEGACY_KEY_ALIAS)
+        }
+    }
+
     fun write(key: String, value: String) {
         val cipher = Cipher.getInstance(TRANSFORMATION)
         cipher.init(Cipher.ENCRYPT_MODE, fetchOrCreateSecretKey())
+        cipher.updateAAD(key.encodeToByteArray())
         val encoded = cipher.iv + cipher.doFinal(value.encodeToByteArray())
-        preferences.edit().putString(key, Base64.encodeToString(encoded, Base64.NO_WRAP)).apply()
+        check(
+            preferences
+                .edit()
+                .putString(key, Base64.encodeToString(encoded, Base64.NO_WRAP))
+                .commit(),
+        )
     }
 
     fun read(key: String): String? {
@@ -50,12 +71,13 @@ internal class AndroidSecureStorage(
             val cipherText = encrypted.copyOfRange(GCM_IV_SIZE, encrypted.size)
             val cipher = Cipher.getInstance(TRANSFORMATION)
             cipher.init(Cipher.DECRYPT_MODE, fetchOrCreateSecretKey(), GCMParameterSpec(GCM_TAG_SIZE, iv))
+            cipher.updateAAD(key.encodeToByteArray())
             cipher.doFinal(cipherText).decodeToString()
         }.getOrNull()
     }
 
     fun delete(key: String) {
-        preferences.edit().remove(key).apply()
+        check(preferences.edit().remove(key).commit())
     }
 
     private fun fetchOrCreateSecretKey(): SecretKey {
@@ -69,6 +91,7 @@ internal class AndroidSecureStorage(
                     KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
                 ).setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                     .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                    .setKeySize(AES_KEY_SIZE_BITS)
                     .build()
             )
             generateKey()
@@ -76,11 +99,14 @@ internal class AndroidSecureStorage(
     }
 
     private companion object {
-        const val PREFERENCES_NAME = "ai_secure_storage"
-        const val KEY_ALIAS = "study_assistant_ai"
+        const val PREFERENCES_NAME = "installation_secure_storage"
+        const val KEY_ALIAS = "study_assistant_installation"
+        const val LEGACY_PREFERENCES_NAME = "ai_secure_storage"
+        const val LEGACY_KEY_ALIAS = "study_assistant_ai"
         const val ANDROID_KEY_STORE = "AndroidKeyStore"
         const val TRANSFORMATION = "AES/GCM/NoPadding"
         const val GCM_IV_SIZE = 12
         const val GCM_TAG_SIZE = 128
+        const val AES_KEY_SIZE_BITS = 256
     }
 }

@@ -23,6 +23,6 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class FunctionResponsePojo(
-    override val name: String,
+    val name: String,
     val arguments: String?,
-) : ToolFunctionPojo
+)

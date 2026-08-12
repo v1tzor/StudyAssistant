@@ -48,6 +48,11 @@ internal sealed class AssistantEvent : StoreEvent {
     data object ClearUnsendMessage : AssistantEvent()
     data object ClearHistory : AssistantEvent()
     data object OpenAiSettings : AssistantEvent()
+    data object OpenScheduleImport : AssistantEvent()
+    data class ResolveToolCall(
+        val toolCallId: String,
+        val approved: Boolean,
+    ) : AssistantEvent()
 }
 
 internal sealed class AssistantEffect : StoreEffect {
@@ -64,4 +69,5 @@ internal sealed class AssistantAction : StoreAction {
 
 internal sealed class AssistantOutput : BaseOutput {
     data object NavigateToAiSettings : AssistantOutput()
+    data object NavigateToScheduleImport : AssistantOutput()
 }

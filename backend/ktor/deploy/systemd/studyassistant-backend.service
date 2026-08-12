@@ -1,0 +1,29 @@
+[Unit]
+Description=StudyAssistant Ktor backend
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+RemainAfterExit=yes
+WorkingDirectory=/opt/studyassistant/backend/ktor
+EnvironmentFile=/etc/studyassistant/production.env
+ExecStartPre=/usr/local/libexec/studyassistant/preflight.sh
+ExecStartPre=/usr/bin/docker compose --env-file /etc/studyassistant/production.env -f compose.production.yml config --quiet
+ExecStart=/usr/bin/docker compose --env-file /etc/studyassistant/production.env -f compose.production.yml up --detach --no-build --remove-orphans --wait nginx
+ExecReload=/usr/bin/docker compose --env-file /etc/studyassistant/production.env -f compose.production.yml up --detach --no-build --remove-orphans --wait nginx
+ExecStop=/usr/bin/docker compose --env-file /etc/studyassistant/production.env -f compose.production.yml down
+TimeoutStartSec=900
+TimeoutStopSec=120
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

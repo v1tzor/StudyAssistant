@@ -16,61 +16,46 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.ai
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.AiServiceTypeUi
+import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.AiSettingsUi
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.ai.contract.AiSettingsEffect
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.ai.contract.AiSettingsEvent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.ai.store.AiSettingsComponent
 import ru.aleshin.studyassistant.settings.impl.resources.Res
-import ru.aleshin.studyassistant.settings.impl.resources.ai_key_saved_title
-import ru.aleshin.studyassistant.settings.impl.resources.ai_key_tested_title
+import ru.aleshin.studyassistant.settings.impl.resources.ai_privacy_description
+import ru.aleshin.studyassistant.settings.impl.resources.ai_privacy_title
+import ru.aleshin.studyassistant.settings.impl.resources.ai_quota_title
 import ru.aleshin.studyassistant.settings.impl.resources.ai_settings_description
 import ru.aleshin.studyassistant.settings.impl.resources.ai_settings_title
-import ru.aleshin.studyassistant.settings.impl.resources.delete_ai_key_title
-import ru.aleshin.studyassistant.settings.impl.resources.personal_ai_description
-import ru.aleshin.studyassistant.settings.impl.resources.personal_ai_key_description
-import ru.aleshin.studyassistant.settings.impl.resources.personal_ai_key_label
-import ru.aleshin.studyassistant.settings.impl.resources.personal_ai_title
-import ru.aleshin.studyassistant.settings.impl.resources.save_ai_key_title
-import ru.aleshin.studyassistant.settings.impl.resources.shared_ai_description
-import ru.aleshin.studyassistant.settings.impl.resources.shared_ai_title
-import ru.aleshin.studyassistant.settings.impl.resources.shared_quota_title
-import ru.aleshin.studyassistant.settings.impl.resources.test_ai_key_title
+import ru.aleshin.studyassistant.settings.impl.resources.backend_ai_description
+import ru.aleshin.studyassistant.settings.impl.resources.backend_ai_title
 
 /**
- * @author Stanislav Aleshin on 05.07.2026.
+ * @author Stanislav Aleshin on 12.08.2026.
  */
 @Composable
 internal fun AiSettingsContent(
@@ -80,98 +65,17 @@ internal fun AiSettingsContent(
     val store = component.store
     val state by store.stateAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val keyTestedMessage = stringResource(Res.string.ai_key_tested_title)
-    val keySavedMessage = stringResource(Res.string.ai_key_saved_title)
-    var personalKey by remember { mutableStateOf("") }
-    var testedPersonalKey by remember { mutableStateOf<String?>(null) }
 
-    Column(
-        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Text(
-            text = stringResource(Res.string.ai_settings_title),
-            style = MaterialTheme.typography.headlineSmall
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data -> ErrorSnackbar(data) }
+        },
+    ) { contentPadding ->
+        AiSettingsLayout(
+            settings = state.settings,
+            modifier = Modifier.padding(contentPadding),
         )
-        Text(
-            text = stringResource(Res.string.ai_settings_description),
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        state.settings?.let { settings ->
-            ServiceRow(
-                title = stringResource(Res.string.shared_ai_title),
-                description = stringResource(Res.string.shared_ai_description),
-                selected = settings.serviceType == AiServiceTypeUi.SHARED,
-                onClick = { store.dispatchEvent(AiSettingsEvent.SelectSharedService) },
-            )
-            Text(
-                text = stringResource(Res.string.shared_quota_title, settings.sharedQuotaRemaining),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            ServiceRow(
-                title = stringResource(Res.string.personal_ai_title),
-                description = stringResource(Res.string.personal_ai_description),
-                selected = settings.serviceType == AiServiceTypeUi.PERSONAL,
-                onClick = {
-                    if (settings.hasPersonalKey) {
-                        store.dispatchEvent(AiSettingsEvent.SelectPersonalService)
-                    }
-                },
-            )
-            OutlinedTextField(
-                value = personalKey,
-                onValueChange = {
-                    personalKey = it
-                    testedPersonalKey = null
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !state.isSaving,
-                shape = MaterialTheme.shapes.large,
-                label = { Text(stringResource(Res.string.personal_ai_key_label)) },
-                supportingText = { Text(stringResource(Res.string.personal_ai_key_description)) },
-                visualTransformation = PasswordVisualTransformation(),
-                singleLine = true,
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                FilledTonalButton(
-                    onClick = { store.dispatchEvent(AiSettingsEvent.TestPersonalKey(personalKey)) },
-                    modifier = Modifier.weight(1f),
-                    enabled = personalKey.isNotBlank() && !state.isSaving,
-                ) {
-                    if (state.isSaving) {
-                        CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp))
-                    }
-                    Text(stringResource(Res.string.test_ai_key_title))
-                }
-                Button(
-                    onClick = { store.dispatchEvent(AiSettingsEvent.SavePersonalKey(personalKey)) },
-                    modifier = Modifier.weight(1f),
-                    enabled = personalKey.isNotBlank() &&
-                        testedPersonalKey == personalKey &&
-                        !state.isSaving,
-                ) {
-                    Text(stringResource(Res.string.save_ai_key_title))
-                }
-            }
-            if (settings.hasPersonalKey) {
-                OutlinedButton(
-                    onClick = {
-                        personalKey = ""
-                        testedPersonalKey = null
-                        store.dispatchEvent(AiSettingsEvent.DeletePersonalKey)
-                    },
-                    enabled = !state.isSaving,
-                ) {
-                    Text(stringResource(Res.string.delete_ai_key_title))
-                }
-            }
-        }
-        SnackbarHost(hostState = snackbarHostState) { ErrorSnackbar(it) }
     }
 
     store.handleEffects { effect ->
@@ -180,34 +84,98 @@ internal fun AiSettingsContent(
                 message = effect.failure.mapToMessage(),
                 withDismissAction = true,
             )
-            is AiSettingsEffect.PersonalKeyTested -> {
-                testedPersonalKey = personalKey
-                snackbarHostState.showSnackbar(keyTestedMessage)
-            }
-            is AiSettingsEffect.PersonalKeySaved -> {
-                personalKey = ""
-                testedPersonalKey = null
-                snackbarHostState.showSnackbar(keySavedMessage)
-            }
         }
     }
 }
 
 @Composable
-private fun ServiceRow(
+private fun AiSettingsLayout(
+    settings: AiSettingsUi?,
+    modifier: Modifier = Modifier,
+) {
+    if (settings == null) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator()
+        }
+    } else {
+        AiSettingsView(
+            settings = settings,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun AiSettingsView(
+    settings: AiSettingsUi,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Text(
+            text = stringResource(Res.string.ai_settings_title),
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        Text(
+            text = stringResource(Res.string.ai_settings_description),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        AiSettingsCard(
+            title = stringResource(Res.string.backend_ai_title),
+            description = stringResource(Res.string.backend_ai_description),
+            supportingText = stringResource(
+                Res.string.ai_quota_title,
+                settings.quotaRemaining,
+            ),
+        )
+        AiSettingsCard(
+            title = stringResource(Res.string.ai_privacy_title),
+            description = stringResource(Res.string.ai_privacy_description),
+        )
+    }
+}
+
+@Composable
+private fun AiSettingsCard(
     title: String,
     description: String,
-    selected: Boolean,
-    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    supportingText: String? = null,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainer,
     ) {
-        RadioButton(selected = selected, onClick = onClick)
-        Column(modifier = Modifier.padding(start = 8.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(description, style = MaterialTheme.typography.bodySmall)
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            supportingText?.let { text ->
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
     }
 }

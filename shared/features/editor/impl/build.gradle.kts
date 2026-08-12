@@ -59,6 +59,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":shared:features:editor:api"))
+            implementation(project(":shared:features:schedule:api"))
 
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:remote"))
@@ -72,7 +73,6 @@ kotlin {
             implementation(libs.kotlin.test)
         }
     }
-
 }
 
 compose.resources {

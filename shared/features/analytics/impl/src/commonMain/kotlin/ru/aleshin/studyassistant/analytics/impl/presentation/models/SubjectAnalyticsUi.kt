@@ -28,6 +28,7 @@ import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 internal data class SubjectAnalyticsUi(
     val subject: SubjectUi?,
     val plannedDuration: Long,
+    val workloadProgress: Float,
     val classesCount: Int,
     val homeworkCount: Int,
     val testsCount: Int,

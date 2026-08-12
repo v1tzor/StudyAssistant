@@ -54,31 +54,15 @@ internal class AiSettingsComposeStore(
             AiSettingsEvent.Started -> launchBackgroundWork(BackgroundKey.LOAD) {
                 workProcessor.work(AiSettingsWorkCommand.LoadSettings).collectAndHandleWork()
             }
-            AiSettingsEvent.SelectSharedService -> launchBackgroundWork(BackgroundKey.ACTION) {
-                workProcessor.work(AiSettingsWorkCommand.SelectSharedService).collectAndHandleWork()
-            }
-            AiSettingsEvent.SelectPersonalService -> launchBackgroundWork(BackgroundKey.ACTION) {
-                workProcessor.work(AiSettingsWorkCommand.SelectPersonalService).collectAndHandleWork()
-            }
-            is AiSettingsEvent.TestPersonalKey -> launchBackgroundWork(BackgroundKey.ACTION) {
-                workProcessor.work(AiSettingsWorkCommand.TestPersonalKey(event.apiKey)).collectAndHandleWork()
-            }
-            is AiSettingsEvent.SavePersonalKey -> launchBackgroundWork(BackgroundKey.ACTION) {
-                workProcessor.work(AiSettingsWorkCommand.SavePersonalKey(event.apiKey)).collectAndHandleWork()
-            }
-            AiSettingsEvent.DeletePersonalKey -> launchBackgroundWork(BackgroundKey.ACTION) {
-                workProcessor.work(AiSettingsWorkCommand.DeletePersonalKey).collectAndHandleWork()
-            }
         }
     }
 
     override suspend fun reduce(action: AiSettingsAction, currentState: AiSettingsState) = when (action) {
         is AiSettingsAction.UpdateSettings -> currentState.copy(settings = action.settings)
-        is AiSettingsAction.UpdateSaving -> currentState.copy(isSaving = action.isSaving)
     }
 
     private enum class BackgroundKey : BackgroundWorkKey {
-        LOAD, ACTION
+        LOAD
     }
 
     class Factory(

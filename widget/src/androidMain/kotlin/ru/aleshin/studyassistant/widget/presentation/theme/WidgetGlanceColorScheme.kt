@@ -17,8 +17,10 @@
 package ru.aleshin.studyassistant.widget.presentation.theme
 
 import android.content.Context
-import android.content.res.Configuration
+import android.os.Build
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.glance.color.ColorProviders
 import androidx.glance.material3.ColorProviders
@@ -78,15 +80,21 @@ import ru.aleshin.studyassistant.core.ui.theme.material.tertiaryLight
 object WidgetGlanceColorScheme {
 
     fun fetch(context: Context, theme: ThemeType): ColorProviders {
-        val systemDark = context.resources.configuration.uiMode and
-            Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-        val isDark = when (theme) {
-            ThemeType.DEFAULT -> systemDark
-            ThemeType.LIGHT -> false
-            ThemeType.DARK -> true
+        val light = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            dynamicLightColorScheme(context)
+        } else {
+            lightWidgetColorScheme
         }
-        val colorScheme = if (isDark) darkWidgetColorScheme else lightWidgetColorScheme
-        return ColorProviders(light = colorScheme, dark = colorScheme)
+        val dark = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            dynamicDarkColorScheme(context)
+        } else {
+            darkWidgetColorScheme
+        }
+        return when (theme) {
+            ThemeType.DEFAULT -> ColorProviders(light = light, dark = dark)
+            ThemeType.LIGHT -> ColorProviders(light = light, dark = light)
+            ThemeType.DARK -> ColorProviders(light = dark, dark = dark)
+        }
     }
 }
 

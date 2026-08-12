@@ -28,9 +28,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.chat.impl.resources.Res
 import ru.aleshin.studyassistant.chat.impl.resources.assistant_top_bar_title
+import ru.aleshin.studyassistant.chat.impl.resources.schedule_import_action_description
+import ru.aleshin.studyassistant.core.ui.resources.ic_document_scanner
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
 
 /**
  * @author Stanislav Aleshin on 20.06.2025.
@@ -40,6 +44,7 @@ import ru.aleshin.studyassistant.chat.impl.resources.assistant_top_bar_title
 internal fun AssistantTopBar(
     modifier: Modifier = Modifier,
     isVisibleClearButton: Boolean,
+    onScheduleImport: () -> Unit,
     onClearChatHistory: () -> Unit,
 ) {
     CenterAlignedTopAppBar(
@@ -48,6 +53,12 @@ internal fun AssistantTopBar(
             Text(text = stringResource(Res.string.assistant_top_bar_title))
         },
         actions = {
+            IconButton(onClick = onScheduleImport) {
+                Icon(
+                    painter = painterResource(CoreRes.drawable.ic_document_scanner),
+                    contentDescription = stringResource(Res.string.schedule_import_action_description),
+                )
+            }
             AnimatedVisibility(visible = isVisibleClearButton) {
                 IconButton(
                     enabled = isVisibleClearButton,
@@ -60,7 +71,7 @@ internal fun AssistantTopBar(
                 }
             }
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
         )
     )

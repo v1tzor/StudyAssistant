@@ -30,7 +30,7 @@ fetchAllMessagesByChatId:
 SELECT *
 FROM aiChatMessageEntity
 WHERE chat_id = ?
-ORDER BY time;
+ORDER BY time, rowid;
 
 deleteMessagesByChatId:
 DELETE FROM aiChatMessageEntity

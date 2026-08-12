@@ -24,8 +24,7 @@ import ru.aleshin.studyassistant.core.common.functional.DomainFailures
 internal sealed class ChatFailures : DomainFailures {
     data object ChatAssistantError : ChatFailures()
     data object QuotaExceeded : ChatFailures()
-    data object InvalidKey : ChatFailures()
-    data object InsufficientBalance : ChatFailures()
+    data object InvalidRequest : ChatFailures()
     data object Offline : ChatFailures()
     data object RateLimited : ChatFailures()
     data object ServerUnavailable : ChatFailures()

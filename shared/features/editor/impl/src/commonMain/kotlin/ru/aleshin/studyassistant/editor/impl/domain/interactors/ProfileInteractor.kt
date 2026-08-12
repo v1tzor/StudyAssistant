@@ -31,11 +31,7 @@ internal interface ProfileInteractor {
 
     suspend fun fetchProfile(): FlowDomainResult<EditorFailures, Profile>
     suspend fun updateProfile(profile: Profile): UnitDomainResult<EditorFailures>
-    suspend fun uploadAvatar(
-        oldAvatar: String?,
-        file: InputFile
-    ): DomainResult<EditorFailures, String>
-
+    suspend fun uploadAvatar(oldAvatar: String?, file: InputFile): DomainResult<EditorFailures, String>
     suspend fun deleteAvatar(avatar: String): UnitDomainResult<EditorFailures>
 
     class Base(
@@ -44,20 +40,18 @@ internal interface ProfileInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : ProfileInteractor {
 
-        override suspend fun fetchProfile(): FlowDomainResult<EditorFailures, Profile> {
-            return eitherWrapper.wrapFlow { profileRepository.fetchProfile().filterNotNull() }
+        override suspend fun fetchProfile() = eitherWrapper.wrapFlow {
+            profileRepository.fetchProfile().filterNotNull()
         }
 
         override suspend fun updateProfile(profile: Profile) = eitherWrapper.wrapUnit {
-            profileRepository.updateProfile(
-                profile.copy(updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds())
-            )
+            val updatedProfile = profile.copy(updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds())
+            profileRepository.updateProfile(updatedProfile)
         }
 
-        override suspend fun uploadAvatar(oldAvatar: String?, file: InputFile) =
-            eitherWrapper.wrap {
-                profileRepository.uploadAvatar(oldAvatar, file)
-            }
+        override suspend fun uploadAvatar(oldAvatar: String?, file: InputFile) = eitherWrapper.wrap {
+            profileRepository.uploadAvatar(oldAvatar, file)
+        }
 
         override suspend fun deleteAvatar(avatar: String) = eitherWrapper.wrapUnit {
             profileRepository.deleteAvatar(avatar)

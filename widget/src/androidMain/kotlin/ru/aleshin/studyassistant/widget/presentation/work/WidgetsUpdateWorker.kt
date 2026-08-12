@@ -61,8 +61,8 @@ class WidgetsUpdateWorker(
     override val directDI = WidgetWorkerDependencies.create {
         bindSingleton<WidgetStateUiMapper> { WidgetStateUiMapper() }
     }
-    private val widgetInteractor = instance<WidgetInteractor>()
-    private val stateMapper = instance<WidgetStateUiMapper>()
+    private val widgetInteractor by lazy { instance<WidgetInteractor>() }
+    private val stateMapper by lazy { instance<WidgetStateUiMapper>() }
 
     override suspend fun doWork(): Result {
         return try {

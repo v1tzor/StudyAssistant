@@ -57,6 +57,11 @@ internal interface AssistantWorkProcessor :
             is AssistantWorkCommand.SendMessage -> sendMessageWork(command.chatId, command.message)
             is AssistantWorkCommand.RetryAttempt -> retryAttemptWork(command.chatId)
             is AssistantWorkCommand.ClearUnsendMessage -> clearUnsendMessageWork(command.chatId)
+            is AssistantWorkCommand.ResolveToolCall -> resolveToolCallWork(
+                command.chatId,
+                command.toolCallId,
+                command.approved,
+            )
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -75,7 +80,11 @@ internal interface AssistantWorkProcessor :
                                         onLeftAction = { EffectResult(AssistantEffect.ShowError(it)) },
                                         onRightAction = { chatHistory ->
                                             if (!isInit) {
-                                                if (chatHistory.messages.firstOrNull() is AiAssistantMessage.UserMessage) {
+                                                if (
+                                                    chatHistory.pendingMutations.isEmpty() &&
+                                                    chatHistory.history.messages.firstOrNull() is
+                                                    AiAssistantMessage.UserMessage
+                                                ) {
                                                     val action =
                                                         AssistantAction.UpdateResponseStatus(
                                                             ResponseStatus.FAILURE
@@ -170,6 +179,24 @@ internal interface AssistantWorkProcessor :
                 )
             }
         }
+
+        private fun resolveToolCallWork(
+            chatId: UID,
+            toolCallId: UID,
+            approved: Boolean,
+        ) = flow<AssistantWorkResult> {
+            aiAssistantInteractor.resolveToolCall(chatId, toolCallId, approved).handle(
+                onLeftAction = {
+                    emit(ActionResult(AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE)))
+                    emit(EffectResult(AssistantEffect.ShowError(it)))
+                },
+                onRightAction = {
+                    emit(ActionResult(AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)))
+                },
+            )
+        }.onStart {
+            emit(ActionResult(AssistantAction.UpdateResponseStatus(ResponseStatus.LOADING)))
+        }
     }
 }
 
@@ -180,6 +207,11 @@ internal sealed class AssistantWorkCommand : WorkCommand {
     data class SendMessage(val chatId: UID?, val message: String) : AssistantWorkCommand()
     data class RetryAttempt(val chatId: UID?) : AssistantWorkCommand()
     data class ClearUnsendMessage(val chatId: UID?) : AssistantWorkCommand()
+    data class ResolveToolCall(
+        val chatId: UID,
+        val toolCallId: UID,
+        val approved: Boolean,
+    ) : AssistantWorkCommand()
 }
 
 internal typealias AssistantWorkResult = WorkResult<AssistantAction, AssistantEffect, AssistantOutput>

@@ -58,7 +58,6 @@ internal class ProfileComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-
             is ProfileEvent.UpdateAvatar -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
                     val user = checkNotNull(profile)
@@ -67,7 +66,6 @@ internal class ProfileComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-
             is ProfileEvent.DeleteAvatar -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
                     val user = checkNotNull(profile)
@@ -75,7 +73,6 @@ internal class ProfileComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-
             is ProfileEvent.UpdateUsername -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
                     val updatedUser = checkNotNull(profile).copy(username = event.name)
@@ -83,7 +80,6 @@ internal class ProfileComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-
             is ProfileEvent.UpdateDescription -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
                     val updatedUser = checkNotNull(profile).copy(description = event.text)
@@ -91,7 +87,6 @@ internal class ProfileComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-
             is ProfileEvent.UpdateBirthday -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
                     val updatedUser = checkNotNull(profile).copy(birthday = event.text)
@@ -99,7 +94,6 @@ internal class ProfileComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-
             is ProfileEvent.UpdateGender -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
                     val updatedUser = checkNotNull(profile).copy(gender = event.gender)
@@ -107,7 +101,6 @@ internal class ProfileComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-
             is ProfileEvent.UpdateCity -> with(state()) {
                 launchBackgroundWork(BackgroundKey.USER_ACTION) {
                     val updatedUser = checkNotNull(profile).copy(city = event.city)
@@ -115,7 +108,6 @@ internal class ProfileComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-
             is ProfileEvent.NavigateToBack -> {
                 consumeOutput(ProfileOutput.NavigateToBack)
             }

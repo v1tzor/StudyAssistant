@@ -26,6 +26,8 @@ import com.arkivanov.decompose.value.Value
 import ru.aleshin.studyassistant.core.common.architecture.component.FeatureComponent
 import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
 import ru.aleshin.studyassistant.editor.api.EditorConfig
+import ru.aleshin.studyassistant.editor.api.EditorConfig.Class
+import ru.aleshin.studyassistant.editor.api.EditorConfig.Organization
 import ru.aleshin.studyassistant.editor.api.EditorOutput
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassInput
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassOutput
@@ -331,7 +333,7 @@ internal abstract class EditorFeatureComponent(
         private fun weekScheduleOutputConsumer() = OutputConsumer<WeekScheduleOutput> { output ->
             when (output) {
                 is WeekScheduleOutput.NavigateToClassEditor -> {
-                    val outputData = EditorConfig.Class(
+                    val outputData = Class(
                         classId = output.config.classId,
                         scheduleId = output.config.scheduleId,
                         organizationId = output.config.organizationId,
@@ -340,13 +342,14 @@ internal abstract class EditorFeatureComponent(
                     )
                     stackNavigation.pushToFront(outputData)
                 }
-
                 is WeekScheduleOutput.NavigateToOrganizationEditor -> {
-                    val outputData = EditorConfig.Organization(output.config.organizationId)
+                    val outputData = Organization(output.config.organizationId)
                     stackNavigation.pushToFront(outputData)
                 }
-
                 is WeekScheduleOutput.NavigateToBack -> navigateToBack()
+                is WeekScheduleOutput.NavigateToImport -> {
+                    outputConsumer.consume(EditorOutput.NavigateToImport(output.config.rawText))
+                }
             }
         }
     }

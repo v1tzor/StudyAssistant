@@ -37,14 +37,14 @@ interface AiAssistantRepository {
         message: AiAssistantMessage.UserMessage?
     ): AiAssistantResponse
 
-    suspend fun sendToolResponse(
+    suspend fun saveToolResponses(
         chatId: UID,
         messages: List<AiAssistantMessage.ToolMessage>
-    ): AiAssistantResponse
+    )
+    suspend fun completeToolRound(chatId: UID): AiAssistantResponse
 
     suspend fun saveAssistantMessage(chatId: UID, message: AiAssistantMessage.AssistantMessage)
     suspend fun updateSystemPromt(chatId: UID, message: AiAssistantMessage.SystemMessage)
     suspend fun deleteUnconfirmedMessages(chatId: UID)
-    suspend fun testPersonalKey(apiKey: String)
     suspend fun deleteChat(chatId: UID?)
 }

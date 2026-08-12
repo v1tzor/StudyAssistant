@@ -264,6 +264,11 @@ abstract class TabsComponent(
                 is ChatOutput.NavigateToAiSettings -> {
                     outputConsumer.consume(TabsOutput.NavigateToSettings(SettingsConfig.Ai))
                 }
+                is ChatOutput.NavigateToScheduleImport -> {
+                    stackNavigation.bringToFront(
+                        TabsConfig.Schedule(ScheduleConfig.Import()),
+                    )
+                }
                 is ChatOutput.NavigateToBack -> {
                     stackNavigation.pop()
                 }

@@ -29,4 +29,5 @@ internal data class AiChatHistoryUi(
     val uid: UID,
     val messages: List<AiAssistantMessageUi>,
     val lastMessage: AiAssistantMessageUi? = null,
+    val pendingMutations: List<AiToolConfirmationUi> = emptyList(),
 )

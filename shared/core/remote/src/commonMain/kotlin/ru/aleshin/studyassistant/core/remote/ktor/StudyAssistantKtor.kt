@@ -21,13 +21,16 @@ package ru.aleshin.studyassistant.core.remote.ktor
  */
 object StudyAssistantKtor {
 
-    object DeepSeek {
-        const val HOST = "https://api.deepseek.com"
-        const val CHAT_COMPLETIONS = "chat/completions"
-    }
-
-    object ChatGpt {
-        const val RESPONSES_API = "https://api.openai.com/v1/responses"
-        const val MODEL = "gpt-4o-mini"
+    object Backend {
+        const val INSTALLATION_REGISTER = "/api/v1/installations/register"
+        const val AI_COMPLETIONS = "/api/v1/ai/completions"
+        const val SCHEDULE_EXTRACTIONS = "/api/v1/ai/schedule-extractions"
+        const val SCHEDULE_SHARE_CREATE = "/api/v1/shares/schedule/create"
+        const val SCHEDULE_SHARE_CLAIM = "/api/v1/shares/schedule/claim"
+        const val SCHEDULE_SHARE_CONFIRM = "/api/v1/shares/schedule/confirm"
+        const val SCHEDULE_SHARE_RELEASE = "/api/v1/shares/schedule/release"
+        const val HOMEWORK_SHARE_CREATE = "/api/v1/shares/homework/create"
+        const val HOMEWORK_SHARE_FETCH = "/api/v1/shares/homework/fetch"
+        const val INSTALLATION_TOKEN_HEADER = "X-Installation-Token"
     }
 }

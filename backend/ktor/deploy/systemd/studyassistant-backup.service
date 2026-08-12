@@ -1,0 +1,29 @@
+[Unit]
+Description=Create a verified StudyAssistant PostgreSQL backup
+Requires=docker.service
+After=docker.service studyassistant-backend.service
+
+[Service]
+Type=oneshot
+User=root
+Environment=ENV_FILE=/etc/studyassistant/production.env
+Environment=COMPOSE_FILE=/opt/studyassistant/backend/ktor/compose.production.yml
+Environment=BACKUP_DIRECTORY=/var/backups/studyassistant
+Environment=RETENTION_DAYS=14
+ExecStartPre=/usr/local/libexec/studyassistant/preflight.sh
+ExecStart=/usr/local/libexec/studyassistant/backup.sh
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+TimeoutStartSec=1800
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/backups/studyassistant /run/lock
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

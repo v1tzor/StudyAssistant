@@ -49,5 +49,4 @@ class ProfileRepositoryImpl(
     override suspend fun deleteAvatar(avatar: String) {
         avatarLocalDataSource.deleteAvatar(avatar)
     }
-
 }

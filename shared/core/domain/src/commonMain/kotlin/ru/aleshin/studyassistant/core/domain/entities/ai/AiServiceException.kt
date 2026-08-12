@@ -21,10 +21,10 @@ package ru.aleshin.studyassistant.core.domain.entities.ai
  */
 sealed class AiServiceException(message: String) : RuntimeException(message) {
     class QuotaExceeded(val resetAtEpochMillis: Long?) :
-        AiServiceException("Shared AI quota exceeded")
+        AiServiceException("AI quota exceeded")
 
-    class InvalidKey : AiServiceException("Personal AI key is invalid")
-    class InsufficientBalance : AiServiceException("Personal AI account balance is insufficient")
-    class RateLimited : AiServiceException("AI service rate limit exceeded")
+    class InvalidRequest : AiServiceException("AI request is invalid")
+    class RateLimited(val retryAtEpochMillis: Long? = null) :
+        AiServiceException("AI service rate limit exceeded")
     class ServerUnavailable : AiServiceException("AI service is unavailable")
 }

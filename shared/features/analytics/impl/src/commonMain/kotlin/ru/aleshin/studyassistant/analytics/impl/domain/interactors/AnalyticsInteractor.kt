@@ -206,8 +206,7 @@ internal interface AnalyticsInteractor {
                     previousTodos = todos.second,
                     completedTodos = todos.third,
                     goalDistribution = EMPTY_GOAL_DISTRIBUTION,
-                    workloadThreshold = notificationSettings.highWorkload
-                        ?: NotificationSettings.WORKLOAD_HIGH_VALUE,
+                    workloadThreshold = notificationSettings.highWorkload ?: NotificationSettings.WORKLOAD_HIGH_VALUE,
                     target = target,
                 )
             }.distinctUntilChanged()

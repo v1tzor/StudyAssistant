@@ -125,7 +125,7 @@ fun GoalWidgetRow(
                     },
                 ),
             color = statusColor,
-            backgroundColor = GlanceTheme.colors.outline,
+            backgroundColor = GlanceTheme.colors.secondaryContainer,
         )
     }
 }

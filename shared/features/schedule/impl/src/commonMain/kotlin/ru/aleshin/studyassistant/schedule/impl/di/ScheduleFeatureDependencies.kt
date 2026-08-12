@@ -17,7 +17,9 @@
 package ru.aleshin.studyassistant.schedule.impl.di
 
 import dev.tmapps.konnection.Konnection
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
+import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
@@ -31,6 +33,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ScheduleImportRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ScheduleShareRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
@@ -42,6 +45,7 @@ public interface ScheduleFeatureDependencies : BaseFeatureDependencies {
     public val baseScheduleRepository: BaseScheduleRepository
     public val customScheduleRepository: CustomScheduleRepository
     public val scheduleShareRepository: ScheduleShareRepository
+    public val scheduleImportRepository: ScheduleImportRepository
     public val organizationsRepository: OrganizationsRepository
     public val profileRepository: ProfileRepository
     public val subjectsRepository: SubjectsRepository
@@ -53,7 +57,9 @@ public interface ScheduleFeatureDependencies : BaseFeatureDependencies {
     public val homeworkRepository: HomeworksRepository
     public val todoRepository: TodoRepository
     public val connectionManager: Konnection
+    public val deviceInfoProvider: DeviceInfoProvider
     public val dateManager: DateManager
     public val coroutineManager: CoroutineManager
+    public val appDispatchers: AppDispatchers
     public val crashlyticsService: CrashlyticsService
 }

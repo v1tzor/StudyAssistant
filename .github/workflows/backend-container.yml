@@ -1,0 +1,200 @@
+name: Backend container release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - backend-v*
+
+concurrency:
+  group: backend-container-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  BACKEND_IMAGE: ghcr.io/v1tzor/studyassistant-backend
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Java
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
+
+      - name: Verify backend
+        working-directory: backend/ktor
+        run: ./gradlew test --no-daemon --no-build-cache --console=plain
+
+      - name: Smoke-test production containers and migrations
+        working-directory: backend/ktor
+        run: |
+          set -euo pipefail
+          secret_directory="$(mktemp -d)"
+          cleanup() {
+            docker compose -f compose.production.yml down --volumes --remove-orphans || true
+            rm -rf -- "$secret_directory"
+          }
+          trap cleanup EXIT
+
+          umask 0077
+          for secret_name in \
+            postgres_admin_password \
+            database_app_password \
+            database_migrator_password \
+            installation_hmac_secret \
+            share_hmac_secret \
+            payload_encryption_key; do
+            openssl rand -hex 32 > "$secret_directory/$secret_name"
+          done
+          printf '%s\n' 'ci-smoke-key' > "$secret_directory/deepseek_api_key"
+          sudo chgrp -R 10001 "$secret_directory"
+          chmod 0750 "$secret_directory"
+          chmod 0640 "$secret_directory"/*
+
+          export COMPOSE_PROJECT_NAME=studyassistant-backend-smoke
+          export BACKEND_IMAGE=studyassistant-backend:smoke
+          export POSTGRES_ADMIN_PASSWORD_FILE="$secret_directory/postgres_admin_password"
+          export DATABASE_APP_PASSWORD_FILE="$secret_directory/database_app_password"
+          export DATABASE_MIGRATOR_PASSWORD_FILE="$secret_directory/database_migrator_password"
+          export INSTALLATION_HMAC_SECRET_FILE="$secret_directory/installation_hmac_secret"
+          export SHARE_HMAC_SECRET_FILE="$secret_directory/share_hmac_secret"
+          export PAYLOAD_ENCRYPTION_KEY_FILE="$secret_directory/payload_encryption_key"
+          export DEEPSEEK_API_KEY_FILE="$secret_directory/deepseek_api_key"
+
+          docker compose -f compose.production.yml up --detach --build --wait backend
+          docker compose -f compose.production.yml exec -T backend \
+            wget -q -O /dev/null \
+            --header='Host: api.studyassistant-app.ru' \
+            --header='X-Forwarded-Host: api.studyassistant-app.ru' \
+            --header='X-Forwarded-Proto: https' \
+            http://127.0.0.1:8080/health/ready
+          docker compose -f compose.production.yml exec -T backend sh -c \
+            'curl -fsS -X POST \
+            -H "Host: api.studyassistant-app.ru" \
+            -H "X-Forwarded-Host: api.studyassistant-app.ru" \
+            -H "X-Forwarded-Proto: https" \
+            http://127.0.0.1:8080/api/v1/installations/register | \
+            grep -Eq "\"credential\":\"v1\\.[A-Za-z0-9_-]{43}\\.[A-Za-z0-9_-]{43}\""'
+
+      - name: Scan backend source and deployment configuration
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: backend/ktor
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+  build:
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish immutable image
+        id: build
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: backend/ktor
+          file: backend/ktor/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          provenance: mode=max
+          sbom: true
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:${{ github.ref_name }}
+            ${{ env.BACKEND_IMAGE }}:sha-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  scan:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Log in to GHCR read-only
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Scan published image before signing
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.BACKEND_IMAGE }}@${{ needs.build.outputs.digest }}
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+  sign:
+    needs:
+      - build
+      - scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@f713795cb21599bc4e5c4b58cbad1da852d7eeb9 # v3
+
+      - name: Sign published digest
+        env:
+          IMAGE_DIGEST: ${{ needs.build.outputs.digest }}
+        run: cosign sign --yes "${BACKEND_IMAGE}@${IMAGE_DIGEST}"
+
+      - name: Publish deployment reference
+        env:
+          IMAGE_DIGEST: ${{ needs.build.outputs.digest }}
+        run: printf '%s\n' "BACKEND_IMAGE=${BACKEND_IMAGE}@${IMAGE_DIGEST}" >> "$GITHUB_STEP_SUMMARY"

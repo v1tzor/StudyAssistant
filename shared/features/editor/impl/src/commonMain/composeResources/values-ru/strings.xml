@@ -164,11 +164,11 @@
     <string name="password_changer_label">Пароль</string>
     <string name="old_password_field_label">Старый пароль</string>
     <string name="password_field_placeholder">Мин. 6 символов (a-Z)(0-9)</string>
-    <string name="credentials_error_message">Данные пользователя, неверны или неполны!</string>
     <string name="hide_organization_warning">Вы уверены что хотите скрыть организацию? После этого вы больше не сможете её использовать</string>
     <string name="delete_office_warning_title">Вы уверены что хотите удалить данный кабинет?</string>
     <string name="delete_location_warning_title">Вы уверены что хотите удалить данную локацию?</string>
     <string name="subjects_search_bar_placeholder">Поиск предметов</string>
     <string name="employee_search_bar_placeholder">Поиск преподавателей</string>
+    <string name="schedule_import_open_description">Импорт из фото или текста</string>
     <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
 </resources>

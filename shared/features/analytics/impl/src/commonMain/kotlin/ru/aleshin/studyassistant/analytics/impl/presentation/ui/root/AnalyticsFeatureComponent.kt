@@ -44,7 +44,8 @@ internal abstract class AnalyticsFeatureComponent(
     abstract val stack: Value<ChildStack<*, Child>>
 
     sealed class Child {
-        data class AnalyticsChild(val component: AnalyticsComponent) : Child()
+        data class OverviewChild(val component: AnalyticsComponent) : Child()
+        data class DetailsChild(val component: AnalyticsComponent) : Child()
     }
 
     class Default(
@@ -72,18 +73,24 @@ internal abstract class AnalyticsFeatureComponent(
         }
 
         private fun createChild(route: AnalyticsRoute, componentContext: ComponentContext): Child {
-            val input = when (route) {
-                is AnalyticsRoute.Overview -> AnalyticsInput()
-                is AnalyticsRoute.Details -> AnalyticsInput(route.target, route.selection)
+            return when (route) {
+                is AnalyticsRoute.Overview -> Child.OverviewChild(
+                    component = AnalyticsComponent.Default(
+                        storeFactory = storeFactory,
+                        componentContext = componentContext,
+                        inputData = AnalyticsInput(),
+                        outputConsumer = screenOutputConsumer(),
+                    ),
+                )
+                is AnalyticsRoute.Details -> Child.DetailsChild(
+                    component = AnalyticsComponent.Default(
+                        storeFactory = storeFactory,
+                        componentContext = componentContext,
+                        inputData = AnalyticsInput(route.target, route.selection),
+                        outputConsumer = screenOutputConsumer(),
+                    ),
+                )
             }
-            return Child.AnalyticsChild(
-                component = AnalyticsComponent.Default(
-                    storeFactory = storeFactory,
-                    componentContext = componentContext,
-                    inputData = input,
-                    outputConsumer = screenOutputConsumer(),
-                ),
-            )
         }
 
         private fun screenOutputConsumer() = OutputConsumer<ScreenOutput> { output ->

@@ -35,6 +35,9 @@ public sealed class ScheduleConfig {
 
     @Serializable
     public data class Share(val code: String? = null) : ScheduleConfig()
+
+    @Serializable
+    public data class Import(val rawText: String? = null) : ScheduleConfig()
 }
 
 public sealed class ScheduleOutput : BaseOutput {

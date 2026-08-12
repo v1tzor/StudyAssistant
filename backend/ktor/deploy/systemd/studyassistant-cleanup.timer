@@ -1,0 +1,11 @@
+[Unit]
+Description=Run StudyAssistant cleanup every hour
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=300
+Unit=studyassistant-cleanup.service
+
+[Install]
+WantedBy=timers.target

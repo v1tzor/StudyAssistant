@@ -1,0 +1,45 @@
+name: studyassistant-backend
+
+services:
+
+  postgres:
+    image: postgres:18.4-alpine@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      DATABASE_APP_PASSWORD: ${DATABASE_APP_PASSWORD}
+      DATABASE_MIGRATOR_PASSWORD: ${DATABASE_MIGRATOR_PASSWORD}
+
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+    restart: unless-stopped
+
+    networks:
+      - database
+
+
+volumes:
+
+  postgres_data:
+
+
+networks:
+
+  database:
+    internal: true

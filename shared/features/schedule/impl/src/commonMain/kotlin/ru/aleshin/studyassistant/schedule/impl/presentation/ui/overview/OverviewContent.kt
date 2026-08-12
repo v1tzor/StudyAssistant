@@ -121,7 +121,7 @@ internal fun OverviewContent(
                     },
                     onDetailsClick = {
                         store.dispatchEvent(OverviewEvent.ClickDetails)
-                    },
+                    }
                 )
                 OverviewTopSheet(
                     isLoadingSchedule = state.isScheduleLoading,

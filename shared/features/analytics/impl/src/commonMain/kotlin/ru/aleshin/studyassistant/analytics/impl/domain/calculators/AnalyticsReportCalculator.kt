@@ -45,6 +45,7 @@ import ru.aleshin.studyassistant.analytics.impl.domain.entities.EmployeeAnalytic
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.OrganizationAnalytics
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.SubjectAnalytics
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyWorkload
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
@@ -190,7 +191,11 @@ internal interface AnalyticsReportCalculator {
             currentTime: Instant,
         ): AnalyticsSummary {
             val statuses = buildList {
-                homeworks.forEach { homework -> add(classify(homework.isDone, homework.completeDate, homework.deadline, currentTime)) }
+                homeworks.forEach { homework ->
+                    add(
+                        classify(homework.isDone, homework.completeDate, homework.deadline, currentTime)
+                    )
+                }
                 todos.forEach { todo ->
                     todo.deadline?.let { deadline ->
                         add(classify(todo.isDone, todo.completeDate, deadline, currentTime))
@@ -392,6 +397,12 @@ internal interface AnalyticsReportCalculator {
         ): List<SubjectAnalytics> {
             val allClasses = classes.values.flatten()
             val keys = (allClasses.map { it.subject?.uid } + homeworks.map { it.subject?.uid }).distinct()
+            val maxPlannedDuration = allClasses
+                .groupBy { it.subject?.uid }
+                .maxOfOrNull { it.value.sumOf { it.duration() } }
+                ?.toFloat()
+                ?.coerceAtLeast(1F) ?: 1F
+
             return keys.map { subjectId ->
                 val targetClasses = allClasses.filter { it.subject?.uid == subjectId }
                 val targetHomeworks = homeworks.filter { it.subject?.uid == subjectId }
@@ -399,9 +410,9 @@ internal interface AnalyticsReportCalculator {
                     classify(it.isDone, it.completeDate, it.deadline, currentTime)
                 }
                 SubjectAnalytics(
-                    subject = targetClasses.firstNotNullOfOrNull { it.subject }
-                        ?: targetHomeworks.firstNotNullOfOrNull { it.subject },
+                    subject = targetClasses.firstNotNullOfOrNull { it.subject } ?: targetHomeworks.firstNotNullOfOrNull { it.subject },
                     plannedDuration = targetClasses.sumOf { it.duration() },
+                    workloadProgress = (targetClasses.sumOf { it.duration() }.toFloat() / maxPlannedDuration).coerceIn(0f, 1f),
                     classesCount = targetClasses.size,
                     homeworkCount = targetHomeworks.size,
                     testsCount = targetHomeworks.count { !it.test.isNullOrBlank() },
@@ -409,8 +420,7 @@ internal interface AnalyticsReportCalculator {
                     overdue = statuses.count { it == AnalyticsTaskStatus.OVERDUE },
                 )
             }.sortedWith(
-                compareByDescending<SubjectAnalytics> { it.plannedDuration }
-                    .thenBy { it.subject?.name.orEmpty() },
+                compareByDescending<SubjectAnalytics> { it.plannedDuration }.thenBy { it.subject?.name.orEmpty() },
             )
         }
 
@@ -452,8 +462,10 @@ internal interface AnalyticsReportCalculator {
                     todos = todos.filter { it.deadline?.startThisDay(timeZone) == instant },
                 ).value
             }
-            val completionDates = (completedHomeworks.mapNotNull { it.completeDate } +
-                completedTodos.mapNotNull { it.completeDate })
+            val completionDates = (
+                completedHomeworks.mapNotNull { it.completeDate } +
+                    completedTodos.mapNotNull { it.completeDate }
+                )
                 .map { it.toLocalDateTime(timeZone).date }
                 .filter { it.atStartOfDayIn(timeZone) in selection.range.from..selection.range.to }
                 .toSet()
@@ -477,34 +489,42 @@ internal interface AnalyticsReportCalculator {
                 add(AnalyticsInsight(AnalyticsInsight.Type.PEAK_LOAD, peak.workload, peak.from))
             }
             if (loadDistribution.daysAboveThreshold > 0) {
-                add(AnalyticsInsight(
-                    type = AnalyticsInsight.Type.OVERLOAD_DAYS,
-                    value = loadDistribution.daysAboveThreshold.toFloat(),
-                ))
+                add(
+                    AnalyticsInsight(
+                        type = AnalyticsInsight.Type.OVERLOAD_DAYS,
+                        value = loadDistribution.daysAboveThreshold.toFloat(),
+                    )
+                )
             }
             val completedWithDate = summary.completedOnTime + summary.completedLate
             if (summary.completedLate > 0 && completedWithDate > 0) {
-                add(AnalyticsInsight(
-                    type = AnalyticsInsight.Type.LATE_COMPLETION_SHARE,
-                    value = (summary.completedLate.toRate(completedWithDate) ?: 0f) * PERCENT_FACTOR,
-                ))
+                add(
+                    AnalyticsInsight(
+                        type = AnalyticsInsight.Type.LATE_COMPLETION_SHARE,
+                        value = (summary.completedLate.toRate(completedWithDate) ?: 0f) * PERCENT_FACTOR,
+                    )
+                )
             }
             organizations.firstOrNull()?.takeIf { it.workloadShare >= CONCENTRATION_THRESHOLD }?.let {
-                add(AnalyticsInsight(
-                    type = AnalyticsInsight.Type.ORGANIZATION_CONCENTRATION,
-                    value = it.workloadShare * PERCENT_FACTOR,
-                    name = it.organization.shortName,
-                ))
+                add(
+                    AnalyticsInsight(
+                        type = AnalyticsInsight.Type.ORGANIZATION_CONCENTRATION,
+                        value = it.workloadShare * PERCENT_FACTOR,
+                        name = it.organization.shortName,
+                    )
+                )
             }
             val subjectsDuration = subjects.sumOf { it.plannedDuration }
             subjects.firstOrNull()?.takeIf { subjectsDuration > 0L }?.let { subject ->
                 val share = subject.plannedDuration.toRate(subjectsDuration) ?: 0f
                 if (share >= CONCENTRATION_THRESHOLD) {
-                    add(AnalyticsInsight(
-                        type = AnalyticsInsight.Type.SUBJECT_CONCENTRATION,
-                        value = share * PERCENT_FACTOR,
-                        name = subject.subject?.name,
-                    ))
+                    add(
+                        AnalyticsInsight(
+                            type = AnalyticsInsight.Type.SUBJECT_CONCENTRATION,
+                            value = share * PERCENT_FACTOR,
+                            name = subject.subject?.name,
+                        )
+                    )
                 }
             }
         }.take(MAX_INSIGHTS)
@@ -584,7 +604,7 @@ internal interface AnalyticsReportCalculator {
             else -> AnalyticsTaskStatus.UPCOMING
         }
 
-        private fun ru.aleshin.studyassistant.core.common.functional.TimeRange.localDates(): List<LocalDate> {
+        private fun TimeRange.localDates(): List<LocalDate> {
             val start = from.toLocalDateTime(timeZone).date
             val end = to.toLocalDateTime(timeZone).date
             return buildList {

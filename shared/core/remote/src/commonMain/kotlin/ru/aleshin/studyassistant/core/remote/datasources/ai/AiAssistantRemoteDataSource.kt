@@ -16,44 +16,32 @@
 
 package ru.aleshin.studyassistant.core.remote.datasources.ai
 
-import ru.aleshin.studyassistant.core.remote.api.ai.AiCompletionResult
 import ru.aleshin.studyassistant.core.remote.api.ai.AiRemoteApi
-import ru.aleshin.studyassistant.core.remote.models.ai.ChatCompletionRequestPojo
+import ru.aleshin.studyassistant.core.remote.models.ai.backend.AiCompletionRequestPojo
+import ru.aleshin.studyassistant.core.remote.models.ai.backend.AiCompletionResponsePojo
 
 /**
- * @author Stanislav Aleshin on 08.08.2026.
+ * @author Stanislav Aleshin on 12.08.2026.
  */
 interface AiAssistantRemoteDataSource {
 
-    suspend fun completeShared(
-        request: ChatCompletionRequestPojo,
-        installationId: String,
-        requestKey: String,
-    ): AiCompletionResult
-
-    suspend fun completePersonal(
-        request: ChatCompletionRequestPojo,
-        apiKey: String,
-    ): AiCompletionResult
+    suspend fun complete(
+        request: AiCompletionRequestPojo,
+        installationToken: String,
+    ): AiCompletionResponsePojo
 
     class Base(
-        private val sharedApi: AiRemoteApi,
-        private val personalApi: AiRemoteApi,
+        private val api: AiRemoteApi,
     ) : AiAssistantRemoteDataSource {
 
-        override suspend fun completeShared(
-            request: ChatCompletionRequestPojo,
-            installationId: String,
-            requestKey: String,
-        ): AiCompletionResult {
-            return sharedApi.chatCompletion(request, installationId, requestKey)
-        }
-
-        override suspend fun completePersonal(
-            request: ChatCompletionRequestPojo,
-            apiKey: String,
-        ): AiCompletionResult {
-            return personalApi.chatCompletion(request, apiKey)
+        override suspend fun complete(
+            request: AiCompletionRequestPojo,
+            installationToken: String,
+        ): AiCompletionResponsePojo {
+            return api.complete(
+                request = request,
+                installationToken = installationToken,
+            )
         }
     }
 }

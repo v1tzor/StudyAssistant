@@ -318,10 +318,7 @@ abstract class MainComponent(
                     stackNavigation.replaceAll(TabNavigation())
                 }
                 is PreviewOutput.NavigateToWeekScheduleEditor -> {
-                    stackNavigation.replaceAll(
-                        TabNavigation(),
-                        Editor(EditorConfig.WeekSchedule()),
-                    )
+                    stackNavigation.replaceAll(TabNavigation(), Editor(EditorConfig.WeekSchedule()))
                 }
             }
         }
@@ -329,6 +326,10 @@ abstract class MainComponent(
         private fun editorOutputConsumer() = OutputConsumer<EditorOutput> { output ->
             when (output) {
                 is EditorOutput.NavigateToBack -> navigateToBack()
+                is EditorOutput.NavigateToImport -> {
+                    val config = Schedule(ScheduleConfig.Import(output.rawText))
+                    stackNavigation.pushToFront(config)
+                }
             }
         }
 

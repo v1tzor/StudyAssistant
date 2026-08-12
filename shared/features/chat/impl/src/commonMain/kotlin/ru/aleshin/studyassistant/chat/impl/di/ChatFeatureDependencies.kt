@@ -29,7 +29,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
-import ru.aleshin.studyassistant.core.domain.repositories.DailyAiStatisticsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
@@ -46,13 +45,12 @@ public interface ChatFeatureDependencies : BaseFeatureDependencies {
     public val baseScheduleRepository: BaseScheduleRepository
     public val aiAssistantRepository: AiAssistantRepository
     public val aiSettingsRepository: AiSettingsRepository
-    public val profileRepository: ProfileRepository
-    public val dailyAiStatisticsRepository: DailyAiStatisticsRepository
     public val customScheduleRepository: CustomScheduleRepository
     public val employeeRepository: EmployeeRepository
     public val subjectsRepository: SubjectsRepository
     public val goalsRepository: DailyGoalsRepository
     public val organizationsRepository: OrganizationsRepository
+    public val profileRepository: ProfileRepository
     public val homeworksRepository: HomeworksRepository
     public val todoRepository: TodoRepository
     public val calendarSettingsRepository: CalendarSettingsRepository

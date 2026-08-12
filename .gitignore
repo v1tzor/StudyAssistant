@@ -21,4 +21,3 @@ iosApp/GoogleService-Info.plist
 iosApp/iosApp/GoogleService-Info.plist
 androidApp/google-services.json
 androidApp/agconnect-services.json
-backend/appwrite/node_modules/

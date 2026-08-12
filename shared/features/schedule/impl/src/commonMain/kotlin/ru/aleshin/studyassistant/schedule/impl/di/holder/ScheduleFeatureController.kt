@@ -20,7 +20,9 @@ import dev.tmapps.konnection.Konnection
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureController
+import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
@@ -34,6 +36,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ScheduleImportRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ScheduleShareRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
@@ -57,6 +60,7 @@ public class ScheduleFeatureController(
 
         bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
         bindSingleton<ScheduleShareRepository> { dependencies.scheduleShareRepository }
+        bindSingleton<ScheduleImportRepository> { dependencies.scheduleImportRepository }
         bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
         bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
         bindSingleton<ProfileRepository> { dependencies.profileRepository }
@@ -70,8 +74,10 @@ public class ScheduleFeatureController(
         bindSingleton<StartClassesReminderManager> { dependencies.startClassesReminderManager }
         bindSingleton<EndClassesReminderManager> { dependencies.endClassesReminderManager }
         bindSingleton<Konnection> { dependencies.connectionManager }
+        bindSingleton<DeviceInfoProvider> { dependencies.deviceInfoProvider }
         bindSingleton<DateManager> { dependencies.dateManager }
         bindSingleton<CoroutineManager> { dependencies.coroutineManager }
+        bindSingleton<AppDispatchers> { dependencies.appDispatchers }
 
         bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
 

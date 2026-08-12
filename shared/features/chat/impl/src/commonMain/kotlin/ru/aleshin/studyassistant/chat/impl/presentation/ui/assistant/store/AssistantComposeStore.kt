@@ -104,6 +104,24 @@ internal class AssistantComposeStore(
                 consumeOutput(AssistantOutput.NavigateToAiSettings)
             }
 
+            is AssistantEvent.OpenScheduleImport -> {
+                consumeOutput(AssistantOutput.NavigateToScheduleImport)
+            }
+
+            is AssistantEvent.ResolveToolCall -> with(event) {
+                val chatId = state().chatHistory?.uid
+                if (chatId != null && state().responseStatus != ResponseStatus.LOADING) {
+                    launchBackgroundWork(ToolConfirmationKey(toolCallId)) {
+                        val command = AssistantWorkCommand.ResolveToolCall(
+                            chatId = chatId,
+                            toolCallId = toolCallId,
+                            approved = approved,
+                        )
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
+                }
+            }
+
             is AssistantEvent.StopResponseLoading -> {
                 sendAction(AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE))
             }
@@ -139,6 +157,8 @@ internal class AssistantComposeStore(
     enum class BackgroundKey : BackgroundWorkKey {
         LOAD_MESSAGES, LOAD_QUOTA_EXPIRED_STATUS, SEND_MESSAGE, MESSAGE_ACTION
     }
+
+    data class ToolConfirmationKey(val toolCallId: String) : BackgroundWorkKey
 
     class Factory(
         private val workProcessor: AssistantWorkProcessor,

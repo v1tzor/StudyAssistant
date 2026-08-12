@@ -70,11 +70,15 @@ internal class AiAssistantRepositoryImpl(
         return conversationHandler.sendUserMessage(chatId, message)
     }
 
-    override suspend fun sendToolResponse(
+    override suspend fun saveToolResponses(
         chatId: UID,
         messages: List<AiAssistantMessage.ToolMessage>
-    ): AiAssistantResponse {
-        return conversationHandler.sendToolResponse(chatId, messages)
+    ) {
+        localDataSource.addChatMessages(messages.map { it.mapToLocal(chatId) })
+    }
+
+    override suspend fun completeToolRound(chatId: UID): AiAssistantResponse {
+        return conversationHandler.completeToolRound(chatId)
     }
 
     override suspend fun saveAssistantMessage(
@@ -93,10 +97,6 @@ internal class AiAssistantRepositoryImpl(
 
     override suspend fun deleteUnconfirmedMessages(chatId: UID) {
         conversationHandler.deleteUnconfirmedMessages(chatId)
-    }
-
-    override suspend fun testPersonalKey(apiKey: String) {
-        conversationHandler.testPersonalKey(apiKey)
     }
 
     override suspend fun deleteChat(chatId: UID?) {

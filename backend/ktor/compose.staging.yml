@@ -1,0 +1,13 @@
+services:
+
+  backend:
+    environment:
+      EXPECTED_HOST: ${EXPECTED_HOST:-staging-api.studyassistant-app.ru}
+      TRUST_PROXY_HEADERS: "false"
+      REQUIRE_HTTPS: "false"
+    ports:
+      - 127.0.0.1:${STAGING_BACKEND_PORT:-18081}:8080
+
+  nginx:
+    profiles:
+      - production-ingress

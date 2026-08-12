@@ -1,0 +1,11 @@
+[Unit]
+Description=Create a daily StudyAssistant PostgreSQL backup
+
+[Timer]
+OnCalendar=*-*-* 03:15:00 UTC
+Persistent=true
+RandomizedDelaySec=900
+Unit=studyassistant-backup.service
+
+[Install]
+WantedBy=timers.target

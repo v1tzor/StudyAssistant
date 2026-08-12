@@ -21,6 +21,14 @@ import ru.aleshin.studyassistant.core.domain.entities.share.ShareException
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
 import ru.aleshin.studyassistant.schedule.impl.resources.other_error_message
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_image_too_large_error
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_invalid_error
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_invalid_image_error
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_no_text_error
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_ocr_unavailable_error
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_quota_error
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_rate_limit_error
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_server_error
 import ru.aleshin.studyassistant.schedule.impl.resources.share_daily_limit_message
 import ru.aleshin.studyassistant.schedule.impl.resources.share_item_limit_message
 import ru.aleshin.studyassistant.schedule.impl.resources.share_payload_limit_message
@@ -33,6 +41,16 @@ import ru.aleshin.studyassistant.core.ui.resources.network_error_message as core
  */
 internal suspend fun ScheduleFailures.mapToMessage() = when (this) {
     is ScheduleFailures.InternetError -> getString(CoreRes.string.core_network_error_message)
+    is ScheduleFailures.QuotaExceeded -> getString(Res.string.schedule_import_quota_error)
+    is ScheduleFailures.RateLimited -> getString(Res.string.schedule_import_rate_limit_error)
+    is ScheduleFailures.InvalidImport -> getString(Res.string.schedule_import_invalid_error)
+    is ScheduleFailures.InvalidImage -> getString(Res.string.schedule_import_invalid_image_error)
+    is ScheduleFailures.ImageTooLarge -> getString(Res.string.schedule_import_image_too_large_error)
+    is ScheduleFailures.NoTextRecognized -> getString(Res.string.schedule_import_no_text_error)
+    is ScheduleFailures.TextRecognitionUnavailable -> {
+        getString(Res.string.schedule_import_ocr_unavailable_error)
+    }
+    is ScheduleFailures.ServerUnavailable -> getString(Res.string.schedule_import_server_error)
     is ScheduleFailures.OtherError -> when (throwable) {
         is ShareException.RateLimit -> getString(Res.string.share_rate_limit_message)
         is ShareException.ShareLimit -> getString(Res.string.share_daily_limit_message)

@@ -16,19 +16,12 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.mappers
 
-import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceType
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
-import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.AiServiceTypeUi
 import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.AiSettingsUi
 
 /**
  * @author Stanislav Aleshin on 08.08.2026.
  */
 internal fun AiSettings.mapToUi() = AiSettingsUi(
-    serviceType = when (serviceType) {
-        AiServiceType.SHARED -> AiServiceTypeUi.SHARED
-        AiServiceType.PERSONAL -> AiServiceTypeUi.PERSONAL
-    },
-    hasPersonalKey = hasPersonalKey,
-    sharedQuotaRemaining = sharedQuotaRemaining,
+    quotaRemaining = quotaRemaining,
 )

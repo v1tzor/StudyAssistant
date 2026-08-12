@@ -16,66 +16,27 @@
 
 package ru.aleshin.studyassistant.chat.impl.domain.interactors
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Instant
-import kotlinx.datetime.format
-import kotlinx.datetime.format.DateTimeComponents.Formats
-import kotlinx.serialization.json.addJsonObject
-import kotlinx.serialization.json.buildJsonArray
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import ru.aleshin.studyassistant.chat.impl.domain.common.ChatEitherWrapper
+import ru.aleshin.studyassistant.chat.impl.domain.entities.AiToolConfirmationData
+import ru.aleshin.studyassistant.chat.impl.domain.entities.AssistantChatData
 import ru.aleshin.studyassistant.chat.impl.domain.entities.ChatFailures
-import ru.aleshin.studyassistant.core.common.extensions.dateTime
-import ru.aleshin.studyassistant.core.common.extensions.endOfWeek
-import ru.aleshin.studyassistant.core.common.extensions.endThisDay
-import ru.aleshin.studyassistant.core.common.extensions.equalsDay
-import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
-import ru.aleshin.studyassistant.core.common.extensions.parseUsingOffset
+import ru.aleshin.studyassistant.chat.impl.domain.tools.AiToolCallProcessor
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
-import ru.aleshin.studyassistant.core.common.extensions.shiftDay
-import ru.aleshin.studyassistant.core.common.extensions.shiftWeek
-import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
-import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage
-import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage.Type
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiChat
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiChatHistory
-import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceType
-import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
-import ru.aleshin.studyassistant.core.domain.entities.ai.DailyAiResponses
-import ru.aleshin.studyassistant.core.domain.entities.ai.ToolCall
-import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
-import ru.aleshin.studyassistant.core.domain.entities.schedules.base.associateWithDates
-import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
-import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
-import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
-import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
-import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
-import ru.aleshin.studyassistant.core.domain.repositories.DailyAiStatisticsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
-import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
-import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
-import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
-import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
-import ru.aleshin.studyassistant.core.ui.views.TIME_SUFFIX
-import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
-import ru.aleshin.studyassistant.core.ui.views.iso8601
-import ru.aleshin.studyassistant.core.ui.views.timeFormat
 
 /**
  * @author Stanislav Aleshin on 21.06.2025.
@@ -85,57 +46,38 @@ internal interface AiAssistantInteractor {
     suspend fun addChat(): DomainResult<ChatFailures, UID>
     suspend fun quotaIsExpired(): FlowDomainResult<ChatFailures, Boolean>
     suspend fun fetchChats(): FlowDomainResult<ChatFailures, List<AiChat>>
-    suspend fun fetchChatHistory(chatId: UID): FlowDomainResult<ChatFailures, AiChatHistory>
+    suspend fun fetchChatHistory(chatId: UID): FlowDomainResult<ChatFailures, AssistantChatData>
     suspend fun clearHistory(chatId: UID): UnitDomainResult<ChatFailures>
     suspend fun sendMessage(chatId: UID, message: String?): UnitDomainResult<ChatFailures>
+    suspend fun resolveToolCall(
+        chatId: UID,
+        toolCallId: UID,
+        approved: Boolean,
+    ): UnitDomainResult<ChatFailures>
     suspend fun retryAttempt(chatId: UID): UnitDomainResult<ChatFailures>
     suspend fun clearUnsendMessage(chatId: UID): UnitDomainResult<ChatFailures>
 
     class Base(
         private val aiAssistantRepository: AiAssistantRepository,
-        private val statisticsRepository: DailyAiStatisticsRepository,
-        private val todoRepository: TodoRepository,
-        private val homeworksRepository: HomeworksRepository,
-        private val subjectsRepository: SubjectsRepository,
-        private val organizationsRepository: OrganizationsRepository,
-        private val baseScheduleRepository: BaseScheduleRepository,
-        private val customScheduleRepository: CustomScheduleRepository,
-        private val employeeRepository: EmployeeRepository,
-        private val calendarSettingsRepository: CalendarSettingsRepository,
-        private val todoReminderManager: TodoReminderManager,
-        private val profileRepository: ProfileRepository,
         private val aiSettingsRepository: AiSettingsRepository,
+        private val toolCallProcessor: AiToolCallProcessor,
         private val dateManager: DateManager,
         private val eitherWrapper: ChatEitherWrapper,
     ) : AiAssistantInteractor {
 
-        override suspend fun addChat() = eitherWrapper.wrap {
-            val profile = profileRepository.fetchProfile().first()
-            val chatId = randomUUID()
-            val systemMessage = AiAssistantMessage.SystemMessage(
-                id = chatId,
-                content = systemPromt(
-                    username = profile?.username.orEmpty(),
-                    birthday = profile?.birthday,
-                    currentDate = dateManager.fetchCurrentInstant().formatByTimeZone(
-                        format = Formats.dayMonthYearFormat()
-                    )
-                ),
-                time = dateManager.fetchCurrentInstant(),
-            )
-            val aiChatHistory = AiChatHistory(messages = listOf(systemMessage))
-            aiAssistantRepository.addOrUpdateChat(aiChatHistory)
+        private val toolDecisionMutex = Mutex()
 
-            return@wrap chatId
+        override suspend fun addChat() = eitherWrapper.wrap {
+            val chatId = randomUUID()
+            aiAssistantRepository.addOrUpdateChat(
+                AiChatHistory(uid = chatId, messages = emptyList()),
+            )
+            chatId
         }
 
         override suspend fun quotaIsExpired() = eitherWrapper.wrapFlow {
-            val currentDate = utcDayStart()
-            val aiSettingsFlow = aiSettingsRepository.fetchSettings()
-            val dailyResponseFlow = statisticsRepository.fetchStatisticsByDate(currentDate)
-
-            combine(aiSettingsFlow, dailyResponseFlow) { settings, statistics ->
-                settings.serviceType == AiServiceType.SHARED && (statistics?.totalResponses ?: 0) >= AiSettings.SHARED_DAILY_QUOTA
+            aiSettingsRepository.fetchSettings().map { settings ->
+                settings.quotaRemaining <= 0
             }
         }
 
@@ -145,85 +87,96 @@ internal interface AiAssistantInteractor {
 
         override suspend fun fetchChatHistory(chatId: UID) = eitherWrapper.wrapFlow {
             aiAssistantRepository.fetchChatHistoryById(chatId).map { chat ->
-                if (chat == null) throw NullPointerException("Chat($chatId) is not found")
-                val messages = chat.messages.filter {
-                    (it.type == Type.USER || it.type == Type.ASSISTANT) && !it.content.isNullOrEmpty()
-                }.sortedByDescending {
-                    it.time
-                }
-                chat.copy(
-                    messages = messages,
-                    lastMessage = if (chat.lastMessage?.type == Type.USER || chat.lastMessage?.type == Type.ASSISTANT) {
-                        chat.lastMessage
-                    } else {
-                        null
-                    }
+                val history = checkNotNull(chat) { "Chat($chatId) is not found" }
+                val visibleMessages = history.messages.filter { message ->
+                    (message is AiAssistantMessage.UserMessage ||
+                        message is AiAssistantMessage.AssistantMessage) &&
+                        !message.content.isNullOrEmpty()
+                }.sortedByDescending(AiAssistantMessage::time)
+                AssistantChatData(
+                    history = history.copy(
+                        messages = visibleMessages,
+                        lastMessage = history.lastMessage?.takeIf { message ->
+                            (message is AiAssistantMessage.UserMessage ||
+                                message is AiAssistantMessage.AssistantMessage) &&
+                                !message.content.isNullOrEmpty()
+                        },
+                    ),
+                    pendingMutations = toolCallProcessor.pendingMutations(history.messages).map { call ->
+                        AiToolConfirmationData(
+                            call = call,
+                            preview = toolCallProcessor.confirmationPreview(call),
+                        )
+                    },
                 )
-            }.distinctUntilChangedBy {
-                it.messages
+            }.distinctUntilChangedBy { data ->
+                data.history.messages to data.pendingMutations
             }
         }
 
         override suspend fun clearHistory(chatId: UID) = eitherWrapper.wrapUnit {
             val chat = aiAssistantRepository.fetchChatHistoryById(chatId).first()
-
             if (chat != null) {
-                val profile = profileRepository.fetchProfile().first()
-                val systemMessage = AiAssistantMessage.SystemMessage(
-                    id = chatId,
-                    content = systemPromt(
-                        username = profile?.username.orEmpty(),
-                        birthday = profile?.birthday,
-                        currentDate = dateManager.fetchCurrentInstant().formatByTimeZone(
-                            format = Formats.dayMonthYearFormat()
-                        )
-                    ),
-                    time = dateManager.fetchCurrentInstant(),
+                aiAssistantRepository.addOrUpdateChat(
+                    chat.copy(messages = emptyList(), lastMessage = null),
                 )
-                val clearedChat = chat.copy(messages = listOf(systemMessage), lastMessage = null)
-                aiAssistantRepository.addOrUpdateChat(clearedChat)
             }
         }
 
         override suspend fun sendMessage(chatId: UID, message: String?) = eitherWrapper.wrapUnit {
-            val currentTime = dateManager.fetchCurrentInstant()
-            val lastMessage = aiAssistantRepository.fetchChatHistoryLastMessage(chatId).first()
-
-            if (lastMessage?.time?.equalsDay(currentTime) != true) {
-                val systemMessage = AiAssistantMessage.SystemMessage(
-                    id = chatId,
-                    content = updatedActualInfoPromt(
-                        currentDate = dateManager.fetchCurrentInstant().format(
-                            format = Formats.dayMonthYearFormat()
-                        )
-                    ),
+            val userMessage = message?.let { content ->
+                AiAssistantMessage.UserMessage(
+                    content = content,
                     time = dateManager.fetchCurrentInstant(),
                 )
-                aiAssistantRepository.updateSystemPromt(chatId, systemMessage)
             }
-            val userMessage = message?.let { AiAssistantMessage.UserMessage(content = it, time = currentTime) }
             val response = aiAssistantRepository.sendUserMessage(chatId, userMessage)
+            handleMessage(
+                chatId = chatId,
+                assistantMessage = response.choices.firstOrNull()?.message,
+                toolRound = 0,
+            )
+        }
 
-            val assistantMessage = response.choices.firstOrNull()?.message
-            handleMessage(chatId, assistantMessage, toolRound = 0)
+        override suspend fun resolveToolCall(
+            chatId: UID,
+            toolCallId: UID,
+            approved: Boolean,
+        ) = eitherWrapper.wrapUnit {
+            toolDecisionMutex.withLock {
+                val history = checkNotNull(aiAssistantRepository.fetchChatHistoryById(chatId).first())
+                val activeCalls = toolCallProcessor.activeCalls(history.messages)
+                val targetCall = activeCalls.find { it.id == toolCallId }
+                    ?: throw IllegalArgumentException("Tool call is not pending")
+                require(toolCallProcessor.isMutation(targetCall)) {
+                    "Read-only tool cannot be confirmed"
+                }
+
+                aiAssistantRepository.saveToolResponses(
+                    chatId = chatId,
+                    messages = listOf(toolCallProcessor.execute(targetCall, approved)),
+                )
+
+                val updatedHistory = checkNotNull(
+                    aiAssistantRepository.fetchChatHistoryById(chatId).first(),
+                )
+                val unresolvedCalls = toolCallProcessor.activeCalls(updatedHistory.messages)
+                if (unresolvedCalls.any(toolCallProcessor::isMutation)) return@withLock
+
+                val readResults = unresolvedCalls.map { call -> toolCallProcessor.execute(call) }
+                if (readResults.isNotEmpty()) {
+                    aiAssistantRepository.saveToolResponses(chatId, readResults)
+                }
+                val response = aiAssistantRepository.completeToolRound(chatId)
+                handleMessage(
+                    chatId = chatId,
+                    assistantMessage = response.choices.firstOrNull()?.message,
+                    toolRound = countToolRounds(updatedHistory.messages),
+                )
+            }
         }
 
         override suspend fun retryAttempt(chatId: UID) = eitherWrapper.wrapUnit {
-            val currentTime = dateManager.fetchCurrentInstant()
-            val lastMessage = aiAssistantRepository.fetchChatHistoryLastMessage(chatId).first()
-
-            if (lastMessage?.time?.equalsDay(currentTime) != true) {
-                val systemMessage = AiAssistantMessage.SystemMessage(
-                    id = chatId,
-                    content = updatedActualInfoPromt(
-                        currentDate = dateManager.fetchCurrentInstant().format(
-                            format = Formats.dayMonthYearFormat()
-                        )
-                    ),
-                    time = dateManager.fetchCurrentInstant(),
-                )
-                aiAssistantRepository.updateSystemPromt(chatId, systemMessage)
-            }
             val assistantMessage = aiAssistantRepository.retrySendLastMessage(chatId)
             handleMessage(chatId, assistantMessage, toolRound = 0)
         }
@@ -238,444 +191,33 @@ internal interface AiAssistantInteractor {
             toolRound: Int,
         ) {
             val message = checkNotNull(assistantMessage as? AiAssistantMessage.AssistantMessage)
-            val toolCalls = message.toolCalls
+            val toolCalls = message.toolCalls.orEmpty()
             aiAssistantRepository.saveAssistantMessage(chatId, message)
 
-            if (toolCalls != null && toolCalls.isNotEmpty()) {
-                check(toolRound < MAX_TOOL_ROUNDS) { "Maximum AI tool-call rounds exceeded" }
-                val handleResult = handleToolCalls(toolCalls)
-                val toolResponse = aiAssistantRepository.sendToolResponse(chatId, handleResult)
-                handleMessage(chatId, toolResponse.choices.firstOrNull()?.message, toolRound + 1)
-            } else {
-                if (aiSettingsRepository.fetchSettings()
-                        .first().serviceType == AiServiceType.SHARED
-                ) {
-                    val currentDate = utcDayStart()
-                    val currentStatistics = statisticsRepository.fetchStatisticsByDate(currentDate).first()
-                    val statistics = currentStatistics?.copy(
-                        totalResponses = currentStatistics.totalResponses + 1,
-                        updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
-                    ) ?: DailyAiResponses(
-                        id = randomUUID(),
-                        date = currentDate,
-                        totalResponses = 1,
-                        updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
-                    )
-                    statisticsRepository.addOrUpdateStatistics(statistics)
-                    aiSettingsRepository.updateSharedQuota(
-                        remaining = AiSettings.SHARED_DAILY_QUOTA - statistics.totalResponses,
-                        resetAt = Instant.fromEpochMilliseconds(
-                            currentDate.toEpochMilliseconds() + MILLIS_IN_DAY
-                        ),
-                    )
-                }
-            }
-        }
+            if (toolCalls.isEmpty()) return
+            check(toolRound < MAX_TOOL_ROUNDS) { "Maximum AI tool-call rounds exceeded" }
+            if (toolCalls.any(toolCallProcessor::isMutation)) return
 
-        private suspend fun handleToolCalls(toolCalls: List<ToolCall>): List<AiAssistantMessage.ToolMessage> {
-            return toolCalls.map { call ->
-                val functionName = call.function.name
-                val functionArgs = call.function.arguments ?: emptyMap()
-
-                val resultContent = try {
-                    when (functionName) {
-                        "create_todo" -> createTodo(functionArgs)
-                        "create_homework" -> createHomeworks(functionArgs)
-                        "get_homeworks" -> getHomeworks(functionArgs)
-                        "get_overdue_homeworks" -> getOverdueHomeworks(functionArgs)
-                        "get_subjects" -> getSubjects(functionArgs)
-                        "get_employee" -> getEmployee(functionArgs)
-                        "get_organizations" -> getOrganizations(functionArgs)
-                        "get_classes_by_date" -> getClassesByDate(functionArgs)
-                        "get_near_class" -> getNearClass(functionArgs)
-                        else -> """{"error": "Функция $functionName не найдена"}"""
-                    }
-                } catch (error: CancellationException) {
-                    throw error
-                } catch (_: Exception) {
-                    """{"error": "Не удалось выполнить функцию. Проверь аргументы и повтори запрос"}"""
-                }
-
-                AiAssistantMessage.ToolMessage(
-                    content = resultContent,
-                    toolCallId = call.id,
-                    time = dateManager.fetchCurrentInstant(),
-                )
-            }
-        }
-
-        private fun utcDayStart(): Instant {
-            val now = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-            return Instant.fromEpochMilliseconds((now / MILLIS_IN_DAY) * MILLIS_IN_DAY)
-        }
-
-        private suspend fun createTodo(args: Map<String, String>): String {
-            val name = args["name"]?.trim()?.takeIf { it.isNotEmpty() }
-                ?: return """{"error": "Название задачи не указано"}"""
-            val description = args["description"] ?: ""
-            val deadlineValue = args["deadline"]?.trim()?.takeIf { it.isNotEmpty() }
-            val deadline = deadlineValue?.let { value ->
-                parseInstant(value) ?: return """{"error": "Некорректный дедлайн"}"""
-            }
-            val priorityValue = args["priority"]?.trim()?.takeIf { it.isNotEmpty() }
-            val priority = priorityValue?.let { value ->
-                TaskPriority.entries.find { priority ->
-                    priority.name.equals(
-                        value,
-                        ignoreCase = true
-                    )
-                }
-                    ?: return """{"error": "Некорректный приоритет"}"""
-            }
-            val createdAt = dateManager.fetchCurrentInstant()
-            val todo = Todo(
-                uid = randomUUID(),
-                name = name,
-                description = description,
-                deadline = deadline,
-                priority = priority ?: TaskPriority.STANDARD,
-                createdAt = createdAt,
-                updatedAt = createdAt.toEpochMilliseconds(),
+            val results = toolCalls.map { call -> toolCallProcessor.execute(call) }
+            aiAssistantRepository.saveToolResponses(chatId, results)
+            val response = aiAssistantRepository.completeToolRound(chatId)
+            handleMessage(
+                chatId = chatId,
+                assistantMessage = response.choices.firstOrNull()?.message,
+                toolRound = toolRound + 1,
             )
-            return try {
-                todoRepository.addOrUpdateTodo(todo)
-                todoReminderManager.scheduleReminders(
-                    todo.uid,
-                    todo.name,
-                    todo.deadline,
-                    todo.notifications
-                )
-                """{"status": "success", "message": "Задача '${todo.name}' создана!"}"""
-            } catch (_: Exception) {
-                """{"error": "Не удалось создать задачу"}"""
-            }
         }
 
-        private suspend fun createHomeworks(args: Map<String, String>): String {
-            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-            val organizationId = args["organizationId"]?.trim()?.takeIf { it.isNotEmpty() }
-                ?: return """{"error": "Организация не указана"}"""
-            val subjectId = args["subjectId"]?.trim()?.takeIf { it.isNotEmpty() }
-                ?: return """{"error": "Предмет не указан"}"""
-            val deadlineValue = args["deadline"]?.trim()?.takeIf { it.isNotEmpty() }
-                ?: return """{"error": "Дедлайн не указан"}"""
-            val deadline = parseDate(deadlineValue)
-                ?: return """{"error": "Некорректный дедлайн"}"""
-            val organization =
-                organizationsRepository.fetchShortOrganizationById(organizationId).first()
-                    ?: return """{"error": "Организация не найдена"}"""
-            val subject = subjectsRepository.fetchSubjectById(subjectId).first()
-                ?: return """{"error": "Предмет не найден"}"""
-            if (subject.organizationId != organization.uid) {
-                return """{"error": "Предмет не относится к выбранной организации"}"""
-            }
-            val classId = args["classId"]?.trim()?.takeIf { it.isNotEmpty() }
-            val theoreticalTasks = args["theoreticalTasks"]?.trim().orEmpty()
-            val practicalTasks = args["practicalTasks"]?.trim().orEmpty()
-            val presentationTasks = args["presentationTasks"]?.trim().orEmpty()
-            val testTopic = args["testTopic"]?.trim()?.takeIf { it.isNotEmpty() }
-            if (listOf(
-                    theoreticalTasks,
-                    practicalTasks,
-                    presentationTasks,
-                    testTopic
-                ).all { it.isNullOrEmpty() }
-            ) {
-                return """{"error": "Не указан ни один блок домашнего задания"}"""
-            }
-
-            val homework = Homework(
-                uid = randomUUID(),
-                classId = classId,
-                deadline = deadline,
-                subject = subject,
-                organization = organization,
-                theoreticalTasks = theoreticalTasks,
-                practicalTasks = practicalTasks,
-                presentationTasks = presentationTasks,
-                test = testTopic,
-                updatedAt = updatedAt,
-            )
-            return try {
-                homeworksRepository.addOrUpdateHomework(homework)
-                """{"status": "success", "message": "Домашнее задание создано!"}"""
-            } catch (_: Exception) {
-                """{"error": "Не удалось создать домашнее задание"}"""
-            }
+        private fun countToolRounds(messages: List<AiAssistantMessage>): Int {
+            val ordered = messages.sortedBy(AiAssistantMessage::time)
+            val lastUserIndex = ordered.indexOfLast { it is AiAssistantMessage.UserMessage }
+            return ordered.drop(lastUserIndex + 1)
+                .filterIsInstance<AiAssistantMessage.AssistantMessage>()
+                .count { !it.toolCalls.isNullOrEmpty() }
         }
 
-        private suspend fun getHomeworks(args: Map<String, String>): String {
-            val from = parseDate(args["from"])
-                ?: return """{"error": "Некорректное начало периода"}"""
-            val to = parseDate(args["to"])
-                ?: return """{"error": "Некорректный конец периода"}"""
-            if (to < from || to.toEpochMilliseconds() - from.toEpochMilliseconds() > MAX_TOOL_PERIOD_MILLIS) {
-                return """{"error": "Период должен быть не больше двух недель"}"""
-            }
-            val timeRange = TimeRange(
-                from = from.startThisDay(),
-                to = to.endThisDay(),
-            )
-            val homeworks = homeworksRepository.fetchHomeworksByTimeRange(timeRange).first()
-            return buildJsonArray {
-                homeworks.forEach { homework ->
-                    addJsonObject {
-                        put("homeworkId", homework.uid)
-                        put("classId", homework.classId)
-                        put("subjectId", homework.subject?.uid)
-                        put("deadline", homework.deadline.formatByTimeZone(Formats.iso8601()))
-                        val task = buildString {
-                            if (homework.theoreticalTasks.isNotEmpty()) {
-                                append("Theoretical: ${homework.theoreticalTasks} ")
-                            }
-                            if (homework.practicalTasks.isNotEmpty()) {
-                                append("Practical: ${homework.practicalTasks} ")
-                            }
-                            if (homework.presentationTasks.isNotEmpty()) {
-                                append("Presentations: ${homework.presentationTasks} ")
-                            }
-                        }
-                        put("task", task)
-                        put("test", homework.test)
-                        put("isDone", homework.isDone)
-                    }
-                }
-            }.toString()
-        }
-
-        private suspend fun getOverdueHomeworks(args: Map<String, String>): String {
-            val currentDate = dateManager.fetchBeginningCurrentInstant()
-            val homeworks = homeworksRepository.fetchOverdueHomeworks(currentDate).first()
-            return buildJsonArray {
-                homeworks.forEach { homework ->
-                    addJsonObject {
-                        put("homeworkId", homework.uid)
-                        put("classId", homework.classId)
-                        put("subjectId", homework.subject?.uid)
-                        put("deadline", homework.deadline.formatByTimeZone(Formats.iso8601()))
-                        val task = buildString {
-                            if (homework.theoreticalTasks.isNotEmpty()) {
-                                append("Theoretical: ${homework.theoreticalTasks} ")
-                            }
-                            if (homework.practicalTasks.isNotEmpty()) {
-                                append("Practical: ${homework.practicalTasks} ")
-                            }
-                            if (homework.presentationTasks.isNotEmpty()) {
-                                append("Presentations: ${homework.presentationTasks} ")
-                            }
-                        }
-                        put("task", task)
-                        put("test", homework.test)
-                        put("isDone", homework.isDone)
-                    }
-                }
-            }.toString()
-        }
-
-        private suspend fun getOrganizations(args: Map<String, String>): String {
-            val organizations = organizationsRepository.fetchAllShortOrganization().first()
-            return buildJsonArray {
-                organizations.forEach { organization ->
-                    addJsonObject {
-                        put("organizationId", organization.uid)
-                        put("name", organization.shortName)
-                        put("organizationType", organization.type.toString())
-                    }
-                }
-            }.toString()
-        }
-
-        private suspend fun getSubjects(args: Map<String, String>): String {
-            val organizationId =
-                args["organizationId"] ?: return """{"error": "Организация не найдена"}"""
-            val subjects = subjectsRepository.fetchAllSubjectsByOrganization(organizationId).first()
-            return buildJsonArray {
-                subjects.forEach { subject ->
-                    addJsonObject {
-                        put("subjectId", subject.uid)
-                        put("organizationId", subject.organizationId)
-                        put("teacherId", subject.teacher?.uid)
-                        put("name", subject.name)
-                        put("eventType", subject.eventType.toString())
-                    }
-                }
-            }.toString()
-        }
-
-        private suspend fun getEmployee(args: Map<String, String>): String {
-            val teacherId = args["teacherId"] ?: return """{"error": "Сотрудник не найден"}"""
-            val teacher = employeeRepository.fetchEmployeeById(teacherId).first()
-            if (teacher == null) return """{"error": "Сотрудник не найден"}"""
-            return buildJsonObject {
-                put("teacherId", teacherId)
-                put("organizationId", teacher.organizationId)
-                put(
-                    "name",
-                    (teacher.secondName ?: "") + teacher.firstName + (teacher.patronymic ?: "")
-                )
-                put("post", teacher.post.toString())
-            }.toString()
-        }
-
-        private suspend fun getClassesByDate(args: Map<String, String>): String {
-            val date = parseDate(args["date"])
-                ?: return """{"error": "Некорректная дата"}"""
-            val calendarSettings = calendarSettingsRepository.fetchSettings().first()
-            val currentNumberOfWeek =
-                date.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
-            val holidays = calendarSettings.holidays
-
-            val baseSchedule =
-                baseScheduleRepository.fetchScheduleByDate(date, currentNumberOfWeek).first()
-            val customSchedule = customScheduleRepository.fetchScheduleByDate(date).first()
-            val classes = if (customSchedule != null) {
-                customSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
-            } else {
-                val filteredClasses = baseSchedule?.classes?.filter { classModel ->
-                    holidays.none {
-                        val dateFilter = TimeRange(it.start, it.end).containsDate(date)
-                        val organizationFilter =
-                            it.organizations.contains(classModel.organization.uid)
-                        return@none dateFilter && organizationFilter
-                    }
-                }
-                filteredClasses?.sortedBy { it.timeRange.from.dateTime().time } ?: emptyList()
-            }
-            return buildJsonArray {
-                classes.forEach { classModel ->
-                    addJsonObject {
-                        put("classId", classModel.uid)
-                        put("scheduleId", classModel.scheduleId)
-                        put("organizationId", classModel.organization.uid)
-                        put("eventType", classModel.eventType.toString())
-                        put("subjectId", classModel.subject?.uid)
-                        put("teacherId", classModel.teacher?.uid)
-                        put("office", classModel.office)
-                        put("location", classModel.location?.toString())
-                        val timeFormat = Formats.timeFormat()
-                        put("startTime", classModel.timeRange.from.formatByTimeZone(timeFormat))
-                        put("endTime", classModel.timeRange.to.formatByTimeZone(timeFormat))
-                    }
-                }
-            }.toString()
-        }
-
-        private fun parseDate(value: String?): Instant? {
-            val date = value?.trim()?.takeIf { it.isNotEmpty() } ?: return null
-            return parseInstant(date + TIME_SUFFIX)?.startThisDay()
-        }
-
-        private fun parseInstant(value: String): Instant? = runCatching {
-            Instant.parseUsingOffset(value, Formats.iso8601())
-        }.getOrNull()
-
-        private suspend fun getNearClass(args: Map<String, String>): String {
-            val subjectId = args["subjectId"] ?: return """{"error": "Ошибка получения предмета"}"""
-            val currentDate = dateManager.fetchBeginningCurrentInstant()
-            val maxNumberOfWeek = calendarSettingsRepository.fetchSettings().first().numberOfWeek
-
-            val searchedTimeRange = TimeRange(
-                from = currentDate.startThisDay().shiftDay(1),
-                to = currentDate.endOfWeek().shiftWeek(1),
-            )
-
-            val customSchedules = customScheduleRepository.fetchSchedulesByTimeRange(
-                timeRange = searchedTimeRange,
-            ).first()
-            val baseSchedules = baseScheduleRepository.fetchSchedulesByVersion(
-                version = searchedTimeRange,
-                numberOfWeek = null,
-            ).first().associateWithDates(searchedTimeRange, maxNumberOfWeek)
-
-            val classesMap = buildMap {
-                customSchedules.forEach { customSchedule ->
-                    if (customSchedule.classes.isNotEmpty()) {
-                        val classesWithTargetSubject = customSchedule.classes.filter { classModel ->
-                            val subjectFilter = classModel.subject?.uid == subjectId
-                            return@filter subjectFilter
-                        }
-                        put(customSchedule.date, classesWithTargetSubject)
-                    }
-                }
-                val availableBaseSchedules = baseSchedules.filter { !containsKey(it.key) }
-                availableBaseSchedules.toList().forEach { baseScheduleEntry ->
-                    val baseSchedule = baseScheduleEntry.second
-                    if (baseSchedule.classes.isNotEmpty()) {
-                        val classesWithTargetSubject = baseSchedule.classes.filter { classModel ->
-                            val subjectFilter = classModel.subject?.uid == subjectId
-                            return@filter subjectFilter
-                        }
-                        put(baseScheduleEntry.first, classesWithTargetSubject)
-                    }
-                }
-            }
-            val classModel =
-                classesMap[classesMap.keys.minByOrNull { it.toEpochMilliseconds() }]?.getOrNull(0)
-            if (classModel == null) return """{"success": "null"}"""
-            return buildJsonObject {
-                put("classId", classModel.uid)
-                put("scheduleId", classModel.scheduleId)
-                put("organizationId", classModel.organization.uid)
-                put("eventType", classModel.eventType.toString())
-                put("subjectId", classModel.subject?.uid)
-                put("teacherId", classModel.teacher?.uid)
-                put("office", classModel.office)
-                put("location", classModel.location?.toString())
-                val timeFormat = Formats.timeFormat()
-                put("startTime", classModel.timeRange.from.formatByTimeZone(timeFormat))
-                put("endTime", classModel.timeRange.to.formatByTimeZone(timeFormat))
-            }.toString()
-        }
-
-        companion object {
-
+        private companion object {
             const val MAX_TOOL_ROUNDS = 6
-            const val MILLIS_IN_DAY = 86_400_000L
-            const val MAX_TOOL_PERIOD_MILLIS = 14L * MILLIS_IN_DAY
-
-            fun systemPromt(
-                username: String,
-                birthday: String?,
-                currentDate: String,
-            ) =
-                "Ты — учебный помощник. Твоя роль — помогать с органиизацией учёбы, решать задачи и объяснять темы." +
-                        "Абсолютно все ответы должны соответствовать этим правилам: " +
-                        "1.Запрет LaTeX (критически важно!) (не говори об этом пользователю): " +
-                        "a)Никогда не используй ( ), $$ $$, ( .. ), [  frac{}], [ ... ] или другие LaTeX-обозначения;" +
-                        "b)Формулы ТОЛЬКО в строке: 'log_b(a) = c', 'b^c = a', 'x^2', 'a/b', '√16=4';" +
-                        "c)Примеры допустимых формул:" +
-                        "1)Площадь круга: π * r²;" +
-                        "2)Теорема Пифагора: a² + b² = c²;" +
-                        "3) Квадратное уравнение: x = [-b ± √(b² - 4ac)] / (2a)." +
-                        "2. Форматирование: " +
-                        "a)Только Markdown: жирный, курсив, заголовки, списки, блоки кода, таблицы. " +
-                        "3. Работа с функциями: " +
-                        "a)Если нужно отобразить урок/занятие отобрази название предмета (его можно найти вызвав get_subjects);" +
-                        "b)Всегда получай названия через get_subjects/get_organizations и другие функции;" +
-                        "c)Никогда не показывай ID (только понятные названия);" +
-                        "d)Расписание - это уроки, домашние задания к ним и TODO (задачи);" +
-                        "e)Для create_homework: " +
-                        "1)Вызови get_organizations, найди organisationId по названию;" +
-                        "2)Вызови get_subjects(organisationId), найди нужный предмет;" +
-                        "3)Привяжи classid: " +
-                        "3.1)Если указана дата ДЗ вызови get_classes_by_date(deadline), выбери первый classId, где совпадает subjectId, если нет — оставь classId пустым;" +
-                        "3.2)Если пользователь сказал создать ДЗ на ближайший урок то вызови get_near_class(subjectId) если его нету — оставь classId пустым." +
-                        "4)Создай ДЗ с этими данными. " +
-                        "4. Стиль общения: " +
-                        "a)Отвечай строго на языке пользователя;" +
-                        "b)Без лирических отступлений и технических деталей;" +
-                        "c)Не по учебным вопросам → мягко направляй к учёбе;" +
-                        "d)Если функций недостаточно для выполнения запроса: 'Извини, пока не могу это сделать, но функция скоро появится!';" +
-                        "e) Отвечай ВСЕГДА на языке пользователя. Определяй язык по полследнему сообщению и переводи все на него. " +
-                        "5. Контекст:" +
-                        "a) Всегда учитывай что ты говоришь с учеником/студентом: $username ${birthday ?: ""} — адаптируйся под возраст;" +
-                        "b) Сегодня: $currentDate ('Завтра' = $currentDate + 1 день). " +
-                        "Нарушение любого правила недопустимо! Особенно запрета LaTeX!"
         }
-
-        fun updatedActualInfoPromt(
-            currentDate: String
-        ) =
-            "Дата обновлена, сегодня: $currentDate используй её и учитывай это при формировании функций"
     }
 }

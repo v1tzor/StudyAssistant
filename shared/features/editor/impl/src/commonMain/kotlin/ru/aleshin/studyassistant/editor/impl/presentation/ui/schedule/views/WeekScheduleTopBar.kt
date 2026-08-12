@@ -23,9 +23,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.resources.ic_document_scanner
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarButton
 import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.schedule_import_open_description
 import ru.aleshin.studyassistant.editor.impl.resources.week_schedule_editor_header
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -34,12 +39,20 @@ import ru.aleshin.studyassistant.editor.impl.resources.week_schedule_editor_head
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun WeekScheduleTopBar(
     modifier: Modifier = Modifier,
+    onImportClick: () -> Unit,
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = { Text(text = stringResource(Res.string.week_schedule_editor_header)) },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
         ),
+        actions = {
+            TopAppBarButton(
+                imagePainter = painterResource(CoreRes.drawable.ic_document_scanner),
+                imageDescription = stringResource(Res.string.schedule_import_open_description),
+                onButtonClick = onImportClick,
+            )
+        }
     )
 }

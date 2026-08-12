@@ -19,8 +19,11 @@ package ru.aleshin.studyassistant.schedule.impl.domain.common
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
+import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceException
 import ru.aleshin.studyassistant.core.domain.entities.share.ShareException
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleImportException
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleTextRecognitionException
 
 /**
  * @author Stanislav Aleshin on 21.04.2024
@@ -34,7 +37,11 @@ internal interface ScheduleEitherWrapper : FlowEitherWrapper<ScheduleFailures> {
         errorHandler = errorHandler,
         crashlyticsService = crashlyticsService,
         ignoreExceptions = { error ->
-            error is InternetConnectionException || error is ShareException
+            error is InternetConnectionException ||
+                error is ShareException ||
+                error is AiServiceException ||
+                error is ScheduleImportException ||
+                error is ScheduleTextRecognitionException
         },
     )
 }

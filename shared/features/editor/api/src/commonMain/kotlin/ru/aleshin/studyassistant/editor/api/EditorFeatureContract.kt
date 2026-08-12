@@ -84,4 +84,5 @@ public sealed class EditorConfig {
 
 public sealed class EditorOutput : BaseOutput {
     public data object NavigateToBack : EditorOutput()
+    public data class NavigateToImport(val rawText: String?) : EditorOutput()
 }

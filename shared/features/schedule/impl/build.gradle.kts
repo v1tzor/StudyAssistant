@@ -69,6 +69,11 @@ kotlin {
 
             implementation(compose.components.resources)
             implementation(libs.koalaplot.charts)
+            implementation(libs.bundles.filekit)
+        }
+        androidMain.dependencies {
+            implementation(libs.androidx.exifinterface)
+            implementation(libs.google.mlkit.text.recognition)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

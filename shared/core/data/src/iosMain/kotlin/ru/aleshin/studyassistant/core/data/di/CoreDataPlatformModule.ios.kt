@@ -21,10 +21,8 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import platform.UserNotifications.UNUserNotificationCenter
-import ru.aleshin.studyassistant.core.data.datasources.AiSecureDataSource
 import ru.aleshin.studyassistant.core.data.datasources.AvatarLocalDataSource
 import ru.aleshin.studyassistant.core.data.datasources.InstallationSecureDataSource
-import ru.aleshin.studyassistant.core.data.datasources.IosAiSecureDataSource
 import ru.aleshin.studyassistant.core.data.datasources.IosAvatarLocalDataSource
 import ru.aleshin.studyassistant.core.data.datasources.IosInstallationSecureDataSource
 import ru.aleshin.studyassistant.core.data.datasources.IosSecureStorage
@@ -43,7 +41,6 @@ import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningM
  */
 actual val coreDataPlatformModule = DI.Module("CoreDataPlatform") {
     bindSingleton<IosSecureStorage> { IosSecureStorage() }
-    bindSingleton<AiSecureDataSource> { IosAiSecureDataSource(instance()) }
     bindSingleton<InstallationSecureDataSource> { IosInstallationSecureDataSource(instance()) }
     bindSingleton<AvatarLocalDataSource> { IosAvatarLocalDataSource() }
     bindProvider<WorkloadWarningManager> {

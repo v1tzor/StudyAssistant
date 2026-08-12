@@ -17,22 +17,20 @@
 package ru.aleshin.studyassistant.core.data.handlers
 
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.TimeZone
+import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.data.mappers.ai.mapToBackend
 import ru.aleshin.studyassistant.core.data.mappers.ai.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.ai.mapToLocal
-import ru.aleshin.studyassistant.core.data.mappers.ai.mapToRemote
 import ru.aleshin.studyassistant.core.database.datasource.ai.AiLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantResponse
 import ru.aleshin.studyassistant.core.domain.entities.ai.dropUnconfirmedMessages
 import ru.aleshin.studyassistant.core.domain.entities.ai.dropUntilConfirmedMessage
 import ru.aleshin.studyassistant.core.domain.entities.ai.optimisedMessagesForSend
-import ru.aleshin.studyassistant.core.remote.api.ai.AiRemoteApi
-import ru.aleshin.studyassistant.core.remote.models.ai.ChatCompletionRequestPojo
-import ru.aleshin.studyassistant.core.remote.models.ai.ChatCompletionToolChoicePojo
-import ru.aleshin.studyassistant.core.remote.models.ai.ChatModel
-import ru.aleshin.studyassistant.core.remote.models.ai.UserMessagePojo
+import ru.aleshin.studyassistant.core.remote.models.ai.backend.AiCompletionRequestPojo
 
 /**
  * @author Stanislav Aleshin on 09.08.2026.
@@ -45,18 +43,15 @@ internal interface AiConversationHandler {
         message: AiAssistantMessage.UserMessage?,
     ): AiAssistantResponse
 
-    suspend fun sendToolResponse(
-        chatId: UID,
-        messages: List<AiAssistantMessage.ToolMessage>,
-    ): AiAssistantResponse
+    suspend fun completeToolRound(chatId: UID): AiAssistantResponse
 
     suspend fun deleteUnconfirmedMessages(chatId: UID)
-    suspend fun testPersonalKey(apiKey: String)
 
     class Base(
         private val localDataSource: AiLocalDataSource,
         private val completionHandler: AiCompletionHandler,
         private val dateManager: DateManager,
+        private val deviceInfoProvider: DeviceInfoProvider,
     ) : AiConversationHandler {
 
         override suspend fun retryLastMessage(
@@ -67,13 +62,12 @@ internal interface AiConversationHandler {
                 ?.map { it.mapToDomain() }
             if (messages.isNullOrEmpty()) throw NoSuchElementException()
 
-            val assistantMessage = if (
-                messages.last { it !is AiAssistantMessage.SystemMessage } is
-                AiAssistantMessage.UserMessage
-            ) {
-                complete(messages)
-            } else {
-                messages.dropUntilConfirmedMessage { message ->
+            val lastMessage = messages.last { it !is AiAssistantMessage.SystemMessage }
+            val assistantMessage = when (lastMessage) {
+                is AiAssistantMessage.UserMessage,
+                is AiAssistantMessage.ToolMessage,
+                -> complete(messages)
+                else -> messages.dropUntilConfirmedMessage { message ->
                     localDataSource.deleteChatMessage(message.id)
                 }
             }
@@ -94,11 +88,7 @@ internal interface AiConversationHandler {
             return completeResponse(messages)
         }
 
-        override suspend fun sendToolResponse(
-            chatId: UID,
-            messages: List<AiAssistantMessage.ToolMessage>,
-        ): AiAssistantResponse {
-            localDataSource.addChatMessages(messages.map { it.mapToLocal(chatId) })
+        override suspend fun completeToolRound(chatId: UID): AiAssistantResponse {
             val historyMessages = localDataSource.fetchChatHistoryById(chatId).first()
                 ?.messages
                 ?.map { it.mapToDomain() }
@@ -115,17 +105,6 @@ internal interface AiConversationHandler {
             }
         }
 
-        override suspend fun testPersonalKey(apiKey: String) {
-            completionHandler.testPersonalKey(
-                request = ChatCompletionRequestPojo(
-                    model = ChatModel.DEEPSEEK_CHAT.model,
-                    messages = listOf(UserMessagePojo(content = "Reply with OK")),
-                    maxTokens = 2,
-                ),
-                apiKey = apiKey,
-            )
-        }
-
         private suspend fun complete(
             messages: List<AiAssistantMessage>,
         ): AiAssistantMessage? {
@@ -136,31 +115,45 @@ internal interface AiConversationHandler {
             messages: List<AiAssistantMessage>,
         ): AiAssistantResponse {
             val optimisedMessages = messages.optimisedMessagesForSend()
-            val request = ChatCompletionRequestPojo(
-                model = ChatModel.DEEPSEEK_CHAT.model,
-                messages = optimisedMessages.map { it.mapToRemote() },
-                tools = AI_TOOLS,
-                toolChoice = ChatCompletionToolChoicePojo.AUTO,
+            val request = AiCompletionRequestPojo(
+                messageId = optimisedMessages
+                    .last { message -> message is AiAssistantMessage.UserMessage }
+                    .id,
+                locale = deviceInfoProvider.fetchDeviceLanguage(),
+                timeZone = TimeZone.currentSystemDefault().id,
+                toolProtocolVersion = TOOL_PROTOCOL_VERSION,
+                messages = optimisedMessages.mapNotNull { message -> message.mapToBackend() },
+                toolNames = AI_TOOL_NAMES,
             )
-            return completionHandler.complete(
-                request = request,
-                requestKey = optimisedMessages.last { it is AiAssistantMessage.UserMessage }.id,
-            ).mapToDomain(
+            return completionHandler.complete(request = request).mapToDomain(
                 time = dateManager.fetchCurrentInstant(),
             )
         }
 
         private companion object {
-            val AI_TOOLS = listOf(
-                AiRemoteApi.DeepSeek.createTodoTool,
-                AiRemoteApi.DeepSeek.createHomework,
-                AiRemoteApi.DeepSeek.getOrganizationsTool,
-                AiRemoteApi.DeepSeek.getSubjectsTool,
-                AiRemoteApi.DeepSeek.getEmployeeTool,
-                AiRemoteApi.DeepSeek.getHomeworksTool,
-                AiRemoteApi.DeepSeek.getOverdueHomeworksTool,
-                AiRemoteApi.DeepSeek.getClassesByDateTool,
-                AiRemoteApi.DeepSeek.getNearClassTool,
+            const val TOOL_PROTOCOL_VERSION = 1
+
+            val AI_TOOL_NAMES = listOf(
+                "get_profile",
+                "create_todo",
+                "update_todo",
+                "complete_todo",
+                "delete_todo",
+                "create_homework",
+                "update_homework",
+                "complete_homework",
+                "delete_homework",
+                "get_organizations",
+                "get_subjects",
+                "get_employees",
+                "get_employee",
+                "get_todos",
+                "get_homeworks",
+                "get_overdue_homeworks",
+                "get_classes_by_date",
+                "get_classes_by_range",
+                "get_near_class",
+                "get_free_time",
             )
         }
     }

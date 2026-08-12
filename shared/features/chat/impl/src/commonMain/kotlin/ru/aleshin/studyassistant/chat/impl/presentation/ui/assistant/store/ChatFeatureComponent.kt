@@ -58,6 +58,9 @@ internal abstract class ChatFeatureComponent(
         private fun assistantOutputConsumer() = OutputConsumer<AssistantOutput> { output ->
             when (output) {
                 AssistantOutput.NavigateToAiSettings -> outputConsumer.consume(ChatOutput.NavigateToAiSettings)
+                AssistantOutput.NavigateToScheduleImport -> {
+                    outputConsumer.consume(ChatOutput.NavigateToScheduleImport)
+                }
             }
         }
 

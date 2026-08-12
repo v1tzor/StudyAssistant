@@ -31,7 +31,6 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
-import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.text.Text
 import ru.aleshin.studyassistant.widget.R
@@ -112,16 +111,24 @@ private fun WidgetHeaderAction(
     Box(
         modifier = GlanceModifier
             .size(WidgetDimensions.touchTarget)
-            .padding(WidgetDimensions.spacingExtraSmall)
-            .compatCornerBackground(GlanceTheme.colors.surfaceVariant, WidgetShapes.FULL)
             .clickable(action),
         contentAlignment = Alignment.Center,
     ) {
-        Image(
-            modifier = GlanceModifier.size(iconSize),
-            provider = icon,
-            contentDescription = description,
-            colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurfaceVariant),
-        )
+        Box(
+            modifier = GlanceModifier
+                .size(WidgetDimensions.headerActionContainer)
+                .compatCornerBackground(
+                    GlanceTheme.colors.secondaryContainer,
+                    WidgetShapes.FULL,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                modifier = GlanceModifier.size(iconSize),
+                provider = icon,
+                contentDescription = description,
+                colorFilter = ColorFilter.tint(GlanceTheme.colors.onSecondaryContainer),
+            )
+        }
     }
 }

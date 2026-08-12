@@ -58,7 +58,6 @@ kotlin {
             implementation(project(":shared:core:presentation"))
             implementation(project(":shared:core:database"))
             implementation(project(":shared:core:remote"))
-            implementation(project(":shared:core:client-api"))
 
             implementation(libs.sqldelight.core)
             implementation(libs.sqldelight.coroutines)

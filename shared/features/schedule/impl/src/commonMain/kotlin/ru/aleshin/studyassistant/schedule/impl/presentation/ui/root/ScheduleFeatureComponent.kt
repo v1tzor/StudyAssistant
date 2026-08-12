@@ -31,6 +31,10 @@ import ru.aleshin.studyassistant.schedule.api.ScheduleOutput
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsOutput
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.store.DetailsComponent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.store.DetailsComposeStore
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportInput
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportOutput
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.store.ImportComponent
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.store.ImportComposeStore
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.contract.OverviewOutput
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.store.OverviewComponent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.store.OverviewComposeStore
@@ -54,6 +58,7 @@ internal abstract class ScheduleFeatureComponent(
         data class OverviewChild(val component: OverviewComponent) : Child()
         data class DetailsChild(val component: DetailsComponent) : Child()
         data class ShareChild(val component: ShareComponent) : Child()
+        data class ImportChild(val component: ImportComponent) : Child()
     }
 
     class Default(
@@ -63,6 +68,7 @@ internal abstract class ScheduleFeatureComponent(
         private val overviewStoreFactory: OverviewComposeStore.Factory,
         private val detailsStoreFactory: DetailsComposeStore.Factory,
         private val shareStoreFactory: ShareComposeStore.Factory,
+        private val importStoreFactory: ImportComposeStore.Factory,
     ) : ScheduleFeatureComponent(
         componentContext = componentContext,
         startConfig = startConfig,
@@ -122,6 +128,14 @@ internal abstract class ScheduleFeatureComponent(
                         outputConsumer = shareOutputConsumer()
                     )
                 )
+                is ScheduleConfig.Import -> Child.ImportChild(
+                    component = ImportComponent.Default(
+                        storeFactory = importStoreFactory,
+                        componentContext = componentContext,
+                        input = ImportInput(config.rawText),
+                        outputConsumer = importOutputConsumer(),
+                    ),
+                )
             }
         }
 
@@ -176,6 +190,12 @@ internal abstract class ScheduleFeatureComponent(
         private fun shareOutputConsumer() = OutputConsumer<ShareOutput> { output ->
             when (output) {
                 is ShareOutput.NavigateToBack -> navigateToBack()
+            }
+        }
+
+        private fun importOutputConsumer() = OutputConsumer<ImportOutput> { output ->
+            when (output) {
+                is ImportOutput.NavigateToBack -> navigateToBack()
             }
         }
     }

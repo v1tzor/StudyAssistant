@@ -38,7 +38,7 @@ internal fun OrganizationsTopBar(
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = { Text(text = stringResource(Res.string.organizations_header)) },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
         ),
     )

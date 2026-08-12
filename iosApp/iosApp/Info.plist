@@ -46,7 +46,7 @@
         <key>LSRequiresIPhoneOS</key>
         <true />
         <key>NSCameraUsageDescription</key>
-        <string>Scan sharing QR codes / Сканирование QR-кодов обмена</string>
+        <string>Scan sharing QR codes and recognize schedule photos / Сканирование QR-кодов и распознавание фотографий расписания</string>
         <key>UIApplicationSceneManifest</key>
         <dict>
             <key>UIApplicationSupportsMultipleScenes</key>

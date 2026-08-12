@@ -28,6 +28,8 @@ import ru.aleshin.studyassistant.schedule.impl.navigation.DefaultScheduleContent
 import ru.aleshin.studyassistant.schedule.impl.navigation.ScheduleComponentDeps
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.store.DetailsComposeStore
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.store.DetailsWorkProcessor
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.store.ImportComposeStore
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.store.ImportWorkProcessor
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.store.OverviewComposeStore
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.store.OverviewWorkProcessor
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.root.ScheduleFeatureComponent
@@ -46,6 +48,7 @@ internal val presentationModule = DI.Module("Presentation") {
             overviewStoreFactory = instance(),
             detailsStoreFactory = instance(),
             shareStoreFactory = instance(),
+            importStoreFactory = instance(),
         )
     }
     bindSingleton<ScheduleContentProviderFactory> { DefaultScheduleContentProviderFactory(di) }
@@ -58,4 +61,7 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindSingleton<ShareWorkProcessor> { ShareWorkProcessor.Base(instance()) }
     bindSingleton<ShareComposeStore.Factory> { ShareComposeStore.Factory(instance(), instance(), instance()) }
+
+    bindSingleton<ImportWorkProcessor> { ImportWorkProcessor.Base(instance()) }
+    bindSingleton<ImportComposeStore.Factory> { ImportComposeStore.Factory(instance(), instance()) }
 }

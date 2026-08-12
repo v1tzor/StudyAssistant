@@ -26,81 +26,105 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonNamingStrategy
 import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.remote.BuildKonfig
 import ru.aleshin.studyassistant.core.remote.api.ai.AiRemoteApi
-import ru.aleshin.studyassistant.core.remote.api.ai.SharedAiRemoteApi
+import ru.aleshin.studyassistant.core.remote.api.ai.ScheduleExtractionRemoteApi
+import ru.aleshin.studyassistant.core.remote.api.installation.InstallationRemoteApi
+import ru.aleshin.studyassistant.core.remote.api.share.BackendShareApi
 import ru.aleshin.studyassistant.core.remote.datasources.ai.AiAssistantRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.ai.ScheduleExtractionRemoteDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.installation.InstallationRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.share.HomeworkShareRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.share.ScheduleShareRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.ktor.HttpEngineFactory
-import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor.DeepSeek
+import ru.aleshin.studyassistant.core.remote.ktor.NetworkConnectionChecker
 
 /**
  * @author Stanislav Aleshin on 01.08.2024.
  */
-@OptIn(ExperimentalSerializationApi::class)
 val coreRemoteModule = DI.Module("CoreRemote") {
     import(coreRemotePlatformModule)
 
     bindSingleton<Settings> { Settings() }
-    bindSingleton<Json> {
+    bindSingleton<Json>(tag = "Backend") {
         Json {
-            isLenient = true
+            isLenient = false
             ignoreUnknownKeys = true
-            useAlternativeNames = false
-            namingStrategy = JsonNamingStrategy.SnakeCase
-        }
-    }
-    bindSingleton<Json>(tag = "Functions") {
-        Json {
-            isLenient = true
-            ignoreUnknownKeys = true
+            explicitNulls = false
             useAlternativeNames = false
         }
     }
 
     bindSingleton<HttpEngineFactory> { HttpEngineFactory() }
+    bindSingleton<NetworkConnectionChecker> {
+        NetworkConnectionChecker.Base(connectionManager = instance())
+    }
     bindProvider<HttpClientEngineFactory<HttpClientEngineConfig>> {
         instance<HttpEngineFactory>().createEngine()
     }
-    bindSingleton<HttpClient>(tag = "DeepSeek") {
+    bindSingleton<HttpClient>(tag = "Backend") {
         HttpClient(instance<HttpEngineFactory>().createEngine()) {
             defaultRequest {
-                url(DeepSeek.HOST)
+                url(BuildKonfig.BACKEND_BASE_URL)
                 contentType(ContentType.Application.Json)
             }
             install(HttpTimeout) {
-                connectTimeoutMillis = 300_000
-                requestTimeoutMillis = 300_000
-                socketTimeoutMillis = 300_000
+                connectTimeoutMillis = 10_000
+                requestTimeoutMillis = 45_000
+                socketTimeoutMillis = 45_000
             }
-            install(ContentNegotiation) { json(instance<Json>()) }
+            install(ContentNegotiation) { json(instance<Json>(tag = "Backend")) }
         }
     }
 
-    bindSingleton<AiRemoteApi>(tag = "SharedAi") {
-        SharedAiRemoteApi(instance(), instance(tag = "Functions"))
+    bindSingleton<AiRemoteApi> {
+        AiRemoteApi.Backend(
+            httpClient = instance(tag = "Backend"),
+            connectionChecker = instance(),
+            json = instance(tag = "Backend"),
+        )
     }
-    bindSingleton<AiRemoteApi>(tag = "PersonalAi") {
-        AiRemoteApi.DeepSeek(instance(tag = "DeepSeek"), instance())
+    bindSingleton<InstallationRemoteApi> {
+        InstallationRemoteApi.Backend(
+            httpClient = instance(tag = "Backend"),
+            connectionChecker = instance(),
+            json = instance(tag = "Backend"),
+        )
+    }
+    bindSingleton<InstallationRemoteDataSource> {
+        InstallationRemoteDataSource.Base(api = instance())
     }
     bindSingleton<AiAssistantRemoteDataSource> {
-        AiAssistantRemoteDataSource.Base(
-            sharedApi = instance(tag = "SharedAi"),
-            personalApi = instance(tag = "PersonalAi"),
+        AiAssistantRemoteDataSource.Base(api = instance())
+    }
+    bindSingleton<ScheduleExtractionRemoteApi> {
+        ScheduleExtractionRemoteApi.Backend(
+            httpClient = instance(tag = "Backend"),
+            connectionChecker = instance(),
+            json = instance(tag = "Backend"),
+        )
+    }
+    bindSingleton<ScheduleExtractionRemoteDataSource> {
+        ScheduleExtractionRemoteDataSource.Base(api = instance())
+    }
+
+    bindSingleton<BackendShareApi> {
+        BackendShareApi(
+            httpClient = instance(tag = "Backend"),
+            connectionChecker = instance(),
+            json = instance(tag = "Backend"),
         )
     }
 
     bindProvider<ScheduleShareRemoteDataSource> {
-        ScheduleShareRemoteDataSource.Base(instance(), instance(tag = "Functions"))
+        ScheduleShareRemoteDataSource.Base(instance(), instance(tag = "Backend"))
     }
     bindProvider<HomeworkShareRemoteDataSource> {
-        HomeworkShareRemoteDataSource.Base(instance(), instance(tag = "Functions"))
+        HomeworkShareRemoteDataSource.Base(instance(), instance(tag = "Backend"))
     }
 }

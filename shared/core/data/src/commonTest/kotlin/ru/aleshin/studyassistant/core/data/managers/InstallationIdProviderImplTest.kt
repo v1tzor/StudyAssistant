@@ -22,6 +22,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
 import ru.aleshin.studyassistant.core.data.datasources.InstallationSecureDataSource
+import ru.aleshin.studyassistant.core.remote.datasources.installation.InstallationRemoteDataSource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -33,7 +34,8 @@ class InstallationIdProviderImplTest {
     @Test
     fun concurrentRequestsPersistOnlyOneInstallationId() = runBlocking {
         val dataSource = FakeInstallationSecureDataSource()
-        val provider = InstallationIdProviderImpl(dataSource)
+        val remoteDataSource = FakeInstallationRemoteDataSource()
+        val provider = InstallationIdProviderImpl(dataSource, remoteDataSource)
 
         val ids = coroutineScope {
             List(20) { async { provider.fetchInstallationId() } }.awaitAll()
@@ -41,17 +43,34 @@ class InstallationIdProviderImplTest {
 
         assertEquals(1, ids.distinct().size)
         assertEquals(1, dataSource.saveCount)
+        assertEquals(1, remoteDataSource.registerCount)
     }
 
     @Test
     fun invalidStoredTokenIsReplaced() = runBlocking {
         val dataSource = FakeInstallationSecureDataSource(token = "invalid")
-        val provider = InstallationIdProviderImpl(dataSource)
+        val remoteDataSource = FakeInstallationRemoteDataSource()
+        val provider = InstallationIdProviderImpl(dataSource, remoteDataSource)
 
         val installationId = provider.fetchInstallationId()
 
-        assertEquals(36, installationId.length)
+        assertEquals(90, installationId.length)
         assertEquals(1, dataSource.saveCount)
+        assertEquals(1, remoteDataSource.registerCount)
+    }
+
+    @Test
+    fun validStoredCredentialIsReused() = runBlocking {
+        val storedId = INSTALLATION_CREDENTIAL
+        val dataSource = FakeInstallationSecureDataSource(token = storedId)
+        val remoteDataSource = FakeInstallationRemoteDataSource()
+        val provider = InstallationIdProviderImpl(dataSource, remoteDataSource)
+
+        val installationId = provider.fetchInstallationId()
+
+        assertEquals(storedId, installationId)
+        assertEquals(0, dataSource.saveCount)
+        assertEquals(0, remoteDataSource.registerCount)
     }
 
     private class FakeInstallationSecureDataSource(
@@ -70,5 +89,23 @@ class InstallationIdProviderImplTest {
             this.token = token
             saveCount += 1
         }
+    }
+
+    private class FakeInstallationRemoteDataSource(
+        private val credential: String = INSTALLATION_CREDENTIAL,
+    ) : InstallationRemoteDataSource {
+
+        var registerCount = 0
+
+        override suspend fun register(): String {
+            yield()
+            registerCount += 1
+            return credential
+        }
+    }
+
+    private companion object {
+
+        val INSTALLATION_CREDENTIAL = "v1.${"A".repeat(43)}.${"B".repeat(43)}"
     }
 }

@@ -23,6 +23,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import kotlinx.coroutines.CancellationException
 import org.kodein.di.DirectDIAware
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.functional.rightOrNull
@@ -38,19 +39,25 @@ class TodoWidgetActionWorker(
 ) : CoroutineWorker(context, workerParameters), DirectDIAware {
 
     override val directDI = WidgetWorkerDependencies.create()
-    private val widgetInteractor = instance<WidgetInteractor>()
+    private val widgetInteractor by lazy { instance<WidgetInteractor>() }
 
     override suspend fun doWork(): Result {
-        val todoId = inputData.getString(TODO_ID_KEY) ?: return Result.failure()
-        val isDone = inputData.getBoolean(IS_DONE_KEY, true)
-        val result = widgetInteractor.setTodoDone(todoId, isDone).rightOrNull()
-        return if (result != null) {
-            WidgetsUpdateScheduler.enqueueImmediate(applicationContext)
-            Result.success()
-        } else if (runAttemptCount < MAX_RETRY_COUNT) {
-            Result.retry()
-        } else {
-            Result.failure()
+        return try {
+            val todoId = inputData.getString(TODO_ID_KEY) ?: return Result.failure()
+            val isDone = inputData.getBoolean(IS_DONE_KEY, true)
+            val result = widgetInteractor.setTodoDone(todoId, isDone).rightOrNull()
+            if (result != null) {
+                WidgetsUpdateScheduler.enqueueImmediate(applicationContext)
+                Result.success()
+            } else if (runAttemptCount < MAX_RETRY_COUNT) {
+                Result.retry()
+            } else {
+                Result.failure()
+            }
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            if (runAttemptCount < MAX_RETRY_COUNT) Result.retry() else Result.failure()
         }
     }
 

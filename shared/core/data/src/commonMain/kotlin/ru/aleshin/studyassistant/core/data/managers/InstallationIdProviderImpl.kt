@@ -18,28 +18,35 @@ package ru.aleshin.studyassistant.core.data.managers
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import ru.aleshin.studyassistant.core.common.extensions.randomUUID
+import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.data.datasources.InstallationSecureDataSource
 import ru.aleshin.studyassistant.core.domain.managers.InstallationIdProvider
+import ru.aleshin.studyassistant.core.remote.datasources.installation.InstallationRemoteDataSource
 
 /**
  * @author Stanislav Aleshin on 08.08.2026.
  */
 class InstallationIdProviderImpl(
     private val secureDataSource: InstallationSecureDataSource,
+    private val remoteDataSource: InstallationRemoteDataSource,
 ) : InstallationIdProvider {
 
     private val mutex = Mutex()
 
     override suspend fun fetchInstallationId(): String = mutex.withLock {
         secureDataSource.fetchInstallationToken()
-            ?.takeIf { token -> token.length in MIN_TOKEN_LENGTH..MAX_TOKEN_LENGTH }
+            ?.takeIf(INSTALLATION_CREDENTIAL_PATTERN::matches)
             ?.let { token -> return@withLock token }
-        randomUUID().also { token -> secureDataSource.saveInstallationToken(token) }
+        remoteDataSource.register()
+            .takeIf(INSTALLATION_CREDENTIAL_PATTERN::matches)
+            ?.also { token -> secureDataSource.saveInstallationToken(token) }
+            ?: throw InternetConnectionException()
     }
 
     private companion object {
-        const val MIN_TOKEN_LENGTH = 16
-        const val MAX_TOKEN_LENGTH = 256
+
+        val INSTALLATION_CREDENTIAL_PATTERN = Regex(
+            "^v1\\.[A-Za-z0-9_-]{43}\\.[A-Za-z0-9_-]{43}$",
+        )
     }
 }

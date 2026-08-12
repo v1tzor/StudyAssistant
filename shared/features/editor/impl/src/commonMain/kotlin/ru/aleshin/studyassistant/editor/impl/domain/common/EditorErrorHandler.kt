@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.common
 
-import ru.aleshin.studyassistant.core.common.exceptions.AppwriteException
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
@@ -29,12 +28,6 @@ internal interface EditorErrorHandler : ErrorHandler<EditorFailures> {
     class Base : EditorErrorHandler {
         override fun handle(throwable: Throwable) = when (throwable) {
             is InternetConnectionException -> EditorFailures.InternetError
-            is AppwriteException -> if (throwable.type == "user_invalid_credentials") {
-                EditorFailures.CredentialsError
-            } else {
-                EditorFailures.OtherError(throwable)
-            }
-
             is ShiftTimeError -> EditorFailures.ShiftTimeError
             else -> EditorFailures.OtherError(throwable)
         }

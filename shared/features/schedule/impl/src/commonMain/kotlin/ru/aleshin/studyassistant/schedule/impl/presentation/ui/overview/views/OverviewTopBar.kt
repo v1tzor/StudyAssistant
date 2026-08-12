@@ -45,7 +45,7 @@ internal fun OverviewTopBar(
     enabledEdit: Boolean,
     onEditClick: () -> Unit,
     onDetailsClick: () -> Unit,
-    onCurrentDay: () -> Unit,
+    onCurrentDay: () -> Unit
 ) {
     TopAppBar(
         modifier = modifier,

@@ -42,9 +42,14 @@ internal class AnalyticsContentProvider(
             animation = stackAnimation(),
         ) { child ->
             when (val instance = child.instance) {
-                is AnalyticsFeatureComponent.Child.AnalyticsChild -> {
-                    AnalyticsContent(instance.component)
-                }
+                is AnalyticsFeatureComponent.Child.OverviewChild -> AnalyticsContent(
+                    component = instance.component,
+                    isDetails = false,
+                )
+                is AnalyticsFeatureComponent.Child.DetailsChild -> AnalyticsContent(
+                    component = instance.component,
+                    isDetails = true,
+                )
             }
         }
     }

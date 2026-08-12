@@ -46,6 +46,5 @@ interface ProfileLocalDataSource {
                 profile.mapToLocalData()
             }
         }
-
     }
 }

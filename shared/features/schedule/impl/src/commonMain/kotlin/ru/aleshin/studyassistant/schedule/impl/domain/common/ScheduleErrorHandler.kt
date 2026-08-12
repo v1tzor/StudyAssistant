@@ -18,7 +18,10 @@ package ru.aleshin.studyassistant.schedule.impl.domain.common
 
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
+import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceException
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleImportException
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleTextRecognitionException
 
 /**
  * @author Stanislav Aleshin on 21.04.2024
@@ -29,6 +32,18 @@ internal interface ScheduleErrorHandler : ErrorHandler<ScheduleFailures> {
 
         override fun handle(throwable: Throwable) = when (throwable) {
             is InternetConnectionException -> ScheduleFailures.InternetError
+            is AiServiceException.QuotaExceeded -> ScheduleFailures.QuotaExceeded
+            is AiServiceException.RateLimited -> ScheduleFailures.RateLimited
+            is AiServiceException.InvalidRequest,
+            is ScheduleImportException,
+            -> ScheduleFailures.InvalidImport
+            ScheduleTextRecognitionException.InvalidImage -> ScheduleFailures.InvalidImage
+            ScheduleTextRecognitionException.ImageTooLarge -> ScheduleFailures.ImageTooLarge
+            ScheduleTextRecognitionException.NoText -> ScheduleFailures.NoTextRecognized
+            ScheduleTextRecognitionException.Unavailable -> {
+                ScheduleFailures.TextRecognitionUnavailable
+            }
+            is AiServiceException.ServerUnavailable -> ScheduleFailures.ServerUnavailable
             else -> ScheduleFailures.OtherError(throwable)
         }
     }

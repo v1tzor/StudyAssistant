@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToUi
 internal fun SubjectAnalytics.mapToUi() = SubjectAnalyticsUi(
     subject = subject?.mapToUi(),
     plannedDuration = plannedDuration,
+    workloadProgress = workloadProgress,
     classesCount = classesCount,
     homeworkCount = homeworkCount,
     testsCount = testsCount,

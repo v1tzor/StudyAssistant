@@ -23,8 +23,6 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.data.datasources.AiSecureDataSource
-import ru.aleshin.studyassistant.core.data.datasources.AndroidAiSecureDataSource
 import ru.aleshin.studyassistant.core.data.datasources.AndroidAvatarLocalDataSource
 import ru.aleshin.studyassistant.core.data.datasources.AndroidInstallationSecureDataSource
 import ru.aleshin.studyassistant.core.data.datasources.AndroidSecureStorage
@@ -45,7 +43,6 @@ import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningM
  */
 actual val coreDataPlatformModule = DI.Module("CoreDataPlatform") {
     bindSingleton<AndroidSecureStorage> { AndroidSecureStorage(instance()) }
-    bindSingleton<AiSecureDataSource> { AndroidAiSecureDataSource(instance()) }
     bindSingleton<InstallationSecureDataSource> {
         AndroidInstallationSecureDataSource(instance())
     }

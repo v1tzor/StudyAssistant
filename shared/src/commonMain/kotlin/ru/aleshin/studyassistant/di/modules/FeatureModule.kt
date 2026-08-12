@@ -34,6 +34,7 @@ import ru.aleshin.studyassistant.chat.impl.di.holder.ChatFeatureController
 import ru.aleshin.studyassistant.chat.impl.navigation.DefaultChatFeatureFactory
 import ru.aleshin.studyassistant.core.common.di.scope.FeatureControllerScope
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
+import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
@@ -48,7 +49,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
-import ru.aleshin.studyassistant.core.domain.repositories.DailyAiStatisticsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
@@ -57,6 +57,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
+import ru.aleshin.studyassistant.core.domain.repositories.ScheduleImportRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ScheduleShareRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
@@ -120,8 +121,8 @@ val featureModule = DI.Module("Feature") {
 
     bindProvider<PreviewFeatureDependencies> {
         object : PreviewFeatureDependencies {
-            override val profileRepository = instance<ProfileRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
+            override val profileRepository = instance<ProfileRepository>()
             override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
             override val coroutineManager = instance<CoroutineManager>()
@@ -141,6 +142,7 @@ val featureModule = DI.Module("Feature") {
         object : ScheduleFeatureDependencies {
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val scheduleShareRepository = instance<ScheduleShareRepository>()
+            override val scheduleImportRepository = instance<ScheduleImportRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
             override val employeeRepository = instance<EmployeeRepository>()
@@ -153,8 +155,10 @@ val featureModule = DI.Module("Feature") {
             override val startClassesReminderManager = instance<StartClassesReminderManager>()
             override val endClassesReminderManager = instance<EndClassesReminderManager>()
             override val connectionManager = instance<Konnection>()
+            override val deviceInfoProvider = instance<DeviceInfoProvider>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
+            override val appDispatchers = instance<AppDispatchers>()
             override val crashlyticsService = instance<CrashlyticsService>()
         }
     }
@@ -305,7 +309,6 @@ val featureModule = DI.Module("Feature") {
             override val aiAssistantRepository = instance<AiAssistantRepository>()
             override val aiSettingsRepository = instance<AiSettingsRepository>()
             override val profileRepository = instance<ProfileRepository>()
-            override val dailyAiStatisticsRepository = instance<DailyAiStatisticsRepository>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()

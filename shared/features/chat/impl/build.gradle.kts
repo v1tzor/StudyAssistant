@@ -35,6 +35,8 @@ kotlin {
         compileSdk = libs.versions.compileSdk.get().toInt()
         minSdk = libs.versions.minSdk.get().toInt()
 
+        withHostTest {}
+
         androidResources {
             enable = true
         }
@@ -68,6 +70,9 @@ kotlin {
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
             implementation(compose.components.resources)
+        }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
     }
 

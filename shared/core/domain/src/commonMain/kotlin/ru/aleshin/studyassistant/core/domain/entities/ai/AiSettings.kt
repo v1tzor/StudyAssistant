@@ -24,12 +24,10 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class AiSettings(
-    val serviceType: AiServiceType = AiServiceType.SHARED,
-    val hasPersonalKey: Boolean = false,
-    val sharedQuotaRemaining: Int = SHARED_DAILY_QUOTA,
-    val sharedQuotaResetAt: Instant? = null,
+    val quotaRemaining: Int = DAILY_QUOTA,
+    val quotaResetAt: Instant? = null,
 ) {
     companion object {
-        const val SHARED_DAILY_QUOTA = 25
+        const val DAILY_QUOTA = 25
     }
 }

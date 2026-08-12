@@ -30,25 +30,16 @@ import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.AiSe
 @Serializable
 internal data class AiSettingsState(
     val settings: AiSettingsUi? = null,
-    val isSaving: Boolean = false,
 ) : StoreState
 
 internal sealed class AiSettingsEvent : StoreEvent {
     data object Started : AiSettingsEvent()
-    data object SelectSharedService : AiSettingsEvent()
-    data object SelectPersonalService : AiSettingsEvent()
-    data class TestPersonalKey(val apiKey: String) : AiSettingsEvent()
-    data class SavePersonalKey(val apiKey: String) : AiSettingsEvent()
-    data object DeletePersonalKey : AiSettingsEvent()
 }
 
 internal sealed class AiSettingsEffect : StoreEffect {
     data class ShowError(val failure: SettingsFailures) : AiSettingsEffect()
-    data object PersonalKeyTested : AiSettingsEffect()
-    data object PersonalKeySaved : AiSettingsEffect()
 }
 
 internal sealed class AiSettingsAction : StoreAction {
     data class UpdateSettings(val settings: AiSettingsUi) : AiSettingsAction()
-    data class UpdateSaving(val isSaving: Boolean) : AiSettingsAction()
 }

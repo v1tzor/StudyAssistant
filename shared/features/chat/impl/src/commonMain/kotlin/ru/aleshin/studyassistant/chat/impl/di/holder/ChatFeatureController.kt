@@ -37,7 +37,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
-import ru.aleshin.studyassistant.core.domain.repositories.DailyAiStatisticsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
@@ -61,14 +60,13 @@ public class ChatFeatureController(
         
         bindSingleton<AiAssistantRepository> { dependencies.aiAssistantRepository }
         bindSingleton<AiSettingsRepository> { dependencies.aiSettingsRepository }
-        bindSingleton<ProfileRepository> { dependencies.profileRepository }
-        bindSingleton<DailyAiStatisticsRepository> { dependencies.dailyAiStatisticsRepository }
         bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
         bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
         bindSingleton<EmployeeRepository> { dependencies.employeeRepository }
         bindSingleton<SubjectsRepository> { dependencies.subjectsRepository }
         bindSingleton<DailyGoalsRepository> { dependencies.goalsRepository }
         bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
+        bindSingleton<ProfileRepository> { dependencies.profileRepository }
         bindSingleton<HomeworksRepository> { dependencies.homeworksRepository }
         bindSingleton<TodoRepository> { dependencies.todoRepository }
         bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }

@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
+import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.library)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.konfig)
 }
 
 kotlin {
@@ -54,8 +56,6 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:domain"))
-            implementation(project(":shared:core:client-api"))
-
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.content.negotiation)
@@ -73,10 +73,27 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlin.coroutines.test)
+            implementation(libs.ktor.client.mock)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
     }
 
+}
+
+buildkonfig {
+    packageName = "ru.aleshin.studyassistant.core.remote"
+
+    val configuredBackendUrl = providers.gradleProperty("studyassistant.backend.url")
+        .orElse(providers.environmentVariable("STUDYASSISTANT_BACKEND_URL"))
+        .orNull
+        ?.trim()
+        ?.trimEnd('/')
+        ?.takeIf(String::isNotEmpty)
+
+    defaultConfigs {
+        buildConfigField(FieldSpec.Type.STRING, "BACKEND_BASE_URL", configuredBackendUrl ?: "http://127.0.0.1:8080")
+    }
 }

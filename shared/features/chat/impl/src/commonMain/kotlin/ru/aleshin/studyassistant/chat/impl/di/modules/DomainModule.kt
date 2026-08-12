@@ -22,6 +22,9 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.chat.impl.domain.common.ChatEitherWrapper
 import ru.aleshin.studyassistant.chat.impl.domain.common.ChatErrorHandler
 import ru.aleshin.studyassistant.chat.impl.domain.interactors.AiAssistantInteractor
+import ru.aleshin.studyassistant.chat.impl.domain.tools.AiToolCallProcessor
+import ru.aleshin.studyassistant.chat.impl.domain.tools.AiToolCallStateResolver
+import ru.aleshin.studyassistant.chat.impl.domain.tools.validation.AiToolArgumentsValidator
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -30,5 +33,29 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<ChatErrorHandler> { ChatErrorHandler.Base() }
     bindSingleton<ChatEitherWrapper> { ChatEitherWrapper.Base(instance(), instance()) }
 
-    bindSingleton<AiAssistantInteractor> {  AiAssistantInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance())  }
+    bindSingleton<AiToolArgumentsValidator> { AiToolArgumentsValidator.Base() }
+    bindSingleton<AiToolCallStateResolver> { AiToolCallStateResolver.Base() }
+    bindSingleton<AiToolCallProcessor> {
+        AiToolCallProcessor.Base(
+            todoRepository = instance(),
+            homeworksRepository = instance(),
+            subjectsRepository = instance(),
+            organizationsRepository = instance(),
+            baseScheduleRepository = instance(),
+            customScheduleRepository = instance(),
+            employeeRepository = instance(),
+            calendarSettingsRepository = instance(),
+            todoReminderManager = instance(),
+            notificationSettingsRepository = instance(),
+            startClassesReminderManager = instance(),
+            endClassesReminderManager = instance(),
+            profileRepository = instance(),
+            dateManager = instance(),
+            validator = instance(),
+            stateResolver = instance(),
+        )
+    }
+    bindSingleton<AiAssistantInteractor> {
+        AiAssistantInteractor.Base(instance(), instance(), instance(), instance(), instance())
+    }
 }

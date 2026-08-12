@@ -17,21 +17,27 @@
 package ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.sections
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Insights
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsInsight
 import ru.aleshin.studyassistant.analytics.impl.presentation.models.AnalyticsInsightUi
-import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.AnalyticsSectionCard
+import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.AnalyticsSection
 import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.formatAnalyticsPercentage
 import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.formatAnalyticsWorkload
 import ru.aleshin.studyassistant.analytics.impl.resources.Res
@@ -52,24 +58,41 @@ internal fun AnalyticsInsightsSection(
     modifier: Modifier = Modifier,
 ) {
     if (insights.isEmpty()) return
-    AnalyticsSectionCard(
+    AnalyticsSection(
         title = stringResource(Res.string.analytics_insights_title),
         modifier = modifier,
     ) {
         insights.forEach { insight ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.Top,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
-                    imageVector = Icons.Default.Insights,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
+                Surface(
+                    modifier = Modifier.size(40.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = when (insight.type) {
+                                AnalyticsInsight.Type.PEAK_LOAD -> Icons.AutoMirrored.Filled.TrendingUp
+                                AnalyticsInsight.Type.OVERLOAD_DAYS -> Icons.Default.WarningAmber
+                                AnalyticsInsight.Type.LATE_COMPLETION_SHARE -> Icons.Default.WarningAmber
+                                AnalyticsInsight.Type.ORGANIZATION_CONCENTRATION -> Icons.Default.Business
+                                AnalyticsInsight.Type.SUBJECT_CONCENTRATION -> Icons.AutoMirrored.Filled.MenuBook
+                            },
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
                 Text(
+                    modifier = Modifier.weight(1f),
                     text = insightTitle(insight),
                     style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

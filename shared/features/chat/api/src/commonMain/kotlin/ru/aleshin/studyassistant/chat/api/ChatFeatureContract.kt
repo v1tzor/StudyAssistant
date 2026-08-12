@@ -32,4 +32,5 @@ public sealed class ChatConfig {
 public sealed class ChatOutput : BaseOutput {
     public data object NavigateToBack : ChatOutput()
     public data object NavigateToAiSettings : ChatOutput()
+    public data object NavigateToScheduleImport : ChatOutput()
 }

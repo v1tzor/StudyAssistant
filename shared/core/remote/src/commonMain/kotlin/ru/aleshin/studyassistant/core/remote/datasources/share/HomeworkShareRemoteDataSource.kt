@@ -17,20 +17,18 @@
 package ru.aleshin.studyassistant.core.remote.datasources.share
 
 import kotlinx.serialization.json.Json
-import ru.aleshin.studyassistant.core.api.AppwriteApi
-import ru.aleshin.studyassistant.core.api.functions.FunctionExecutionException
-import ru.aleshin.studyassistant.core.api.functions.FunctionsService
-import ru.aleshin.studyassistant.core.remote.models.shared.CreateHomeworkShareRequestPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.CreateShareResponsePojo
-import ru.aleshin.studyassistant.core.remote.models.shared.FetchHomeworkShareRequestPojo
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
+import ru.aleshin.studyassistant.core.remote.api.share.BackendShareApi
 import ru.aleshin.studyassistant.core.remote.models.shared.HomeworkSharePayloadPojo
-import ru.aleshin.studyassistant.core.remote.models.shared.HomeworkShareResponsePojo
 import ru.aleshin.studyassistant.core.remote.models.shared.ShareLinkResponsePojo
 
 /**
- * @author Stanislav Aleshin on 08.08.2026.
+ * @author Stanislav Aleshin on 12.08.2026.
  */
 interface HomeworkShareRemoteDataSource {
+
     suspend fun createShare(
         share: HomeworkSharePayloadPojo,
         installationToken: String,
@@ -39,49 +37,30 @@ interface HomeworkShareRemoteDataSource {
     suspend fun fetchShare(code: String, installationToken: String): HomeworkSharePayloadPojo
 
     class Base(
-        private val functionsService: FunctionsService,
+        private val api: BackendShareApi,
         private val json: Json,
     ) : HomeworkShareRemoteDataSource {
 
         override suspend fun createShare(
             share: HomeworkSharePayloadPojo,
             installationToken: String,
-        ): ShareLinkResponsePojo = execute(
-            request = json.encodeToString(
-                CreateHomeworkShareRequestPojo(
-                    operation = HOMEWORK_CREATE_OPERATION,
-                    installationToken = installationToken,
-                    share = share,
-                )
-            ),
-            decode = { response -> json.decodeFromString<CreateShareResponsePojo>(response).link },
-        )
+        ): ShareLinkResponsePojo {
+            return api.createHomework(
+                share = json.encodeToJsonElement(share).jsonObject,
+                installationToken = installationToken,
+            )
+        }
 
         override suspend fun fetchShare(
             code: String,
             installationToken: String,
-        ): HomeworkSharePayloadPojo = execute(
-            request = json.encodeToString(
-                FetchHomeworkShareRequestPojo(
-                    operation = HOMEWORK_FETCH_OPERATION,
-                    installationToken = installationToken,
+        ): HomeworkSharePayloadPojo {
+            return json.decodeFromJsonElement(
+                api.fetchHomework(
                     code = code,
-                )
-            ),
-            decode = { response -> json.decodeFromString<HomeworkShareResponsePojo>(response).share },
-        )
-
-        private suspend fun <T> execute(request: String, decode: (String) -> T): T {
-            return try {
-                decode(functionsService.execute(AppwriteApi.Functions.SHARING, request))
-            } catch (error: FunctionExecutionException) {
-                throw error.mapToShareException(json)
-            }
-        }
-
-        private companion object {
-            const val HOMEWORK_CREATE_OPERATION = "homework.create"
-            const val HOMEWORK_FETCH_OPERATION = "homework.fetch"
+                    installationToken = installationToken,
+                ),
+            )
         }
     }
 }

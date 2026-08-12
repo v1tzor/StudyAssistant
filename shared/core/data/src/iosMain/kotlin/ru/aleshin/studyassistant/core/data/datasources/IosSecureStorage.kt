@@ -42,7 +42,7 @@ import platform.Security.SecItemCopyMatching
 import platform.Security.SecItemDelete
 import platform.Security.errSecSuccess
 import platform.Security.kSecAttrAccessible
-import platform.Security.kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+import platform.Security.kSecAttrAccessibleWhenUnlockedThisDeviceOnly
 import platform.Security.kSecAttrAccount
 import platform.Security.kSecAttrService
 import platform.Security.kSecClass
@@ -56,6 +56,11 @@ import platform.Security.kSecValueData
  * @author Stanislav Aleshin on 08.08.2026.
  */
 internal class IosSecureStorage {
+
+    init {
+        delete(account = LEGACY_PERSONAL_KEY, serviceName = LEGACY_SERVICE)
+        delete(account = LEGACY_INSTALLATION_TOKEN, serviceName = LEGACY_SERVICE)
+    }
 
     fun read(account: String): String? = memScoped {
         withBaseQuery(account) { query ->
@@ -82,18 +87,20 @@ internal class IosSecureStorage {
         }
         delete(account)
         val bytes = value.encodeToByteArray()
-        val data = bytes.usePinned { pinned ->
-            CFDataCreate(null, pinned.addressOf(0).reinterpret(), bytes.size.toLong())
-        } ?: return
+        val data = checkNotNull(
+            bytes.usePinned { pinned ->
+                CFDataCreate(null, pinned.addressOf(0).reinterpret(), bytes.size.toLong())
+            },
+        )
         try {
             withBaseQuery(account) { query ->
                 CFDictionarySetValue(query, kSecValueData, data)
                 CFDictionarySetValue(
                     query,
                     kSecAttrAccessible,
-                    kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+                    kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
                 )
-                SecItemAdd(query, null)
+                check(SecItemAdd(query, null) == errSecSuccess)
             }
         } finally {
             CFRelease(data)
@@ -101,15 +108,27 @@ internal class IosSecureStorage {
     }
 
     fun delete(account: String) {
-        withBaseQuery(account) { query -> SecItemDelete(query) }
+        delete(account = account, serviceName = SERVICE)
+    }
+
+    private fun delete(
+        account: String,
+        serviceName: String,
+    ) {
+        withBaseQuery(account = account, serviceName = serviceName) { query ->
+            SecItemDelete(query)
+        }
     }
 
     private inline fun <T> withBaseQuery(
         account: String,
+        serviceName: String = SERVICE,
         block: (platform.CoreFoundation.CFMutableDictionaryRef) -> T
     ): T {
         val query = checkNotNull(CFDictionaryCreateMutable(null, 0, null, null))
-        val service = checkNotNull(CFStringCreateWithCString(null, SERVICE, kCFStringEncodingUTF8))
+        val service = checkNotNull(
+            CFStringCreateWithCString(null, serviceName, kCFStringEncodingUTF8),
+        )
         val accountValue =
             checkNotNull(CFStringCreateWithCString(null, account, kCFStringEncodingUTF8))
         return try {
@@ -125,6 +144,9 @@ internal class IosSecureStorage {
     }
 
     private companion object {
-        const val SERVICE = "ru.aleshin.studyassistant.ai"
+        const val SERVICE = "ru.aleshin.studyassistant.installation"
+        const val LEGACY_SERVICE = "ru.aleshin.studyassistant.ai"
+        const val LEGACY_PERSONAL_KEY = "personal_key"
+        const val LEGACY_INSTALLATION_TOKEN = "installation_token"
     }
 }

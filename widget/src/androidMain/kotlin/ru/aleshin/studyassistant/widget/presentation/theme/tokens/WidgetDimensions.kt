@@ -23,7 +23,8 @@ import androidx.compose.ui.unit.dp
  */
 object WidgetDimensions {
     val touchTarget = 48.dp
-    val headerHeight = 52.dp
+    val headerHeight = 48.dp
+    val headerActionContainer = 36.dp
     val contentPaddingCompact = 8.dp
     val contentPadding = 12.dp
     val contentPaddingExpanded = 16.dp
@@ -34,16 +35,16 @@ object WidgetDimensions {
     val iconSmall = 18.dp
     val icon = 22.dp
     val iconCompact = 20.dp
-    val scheduleRowHeight = 76.dp
-    val scheduleRowHeightCompact = 64.dp
-    val homeworkRowHeight = 68.dp
-    val todoRowHeight = 68.dp
-    val todoRowHeightExpanded = 80.dp
-    val goalRowHeight = 76.dp
+    val scheduleRowHeight = 72.dp
+    val scheduleRowHeightCompact = 60.dp
+    val homeworkRowHeight = 64.dp
+    val todoRowHeight = 64.dp
+    val todoRowHeightExpanded = 76.dp
+    val goalRowHeight = 72.dp
     val timeColumnWidth = 48.dp
     val timeColumnWidthCompact = 40.dp
     val subjectRailWidth = 4.dp
     val checkboxSize = 24.dp
-    val progressHeight = 6.dp
+    val progressHeight = 4.dp
     val progressHeightCompact = 4.dp
 }

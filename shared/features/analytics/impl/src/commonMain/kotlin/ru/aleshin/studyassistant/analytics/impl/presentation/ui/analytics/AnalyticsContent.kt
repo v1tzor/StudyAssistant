@@ -75,11 +75,6 @@ import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEf
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantLanguage
-import ru.aleshin.studyassistant.core.ui.utils.isBookPosture
-import ru.aleshin.studyassistant.core.ui.utils.isCompactHeight
-import ru.aleshin.studyassistant.core.ui.utils.isCompactWidth
-import ru.aleshin.studyassistant.core.ui.utils.isTabletopPosture
-import ru.aleshin.studyassistant.core.ui.utils.useExpandedLayout
 import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
 
 /**
@@ -89,6 +84,7 @@ import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun AnalyticsContent(
     component: AnalyticsComponent,
+    isDetails: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val store = component.store
@@ -160,6 +156,7 @@ internal fun AnalyticsContent(
             }
             Crossfade(
                 targetState = when {
+                    state.isLoading && state.data == null -> AnalyticsRenderState.LOADING
                     state.isError && state.data == null -> AnalyticsRenderState.ERROR
                     state.data == null -> AnalyticsRenderState.LOADING
                     state.data?.hasData == false -> AnalyticsRenderState.EMPTY
@@ -175,18 +172,23 @@ internal fun AnalyticsContent(
                     )
                     AnalyticsRenderState.EMPTY -> AnalyticsEmptyLayout(Modifier.padding(16.dp))
                     AnalyticsRenderState.CONTENT -> state.data?.let { data ->
-                        AnalyticsLayout(
-                            data = data,
-                            useTwoColumns = adaptiveInfo.useExpandedLayout || (
-                                !adaptiveInfo.isCompactWidth &&
-                                    !adaptiveInfo.isCompactHeight &&
-                                    !adaptiveInfo.isTabletopPosture
-                                ),
-                            isBookPosture = adaptiveInfo.isBookPosture,
-                            onTargetClick = {
-                                store.dispatchEvent(AnalyticsEvent.ClickTarget(it))
-                            },
-                        )
+                        if (isDetails) {
+                            AnalyticsDetailsLayout(
+                                data = data,
+                                adaptiveInfo = adaptiveInfo,
+                                onTargetClick = {
+                                    store.dispatchEvent(AnalyticsEvent.ClickTarget(it))
+                                },
+                            )
+                        } else {
+                            AnalyticsOverviewLayout(
+                                data = data,
+                                adaptiveInfo = adaptiveInfo,
+                                onTargetClick = {
+                                    store.dispatchEvent(AnalyticsEvent.ClickTarget(it))
+                                },
+                            )
+                        }
                     }
                 }
             }

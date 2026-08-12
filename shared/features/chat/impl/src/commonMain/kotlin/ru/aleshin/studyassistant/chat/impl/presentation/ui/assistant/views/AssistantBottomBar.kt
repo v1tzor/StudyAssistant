@@ -65,6 +65,7 @@ internal fun AssistantBottomBar(
     isLoadingChat: Boolean,
     responseStatus: ResponseStatus,
     isQuotaExpired: Boolean,
+    isInputEnabled: Boolean,
     userQuery: String,
     onUpdateUserQuery: (String) -> Unit,
     onSendMessage: (String) -> Unit,
@@ -87,6 +88,7 @@ internal fun AssistantBottomBar(
             OutlinedTextField(
                 modifier = Modifier.weight(1f),
                 value = textFieldState,
+                enabled = isInputEnabled,
                 singleLine = true,
                 onValueChange = {
                     textFieldState = it
@@ -114,6 +116,7 @@ internal fun AssistantBottomBar(
                 enabled = !isLoadingChat &&
                         responseStatus == ResponseStatus.SUCCESS &&
                         !isQuotaExpired &&
+                        isInputEnabled &&
                         textFieldState.text.isNotBlank(),
                 onClick = {
                     onSendMessage(textFieldState.text)

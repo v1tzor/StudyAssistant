@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.core.data.repositories
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.data.handlers.AiSettingsHandler
-import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceType
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
 import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 
@@ -32,21 +31,7 @@ internal class AiSettingsRepositoryImpl(
 
     override fun fetchSettings(): Flow<AiSettings> = settingsHandler.fetchSettings()
 
-    override suspend fun updateServiceType(serviceType: AiServiceType) {
-        settingsHandler.updateServiceType(serviceType)
-    }
-
-    override suspend fun savePersonalKey(apiKey: String) {
-        settingsHandler.savePersonalKey(apiKey)
-    }
-
-    override suspend fun deletePersonalKey() {
-        settingsHandler.deletePersonalKey()
-    }
-
-    override suspend fun fetchPersonalKey(): String? = settingsHandler.fetchPersonalKey()
-
-    override suspend fun updateSharedQuota(remaining: Int, resetAt: Instant?) {
-        settingsHandler.updateSharedQuota(remaining, resetAt)
+    override suspend fun updateQuota(remaining: Int, resetAt: Instant?) {
+        settingsHandler.updateQuota(remaining, resetAt)
     }
 }

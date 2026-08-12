@@ -138,8 +138,14 @@ This project utilizes the following technologies and libraries:
 
 ## 🌐 Networking & API
 - **[Ktor](https://ktor.io/)**: Asynchronous HTTP client and server framework for Kotlin.
-- **[Appwrite Functions](https://appwrite.io/docs/products/functions)**: Explicit temporary sharing and the shared AI endpoint.
-- **[DeepSeek API](https://api-docs.deepseek.com/)**: Optional personal-key AI mode.
+- **[PostgreSQL](https://www.postgresql.org/)**: Transactional quotas and encrypted temporary sharing storage.
+- **[DeepSeek API](https://api-docs.deepseek.com/)**: Server-side shared AI through the fixed Flash model.
+
+Release/archive builds require the public Ktor endpoint explicitly via
+`-Pstudyassistant.backend.url=https://api.studyassistant-app.ru` or
+`STUDYASSISTANT_BACKEND_URL`; provider keys and other privileged secrets never enter the mobile binary.
+For Android emulator development use
+`-Pstudyassistant.backend.url=http://10.0.2.2:8080`; cleartext traffic is enabled only in debug builds.
 - **[Tracer](https://apptracer.ru/)**: Android crash reporting.
 - **[MyTracker](https://tracker.my.com/ru/)**: Android analytics.
 
@@ -178,8 +184,7 @@ graph LR;
     subgraph one [Core]
     direction LR;
     core --> common & ui & presentation & domain & data
-    data --> remote & database & client-api
-    remote --> client-api
+    data --> remote & database
     end
 
     shared --> features

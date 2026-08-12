@@ -28,8 +28,7 @@ internal interface ChatErrorHandler : ErrorHandler<ChatFailures> {
     class Base : ChatErrorHandler {
         override fun handle(throwable: Throwable) = when (throwable) {
             is AiServiceException.QuotaExceeded -> ChatFailures.QuotaExceeded
-            is AiServiceException.InvalidKey -> ChatFailures.InvalidKey
-            is AiServiceException.InsufficientBalance -> ChatFailures.InsufficientBalance
+            is AiServiceException.InvalidRequest -> ChatFailures.InvalidRequest
             is AiServiceException.RateLimited -> ChatFailures.RateLimited
             is AiServiceException.ServerUnavailable -> ChatFailures.ServerUnavailable
             is InternetConnectionException -> ChatFailures.Offline

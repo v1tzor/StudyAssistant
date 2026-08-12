@@ -35,6 +35,8 @@
     <string name="analytics_workload_title">Workload and schedule</string>
     <string name="analytics_tasks_title">Assignments</string>
     <string name="analytics_goals_title">Goals</string>
+    <string name="analytics_regularity_chart_label">Average academic workload by day</string>
+    <string name="analytics_goals_duration">Time control</string>
     <string name="analytics_organizations_title">Organizations</string>
     <string name="analytics_subjects_title">Subjects</string>
     <string name="analytics_employees_title">Teachers</string>
@@ -97,7 +99,9 @@
     <string name="analytics_insight_late">%1$s of completed assignments were late.</string>
     <string name="analytics_insight_organization">%1$s of workload is concentrated in %2$s.</string>
     <string name="analytics_insight_subject">%1$s of workload is concentrated in %2$s.</string>
+    <string name="analytics_organizations_count">Organizations</string>
     <string name="analytics_completion_dynamics">Completion dynamics</string>
+    <string name="analytics_no_overloads">No overloads</string>
     <string name="analytics_status_distribution">Status distribution</string>
     <string name="analytics_task_structure">Assignment structure</string>
     <string name="analytics_todo_priorities">TODO priorities</string>

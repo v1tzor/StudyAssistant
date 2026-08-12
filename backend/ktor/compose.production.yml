@@ -1,0 +1,244 @@
+name: ${COMPOSE_PROJECT_NAME:-studyassistant-backend}
+
+x-app-runtime: &app-runtime
+  image: ${BACKEND_IMAGE:-studyassistant-backend:local}
+  build:
+    context: .
+    dockerfile: Dockerfile
+  init: true
+  read_only: true
+  user: "10001:10001"
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,size=64m
+  pids_limit: 256
+  mem_limit: 768m
+  cpus: 1.5
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: "5"
+
+services:
+
+  postgres:
+    image: postgres:18.4-alpine@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15
+    user: "70:10001"
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-studyassistant}
+      POSTGRES_USER: ${POSTGRES_USER:-studyassistant_admin}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_admin_password
+      DATABASE_APP_PASSWORD_FILE: /run/secrets/database_app_password
+      DATABASE_MIGRATOR_PASSWORD_FILE: /run/secrets/database_migrator_password
+    secrets:
+      - postgres_admin_password
+      - database_app_password
+      - database_migrator_password
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 15s
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+      - /var/run/postgresql:rw,noexec,nosuid,size=16m
+    shm_size: 128m
+    pids_limit: 256
+    mem_limit: 1g
+    cpus: 1.5
+    stop_grace_period: 60s
+    networks:
+      - database
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "5"
+
+  migrate:
+    <<: *app-runtime
+    restart: "no"
+    entrypoint:
+      - java
+      - -XX:MaxRAMPercentage=75.0
+      - -XX:+ExitOnOutOfMemoryError
+      - -cp
+      - /app/lib/*
+      - ru.aleshin.studyassistant.backend.maintenance.MigrationMainKt
+    environment:
+      FLYWAY_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-studyassistant}
+      FLYWAY_USER: studyassistant_migrator
+      FLYWAY_PASSWORD_FILE: /run/secrets/database_migrator_password
+    secrets:
+      - database_migrator_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - database
+
+  backend:
+    <<: *app-runtime
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-studyassistant}
+      DATABASE_USER: studyassistant_app
+      DATABASE_PASSWORD_FILE: /run/secrets/database_app_password
+      INSTALLATION_HMAC_SECRET_FILE: /run/secrets/installation_hmac_secret
+      SHARE_HMAC_SECRET_FILE: /run/secrets/share_hmac_secret
+      PAYLOAD_ENCRYPTION_KEY_FILE: /run/secrets/payload_encryption_key
+      DEEPSEEK_API_KEY_FILE: /run/secrets/deepseek_api_key
+      EXPECTED_HOST: ${EXPECTED_HOST:-api.studyassistant-app.ru}
+      TRUST_PROXY_HEADERS: "true"
+      REQUIRE_HTTPS: "true"
+      AI_GLOBAL_DAILY_EXECUTION_LIMIT: ${AI_GLOBAL_DAILY_EXECUTION_LIMIT:-500}
+    secrets:
+      - database_app_password
+      - installation_hmac_secret
+      - share_hmac_secret
+      - payload_encryption_key
+      - deepseek_api_key
+    expose:
+      - "8080"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          wget -q -O /dev/null
+          --header="Host: $${EXPECTED_HOST}"
+          --header="X-Forwarded-Host: $${EXPECTED_HOST}"
+          --header="X-Forwarded-Proto: https"
+          http://127.0.0.1:8080/health/ready
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    stop_grace_period: 45s
+    networks:
+      - database
+      - egress
+      - web
+
+  nginx:
+    image: nginx:stable-alpine@sha256:97d490c12ba55b4946b01546d1c3ed324e8d41ab1c9fcb2a616aa470620e5b46
+    restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - NET_BIND_SERVICE
+      - SETGID
+      - SETUID
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - nginx
+      - -g
+      - daemon off;
+      - -c
+      - /etc/nginx/studyassistant/nginx.conf
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx:/etc/nginx/studyassistant:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    tmpfs:
+      - /var/cache/nginx:rw,noexec,nosuid,size=32m
+      - /var/run:rw,noexec,nosuid,size=4m
+    pids_limit: 128
+    mem_limit: 128m
+    cpus: 0.5
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - nginx
+        - -t
+        - -c
+        - /etc/nginx/studyassistant/nginx.conf
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - web
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "5"
+
+  cleanup:
+    <<: *app-runtime
+    profiles:
+      - maintenance
+    restart: "no"
+    entrypoint:
+      - java
+      - -XX:MaxRAMPercentage=75.0
+      - -XX:+ExitOnOutOfMemoryError
+      - -cp
+      - /app/lib/*
+      - ru.aleshin.studyassistant.backend.maintenance.CleanupMainKt
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-studyassistant}
+      DATABASE_USER: studyassistant_app
+      DATABASE_PASSWORD_FILE: /run/secrets/database_app_password
+    secrets:
+      - database_app_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - database
+
+volumes:
+  postgres_data:
+
+networks:
+  database:
+    internal: true
+  egress:
+  web:
+
+secrets:
+  postgres_admin_password:
+    file: ${POSTGRES_ADMIN_PASSWORD_FILE}
+  database_app_password:
+    file: ${DATABASE_APP_PASSWORD_FILE}
+  database_migrator_password:
+    file: ${DATABASE_MIGRATOR_PASSWORD_FILE}
+  installation_hmac_secret:
+    file: ${INSTALLATION_HMAC_SECRET_FILE}
+  share_hmac_secret:
+    file: ${SHARE_HMAC_SECRET_FILE}
+  payload_encryption_key:
+    file: ${PAYLOAD_ENCRYPTION_KEY_FILE}
+  deepseek_api_key:
+    file: ${DEEPSEEK_API_KEY_FILE}

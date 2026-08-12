@@ -45,7 +45,7 @@ class WidgetStateUiMapper {
             baseScheduleId = schedule.baseScheduleId,
             items = schedule.items.map { item ->
                 ScheduleWidgetItemUi(
-                    id = item.uid.stableWidgetId(),
+                    id = item.uid.stableWidgetId(SCHEDULE_ID_NAMESPACE),
                     eventType = item.eventType,
                     title = item.title,
                     office = item.office,
@@ -65,11 +65,11 @@ class WidgetStateUiMapper {
             groups = homeworks.groups.map { group ->
                 val date = group.date.toEpochMilliseconds()
                 HomeworkWidgetGroupUi(
-                    id = date xor DATE_HEADER_ID_MASK,
+                    id = date.stableWidgetId(HOMEWORK_HEADER_ID_NAMESPACE),
                     date = date,
                     items = group.items.map { item ->
                         HomeworkWidgetItemUi(
-                            id = item.uid.stableWidgetId(),
+                            id = item.uid.stableWidgetId(HOMEWORK_ID_NAMESPACE),
                             homeworkId = item.uid,
                             subjectId = item.subjectId,
                             organizationId = item.organizationId,
@@ -93,7 +93,7 @@ class WidgetStateUiMapper {
             generatedAt = todos.generatedAt.toEpochMilliseconds(),
             items = todos.items.map { item ->
                 TodoWidgetItemUi(
-                    id = item.uid.stableWidgetId(),
+                    id = item.uid.stableWidgetId(TODO_ID_NAMESPACE),
                     todoId = item.uid,
                     name = item.name,
                     description = item.description,
@@ -111,7 +111,7 @@ class WidgetStateUiMapper {
             generatedAt = goals.generatedAt.toEpochMilliseconds(),
             items = goals.items.map { item ->
                 GoalWidgetItemUi(
-                    id = item.uid.stableWidgetId(),
+                    id = item.uid.stableWidgetId(GOAL_ID_NAMESPACE),
                     number = item.number,
                     contentType = item.contentType,
                     title = item.title,
@@ -130,13 +130,23 @@ class WidgetStateUiMapper {
         return if (isEmpty()) WidgetContentStatusUi.EMPTY else WidgetContentStatusUi.CONTENT
     }
 
-    private fun String.stableWidgetId(): Long {
-        return fold(FNV_OFFSET_BASIS) { hash, char ->
+    private fun String.stableWidgetId(namespace: Long): Long {
+        val hash = fold(FNV_OFFSET_BASIS) { hash, char ->
             (hash xor char.code.toLong()) * FNV_PRIME
         }
+        return namespace or (hash and WIDGET_ID_PAYLOAD_MASK)
+    }
+
+    private fun Long.stableWidgetId(namespace: Long): Long {
+        return namespace or (this and WIDGET_ID_PAYLOAD_MASK)
     }
 }
 
 private const val FNV_OFFSET_BASIS = -3750763034362895579L
 private const val FNV_PRIME = 1099511628211L
-private const val DATE_HEADER_ID_MASK = Long.MIN_VALUE
+private const val WIDGET_ID_PAYLOAD_MASK = 0x07FF_FFFF_FFFF_FFFFL
+private const val SCHEDULE_ID_NAMESPACE = 0x0800_0000_0000_0000L
+private const val HOMEWORK_HEADER_ID_NAMESPACE = 0x1000_0000_0000_0000L
+private const val HOMEWORK_ID_NAMESPACE = 0x1800_0000_0000_0000L
+private const val TODO_ID_NAMESPACE = 0x2000_0000_0000_0000L
+private const val GOAL_ID_NAMESPACE = 0x2800_0000_0000_0000L

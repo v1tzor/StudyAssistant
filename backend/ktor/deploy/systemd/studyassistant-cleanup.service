@@ -1,0 +1,23 @@
+[Unit]
+Description=Remove expired StudyAssistant temporary data
+Requires=docker.service
+After=docker.service studyassistant-backend.service
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/studyassistant/backend/ktor
+EnvironmentFile=/etc/studyassistant/production.env
+ExecStartPre=/usr/local/libexec/studyassistant/preflight.sh
+ExecStart=/usr/bin/docker compose --env-file /etc/studyassistant/production.env -f compose.production.yml --profile maintenance run --rm cleanup
+TimeoutStartSec=300
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

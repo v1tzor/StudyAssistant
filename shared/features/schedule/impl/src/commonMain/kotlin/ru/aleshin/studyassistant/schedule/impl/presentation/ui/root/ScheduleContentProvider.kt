@@ -24,6 +24,7 @@ import org.kodein.di.DI
 import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
 import ru.aleshin.studyassistant.core.common.navigation.backAnimation
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.DetailsContent
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.ImportContent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.OverviewContent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.root.ScheduleFeatureComponent.Child
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.ShareContent
@@ -56,6 +57,9 @@ internal class ScheduleContentProvider(
                 }
                 is Child.ShareChild -> {
                     ShareContent(shareComponent = instance.component)
+                }
+                is Child.ImportChild -> {
+                    ImportContent(component = instance.component)
                 }
             }
         }

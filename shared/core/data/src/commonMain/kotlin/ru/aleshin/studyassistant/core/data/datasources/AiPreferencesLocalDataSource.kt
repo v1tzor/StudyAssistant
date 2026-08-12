@@ -27,29 +27,15 @@ interface AiPreferencesLocalDataSource {
 
     fun fetchSettings(): Flow<AiSettingsEntity>
     suspend fun updateSettings(settings: AiSettingsEntity)
-    suspend fun fetchPersonalKey(): String?
-    suspend fun savePersonalKey(apiKey: String)
-    suspend fun deletePersonalKey()
 
     class Base(
         private val settingsDataSource: AiSettingsLocalDataSource,
-        private val secureDataSource: AiSecureDataSource,
     ) : AiPreferencesLocalDataSource {
 
         override fun fetchSettings(): Flow<AiSettingsEntity> = settingsDataSource.fetchSettings()
 
         override suspend fun updateSettings(settings: AiSettingsEntity) {
             settingsDataSource.updateSettings(settings)
-        }
-
-        override suspend fun fetchPersonalKey(): String? = secureDataSource.fetchPersonalKey()
-
-        override suspend fun savePersonalKey(apiKey: String) {
-            secureDataSource.savePersonalKey(apiKey)
-        }
-
-        override suspend fun deletePersonalKey() {
-            secureDataSource.deletePersonalKey()
         }
     }
 }

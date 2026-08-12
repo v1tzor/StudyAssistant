@@ -61,7 +61,7 @@ internal fun EmployeeProfileTopBar(
                 Icon(imageVector = Icons.Default.Edit, contentDescription = null)
             }
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         )
     )

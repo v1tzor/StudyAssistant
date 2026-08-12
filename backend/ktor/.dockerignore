@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+!.env.production.example
+.gradle
+.idea
+build
+local.properties
+out
+secrets
+*.iml

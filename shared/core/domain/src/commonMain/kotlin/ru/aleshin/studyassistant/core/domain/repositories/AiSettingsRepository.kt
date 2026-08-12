@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.core.domain.repositories
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceType
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
 
 /**
@@ -26,9 +25,5 @@ import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
  */
 interface AiSettingsRepository {
     fun fetchSettings(): Flow<AiSettings>
-    suspend fun updateServiceType(serviceType: AiServiceType)
-    suspend fun savePersonalKey(apiKey: String)
-    suspend fun deletePersonalKey()
-    suspend fun fetchPersonalKey(): String?
-    suspend fun updateSharedQuota(remaining: Int, resetAt: Instant?)
+    suspend fun updateQuota(remaining: Int, resetAt: Instant?)
 }
