@@ -15,7 +15,7 @@ StudyAssistant
   <img alt="material" src="https://custom-icon-badges.demolab.com/badge/material%20you-lightblue?style=for-the-badge&logoColor=333&logo=material-you"/></a>
   </br>
   </br>
-  <a href=""><img src="https://tokei.rs/b1/github/v1tzor/StudyAssistant?category=code&color=purple&include_prereleases&logo=github&style=for-the-badge"/></a>
+  <a href=""><img src="https://img.shields.io/endpoint?url=https://tokei.kojix2.net/badge/github/v1tzor/StudyAssistant/lines?category=code&color=purple&include_prereleases&logo=github&style=for-the-badge"/></a>
   <a href=""><img src="https://img.shields.io/github/v/release/v1tzor/StudyAssistant?color=purple&include_prereleases&logo=github&style=for-the-badge"/></a>
   <a href="https://github.com/v1tzor/StudyAssistant/stargazers"><img src="https://img.shields.io/github/stars/v1tzor/StudyAssistant?color=ffff00&style=for-the-badge"/></a>
   <a href=""><img src="https://img.shields.io/github/forks/v1tzor/StudyAssistant?style=for-the-badge"/></a>
