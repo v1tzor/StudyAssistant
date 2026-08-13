@@ -47,9 +47,11 @@ class InstallationCredentialService(
 
         val lastSeparator = credential.lastIndexOf('.')
         val payload = credential.substring(startIndex = 0, endIndex = lastSeparator)
+        val encodedSignature = credential.substring(startIndex = lastSeparator + 1)
         val suppliedSignature = runCatching {
-            decoder.decode(credential.substring(startIndex = lastSeparator + 1))
+            decoder.decode(encodedSignature)
         }.getOrNull() ?: return false
+        if (encoder.encodeToString(suppliedSignature) != encodedSignature) return false
         val expectedSignature = hasher.hash(payload)
 
         return MessageDigest.isEqual(expectedSignature, suppliedSignature)

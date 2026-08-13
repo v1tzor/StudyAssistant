@@ -99,11 +99,29 @@ class SecurityPrimitivesTest {
             secret = installationSecret,
         )
         val credential = service.issue()
-        val replacement = if (credential.last() == 'A') 'B' else 'A'
-        val tampered = credential.dropLast(1) + replacement
+        val signatureStartIndex = credential.lastIndexOf('.') + 1
+        val replacement = if (credential[signatureStartIndex] == 'A') 'B' else 'A'
+        val tampered = credential.replaceRange(
+            startIndex = signatureStartIndex,
+            endIndex = signatureStartIndex + 1,
+            replacement = replacement.toString(),
+        )
 
         assertFalse(service.isValid(tampered))
         assertFalse(service.isValid("v1.invalid.invalid"))
+    }
+
+    @Test
+    fun nonCanonicalInstallationCredentialSignatureShouldBeRejected() {
+        val service = InstallationCredentialService(
+            secret = installationSecret,
+        )
+        val credential = service.issue()
+        val canonicalTailIndex = BASE64_URL_ALPHABET.indexOf(credential.last())
+        assertTrue(canonicalTailIndex >= 0)
+        val nonCanonical = credential.dropLast(1) + BASE64_URL_ALPHABET[canonicalTailIndex + 1]
+
+        assertFalse(service.isValid(nonCanonical))
     }
 
     @Test
@@ -281,5 +299,11 @@ class SecurityPrimitivesTest {
                 purpose = PayloadPurpose.SCHEDULE_SHARE,
             )
         }
+    }
+
+    private companion object {
+
+        const val BASE64_URL_ALPHABET =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
     }
 }
