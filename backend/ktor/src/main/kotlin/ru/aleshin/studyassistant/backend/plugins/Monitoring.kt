@@ -35,7 +35,6 @@ import java.util.UUID
 fun Application.configureMonitoring() {
     install(CallId) {
         header(HttpHeaders.XRequestId)
-        replyToHeader(HttpHeaders.XRequestId)
         generate {
             UUID.randomUUID().toString()
         }

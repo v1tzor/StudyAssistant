@@ -7,8 +7,13 @@ build
 captures
 .externalNativeBuild
 .cxx
+AGENTS.md
+design-qa.md
+.claude
 local.properties
 xcuserdata
+backend/ktor/deploy/DEPLOYMENT.md
+backend/ktor/README.md
 androidApp/fdroid/
 androidApp/github/
 androidApp/google/
