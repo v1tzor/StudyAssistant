@@ -24,4 +24,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class AiSettingsUi(
     val quotaRemaining: Int,
+    val quotaLimit: Int,
+    val rewardedResetsRemaining: Int,
 )

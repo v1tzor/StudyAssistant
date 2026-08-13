@@ -192,7 +192,7 @@ class ScheduleExtractionRoutesTest {
         ): AiQuotaReservationResult {
             reserveCalls++
             return AiQuotaReservationResult.Reserved(
-                quota = AiQuota(used = 1, limit = 25),
+                quota = AiQuota(used = 1, limit = 12, rewardedResetsRemaining = 3),
                 resetAt = Instant.parse("2026-08-13T00:00:00Z"),
                 isNewMessage = true,
             )

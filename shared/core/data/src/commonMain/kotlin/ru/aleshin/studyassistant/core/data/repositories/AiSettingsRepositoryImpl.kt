@@ -31,7 +31,17 @@ internal class AiSettingsRepositoryImpl(
 
     override fun fetchSettings(): Flow<AiSettings> = settingsHandler.fetchSettings()
 
-    override suspend fun updateQuota(remaining: Int, resetAt: Instant?) {
-        settingsHandler.updateQuota(remaining, resetAt)
+    override suspend fun updateQuota(
+        remaining: Int,
+        limit: Int,
+        rewardedResetsRemaining: Int,
+        resetAt: Instant?,
+    ) {
+        settingsHandler.updateQuota(
+            remaining = remaining,
+            limit = limit,
+            rewardedResetsRemaining = rewardedResetsRemaining,
+            resetAt = resetAt,
+        )
     }
 }

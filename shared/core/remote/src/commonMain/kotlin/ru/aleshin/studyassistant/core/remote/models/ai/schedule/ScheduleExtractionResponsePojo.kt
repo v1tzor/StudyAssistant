@@ -25,5 +25,7 @@ import kotlinx.serialization.Serializable
 data class ScheduleExtractionResponsePojo(
     val draft: ScheduleImportDraftPojo,
     val quotaRemaining: Int,
+    val quotaLimit: Int,
+    val rewardedResetsRemaining: Int,
     val quotaResetAt: Long,
 )

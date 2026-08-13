@@ -2,6 +2,14 @@
     "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
     <dict>
+        <key>YandexAiRewardedId</key>
+        <string></string>
+        <key>YandexInfoBannerId</key>
+        <string></string>
+        <key>YandexScheduleRewardedId</key>
+        <string></string>
+        <key>YandexTasksBannerId</key>
+        <string></string>
         <key>BGTaskSchedulerPermittedIdentifiers</key>
         <array>
             <string>ru.aleshin.studyassistant.homeworksreminder</string>

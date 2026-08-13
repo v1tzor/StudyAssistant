@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.data.repositories
 
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.data.handlers.AiSettingsHandler
 import ru.aleshin.studyassistant.core.data.mappers.schedules.mapToDomain
@@ -44,12 +45,17 @@ internal class ScheduleImportRepositoryImpl(
             ).also { response ->
                 settingsHandler.updateQuota(
                     remaining = response.quotaRemaining,
+                    limit = response.quotaLimit,
+                    rewardedResetsRemaining = response.rewardedResetsRemaining,
                     resetAt = Instant.fromEpochMilliseconds(response.quotaResetAt),
                 )
             }.draft.mapToDomain()
         } catch (error: AiServiceException.QuotaExceeded) {
+            val settings = settingsHandler.fetchSettings().first()
             settingsHandler.updateQuota(
                 remaining = 0,
+                limit = settings.quotaLimit,
+                rewardedResetsRemaining = settings.rewardedResetsRemaining,
                 resetAt = error.resetAtEpochMillis?.let(Instant::fromEpochMilliseconds),
             )
             throw error

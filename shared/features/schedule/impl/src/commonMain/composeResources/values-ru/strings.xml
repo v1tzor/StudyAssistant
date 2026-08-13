@@ -68,7 +68,8 @@
     <string name="first_week_title">1 неделя</string>
     <string name="second_week_title">2 неделя</string>
     <string name="thirty_week_title">3 неделя</string>
-    <string name="accept_shared_schedule_button_title">Принять</string>
+    <string name="accept_shared_schedule_button_title">Посмотреть рекламу и принять</string>
+    <string name="schedule_reward_unavailable_error">Реклама сейчас недоступна. Попробуйте ещё раз позже.</string>
     <string name="reject_shared_schedule_button_title">Отклонить</string>
     <string name="create_share_title">Передать расписание</string>
     <string name="create_share_description">Создайте временный код. В него войдут расписание и связанные учебные данные без профиля и аккаунта.</string>

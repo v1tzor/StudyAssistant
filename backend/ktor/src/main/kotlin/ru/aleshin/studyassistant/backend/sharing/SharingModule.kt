@@ -34,6 +34,8 @@ import ru.aleshin.studyassistant.backend.sharing.services.HomeworkSharingService
 import ru.aleshin.studyassistant.backend.sharing.services.ScheduleSharingService
 import ru.aleshin.studyassistant.backend.sharing.domain.repository.HomeworkSharingRepository
 import ru.aleshin.studyassistant.backend.sharing.domain.repository.ScheduleSharingRepository
+import ru.aleshin.studyassistant.backend.ads.domain.repository.AdRewardRepository
+import ru.aleshin.studyassistant.backend.ads.services.AdRewardService
 import ru.aleshin.studyassistant.backend.sharing.infrastructure.HomeworkSharingRepositoryImpl
 import ru.aleshin.studyassistant.backend.sharing.infrastructure.ScheduleSharingRepositoryImpl
 import java.time.Clock
@@ -94,6 +96,8 @@ fun Application.sharingModule() {
                 claimTokenService = resolve<ClaimTokenService>(),
                 payloadCipher = resolve<PayloadCipher>(),
                 payloadValidator = resolve<SharePayloadValidator>(),
+                adRewardRepository = resolve<AdRewardRepository>(),
+                adRewardService = resolve<AdRewardService>(),
                 config = config,
                 clock = Clock.systemUTC(),
             )

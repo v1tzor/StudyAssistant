@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.data.handlers
 
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceException
 import ru.aleshin.studyassistant.core.domain.managers.InstallationIdProvider
@@ -46,12 +47,17 @@ internal interface AiCompletionHandler {
                 ).also { result ->
                     settingsHandler.updateQuota(
                         remaining = result.quotaRemaining,
+                        limit = result.quotaLimit,
+                        rewardedResetsRemaining = result.rewardedResetsRemaining,
                         resetAt = Instant.fromEpochMilliseconds(result.quotaResetAt),
                     )
                 }
             } catch (error: AiServiceException.QuotaExceeded) {
+                val settings = settingsHandler.fetchSettings().first()
                 settingsHandler.updateQuota(
                     remaining = 0,
+                    limit = settings.quotaLimit,
+                    rewardedResetsRemaining = settings.rewardedResetsRemaining,
                     resetAt = error.resetAtEpochMillis?.let(Instant::fromEpochMilliseconds),
                 )
                 throw error

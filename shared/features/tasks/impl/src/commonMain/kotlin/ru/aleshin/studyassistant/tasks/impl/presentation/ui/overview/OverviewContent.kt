@@ -65,6 +65,8 @@ import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkUi
 import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoUi
+import ru.aleshin.studyassistant.core.ui.ads.AdPlacement
+import ru.aleshin.studyassistant.core.ui.ads.YandexInlineBanner
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.ShareQrCode
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToMessage
@@ -322,6 +324,10 @@ private fun BaseOverviewContent(
             onChangeGoalDesiredTime = onChangeGoalDesiredTime,
         )
         HorizontalDivider()
+        YandexInlineBanner(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            placement = AdPlacement.TASKS_OVERVIEW,
+        )
         OverviewContentDetails(
             currentTab = overviewTasksTab,
             isLoadingHomeworks = state.isLoadingHomeworks,

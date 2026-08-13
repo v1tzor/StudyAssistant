@@ -24,6 +24,8 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback
 import com.arkivanov.essenty.backhandler.BackDispatcher
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.di.MainDependenciesGraph
+import ru.aleshin.studyassistant.core.ui.ads.AdsConfiguration
+import ru.aleshin.studyassistant.core.ui.ads.YandexAdsProvider
 import ru.aleshin.studyassistant.presentation.ui.main.MainScreen
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponentFactory
 
@@ -35,6 +37,7 @@ fun MainViewController(
     componentContext: ComponentContext,
     backDispatcher: BackDispatcher,
     deepLinkReceiver: DeepLinkReceiver,
+    adsConfiguration: AdsConfiguration,
 ) = ComposeUIViewController {
     val componentFactory = remember {
         MainDependenciesGraph.fetchDI().instance<MainComponentFactory>()
@@ -51,6 +54,8 @@ fun MainViewController(
         backIcon = null,
         modifier = Modifier.fillMaxSize(),
     ) {
-        MainScreen(mainComponent = mainComponent)
+        YandexAdsProvider(configuration = adsConfiguration) {
+            MainScreen(mainComponent = mainComponent)
+        }
     }
 }

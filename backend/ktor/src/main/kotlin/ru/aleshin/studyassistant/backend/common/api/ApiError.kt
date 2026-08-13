@@ -67,6 +67,11 @@ class QuotaExceededException(
     quotaResetAt = quotaResetAt,
 )
 
+class RewardUnavailableException : ApiException(
+    status = HttpStatusCode.Conflict,
+    errorCode = "reward_unavailable",
+)
+
 class ServerUnavailableException : ApiException(
     status = HttpStatusCode.ServiceUnavailable,
     errorCode = "server_unavailable",

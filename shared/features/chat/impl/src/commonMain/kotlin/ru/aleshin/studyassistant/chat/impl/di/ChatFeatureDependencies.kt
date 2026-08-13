@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsServic
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.repositories.AdRewardRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
@@ -45,6 +46,7 @@ public interface ChatFeatureDependencies : BaseFeatureDependencies {
     public val baseScheduleRepository: BaseScheduleRepository
     public val aiAssistantRepository: AiAssistantRepository
     public val aiSettingsRepository: AiSettingsRepository
+    public val adRewardRepository: AdRewardRepository
     public val customScheduleRepository: CustomScheduleRepository
     public val employeeRepository: EmployeeRepository
     public val subjectsRepository: SubjectsRepository

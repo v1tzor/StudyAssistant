@@ -27,6 +27,8 @@ import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardChallenge
+import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardPurpose
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.organizations.MediatedOrganization
@@ -42,6 +44,7 @@ import ru.aleshin.studyassistant.core.domain.entities.share.ScheduleShareClaim
 import ru.aleshin.studyassistant.core.domain.entities.share.ShareException
 import ru.aleshin.studyassistant.core.domain.entities.share.ShareLink
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
+import ru.aleshin.studyassistant.core.domain.repositories.AdRewardRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
@@ -62,6 +65,8 @@ internal interface ShareSchedulesInteractor {
     suspend fun claimShare(code: String): DomainResult<ScheduleFailures, ScheduleSharePreview>
 
     suspend fun releaseShare(claim: ScheduleShareClaim): UnitDomainResult<ScheduleFailures>
+
+    suspend fun createImportReward(claim: ScheduleShareClaim): DomainResult<ScheduleFailures, AdRewardChallenge>
 
     suspend fun linkOrganization(
         links: List<ScheduleOrganizationLink>,
@@ -85,6 +90,7 @@ internal interface ShareSchedulesInteractor {
     ): DomainResult<ScheduleFailures, ScheduleLinkResult>
 
     suspend fun importShare(
+        rewardChallengeId: String,
         claim: ScheduleShareClaim,
         links: List<ScheduleOrganizationLink>,
     ): UnitDomainResult<ScheduleFailures>
@@ -94,6 +100,7 @@ internal interface ShareSchedulesInteractor {
         private val profileRepository: ProfileRepository,
         private val organizationRepository: OrganizationsRepository,
         private val baseSchedulesRepository: BaseScheduleRepository,
+        private val adRewardRepository: AdRewardRepository,
         private val dateManager: DateManager,
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : ShareSchedulesInteractor {
@@ -147,6 +154,13 @@ internal interface ShareSchedulesInteractor {
 
         override suspend fun releaseShare(claim: ScheduleShareClaim) = eitherWrapper.wrapUnit {
             shareRepository.releaseShare(claim)
+        }
+
+        override suspend fun createImportReward(claim: ScheduleShareClaim) = eitherWrapper.wrap {
+            adRewardRepository.createChallenge(
+                purpose = AdRewardPurpose.SCHEDULE_IMPORT,
+                subject = claim.claimId,
+            )
         }
 
         override suspend fun linkOrganization(
@@ -215,9 +229,11 @@ internal interface ShareSchedulesInteractor {
         }
 
         override suspend fun importShare(
+            rewardChallengeId: String,
             claim: ScheduleShareClaim,
             links: List<ScheduleOrganizationLink>,
         ) = eitherWrapper.wrapUnit {
+            adRewardRepository.completeChallenge(rewardChallengeId)
             var imported = false
             try {
                 val (organizations, idMappings) = buildOrganizations(links)

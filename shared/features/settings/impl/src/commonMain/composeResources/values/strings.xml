@@ -52,7 +52,7 @@
     <string name="ai_settings_description">AI requests are handled by the protected StudyAssistant backend. No API key or account is required.</string>
     <string name="backend_ai_title">StudyAssistant AI</string>
     <string name="backend_ai_description">One secure mode for chat, tools, and schedule recognition</string>
-    <string name="ai_quota_title">Messages left today: %d of 25</string>
+    <string name="ai_quota_title">Messages left today: %1$d of %2$d. Ad rewards left: %3$d of %4$d.</string>
     <string name="ai_privacy_title">Your study data stays under your control</string>
     <string name="ai_privacy_description">Only the conversation context required for an answer is sent. Changes to tasks and schedules require confirmation.</string>
     <string name="about_app_header">About the app</string>

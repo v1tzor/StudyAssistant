@@ -45,6 +45,8 @@ internal data class ShareState(
     val code: String = "",
     val link: ScheduleShareLinkUi? = null,
     val claim: ScheduleShareClaimUi? = null,
+    val rewardChallengeId: String? = null,
+    val isRewardInProgress: Boolean = false,
     val isLoadingLinkedOrganization: Boolean = false,
     val currentTime: Instant = Clock.System.now(),
     val allOrganizations: List<OrganizationShortUi> = emptyList(),
@@ -63,6 +65,8 @@ internal sealed class ShareEvent : StoreEvent {
     data class UpdatedLinkedSubjects(val sharedOrganization: UID, val subjects: Map<UID, SubjectUi>) : ShareEvent()
     data class UpdatedLinkedTeachers(val sharedOrganization: UID, val teachers: Map<UID, EmployeeUi>) : ShareEvent()
     data object AcceptedSharedSchedule : ShareEvent()
+    data class RewardedAdGranted(val challengeId: String) : ShareEvent()
+    data object RewardedAdUnavailable : ShareEvent()
     data object RejectedSharedSchedule : ShareEvent()
     data object Reset : ShareEvent()
     data object ClickBack : ShareEvent()
@@ -89,6 +93,10 @@ internal sealed class ShareAction : StoreAction {
     data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : ShareAction()
     data class UpdateCurrentTime(val time: Instant) : ShareAction()
     data class UpdateLoadingLinkedOrganization(val isLoading: Boolean) : ShareAction()
+    data class UpdateRewardChallenge(
+        val challengeId: String?,
+        val isInProgress: Boolean,
+    ) : ShareAction()
     data object Reset : ShareAction()
 }
 

@@ -82,11 +82,15 @@ fun Route.scheduleSharingRoutes(
         }
 
         post("/confirm") {
+            val installationToken = call.requireInstallationToken(
+                credentialService = credentialService,
+            )
             val request = call.receive<ConfirmScheduleShareRequest>()
 
             call.respond(
                 status = HttpStatusCode.OK,
                 message = service.confirm(
+                    installationToken = installationToken,
                     request = request,
                 ),
             )

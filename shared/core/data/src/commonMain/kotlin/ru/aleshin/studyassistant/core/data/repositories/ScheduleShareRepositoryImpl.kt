@@ -70,7 +70,10 @@ internal class ScheduleShareRepositoryImpl(
     }
 
     override suspend fun confirmShare(claim: ScheduleShareClaim) {
-        remoteDataSource.confirmShare(claim.claimId)
+        remoteDataSource.confirmShare(
+            claimToken = claim.claimId,
+            installationToken = installationIdProvider.fetchInstallationId(),
+        )
     }
 
     override suspend fun releaseShare(claim: ScheduleShareClaim) {

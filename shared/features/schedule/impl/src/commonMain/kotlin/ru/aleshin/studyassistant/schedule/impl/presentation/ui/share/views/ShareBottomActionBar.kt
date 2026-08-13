@@ -24,9 +24,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -66,10 +69,19 @@ internal fun ShareBottomActionBar(
                 )
             ) { loading ->
                 if (!loading) {
-                    Text(
-                        text = stringResource(Res.string.accept_shared_schedule_button_title),
-                        maxLines = 1
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.PlayCircle,
+                            contentDescription = null,
+                        )
+                        Text(
+                            text = stringResource(Res.string.accept_shared_schedule_button_title),
+                            maxLines = 1,
+                        )
+                    }
                 } else {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),

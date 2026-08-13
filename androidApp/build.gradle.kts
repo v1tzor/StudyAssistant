@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
@@ -28,6 +27,11 @@ android {
     flavorDimensions += "production"
 
     val localProperties = gradleLocalProperties(rootDir, providers)
+
+    val yandexTasksBannerId = providers.gradleProperty("studyassistant.ads.tasks.banner.id").orNull
+    val yandexInfoBannerId = providers.gradleProperty("studyassistant.ads.info.banner.id").orNull
+    val yandexAiRewardedId = providers.gradleProperty("studyassistant.ads.ai.rewarded.id").orNull
+    val yandexScheduleRewardedId = providers.gradleProperty("studyassistant.ads.schedule.rewarded.id").orNull
 
     defaultConfig {
         applicationId = libs.versions.applicationId.get()
@@ -71,11 +75,19 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
+
+            buildConfigField("String", "YANDEX_TASKS_BANNER_ID", "\"${yandexTasksBannerId.orEmpty()}\"")
+            buildConfigField("String", "YANDEX_INFO_BANNER_ID", "\"${yandexInfoBannerId.orEmpty()}\"")
+            buildConfigField("String", "YANDEX_AI_REWARDED_ID", "\"${yandexAiRewardedId.orEmpty()}\"")
+            buildConfigField("String", "YANDEX_SCHEDULE_REWARDED_ID", "\"${yandexScheduleRewardedId.orEmpty()}\"")
         }
         getByName("debug") {
-            // applicationIdSuffix = ".debug"
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
+            buildConfigField("String", "YANDEX_TASKS_BANNER_ID", "\"${yandexTasksBannerId ?: "demo-banner-yandex"}\"")
+            buildConfigField("String", "YANDEX_INFO_BANNER_ID", "\"${yandexInfoBannerId ?: "demo-banner-yandex"}\"")
+            buildConfigField("String", "YANDEX_AI_REWARDED_ID", "\"${yandexAiRewardedId ?: "demo-rewarded-yandex"}\"")
+            buildConfigField("String", "YANDEX_SCHEDULE_REWARDED_ID", "\"${yandexScheduleRewardedId ?: "demo-rewarded-yandex"}\"")
         }
     }
 

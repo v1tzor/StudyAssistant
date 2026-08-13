@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.backend
 import io.ktor.server.application.Application
 import io.ktor.server.netty.EngineMain
 import ru.aleshin.studyassistant.backend.ai.aiModule
+import ru.aleshin.studyassistant.backend.ads.adRewardModule
 import ru.aleshin.studyassistant.backend.database.databaseModule
 import ru.aleshin.studyassistant.backend.health.healthModule
 import ru.aleshin.studyassistant.backend.installation.installationModule
@@ -47,6 +48,7 @@ fun Application.module() {
 
     healthModule()
     installationModule()
-    sharingModule()
     aiModule()
+    adRewardModule()
+    sharingModule()
 }

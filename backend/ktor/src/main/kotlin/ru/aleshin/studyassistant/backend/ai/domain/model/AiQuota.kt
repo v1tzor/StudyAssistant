@@ -22,6 +22,7 @@ package ru.aleshin.studyassistant.backend.ai.domain.model
 data class AiQuota(
     val used: Int,
     val limit: Int,
+    val rewardedResetsRemaining: Int,
 ) {
 
     val remaining: Int

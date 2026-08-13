@@ -36,7 +36,7 @@ interface ScheduleShareRemoteDataSource {
     ): ShareLinkResponsePojo
 
     suspend fun claimShare(code: String, installationToken: String): ScheduleShareClaimPojo
-    suspend fun confirmShare(claimToken: String)
+    suspend fun confirmShare(claimToken: String, installationToken: String)
     suspend fun releaseShare(claimToken: String)
 
     class Base(
@@ -68,8 +68,11 @@ interface ScheduleShareRemoteDataSource {
             )
         }
 
-        override suspend fun confirmShare(claimToken: String) {
-            api.confirmSchedule(claimToken = claimToken)
+        override suspend fun confirmShare(claimToken: String, installationToken: String) {
+            api.confirmSchedule(
+                claimToken = claimToken,
+                installationToken = installationToken,
+            )
         }
 
         override suspend fun releaseShare(claimToken: String) {

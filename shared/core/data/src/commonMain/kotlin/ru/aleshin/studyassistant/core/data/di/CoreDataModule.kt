@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.data.handlers.AiConversationHandler
 import ru.aleshin.studyassistant.core.data.handlers.AiSettingsHandler
 import ru.aleshin.studyassistant.core.data.managers.InstallationIdProviderImpl
 import ru.aleshin.studyassistant.core.data.managers.reminders.TodoReminderManagerImpl
+import ru.aleshin.studyassistant.core.data.repositories.AdRewardRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.AiAssistantRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.AiSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.BaseScheduleRepositoryImpl
@@ -46,6 +47,7 @@ import ru.aleshin.studyassistant.core.data.repositories.TodoRepositoryImpl
 import ru.aleshin.studyassistant.core.database.di.coreDatabaseModule
 import ru.aleshin.studyassistant.core.domain.managers.InstallationIdProvider
 import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.repositories.AdRewardRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
@@ -109,6 +111,7 @@ val coreDataModule = DI.Module("CoreData") {
         AiConversationHandler.Base(instance(), instance(), instance(), instance())
     }
     bindSingleton<AiSettingsRepository> { AiSettingsRepositoryImpl(instance()) }
+    bindSingleton<AdRewardRepository> { AdRewardRepositoryImpl(instance(), instance(), instance()) }
     bindSingleton<AiAssistantRepository> {
         AiAssistantRepositoryImpl(instance(), instance())
     }

@@ -70,10 +70,11 @@ class BackendShareApi(
         ).claim
     }
 
-    suspend fun confirmSchedule(claimToken: String) {
+    suspend fun confirmSchedule(claimToken: String, installationToken: String) {
         executeWithoutResponse(
             path = StudyAssistantKtor.Backend.SCHEDULE_SHARE_CONFIRM,
             request = ClaimTokenRequestPojo(claimToken = claimToken),
+            installationToken = installationToken,
         )
     }
 
@@ -127,11 +128,12 @@ class BackendShareApi(
     private suspend inline fun <reified Request : Any> executeWithoutResponse(
         path: String,
         request: Request,
+        installationToken: String? = null,
     ) {
         executeRequest(
             path = path,
             request = request,
-            installationToken = null,
+            installationToken = installationToken,
         )
     }
 

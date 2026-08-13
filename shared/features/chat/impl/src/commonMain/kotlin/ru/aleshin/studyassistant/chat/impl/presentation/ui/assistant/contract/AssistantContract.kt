@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAc
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
+import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
 
 /**
  * @author Stanislav Aleshin on 20.06.2025
@@ -33,11 +34,17 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreSt
 @Serializable
 internal data class AssistantState(
     val isLoadingChat: Boolean = true,
-    val isQuotaExpired: Boolean = false,
+    val quotaRemaining: Int = AiSettings.DAILY_QUOTA,
+    val quotaLimit: Int = AiSettings.DAILY_QUOTA,
+    val rewardedResetsRemaining: Int = AiSettings.MAX_REWARDED_RESETS,
+    val rewardChallengeId: String? = null,
+    val isRewardInProgress: Boolean = false,
     val responseStatus: ResponseStatus = ResponseStatus.SUCCESS,
     val userQuery: ChatQueryUi = ChatQueryUi(),
     val chatHistory: AiChatHistoryUi? = null,
-) : StoreState
+) : StoreState {
+    val isQuotaExpired: Boolean get() = quotaRemaining <= 0
+}
 
 internal sealed class AssistantEvent : StoreEvent {
     data object Started : AssistantEvent()
@@ -49,6 +56,9 @@ internal sealed class AssistantEvent : StoreEvent {
     data object ClearHistory : AssistantEvent()
     data object OpenAiSettings : AssistantEvent()
     data object OpenScheduleImport : AssistantEvent()
+    data object RequestQuotaReward : AssistantEvent()
+    data class RewardedAdGranted(val challengeId: String) : AssistantEvent()
+    data object RewardedAdUnavailable : AssistantEvent()
     data class ResolveToolCall(
         val toolCallId: String,
         val approved: Boolean,
@@ -64,7 +74,15 @@ internal sealed class AssistantAction : StoreAction {
     data class UpdateChatHistory(val chatHistory: AiChatHistoryUi?) : AssistantAction()
     data class UpdateLoadingChat(val isLoading: Boolean) : AssistantAction()
     data class UpdateResponseStatus(val responseStatus: ResponseStatus) : AssistantAction()
-    data class UpdateQuotaExpiredStatus(val isQuotaExpired: Boolean) : AssistantAction()
+    data class SetupQuota(
+        val remaining: Int,
+        val limit: Int,
+        val rewardedResetsRemaining: Int,
+    ) : AssistantAction()
+    data class UpdateRewardChallenge(
+        val challengeId: String?,
+        val isInProgress: Boolean,
+    ) : AssistantAction()
 }
 
 internal sealed class AssistantOutput : BaseOutput {

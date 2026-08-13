@@ -33,6 +33,8 @@ import androidx.compose.ui.text.AnnotatedString
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
+import ru.aleshin.studyassistant.core.ui.ads.LocalAdsConfiguration
+import ru.aleshin.studyassistant.core.ui.ads.YandexRewardedAdHost
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.ShareCodeScannerDialog
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
@@ -59,6 +61,7 @@ internal fun ShareContent(
     val state by store.stateAsState()
     val clipboardManager = LocalClipboardManager.current
     val coreCancelTitle = stringResource(CoreRes.string.core_cancel_title)
+    val adsConfiguration = LocalAdsConfiguration.current
     val snackbarHostState = remember { SnackbarHostState() }
     var isScannerOpen by rememberSaveable { mutableStateOf(false) }
 
@@ -70,8 +73,8 @@ internal fun ShareContent(
         bottomBar = {
             if (state.status == ShareStatus.PREVIEW) {
                 ShareBottomActionBar(
-                    enabled = true,
-                    isLoadingAccept = false,
+                    enabled = !state.isRewardInProgress,
+                    isLoadingAccept = state.isRewardInProgress,
                     onAcceptSharedSchedule = {
                         store.dispatchEvent(ShareEvent.AcceptedSharedSchedule)
                     },
@@ -130,6 +133,15 @@ internal fun ShareContent(
             onDismiss = { isScannerOpen = false },
         )
     }
+
+    YandexRewardedAdHost(
+        adUnitId = adsConfiguration?.scheduleImportRewardedId.orEmpty(),
+        requestKey = state.rewardChallengeId,
+        onRewarded = { challengeId ->
+            store.dispatchEvent(ShareEvent.RewardedAdGranted(challengeId))
+        },
+        onUnavailable = { store.dispatchEvent(ShareEvent.RewardedAdUnavailable) },
+    )
 
     store.handleEffects { effect ->
         when (effect) {

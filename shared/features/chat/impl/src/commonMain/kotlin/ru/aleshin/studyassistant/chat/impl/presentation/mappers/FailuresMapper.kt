@@ -25,17 +25,23 @@ import ru.aleshin.studyassistant.chat.impl.resources.offline_error_message
 import ru.aleshin.studyassistant.chat.impl.resources.other_error_message
 import ru.aleshin.studyassistant.chat.impl.resources.quota_error_message
 import ru.aleshin.studyassistant.chat.impl.resources.rate_limit_error_message
+import ru.aleshin.studyassistant.chat.impl.resources.reward_unavailable_error_message
 import ru.aleshin.studyassistant.chat.impl.resources.server_unavailable_error_message
+import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
  */
 internal suspend fun ChatFailures.mapToMessage() = when (this) {
     is ChatFailures.ChatAssistantError -> getString(Res.string.chat_assistant_error_message)
-    is ChatFailures.QuotaExceeded -> getString(Res.string.quota_error_message)
+    is ChatFailures.QuotaExceeded -> getString(
+        Res.string.quota_error_message,
+        AiSettings.DAILY_QUOTA,
+    )
     is ChatFailures.InvalidRequest -> getString(Res.string.invalid_request_error_message)
     is ChatFailures.Offline -> getString(Res.string.offline_error_message)
     is ChatFailures.RateLimited -> getString(Res.string.rate_limit_error_message)
     is ChatFailures.ServerUnavailable -> getString(Res.string.server_unavailable_error_message)
+    is ChatFailures.RewardUnavailable -> getString(Res.string.reward_unavailable_error_message)
     is ChatFailures.OtherError -> getString(Res.string.other_error_message)
 }

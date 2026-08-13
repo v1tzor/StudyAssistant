@@ -85,6 +85,8 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationUi
 import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.presentation.utils.groupedContactInfo
+import ru.aleshin.studyassistant.core.ui.ads.AdPlacement
+import ru.aleshin.studyassistant.core.ui.ads.YandexInlineBanner
 import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
@@ -262,6 +264,10 @@ private fun BaseOrganizationsContent(
                 organizationData = state.organizationData,
                 onShowAllSubjects = onShowAllSubjects,
                 onShowSubjectEditor = onShowSubjectEditor,
+            )
+            YandexInlineBanner(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                placement = AdPlacement.INFO_ORGANIZATIONS,
             )
             Spacer(modifier = Modifier.height(60.dp))
         }

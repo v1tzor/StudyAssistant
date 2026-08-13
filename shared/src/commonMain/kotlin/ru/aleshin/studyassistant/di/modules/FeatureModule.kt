@@ -44,6 +44,7 @@ import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminde
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningManager
+import ru.aleshin.studyassistant.core.domain.repositories.AdRewardRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
@@ -143,6 +144,7 @@ val featureModule = DI.Module("Feature") {
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val scheduleShareRepository = instance<ScheduleShareRepository>()
             override val scheduleImportRepository = instance<ScheduleImportRepository>()
+            override val adRewardRepository = instance<AdRewardRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
             override val employeeRepository = instance<EmployeeRepository>()
@@ -308,6 +310,7 @@ val featureModule = DI.Module("Feature") {
         object : ChatFeatureDependencies {
             override val aiAssistantRepository = instance<AiAssistantRepository>()
             override val aiSettingsRepository = instance<AiSettingsRepository>()
+            override val adRewardRepository = instance<AdRewardRepository>()
             override val profileRepository = instance<ProfileRepository>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()

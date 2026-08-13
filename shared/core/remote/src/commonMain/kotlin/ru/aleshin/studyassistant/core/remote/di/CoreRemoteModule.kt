@@ -32,10 +32,12 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.remote.BuildKonfig
+import ru.aleshin.studyassistant.core.remote.api.ads.AdRewardRemoteApi
 import ru.aleshin.studyassistant.core.remote.api.ai.AiRemoteApi
 import ru.aleshin.studyassistant.core.remote.api.ai.ScheduleExtractionRemoteApi
 import ru.aleshin.studyassistant.core.remote.api.installation.InstallationRemoteApi
 import ru.aleshin.studyassistant.core.remote.api.share.BackendShareApi
+import ru.aleshin.studyassistant.core.remote.datasources.ads.AdRewardRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.ai.AiAssistantRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.ai.ScheduleExtractionRemoteDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.installation.InstallationRemoteDataSource
@@ -88,6 +90,16 @@ val coreRemoteModule = DI.Module("CoreRemote") {
             connectionChecker = instance(),
             json = instance(tag = "Backend"),
         )
+    }
+    bindSingleton<AdRewardRemoteApi> {
+        AdRewardRemoteApi.Backend(
+            httpClient = instance(tag = "Backend"),
+            connectionChecker = instance(),
+            json = instance(tag = "Backend"),
+        )
+    }
+    bindSingleton<AdRewardRemoteDataSource> {
+        AdRewardRemoteDataSource.Base(api = instance())
     }
     bindSingleton<InstallationRemoteApi> {
         InstallationRemoteApi.Backend(

@@ -67,7 +67,9 @@ class ScheduleExtractionRemoteApiTest {
         assertEquals("request-1", requestJson.getValue("requestId").jsonPrimitive.content)
         assertEquals(2, requestJson.getValue("numberOfWeeks").jsonPrimitive.content.toInt())
         assertEquals("Математика", response.draft.entries.single().subject)
-        assertEquals(24, response.quotaRemaining)
+        assertEquals(11, response.quotaRemaining)
+        assertEquals(12, response.quotaLimit)
+        assertEquals(3, response.rewardedResetsRemaining)
         assertEquals(1_786_550_400_000L, response.quotaResetAt)
     }
 
@@ -155,7 +157,9 @@ class ScheduleExtractionRemoteApiTest {
                 ],
                 "unparsedLines": []
               },
-              "quotaRemaining": 24,
+              "quotaRemaining": 11,
+              "quotaLimit": 12,
+              "rewardedResetsRemaining": 3,
               "quotaResetAt": 1786550400000
             }
         """

@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.store
 
+import ru.aleshin.studyassistant.chat.impl.domain.entities.ChatFailures
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ResponseStatus
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantAction
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.contract.AssistantEffect
@@ -57,8 +58,8 @@ internal class AssistantComposeStore(
                     val command = AssistantWorkCommand.LoadMessages
                     workProcessor.work(command).collectAndHandleWork()
                 }
-                launchBackgroundWork(BackgroundKey.LOAD_QUOTA_EXPIRED_STATUS) {
-                    val command = AssistantWorkCommand.LoadQuotaExpiredStatus
+                launchBackgroundWork(BackgroundKey.LOAD_AI_SETTINGS) {
+                    val command = AssistantWorkCommand.LoadAiSettings
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -108,6 +109,29 @@ internal class AssistantComposeStore(
                 consumeOutput(AssistantOutput.NavigateToScheduleImport)
             }
 
+            is AssistantEvent.RequestQuotaReward -> with(state()) {
+                if (isQuotaExpired && rewardedResetsRemaining > 0 && !isRewardInProgress) {
+                    launchBackgroundWork(BackgroundKey.REWARD_ACTION) {
+                        workProcessor.work(AssistantWorkCommand.PrepareQuotaReward)
+                            .collectAndHandleWork()
+                    }
+                }
+            }
+
+            is AssistantEvent.RewardedAdGranted -> with(state()) {
+                if (event.challengeId == rewardChallengeId) {
+                    launchBackgroundWork(BackgroundKey.REWARD_ACTION) {
+                        val command = AssistantWorkCommand.CompleteQuotaReward(event.challengeId)
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
+                }
+            }
+
+            is AssistantEvent.RewardedAdUnavailable -> {
+                sendAction(AssistantAction.UpdateRewardChallenge(null, false))
+                sendEffect(AssistantEffect.ShowError(ChatFailures.RewardUnavailable))
+            }
+
             is AssistantEvent.ResolveToolCall -> with(event) {
                 val chatId = state().chatHistory?.uid
                 if (chatId != null && state().responseStatus != ResponseStatus.LOADING) {
@@ -149,13 +173,20 @@ internal class AssistantComposeStore(
             isLoadingChat = false,
         )
 
-        is AssistantAction.UpdateQuotaExpiredStatus -> currentState.copy(
-            isQuotaExpired = action.isQuotaExpired,
+        is AssistantAction.SetupQuota -> currentState.copy(
+            quotaRemaining = action.remaining,
+            quotaLimit = action.limit,
+            rewardedResetsRemaining = action.rewardedResetsRemaining,
+        )
+
+        is AssistantAction.UpdateRewardChallenge -> currentState.copy(
+            rewardChallengeId = action.challengeId,
+            isRewardInProgress = action.isInProgress,
         )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_MESSAGES, LOAD_QUOTA_EXPIRED_STATUS, SEND_MESSAGE, MESSAGE_ACTION
+        LOAD_MESSAGES, LOAD_AI_SETTINGS, SEND_MESSAGE, MESSAGE_ACTION, REWARD_ACTION
     }
 
     data class ToolConfirmationKey(val toolCallId: String) : BackgroundWorkKey

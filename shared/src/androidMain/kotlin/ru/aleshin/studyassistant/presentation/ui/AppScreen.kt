@@ -17,6 +17,8 @@
 package ru.aleshin.studyassistant.presentation.ui
 
 import androidx.compose.runtime.Composable
+import ru.aleshin.studyassistant.core.ui.ads.AdsConfiguration
+import ru.aleshin.studyassistant.core.ui.ads.YandexAdsProvider
 import ru.aleshin.studyassistant.presentation.ui.main.MainScreen
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent
 
@@ -24,6 +26,11 @@ import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent
  * @author Stanislav Aleshin on 14.04.2024.
  */
 @Composable
-fun AppScreen(component: MainComponent) {
-    MainScreen(component)
+fun AppScreen(
+    component: MainComponent,
+    adsConfiguration: AdsConfiguration,
+) {
+    YandexAdsProvider(configuration = adsConfiguration) {
+        MainScreen(component)
+    }
 }

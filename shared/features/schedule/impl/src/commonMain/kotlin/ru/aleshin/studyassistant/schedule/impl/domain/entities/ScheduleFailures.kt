@@ -31,5 +31,6 @@ internal sealed class ScheduleFailures : DomainFailures {
     object NoTextRecognized : ScheduleFailures()
     object TextRecognitionUnavailable : ScheduleFailures()
     object ServerUnavailable : ScheduleFailures()
+    object RewardUnavailable : ScheduleFailures()
     data class OtherError(val throwable: Throwable) : ScheduleFailures()
 }

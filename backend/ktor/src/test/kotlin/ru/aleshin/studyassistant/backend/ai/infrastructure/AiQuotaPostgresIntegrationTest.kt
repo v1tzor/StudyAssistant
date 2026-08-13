@@ -28,6 +28,8 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
+import ru.aleshin.studyassistant.backend.ads.domain.model.AdRewardPurpose
+import ru.aleshin.studyassistant.backend.ads.infrastructure.AdRewardRepositoryImpl
 import ru.aleshin.studyassistant.backend.ai.AiConfig
 import ru.aleshin.studyassistant.backend.ai.domain.result.AiQuotaReservationResult
 import ru.aleshin.studyassistant.backend.database.DatabaseConfig
@@ -248,11 +250,11 @@ class AiQuotaPostgresIntegrationTest {
 
         val now = Instant.parse("2026-08-11T18:00:00Z")
 
-        repeat(24) { index ->
+        repeat(11) { index ->
             repository.reserve(
                 installationHash = installationHash,
                 messageId = UUID.randomUUID(),
-                now = now.minusSeconds((24 - index).toLong()),
+                now = now.minusSeconds((11 - index).toLong()),
             )
         }
 
@@ -301,9 +303,112 @@ class AiQuotaPostgresIntegrationTest {
             .single()
 
         assertEquals(
-            expected = 25,
+            expected = 12,
             actual = reserved.quota.used,
         )
+    }
+
+    @Test
+    fun rewardedQuotaShouldGrantTwelveMessagesAtMostThreeTimesPerDay() = runBlocking {
+        val config = aiConfig()
+        val rewardRepository = AdRewardRepositoryImpl(
+            database = databaseFactory.database,
+            config = config,
+        )
+        val installationHash = randomHash()
+        var currentTime = Instant.parse("2026-08-11T01:00:00Z")
+
+        repeat(config.dailyMessageLimit) { index ->
+            check(
+                repository.reserve(
+                    installationHash = installationHash,
+                    messageId = UUID.randomUUID(),
+                    now = currentTime.plusSeconds(index.toLong()),
+                ) is AiQuotaReservationResult.Reserved,
+            )
+        }
+        currentTime = currentTime.plus(Duration.ofHours(2))
+
+        repeat(config.maxRewardedResetsPerDay) { rewardIndex ->
+            val challenge = checkNotNull(
+                rewardRepository.createChallenge(
+                    installationHash = installationHash,
+                    purpose = AdRewardPurpose.AI_QUOTA_RESET,
+                    subjectHash = null,
+                    now = currentTime,
+                ),
+            )
+            val completion = checkNotNull(
+                rewardRepository.completeChallenge(
+                    installationHash = installationHash,
+                    challengeId = challenge.id,
+                    now = currentTime.plusSeconds(1),
+                ),
+            )
+
+            assertEquals(12, completion.quota?.remaining)
+            assertEquals(2 - rewardIndex, completion.quota?.rewardedResetsRemaining)
+
+            repeat(config.rewardedMessageAmount) { index ->
+                check(
+                    repository.reserve(
+                        installationHash = installationHash,
+                        messageId = UUID.randomUUID(),
+                        now = currentTime.plusSeconds(index.toLong() + 2),
+                    ) is AiQuotaReservationResult.Reserved,
+                )
+            }
+            currentTime = currentTime.plus(Duration.ofHours(2))
+        }
+
+        assertEquals(
+            null,
+            rewardRepository.createChallenge(
+                installationHash = installationHash,
+                purpose = AdRewardPurpose.AI_QUOTA_RESET,
+                subjectHash = null,
+                now = currentTime,
+            ),
+        )
+    }
+
+    @Test
+    fun scheduleRewardShouldBeBoundToInstallationAndConsumedOnce() = runBlocking {
+        val rewardRepository = AdRewardRepositoryImpl(
+            database = databaseFactory.database,
+            config = aiConfig(),
+        )
+        val installationHash = randomHash()
+        val otherInstallationHash = randomHash()
+        val subjectHash = randomHash()
+        val now = Instant.parse("2026-08-11T18:00:00Z")
+        val challenge = checkNotNull(
+            rewardRepository.createChallenge(
+                installationHash = installationHash,
+                purpose = AdRewardPurpose.SCHEDULE_IMPORT,
+                subjectHash = subjectHash,
+                now = now,
+            ),
+        )
+
+        checkNotNull(
+            rewardRepository.completeChallenge(
+                installationHash = installationHash,
+                challengeId = challenge.id,
+                now = now.plusSeconds(1),
+            ),
+        )
+
+        assertEquals(true, rewardRepository.hasScheduleImportReward(installationHash, subjectHash))
+        assertEquals(false, rewardRepository.hasScheduleImportReward(otherInstallationHash, subjectHash))
+
+        rewardRepository.consumeScheduleImportReward(
+            installationHash = installationHash,
+            subjectHash = subjectHash,
+            now = now.plusSeconds(2),
+        )
+
+        assertEquals(false, rewardRepository.hasScheduleImportReward(installationHash, subjectHash))
     }
 
     @Test
@@ -361,7 +466,7 @@ class AiQuotaPostgresIntegrationTest {
         val installationHash = randomHash()
         val now = Instant.parse("2026-08-11T18:00:00Z")
 
-        repeat(25) { index ->
+        repeat(12) { index ->
             check(
                 repository.reserve(
                     installationHash = installationHash,
@@ -375,12 +480,12 @@ class AiQuotaPostgresIntegrationTest {
             repository.reserve(
                 installationHash = installationHash,
                 messageId = UUID.randomUUID(),
-                now = now.plusSeconds(25),
+                now = now.plusSeconds(12),
             ) is AiQuotaReservationResult.QuotaExceeded,
         )
 
         transaction(db = databaseFactory.database) {
-            assertEquals(25L, RateLimitEventsTable.selectAll().count())
+            assertEquals(12L, RateLimitEventsTable.selectAll().count())
         }
     }
 
@@ -529,6 +634,8 @@ class AiQuotaPostgresIntegrationTest {
             exec(
                 """
                 TRUNCATE TABLE
+                    ai_reward_grants,
+                    ad_reward_challenges,
                     ai_requests,
                     ai_usage,
                     rate_limit_events
@@ -563,7 +670,10 @@ class AiQuotaPostgresIntegrationTest {
         maxConcurrentExecutionsPerInstallation: Int = 100,
     ): AiConfig {
         return AiConfig(
-            dailyMessageLimit = 25,
+            dailyMessageLimit = 12,
+            rewardedMessageAmount = 12,
+            maxRewardedResetsPerDay = 3,
+            rewardChallengeLifetime = Duration.ofMinutes(15),
             globalDailyExecutionLimit = globalDailyExecutionLimit,
             executionLimit = 30,
             maxExecutionsPerMessage = 8,

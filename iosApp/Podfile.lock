@@ -1,0 +1,126 @@
+PODS:
+  - AppMetricaAdSupport (6.3.0):
+    - AppMetricaCore (= 6.3.0)
+    - AppMetricaCoreExtension (= 6.3.0)
+  - AppMetricaCore (6.3.0):
+    - AppMetricaCoreUtils (= 6.3.0)
+    - AppMetricaEncodingUtils (= 6.3.0)
+    - AppMetricaFMDB (= 6.3.0)
+    - AppMetricaHostState (= 6.3.0)
+    - AppMetricaIdentifiers (= 6.3.0)
+    - AppMetricaKeychain (= 6.3.0)
+    - AppMetricaLog (= 6.3.0)
+    - AppMetricaNetwork (= 6.3.0)
+    - AppMetricaPlatform (= 6.3.0)
+    - AppMetricaProtobuf (= 6.3.0)
+    - AppMetricaProtobufUtils (= 6.3.0)
+    - AppMetricaStorageUtils (= 6.3.0)
+  - AppMetricaCoreExtension (6.3.0):
+    - AppMetricaCore (= 6.3.0)
+    - AppMetricaStorageUtils (= 6.3.0)
+  - AppMetricaCoreUtils (6.3.0):
+    - AppMetricaLog (= 6.3.0)
+  - AppMetricaEncodingUtils (6.3.0):
+    - AppMetricaCoreUtils (= 6.3.0)
+    - AppMetricaLog (= 6.3.0)
+    - AppMetricaPlatform (= 6.3.0)
+  - AppMetricaFMDB (6.3.0)
+  - AppMetricaHostState (6.3.0):
+    - AppMetricaCoreUtils (= 6.3.0)
+    - AppMetricaLog (= 6.3.0)
+  - AppMetricaIdentifiers (6.3.0):
+    - AppMetricaKeychain (= 6.3.0)
+    - AppMetricaLogSwift (= 6.3.0)
+    - AppMetricaPlatform (= 6.3.0)
+    - AppMetricaStorageUtils (= 6.3.0)
+    - AppMetricaSynchronization (= 6.3.0)
+  - AppMetricaIDSync (6.3.0):
+    - AppMetricaCore (= 6.3.0)
+    - AppMetricaCoreExtension (= 6.3.0)
+    - AppMetricaCoreUtils (= 6.3.0)
+    - AppMetricaLog (= 6.3.0)
+    - AppMetricaNetwork (= 6.3.0)
+    - AppMetricaPlatform (= 6.3.0)
+    - AppMetricaStorageUtils (= 6.3.0)
+  - AppMetricaKeychain (6.3.0):
+    - AppMetricaCoreUtils (= 6.3.0)
+    - AppMetricaLog (= 6.3.0)
+    - AppMetricaStorageUtils (= 6.3.0)
+  - AppMetricaLibraryAdapter (6.3.0):
+    - AppMetricaCore (= 6.3.0)
+    - AppMetricaCoreExtension (= 6.3.0)
+  - AppMetricaLog (6.3.0)
+  - AppMetricaLogSwift (6.3.0):
+    - AppMetricaLog (= 6.3.0)
+  - AppMetricaNetwork (6.3.0):
+    - AppMetricaCoreUtils (= 6.3.0)
+    - AppMetricaLog (= 6.3.0)
+    - AppMetricaPlatform (= 6.3.0)
+  - AppMetricaPlatform (6.3.0):
+    - AppMetricaCoreUtils (= 6.3.0)
+    - AppMetricaLog (= 6.3.0)
+  - AppMetricaProtobuf (6.3.0)
+  - AppMetricaProtobufUtils (6.3.0):
+    - AppMetricaProtobuf (= 6.3.0)
+  - AppMetricaStorageUtils (6.3.0):
+    - AppMetricaCoreUtils (= 6.3.0)
+    - AppMetricaLog (= 6.3.0)
+  - AppMetricaSynchronization (6.3.0):
+    - AppMetricaLogSwift (= 6.3.0)
+  - YandexMobileAds (8.1.0):
+    - AppMetricaAdSupport (~> 6.3.0)
+    - AppMetricaCore (~> 6.3.0)
+    - AppMetricaIDSync (~> 6.3.0)
+    - AppMetricaLibraryAdapter (~> 6.3.0)
+
+DEPENDENCIES:
+  - YandexMobileAds (= 8.1.0)
+
+SPEC REPOS:
+  trunk:
+    - AppMetricaAdSupport
+    - AppMetricaCore
+    - AppMetricaCoreExtension
+    - AppMetricaCoreUtils
+    - AppMetricaEncodingUtils
+    - AppMetricaFMDB
+    - AppMetricaHostState
+    - AppMetricaIdentifiers
+    - AppMetricaIDSync
+    - AppMetricaKeychain
+    - AppMetricaLibraryAdapter
+    - AppMetricaLog
+    - AppMetricaLogSwift
+    - AppMetricaNetwork
+    - AppMetricaPlatform
+    - AppMetricaProtobuf
+    - AppMetricaProtobufUtils
+    - AppMetricaStorageUtils
+    - AppMetricaSynchronization
+    - YandexMobileAds
+
+SPEC CHECKSUMS:
+  AppMetricaAdSupport: d9d6516e5e21032f058b7aef3f17aefe9c7cc116
+  AppMetricaCore: 12186e7fca8c7e293bd45f66f0e18d64435f1ab7
+  AppMetricaCoreExtension: 71f4f4b7e993e963241a764790e07b0813926f18
+  AppMetricaCoreUtils: 88b1288644a44ddc2572483bcd64c2e62f6f76ba
+  AppMetricaEncodingUtils: a895862856ee06b9b22fdc02771157e4004b3819
+  AppMetricaFMDB: cc66f2b0c0e8d3d451313b0ac7174b111820f6ec
+  AppMetricaHostState: c6bbff91eb4e35a16da4cf721a729029db455d9b
+  AppMetricaIdentifiers: 7dd47f89a04955b8913c96a6be367c4dc739b3db
+  AppMetricaIDSync: 6799f35fd10a5616f4d214d896829136dc2b4533
+  AppMetricaKeychain: 743d4d2e1dadcce2e33c892b82409e5882e87da1
+  AppMetricaLibraryAdapter: b476a378a83c89e2b4e7b874f4a3874266989ee9
+  AppMetricaLog: a939df984c6564ac0007b6634ea6c24dc54df3a9
+  AppMetricaLogSwift: fa337df59c92edcd51bed406c4298ab1ce9ddd4b
+  AppMetricaNetwork: 1d7cb179c7dce7dbac5f54fb28cc378410b89e61
+  AppMetricaPlatform: 0732c0de92c8db13b25592c49e9bc82df1cc27eb
+  AppMetricaProtobuf: 4d554ca95b28d1d11c661ad4b6b8c6e5c647624a
+  AppMetricaProtobufUtils: f3bfe7f36e3d0b00552398e0c06bd2af515800dd
+  AppMetricaStorageUtils: 658dc0cd262a94c0a4ce450af11a50aef0809a82
+  AppMetricaSynchronization: d629fdefd72af0bb7768ae4d32fb107c42662811
+  YandexMobileAds: 47d9d0ce6705e79e3801138e8c1d9898e4c79a51
+
+PODFILE CHECKSUM: 9d0bf75507427fddac2c38df173ed990fc4204b6
+
+COCOAPODS: 1.16.2

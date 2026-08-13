@@ -27,5 +27,7 @@ data class AiCompletionResponsePojo(
     val finishReason: AiCompletionFinishReasonPojo,
     val usage: AiTokenUsagePojo? = null,
     val quotaRemaining: Int,
+    val quotaLimit: Int,
+    val rewardedResetsRemaining: Int,
     val quotaResetAt: Long,
 )

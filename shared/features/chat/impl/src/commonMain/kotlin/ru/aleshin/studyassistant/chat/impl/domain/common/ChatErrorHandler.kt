@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.chat.impl.domain.common
 import ru.aleshin.studyassistant.chat.impl.domain.entities.ChatFailures
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
+import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardException
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceException
 
 /**
@@ -31,6 +32,7 @@ internal interface ChatErrorHandler : ErrorHandler<ChatFailures> {
             is AiServiceException.InvalidRequest -> ChatFailures.InvalidRequest
             is AiServiceException.RateLimited -> ChatFailures.RateLimited
             is AiServiceException.ServerUnavailable -> ChatFailures.ServerUnavailable
+            is AdRewardException -> ChatFailures.RewardUnavailable
             is InternetConnectionException -> ChatFailures.Offline
             else -> ChatFailures.OtherError(throwable)
         }

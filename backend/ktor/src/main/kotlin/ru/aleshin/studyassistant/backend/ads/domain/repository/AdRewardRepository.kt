@@ -1,0 +1,53 @@
+/*
+ * Copyright 2026 Stanislav Aleshin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package ru.aleshin.studyassistant.backend.ads.domain.repository
+
+import ru.aleshin.studyassistant.backend.ads.domain.model.AdRewardChallenge
+import ru.aleshin.studyassistant.backend.ads.domain.model.AdRewardCompletion
+import ru.aleshin.studyassistant.backend.ads.domain.model.AdRewardPurpose
+import java.time.Instant
+import java.util.UUID
+
+/**
+ * @author Stanislav Aleshin on 13.08.2026.
+ */
+interface AdRewardRepository {
+
+    suspend fun createChallenge(
+        installationHash: ByteArray,
+        purpose: AdRewardPurpose,
+        subjectHash: ByteArray?,
+        now: Instant,
+    ): AdRewardChallenge?
+
+    suspend fun completeChallenge(
+        installationHash: ByteArray,
+        challengeId: UUID,
+        now: Instant,
+    ): AdRewardCompletion?
+
+    suspend fun hasScheduleImportReward(
+        installationHash: ByteArray,
+        subjectHash: ByteArray,
+    ): Boolean
+
+    suspend fun consumeScheduleImportReward(
+        installationHash: ByteArray,
+        subjectHash: ByteArray,
+        now: Instant,
+    )
+}

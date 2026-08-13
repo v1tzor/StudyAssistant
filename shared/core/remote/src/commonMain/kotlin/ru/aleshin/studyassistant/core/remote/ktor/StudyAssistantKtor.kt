@@ -25,6 +25,7 @@ object StudyAssistantKtor {
         const val INSTALLATION_REGISTER = "/api/v1/installations/register"
         const val AI_COMPLETIONS = "/api/v1/ai/completions"
         const val SCHEDULE_EXTRACTIONS = "/api/v1/ai/schedule-extractions"
+        const val AD_REWARD_CHALLENGES = "/api/v1/ad-rewards/challenges"
         const val SCHEDULE_SHARE_CREATE = "/api/v1/shares/schedule/create"
         const val SCHEDULE_SHARE_CLAIM = "/api/v1/shares/schedule/claim"
         const val SCHEDULE_SHARE_CONFIRM = "/api/v1/shares/schedule/confirm"

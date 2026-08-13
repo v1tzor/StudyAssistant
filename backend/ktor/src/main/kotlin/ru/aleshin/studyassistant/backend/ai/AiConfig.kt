@@ -24,6 +24,9 @@ import java.time.Duration
  */
 data class AiConfig(
     val dailyMessageLimit: Int,
+    val rewardedMessageAmount: Int,
+    val maxRewardedResetsPerDay: Int,
+    val rewardChallengeLifetime: Duration,
     val globalDailyExecutionLimit: Int,
     val executionLimit: Int,
     val maxExecutionsPerMessage: Int,
@@ -47,6 +50,9 @@ data class AiConfig(
 
     init {
         require(dailyMessageLimit > 0)
+        require(rewardedMessageAmount > 0)
+        require(maxRewardedResetsPerDay > 0)
+        require(!rewardChallengeLifetime.isZero && !rewardChallengeLifetime.isNegative)
         require(globalDailyExecutionLimit > 0)
         require(executionLimit > 0)
         require(maxExecutionsPerMessage > 0)
@@ -75,6 +81,11 @@ data class AiConfig(
 
             return AiConfig(
                 dailyMessageLimit = config.property("dailyMessageLimit").getString().toInt(),
+                rewardedMessageAmount = config.property("rewardedMessageAmount").getString().toInt(),
+                maxRewardedResetsPerDay = config.property("maxRewardedResetsPerDay").getString().toInt(),
+                rewardChallengeLifetime = Duration.ofMinutes(
+                    config.property("rewardChallengeLifetimeMinutes").getString().toLong(),
+                ),
                 globalDailyExecutionLimit = config
                     .property("globalDailyExecutionLimit")
                     .getString()

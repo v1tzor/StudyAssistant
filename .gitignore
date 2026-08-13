@@ -19,5 +19,7 @@ iosApp/iosApp/service-account-file.json
 iosApp/service-account-file.json
 iosApp/GoogleService-Info.plist
 iosApp/iosApp/GoogleService-Info.plist
+iosApp/Pods/
+iosApp/iosApp.xcworkspace/
 androidApp/google-services.json
 androidApp/agconnect-services.json

@@ -28,5 +28,6 @@ internal sealed class ChatFailures : DomainFailures {
     data object Offline : ChatFailures()
     data object RateLimited : ChatFailures()
     data object ServerUnavailable : ChatFailures()
+    data object RewardUnavailable : ChatFailures()
     data class OtherError(val throwable: Throwable) : ChatFailures()
 }

@@ -25,9 +25,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AiSettings(
     val quotaRemaining: Int = DAILY_QUOTA,
+    val quotaLimit: Int = DAILY_QUOTA,
+    val rewardedResetsRemaining: Int = MAX_REWARDED_RESETS,
     val quotaResetAt: Instant? = null,
 ) {
     companion object {
-        const val DAILY_QUOTA = 25
+        const val DAILY_QUOTA = 12
+        const val REWARDED_QUOTA = 12
+        const val MAX_REWARDED_RESETS = 3
+        const val MAX_DAILY_QUOTA = DAILY_QUOTA + REWARDED_QUOTA * MAX_REWARDED_RESETS
     }
 }

@@ -52,7 +52,7 @@
     <string name="ai_settings_description">AI-запросы обрабатывает защищённый backend StudyAssistant. API-ключ и аккаунт не нужны.</string>
     <string name="backend_ai_title">StudyAssistant AI</string>
     <string name="backend_ai_description">Единый безопасный режим для чата, действий и распознавания расписания</string>
-    <string name="ai_quota_title">Осталось сообщений сегодня: %d из 25</string>
+    <string name="ai_quota_title">Осталось сообщений сегодня: %1$d из %2$d. Наград за рекламу: %3$d из %4$d.</string>
     <string name="ai_privacy_title">Учебные данные остаются под вашим контролем</string>
     <string name="ai_privacy_description">Отправляется только контекст, необходимый для ответа. Изменения задач и расписания требуют подтверждения.</string>
     <string name="about_app_header">О приложении</string>

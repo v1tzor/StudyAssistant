@@ -24,10 +24,13 @@
     <string name="assistant_chat_text_field_placeholder">Enter your query</string>
     <string name="assistant_empty_chat_title">How can I help you?</string>
     <string name="failure_response_text">Unfortunately, the request could not be completed</string>
-    <string name="quota_expired_title">Your free daily quota has expired.\nAccess will be restored tomorrow.</string>
-    <string name="quota_reset_suggestion_text">Your quota is enforced by the backend and resets automatically at the time shown in AI settings.</string>
+    <string name="quota_expired_title">Today’s limit of %d messages has been used.</string>
+    <string name="quota_reset_suggestion_text">Watch a short ad to support the team and get %1$d more messages. Available today: %2$d of %3$d.</string>
+    <string name="quota_rewards_exhausted_text">All %d ad rewards have been used today. The quota will reset automatically tomorrow.</string>
+    <string name="watch_ad_reward_button">Watch ad · +%d messages</string>
     <string name="ai_settings_button">Configure AI</string>
-    <string name="quota_error_message">The daily quota of 25 messages has been used</string>
+    <string name="quota_error_message">The daily quota of %d messages has been used</string>
+    <string name="reward_unavailable_error_message">The ad is unavailable right now. Please try again later.</string>
     <string name="invalid_request_error_message">The assistant could not process this request. Check the message and try again</string>
     <string name="offline_error_message">No internet connection</string>
     <string name="rate_limit_error_message">Too many requests. Try again shortly</string>

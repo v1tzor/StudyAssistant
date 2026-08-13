@@ -24,4 +24,6 @@ import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.AiSe
  */
 internal fun AiSettings.mapToUi() = AiSettingsUi(
     quotaRemaining = quotaRemaining,
+    quotaLimit = quotaLimit,
+    rewardedResetsRemaining = rewardedResetsRemaining,
 )

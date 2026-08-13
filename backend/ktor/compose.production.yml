@@ -2,9 +2,6 @@ name: ${COMPOSE_PROJECT_NAME:-studyassistant-backend}
 
 x-app-runtime: &app-runtime
   image: ${BACKEND_IMAGE:-studyassistant-backend:local}
-  build:
-    context: .
-    dockerfile: Dockerfile
   init: true
   read_only: true
   user: "10001:10001"
@@ -13,15 +10,15 @@ x-app-runtime: &app-runtime
   security_opt:
     - no-new-privileges:true
   tmpfs:
-    - /tmp:rw,noexec,nosuid,size=64m
-  pids_limit: 256
-  mem_limit: 768m
-  cpus: 1.5
+    - /tmp:rw,noexec,nosuid,size=32m
+  pids_limit: 128
+  mem_limit: 512m
+  cpus: 1.0
   logging:
-    driver: json-file
+    driver: local
     options:
       max-size: 10m
-      max-file: "5"
+      max-file: "3"
 
 services:
 
@@ -42,6 +39,26 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
       - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    command:
+      - postgres
+      - -c
+      - max_connections=40
+      - -c
+      - shared_buffers=256MB
+      - -c
+      - work_mem=2MB
+      - -c
+      - maintenance_work_mem=64MB
+      - -c
+      - autovacuum_work_mem=64MB
+      - -c
+      - effective_cache_size=1GB
+      - -c
+      - max_parallel_workers=2
+      - -c
+      - max_parallel_workers_per_gather=1
+      - -c
+      - jit=off
     healthcheck:
       test:
         - CMD-SHELL
@@ -56,27 +73,29 @@ services:
     security_opt:
       - no-new-privileges:true
     tmpfs:
-      - /tmp:rw,noexec,nosuid,size=64m
-      - /var/run/postgresql:rw,noexec,nosuid,size=16m
-    shm_size: 128m
-    pids_limit: 256
-    mem_limit: 1g
+      - /tmp:rw,noexec,nosuid,size=32m
+      - /var/run/postgresql:rw,noexec,nosuid,size=8m
+    shm_size: 256m
+    pids_limit: 128
+    mem_limit: 768m
     cpus: 1.5
     stop_grace_period: 60s
     networks:
       - database
     logging:
-      driver: json-file
+      driver: local
       options:
         max-size: 10m
-        max-file: "5"
+        max-file: "3"
 
   migrate:
     <<: *app-runtime
     restart: "no"
     entrypoint:
       - java
-      - -XX:MaxRAMPercentage=75.0
+      - -XX:MaxRAMPercentage=55.0
+      - -XX:MaxDirectMemorySize=48m
+      - -Xss512k
       - -XX:+ExitOnOutOfMemoryError
       - -cp
       - /app/lib/*
@@ -95,12 +114,28 @@ services:
 
   backend:
     <<: *app-runtime
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
+    mem_limit: 768m
+    cpus: 1.5
     environment:
+      JAVA_OPTS: >-
+        -XX:InitialRAMPercentage=20.0
+        -XX:MaxRAMPercentage=50.0
+        -XX:MaxDirectMemorySize=96m
+        -XX:ReservedCodeCacheSize=64m
+        -XX:MaxMetaspaceSize=128m
+        -XX:ActiveProcessorCount=2
+        -Xss512k
+        -XX:+ExitOnOutOfMemoryError
+        -Dfile.encoding=UTF-8
       PORT: 8080
       DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-studyassistant}
       DATABASE_USER: studyassistant_app
       DATABASE_PASSWORD_FILE: /run/secrets/database_app_password
+      DATABASE_MAXIMUM_POOL_SIZE: ${DATABASE_MAXIMUM_POOL_SIZE:-6}
       INSTALLATION_HMAC_SECRET_FILE: /run/secrets/installation_hmac_secret
       SHARE_HMAC_SECRET_FILE: /run/secrets/share_hmac_secret
       PAYLOAD_ENCRYPTION_KEY_FILE: /run/secrets/payload_encryption_key
@@ -109,6 +144,7 @@ services:
       TRUST_PROXY_HEADERS: "true"
       REQUIRE_HTTPS: "true"
       AI_GLOBAL_DAILY_EXECUTION_LIMIT: ${AI_GLOBAL_DAILY_EXECUTION_LIMIT:-500}
+      DEEPSEEK_MAX_CONCURRENT_REQUESTS: ${DEEPSEEK_MAX_CONCURRENT_REQUESTS:-8}
     secrets:
       - database_app_password
       - installation_hmac_secret
@@ -167,10 +203,10 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/certbot:/var/www/certbot:ro
     tmpfs:
-      - /var/cache/nginx:rw,noexec,nosuid,size=32m
+      - /var/cache/nginx:rw,noexec,nosuid,size=16m
       - /var/run:rw,noexec,nosuid,size=4m
-    pids_limit: 128
-    mem_limit: 128m
+    pids_limit: 64
+    mem_limit: 96m
     cpus: 0.5
     depends_on:
       backend:
@@ -189,10 +225,10 @@ services:
     networks:
       - web
     logging:
-      driver: json-file
+      driver: local
       options:
         max-size: 10m
-        max-file: "5"
+        max-file: "3"
 
   cleanup:
     <<: *app-runtime
@@ -201,7 +237,9 @@ services:
     restart: "no"
     entrypoint:
       - java
-      - -XX:MaxRAMPercentage=75.0
+      - -XX:MaxRAMPercentage=55.0
+      - -XX:MaxDirectMemorySize=48m
+      - -Xss512k
       - -XX:+ExitOnOutOfMemoryError
       - -cp
       - /app/lib/*

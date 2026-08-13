@@ -33,9 +33,11 @@ import androidx.compose.runtime.SideEffect
 import com.arkivanov.decompose.defaultComponentContext
 import org.jetbrains.compose.resources.stringResource
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.android.BuildConfig
 import ru.aleshin.studyassistant.core.common.di.MainDependenciesGraph
 import ru.aleshin.studyassistant.core.common.extensions.isAllowPermission
 import ru.aleshin.studyassistant.core.common.navigation.DeepLinkUrl
+import ru.aleshin.studyassistant.core.ui.ads.AdsConfiguration
 import ru.aleshin.studyassistant.core.ui.resources.Res
 import ru.aleshin.studyassistant.core.ui.resources.warning_granted_permission_message
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent
@@ -61,7 +63,15 @@ class MainActivity : FlavorMainActivity() {
         )
 
         setContent {
-            AppScreen(mainComponent)
+            AppScreen(
+                component = mainComponent,
+                adsConfiguration = AdsConfiguration(
+                    tasksOverviewBannerId = BuildConfig.YANDEX_TASKS_BANNER_ID,
+                    infoOrganizationsBannerId = BuildConfig.YANDEX_INFO_BANNER_ID,
+                    aiQuotaRewardedId = BuildConfig.YANDEX_AI_REWARDED_ID,
+                    scheduleImportRewardedId = BuildConfig.YANDEX_SCHEDULE_REWARDED_ID,
+                ),
+            )
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 RequestNotificationPermission()

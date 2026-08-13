@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
+import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.AiSettingsUi
@@ -135,6 +136,9 @@ private fun AiSettingsView(
             supportingText = stringResource(
                 Res.string.ai_quota_title,
                 settings.quotaRemaining,
+                settings.quotaLimit,
+                settings.rewardedResetsRemaining,
+                AiSettings.MAX_REWARDED_RESETS,
             ),
         )
         AiSettingsCard(

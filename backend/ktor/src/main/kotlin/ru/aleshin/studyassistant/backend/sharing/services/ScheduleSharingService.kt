@@ -23,6 +23,9 @@ import ru.aleshin.studyassistant.backend.common.api.InvalidRequestException
 import ru.aleshin.studyassistant.backend.common.api.InvalidShareException
 import ru.aleshin.studyassistant.backend.common.api.RateLimitException
 import ru.aleshin.studyassistant.backend.common.api.ServerUnavailableException
+import ru.aleshin.studyassistant.backend.common.api.RewardUnavailableException
+import ru.aleshin.studyassistant.backend.ads.domain.repository.AdRewardRepository
+import ru.aleshin.studyassistant.backend.ads.services.AdRewardService
 import ru.aleshin.studyassistant.backend.plugins.BackendJson
 import ru.aleshin.studyassistant.backend.security.ClaimTokenService
 import ru.aleshin.studyassistant.backend.security.InstallationHasher
@@ -62,6 +65,8 @@ class ScheduleSharingService(
     private val claimTokenService: ClaimTokenService,
     private val payloadCipher: PayloadCipher,
     private val payloadValidator: SharePayloadValidator,
+    private val adRewardRepository: AdRewardRepository,
+    private val adRewardService: AdRewardService,
     private val config: SharingConfig,
     private val clock: Clock,
 ) {
@@ -209,14 +214,27 @@ class ScheduleSharingService(
     }
 
     suspend fun confirm(
+        installationToken: String,
         request: ConfirmScheduleShareRequest,
     ): SuccessResponse {
         val claimHash = claimTokenHash(
             token = request.claimToken,
         )
+        val installationHash = installationHasher.hash(
+            installationToken = installationToken,
+        )
+        val rewardSubjectHash = adRewardService.hashSubject(request.claimToken)
+        if (!adRewardRepository.hasScheduleImportReward(installationHash, rewardSubjectHash)) {
+            throw RewardUnavailableException()
+        }
 
         return when (repository.confirm(claimHash = claimHash, now = clock.instant())) {
             ClaimActionStorageResult.Success -> {
+                adRewardRepository.consumeScheduleImportReward(
+                    installationHash = installationHash,
+                    subjectHash = rewardSubjectHash,
+                    now = clock.instant(),
+                )
                 SuccessResponse(
                     success = true,
                 )

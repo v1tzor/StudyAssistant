@@ -23,6 +23,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundW
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.share.ShareStatus
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareAction
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareEffect
@@ -123,12 +124,23 @@ internal class ShareComposeStore(
             }
             is ShareEvent.AcceptedSharedSchedule -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SHARE_ACTION) {
+                    val command = ShareWorkCommand.PrepareImportReward(checkNotNull(claim))
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is ShareEvent.RewardedAdGranted -> with(state()) {
+                launchBackgroundWork(BackgroundKey.SHARE_ACTION) {
                     val command = ShareWorkCommand.AcceptSharedSchedule(
+                        rewardChallengeId = event.challengeId,
                         claim = checkNotNull(claim),
                         organizationsLinkData = organizationsLinkData,
                     )
                     workProcessor.work(command).collectAndHandleWork()
                 }
+            }
+            is ShareEvent.RewardedAdUnavailable -> {
+                sendAction(ShareAction.UpdateRewardChallenge(null, false))
+                sendEffect(ShareEffect.ShowError(ScheduleFailures.RewardUnavailable))
             }
             is ShareEvent.RejectedSharedSchedule -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SHARE_ACTION) {
@@ -188,6 +200,10 @@ internal class ShareComposeStore(
         )
         is ShareAction.UpdateLoadingLinkedOrganization -> currentState.copy(
             isLoadingLinkedOrganization = action.isLoading,
+        )
+        is ShareAction.UpdateRewardChallenge -> currentState.copy(
+            rewardChallengeId = action.challengeId,
+            isRewardInProgress = action.isInProgress,
         )
         is ShareAction.Reset -> ShareState(currentTime = currentState.currentTime)
     }

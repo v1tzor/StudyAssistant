@@ -62,6 +62,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":shared:core:common"))
             implementation(project(":shared:core:domain"))
+            implementation(libs.yandex.ads.multiplatform)
 
             api(libs.bundles.decompose)
 

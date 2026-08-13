@@ -41,8 +41,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -93,11 +95,16 @@ import ru.aleshin.studyassistant.chat.impl.resources.assistant_empty_chat_title
 import ru.aleshin.studyassistant.chat.impl.resources.failure_response_text
 import ru.aleshin.studyassistant.chat.impl.resources.quota_expired_title
 import ru.aleshin.studyassistant.chat.impl.resources.quota_reset_suggestion_text
+import ru.aleshin.studyassistant.chat.impl.resources.quota_rewards_exhausted_text
 import ru.aleshin.studyassistant.chat.impl.resources.try_again_button
+import ru.aleshin.studyassistant.chat.impl.resources.watch_ad_reward_button
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.functional.Constants
+import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
+import ru.aleshin.studyassistant.core.ui.ads.LocalAdsConfiguration
+import ru.aleshin.studyassistant.core.ui.ads.YandexRewardedAdHost
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.TypingDots
@@ -113,6 +120,7 @@ internal fun AssistantContent(
     val store = assistantComponent.store
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
+    val adsConfiguration = LocalAdsConfiguration.current
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -124,6 +132,9 @@ internal fun AssistantContent(
                 onTryAgain = { store.dispatchEvent(AssistantEvent.RetryAttempt) },
                 onDeleteMessage = { store.dispatchEvent(AssistantEvent.ClearUnsendMessage) },
                 onOpenAiSettings = { store.dispatchEvent(AssistantEvent.OpenAiSettings) },
+                onRequestQuotaReward = {
+                    store.dispatchEvent(AssistantEvent.RequestQuotaReward)
+                },
                 onResolveToolCall = { toolCallId, approved ->
                     store.dispatchEvent(AssistantEvent.ResolveToolCall(toolCallId, approved))
                 },
@@ -158,10 +169,21 @@ internal fun AssistantContent(
         },
     )
 
+    YandexRewardedAdHost(
+        adUnitId = adsConfiguration?.aiQuotaRewardedId.orEmpty(),
+        requestKey = state.rewardChallengeId,
+        onRewarded = { challengeId ->
+            store.dispatchEvent(AssistantEvent.RewardedAdGranted(challengeId))
+        },
+        onUnavailable = { store.dispatchEvent(AssistantEvent.RewardedAdUnavailable) },
+    )
+
     store.handleEffects { effect ->
         when (effect) {
             is AssistantEffect.ShowError -> {
-                store.dispatchEvent(AssistantEvent.StopResponseLoading)
+                if (state.responseStatus == ResponseStatus.LOADING) {
+                    store.dispatchEvent(AssistantEvent.StopResponseLoading)
+                }
                 snackbarState.showSnackbar(
                     message = effect.failures.mapToMessage(),
                     withDismissAction = true,
@@ -180,6 +202,7 @@ private fun BaseAssistantContent(
     onTryAgain: () -> Unit,
     onDeleteMessage: () -> Unit,
     onOpenAiSettings: () -> Unit,
+    onRequestQuotaReward: () -> Unit,
     onResolveToolCall: (String, Boolean) -> Unit,
 ) {
     Crossfade(
@@ -200,7 +223,12 @@ private fun BaseAssistantContent(
                 if (isEmptyChat) {
                     EmptyAssistantChat(
                         isQuotaExpired = state.isQuotaExpired,
-                        onSendMessageSuggestion = onSendMessageSuggestion
+                        quotaLimit = state.quotaLimit,
+                        rewardedResetsRemaining = state.rewardedResetsRemaining,
+                        isRewardInProgress = state.isRewardInProgress,
+                        onSendMessageSuggestion = onSendMessageSuggestion,
+                        onRequestQuotaReward = onRequestQuotaReward,
+                        onOpenAiSettings = onOpenAiSettings,
                     )
                 } else if (state.chatHistory != null) {
                     val chatListState = rememberLazyListState()
@@ -208,10 +236,14 @@ private fun BaseAssistantContent(
                         chatListState = chatListState,
                         responseStatus = state.responseStatus,
                         isQuotaExpired = state.isQuotaExpired,
+                        quotaLimit = state.quotaLimit,
+                        rewardedResetsRemaining = state.rewardedResetsRemaining,
+                        isRewardInProgress = state.isRewardInProgress,
                         chatHistory = state.chatHistory,
                         onTryAgain = onTryAgain,
                         onDeleteMessage = onDeleteMessage,
                         openAiSettings = onOpenAiSettings,
+                        onRequestQuotaReward = onRequestQuotaReward,
                         onResolveToolCall = onResolveToolCall,
                     )
                 }
@@ -224,7 +256,12 @@ private fun BaseAssistantContent(
 private fun EmptyAssistantChat(
     modifier: Modifier = Modifier,
     isQuotaExpired: Boolean,
+    quotaLimit: Int,
+    rewardedResetsRemaining: Int,
+    isRewardInProgress: Boolean,
     onSendMessageSuggestion: (String) -> Unit,
+    onRequestQuotaReward: () -> Unit,
+    onOpenAiSettings: () -> Unit,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         Box(
@@ -239,12 +276,23 @@ private fun EmptyAssistantChat(
                 color = MaterialTheme.colorScheme.onSurface,
             )
         }
-        ChatSuggestionsView(
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
-            enabled = !isQuotaExpired,
-            suggestions = ChatSuggestions.entries,
-            onSelectSuggestion = { onSendMessageSuggestion(it) },
-        )
+        if (isQuotaExpired) {
+            QuotaExpiredItem(
+                modifier = Modifier.padding(start = 8.dp, end = 12.dp, bottom = 12.dp),
+                quotaLimit = quotaLimit,
+                rewardedResetsRemaining = rewardedResetsRemaining,
+                isRewardInProgress = isRewardInProgress,
+                openAiSettings = onOpenAiSettings,
+                onRequestQuotaReward = onRequestQuotaReward,
+            )
+        } else {
+            ChatSuggestionsView(
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+                enabled = true,
+                suggestions = ChatSuggestions.entries,
+                onSelectSuggestion = { onSendMessageSuggestion(it) },
+            )
+        }
     }
 }
 
@@ -253,11 +301,15 @@ private fun AssistantChat(
     modifier: Modifier = Modifier,
     chatListState: LazyListState,
     isQuotaExpired: Boolean,
+    quotaLimit: Int,
+    rewardedResetsRemaining: Int,
+    isRewardInProgress: Boolean,
     responseStatus: ResponseStatus,
     chatHistory: AiChatHistoryUi,
     onTryAgain: () -> Unit,
     onDeleteMessage: () -> Unit,
     openAiSettings: () -> Unit,
+    onRequestQuotaReward: () -> Unit,
     onResolveToolCall: (String, Boolean) -> Unit,
 ) {
     val clipboardManager = LocalClipboardManager.current
@@ -306,7 +358,11 @@ private fun AssistantChat(
             item(key = "isQuotaExpired", contentType = "quota") {
                 QuotaExpiredItem(
                     modifier = Modifier.animateItem(placementSpec = null),
+                    quotaLimit = quotaLimit,
+                    rewardedResetsRemaining = rewardedResetsRemaining,
+                    isRewardInProgress = isRewardInProgress,
                     openAiSettings = openAiSettings,
+                    onRequestQuotaReward = onRequestQuotaReward,
                 )
             }
         }
@@ -513,9 +569,13 @@ private fun LazyItemScope.UserMessageItem(
 }
 
 @Composable
-private fun LazyItemScope.QuotaExpiredItem(
+private fun QuotaExpiredItem(
     modifier: Modifier = Modifier,
+    quotaLimit: Int,
+    rewardedResetsRemaining: Int,
+    isRewardInProgress: Boolean,
     openAiSettings: () -> Unit,
+    onRequestQuotaReward: () -> Unit,
 ) {
     Box(
         modifier = modifier.padding(start = 8.dp, end = 12.dp),
@@ -531,21 +591,66 @@ private fun LazyItemScope.QuotaExpiredItem(
             ) {
                 AssistantSenderBadge()
                 Text(
-                    text = stringResource(Res.string.quota_expired_title),
+                    text = stringResource(Res.string.quota_expired_title, quotaLimit),
                     color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.titleSmall,
                 )
                 Text(
-                    text = stringResource(Res.string.quota_reset_suggestion_text),
+                    text = if (rewardedResetsRemaining > 0) {
+                        stringResource(
+                            Res.string.quota_reset_suggestion_text,
+                            AiSettings.REWARDED_QUOTA,
+                            rewardedResetsRemaining,
+                            AiSettings.MAX_REWARDED_RESETS,
+                        )
+                    } else {
+                        stringResource(
+                            Res.string.quota_rewards_exhausted_text,
+                            AiSettings.MAX_REWARDED_RESETS,
+                        )
+                    },
                     color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.titleSmall,
                 )
-                FilledTonalButton(
-                    modifier = Modifier.height(40.dp),
-                    onClick = openAiSettings,
-                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
-                ) {
-                    Text(text = stringResource(Res.string.ai_settings_button), maxLines = 1)
+                if (rewardedResetsRemaining > 0) {
+                    FilledTonalButton(
+                        modifier = Modifier.height(40.dp),
+                        enabled = !isRewardInProgress,
+                        onClick = onRequestQuotaReward,
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+                    ) {
+                        if (isRewardInProgress) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 3.dp,
+                            )
+                        } else {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.PlayCircle,
+                                    contentDescription = null,
+                                )
+                                Text(
+                                    text = stringResource(
+                                        Res.string.watch_ad_reward_button,
+                                        AiSettings.REWARDED_QUOTA,
+                                    ),
+                                    maxLines = 1,
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    FilledTonalButton(
+                        modifier = Modifier.height(40.dp),
+                        onClick = openAiSettings,
+                        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
+                    ) {
+                        Text(text = stringResource(Res.string.ai_settings_button), maxLines = 1)
+                    }
                 }
             }
         }

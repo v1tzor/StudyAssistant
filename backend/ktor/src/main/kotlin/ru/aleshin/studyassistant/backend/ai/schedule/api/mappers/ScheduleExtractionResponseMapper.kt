@@ -67,6 +67,8 @@ class ScheduleExtractionResponseMapper {
                 unparsedLines = draft.unparsedLines,
             ),
             quotaRemaining = quota.remaining,
+            quotaLimit = quota.limit,
+            rewardedResetsRemaining = quota.rewardedResetsRemaining,
             quotaResetAt = quotaResetAt.toEpochMilli(),
         )
     }

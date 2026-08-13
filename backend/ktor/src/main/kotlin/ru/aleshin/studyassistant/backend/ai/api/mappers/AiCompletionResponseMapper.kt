@@ -62,6 +62,8 @@ class AiCompletionResponseMapper {
                 )
             },
             quotaRemaining = quota.remaining,
+            quotaLimit = quota.limit,
+            rewardedResetsRemaining = quota.rewardedResetsRemaining,
             quotaResetAt = quotaResetAt.toEpochMilli(),
         )
     }

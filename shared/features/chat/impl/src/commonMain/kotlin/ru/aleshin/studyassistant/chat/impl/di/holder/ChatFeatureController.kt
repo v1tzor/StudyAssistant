@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsServic
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
+import ru.aleshin.studyassistant.core.domain.repositories.AdRewardRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
@@ -60,6 +61,7 @@ public class ChatFeatureController(
         
         bindSingleton<AiAssistantRepository> { dependencies.aiAssistantRepository }
         bindSingleton<AiSettingsRepository> { dependencies.aiSettingsRepository }
+        bindSingleton<AdRewardRepository> { dependencies.adRewardRepository }
         bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
         bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
         bindSingleton<EmployeeRepository> { dependencies.employeeRepository }

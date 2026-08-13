@@ -60,7 +60,7 @@ google-mlkit-text-recognition = "16.0.1"
 # RuStore
 rustore-review = "10.5.0"
 rustore-updates = "10.5.0"
-yandex-ads = "8.3.0"
+yandex-ads = "8.1.0"
 mytarget-ads = "5.45.3.4"
 
 # Crashlytics & Analytics

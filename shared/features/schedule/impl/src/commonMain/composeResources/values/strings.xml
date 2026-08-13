@@ -68,7 +68,8 @@
     <string name="first_week_title">1 week</string>
     <string name="second_week_title">2 week</string>
     <string name="thirty_week_title">3 week</string>
-    <string name="accept_shared_schedule_button_title">Accept</string>
+    <string name="accept_shared_schedule_button_title">Watch ad and accept</string>
+    <string name="schedule_reward_unavailable_error">The ad is unavailable right now. Please try again later.</string>
     <string name="reject_shared_schedule_button_title">Reject</string>
     <string name="create_share_title">Share schedule</string>
     <string name="create_share_description">Create a temporary code containing the schedule and related study data without profile or account data.</string>

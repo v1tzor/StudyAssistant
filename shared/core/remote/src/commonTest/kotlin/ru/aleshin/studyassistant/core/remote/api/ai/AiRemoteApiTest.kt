@@ -89,7 +89,9 @@ class AiRemoteApiTest {
         )
         assertEquals("TOOL_CALLS", response.finishReason.name)
         assertEquals("create_todo", response.message.toolCalls.single().name)
-        assertEquals(24, response.quotaRemaining)
+        assertEquals(11, response.quotaRemaining)
+        assertEquals(12, response.quotaLimit)
+        assertEquals(3, response.rewardedResetsRemaining)
         assertEquals(1_786_550_400_000L, response.quotaResetAt)
     }
 
@@ -181,7 +183,9 @@ class AiRemoteApiTest {
                 "completionTokens": 20,
                 "totalTokens": 120
               },
-              "quotaRemaining": 24,
+              "quotaRemaining": 11,
+              "quotaLimit": 12,
+              "rewardedResetsRemaining": 3,
               "quotaResetAt": 1786550400000
             }
         """

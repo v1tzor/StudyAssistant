@@ -35,6 +35,7 @@ import ru.aleshin.studyassistant.backend.ai.AiConfig
 import ru.aleshin.studyassistant.backend.ai.domain.model.AiQuota
 import ru.aleshin.studyassistant.backend.ai.domain.repository.AiQuotaRepository
 import ru.aleshin.studyassistant.backend.ai.domain.result.AiQuotaReservationResult
+import ru.aleshin.studyassistant.backend.ads.infrastructure.AiRewardGrantsTable
 import ru.aleshin.studyassistant.backend.database.tables.RateLimitEventsTable
 import java.nio.ByteBuffer
 import java.time.Instant
@@ -71,6 +72,14 @@ class AiQuotaRepositoryImpl(
             installationHash = installationHash,
             usageDate = usageDate,
         )
+        val grantedAmount = rewardedAmount(
+            installationHash = installationHash,
+            usageDate = usageDate,
+        )
+        val currentLimit = config.dailyMessageLimit + grantedAmount
+        val rewardedResetsRemaining = (
+            config.maxRewardedResetsPerDay - grantedAmount / config.rewardedMessageAmount
+        ).coerceAtLeast(0)
 
         val existingRequest = AiRequestsTable
             .select(
@@ -99,11 +108,12 @@ class AiQuotaRepositoryImpl(
             if (existingRequest[AiRequestsTable.executionCount] >= config.maxExecutionsPerMessage) {
                 return@dbQuery AiQuotaReservationResult.MessageExecutionLimitExceeded
             }
-        } else if (currentUsed >= config.dailyMessageLimit) {
+        } else if (currentUsed >= currentLimit) {
             return@dbQuery AiQuotaReservationResult.QuotaExceeded(
                 quota = AiQuota(
                     used = currentUsed,
-                    limit = config.dailyMessageLimit,
+                    limit = currentLimit,
+                    rewardedResetsRemaining = rewardedResetsRemaining,
                 ),
                 resetAt = resetAt,
             )
@@ -162,7 +172,8 @@ class AiQuotaRepositoryImpl(
             return@dbQuery AiQuotaReservationResult.Reserved(
                 quota = AiQuota(
                     used = currentUsed,
-                    limit = config.dailyMessageLimit,
+                    limit = currentLimit,
+                    rewardedResetsRemaining = rewardedResetsRemaining,
                 ),
                 resetAt = resetAt,
                 isNewMessage = false,
@@ -204,7 +215,8 @@ class AiQuotaRepositoryImpl(
         AiQuotaReservationResult.Reserved(
             quota = AiQuota(
                 used = nextUsed,
-                limit = config.dailyMessageLimit,
+                limit = currentLimit,
+                rewardedResetsRemaining = rewardedResetsRemaining,
             ),
             resetAt = resetAt,
             isNewMessage = true,
@@ -305,6 +317,23 @@ class AiQuotaRepositoryImpl(
             .limit(1)
             .singleOrNull()
             ?.get(AiUsageTable.used)
+            ?: 0
+    }
+
+    private fun rewardedAmount(
+        installationHash: ByteArray,
+        usageDate: LocalDate,
+    ): Int {
+        val amountSum = AiRewardGrantsTable.amount.sum()
+
+        return AiRewardGrantsTable
+            .select(amountSum)
+            .where {
+                (AiRewardGrantsTable.installationHash eq installationHash) and
+                    (AiRewardGrantsTable.usageDate eq usageDate)
+            }
+            .singleOrNull()
+            ?.get(amountSum)
             ?: 0
     }
 

@@ -25,5 +25,10 @@ import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
  */
 interface AiSettingsRepository {
     fun fetchSettings(): Flow<AiSettings>
-    suspend fun updateQuota(remaining: Int, resetAt: Instant?)
+    suspend fun updateQuota(
+        remaining: Int,
+        limit: Int,
+        rewardedResetsRemaining: Int,
+        resetAt: Instant?,
+    )
 }

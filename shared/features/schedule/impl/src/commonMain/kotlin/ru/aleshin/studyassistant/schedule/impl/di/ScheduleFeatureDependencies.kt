@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.repositories.AdRewardRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -46,6 +47,7 @@ public interface ScheduleFeatureDependencies : BaseFeatureDependencies {
     public val customScheduleRepository: CustomScheduleRepository
     public val scheduleShareRepository: ScheduleShareRepository
     public val scheduleImportRepository: ScheduleImportRepository
+    public val adRewardRepository: AdRewardRepository
     public val organizationsRepository: OrganizationsRepository
     public val profileRepository: ProfileRepository
     public val subjectsRepository: SubjectsRepository

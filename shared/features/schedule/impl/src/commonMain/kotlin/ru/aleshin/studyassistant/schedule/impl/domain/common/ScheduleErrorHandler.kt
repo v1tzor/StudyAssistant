@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.schedule.impl.domain.common
 
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.handlers.ErrorHandler
+import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardException
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceException
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleImportException
@@ -44,6 +45,7 @@ internal interface ScheduleErrorHandler : ErrorHandler<ScheduleFailures> {
                 ScheduleFailures.TextRecognitionUnavailable
             }
             is AiServiceException.ServerUnavailable -> ScheduleFailures.ServerUnavailable
+            is AdRewardException -> ScheduleFailures.RewardUnavailable
             else -> ScheduleFailures.OtherError(throwable)
         }
     }

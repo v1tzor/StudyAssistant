@@ -24,10 +24,13 @@
     <string name="assistant_chat_text_field_placeholder">Отправьте любой запрос</string>
     <string name="assistant_empty_chat_title">Чем я могу вам помочь?</string>
     <string name="failure_response_text">К сожалению, не удалось выполнить запрос</string>
-    <string name="quota_expired_title">Бесплатная дневная квота истекла.\nДоступ возобновится только завтра.</string>
-    <string name="quota_reset_suggestion_text">Квота контролируется сервером и восстановится автоматически во время, указанное в настройках AI.</string>
+    <string name="quota_expired_title">Лимит на сегодня — %d сообщений — исчерпан.</string>
+    <string name="quota_reset_suggestion_text">Посмотрите короткую рекламу, чтобы поддержать команду и получить ещё %1$d сообщений. Доступно сегодня: %2$d из %3$d.</string>
+    <string name="quota_rewards_exhausted_text">Все %d награды за рекламу на сегодня использованы. Квота восстановится автоматически завтра.</string>
+    <string name="watch_ad_reward_button">Посмотреть рекламу · +%d сообщений</string>
     <string name="ai_settings_button">Настроить AI</string>
-    <string name="quota_error_message">Дневная квота из 25 сообщений исчерпана</string>
+    <string name="quota_error_message">Дневная квота из %d сообщений исчерпана</string>
+    <string name="reward_unavailable_error_message">Реклама сейчас недоступна. Попробуйте ещё раз позже.</string>
     <string name="invalid_request_error_message">Ассистент не смог обработать запрос. Проверьте сообщение и повторите попытку</string>
     <string name="offline_error_message">Нет подключения к интернету</string>
     <string name="rate_limit_error_message">Слишком много запросов. Попробуйте немного позже</string>

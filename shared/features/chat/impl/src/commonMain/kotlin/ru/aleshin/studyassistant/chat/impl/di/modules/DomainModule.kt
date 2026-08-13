@@ -56,6 +56,13 @@ internal val domainModule = DI.Module("Domain") {
         )
     }
     bindSingleton<AiAssistantInteractor> {
-        AiAssistantInteractor.Base(instance(), instance(), instance(), instance(), instance())
+        AiAssistantInteractor.Base(
+            aiAssistantRepository = instance(),
+            aiSettingsRepository = instance(),
+            adRewardRepository = instance(),
+            toolCallProcessor = instance(),
+            dateManager = instance(),
+            eitherWrapper = instance(),
+        )
     }
 }

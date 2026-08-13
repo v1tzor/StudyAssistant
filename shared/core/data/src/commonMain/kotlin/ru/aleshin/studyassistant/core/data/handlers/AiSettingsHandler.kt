@@ -31,7 +31,12 @@ import ru.aleshin.studyassistant.sqldelight.ai.AiSettingsEntity
 internal interface AiSettingsHandler {
 
     fun fetchSettings(): Flow<AiSettings>
-    suspend fun updateQuota(remaining: Int, resetAt: Instant?)
+    suspend fun updateQuota(
+        remaining: Int,
+        limit: Int,
+        rewardedResetsRemaining: Int,
+        resetAt: Instant?,
+    )
 
     class Base(
         private val localDataSource: AiPreferencesLocalDataSource,
@@ -48,16 +53,39 @@ internal interface AiSettingsHandler {
                 } else {
                     entity.quota_remaining.toInt()
                 },
+                quotaLimit = if (quotaExpired) {
+                    AiSettings.DAILY_QUOTA
+                } else {
+                    entity.quota_limit.toInt()
+                },
+                rewardedResetsRemaining = if (quotaExpired) {
+                    AiSettings.MAX_REWARDED_RESETS
+                } else {
+                    entity.rewarded_resets_remaining.toInt()
+                },
                 quotaResetAt = storedResetAt.takeUnless { quotaExpired },
             )
         }
 
-        override suspend fun updateQuota(remaining: Int, resetAt: Instant?) {
+        override suspend fun updateQuota(
+            remaining: Int,
+            limit: Int,
+            rewardedResetsRemaining: Int,
+            resetAt: Instant?,
+        ) {
             localDataSource.updateSettings(
                 currentSettings().copy(
                     quota_remaining = remaining.coerceIn(
                         minimumValue = 0,
-                        maximumValue = AiSettings.DAILY_QUOTA,
+                        maximumValue = AiSettings.MAX_DAILY_QUOTA,
+                    ).toLong(),
+                    quota_limit = limit.coerceIn(
+                        minimumValue = AiSettings.DAILY_QUOTA,
+                        maximumValue = AiSettings.MAX_DAILY_QUOTA,
+                    ).toLong(),
+                    rewarded_resets_remaining = rewardedResetsRemaining.coerceIn(
+                        minimumValue = 0,
+                        maximumValue = AiSettings.MAX_REWARDED_RESETS,
                     ).toLong(),
                     quota_reset_at = resetAt?.toEpochMilliseconds(),
                 )

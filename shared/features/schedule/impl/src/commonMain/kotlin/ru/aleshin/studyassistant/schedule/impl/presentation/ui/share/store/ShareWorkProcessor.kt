@@ -63,6 +63,7 @@ internal interface ShareWorkProcessor :
             is ShareWorkCommand.UpdateLinkedSubjects -> updateLinkedSubjectsWork(command)
             is ShareWorkCommand.UpdateLinkedEmployees -> updateLinkedEmployeesWork(command)
             is ShareWorkCommand.AcceptSharedSchedule -> acceptSharedScheduleWork(command)
+            is ShareWorkCommand.PrepareImportReward -> prepareImportRewardWork(command.claim)
         }
 
         private fun createShareWork() = flow<ShareWorkResult> {
@@ -227,6 +228,7 @@ internal interface ShareWorkProcessor :
             command: ShareWorkCommand.AcceptSharedSchedule,
         ) = flow<ShareWorkResult> {
             shareSchedulesInteractor.importShare(
+                rewardChallengeId = command.rewardChallengeId,
                 claim = command.claim.mapToDomain(),
                 links = command.organizationsLinkData.map { link -> link.mapToDomain() },
             ).handle(
@@ -260,6 +262,26 @@ internal interface ShareWorkProcessor :
             emit(ActionResult(ShareAction.UpdateStatus(ShareStatus.IMPORTING)))
         }
 
+        private fun prepareImportRewardWork(
+            claim: ScheduleShareClaimUi,
+        ) = flow<ShareWorkResult> {
+            shareSchedulesInteractor.createImportReward(claim.mapToDomain()).handle(
+                onLeftAction = { failure ->
+                    emit(ActionResult(ShareAction.UpdateRewardChallenge(null, false)))
+                    emit(EffectResult(ShareEffect.ShowError(failure)))
+                },
+                onRightAction = { challenge ->
+                    val action = ShareAction.UpdateRewardChallenge(
+                        challengeId = challenge.id,
+                        isInProgress = true,
+                    )
+                    emit(ActionResult(action))
+                },
+            )
+        }.onStart {
+            emit(ActionResult(ShareAction.UpdateRewardChallenge(null, true)))
+        }
+
     }
 }
 
@@ -289,9 +311,11 @@ internal sealed class ShareWorkCommand : WorkCommand {
         val teachers: Map<UID, EmployeeUi>,
     ) : ShareWorkCommand()
     data class AcceptSharedSchedule(
+        val rewardChallengeId: String,
         val claim: ScheduleShareClaimUi,
         val organizationsLinkData: List<OrganizationLinkData>,
     ) : ShareWorkCommand()
+    data class PrepareImportReward(val claim: ScheduleShareClaimUi) : ShareWorkCommand()
 }
 
 internal typealias ShareWorkResult = WorkResult<ShareAction, ShareEffect, ShareOutput>

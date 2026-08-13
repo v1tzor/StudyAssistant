@@ -23,6 +23,7 @@ import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.Either
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardChallenge
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.MediatedBaseSchedule
 import ru.aleshin.studyassistant.core.domain.entities.share.ScheduleShareClaim
@@ -105,6 +106,10 @@ class ShareWorkProcessorTest {
             return Either.Right(Unit)
         }
 
+        override suspend fun createImportReward(
+            claim: ScheduleShareClaim,
+        ): DomainResult<ScheduleFailures, AdRewardChallenge> = error("Unused")
+
         override suspend fun linkOrganization(
             links: List<ScheduleOrganizationLink>,
             schedules: List<MediatedBaseSchedule>,
@@ -127,6 +132,7 @@ class ShareWorkProcessorTest {
         ): DomainResult<ScheduleFailures, ScheduleLinkResult> = error("Unused")
 
         override suspend fun importShare(
+            rewardChallengeId: String,
             claim: ScheduleShareClaim,
             links: List<ScheduleOrganizationLink>,
         ): UnitDomainResult<ScheduleFailures> = error("Unused")

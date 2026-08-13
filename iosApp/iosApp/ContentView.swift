@@ -13,11 +13,38 @@ struct ComposeView: UIViewControllerRepresentable {
         MainViewControllerKt.MainViewController(
             componentContext: componentContext,
             backDispatcher: backDispatcher,
-            deepLinkReceiver: deepLinkReceiver
+            deepLinkReceiver: deepLinkReceiver,
+            adsConfiguration: UiAdsConfiguration(
+                tasksOverviewBannerId: adUnitId(
+                    key: "YandexTasksBannerId",
+                    demo: "demo-banner-yandex"
+                ),
+                infoOrganizationsBannerId: adUnitId(
+                    key: "YandexInfoBannerId",
+                    demo: "demo-banner-yandex"
+                ),
+                aiQuotaRewardedId: adUnitId(
+                    key: "YandexAiRewardedId",
+                    demo: "demo-rewarded-yandex"
+                ),
+                scheduleImportRewardedId: adUnitId(
+                    key: "YandexScheduleRewardedId",
+                    demo: "demo-rewarded-yandex"
+                )
+            )
         )
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+
+    private func adUnitId(key: String, demo: String) -> String {
+        let configured = Bundle.main.object(forInfoDictionaryKey: key) as? String ?? ""
+#if DEBUG
+        return configured.isEmpty ? demo : configured
+#else
+        return configured
+#endif
+    }
 }
 
 struct ContentView: View {

@@ -1,0 +1,8 @@
+source 'https://cdn.cocoapods.org/'
+
+platform :ios, '16.0'
+
+target 'iosApp' do
+  use_frameworks!
+  pod 'YandexMobileAds', '8.1.0'
+end

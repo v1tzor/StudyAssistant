@@ -24,7 +24,10 @@ import java.time.Duration
  */
 fun testAiConfig(): AiConfig {
     return AiConfig(
-        dailyMessageLimit = 25,
+        dailyMessageLimit = 12,
+        rewardedMessageAmount = 12,
+        maxRewardedResetsPerDay = 3,
+        rewardChallengeLifetime = Duration.ofMinutes(15),
         globalDailyExecutionLimit = 2_000,
         executionLimit = 30,
         maxExecutionsPerMessage = 8,

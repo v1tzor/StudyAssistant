@@ -52,7 +52,9 @@ internal interface AssistantWorkProcessor :
 
         override suspend fun work(command: AssistantWorkCommand) = when (command) {
             is AssistantWorkCommand.LoadMessages -> loadMessagesWork()
-            is AssistantWorkCommand.LoadQuotaExpiredStatus -> loadQuotaExpiredStatusWork()
+            is AssistantWorkCommand.LoadAiSettings -> loadAiSettingsWork()
+            is AssistantWorkCommand.PrepareQuotaReward -> prepareQuotaRewardWork()
+            is AssistantWorkCommand.CompleteQuotaReward -> completeQuotaRewardWork(command.challengeId)
             is AssistantWorkCommand.ClearChatHistory -> clearChatHistoryWork(command.chatId)
             is AssistantWorkCommand.SendMessage -> sendMessageWork(command.chatId, command.message)
             is AssistantWorkCommand.RetryAttempt -> retryAttemptWork(command.chatId)
@@ -119,11 +121,40 @@ internal interface AssistantWorkProcessor :
             emit(ActionResult(AssistantAction.UpdateLoadingChat(true)))
         }
 
-        private fun loadQuotaExpiredStatusWork() = flow {
-            aiAssistantInteractor.quotaIsExpired().collectAndHandle(
+        private fun loadAiSettingsWork() = flow {
+            aiAssistantInteractor.fetchAiSettings().collectAndHandle(
                 onLeftAction = { emit(EffectResult(AssistantEffect.ShowError(it))) },
-                onRightAction = { emit(ActionResult(AssistantAction.UpdateQuotaExpiredStatus(it))) },
+                onRightAction = { settings ->
+                    emit(ActionResult(AssistantAction.SetupQuota(
+                        remaining = settings.quotaRemaining,
+                        limit = settings.quotaLimit,
+                        rewardedResetsRemaining = settings.rewardedResetsRemaining,
+                    )))
+                },
             )
+        }
+
+        private fun prepareQuotaRewardWork() = flow<AssistantWorkResult> {
+            aiAssistantInteractor.createQuotaReward().handle(
+                onLeftAction = { failure ->
+                    emit(ActionResult(AssistantAction.UpdateRewardChallenge(null, false)))
+                    emit(EffectResult(AssistantEffect.ShowError(failure)))
+                },
+                onRightAction = { challenge ->
+                    emit(ActionResult(AssistantAction.UpdateRewardChallenge(challenge.id, true)))
+                },
+            )
+        }.onStart {
+            emit(ActionResult(AssistantAction.UpdateRewardChallenge(null, true)))
+        }
+
+        private fun completeQuotaRewardWork(challengeId: String) = flow<AssistantWorkResult> {
+            aiAssistantInteractor.completeQuotaReward(challengeId).handle(
+                onLeftAction = { failure ->
+                    emit(EffectResult(AssistantEffect.ShowError(failure)))
+                },
+            )
+            emit(ActionResult(AssistantAction.UpdateRewardChallenge(null, false)))
         }
 
         private fun clearChatHistoryWork(chatId: UID) = flow {
@@ -202,7 +233,9 @@ internal interface AssistantWorkProcessor :
 
 internal sealed class AssistantWorkCommand : WorkCommand {
     data object LoadMessages : AssistantWorkCommand()
-    data object LoadQuotaExpiredStatus : AssistantWorkCommand()
+    data object LoadAiSettings : AssistantWorkCommand()
+    data object PrepareQuotaReward : AssistantWorkCommand()
+    data class CompleteQuotaReward(val challengeId: String) : AssistantWorkCommand()
     data class ClearChatHistory(val chatId: UID) : AssistantWorkCommand()
     data class SendMessage(val chatId: UID?, val message: String) : AssistantWorkCommand()
     data class RetryAttempt(val chatId: UID?) : AssistantWorkCommand()

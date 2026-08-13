@@ -32,9 +32,13 @@ import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardChallenge
+import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardPurpose
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiChat
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiChatHistory
+import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
+import ru.aleshin.studyassistant.core.domain.repositories.AdRewardRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 
@@ -44,7 +48,9 @@ import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
 internal interface AiAssistantInteractor {
 
     suspend fun addChat(): DomainResult<ChatFailures, UID>
-    suspend fun quotaIsExpired(): FlowDomainResult<ChatFailures, Boolean>
+    suspend fun fetchAiSettings(): FlowDomainResult<ChatFailures, AiSettings>
+    suspend fun createQuotaReward(): DomainResult<ChatFailures, AdRewardChallenge>
+    suspend fun completeQuotaReward(challengeId: String): UnitDomainResult<ChatFailures>
     suspend fun fetchChats(): FlowDomainResult<ChatFailures, List<AiChat>>
     suspend fun fetchChatHistory(chatId: UID): FlowDomainResult<ChatFailures, AssistantChatData>
     suspend fun clearHistory(chatId: UID): UnitDomainResult<ChatFailures>
@@ -60,6 +66,7 @@ internal interface AiAssistantInteractor {
     class Base(
         private val aiAssistantRepository: AiAssistantRepository,
         private val aiSettingsRepository: AiSettingsRepository,
+        private val adRewardRepository: AdRewardRepository,
         private val toolCallProcessor: AiToolCallProcessor,
         private val dateManager: DateManager,
         private val eitherWrapper: ChatEitherWrapper,
@@ -75,10 +82,16 @@ internal interface AiAssistantInteractor {
             chatId
         }
 
-        override suspend fun quotaIsExpired() = eitherWrapper.wrapFlow {
-            aiSettingsRepository.fetchSettings().map { settings ->
-                settings.quotaRemaining <= 0
-            }
+        override suspend fun fetchAiSettings() = eitherWrapper.wrapFlow {
+            aiSettingsRepository.fetchSettings()
+        }
+
+        override suspend fun createQuotaReward() = eitherWrapper.wrap {
+            adRewardRepository.createChallenge(AdRewardPurpose.AI_QUOTA_RESET)
+        }
+
+        override suspend fun completeQuotaReward(challengeId: String) = eitherWrapper.wrapUnit {
+            adRewardRepository.completeChallenge(challengeId)
         }
 
         override suspend fun fetchChats() = eitherWrapper.wrapFlow {

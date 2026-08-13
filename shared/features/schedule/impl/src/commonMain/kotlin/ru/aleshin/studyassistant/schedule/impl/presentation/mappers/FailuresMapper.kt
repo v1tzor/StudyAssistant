@@ -29,6 +29,7 @@ import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_ocr_una
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_quota_error
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_rate_limit_error
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_server_error
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_reward_unavailable_error
 import ru.aleshin.studyassistant.schedule.impl.resources.share_daily_limit_message
 import ru.aleshin.studyassistant.schedule.impl.resources.share_item_limit_message
 import ru.aleshin.studyassistant.schedule.impl.resources.share_payload_limit_message
@@ -51,6 +52,7 @@ internal suspend fun ScheduleFailures.mapToMessage() = when (this) {
         getString(Res.string.schedule_import_ocr_unavailable_error)
     }
     is ScheduleFailures.ServerUnavailable -> getString(Res.string.schedule_import_server_error)
+    is ScheduleFailures.RewardUnavailable -> getString(Res.string.schedule_reward_unavailable_error)
     is ScheduleFailures.OtherError -> when (throwable) {
         is ShareException.RateLimit -> getString(Res.string.share_rate_limit_message)
         is ShareException.ShareLimit -> getString(Res.string.share_daily_limit_message)

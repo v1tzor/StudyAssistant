@@ -20,6 +20,7 @@ import ru.aleshin.studyassistant.chat.impl.domain.entities.ChatFailures
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.common.wrappers.FlowEitherWrapper
+import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardException
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceException
 
 /**
@@ -34,7 +35,9 @@ internal interface ChatEitherWrapper : FlowEitherWrapper<ChatFailures> {
         errorHandler = errorHandler,
         crashlyticsService = crashlyticsService,
         ignoreExceptions = { error ->
-            error is InternetConnectionException || error is AiServiceException
+            error is InternetConnectionException ||
+                error is AiServiceException ||
+                error is AdRewardException
         },
     )
 }

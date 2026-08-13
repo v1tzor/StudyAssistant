@@ -27,5 +27,7 @@ data class AiCompletionResponseDto(
     val finishReason: AiFinishReasonDto,
     val usage: AiTokenUsageDto? = null,
     val quotaRemaining: Int,
+    val quotaLimit: Int,
+    val rewardedResetsRemaining: Int,
     val quotaResetAt: Long,
 )
