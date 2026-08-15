@@ -21,4 +21,4 @@ import kotlinx.io.IOException
 /**
  * @author Stanislav Aleshin on 12.08.2026.
  */
-class InternetConnectionException : IOException()
+class InternetConnectionException(override val cause: Throwable? = null) : IOException()

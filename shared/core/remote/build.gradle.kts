@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -80,18 +81,18 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
     }
-
 }
 
 buildkonfig {
     packageName = "ru.aleshin.studyassistant.core.remote"
 
-    val configuredBackendUrl = providers.gradleProperty("studyassistant.backend.url")
-        .orElse(providers.environmentVariable("STUDYASSISTANT_BACKEND_URL"))
-        .orNull
-        ?.trim()
-        ?.trimEnd('/')
-        ?.takeIf(String::isNotEmpty)
+    val localProperties = gradleLocalProperties(rootDir, providers)
+
+    val configuredBackendUrl = localProperties.getProperty("studyassistant.backend.url")
+        ?: providers.gradleProperty("studyassistant.backend.url").orNull
+            ?.trim()
+            ?.trimEnd('/')
+            ?.takeIf(String::isNotEmpty)
 
     defaultConfigs {
         buildConfigField(FieldSpec.Type.STRING, "BACKEND_BASE_URL", configuredBackendUrl ?: "http://127.0.0.1:8080")

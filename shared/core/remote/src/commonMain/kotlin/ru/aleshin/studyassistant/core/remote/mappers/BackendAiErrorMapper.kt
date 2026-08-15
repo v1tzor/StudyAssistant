@@ -40,8 +40,7 @@ internal fun mapBackendAiError(
         "server_unavailable" -> AiServiceException.ServerUnavailable()
         else -> when (status) {
             HttpStatusCode.BadRequest,
-            HttpStatusCode.PayloadTooLarge,
-            -> AiServiceException.InvalidRequest()
+            HttpStatusCode.PayloadTooLarge -> AiServiceException.InvalidRequest()
             HttpStatusCode.TooManyRequests -> AiServiceException.RateLimited()
             else -> AiServiceException.ServerUnavailable()
         }

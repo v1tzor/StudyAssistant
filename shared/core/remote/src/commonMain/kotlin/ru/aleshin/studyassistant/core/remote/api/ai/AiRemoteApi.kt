@@ -59,8 +59,8 @@ interface AiRemoteApi {
                     header(StudyAssistantKtor.Backend.INSTALLATION_TOKEN_HEADER, installationToken)
                     setBody(request)
                 }
-            } catch (_: IOException) {
-                throw InternetConnectionException()
+            } catch (exception: IOException) {
+                throw InternetConnectionException(exception)
             }
             val responseBody = response.bodyAsText()
 
