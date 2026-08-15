@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.data.datasources
+package ru.aleshin.studyassistant.core.database.datasource.secure
 
-enum class AvatarType {
-    PROFILE,
-    ORGANIZATION,
-    EMPLOYEE,
+/**
+ * @author Stanislav Aleshin on 08.08.2026.
+ */
+internal class IosInstallationSecureDataSource(
+    private val storage: IosSecureStorage,
+) : InstallationSecureDataSource {
+
+    override suspend fun fetchInstallationToken(): String? = storage.read(INSTALLATION_TOKEN)
+
+    override suspend fun saveInstallationToken(token: String) {
+        storage.write(INSTALLATION_TOKEN, token)
+    }
+
+    private companion object {
+        const val INSTALLATION_TOKEN = "installation_token"
+    }
 }

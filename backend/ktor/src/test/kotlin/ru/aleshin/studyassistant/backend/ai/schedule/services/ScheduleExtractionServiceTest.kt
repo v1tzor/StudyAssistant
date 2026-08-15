@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.backend.ai.services.AiQuotaService
 import ru.aleshin.studyassistant.backend.ai.testAiConfig
 import ru.aleshin.studyassistant.backend.common.api.ServerUnavailableException
 import ru.aleshin.studyassistant.backend.security.InstallationHasher
+import ru.aleshin.studyassistant.backend.security.PayloadCipher
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
@@ -86,6 +87,35 @@ class ScheduleExtractionServiceTest {
         assertEquals(listOf(false), repository.finalizedResults)
     }
 
+    @Test
+    fun successfulExtractionShouldBeReplayedWithoutProviderCall() = runBlocking {
+        val repository = FakeAiQuotaRepository()
+        val request = request()
+        val successfulService = service(
+            repository = repository,
+            gatewayResult = ScheduleProviderResult.Success(
+                draft = ScheduleDraft(
+                    title = "Cached schedule",
+                    entries = emptyList(),
+                    unparsedLines = emptyList(),
+                ),
+            ),
+        )
+        successfulService.extract("installation-token", request)
+        repository.reservationResult = AiQuotaReservationResult.IdempotencyReplay(
+            responsePayload = checkNotNull(repository.responsePayload),
+            responseNonce = checkNotNull(repository.responseNonce),
+        )
+
+        val replay = service(
+            repository = repository,
+            gatewayResult = ScheduleProviderResult.Unavailable,
+        ).extract("installation-token", request)
+
+        assertEquals("Cached schedule", replay.draft.title)
+        assertEquals(listOf(true), repository.finalizedResults)
+    }
+
     private fun service(
         repository: AiQuotaRepository,
         gatewayResult: ScheduleProviderResult,
@@ -111,6 +141,7 @@ class ScheduleExtractionServiceTest {
                 }
             },
             clock = clock,
+            payloadCipher = PayloadCipher(ByteArray(32) { 2 }),
         )
     }
 
@@ -129,6 +160,9 @@ class ScheduleExtractionServiceTest {
         val finalizedResults = mutableListOf<Boolean>()
 
         var requestHash: ByteArray? = null
+        var reservationResult: AiQuotaReservationResult? = null
+        var responsePayload: ByteArray? = null
+        var responseNonce: ByteArray? = null
 
         override suspend fun reserve(
             installationHash: ByteArray,
@@ -138,7 +172,7 @@ class ScheduleExtractionServiceTest {
             now: Instant,
         ): AiQuotaReservationResult {
             this.requestHash = requestHash
-            return AiQuotaReservationResult.Reserved(
+            return reservationResult ?: AiQuotaReservationResult.Reserved(
                 quota = AiQuota(used = 1, limit = 12, rewardedResetsRemaining = 3),
                 resetAt = Instant.parse("2026-08-13T00:00:00Z"),
                 isNewMessage = true,
@@ -152,6 +186,17 @@ class ScheduleExtractionServiceTest {
             now: Instant,
         ) {
             finalizedResults += succeeded
+        }
+
+        override suspend fun saveResponse(
+            installationHash: ByteArray,
+            messageId: UUID,
+            executionHash: ByteArray,
+            responsePayload: ByteArray,
+            responseNonce: ByteArray,
+        ) {
+            this.responsePayload = responsePayload
+            this.responseNonce = responseNonce
         }
     }
 

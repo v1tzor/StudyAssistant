@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class)
 
-package ru.aleshin.studyassistant.core.data.datasources
+package ru.aleshin.studyassistant.core.database.datasource.avatar
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Foundation.NSApplicationSupportDirectory
@@ -30,6 +31,9 @@ import platform.Foundation.writeToURL
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 
+/**
+ * @author Stanislav Aleshin on 08.08.2026.
+ */
 class IosAvatarLocalDataSource : AvatarLocalDataSource {
 
     private val fileManager = NSFileManager.defaultManager

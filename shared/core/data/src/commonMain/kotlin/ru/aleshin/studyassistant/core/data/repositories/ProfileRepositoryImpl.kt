@@ -18,15 +18,18 @@ package ru.aleshin.studyassistant.core.data.repositories
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import ru.aleshin.studyassistant.core.data.datasources.AvatarLocalDataSource
-import ru.aleshin.studyassistant.core.data.datasources.AvatarType
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
+import ru.aleshin.studyassistant.core.database.datasource.avatar.AvatarLocalDataSource
+import ru.aleshin.studyassistant.core.database.datasource.avatar.AvatarType
 import ru.aleshin.studyassistant.core.database.datasource.user.ProfileLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.users.Profile
 import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
 
+/**
+ * @author Stanislav Aleshin on 29.04.2024.
+ */
 class ProfileRepositoryImpl(
     private val localDataSource: ProfileLocalDataSource,
     private val avatarLocalDataSource: AvatarLocalDataSource,

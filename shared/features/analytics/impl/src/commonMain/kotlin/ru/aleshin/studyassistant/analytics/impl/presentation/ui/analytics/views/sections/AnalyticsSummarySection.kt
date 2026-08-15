@@ -155,7 +155,7 @@ private fun OnTimeIndicator(
     rate: Float?,
     comparison: Float?,
 ) {
-    val progress = rate?.coerceIn(0f, 1f) ?: 0f
+    val progress = rate?.takeIf { it.isFinite() }?.coerceIn(0f, 1f) ?: 0f
 
     Column(
         modifier = modifier,

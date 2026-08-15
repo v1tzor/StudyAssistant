@@ -34,26 +34,24 @@ interface TodoLocalDataSource {
 
     suspend fun addOrUpdateTodo(item: BaseTodoEntity)
     suspend fun fetchTodoById(id: String): Flow<BaseTodoEntity?>
-    suspend fun deleteTodosByIds(ids: List<String>)
-
     suspend fun fetchTodosByTimeRange(from: Long, to: Long): Flow<List<BaseTodoEntity>>
     suspend fun fetchActiveTodos(): Flow<List<BaseTodoEntity>>
     suspend fun fetchCompletedTodos(from: Long?, to: Long?): Flow<List<BaseTodoEntity>>
     suspend fun fetchOverdueTodos(currentDate: Long): Flow<List<BaseTodoEntity>>
+    suspend fun deleteTodosByIds(ids: List<String>)
 
     class Base(
-        protected val todoQueries: TodoQueries,
-        protected val coroutineManager: CoroutineManager,
+        private val todoQueries: TodoQueries,
+        private val coroutineManager: CoroutineManager,
     ) : TodoLocalDataSource {
 
-        protected val coroutineContext: CoroutineContext
+        private val coroutineContext: CoroutineContext
             get() = coroutineManager.ioDispatcher
-
 
         override suspend fun addOrUpdateTodo(item: BaseTodoEntity) {
             val uid = item.uid.ifEmpty { randomUUID() }
             val updatedItem = item.copy(uid = uid).mapToEntity()
-            todoQueries.addOrUpdateTodo(updatedItem).await()
+            todoQueries.addOrUpdateTodo(updatedItem)
         }
 
         override suspend fun fetchTodoById(id: String): Flow<BaseTodoEntity?> {
@@ -61,10 +59,7 @@ interface TodoLocalDataSource {
             return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }
         }
 
-        override suspend fun fetchTodosByTimeRange(
-            from: Long,
-            to: Long
-        ): Flow<List<BaseTodoEntity>> {
+        override suspend fun fetchTodosByTimeRange(from: Long, to: Long): Flow<List<BaseTodoEntity>> {
             val query = todoQueries.fetchTodosByTimeRange(from, to)
             return query.mapToListFlow(coroutineContext) { it.mapToBase() }
         }
@@ -74,10 +69,7 @@ interface TodoLocalDataSource {
             return query.mapToListFlow(coroutineContext) { it.mapToBase() }
         }
 
-        override suspend fun fetchCompletedTodos(
-            from: Long?,
-            to: Long?
-        ): Flow<List<BaseTodoEntity>> {
+        override suspend fun fetchCompletedTodos(from: Long?, to: Long?): Flow<List<BaseTodoEntity>> {
             return if (from != null && to != null) {
                 val query = todoQueries.fetchCompletedTodosByTimeRange(from, to)
                 query.mapToListFlow(coroutineContext) { it.mapToBase() }
@@ -93,9 +85,7 @@ interface TodoLocalDataSource {
         }
 
         override suspend fun deleteTodosByIds(ids: List<String>) {
-            todoQueries.deleteTodosById(ids).await()
+            todoQueries.deleteTodosById(ids)
         }
-
     }
-
 }

@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.data.datasources
+package ru.aleshin.studyassistant.core.database.datasource.secure
 
-import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
-
-interface AvatarLocalDataSource {
-    suspend fun saveAvatar(type: AvatarType, file: InputFile): String
-    suspend fun deleteAvatar(avatar: String)
+/**
+ * @author Stanislav Aleshin on 08.08.2026.
+ */
+interface InstallationSecureDataSource {
+    suspend fun fetchInstallationToken(): String?
+    suspend fun saveInstallationToken(token: String)
 }

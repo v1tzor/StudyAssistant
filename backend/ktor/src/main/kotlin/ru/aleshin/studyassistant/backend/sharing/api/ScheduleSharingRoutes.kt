@@ -29,6 +29,7 @@ import ru.aleshin.studyassistant.backend.sharing.api.dto.schedule.CreateSchedule
 import ru.aleshin.studyassistant.backend.sharing.api.dto.schedule.ReleaseScheduleShareRequest
 import ru.aleshin.studyassistant.backend.sharing.services.ScheduleSharingService
 import ru.aleshin.studyassistant.backend.common.api.requireInstallationToken
+import ru.aleshin.studyassistant.backend.common.api.requireJsonContentType
 import ru.aleshin.studyassistant.backend.security.InstallationCredentialService
 
 /**
@@ -51,6 +52,7 @@ fun Route.scheduleSharingRoutes(
             val installationToken = call.requireInstallationToken(
                 credentialService = credentialService,
             )
+            call.requireJsonContentType()
             val request = call.receive<CreateScheduleShareRequest>()
 
             val response = service.create(
@@ -68,6 +70,7 @@ fun Route.scheduleSharingRoutes(
             val installationToken = call.requireInstallationToken(
                 credentialService = credentialService,
             )
+            call.requireJsonContentType()
             val request = call.receive<ClaimScheduleShareRequest>()
 
             val response = service.claim(
@@ -85,6 +88,7 @@ fun Route.scheduleSharingRoutes(
             val installationToken = call.requireInstallationToken(
                 credentialService = credentialService,
             )
+            call.requireJsonContentType()
             val request = call.receive<ConfirmScheduleShareRequest>()
 
             call.respond(
@@ -97,6 +101,7 @@ fun Route.scheduleSharingRoutes(
         }
 
         post("/release") {
+            call.requireJsonContentType()
             val request = call.receive<ReleaseScheduleShareRequest>()
 
             call.respond(

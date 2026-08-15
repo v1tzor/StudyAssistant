@@ -36,9 +36,8 @@ interface EmployeeLocalDataSource {
     suspend fun addOrUpdateEmployee(item: BaseEmployeeEntity)
     suspend fun addOrUpdateEmployees(items: List<BaseEmployeeEntity>)
     suspend fun fetchEmployeeById(id: String): Flow<BaseEmployeeEntity?>
-    suspend fun deleteEmployeesByIds(ids: List<String>)
-
     suspend fun fetchAllEmployeeByOrganization(organizationId: UID?): Flow<List<BaseEmployeeEntity>>
+    suspend fun deleteEmployeesByIds(ids: List<String>)
 
     class Base(
         private val employeeQueries: EmployeeQueries,
@@ -48,11 +47,10 @@ interface EmployeeLocalDataSource {
         private val coroutineContext: CoroutineContext
             get() = coroutineManager.ioDispatcher
 
-
         override suspend fun addOrUpdateEmployee(item: BaseEmployeeEntity) {
             val uid = item.uid.ifEmpty { randomUUID() }
             val updatedItem = item.copy(uid = uid).mapToEntity()
-            employeeQueries.addOrUpdateEmployee(updatedItem).await()
+            employeeQueries.addOrUpdateEmployee(updatedItem)
         }
 
         override suspend fun addOrUpdateEmployees(items: List<BaseEmployeeEntity>) {
@@ -74,8 +72,7 @@ interface EmployeeLocalDataSource {
         }
 
         override suspend fun deleteEmployeesByIds(ids: List<String>) {
-            employeeQueries.deleteEmployeesById(ids).await()
+            employeeQueries.deleteEmployeesById(ids)
         }
     }
-
 }

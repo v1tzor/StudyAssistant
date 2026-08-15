@@ -39,7 +39,7 @@ docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull backend
 docker compose \
     --env-file "$ENV_FILE" \
     -f "$COMPOSE_FILE" \
-    up --detach --remove-orphans --wait --no-build nginx
+    up --detach --remove-orphans --wait --no-build --force-recreate nginx
 
 API_URL="$API_URL" "$SCRIPT_DIRECTORY/healthcheck.sh"
 

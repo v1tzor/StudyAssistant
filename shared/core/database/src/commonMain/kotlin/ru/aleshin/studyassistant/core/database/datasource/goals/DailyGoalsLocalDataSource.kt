@@ -59,19 +59,14 @@ interface DailyGoalsLocalDataSource {
 
     suspend fun addOrUpdateGoal(item: BaseGoalEntity)
     suspend fun addOrUpdateGoals(items: List<BaseGoalEntity>)
-    suspend fun deleteGoalsByIds(ids: List<String>)
-
     suspend fun fetchGoalDetailsById(uid: UID): Flow<GoalEntityDetails?>
     suspend fun fetchGoalDetailsByDate(date: Long): Flow<List<GoalEntityDetails>>
     suspend fun fetchGoalDetailsByContentId(uid: UID): Flow<GoalEntityDetails?>
-    suspend fun fetchGoalsDetailsByTimeRange(
-        from: Long,
-        to: Long
-    ): Flow<List<GoalEntityDetails>>
-
+    suspend fun fetchGoalsDetailsByTimeRange(from: Long, to: Long): Flow<List<GoalEntityDetails>>
     suspend fun fetchShortGoalsByTimeRange(from: Long, to: Long): Flow<List<BaseGoalEntity>>
     suspend fun fetchShortActiveDailyGoals(): Flow<List<BaseGoalEntity>>
     suspend fun fetchOverdueGoalsDetails(currentDate: Long): Flow<List<GoalEntityDetails>>
+    suspend fun deleteGoalsByIds(ids: List<String>)
 
     class Base(
         private val goalQueries: GoalQueries,
@@ -86,11 +81,10 @@ interface DailyGoalsLocalDataSource {
         private val coroutineContext: CoroutineContext
             get() = coroutineManager.ioDispatcher
 
-
         override suspend fun addOrUpdateGoal(item: BaseGoalEntity) {
             val uid = item.uid.ifEmpty { randomUUID() }
             val updatedItem = item.copy(uid = uid).mapToEntity()
-            goalQueries.addOrUpdateGoal(updatedItem).await()
+            goalQueries.addOrUpdateGoal(updatedItem)
         }
 
         override suspend fun addOrUpdateGoals(items: List<BaseGoalEntity>) {
@@ -99,35 +93,25 @@ interface DailyGoalsLocalDataSource {
 
         override suspend fun fetchGoalDetailsById(uid: UID): Flow<GoalEntityDetails?> {
             val query = goalQueries.fetchGoalById(uid)
-            return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }
-                .flatMapToDetails()
+            return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }.flatMapToDetails()
         }
 
         override suspend fun fetchGoalDetailsByDate(date: Long): Flow<List<GoalEntityDetails>> {
             val query = goalQueries.fetchGoalsByDate(date)
-            return query.mapToListFlow(coroutineContext) { it.mapToBase() }
-                .flatMapListToDetails()
+            return query.mapToListFlow(coroutineContext) { it.mapToBase() }.flatMapListToDetails()
         }
 
         override suspend fun fetchGoalDetailsByContentId(uid: UID): Flow<GoalEntityDetails?> {
             val query = goalQueries.fetchGoalByContentId(uid)
-            return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }
-                .flatMapToDetails()
+            return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }.flatMapToDetails()
         }
 
-        override suspend fun fetchGoalsDetailsByTimeRange(
-            from: Long,
-            to: Long
-        ): Flow<List<GoalEntityDetails>> {
+        override suspend fun fetchGoalsDetailsByTimeRange(from: Long, to: Long): Flow<List<GoalEntityDetails>> {
             val query = goalQueries.fetchDailyGoaslByTimeRange(from, to)
-            return query.mapToListFlow(coroutineContext) { it.mapToBase() }
-                .flatMapListToDetails()
+            return query.mapToListFlow(coroutineContext) { it.mapToBase() }.flatMapListToDetails()
         }
 
-        override suspend fun fetchShortGoalsByTimeRange(
-            from: Long,
-            to: Long
-        ): Flow<List<BaseGoalEntity>> {
+        override suspend fun fetchShortGoalsByTimeRange(from: Long, to: Long): Flow<List<BaseGoalEntity>> {
             val query = goalQueries.fetchDailyGoaslByTimeRange(from, to)
             return query.mapToListFlow(coroutineContext) { it.mapToBase() }
         }
@@ -139,12 +123,11 @@ interface DailyGoalsLocalDataSource {
 
         override suspend fun fetchOverdueGoalsDetails(currentDate: Long): Flow<List<GoalEntityDetails>> {
             val query = goalQueries.fetchOverdueGoals(currentDate)
-            return query.mapToListFlow(coroutineContext) { it.mapToBase() }
-                .flatMapListToDetails()
+            return query.mapToListFlow(coroutineContext) { it.mapToBase() }.flatMapListToDetails()
         }
 
         override suspend fun deleteGoalsByIds(ids: List<String>) {
-            goalQueries.deleteGoalsById(ids).await()
+            goalQueries.deleteGoalsById(ids)
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -156,52 +139,34 @@ interface DailyGoalsLocalDataSource {
                 val fromDeadline = goals.minOf { it.contentDeadline ?: 0 }
                 val toDeadline = goals.maxOf { it.contentDeadline ?: Long.MAX_VALUE }
 
-                val todosMapFlow =
-                    todoQueries.fetchTodosByTimeRange(fromDeadline, toDeadline)
-                        .mapToListFlow(coroutineContext) { it.mapToBase() }
-                        .map { todos -> todos.associateBy { it.uid } }
+                val todosMapFlow = todoQueries.fetchTodosByTimeRange(fromDeadline, toDeadline)
+                    .mapToListFlow(coroutineContext) { it.mapToBase() }
+                    .map { todos -> todos.associateBy { it.uid } }
 
-                val homeworksMapFlow = homeworkQueries.fetchHomeworksByTimeRange(
-                    fromDeadline,
-                    toDeadline,
-                )
+                val homeworksMapFlow = homeworkQueries.fetchHomeworksByTimeRange(fromDeadline, toDeadline)
                     .mapToListFlow(coroutineContext) { it.mapToBase() }
                     .map { homeworks -> homeworks.associateBy { it.uid } }
 
                 val organizationsMapFlow = organizationsQueries.fetchOrganizationsById(
                     uid = organizationsIds,
                     mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel, _, _, locationList, _, offices, _, updatedAt ->
-                        val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsEntity>(
-                            timeIntervalsModel
-                        )
+                        val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsEntity>(timeIntervalsModel)
                         val locations = locationList.map {
                             Json.decodeFromString<ContactInfoEntity>(it)
                         }
-                        OrganizationShortEntity(
-                            uid,
-                            isMain == 1L,
-                            name,
-                            type,
-                            avatar,
-                            locations,
-                            offices,
-                            timeIntervals,
-                            updatedAt
-                        )
+                        OrganizationShortEntity(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals, updatedAt)
                     },
                 ).asFlow()
                     .mapToList(coroutineContext)
                     .map { organization -> organization.associateBy { it.uid } }
 
-                val subjectsMapFlow =
-                    subjectQueries.fetchSubjectsByOrganizations(organizationsIds)
-                        .mapToListFlow(coroutineContext) { it.mapToBase() }
-                        .map { subject -> subject.associateBy { it.uid } }
+                val subjectsMapFlow = subjectQueries.fetchSubjectsByOrganizations(organizationsIds)
+                    .mapToListFlow(coroutineContext) { it.mapToBase() }
+                    .map { subject -> subject.associateBy { it.uid } }
 
-                val employeesMapFlow =
-                    employeeQueries.fetchEmployeesByOrganizations(organizationsIds)
-                        .mapToListFlow(coroutineContext) { it.mapToBase() }
-                        .map { employee -> employee.associateBy { it.uid } }
+                val employeesMapFlow = employeeQueries.fetchEmployeesByOrganizations(organizationsIds)
+                    .mapToListFlow(coroutineContext) { it.mapToBase() }
+                    .map { employee -> employee.associateBy { it.uid } }
 
                 val homeworksDetailsMapFlow = combine(
                     homeworksMapFlow,
@@ -235,10 +200,7 @@ interface DailyGoalsLocalDataSource {
         }
 
         private fun Flow<BaseGoalEntity?>.flatMapToDetails(): Flow<GoalEntityDetails?> {
-            return mapNotNull { it?.let { listOf(it) } ?: emptyList() }
-                .flatMapListToDetails()
-                .map { it.getOrNull(0) }
+            return mapNotNull { it?.let { listOf(it) } ?: emptyList() }.flatMapListToDetails().map { it.getOrNull(0) }
         }
     }
-
 }

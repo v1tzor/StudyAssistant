@@ -121,6 +121,7 @@ internal fun AssistantContent(
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
     val adsConfiguration = LocalAdsConfiguration.current
+    val chatHistory = state.chatHistory
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -143,7 +144,7 @@ internal fun AssistantContent(
         topBar = {
             AssistantTopBar(
                 isVisibleClearButton = state.responseStatus != ResponseStatus.LOADING &&
-                        !state.chatHistory?.messages.isNullOrEmpty(),
+                    !state.chatHistory?.messages.isNullOrEmpty(),
                 onClearChatHistory = { store.dispatchEvent(AssistantEvent.ClearHistory) },
                 onScheduleImport = {
                     store.dispatchEvent(AssistantEvent.OpenScheduleImport)
@@ -155,7 +156,7 @@ internal fun AssistantContent(
                 isLoadingChat = state.isLoadingChat,
                 responseStatus = state.responseStatus,
                 isQuotaExpired = state.isQuotaExpired,
-                isInputEnabled = state.chatHistory?.pendingMutations.isNullOrEmpty(),
+                isInputEnabled = chatHistory != null && chatHistory.pendingMutations.isEmpty(),
                 userQuery = state.userQuery.query,
                 onUpdateUserQuery = { store.dispatchEvent(AssistantEvent.UpdateUserQuery(it)) },
                 onSendMessage = { store.dispatchEvent(AssistantEvent.SendMessage(it)) },
@@ -222,6 +223,8 @@ private fun BaseAssistantContent(
             ) { isEmptyChat ->
                 if (isEmptyChat) {
                     EmptyAssistantChat(
+                        suggestionsEnabled = state.chatHistory != null &&
+                            state.responseStatus == ResponseStatus.SUCCESS,
                         isQuotaExpired = state.isQuotaExpired,
                         quotaLimit = state.quotaLimit,
                         rewardedResetsRemaining = state.rewardedResetsRemaining,
@@ -255,6 +258,7 @@ private fun BaseAssistantContent(
 @Composable
 private fun EmptyAssistantChat(
     modifier: Modifier = Modifier,
+    suggestionsEnabled: Boolean,
     isQuotaExpired: Boolean,
     quotaLimit: Int,
     rewardedResetsRemaining: Int,
@@ -288,7 +292,7 @@ private fun EmptyAssistantChat(
         } else {
             ChatSuggestionsView(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
-                enabled = true,
+                enabled = suggestionsEnabled,
                 suggestions = ChatSuggestions.entries,
                 onSelectSuggestion = { onSendMessageSuggestion(it) },
             )

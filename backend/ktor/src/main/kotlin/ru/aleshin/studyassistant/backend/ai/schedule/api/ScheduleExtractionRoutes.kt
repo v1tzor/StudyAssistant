@@ -26,6 +26,7 @@ import io.ktor.server.routing.route
 import ru.aleshin.studyassistant.backend.ai.schedule.api.dto.ScheduleExtractionRequestDto
 import ru.aleshin.studyassistant.backend.ai.schedule.services.ScheduleExtractionService
 import ru.aleshin.studyassistant.backend.common.api.requireInstallationToken
+import ru.aleshin.studyassistant.backend.common.api.requireJsonContentType
 import ru.aleshin.studyassistant.backend.security.InstallationCredentialService
 
 /**
@@ -47,6 +48,7 @@ fun Route.scheduleExtractionRoutes(
             val installationToken = call.requireInstallationToken(
                 credentialService = credentialService,
             )
+            call.requireJsonContentType()
             val request = call.receive<ScheduleExtractionRequestDto>()
             val response = service.extract(
                 installationToken = installationToken,

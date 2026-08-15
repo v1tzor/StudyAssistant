@@ -19,6 +19,9 @@ package ru.aleshin.studyassistant.core.database.mappers.user
 import ru.aleshin.studyassistant.core.database.models.users.ProfileEntity
 import ru.aleshin.studyassistant.sqldelight.user.ProfileEntity as ProfileSqlEntity
 
+/**
+ * @author Stanislav Aleshin on 01.07.2024.
+ */
 fun ProfileSqlEntity.mapToLocalData() = ProfileEntity(
     uid = uid,
     username = username,

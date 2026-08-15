@@ -54,7 +54,8 @@ fun main() = runBlocking {
             "homeworkShares=${result.removedHomeworkShares}, " +
             "rateLimitEvents=${result.removedRateLimitEvents}, " +
             "aiRequests=${aiResult.removedRequests}, " +
-            "aiUsageRows=${aiResult.removedUsageRows}",
+            "aiUsageRows=${aiResult.removedUsageRows}, " +
+            "adRewardChallenges=${aiResult.removedRewardChallenges}",
         )
     }
 }

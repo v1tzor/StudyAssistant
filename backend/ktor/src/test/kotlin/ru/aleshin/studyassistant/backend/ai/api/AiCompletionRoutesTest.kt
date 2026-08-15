@@ -26,6 +26,9 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.routing.routing
 import io.ktor.server.testing.testApplication
 import ru.aleshin.studyassistant.backend.ai.api.dto.AiCompletionRequestDto
+import ru.aleshin.studyassistant.backend.ai.api.dto.AiCompletionMessageDto
+import ru.aleshin.studyassistant.backend.ai.api.dto.AiCompletionResponseDto
+import ru.aleshin.studyassistant.backend.ai.api.dto.AiFinishReasonDto
 import ru.aleshin.studyassistant.backend.ai.api.dto.AiMessageDto
 import ru.aleshin.studyassistant.backend.ai.api.dto.AiMessageRoleDto
 import ru.aleshin.studyassistant.backend.ai.api.mappers.AiCompletionRequestMapper
@@ -50,6 +53,8 @@ import ru.aleshin.studyassistant.backend.plugins.configureSerialization
 import ru.aleshin.studyassistant.backend.plugins.configureStatusPages
 import ru.aleshin.studyassistant.backend.security.InstallationHasher
 import ru.aleshin.studyassistant.backend.security.InstallationCredentialService
+import ru.aleshin.studyassistant.backend.security.PayloadCipher
+import ru.aleshin.studyassistant.backend.security.PayloadPurpose
 import ru.aleshin.studyassistant.backend.common.api.INSTALLATION_TOKEN_HEADER
 import java.time.Clock
 import java.time.Instant
@@ -171,7 +176,82 @@ class AiCompletionRoutesTest {
         assertTrue(response.bodyAsText().contains("\"errorCode\":\"too_large\""))
     }
 
-    private fun service(repository: AiQuotaRepository): AiCompletionService {
+    @Test
+    fun nonJsonRequestShouldReturnUnsupportedMediaTypeWithoutQuotaCall() = testApplication {
+        val repository = FakeAiQuotaRepository()
+
+        application {
+            configureSerialization()
+            configureStatusPages()
+            routing {
+                aiCompletionRoutes(
+                    service = service(repository = repository),
+                    credentialService = credentialService,
+                    maxRequestBodyBytes = 4_096,
+                )
+            }
+        }
+
+        val response = client.post("/api/v1/ai/completions") {
+            header(HttpHeaders.ContentType, ContentType.Text.Plain.toString())
+            header(INSTALLATION_TOKEN_HEADER, installationToken)
+            setBody(validRequestBody())
+        }
+
+        assertEquals(HttpStatusCode.UnsupportedMediaType, response.status)
+        assertTrue(response.bodyAsText().contains("\"errorCode\":\"unsupported_media_type\""))
+        assertEquals(0, repository.reserveCalls)
+    }
+
+    @Test
+    fun idempotentReplayShouldReturnEncryptedCachedResponse() = testApplication {
+        val cipher = PayloadCipher(key = ByteArray(32) { 2 })
+        val cachedResponse = AiCompletionResponseDto(
+            message = AiCompletionMessageDto(content = "Recovered response"),
+            finishReason = AiFinishReasonDto.STOP,
+            quotaRemaining = 11,
+            quotaLimit = 12,
+            rewardedResetsRemaining = 3,
+            quotaResetAt = Instant.parse("2026-08-13T00:00:00Z").toEpochMilli(),
+        )
+        val encrypted = cipher.encrypt(
+            plaintext = BackendJson.encodeToString(cachedResponse).encodeToByteArray(),
+            purpose = PayloadPurpose.AI_RESPONSE_CACHE,
+        )
+        val repository = FakeAiQuotaRepository(
+            reservationResult = AiQuotaReservationResult.IdempotencyReplay(
+                responsePayload = encrypted.ciphertext,
+                responseNonce = encrypted.nonce,
+            ),
+        )
+
+        application {
+            configureSerialization()
+            configureStatusPages()
+            routing {
+                aiCompletionRoutes(
+                    service = service(repository = repository, payloadCipher = cipher),
+                    credentialService = credentialService,
+                    maxRequestBodyBytes = 4_096,
+                )
+            }
+        }
+
+        val response = client.post("/api/v1/ai/completions") {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            header(INSTALLATION_TOKEN_HEADER, installationToken)
+            setBody(validRequestBody())
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertTrue(response.bodyAsText().contains("Recovered response"))
+        assertEquals(0, repository.finalizedResults.size)
+    }
+
+    private fun service(
+        repository: AiQuotaRepository,
+        payloadCipher: PayloadCipher = PayloadCipher(key = ByteArray(32) { 2 }),
+    ): AiCompletionService {
         val config = testAiConfig()
         val clock = Clock.fixed(
             Instant.parse("2026-08-12T10:00:00Z"),
@@ -212,6 +292,7 @@ class AiCompletionRoutesTest {
                 }
             },
             clock = clock,
+            payloadCipher = payloadCipher,
         )
     }
 
@@ -231,7 +312,9 @@ class AiCompletionRoutesTest {
         )
     }
 
-    private class FakeAiQuotaRepository : AiQuotaRepository {
+    private class FakeAiQuotaRepository(
+        private val reservationResult: AiQuotaReservationResult? = null,
+    ) : AiQuotaRepository {
 
         var reserveCalls = 0
         val finalizedResults = mutableListOf<Boolean>()
@@ -244,7 +327,7 @@ class AiCompletionRoutesTest {
             now: Instant,
         ): AiQuotaReservationResult {
             reserveCalls++
-            return AiQuotaReservationResult.Reserved(
+            return reservationResult ?: AiQuotaReservationResult.Reserved(
                 quota = AiQuota(used = 1, limit = 12, rewardedResetsRemaining = 3),
                 resetAt = Instant.parse("2026-08-13T00:00:00Z"),
                 isNewMessage = true,
@@ -259,6 +342,14 @@ class AiCompletionRoutesTest {
         ) {
             finalizedResults += succeeded
         }
+
+        override suspend fun saveResponse(
+            installationHash: ByteArray,
+            messageId: UUID,
+            executionHash: ByteArray,
+            responsePayload: ByteArray,
+            responseNonce: ByteArray,
+        ) = Unit
     }
 
 }

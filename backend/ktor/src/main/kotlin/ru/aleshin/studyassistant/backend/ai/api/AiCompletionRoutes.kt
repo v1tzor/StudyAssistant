@@ -26,6 +26,7 @@ import io.ktor.server.routing.route
 import ru.aleshin.studyassistant.backend.ai.api.dto.AiCompletionRequestDto
 import ru.aleshin.studyassistant.backend.ai.services.AiCompletionService
 import ru.aleshin.studyassistant.backend.common.api.requireInstallationToken
+import ru.aleshin.studyassistant.backend.common.api.requireJsonContentType
 import ru.aleshin.studyassistant.backend.security.InstallationCredentialService
 
 /**
@@ -47,6 +48,7 @@ fun Route.aiCompletionRoutes(
             val installationToken = call.requireInstallationToken(
                 credentialService = credentialService,
             )
+            call.requireJsonContentType()
             val request = call.receive<AiCompletionRequestDto>()
             val response = service.complete(
                 installationToken = installationToken,

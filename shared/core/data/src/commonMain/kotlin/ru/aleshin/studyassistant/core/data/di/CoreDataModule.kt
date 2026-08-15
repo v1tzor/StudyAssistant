@@ -20,7 +20,6 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.data.datasources.AiPreferencesLocalDataSource
 import ru.aleshin.studyassistant.core.data.handlers.AiCompletionHandler
 import ru.aleshin.studyassistant.core.data.handlers.AiConversationHandler
 import ru.aleshin.studyassistant.core.data.handlers.AiSettingsHandler
@@ -90,31 +89,16 @@ val coreDataModule = DI.Module("CoreData") {
             remoteDataSource = instance(),
         )
     }
-    bindProvider<ScheduleShareRepository> {
-        ScheduleShareRepositoryImpl(instance(), instance(), instance())
-    }
-    bindProvider<HomeworkShareRepository> {
-        HomeworkShareRepositoryImpl(instance(), instance(), instance(), instance())
-    }
-    bindProvider<ScheduleImportRepository> {
-        ScheduleImportRepositoryImpl(instance(), instance(), instance())
-    }
+    bindProvider<ScheduleShareRepository> { ScheduleShareRepositoryImpl(instance(), instance(), instance()) }
+    bindProvider<HomeworkShareRepository> { HomeworkShareRepositoryImpl(instance(), instance(), instance(), instance()) }
+    bindProvider<ScheduleImportRepository> { ScheduleImportRepositoryImpl(instance(), instance(), instance()) }
 
-    bindSingleton<AiPreferencesLocalDataSource> {
-        AiPreferencesLocalDataSource.Base(instance())
-    }
     bindSingleton<AiSettingsHandler> { AiSettingsHandler.Base(instance(), instance()) }
-    bindSingleton<AiCompletionHandler> {
-        AiCompletionHandler.Base(instance(), instance(), instance())
-    }
-    bindSingleton<AiConversationHandler> {
-        AiConversationHandler.Base(instance(), instance(), instance(), instance())
-    }
+    bindSingleton<AiCompletionHandler> { AiCompletionHandler.Base(instance(), instance(), instance()) }
+    bindSingleton<AiConversationHandler> { AiConversationHandler.Base(instance(), instance(), instance(), instance()) }
     bindSingleton<AiSettingsRepository> { AiSettingsRepositoryImpl(instance()) }
     bindSingleton<AdRewardRepository> { AdRewardRepositoryImpl(instance(), instance(), instance()) }
-    bindSingleton<AiAssistantRepository> {
-        AiAssistantRepositoryImpl(instance(), instance())
-    }
+    bindSingleton<AiAssistantRepository> { AiAssistantRepositoryImpl(instance(), instance()) }
 
     bindSingleton<GeneralSettingsRepository> { GeneralSettingsRepositoryImpl(instance()) }
     bindSingleton<NotificationSettingsRepository> { NotificationSettingsRepositoryImpl(instance()) }

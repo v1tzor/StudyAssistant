@@ -20,10 +20,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.data.datasources.AvatarLocalDataSource
-import ru.aleshin.studyassistant.core.data.datasources.AvatarType
 import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.organizations.mapToLocalData
+import ru.aleshin.studyassistant.core.database.datasource.avatar.AvatarLocalDataSource
+import ru.aleshin.studyassistant.core.database.datasource.avatar.AvatarType
 import ru.aleshin.studyassistant.core.database.datasource.organizations.OrganizationsLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization

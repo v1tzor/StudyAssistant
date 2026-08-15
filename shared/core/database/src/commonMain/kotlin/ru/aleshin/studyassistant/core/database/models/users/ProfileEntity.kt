@@ -16,6 +16,9 @@
 
 package ru.aleshin.studyassistant.core.database.models.users
 
+/**
+ * @author Stanislav Aleshin on 01.07.2024.
+ */
 data class ProfileEntity(
     val uid: String,
     val username: String,

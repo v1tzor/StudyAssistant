@@ -33,6 +33,8 @@ object AiRequestsTable : Table(name = "ai_requests") {
     val executionCount = integer("execution_count")
     val inFlight = integer("in_flight")
     val succeeded = bool("succeeded")
+    val responsePayload = binary("response_payload").nullable()
+    val responseNonce = binary("response_nonce").nullable()
     val createdAt = timestampWithTimeZone("created_at")
     val updatedAt = timestampWithTimeZone("updated_at")
 

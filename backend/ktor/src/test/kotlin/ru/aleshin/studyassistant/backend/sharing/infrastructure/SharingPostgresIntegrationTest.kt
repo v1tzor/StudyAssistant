@@ -22,6 +22,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.flywaydb.core.Flyway
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -30,11 +31,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
+import ru.aleshin.studyassistant.backend.ads.domain.model.AdRewardPurpose
+import ru.aleshin.studyassistant.backend.ads.infrastructure.AdRewardChallengesTable
 import ru.aleshin.studyassistant.backend.database.DatabaseConfig
 import ru.aleshin.studyassistant.backend.database.DatabaseFactory
 import ru.aleshin.studyassistant.backend.sharing.SharingConfig
 import ru.aleshin.studyassistant.backend.sharing.domain.model.StoredHomeworkShare
 import ru.aleshin.studyassistant.backend.sharing.domain.model.StoredScheduleShare
+import ru.aleshin.studyassistant.backend.sharing.domain.result.ClaimActionStorageResult
 import ru.aleshin.studyassistant.backend.sharing.domain.result.ClaimScheduleShareStorageResult
 import ru.aleshin.studyassistant.backend.sharing.domain.result.CreateScheduleShareStorageResult
 import ru.aleshin.studyassistant.backend.sharing.domain.result.CreateHomeworkShareStorageResult
@@ -48,6 +52,8 @@ import java.time.ZoneOffset
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.uuid.Uuid
 
 /**
  * @author Stanislav Aleshin on 11.08.2026.
@@ -219,6 +225,85 @@ class SharingPostgresIntegrationTest {
     }
 
     @Test
+    fun scheduleConfirmationShouldConsumeRewardAtomicallyAndRemainIdempotent() = runBlocking {
+        val now = Instant.parse("2026-08-11T18:00:00Z")
+        val installationHash = randomHash()
+        val claimHash = randomHash()
+        val rewardSubjectHash = randomHash()
+        val share = StoredScheduleShare(
+            id = UUID.randomUUID(),
+            codeHash = randomHash(),
+            creatorHash = randomHash(),
+            itemCount = 1,
+            payload = encryptedPayload(),
+            payloadNonce = ByteArray(12) { 1 },
+            createdAt = now,
+            expiresAt = now.plus(Duration.ofMinutes(30)),
+            claimHash = null,
+            claimedUntil = null,
+            consumedAt = null,
+        )
+        assertEquals(CreateScheduleShareStorageResult.Created, scheduleRepository.tryCreate(share))
+        check(
+            scheduleRepository.claim(
+                codeHash = share.codeHash,
+                claimHash = claimHash,
+                now = now,
+                claimedUntil = now.plus(Duration.ofMinutes(5)),
+            ) is ClaimScheduleShareStorageResult.Claimed,
+        )
+
+        assertEquals(
+            ClaimActionStorageResult.RewardUnavailable,
+            scheduleRepository.confirm(
+                claimHash = claimHash,
+                installationHash = installationHash,
+                rewardSubjectHash = rewardSubjectHash,
+                now = now.plusSeconds(1),
+            ),
+        )
+
+        val challengeId = Uuid.parse(UUID.randomUUID().toString())
+        transaction(db = databaseFactory.database) {
+            AdRewardChallengesTable.insert {
+                it[id] = challengeId
+                it[AdRewardChallengesTable.installationHash] = installationHash
+                it[purpose] = AdRewardPurpose.SCHEDULE_IMPORT.value
+                it[subjectHash] = rewardSubjectHash
+                it[createdAt] = now.atOffset(ZoneOffset.UTC)
+                it[expiresAt] = now.plus(Duration.ofMinutes(10)).atOffset(ZoneOffset.UTC)
+                it[completedAt] = now.atOffset(ZoneOffset.UTC)
+                it[consumedAt] = null
+            }
+        }
+
+        repeat(2) { attempt ->
+            assertEquals(
+                ClaimActionStorageResult.Success,
+                scheduleRepository.confirm(
+                    claimHash = claimHash,
+                    installationHash = installationHash,
+                    rewardSubjectHash = rewardSubjectHash,
+                    now = now.plusSeconds(2L + attempt),
+                ),
+            )
+        }
+
+        transaction(db = databaseFactory.database) {
+            assertNotNull(
+                ScheduleSharesTable.selectAll()
+                    .where { ScheduleSharesTable.id eq share.id }
+                    .single()[ScheduleSharesTable.consumedAt],
+            )
+            assertNotNull(
+                AdRewardChallengesTable.selectAll()
+                    .where { AdRewardChallengesTable.id eq challengeId }
+                    .single()[AdRewardChallengesTable.consumedAt],
+            )
+        }
+    }
+
+    @Test
     fun cleanupShouldRemoveOnlyExpiredData() =
         runBlocking {
             val now = Instant.parse(
@@ -318,6 +403,8 @@ class SharingPostgresIntegrationTest {
             exec(
                 """
                 TRUNCATE TABLE
+                    ai_reward_grants,
+                    ad_reward_challenges,
                     rate_limit_events,
                     homework_shares,
                     schedule_shares

@@ -24,6 +24,8 @@ import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.core.greater
+import org.jetbrains.exposed.v1.core.isNotNull
+import org.jetbrains.exposed.v1.core.isNull
 import org.jetbrains.exposed.v1.core.sum
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -33,6 +35,8 @@ import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
+import ru.aleshin.studyassistant.backend.ads.domain.model.AdRewardPurpose
+import ru.aleshin.studyassistant.backend.ads.infrastructure.AdRewardChallengesTable
 import ru.aleshin.studyassistant.backend.sharing.SharingConfig
 import ru.aleshin.studyassistant.backend.sharing.domain.model.StoredScheduleShare
 import ru.aleshin.studyassistant.backend.sharing.domain.repository.ScheduleSharingRepository
@@ -220,8 +224,12 @@ class ScheduleSharingRepositoryImpl(
 
     override suspend fun confirm(
         claimHash: ByteArray,
+        installationHash: ByteArray,
+        rewardSubjectHash: ByteArray,
         now: Instant,
     ): ClaimActionStorageResult = dbQuery {
+        lockInstallation(installationHash = installationHash)
+
         val row = ScheduleSharesTable
             .selectAll()
             .where {
@@ -233,23 +241,41 @@ class ScheduleSharingRepositoryImpl(
 
         val share = row.toStoredScheduleShare()
 
+        if (share.consumedAt != null) {
+            return@dbQuery ClaimActionStorageResult.Success
+        }
+
         val claimedUntil = share.claimedUntil ?: return@dbQuery ClaimActionStorageResult.InvalidClaim
 
         if (!claimedUntil.isAfter(now)) {
             return@dbQuery ClaimActionStorageResult.InvalidClaim
         }
 
-        /*
-         * Confirm is idempotent while the claim is valid.
-         */
-        if (share.consumedAt == null) {
-            ScheduleSharesTable.update(
-                where = {
-                    ScheduleSharesTable.id eq share.id
-                },
-            ) {
-                it[consumedAt] = now.atOffset(ZoneOffset.UTC)
+        val rewardChallengeId = AdRewardChallengesTable
+            .select(AdRewardChallengesTable.id)
+            .where {
+                (AdRewardChallengesTable.installationHash eq installationHash) and
+                    (AdRewardChallengesTable.purpose eq AdRewardPurpose.SCHEDULE_IMPORT.value) and
+                    (AdRewardChallengesTable.subjectHash eq rewardSubjectHash) and
+                    AdRewardChallengesTable.completedAt.isNotNull() and
+                    AdRewardChallengesTable.consumedAt.isNull()
             }
+            .forUpdate()
+            .limit(1)
+            .singleOrNull()
+            ?.get(AdRewardChallengesTable.id)
+            ?: return@dbQuery ClaimActionStorageResult.RewardUnavailable
+
+        ScheduleSharesTable.update(
+            where = { ScheduleSharesTable.id eq share.id },
+        ) {
+            it[consumedAt] = now.atOffset(ZoneOffset.UTC)
+        }
+
+        AdRewardChallengesTable.update(
+            where = { AdRewardChallengesTable.id eq rewardChallengeId },
+        ) {
+            it[consumedAt] = now.atOffset(ZoneOffset.UTC)
         }
 
         ClaimActionStorageResult.Success

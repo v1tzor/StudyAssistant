@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.data.datasources
+package ru.aleshin.studyassistant.backend.common.api
+
+import io.ktor.http.ContentType
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.request.contentType
 
 /**
- * @author Stanislav Aleshin on 08.08.2026.
+ * @author Stanislav Aleshin on 15.08.2026.
  */
-interface InstallationSecureDataSource {
-    suspend fun fetchInstallationToken(): String?
-    suspend fun saveInstallationToken(token: String)
+fun ApplicationCall.requireJsonContentType() {
+    if (!request.contentType().match(ContentType.Application.Json)) {
+        throw UnsupportedMediaTypeApiException()
+    }
 }

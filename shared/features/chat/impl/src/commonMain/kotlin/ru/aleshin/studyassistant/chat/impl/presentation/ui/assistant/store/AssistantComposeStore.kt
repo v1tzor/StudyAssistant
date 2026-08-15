@@ -63,31 +63,35 @@ internal class AssistantComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
-
             is AssistantEvent.SendMessage -> with(event) {
-                launchBackgroundWork(BackgroundKey.SEND_MESSAGE) {
-                    val command =
-                        AssistantWorkCommand.SendMessage(state().chatHistory?.uid, message)
-                    workProcessor.work(command).collectAndHandleWork()
+                val chatId = state().chatHistory?.uid
+                if (chatId != null) {
+                    launchBackgroundWork(BackgroundKey.SEND_MESSAGE) {
+                        val command = AssistantWorkCommand.SendMessage(chatId, message)
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
                 }
             }
-
-            is AssistantEvent.RetryAttempt -> with(state()) {
-                launchBackgroundWork(BackgroundKey.SEND_MESSAGE) {
-                    val command = AssistantWorkCommand.RetryAttempt(chatHistory?.uid)
-                    workProcessor.work(command).collectAndHandleWork()
+            is AssistantEvent.RetryAttempt -> {
+                val chatId = state().chatHistory?.uid
+                if (chatId != null) {
+                    launchBackgroundWork(BackgroundKey.SEND_MESSAGE) {
+                        val command = AssistantWorkCommand.RetryAttempt(chatId)
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
                 }
             }
-
-            is AssistantEvent.ClearUnsendMessage -> with(state()) {
-                launchBackgroundWork(BackgroundKey.MESSAGE_ACTION) {
-                    val command = AssistantWorkCommand.ClearUnsendMessage(chatHistory?.uid)
-                    workProcessor.work(command).collectAndHandleWork()
+            is AssistantEvent.ClearUnsendMessage -> {
+                val chatId = state().chatHistory?.uid
+                if (chatId != null) {
+                    launchBackgroundWork(BackgroundKey.MESSAGE_ACTION) {
+                        val command = AssistantWorkCommand.ClearUnsendMessage(chatId)
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
                 }
             }
-
-            is AssistantEvent.ClearHistory -> with(state()) {
-                val chatId = chatHistory?.uid
+            is AssistantEvent.ClearHistory -> {
+                val chatId = state().chatHistory?.uid
                 if (chatId != null) {
                     launchBackgroundWork(BackgroundKey.MESSAGE_ACTION) {
                         val command = AssistantWorkCommand.ClearChatHistory(chatId)
@@ -95,29 +99,24 @@ internal class AssistantComposeStore(
                     }
                 }
             }
-
             is AssistantEvent.UpdateUserQuery -> with(event) {
                 val query = state().userQuery.copy(query)
                 sendAction(AssistantAction.UpdateUserQuery(query))
             }
-
             is AssistantEvent.OpenAiSettings -> {
                 consumeOutput(AssistantOutput.NavigateToAiSettings)
             }
-
             is AssistantEvent.OpenScheduleImport -> {
                 consumeOutput(AssistantOutput.NavigateToScheduleImport)
             }
-
             is AssistantEvent.RequestQuotaReward -> with(state()) {
                 if (isQuotaExpired && rewardedResetsRemaining > 0 && !isRewardInProgress) {
                     launchBackgroundWork(BackgroundKey.REWARD_ACTION) {
-                        workProcessor.work(AssistantWorkCommand.PrepareQuotaReward)
-                            .collectAndHandleWork()
+                        val command = AssistantWorkCommand.PrepareQuotaReward
+                        workProcessor.work(command).collectAndHandleWork()
                     }
                 }
             }
-
             is AssistantEvent.RewardedAdGranted -> with(state()) {
                 if (event.challengeId == rewardChallengeId) {
                     launchBackgroundWork(BackgroundKey.REWARD_ACTION) {
@@ -126,12 +125,10 @@ internal class AssistantComposeStore(
                     }
                 }
             }
-
             is AssistantEvent.RewardedAdUnavailable -> {
                 sendAction(AssistantAction.UpdateRewardChallenge(null, false))
                 sendEffect(AssistantEffect.ShowError(ChatFailures.RewardUnavailable))
             }
-
             is AssistantEvent.ResolveToolCall -> with(event) {
                 val chatId = state().chatHistory?.uid
                 if (chatId != null && state().responseStatus != ResponseStatus.LOADING) {
@@ -145,7 +142,6 @@ internal class AssistantComposeStore(
                     }
                 }
             }
-
             is AssistantEvent.StopResponseLoading -> {
                 sendAction(AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE))
             }

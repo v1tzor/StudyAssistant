@@ -23,11 +23,6 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.data.datasources.AndroidAvatarLocalDataSource
-import ru.aleshin.studyassistant.core.data.datasources.AndroidInstallationSecureDataSource
-import ru.aleshin.studyassistant.core.data.datasources.AndroidSecureStorage
-import ru.aleshin.studyassistant.core.data.datasources.AvatarLocalDataSource
-import ru.aleshin.studyassistant.core.data.datasources.InstallationSecureDataSource
 import ru.aleshin.studyassistant.core.data.managers.reminders.EndClassesReminderManagerImpl
 import ru.aleshin.studyassistant.core.data.managers.reminders.HomeworksReminderManagerImpl
 import ru.aleshin.studyassistant.core.data.managers.reminders.NotificationScheduler
@@ -42,32 +37,11 @@ import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningM
  * @author Stanislav Aleshin on 22.08.2024.
  */
 actual val coreDataPlatformModule = DI.Module("CoreDataPlatform") {
-    bindSingleton<AndroidSecureStorage> { AndroidSecureStorage(instance()) }
-    bindSingleton<InstallationSecureDataSource> {
-        AndroidInstallationSecureDataSource(instance())
-    }
-    bindSingleton<AvatarLocalDataSource> { AndroidAvatarLocalDataSource(instance()) }
     bindSingleton<WorkManager> { WorkManager.getInstance(instance<Context>()) }
     bindSingleton<AlarmManager> { instance<Context>().getSystemService(AlarmManager::class.java) }
-    bindProvider<WorkloadWarningManager> {
-        WorkloadWarningManagerImpl(instance(), instance(), instance())
-    }
-    bindProvider<HomeworksReminderManager> {
-        HomeworksReminderManagerImpl(instance(), instance(), instance())
-    }
-    bindProvider<StartClassesReminderManager> {
-        StartClassesReminderManagerImpl(
-            instance(),
-            instance(),
-            instance(),
-        )
-    }
-    bindProvider<EndClassesReminderManager> {
-        EndClassesReminderManagerImpl(
-            instance(),
-            instance(),
-            instance(),
-        )
-    }
+    bindProvider<WorkloadWarningManager> { WorkloadWarningManagerImpl(instance(), instance(), instance()) }
+    bindProvider<HomeworksReminderManager> { HomeworksReminderManagerImpl(instance(), instance(), instance()) }
+    bindProvider<StartClassesReminderManager> { StartClassesReminderManagerImpl(instance(), instance(), instance()) }
+    bindProvider<EndClassesReminderManager> { EndClassesReminderManagerImpl(instance(), instance(), instance()) }
     bindSingleton<NotificationScheduler> { NotificationScheduler(instance(), instance()) }
 }

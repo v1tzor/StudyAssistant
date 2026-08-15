@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant
+package ru.aleshin.studyassistant.analytics.impl.domain.calculators
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import org.kodein.di.DI
-import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.store.ChatFeatureComponent
-import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlin.test.Test
+import kotlin.test.assertNull
 
-internal class ChatContentProvider(
-    di: DI,
-    private val component: ChatFeatureComponent,
-) : FeatureContentProvider(di) {
-    @Composable
-    override fun RootContent(modifier: Modifier) {
-        AssistantContent(component, modifier)
+/**
+ * @author Stanislav Aleshin on 13.08.2026.
+ */
+class AnalyticsGoalCalculatorTest {
 
+    @Test
+    fun emptyGoalsHaveUnavailableCompletionRate() {
+        val distribution = AnalyticsGoalCalculator.Base(TimeZone.UTC).calculate(
+            goals = emptyList(),
+            currentTime = Instant.fromEpochMilliseconds(0L),
+            target = null,
+        )
+
+        assertNull(distribution.completionRate)
     }
 }

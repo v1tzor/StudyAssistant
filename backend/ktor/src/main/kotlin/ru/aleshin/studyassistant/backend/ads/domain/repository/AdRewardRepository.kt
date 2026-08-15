@@ -39,15 +39,4 @@ interface AdRewardRepository {
         challengeId: UUID,
         now: Instant,
     ): AdRewardCompletion?
-
-    suspend fun hasScheduleImportReward(
-        installationHash: ByteArray,
-        subjectHash: ByteArray,
-    ): Boolean
-
-    suspend fun consumeScheduleImportReward(
-        installationHash: ByteArray,
-        subjectHash: ByteArray,
-        now: Instant,
-    )
 }

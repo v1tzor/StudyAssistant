@@ -38,13 +38,8 @@ import ru.aleshin.studyassistant.core.remote.models.ai.backend.AiCompletionReque
 internal interface AiConversationHandler {
 
     suspend fun retryLastMessage(chatId: UID): AiAssistantMessage.AssistantMessage?
-    suspend fun sendUserMessage(
-        chatId: UID,
-        message: AiAssistantMessage.UserMessage?,
-    ): AiAssistantResponse
-
+    suspend fun sendUserMessage(chatId: UID, message: AiAssistantMessage.UserMessage?): AiAssistantResponse
     suspend fun completeToolRound(chatId: UID): AiAssistantResponse
-
     suspend fun deleteUnconfirmedMessages(chatId: UID)
 
     class Base(
@@ -65,8 +60,7 @@ internal interface AiConversationHandler {
             val lastMessage = messages.last { it !is AiAssistantMessage.SystemMessage }
             val assistantMessage = when (lastMessage) {
                 is AiAssistantMessage.UserMessage,
-                is AiAssistantMessage.ToolMessage,
-                -> complete(messages)
+                is AiAssistantMessage.ToolMessage -> complete(messages)
                 else -> messages.dropUntilConfirmedMessage { message ->
                     localDataSource.deleteChatMessage(message.id)
                 }
@@ -80,26 +74,21 @@ internal interface AiConversationHandler {
         ): AiAssistantResponse {
             deleteUnconfirmedMessages(chatId)
             if (message != null) localDataSource.addChatMessage(message.mapToLocal(chatId))
-
-            val messages = localDataSource.fetchChatHistoryById(chatId).first()
-                ?.messages
-                ?.map { it.mapToDomain() }
+            val messages = localDataSource.fetchChatHistoryById(chatId).first()?.messages?.map { it.mapToDomain() }
             if (messages.isNullOrEmpty()) throw NoSuchElementException()
+
             return completeResponse(messages)
         }
 
         override suspend fun completeToolRound(chatId: UID): AiAssistantResponse {
-            val historyMessages = localDataSource.fetchChatHistoryById(chatId).first()
-                ?.messages
-                ?.map { it.mapToDomain() }
+            val historyMessages = localDataSource.fetchChatHistoryById(chatId).first()?.messages?.map { it.mapToDomain() }
             if (historyMessages.isNullOrEmpty()) throw NoSuchElementException()
+
             return completeResponse(historyMessages)
         }
 
         override suspend fun deleteUnconfirmedMessages(chatId: UID) {
-            val messages = localDataSource.fetchChatHistoryById(chatId).first()
-                ?.messages
-                ?.map { it.mapToDomain() }
+            val messages = localDataSource.fetchChatHistoryById(chatId).first()?.messages?.map { it.mapToDomain() }
             messages?.dropUnconfirmedMessages { message ->
                 localDataSource.deleteChatMessage(message.id)
             }
@@ -116,9 +105,7 @@ internal interface AiConversationHandler {
         ): AiAssistantResponse {
             val optimisedMessages = messages.optimisedMessagesForSend()
             val request = AiCompletionRequestPojo(
-                messageId = optimisedMessages
-                    .last { message -> message is AiAssistantMessage.UserMessage }
-                    .id,
+                messageId = optimisedMessages.last { message -> message is AiAssistantMessage.UserMessage }.id,
                 locale = deviceInfoProvider.fetchDeviceLanguage(),
                 timeZone = TimeZone.currentSystemDefault().id,
                 toolProtocolVersion = TOOL_PROTOCOL_VERSION,
@@ -143,6 +130,9 @@ internal interface AiConversationHandler {
                 "update_homework",
                 "complete_homework",
                 "delete_homework",
+                "create_class",
+                "update_class",
+                "delete_class",
                 "get_organizations",
                 "get_subjects",
                 "get_employees",

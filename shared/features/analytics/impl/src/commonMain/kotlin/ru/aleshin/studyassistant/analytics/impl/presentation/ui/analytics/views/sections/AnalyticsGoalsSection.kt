@@ -86,7 +86,12 @@ internal fun AnalyticsGoalsSection(
                     contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator(
-                        progress = { distribution.completionRate?.coerceIn(0f, 1f) ?: 0f },
+                        progress = {
+                            distribution.completionRate
+                                ?.takeIf { it.isFinite() }
+                                ?.coerceIn(0f, 1f)
+                                ?: 0f
+                        },
                         modifier = Modifier.size(104.dp),
                         strokeWidth = 10.dp,
                         trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -170,7 +175,8 @@ internal fun AnalyticsGoalsSection(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     val progress = remember(distribution) {
-                        (distribution.actualDuration.toFloat() / distribution.desiredDuration.coerceAtLeast(1L)).coerceIn(0f, 1f)
+                        (distribution.actualDuration.toFloat() / distribution.desiredDuration.coerceAtLeast(1L))
+                            .coerceIn(0f, 1f)
                     }
                     LinearProgressIndicator(
                         modifier = Modifier.weight(1f),

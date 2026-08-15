@@ -39,4 +39,12 @@ interface AiQuotaRepository {
         succeeded: Boolean,
         now: Instant,
     )
+
+    suspend fun saveResponse(
+        installationHash: ByteArray,
+        messageId: UUID,
+        executionHash: ByteArray,
+        responsePayload: ByteArray,
+        responseNonce: ByteArray,
+    )
 }

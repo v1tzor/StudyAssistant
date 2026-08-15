@@ -323,11 +323,11 @@ private fun BaseOverviewContent(
             onChangeGoalTimeType = onChangeGoalTimeType,
             onChangeGoalDesiredTime = onChangeGoalDesiredTime,
         )
-        HorizontalDivider()
         YandexInlineBanner(
             modifier = Modifier.padding(horizontal = 16.dp),
             placement = AdPlacement.TASKS_OVERVIEW,
         )
+        HorizontalDivider()
         OverviewContentDetails(
             currentTab = overviewTasksTab,
             isLoadingHomeworks = state.isLoadingHomeworks,

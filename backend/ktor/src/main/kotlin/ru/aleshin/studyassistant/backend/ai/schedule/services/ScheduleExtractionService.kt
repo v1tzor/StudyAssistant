@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.backend.ai.schedule.services
 
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import ru.aleshin.studyassistant.backend.ai.domain.result.AiQuotaReservationResult
 import ru.aleshin.studyassistant.backend.ai.schedule.api.dto.ScheduleExtractionRequestDto
 import ru.aleshin.studyassistant.backend.ai.schedule.api.dto.ScheduleExtractionResponseDto
@@ -32,6 +33,10 @@ import ru.aleshin.studyassistant.backend.common.api.InvalidRequestException
 import ru.aleshin.studyassistant.backend.common.api.QuotaExceededException
 import ru.aleshin.studyassistant.backend.common.api.RateLimitException
 import ru.aleshin.studyassistant.backend.common.api.ServerUnavailableException
+import ru.aleshin.studyassistant.backend.plugins.BackendJson
+import ru.aleshin.studyassistant.backend.security.PayloadCipher
+import ru.aleshin.studyassistant.backend.security.PayloadPurpose
+import java.nio.charset.StandardCharsets.UTF_8
 import java.time.Clock
 
 /**
@@ -44,6 +49,8 @@ class ScheduleExtractionService(
     private val quotaService: AiQuotaService,
     private val extractionGateway: ScheduleExtractionGateway,
     private val clock: Clock,
+    private val payloadCipher: PayloadCipher,
+    private val json: Json = BackendJson,
 ) {
 
     suspend fun extract(
@@ -52,12 +59,13 @@ class ScheduleExtractionService(
     ): ScheduleExtractionResponseDto {
         validator.validate(request = request)
         val command = requestMapper.map(request = request)
+        val requestFingerprint = command.request.fingerprint()
 
         val reservation = when (
             val result = quotaService.reserve(
                 installationToken = installationToken,
                 messageId = command.requestId,
-                requestFingerprint = command.request.fingerprint(),
+                requestFingerprint = requestFingerprint,
             )
         ) {
             is AiQuotaReservationResult.Reserved -> result
@@ -69,7 +77,31 @@ class ScheduleExtractionService(
             )
             AiQuotaReservationResult.MessageExecutionLimitExceeded -> throw InvalidRequestException()
             AiQuotaReservationResult.IdempotencyConflict -> throw InvalidRequestException()
-            AiQuotaReservationResult.IdempotencyReplay -> throw InvalidRequestException()
+            is AiQuotaReservationResult.IdempotencyReplay -> {
+                val payload = result.responsePayload
+                val nonce = result.responseNonce
+                if (payload == null || nonce == null) throw RateLimitException(
+                    retryAt = clock.instant().plusSeconds(5).toEpochMilli(),
+                )
+                val cachedResponse = runCatching {
+                    val response = payloadCipher.decrypt(
+                        ciphertext = payload,
+                        nonce = nonce,
+                        purpose = PayloadPurpose.AI_RESPONSE_CACHE,
+                    ).toString(UTF_8)
+                    json.decodeFromString<ScheduleExtractionResponseDto>(response)
+                }.getOrElse {
+                    throw ServerUnavailableException()
+                }
+                return result.quota?.let { quota ->
+                    cachedResponse.copy(
+                        quotaRemaining = quota.remaining,
+                        quotaLimit = quota.limit,
+                        rewardedResetsRemaining = quota.rewardedResetsRemaining,
+                        quotaResetAt = result.resetAt?.toEpochMilli() ?: cachedResponse.quotaResetAt,
+                    )
+                } ?: cachedResponse
+            }
         }
 
         var succeeded = false
@@ -77,12 +109,24 @@ class ScheduleExtractionService(
         try {
             return when (val result = extractionGateway.extract(request = command.request)) {
                 is ScheduleProviderResult.Success -> {
-                    succeeded = true
-                    responseMapper.map(
+                    val response = responseMapper.map(
                         draft = result.draft,
                         quota = reservation.quota,
                         quotaResetAt = reservation.resetAt,
                     )
+                    val encrypted = payloadCipher.encrypt(
+                        plaintext = json.encodeToString(response).toByteArray(UTF_8),
+                        purpose = PayloadPurpose.AI_RESPONSE_CACHE,
+                    )
+                    quotaService.saveResponse(
+                        installationToken = installationToken,
+                        messageId = command.requestId,
+                        executionFingerprint = requestFingerprint,
+                        responsePayload = encrypted.ciphertext,
+                        responseNonce = encrypted.nonce,
+                    )
+                    succeeded = true
+                    response
                 }
                 is ScheduleProviderResult.RateLimited -> throw RateLimitException(
                     retryAt = result.retryAfterSeconds?.let { seconds ->

@@ -76,9 +76,7 @@ internal interface AiAssistantInteractor {
 
         override suspend fun addChat() = eitherWrapper.wrap {
             val chatId = randomUUID()
-            aiAssistantRepository.addOrUpdateChat(
-                AiChatHistory(uid = chatId, messages = emptyList()),
-            )
+            aiAssistantRepository.addOrUpdateChat(AiChatHistory(uid = chatId, messages = emptyList()))
             chatId
         }
 
@@ -102,17 +100,13 @@ internal interface AiAssistantInteractor {
             aiAssistantRepository.fetchChatHistoryById(chatId).map { chat ->
                 val history = checkNotNull(chat) { "Chat($chatId) is not found" }
                 val visibleMessages = history.messages.filter { message ->
-                    (message is AiAssistantMessage.UserMessage ||
-                        message is AiAssistantMessage.AssistantMessage) &&
-                        !message.content.isNullOrEmpty()
+                    (message is AiAssistantMessage.UserMessage || message is AiAssistantMessage.AssistantMessage) && !message.content.isNullOrEmpty()
                 }.sortedByDescending(AiAssistantMessage::time)
                 AssistantChatData(
                     history = history.copy(
                         messages = visibleMessages,
                         lastMessage = history.lastMessage?.takeIf { message ->
-                            (message is AiAssistantMessage.UserMessage ||
-                                message is AiAssistantMessage.AssistantMessage) &&
-                                !message.content.isNullOrEmpty()
+                            (message is AiAssistantMessage.UserMessage || message is AiAssistantMessage.AssistantMessage) && !message.content.isNullOrEmpty()
                         },
                     ),
                     pendingMutations = toolCallProcessor.pendingMutations(history.messages).map { call ->
@@ -130,9 +124,7 @@ internal interface AiAssistantInteractor {
         override suspend fun clearHistory(chatId: UID) = eitherWrapper.wrapUnit {
             val chat = aiAssistantRepository.fetchChatHistoryById(chatId).first()
             if (chat != null) {
-                aiAssistantRepository.addOrUpdateChat(
-                    chat.copy(messages = emptyList(), lastMessage = null),
-                )
+                aiAssistantRepository.addOrUpdateChat(chat.copy(messages = emptyList(), lastMessage = null))
             }
         }
 
@@ -159,8 +151,7 @@ internal interface AiAssistantInteractor {
             toolDecisionMutex.withLock {
                 val history = checkNotNull(aiAssistantRepository.fetchChatHistoryById(chatId).first())
                 val activeCalls = toolCallProcessor.activeCalls(history.messages)
-                val targetCall = activeCalls.find { it.id == toolCallId }
-                    ?: throw IllegalArgumentException("Tool call is not pending")
+                val targetCall = activeCalls.find { it.id == toolCallId } ?: throw IllegalArgumentException("Tool call is not pending")
                 require(toolCallProcessor.isMutation(targetCall)) {
                     "Read-only tool cannot be confirmed"
                 }

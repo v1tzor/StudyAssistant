@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.backend.sharing.api.dto.homework.CreateHomework
 import ru.aleshin.studyassistant.backend.sharing.api.dto.homework.FetchHomeworkShareRequest
 import ru.aleshin.studyassistant.backend.sharing.services.HomeworkSharingService
 import ru.aleshin.studyassistant.backend.common.api.requireInstallationToken
+import ru.aleshin.studyassistant.backend.common.api.requireJsonContentType
 import ru.aleshin.studyassistant.backend.security.InstallationCredentialService
 
 /**
@@ -49,6 +50,7 @@ fun Route.homeworkSharingRoutes(
             val installationToken = call.requireInstallationToken(
                 credentialService = credentialService,
             )
+            call.requireJsonContentType()
             val request = call.receive<CreateHomeworkShareRequest>()
 
             val response = service.create(
@@ -66,6 +68,7 @@ fun Route.homeworkSharingRoutes(
             val installationToken = call.requireInstallationToken(
                 credentialService = credentialService,
             )
+            call.requireJsonContentType()
             val request = call.receive<FetchHomeworkShareRequest>()
 
             val response = service.fetch(

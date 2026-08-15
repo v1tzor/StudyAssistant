@@ -76,31 +76,11 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
     bindEagerSingleton<ColumnAdapter<List<String>, String>> { listOfStringsAdapter }
     bindEagerSingleton<ColumnAdapter<List<Int>, String>> { listOfIntAdapter }
     bindEagerSingleton<CalendarSettingsEntity.Adapter> { CalendarSettingsEntity.Adapter(instance()) }
-    bindEagerSingleton<NotificationSettingsEntity.Adapter> {
-        NotificationSettingsEntity.Adapter(
-            instance(),
-            instance()
-        )
-    }
+    bindEagerSingleton<NotificationSettingsEntity.Adapter> { NotificationSettingsEntity.Adapter(instance(), instance()) }
     bindEagerSingleton<CustomScheduleEntity.Adapter> { CustomScheduleEntity.Adapter(instance()) }
     bindEagerSingleton<BaseScheduleEntity.Adapter> { BaseScheduleEntity.Adapter(instance()) }
-    bindEagerSingleton<OrganizationEntity.Adapter> {
-        OrganizationEntity.Adapter(
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance()
-        )
-    }
-    bindEagerSingleton<EmployeeEntity.Adapter> {
-        EmployeeEntity.Adapter(
-            instance(),
-            instance(),
-            instance(),
-            instance()
-        )
-    }
+    bindEagerSingleton<OrganizationEntity.Adapter> { OrganizationEntity.Adapter(instance(), instance(), instance(), instance(), instance()) }
+    bindEagerSingleton<EmployeeEntity.Adapter> { EmployeeEntity.Adapter(instance(), instance(), instance(), instance()) }
     bindEagerSingleton<AiChatMessageEntity.Adapter> { AiChatMessageEntity.Adapter(instance()) }
     bindEagerSingleton<Database> {
         Database(
@@ -125,7 +105,7 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
     bindSingleton<GeneralSettingsLocalDataSource> { GeneralSettingsLocalDataSource.Base(instance(), instance()) }
 
     bindSingleton<HomeworkShareReceiptQueries> { instance<Database>().homeworkShareReceiptQueries }
-    bindSingleton<HomeworkShareLocalDataSource> { HomeworkShareLocalDataSource.Base(instance()) }
+    bindSingleton<HomeworkShareLocalDataSource> { HomeworkShareLocalDataSource.Base(instance(), instance()) }
     bindSingleton<ScheduleShareLocalDataSource> { ScheduleShareLocalDataSource.Base(instance()) }
 
     bindSingleton<ProfileQueries> { instance<Database>().profileQueries }

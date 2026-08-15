@@ -16,12 +16,15 @@
 
 package ru.aleshin.studyassistant.core.data.handlers
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.data.datasources.AiPreferencesLocalDataSource
+import ru.aleshin.studyassistant.core.database.datasource.ai.AiSettingsLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
 import ru.aleshin.studyassistant.sqldelight.ai.AiSettingsEntity
 
@@ -39,32 +42,54 @@ internal interface AiSettingsHandler {
     )
 
     class Base(
-        private val localDataSource: AiPreferencesLocalDataSource,
+        private val localDataSource: AiSettingsLocalDataSource,
         private val dateManager: DateManager,
     ) : AiSettingsHandler {
 
-        override fun fetchSettings(): Flow<AiSettings> = localDataSource.fetchSettings().map { entity ->
-            val currentTime = dateManager.fetchCurrentInstant()
-            val storedResetAt = entity.quota_reset_at?.let(Instant::fromEpochMilliseconds)
-            val quotaExpired = storedResetAt != null && storedResetAt <= currentTime
-            AiSettings(
-                quotaRemaining = if (quotaExpired) {
-                    AiSettings.DAILY_QUOTA
-                } else {
-                    entity.quota_remaining.toInt()
-                },
-                quotaLimit = if (quotaExpired) {
-                    AiSettings.DAILY_QUOTA
-                } else {
-                    entity.quota_limit.toInt()
-                },
-                rewardedResetsRemaining = if (quotaExpired) {
-                    AiSettings.MAX_REWARDED_RESETS
-                } else {
-                    entity.rewarded_resets_remaining.toInt()
-                },
-                quotaResetAt = storedResetAt.takeUnless { quotaExpired },
-            )
+        @OptIn(ExperimentalCoroutinesApi::class)
+        override fun fetchSettings(): Flow<AiSettings> {
+            return localDataSource.fetchSettings().flatMapLatest { entity ->
+                flow {
+                    val currentTime = dateManager.fetchCurrentInstant()
+                    val storedResetAt = entity.quota_reset_at?.let(Instant::fromEpochMilliseconds)
+                    val resetDelayMillis = storedResetAt?.toEpochMilliseconds()
+                        ?.minus(currentTime.toEpochMilliseconds())
+                    val quotaExpired = resetDelayMillis != null && resetDelayMillis <= 0L
+
+                    emit(
+                        AiSettings(
+                            quotaRemaining = if (quotaExpired) {
+                                AiSettings.DAILY_QUOTA
+                            } else {
+                                entity.quota_remaining.toInt()
+                            },
+                            quotaLimit = if (quotaExpired) {
+                                AiSettings.DAILY_QUOTA
+                            } else {
+                                entity.quota_limit.toInt()
+                            },
+                            rewardedResetsRemaining = if (quotaExpired) {
+                                AiSettings.MAX_REWARDED_RESETS
+                            } else {
+                                entity.rewarded_resets_remaining.toInt()
+                            },
+                            quotaResetAt = storedResetAt.takeUnless { quotaExpired },
+                        ),
+                    )
+
+                    if (resetDelayMillis != null && resetDelayMillis > 0L) {
+                        delay(resetDelayMillis)
+                        emit(
+                            AiSettings(
+                                quotaRemaining = AiSettings.DAILY_QUOTA,
+                                quotaLimit = AiSettings.DAILY_QUOTA,
+                                rewardedResetsRemaining = AiSettings.MAX_REWARDED_RESETS,
+                                quotaResetAt = null,
+                            ),
+                        )
+                    }
+                }
+            }
         }
 
         override suspend fun updateQuota(

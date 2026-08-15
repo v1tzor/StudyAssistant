@@ -46,6 +46,11 @@ class PayloadTooLargeApiException : ApiException(
     errorCode = "too_large",
 )
 
+class UnsupportedMediaTypeApiException : ApiException(
+    status = HttpStatusCode.UnsupportedMediaType,
+    errorCode = "unsupported_media_type",
+)
+
 class InvalidShareException : ApiException(
     status = HttpStatusCode.NotFound,
     errorCode = "invalid",

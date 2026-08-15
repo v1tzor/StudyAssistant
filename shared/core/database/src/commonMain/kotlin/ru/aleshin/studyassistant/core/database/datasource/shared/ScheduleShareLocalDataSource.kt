@@ -50,24 +50,16 @@ interface ScheduleShareLocalDataSource {
         ) {
             database.transaction {
                 organizations.forEach { organization ->
-                    database.organizationQueries.addOrUpdateOrganization(
-                        organization.mapToEntity(),
-                    )
+                    database.organizationQueries.addOrUpdateOrganization(organization.mapToEntity())
                 }
                 employees.forEach { employee ->
-                    database.employeeQueries.addOrUpdateEmployee(
-                        employee.mapToEntity(),
-                    )
+                    database.employeeQueries.addOrUpdateEmployee(employee.mapToEntity())
                 }
                 subjects.forEach { subject ->
-                    database.subjectQueries.addOrUpdateSubject(
-                        subject.mapToEntity(),
-                    )
+                    database.subjectQueries.addOrUpdateSubject(subject.mapToEntity())
                 }
                 schedules.forEach { schedule ->
-                    database.baseScheduleQueries.addOrUpdateSchedule(
-                        schedule.mapToEntity(),
-                    )
+                    database.baseScheduleQueries.addOrUpdateSchedule(schedule.mapToEntity())
                 }
             }
         }

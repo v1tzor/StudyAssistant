@@ -78,13 +78,14 @@ kotlin {
             implementation(libs.sqldelight.native)
         }
     }
-
 }
 
 sqldelight {
     databases {
+        linkSqlite = true
         create("Database") {
             packageName.set("ru.aleshin.studyassistant.core.data")
+            generateAsync.set(true)
         }
     }
 }

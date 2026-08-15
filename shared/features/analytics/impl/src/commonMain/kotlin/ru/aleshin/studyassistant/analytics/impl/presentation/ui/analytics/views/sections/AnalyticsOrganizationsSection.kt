@@ -204,7 +204,7 @@ private fun OrganizationHeader(
 private fun OrganizationWorkload(
     workloadShare: Float,
 ) {
-    val progress = workloadShare.coerceIn(0f, 1f)
+    val progress = workloadShare.takeIf { it.isFinite() }?.coerceIn(0f, 1f) ?: 0f
 
     Row(
         modifier = Modifier.fillMaxWidth(),

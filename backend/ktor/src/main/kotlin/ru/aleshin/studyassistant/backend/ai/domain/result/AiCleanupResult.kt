@@ -22,4 +22,5 @@ package ru.aleshin.studyassistant.backend.ai.domain.result
 data class AiCleanupResult(
     val removedRequests: Int,
     val removedUsageRows: Int,
+    val removedRewardChallenges: Int,
 )

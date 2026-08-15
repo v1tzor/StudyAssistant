@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class)
 
-package ru.aleshin.studyassistant.core.data.datasources
+package ru.aleshin.studyassistant.core.database.datasource.secure
 
 import cnames.structs.__CFData
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.get
@@ -32,6 +33,7 @@ import platform.CoreFoundation.CFDataGetBytePtr
 import platform.CoreFoundation.CFDataGetLength
 import platform.CoreFoundation.CFDictionaryCreateMutable
 import platform.CoreFoundation.CFDictionarySetValue
+import platform.CoreFoundation.CFMutableDictionaryRef
 import platform.CoreFoundation.CFRelease
 import platform.CoreFoundation.CFStringCreateWithCString
 import platform.CoreFoundation.CFTypeRefVar
@@ -123,7 +125,7 @@ internal class IosSecureStorage {
     private inline fun <T> withBaseQuery(
         account: String,
         serviceName: String = SERVICE,
-        block: (platform.CoreFoundation.CFMutableDictionaryRef) -> T
+        block: (CFMutableDictionaryRef) -> T
     ): T {
         val query = checkNotNull(CFDictionaryCreateMutable(null, 0, null, null))
         val service = checkNotNull(

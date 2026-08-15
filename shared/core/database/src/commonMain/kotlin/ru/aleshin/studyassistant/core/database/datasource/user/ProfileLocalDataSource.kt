@@ -25,7 +25,11 @@ import ru.aleshin.studyassistant.core.database.models.users.ProfileEntity
 import ru.aleshin.studyassistant.sqldelight.user.ProfileQueries
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * @author Stanislav Aleshin on 01.07.2024.
+ */
 interface ProfileLocalDataSource {
+
     suspend fun addOrUpdateProfile(profile: ProfileEntity)
     suspend fun fetchProfile(): Flow<ProfileEntity?>
 
@@ -38,7 +42,7 @@ interface ProfileLocalDataSource {
             get() = coroutineManager.ioDispatcher
 
         override suspend fun addOrUpdateProfile(profile: ProfileEntity) {
-            profileQueries.addOrUpdateProfile(profile.mapToEntity()).await()
+            profileQueries.addOrUpdateProfile(profile.mapToEntity())
         }
 
         override suspend fun fetchProfile(): Flow<ProfileEntity?> {

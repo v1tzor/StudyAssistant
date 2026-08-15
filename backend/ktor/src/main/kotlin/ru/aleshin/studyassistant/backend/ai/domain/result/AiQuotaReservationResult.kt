@@ -32,5 +32,10 @@ sealed interface AiQuotaReservationResult {
     data class RateLimited(val retryAt: Instant?) : AiQuotaReservationResult
     data object MessageExecutionLimitExceeded : AiQuotaReservationResult
     data object IdempotencyConflict : AiQuotaReservationResult
-    data object IdempotencyReplay : AiQuotaReservationResult
+    data class IdempotencyReplay(
+        val responsePayload: ByteArray? = null,
+        val responseNonce: ByteArray? = null,
+        val quota: AiQuota? = null,
+        val resetAt: Instant? = null,
+    ) : AiQuotaReservationResult
 }

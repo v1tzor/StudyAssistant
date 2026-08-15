@@ -108,7 +108,12 @@ internal fun AssistantBottomBar(
                     unfocusedBorderColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                 ),
                 trailingIcon = {
-                    VoiceInputButton(onResult = { textFieldState = TextFieldValue(it) })
+                    VoiceInputButton(
+                        onResult = {
+                            textFieldState = TextFieldValue(it)
+                            onUpdateUserQuery(it)
+                        },
+                    )
                 }
             )
             IconButton(

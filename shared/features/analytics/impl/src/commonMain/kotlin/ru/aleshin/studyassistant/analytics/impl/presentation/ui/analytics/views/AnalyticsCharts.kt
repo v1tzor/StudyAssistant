@@ -82,7 +82,7 @@ internal fun AnalyticsWorkloadChart(
         )
     }
     val values = remember(buckets) {
-        buckets.map { it.workload }
+        buckets.map { it.workload.takeIf(Float::isFinite) ?: 0f }
     }
     val peakIndex = remember(values) {
         values.indices.maxByOrNull { values[it] }
@@ -273,13 +273,17 @@ private fun AnalyticsAdaptiveBarChart(
         else -> 0.46f
     },
 ) {
-    if (values.isEmpty() || values.none { it > 0f }) {
+    val safeValues = remember(values) {
+        values.map { it.takeIf(Float::isFinite) ?: 0f }
+    }
+
+    if (safeValues.isEmpty() || safeValues.none { it > 0f }) {
         AnalyticsChartPlaceholder(modifier)
         return
     }
 
-    val peak = remember(values) {
-        values.maxOrNull() ?: 0f
+    val peak = remember(safeValues) {
+        safeValues.maxOrNull() ?: 0f
     }
     val axisScale = remember(peak) {
         calculateAdaptiveAxisScale(peak)
@@ -326,16 +330,16 @@ private fun AnalyticsAdaptiveBarChart(
             }
 
         val barWidth = chartContext.calculateBarWidth(
-            totalBars = values.size,
+            totalBars = safeValues.size,
             widthFraction = barWidthFraction,
         )
 
-        values.forEachIndexed { index, value ->
+        safeValues.forEachIndexed { index, value ->
             if (value <= 0f) return@forEachIndexed
 
             val left = chartContext.calculateBarLeftPosition(
                 index = index,
-                totalBars = values.size,
+                totalBars = safeValues.size,
                 barWidthFraction = barWidthFraction,
             )
             val top = chartContext.convertValueToYPosition(value)
@@ -466,7 +470,7 @@ private fun analyticsScaffoldConfig(): ChartScaffoldConfig {
 private fun calculateAdaptiveAxisScale(
     peak: Float,
 ): AnalyticsAxisScale {
-    if (peak <= 0f) {
+    if (!peak.isFinite() || peak <= 0f) {
         return AnalyticsAxisScale(
             max = 1f,
             steps = 4,

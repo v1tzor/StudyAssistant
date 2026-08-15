@@ -34,6 +34,7 @@ import ru.aleshin.studyassistant.backend.ai.domain.model.AiMessage
 import ru.aleshin.studyassistant.backend.ai.domain.model.AiMessageRole
 import ru.aleshin.studyassistant.backend.ai.domain.result.AiProviderResult
 import ru.aleshin.studyassistant.backend.ai.infrastructure.deepseek.mappers.DeepSeekMapper
+import ru.aleshin.studyassistant.backend.ai.testAiConfig
 import ru.aleshin.studyassistant.backend.ai.testDeepSeekConfig
 import java.time.Clock
 import java.time.Instant
@@ -199,7 +200,10 @@ class DeepSeekAiCompletionGatewayTest {
         return DeepSeekAiCompletionGateway(
             httpClient = client,
             config = config,
-            mapper = DeepSeekMapper(config = config),
+            mapper = DeepSeekMapper(
+                deepSeekConfig = config,
+                aiConfig = testAiConfig(),
+            ),
             clock = Clock.fixed(
                 Instant.parse("2026-08-12T00:00:00Z"),
                 ZoneOffset.UTC,

@@ -20,6 +20,9 @@ import kotlinx.coroutines.flow.Flow
 import ru.aleshin.studyassistant.core.domain.entities.files.InputFile
 import ru.aleshin.studyassistant.core.domain.entities.users.Profile
 
+/**
+ * @author Stanislav Aleshin on 29.04.2024.
+ */
 interface ProfileRepository {
     suspend fun fetchProfile(): Flow<Profile?>
     suspend fun updateProfile(profile: Profile)

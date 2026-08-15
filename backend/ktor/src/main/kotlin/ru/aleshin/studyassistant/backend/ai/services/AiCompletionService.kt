@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.backend.ai.services
 
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import ru.aleshin.studyassistant.backend.ai.api.dto.AiCompletionRequestDto
 import ru.aleshin.studyassistant.backend.ai.api.dto.AiCompletionResponseDto
 import ru.aleshin.studyassistant.backend.ai.api.mappers.AiCompletionRequestMapper
@@ -32,6 +33,10 @@ import ru.aleshin.studyassistant.backend.common.api.InvalidRequestException
 import ru.aleshin.studyassistant.backend.common.api.QuotaExceededException
 import ru.aleshin.studyassistant.backend.common.api.RateLimitException
 import ru.aleshin.studyassistant.backend.common.api.ServerUnavailableException
+import ru.aleshin.studyassistant.backend.plugins.BackendJson
+import ru.aleshin.studyassistant.backend.security.PayloadCipher
+import ru.aleshin.studyassistant.backend.security.PayloadPurpose
+import java.nio.charset.StandardCharsets.UTF_8
 import java.time.Clock
 
 /**
@@ -46,6 +51,8 @@ class AiCompletionService(
     private val quotaService: AiQuotaService,
     private val completionGateway: AiCompletionGateway,
     private val clock: Clock,
+    private val payloadCipher: PayloadCipher,
+    private val json: Json = BackendJson,
 ) {
 
     suspend fun complete(
@@ -58,13 +65,15 @@ class AiCompletionService(
             command = command,
             now = clock.instant(),
         )
+        val requestFingerprint = fingerprintFactory.conversation(command = command)
+        val executionFingerprint = fingerprintFactory.execution(command = command)
 
         val reservation = when (
             val result = quotaService.reserve(
                 installationToken = installationToken,
                 messageId = command.messageId,
-                requestFingerprint = fingerprintFactory.conversation(command = command),
-                executionFingerprint = fingerprintFactory.execution(command = command),
+                requestFingerprint = requestFingerprint,
+                executionFingerprint = executionFingerprint,
             )
         ) {
             is AiQuotaReservationResult.Reserved -> result
@@ -76,7 +85,35 @@ class AiCompletionService(
             )
             AiQuotaReservationResult.MessageExecutionLimitExceeded -> throw InvalidRequestException()
             AiQuotaReservationResult.IdempotencyConflict -> throw InvalidRequestException()
-            AiQuotaReservationResult.IdempotencyReplay -> throw InvalidRequestException()
+            is AiQuotaReservationResult.IdempotencyReplay -> {
+                val payload = result.responsePayload
+                val nonce = result.responseNonce
+                if (payload == null || nonce == null) throw RateLimitException(
+                    retryAt = clock.instant().plusSeconds(5).toEpochMilli(),
+                )
+                val response = runCatching {
+                    payloadCipher.decrypt(
+                        ciphertext = payload,
+                        nonce = nonce,
+                        purpose = PayloadPurpose.AI_RESPONSE_CACHE,
+                    ).toString(UTF_8)
+                }.getOrElse {
+                    throw ServerUnavailableException()
+                }
+                val cachedResponse = runCatching {
+                    json.decodeFromString<AiCompletionResponseDto>(response)
+                }.getOrElse {
+                    throw ServerUnavailableException()
+                }
+                return result.quota?.let { quota ->
+                    cachedResponse.copy(
+                        quotaRemaining = quota.remaining,
+                        quotaLimit = quota.limit,
+                        rewardedResetsRemaining = quota.rewardedResetsRemaining,
+                        quotaResetAt = result.resetAt?.toEpochMilli() ?: cachedResponse.quotaResetAt,
+                    )
+                } ?: cachedResponse
+            }
         }
 
         var succeeded = false
@@ -84,12 +121,24 @@ class AiCompletionService(
         try {
             return when (val result = completionGateway.complete(request = completionRequest)) {
                 is AiProviderResult.Success -> {
-                    succeeded = true
-                    responseMapper.map(
+                    val response = responseMapper.map(
                         completion = result.completion,
                         quota = reservation.quota,
                         quotaResetAt = reservation.resetAt,
                     )
+                    val encrypted = payloadCipher.encrypt(
+                        plaintext = json.encodeToString(response).toByteArray(UTF_8),
+                        purpose = PayloadPurpose.AI_RESPONSE_CACHE,
+                    )
+                    quotaService.saveResponse(
+                        installationToken = installationToken,
+                        messageId = command.messageId,
+                        executionFingerprint = executionFingerprint,
+                        responsePayload = encrypted.ciphertext,
+                        responseNonce = encrypted.nonce,
+                    )
+                    succeeded = true
+                    response
                 }
 
                 is AiProviderResult.RateLimited -> throw RateLimitException(

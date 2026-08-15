@@ -61,10 +61,16 @@ interface BaseScheduleLocalDataSource {
 
     suspend fun addOrUpdateSchedule(item: BaseScheduleEntity)
     suspend fun addOrUpdateSchedules(items: List<BaseScheduleEntity>)
-
     suspend fun fetchScheduleDetailsById(uid: UID): Flow<BaseScheduleDetailsEntity?>
-    suspend fun fetchScheduleDetailsByDate(date: Instant, numberOfWeek: NumberOfRepeatWeek): Flow<BaseScheduleDetailsEntity?>
-    suspend fun fetchSchedulesByVersion(from: Instant, to: Instant, numberOfWeek: NumberOfRepeatWeek?): Flow<List<BaseScheduleDetailsEntity>>
+    suspend fun fetchScheduleDetailsByDate(
+        date: Instant,
+        numberOfWeek: NumberOfRepeatWeek
+    ): Flow<BaseScheduleDetailsEntity?>
+    suspend fun fetchSchedulesByVersion(
+        from: Instant,
+        to: Instant,
+        numberOfWeek: NumberOfRepeatWeek?
+    ): Flow<List<BaseScheduleDetailsEntity>>
     suspend fun fetchClassById(uid: UID, scheduleId: UID): Flow<ClassDetailsEntity?>
     suspend fun deleteSchedulesByTimeRange(from: Instant, to: Instant)
 
@@ -79,28 +85,24 @@ interface BaseScheduleLocalDataSource {
         private val coroutineContext: CoroutineContext
             get() = coroutineManager.ioDispatcher
 
-
         override suspend fun addOrUpdateSchedule(item: BaseScheduleEntity) {
             val uid = item.uid.ifEmpty { randomUUID() }
             val updatedItem = item.copy(uid = uid).mapToEntity()
-            scheduleQueries.addOrUpdateSchedule(updatedItem).await()
+            scheduleQueries.addOrUpdateSchedule(updatedItem)
         }
 
         override suspend fun addOrUpdateSchedules(items: List<BaseScheduleEntity>) {
             scheduleQueries.transaction {
                 items.forEach { item ->
                     val uid = item.uid.ifEmpty { randomUUID() }
-                    scheduleQueries.addOrUpdateSchedule(
-                        item.copy(uid = uid).mapToEntity(),
-                    )
+                    scheduleQueries.addOrUpdateSchedule(item.copy(uid = uid).mapToEntity())
                 }
             }
         }
 
         override suspend fun fetchScheduleDetailsById(uid: UID): Flow<BaseScheduleDetailsEntity?> {
             val query = scheduleQueries.fetchScheduleById(uid)
-            return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }
-                .flatMapToDetails()
+            return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }.flatMapToDetails()
         }
 
         override suspend fun fetchScheduleDetailsByDate(
@@ -144,8 +146,7 @@ interface BaseScheduleLocalDataSource {
             scheduleId: UID
         ): Flow<ClassDetailsEntity?> {
             val query = scheduleQueries.fetchScheduleById(scheduleId)
-            val scheduleFlow = query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }
-                .flatMapToDetails()
+            val scheduleFlow = query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }.flatMapToDetails()
             return scheduleFlow.map { schedule -> schedule?.classes?.find { it.uid == uid } }
         }
 
@@ -216,5 +217,4 @@ interface BaseScheduleLocalDataSource {
                 .map { it.getOrNull(0) }
         }
     }
-
 }

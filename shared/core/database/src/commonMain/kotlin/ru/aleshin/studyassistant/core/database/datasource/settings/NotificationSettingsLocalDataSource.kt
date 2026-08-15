@@ -46,7 +46,7 @@ interface NotificationSettingsLocalDataSource {
         }
 
         override suspend fun updateSettings(settings: NotificationSettingsEntity) {
-            calendarQueries.updateSettings(settings).await()
+            calendarQueries.updateSettings(settings)
         }
     }
 }

@@ -20,6 +20,7 @@ package ru.aleshin.studyassistant.backend.security
  * @author Stanislav Aleshin on 11.08.2026.
  */
 enum class PayloadPurpose(val value: String) {
+    AI_RESPONSE_CACHE(value = "studyassistant:ai-response-cache:v1"),
     SCHEDULE_SHARE(value = "studyassistant:schedule-share:v1"),
     HOMEWORK_SHARE(value = "studyassistant:homework-share:v1"),
 }

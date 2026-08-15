@@ -260,6 +260,8 @@ internal interface ShareWorkProcessor :
             )
         }.onStart {
             emit(ActionResult(ShareAction.UpdateStatus(ShareStatus.IMPORTING)))
+        }.onCompletion {
+            emit(ActionResult(ShareAction.UpdateRewardChallenge(null, false)))
         }
 
         private fun prepareImportRewardWork(

@@ -23,4 +23,5 @@ sealed interface ClaimActionStorageResult {
     data object Success : ClaimActionStorageResult
     data object InvalidClaim : ClaimActionStorageResult
     data object Consumed : ClaimActionStorageResult
+    data object RewardUnavailable : ClaimActionStorageResult
 }

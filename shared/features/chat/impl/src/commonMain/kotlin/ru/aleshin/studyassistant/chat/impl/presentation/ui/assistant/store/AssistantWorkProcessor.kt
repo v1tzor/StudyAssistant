@@ -59,50 +59,44 @@ internal interface AssistantWorkProcessor :
             is AssistantWorkCommand.SendMessage -> sendMessageWork(command.chatId, command.message)
             is AssistantWorkCommand.RetryAttempt -> retryAttemptWork(command.chatId)
             is AssistantWorkCommand.ClearUnsendMessage -> clearUnsendMessageWork(command.chatId)
-            is AssistantWorkCommand.ResolveToolCall -> resolveToolCallWork(
-                command.chatId,
-                command.toolCallId,
-                command.approved,
-            )
+            is AssistantWorkCommand.ResolveToolCall -> resolveToolCallWork(command.chatId, command.toolCallId, command.approved)
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         private fun loadMessagesWork() = channelFlow<AssistantWorkResult> {
             var isChatCreate = false
             var isInit = false
+
             aiAssistantInteractor.fetchChats().flatMapLatest { chatsEither ->
                 chatsEither.handleAndGet(
-                    onLeftAction = { flowOf(EffectResult(AssistantEffect.ShowError(it))) },
+                    onLeftAction = {
+                        send(EffectResult(AssistantEffect.ShowError(it)))
+                        flowOf(ActionResult(AssistantAction.UpdateLoadingChat(false)))
+                    },
                     onRightAction = { chats ->
                         val targetChatId = chats.firstOrNull()?.uid
                         if (targetChatId != null) {
-                            aiAssistantInteractor.fetchChatHistory(targetChatId)
-                                .map { chatHistoryEither ->
-                                    chatHistoryEither.handleAndGet(
-                                        onLeftAction = { EffectResult(AssistantEffect.ShowError(it)) },
-                                        onRightAction = { chatHistory ->
-                                            if (!isInit) {
-                                                if (
-                                                    chatHistory.pendingMutations.isEmpty() &&
-                                                    chatHistory.history.messages.firstOrNull() is
-                                                    AiAssistantMessage.UserMessage
-                                                ) {
-                                                    val action =
-                                                        AssistantAction.UpdateResponseStatus(
-                                                            ResponseStatus.FAILURE
-                                                        )
-                                                    send(ActionResult(action))
-                                                }
-                                                isInit = true
+                            aiAssistantInteractor.fetchChatHistory(targetChatId).map { chatHistoryEither ->
+                                chatHistoryEither.handleAndGet(
+                                    onLeftAction = {
+                                        send(EffectResult(AssistantEffect.ShowError(it)))
+                                        ActionResult(AssistantAction.UpdateLoadingChat(false))
+                                    },
+                                    onRightAction = { chatHistory ->
+                                        if (!isInit) {
+                                            if (
+                                                chatHistory.pendingMutations.isEmpty() &&
+                                                chatHistory.history.messages.firstOrNull() is AiAssistantMessage.UserMessage
+                                            ) {
+                                                val action = AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE)
+                                                send(ActionResult(action))
                                             }
-                                            ActionResult(
-                                                AssistantAction.UpdateChatHistory(
-                                                    chatHistory.mapToUi()
-                                                )
-                                            )
+                                            isInit = true
                                         }
-                                    )
-                                }
+                                        ActionResult(AssistantAction.UpdateChatHistory(chatHistory.mapToUi()))
+                                    }
+                                )
+                            }
                         } else {
                             if (!isChatCreate) {
                                 aiAssistantInteractor.addChat().handle(
@@ -125,11 +119,12 @@ internal interface AssistantWorkProcessor :
             aiAssistantInteractor.fetchAiSettings().collectAndHandle(
                 onLeftAction = { emit(EffectResult(AssistantEffect.ShowError(it))) },
                 onRightAction = { settings ->
-                    emit(ActionResult(AssistantAction.SetupQuota(
+                    val action = AssistantAction.SetupQuota(
                         remaining = settings.quotaRemaining,
                         limit = settings.quotaLimit,
                         rewardedResetsRemaining = settings.rewardedResetsRemaining,
-                    )))
+                    )
+                    emit(ActionResult(action))
                 },
             )
         }
@@ -163,52 +158,46 @@ internal interface AssistantWorkProcessor :
             )
         }
 
-        private fun sendMessageWork(chatId: UID?, message: String) = flow<AssistantWorkResult> {
-            if (chatId != null) {
-                aiAssistantInteractor.sendMessage(chatId, message).handle(
-                    onLeftAction = {
-                        val action = AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE)
-                        emit(ActionResult(action))
-                        emit(EffectResult(AssistantEffect.ShowError(it)))
-                    },
-                    onRightAction = {
-                        val action = AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)
-                        emit(ActionResult(action))
-                    }
-                )
-            }
+        private fun sendMessageWork(chatId: UID, message: String) = flow<AssistantWorkResult> {
+            aiAssistantInteractor.sendMessage(chatId, message).handle(
+                onLeftAction = {
+                    val action = AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE)
+                    emit(ActionResult(action))
+                    emit(EffectResult(AssistantEffect.ShowError(it)))
+                },
+                onRightAction = {
+                    val action = AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)
+                    emit(ActionResult(action))
+                }
+            )
         }.onStart {
             emit(ActionResult(AssistantAction.UpdateResponseStatus(ResponseStatus.LOADING)))
         }
 
-        private fun retryAttemptWork(chatId: String?) = flow<AssistantWorkResult> {
-            if (chatId != null) {
-                aiAssistantInteractor.retryAttempt(chatId).handle(
-                    onLeftAction = {
-                        val action = AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE)
-                        emit(ActionResult(action))
-                        emit(EffectResult(AssistantEffect.ShowError(it)))
-                    },
-                    onRightAction = {
-                        val action = AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)
-                        emit(ActionResult(action))
-                    }
-                )
-            }
+        private fun retryAttemptWork(chatId: UID) = flow<AssistantWorkResult> {
+            aiAssistantInteractor.retryAttempt(chatId).handle(
+                onLeftAction = {
+                    val action = AssistantAction.UpdateResponseStatus(ResponseStatus.FAILURE)
+                    emit(ActionResult(action))
+                    emit(EffectResult(AssistantEffect.ShowError(it)))
+                },
+                onRightAction = {
+                    val action = AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)
+                    emit(ActionResult(action))
+                }
+            )
         }.onStart {
             emit(ActionResult(AssistantAction.UpdateResponseStatus(ResponseStatus.LOADING)))
         }
 
-        private fun clearUnsendMessageWork(chatId: String?) = flow<AssistantWorkResult> {
-            if (chatId != null) {
-                aiAssistantInteractor.clearUnsendMessage(chatId).handle(
-                    onLeftAction = { emit(EffectResult(AssistantEffect.ShowError(it))) },
-                    onRightAction = {
-                        val action = AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)
-                        emit(ActionResult(action))
-                    }
-                )
-            }
+        private fun clearUnsendMessageWork(chatId: UID) = flow<AssistantWorkResult> {
+            aiAssistantInteractor.clearUnsendMessage(chatId).handle(
+                onLeftAction = { emit(EffectResult(AssistantEffect.ShowError(it))) },
+                onRightAction = {
+                    val action = AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)
+                    emit(ActionResult(action))
+                }
+            )
         }
 
         private fun resolveToolCallWork(
@@ -237,14 +226,10 @@ internal sealed class AssistantWorkCommand : WorkCommand {
     data object PrepareQuotaReward : AssistantWorkCommand()
     data class CompleteQuotaReward(val challengeId: String) : AssistantWorkCommand()
     data class ClearChatHistory(val chatId: UID) : AssistantWorkCommand()
-    data class SendMessage(val chatId: UID?, val message: String) : AssistantWorkCommand()
-    data class RetryAttempt(val chatId: UID?) : AssistantWorkCommand()
-    data class ClearUnsendMessage(val chatId: UID?) : AssistantWorkCommand()
-    data class ResolveToolCall(
-        val chatId: UID,
-        val toolCallId: UID,
-        val approved: Boolean,
-    ) : AssistantWorkCommand()
+    data class SendMessage(val chatId: UID, val message: String) : AssistantWorkCommand()
+    data class RetryAttempt(val chatId: UID) : AssistantWorkCommand()
+    data class ClearUnsendMessage(val chatId: UID) : AssistantWorkCommand()
+    data class ResolveToolCall(val chatId: UID, val toolCallId: UID, val approved: Boolean) : AssistantWorkCommand()
 }
 
 internal typealias AssistantWorkResult = WorkResult<AssistantAction, AssistantEffect, AssistantOutput>

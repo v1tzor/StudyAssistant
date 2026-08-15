@@ -44,7 +44,7 @@ interface CalendarSettingsLocalDataSource {
 
         override suspend fun addOrUpdateSettings(item: BaseCalendarSettingsEntity) {
             val updatedModel = item.mapToEntity(id = LOCAL_SETTINGS_ID)
-            calendarQueries.addOrUpdateSettings(updatedModel).await()
+            calendarQueries.addOrUpdateSettings(updatedModel)
         }
 
         override suspend fun fetchSettings(): Flow<BaseCalendarSettingsEntity?> {
@@ -60,5 +60,4 @@ interface CalendarSettingsLocalDataSource {
             const val LOCAL_SETTINGS_ID = 1L
         }
     }
-
 }

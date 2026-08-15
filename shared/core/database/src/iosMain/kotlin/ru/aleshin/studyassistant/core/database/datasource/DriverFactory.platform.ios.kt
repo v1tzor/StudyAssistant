@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.database.datasource
 
+import app.cash.sqldelight.async.coroutines.synchronous
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import co.touchlab.sqliter.DatabaseConfiguration
@@ -27,8 +28,9 @@ import ru.aleshin.studyassistant.core.data.Database
  */
 actual class DriverFactory {
     actual fun createDriver(): SqlDriver {
+        val schema = Database.Schema.synchronous()
         return NativeSqliteDriver(
-            schema = Database.Schema,
+            schema = schema,
             name = Constants.Database.DATABASE_NAME,
             onConfiguration = { config: DatabaseConfiguration ->
                 config.copy(

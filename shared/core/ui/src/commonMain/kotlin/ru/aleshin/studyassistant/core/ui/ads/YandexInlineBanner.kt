@@ -16,9 +16,10 @@
 
 package ru.aleshin.studyassistant.core.ui.ads
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,6 +28,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.eygraber.compose.placeholder.PlaceholderHighlight
+import com.eygraber.compose.placeholder.placeholder
+import com.eygraber.compose.placeholder.shimmer
 import com.yandex.mobile.ads.kmp.banner.Banner
 import com.yandex.mobile.ads.kmp.banner.BannerAdSize
 import com.yandex.mobile.ads.kmp.banner.BannerEvents
@@ -63,12 +67,20 @@ fun YandexInlineBanner(
         LaunchedEffect(adUnitId, maxWidth) {
             bannerState.loadAd(AdRequest(adUnitId = adUnitId))
         }
-        AnimatedVisibility(visible = isLoaded) {
-            Banner(
-                state = bannerState,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
+        Banner(
+            state = bannerState,
+            modifier = Modifier
+                .placeholder(
+                    visible = !isLoaded,
+                    color = MaterialTheme.colorScheme.surfaceContainer,
+                    shape = MaterialTheme.shapes.medium,
+                    highlight = PlaceholderHighlight.shimmer(
+                        highlightColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                    )
+                )
+                .fillMaxWidth()
+                .height(BANNER_MAX_HEIGHT)
+        )
     }
 }
 

@@ -88,6 +88,8 @@ class AiQuotaRepositoryImpl(
                 AiRequestsTable.requestHash,
                 AiRequestsTable.lastExecutionHash,
                 AiRequestsTable.succeeded,
+                AiRequestsTable.responsePayload,
+                AiRequestsTable.responseNonce,
                 AiRequestsTable.updatedAt,
             )
             .where {
@@ -103,7 +105,35 @@ class AiQuotaRepositoryImpl(
                 return@dbQuery AiQuotaReservationResult.IdempotencyConflict
             }
             if (existingRequest[AiRequestsTable.lastExecutionHash].contentEquals(executionHash)) {
-                return@dbQuery AiQuotaReservationResult.IdempotencyReplay
+                val responsePayload = existingRequest[AiRequestsTable.responsePayload]
+                val responseNonce = existingRequest[AiRequestsTable.responseNonce]
+                if (responsePayload != null && responseNonce != null) {
+                    return@dbQuery AiQuotaReservationResult.IdempotencyReplay(
+                        responsePayload = responsePayload,
+                        responseNonce = responseNonce,
+                        quota = AiQuota(
+                            used = currentUsed,
+                            limit = currentLimit,
+                            rewardedResetsRemaining = rewardedResetsRemaining,
+                        ),
+                        resetAt = resetAt,
+                    )
+                }
+                val reservationIsActive = existingRequest[AiRequestsTable.inFlight] > 0 &&
+                    existingRequest[AiRequestsTable.updatedAt]
+                        .toInstant()
+                        .plus(config.reservationTimeout)
+                        .isAfter(now)
+                if (reservationIsActive) {
+                    return@dbQuery AiQuotaReservationResult.IdempotencyReplay(
+                        quota = AiQuota(
+                            used = currentUsed,
+                            limit = currentLimit,
+                            rewardedResetsRemaining = rewardedResetsRemaining,
+                        ),
+                        resetAt = resetAt,
+                    )
+                }
             }
             if (existingRequest[AiRequestsTable.executionCount] >= config.maxExecutionsPerMessage) {
                 return@dbQuery AiQuotaReservationResult.MessageExecutionLimitExceeded
@@ -166,6 +196,8 @@ class AiQuotaRepositoryImpl(
                 it[executionCount] = existingRequest[AiRequestsTable.executionCount] + 1
                 it[AiRequestsTable.requestHash] = requestHash
                 it[lastExecutionHash] = executionHash
+                it[responsePayload] = null
+                it[responseNonce] = null
                 it[updatedAt] = now.atOffset(ZoneOffset.UTC)
             }
 
@@ -267,6 +299,28 @@ class AiQuotaRepositoryImpl(
                 it[inFlight] = remainingAttempts
                 it[AiRequestsTable.succeeded] = hasSucceeded
                 it[updatedAt] = now.atOffset(ZoneOffset.UTC)
+            }
+        }
+    }
+
+    override suspend fun saveResponse(
+        installationHash: ByteArray,
+        messageId: UUID,
+        executionHash: ByteArray,
+        responsePayload: ByteArray,
+        responseNonce: ByteArray,
+    ) {
+        dbQuery {
+            lockInstallation(installationHash = installationHash)
+            AiRequestsTable.update(
+                where = {
+                    (AiRequestsTable.installationHash eq installationHash) and
+                        (AiRequestsTable.messageId eq messageId) and
+                        (AiRequestsTable.lastExecutionHash eq executionHash)
+                },
+            ) {
+                it[AiRequestsTable.responsePayload] = responsePayload
+                it[AiRequestsTable.responseNonce] = responseNonce
             }
         }
     }

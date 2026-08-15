@@ -56,21 +56,13 @@ interface HomeworksLocalDataSource {
 
     suspend fun addOrUpdateHomework(item: BaseHomeworkEntity)
     suspend fun addOrUpdateHomeworks(items: List<BaseHomeworkEntity>)
-    suspend fun deleteHomeworksByIds(ids: List<String>)
-
     suspend fun fetchHomeworkDetailsById(uid: UID): Flow<HomeworkDetailsEntity?>
-    suspend fun fetchHomeworksDetailsByTimeRange(
-        from: Long,
-        to: Long
-    ): Flow<List<HomeworkDetailsEntity>>
-
+    suspend fun fetchHomeworksDetailsByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsEntity>>
     suspend fun fetchOverdueHomeworksDetails(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
     suspend fun fetchActiveLinkedHomeworksDetails(currentDate: Long): Flow<List<HomeworkDetailsEntity>>
     suspend fun fetchCompletedHomeworksCount(): Flow<Int>
-    suspend fun fetchCompletedHomeworksDetailsByTimeRange(
-        from: Long,
-        to: Long,
-    ): Flow<List<HomeworkDetailsEntity>>
+    suspend fun fetchCompletedHomeworksDetailsByTimeRange(from: Long, to: Long): Flow<List<HomeworkDetailsEntity>>
+    suspend fun deleteHomeworksByIds(ids: List<String>)
 
     class Base(
         private val homeworkQueries: HomeworkQueries,
@@ -83,11 +75,10 @@ interface HomeworksLocalDataSource {
         private val coroutineContext: CoroutineContext
             get() = coroutineManager.ioDispatcher
 
-
         override suspend fun addOrUpdateHomework(item: BaseHomeworkEntity) {
             val uid = item.uid.ifEmpty { randomUUID() }
             val updatedItem = item.copy(uid = uid).mapToEntity()
-            homeworkQueries.addOrUpdateHomework(updatedItem).await()
+            homeworkQueries.addOrUpdateHomework(updatedItem)
         }
 
         override suspend fun addOrUpdateHomeworks(items: List<BaseHomeworkEntity>) {
@@ -96,8 +87,7 @@ interface HomeworksLocalDataSource {
 
         override suspend fun fetchHomeworkDetailsById(uid: UID): Flow<HomeworkDetailsEntity?> {
             val query = homeworkQueries.fetchHomeworkById(uid)
-            return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }
-                .flatMapToDetails()
+            return query.mapToOneOrNullFlow(coroutineContext) { it.mapToBase() }.flatMapToDetails()
         }
 
         override suspend fun fetchHomeworksDetailsByTimeRange(
@@ -105,20 +95,17 @@ interface HomeworksLocalDataSource {
             to: Long
         ): Flow<List<HomeworkDetailsEntity>> {
             val query = homeworkQueries.fetchHomeworksByTimeRange(from, to)
-            return query.mapToListFlow(coroutineContext) { it.mapToBase() }
-                .flatMapListToDetails()
+            return query.mapToListFlow(coroutineContext) { it.mapToBase() }.flatMapListToDetails()
         }
 
         override suspend fun fetchOverdueHomeworksDetails(currentDate: Long): Flow<List<HomeworkDetailsEntity>> {
             val query = homeworkQueries.fetchOverdueHomeworks(currentDate)
-            return query.mapToListFlow(coroutineContext) { it.mapToBase() }
-                .flatMapListToDetails()
+            return query.mapToListFlow(coroutineContext) { it.mapToBase() }.flatMapListToDetails()
         }
 
         override suspend fun fetchActiveLinkedHomeworksDetails(currentDate: Long): Flow<List<HomeworkDetailsEntity>> {
             val query = homeworkQueries.fetchActiveAndLinkedHomeworks(currentDate)
-            return query.mapToListFlow(coroutineContext) { it.mapToEntity() }
-                .flatMapListToDetails()
+            return query.mapToListFlow(coroutineContext) { it.mapToEntity() }.flatMapListToDetails()
         }
 
         override suspend fun fetchCompletedHomeworksCount(): Flow<Int> {
@@ -131,77 +118,58 @@ interface HomeworksLocalDataSource {
             to: Long,
         ): Flow<List<HomeworkDetailsEntity>> {
             val query = homeworkQueries.fetchCompletedHomeworksByTimeRange(from, to)
-            return query.mapToListFlow(coroutineContext) { it.mapToBase() }
-                .flatMapListToDetails()
+            return query.mapToListFlow(coroutineContext) { it.mapToBase() }.flatMapListToDetails()
         }
 
         override suspend fun deleteHomeworksByIds(ids: List<String>) {
-            homeworkQueries.deleteHomeworks(ids).await()
+            homeworkQueries.deleteHomeworks(ids)
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
-        private fun Flow<List<BaseHomeworkEntity>>.flatMapListToDetails() =
-            flatMapLatest { homeworks ->
-                if (homeworks.isEmpty()) {
-                    flowOf(emptyList())
-                } else {
-                    val organizationsIds = homeworks.map { it.organizationId }.toSet()
+        private fun Flow<List<BaseHomeworkEntity>>.flatMapListToDetails() = flatMapLatest { homeworks ->
+            if (homeworks.isEmpty()) {
+                flowOf(emptyList())
+            } else {
+                val organizationsIds = homeworks.map { it.organizationId }.toSet()
 
-                    val organizationsMapFlow = organizationsQueries.fetchOrganizationsById(
-                        uid = organizationsIds,
-                        mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel, _, _, locationList, _, offices, _, updatedAt ->
-                            val timeIntervals =
-                                Json.decodeFromString<ScheduleTimeIntervalsEntity>(
-                                    timeIntervalsModel
-                                )
-                            val locations = locationList.map {
-                                Json.decodeFromString<ContactInfoEntity>(it)
-                            }
-                            OrganizationShortEntity(
-                                uid,
-                                isMain == 1L,
-                                name,
-                                type,
-                                avatar,
-                                locations,
-                                offices,
-                                timeIntervals,
-                                updatedAt
-                            )
-                        },
-                    ).asFlow()
-                        .mapToList(coroutineContext)
-                        .map { organization -> organization.associateBy { it.uid } }
-
-                    val subjectsMapFlow = subjectQueries.fetchSubjectsByOrganizations(
-                        organizationsIds,
-                    )
-                        .mapToListFlow(coroutineContext) { it.mapToBase() }
-                        .map { subject -> subject.associateBy { it.uid } }
-
-                    val employeesMapFlow = employeeQueries.fetchEmployeesByOrganizations(
-                        organizationsIds,
-                    )
-                        .mapToListFlow(coroutineContext) { it.mapToBase() }
-                        .map { employee -> employee.associateBy { it.uid } }
-
-                    combine(
-                        flowOf(homeworks),
-                        organizationsMapFlow,
-                        subjectsMapFlow,
-                        employeesMapFlow,
-                    ) { homeworksList, organizationsMap, subjectsMap, employeesMap ->
-                        homeworksList.map { homework ->
-                            homework.mapToDetails(
-                                organization = organizationsMap[homework.organizationId],
-                                subject = subjectsMap[homework.subjectId]?.mapToDetails(
-                                    employee = employeesMap[subjectsMap[homework.subjectId]?.teacherId]
-                                ),
-                            )
+                val organizationsMapFlow = organizationsQueries.fetchOrganizationsById(
+                    uid = organizationsIds,
+                    mapper = { uid, isMain, name, _, type, avatar, timeIntervalsModel, _, _, locationList, _, offices, _, updatedAt ->
+                        val timeIntervals = Json.decodeFromString<ScheduleTimeIntervalsEntity>(timeIntervalsModel)
+                        val locations = locationList.map {
+                            Json.decodeFromString<ContactInfoEntity>(it)
                         }
+                        OrganizationShortEntity(uid, isMain == 1L, name, type, avatar, locations, offices, timeIntervals, updatedAt)
+                    },
+                ).asFlow()
+                    .mapToList(coroutineContext)
+                    .map { organization -> organization.associateBy { it.uid } }
+
+                val subjectsMapFlow = subjectQueries.fetchSubjectsByOrganizations(organizationsIds)
+                    .mapToListFlow(coroutineContext) { it.mapToBase() }
+                    .map { subject -> subject.associateBy { it.uid } }
+
+                val employeesMapFlow = employeeQueries.fetchEmployeesByOrganizations(organizationsIds)
+                    .mapToListFlow(coroutineContext) { it.mapToBase() }
+                    .map { employee -> employee.associateBy { it.uid } }
+
+                combine(
+                    flowOf(homeworks),
+                    organizationsMapFlow,
+                    subjectsMapFlow,
+                    employeesMapFlow,
+                ) { homeworksList, organizationsMap, subjectsMap, employeesMap ->
+                    homeworksList.map { homework ->
+                        homework.mapToDetails(
+                            organization = organizationsMap[homework.organizationId],
+                            subject = subjectsMap[homework.subjectId]?.mapToDetails(
+                                employee = employeesMap[subjectsMap[homework.subjectId]?.teacherId]
+                            ),
+                        )
                     }
                 }
             }
+        }
 
         private fun Flow<BaseHomeworkEntity?>.flatMapToDetails(): Flow<HomeworkDetailsEntity?> {
             return mapNotNull { it?.let { listOf(it) } ?: emptyList() }
@@ -209,5 +177,4 @@ interface HomeworksLocalDataSource {
                 .map { it.getOrNull(0) }
         }
     }
-
 }

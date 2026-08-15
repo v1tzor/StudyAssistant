@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.backend.ai.infrastructure.deepseek.mappers
 
 import kotlinx.serialization.json.JsonObject
+import ru.aleshin.studyassistant.backend.ai.AiConfig
 import ru.aleshin.studyassistant.backend.ai.domain.model.AiCompletion
 import ru.aleshin.studyassistant.backend.ai.domain.model.AiCompletionRequest
 import ru.aleshin.studyassistant.backend.ai.domain.model.AiFinishReason
@@ -39,7 +40,8 @@ import ru.aleshin.studyassistant.backend.ai.infrastructure.deepseek.dto.DeepSeek
  * @author Stanislav Aleshin on 12.08.2026.
  */
 class DeepSeekMapper(
-    private val config: DeepSeekConfig,
+    private val deepSeekConfig: DeepSeekConfig,
+    private val aiConfig: AiConfig,
 ) {
 
     fun mapRequest(request: AiCompletionRequest): DeepSeekChatRequestDto {
@@ -53,7 +55,10 @@ class DeepSeekMapper(
                         AiMessageRole.ASSISTANT -> "assistant"
                         AiMessageRole.TOOL -> "tool"
                     },
-                    content = message.content,
+                    content = when (message.role) {
+                        AiMessageRole.ASSISTANT -> message.content.orEmpty()
+                        else -> message.content
+                    },
                     toolCalls = message.toolCalls
                         .map { toolCall ->
                             DeepSeekToolCallDto(
@@ -86,7 +91,7 @@ class DeepSeekMapper(
                 AiResponseFormat.JSON_OBJECT -> DeepSeekResponseFormatDto(type = JSON_OBJECT_RESPONSE_FORMAT)
             },
             temperature = request.temperature,
-            maxTokens = config.maxTokens,
+            maxTokens = deepSeekConfig.maxTokens,
             stream = false,
         )
     }
@@ -99,9 +104,17 @@ class DeepSeekMapper(
         val message = choice.message
         val allowedToolNames = request.tools
             .mapTo(mutableSetOf()) { tool -> tool.name }
-        val toolCallIds = mutableSetOf<String>()
+        val toolCallIds = request.messages
+            .flatMapTo(mutableSetOf()) { message -> message.toolCalls.map(AiToolCall::id) }
 
         if (message.role != ASSISTANT_ROLE) {
+            return null
+        }
+
+        if (
+            message.content != null && message.content.length > aiConfig.maxMessageCharacters ||
+            message.toolCalls.orEmpty().size > aiConfig.maxToolCallsPerMessage
+        ) {
             return null
         }
 
@@ -114,9 +127,11 @@ class DeepSeekMapper(
                 }.getOrDefault(false)
                 if (
                     toolCall.id.isBlank() ||
+                    toolCall.id.length > MAX_TOOL_CALL_ID_CHARACTERS ||
                     !toolCallIds.add(toolCall.id) ||
                     toolCall.type != FUNCTION_TYPE ||
                     toolCall.function.name !in allowedToolNames ||
+                    arguments.length > aiConfig.maxToolArgumentsCharacters ||
                     !validArguments
                 ) {
                     return null
@@ -138,7 +153,8 @@ class DeepSeekMapper(
 
         if (
             finishReason == AiFinishReason.TOOL_CALLS && toolCalls.isEmpty() ||
-            message.content.isNullOrBlank() && toolCalls.isEmpty() && finishReason != AiFinishReason.CONTENT_FILTER
+            finishReason != AiFinishReason.TOOL_CALLS && toolCalls.isNotEmpty() ||
+            message.content.isNullOrBlank() && toolCalls.isEmpty()
         ) {
             return null
         }
@@ -172,5 +188,6 @@ class DeepSeekMapper(
         const val FUNCTION_TYPE = "function"
         const val AUTO_TOOL_CHOICE = "auto"
         const val JSON_OBJECT_RESPONSE_FORMAT = "json_object"
+        const val MAX_TOOL_CALL_ID_CHARACTERS = 128
     }
 }

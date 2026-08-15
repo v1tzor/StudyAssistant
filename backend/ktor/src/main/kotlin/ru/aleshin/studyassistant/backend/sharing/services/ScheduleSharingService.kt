@@ -24,7 +24,6 @@ import ru.aleshin.studyassistant.backend.common.api.InvalidShareException
 import ru.aleshin.studyassistant.backend.common.api.RateLimitException
 import ru.aleshin.studyassistant.backend.common.api.ServerUnavailableException
 import ru.aleshin.studyassistant.backend.common.api.RewardUnavailableException
-import ru.aleshin.studyassistant.backend.ads.domain.repository.AdRewardRepository
 import ru.aleshin.studyassistant.backend.ads.services.AdRewardService
 import ru.aleshin.studyassistant.backend.plugins.BackendJson
 import ru.aleshin.studyassistant.backend.security.ClaimTokenService
@@ -65,7 +64,6 @@ class ScheduleSharingService(
     private val claimTokenService: ClaimTokenService,
     private val payloadCipher: PayloadCipher,
     private val payloadValidator: SharePayloadValidator,
-    private val adRewardRepository: AdRewardRepository,
     private val adRewardService: AdRewardService,
     private val config: SharingConfig,
     private val clock: Clock,
@@ -224,17 +222,16 @@ class ScheduleSharingService(
             installationToken = installationToken,
         )
         val rewardSubjectHash = adRewardService.hashSubject(request.claimToken)
-        if (!adRewardRepository.hasScheduleImportReward(installationHash, rewardSubjectHash)) {
-            throw RewardUnavailableException()
-        }
 
-        return when (repository.confirm(claimHash = claimHash, now = clock.instant())) {
+        return when (
+            repository.confirm(
+                claimHash = claimHash,
+                installationHash = installationHash,
+                rewardSubjectHash = rewardSubjectHash,
+                now = clock.instant(),
+            )
+        ) {
             ClaimActionStorageResult.Success -> {
-                adRewardRepository.consumeScheduleImportReward(
-                    installationHash = installationHash,
-                    subjectHash = rewardSubjectHash,
-                    now = clock.instant(),
-                )
                 SuccessResponse(
                     success = true,
                 )
@@ -243,11 +240,10 @@ class ScheduleSharingService(
                 throw ClaimedShareException()
             }
             ClaimActionStorageResult.Consumed -> {
-                /*
-                 * Currently confirm itself never returns this:
-                 * repeated confirm is idempotent.
-                 */
                 throw ConsumedShareException()
+            }
+            ClaimActionStorageResult.RewardUnavailable -> {
+                throw RewardUnavailableException()
             }
         }
     }
@@ -263,6 +259,7 @@ class ScheduleSharingService(
             ClaimActionStorageResult.Success -> SuccessResponse(success = true)
             ClaimActionStorageResult.InvalidClaim -> throw ClaimedShareException()
             ClaimActionStorageResult.Consumed -> throw ConsumedShareException()
+            ClaimActionStorageResult.RewardUnavailable -> throw RewardUnavailableException()
         }
     }
 

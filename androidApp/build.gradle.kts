@@ -28,10 +28,14 @@ android {
 
     val localProperties = gradleLocalProperties(rootDir, providers)
 
-    val yandexTasksBannerId = providers.gradleProperty("studyassistant.ads.tasks.banner.id").orNull
-    val yandexInfoBannerId = providers.gradleProperty("studyassistant.ads.info.banner.id").orNull
-    val yandexAiRewardedId = providers.gradleProperty("studyassistant.ads.ai.rewarded.id").orNull
-    val yandexScheduleRewardedId = providers.gradleProperty("studyassistant.ads.schedule.rewarded.id").orNull
+    val yandexTasksBannerId = localProperties.getProperty("studyassistant.ads.tasks.banner.id")
+        ?: providers.gradleProperty("studyassistant.ads.tasks.banner.id").orNull.orEmpty()
+    val yandexInfoBannerId = localProperties.getProperty("studyassistant.ads.info.banner.id")
+        ?: providers.gradleProperty("studyassistant.ads.info.banner.id").orNull.orEmpty()
+    val yandexAiRewardedId = localProperties.getProperty("studyassistant.ads.ai.rewarded.id")
+        ?: providers.gradleProperty("studyassistant.ads.ai.rewarded.id").orNull.orEmpty()
+    val yandexScheduleRewardedId = localProperties.getProperty("studyassistant.ads.schedule.rewarded.id")
+        ?: providers.gradleProperty("studyassistant.ads.schedule.rewarded.id").orNull.orEmpty()
 
     defaultConfig {
         applicationId = libs.versions.applicationId.get()
@@ -76,18 +80,18 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
 
-            buildConfigField("String", "YANDEX_TASKS_BANNER_ID", "\"${yandexTasksBannerId.orEmpty()}\"")
-            buildConfigField("String", "YANDEX_INFO_BANNER_ID", "\"${yandexInfoBannerId.orEmpty()}\"")
-            buildConfigField("String", "YANDEX_AI_REWARDED_ID", "\"${yandexAiRewardedId.orEmpty()}\"")
-            buildConfigField("String", "YANDEX_SCHEDULE_REWARDED_ID", "\"${yandexScheduleRewardedId.orEmpty()}\"")
+            buildConfigField("String", "YANDEX_TASKS_BANNER_ID", "\"$yandexTasksBannerId\"")
+            buildConfigField("String", "YANDEX_INFO_BANNER_ID", "\"$yandexInfoBannerId\"")
+            buildConfigField("String", "YANDEX_AI_REWARDED_ID", "\"$yandexAiRewardedId\"")
+            buildConfigField("String", "YANDEX_SCHEDULE_REWARDED_ID", "\"$yandexScheduleRewardedId\"")
         }
         getByName("debug") {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
-            buildConfigField("String", "YANDEX_TASKS_BANNER_ID", "\"${yandexTasksBannerId ?: "demo-banner-yandex"}\"")
-            buildConfigField("String", "YANDEX_INFO_BANNER_ID", "\"${yandexInfoBannerId ?: "demo-banner-yandex"}\"")
-            buildConfigField("String", "YANDEX_AI_REWARDED_ID", "\"${yandexAiRewardedId ?: "demo-rewarded-yandex"}\"")
-            buildConfigField("String", "YANDEX_SCHEDULE_REWARDED_ID", "\"${yandexScheduleRewardedId ?: "demo-rewarded-yandex"}\"")
+            buildConfigField("String", "YANDEX_TASKS_BANNER_ID", "\"$yandexTasksBannerId\"")
+            buildConfigField("String", "YANDEX_INFO_BANNER_ID", "\"$yandexInfoBannerId\"")
+            buildConfigField("String", "YANDEX_AI_REWARDED_ID", "\"$yandexAiRewardedId\"")
+            buildConfigField("String", "YANDEX_SCHEDULE_REWARDED_ID", "\"$yandexScheduleRewardedId\"")
         }
     }
 

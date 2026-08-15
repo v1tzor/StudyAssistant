@@ -22,7 +22,6 @@ import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.core.isNull
-import org.jetbrains.exposed.v1.core.isNotNull
 import org.jetbrains.exposed.v1.core.sum
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -181,42 +180,6 @@ class AdRewardRepositoryImpl(
             purpose = purpose,
             now = now,
         )
-    }
-
-    override suspend fun hasScheduleImportReward(
-        installationHash: ByteArray,
-        subjectHash: ByteArray,
-    ): Boolean = dbQuery {
-        AdRewardChallengesTable
-            .select(AdRewardChallengesTable.id)
-            .where {
-                (AdRewardChallengesTable.installationHash eq installationHash) and
-                    (AdRewardChallengesTable.purpose eq AdRewardPurpose.SCHEDULE_IMPORT.value) and
-                    (AdRewardChallengesTable.subjectHash eq subjectHash) and
-                    AdRewardChallengesTable.completedAt.isNotNull() and
-                    AdRewardChallengesTable.consumedAt.isNull()
-            }
-            .limit(1)
-            .singleOrNull() != null
-    }
-
-    override suspend fun consumeScheduleImportReward(
-        installationHash: ByteArray,
-        subjectHash: ByteArray,
-        now: Instant,
-    ) = dbQuery {
-        AdRewardChallengesTable.update(
-            where = {
-                (AdRewardChallengesTable.installationHash eq installationHash) and
-                    (AdRewardChallengesTable.purpose eq AdRewardPurpose.SCHEDULE_IMPORT.value) and
-                    (AdRewardChallengesTable.subjectHash eq subjectHash) and
-                    AdRewardChallengesTable.completedAt.isNotNull() and
-                    AdRewardChallengesTable.consumedAt.isNull()
-            },
-        ) {
-            it[consumedAt] = now.atOffset(ZoneOffset.UTC)
-        }
-        Unit
     }
 
     private fun completion(

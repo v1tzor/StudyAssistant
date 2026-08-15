@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.backend.ai.infrastructure.deepseek.dto
 
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.Serializable
 
 /**
@@ -24,6 +25,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DeepSeekToolCallDto(
     val id: String,
+    @EncodeDefault(EncodeDefault.Mode.ALWAYS)
     val type: String = "function",
     val function: DeepSeekFunctionDto,
 )

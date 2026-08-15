@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.data.datasources
+package ru.aleshin.studyassistant.core.database.datasource.secure
 
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec

@@ -54,6 +54,7 @@ import ru.aleshin.studyassistant.backend.plugins.configureSerialization
 import ru.aleshin.studyassistant.backend.plugins.configureStatusPages
 import ru.aleshin.studyassistant.backend.security.InstallationHasher
 import ru.aleshin.studyassistant.backend.security.InstallationCredentialService
+import ru.aleshin.studyassistant.backend.security.PayloadCipher
 
 /**
  * @author Stanislav Aleshin on 12.08.2026.
@@ -163,6 +164,7 @@ class ScheduleExtractionRoutesTest {
                 }
             },
             clock = clock,
+            payloadCipher = PayloadCipher(ByteArray(32) { 2 }),
         )
     }
 
@@ -206,6 +208,14 @@ class ScheduleExtractionRoutesTest {
         ) {
             finalizedResults += succeeded
         }
+
+        override suspend fun saveResponse(
+            installationHash: ByteArray,
+            messageId: UUID,
+            executionHash: ByteArray,
+            responsePayload: ByteArray,
+            responseNonce: ByteArray,
+        ) = Unit
     }
 
 }

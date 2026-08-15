@@ -46,7 +46,7 @@ interface GeneralSettingsLocalDataSource {
         }
 
         override suspend fun updateSettings(settings: GeneralSettingsEntity) {
-            generalQueries.updateSettings(settings).await()
+            generalQueries.updateSettings(settings)
         }
     }
 }

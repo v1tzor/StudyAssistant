@@ -22,6 +22,8 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -71,11 +73,23 @@ class BackendShareApi(
     }
 
     suspend fun confirmSchedule(claimToken: String, installationToken: String) {
-        executeWithoutResponse(
-            path = StudyAssistantKtor.Backend.SCHEDULE_SHARE_CONFIRM,
-            request = ClaimTokenRequestPojo(claimToken = claimToken),
-            installationToken = installationToken,
-        )
+        for (attempt in 0 until CONFIRM_ATTEMPTS) {
+            try {
+                executeWithoutResponse(
+                    path = StudyAssistantKtor.Backend.SCHEDULE_SHARE_CONFIRM,
+                    request = ClaimTokenRequestPojo(claimToken = claimToken),
+                    installationToken = installationToken,
+                )
+                return
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                val retryable = error is InternetConnectionException ||
+                    error is ShareException.ServerUnavailable
+                if (!retryable || attempt == CONFIRM_ATTEMPTS - 1) throw error
+                delay(CONFIRM_RETRY_DELAY_MILLIS * (attempt + 1))
+            }
+        }
     }
 
     suspend fun releaseSchedule(claimToken: String) {
@@ -164,5 +178,10 @@ class BackendShareApi(
             )
         }
         return responseBody
+    }
+
+    private companion object {
+        const val CONFIRM_ATTEMPTS = 4
+        const val CONFIRM_RETRY_DELAY_MILLIS = 250L
     }
 }

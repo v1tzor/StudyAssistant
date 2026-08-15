@@ -246,8 +246,9 @@ private fun WorkloadIndicator(
     progress: Float,
     color: Color,
 ) {
+    val safeProgress = progress.takeIf { it.isFinite() }?.coerceIn(0f, 1f) ?: 0f
     LinearProgressIndicator(
-        progress = { progress },
+        progress = { safeProgress },
         modifier = Modifier.fillMaxWidth().height(6.dp),
         trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         color = color,

@@ -56,10 +56,7 @@ interface AiRemoteApi {
 
             val response = try {
                 httpClient.post(StudyAssistantKtor.Backend.AI_COMPLETIONS) {
-                    header(
-                        StudyAssistantKtor.Backend.INSTALLATION_TOKEN_HEADER,
-                        installationToken,
-                    )
+                    header(StudyAssistantKtor.Backend.INSTALLATION_TOKEN_HEADER, installationToken)
                     setBody(request)
                 }
             } catch (_: IOException) {

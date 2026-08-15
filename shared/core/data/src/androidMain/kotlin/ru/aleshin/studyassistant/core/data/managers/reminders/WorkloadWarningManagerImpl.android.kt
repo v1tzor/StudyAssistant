@@ -39,8 +39,7 @@ actual class WorkloadWarningManagerImpl(
 
     actual override suspend fun startOrRetryWarningService() {
         val currentTime = dateManager.fetchCurrentInstant()
-        val targetTime =
-            currentTime.setHoursAndMinutes(hour = CHECK_TIME_HOUR, minute = CHECK_TIME_MINUTE)
+        val targetTime = currentTime.setHoursAndMinutes(hour = CHECK_TIME_HOUR, minute = CHECK_TIME_MINUTE)
         val delayDuration = targetTime - currentTime
         val delay = if (delayDuration.isPositive()) {
             delayDuration.inWholeMilliseconds

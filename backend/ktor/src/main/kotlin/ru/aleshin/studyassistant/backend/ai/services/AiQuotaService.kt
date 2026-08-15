@@ -40,12 +40,8 @@ class AiQuotaService(
         executionFingerprint: String = requestFingerprint,
     ): AiQuotaReservationResult {
         val installationHash = installationHasher.hash(installationToken = installationToken)
-        val requestHash = MessageDigest
-            .getInstance(HASH_ALGORITHM)
-            .digest(requestFingerprint.toByteArray(StandardCharsets.UTF_8))
-        val executionHash = MessageDigest
-            .getInstance(HASH_ALGORITHM)
-            .digest(executionFingerprint.toByteArray(StandardCharsets.UTF_8))
+        val requestHash = hash(fingerprint = requestFingerprint)
+        val executionHash = hash(fingerprint = executionFingerprint)
 
         return repository.reserve(
             installationHash = installationHash,
@@ -69,6 +65,30 @@ class AiQuotaService(
             succeeded = succeeded,
             now = clock.instant(),
         )
+    }
+
+    suspend fun saveResponse(
+        installationToken: String,
+        messageId: UUID,
+        executionFingerprint: String,
+        responsePayload: ByteArray,
+        responseNonce: ByteArray,
+    ) {
+        val installationHash = installationHasher.hash(installationToken = installationToken)
+
+        repository.saveResponse(
+            installationHash = installationHash,
+            messageId = messageId,
+            executionHash = hash(fingerprint = executionFingerprint),
+            responsePayload = responsePayload,
+            responseNonce = responseNonce,
+        )
+    }
+
+    private fun hash(fingerprint: String): ByteArray {
+        return MessageDigest
+            .getInstance(HASH_ALGORITHM)
+            .digest(fingerprint.toByteArray(StandardCharsets.UTF_8))
     }
 
     private companion object {

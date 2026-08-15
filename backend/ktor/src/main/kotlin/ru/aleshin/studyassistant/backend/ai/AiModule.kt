@@ -50,6 +50,7 @@ import ru.aleshin.studyassistant.backend.database.DatabaseFactory
 import ru.aleshin.studyassistant.backend.plugins.BackendJson
 import ru.aleshin.studyassistant.backend.security.InstallationHasher
 import ru.aleshin.studyassistant.backend.security.InstallationCredentialService
+import ru.aleshin.studyassistant.backend.security.PayloadCipher
 import java.time.Clock
 import kotlin.random.Random
 
@@ -104,7 +105,12 @@ fun Application.aiModule() {
         }
         provide<AiCompletionRequestMapper> { AiCompletionRequestMapper() }
         provide<AiCompletionResponseMapper> { AiCompletionResponseMapper() }
-        provide<DeepSeekMapper> { DeepSeekMapper(config = deepSeekConfig) }
+        provide<DeepSeekMapper> {
+            DeepSeekMapper(
+                deepSeekConfig = deepSeekConfig,
+                aiConfig = config,
+            )
+        }
         provide<ScheduleExtractionRequestValidator> {
             ScheduleExtractionRequestValidator(config = config)
         }
@@ -135,6 +141,7 @@ fun Application.aiModule() {
                 quotaService = resolve<AiQuotaService>(),
                 completionGateway = resolve<AiCompletionGateway>(),
                 clock = clock,
+                payloadCipher = resolve<PayloadCipher>(),
             )
         }
 
@@ -152,6 +159,7 @@ fun Application.aiModule() {
                 quotaService = resolve<AiQuotaService>(),
                 extractionGateway = resolve<ScheduleExtractionGateway>(),
                 clock = clock,
+                payloadCipher = resolve<PayloadCipher>(),
             )
         }
     }

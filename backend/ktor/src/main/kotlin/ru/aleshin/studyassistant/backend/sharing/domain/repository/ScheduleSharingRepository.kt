@@ -46,6 +46,8 @@ interface ScheduleSharingRepository {
 
     suspend fun confirm(
         claimHash: ByteArray,
+        installationHash: ByteArray,
+        rewardSubjectHash: ByteArray,
         now: Instant,
     ): ClaimActionStorageResult
 

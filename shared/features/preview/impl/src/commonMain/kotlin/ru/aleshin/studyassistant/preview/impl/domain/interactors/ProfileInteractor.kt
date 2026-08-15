@@ -36,10 +36,7 @@ internal interface ProfileInteractor {
 
     suspend fun fetchProfile(): FlowDomainResult<PreviewFailures, Profile>
     suspend fun updateProfile(profile: Profile): UnitDomainResult<PreviewFailures>
-    suspend fun uploadAvatar(
-        oldAvatar: String?,
-        file: InputFile,
-    ): DomainResult<PreviewFailures, String>
+    suspend fun uploadAvatar(oldAvatar: String?, file: InputFile): DomainResult<PreviewFailures, String>
     suspend fun deleteAvatar(avatar: String): UnitDomainResult<PreviewFailures>
 
     class Base(
@@ -53,12 +50,7 @@ internal interface ProfileInteractor {
             profileRepository.fetchProfile().map { profile ->
                 profile ?: Profile(
                     uid = randomUUID(),
-                    username = if (
-                        deviceInfoProvider.fetchDeviceLanguage().startsWith(
-                            prefix = "ru",
-                            ignoreCase = true,
-                        )
-                    ) {
+                    username = if (deviceInfoProvider.fetchDeviceLanguage().startsWith(prefix = "ru", ignoreCase = true)) {
                         DEFAULT_USERNAME_RU
                     } else {
                         DEFAULT_USERNAME_EN

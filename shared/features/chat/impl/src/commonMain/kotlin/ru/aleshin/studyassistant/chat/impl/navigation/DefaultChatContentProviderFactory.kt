@@ -23,15 +23,19 @@ import org.kodein.di.on
 import ru.aleshin.studyassistant.chat.api.ChatConfig
 import ru.aleshin.studyassistant.chat.api.ChatContentProviderFactory
 import ru.aleshin.studyassistant.chat.api.ChatOutput
-import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.ChatContentProvider
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.store.ChatFeatureComponent
+import ru.aleshin.studyassistant.chat.impl.presentation.ui.root.ChatContentProvider
 import ru.aleshin.studyassistant.core.common.architecture.component.FeatureComponentDeps
 import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
 import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
 
+/**
+ * @author Stanislav Aleshin on 09.08.2026.
+ */
 internal class DefaultChatContentProviderFactory(
     private val di: DI,
 ) : ChatContentProviderFactory {
+
     override fun createProvider(
         componentContext: ComponentContext,
         startConfig: ChatConfig,

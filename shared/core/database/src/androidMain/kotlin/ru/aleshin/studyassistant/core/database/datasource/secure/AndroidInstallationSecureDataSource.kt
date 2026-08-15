@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.data.datasources
+package ru.aleshin.studyassistant.core.database.datasource.secure
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * @author Stanislav Aleshin on 08.08.2026.
  */
-internal class IosInstallationSecureDataSource(
-    private val storage: IosSecureStorage,
+internal class AndroidInstallationSecureDataSource(
+    private val storage: AndroidSecureStorage,
 ) : InstallationSecureDataSource {
 
-    override suspend fun fetchInstallationToken(): String? = storage.read(INSTALLATION_TOKEN)
+    override suspend fun fetchInstallationToken(): String? = withContext(Dispatchers.IO) {
+        storage.read(INSTALLATION_TOKEN)
+    }
 
     override suspend fun saveInstallationToken(token: String) {
-        storage.write(INSTALLATION_TOKEN, token)
+        withContext(Dispatchers.IO) {
+            storage.write(INSTALLATION_TOKEN, token)
+        }
     }
 
     private companion object {

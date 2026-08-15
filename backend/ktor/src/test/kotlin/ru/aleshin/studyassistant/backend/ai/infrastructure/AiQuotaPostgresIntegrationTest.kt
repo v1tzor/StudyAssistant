@@ -23,12 +23,14 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
 import ru.aleshin.studyassistant.backend.ads.domain.model.AdRewardPurpose
+import ru.aleshin.studyassistant.backend.ads.infrastructure.AdRewardChallengesTable
 import ru.aleshin.studyassistant.backend.ads.infrastructure.AdRewardRepositoryImpl
 import ru.aleshin.studyassistant.backend.ai.AiConfig
 import ru.aleshin.studyassistant.backend.ai.domain.result.AiQuotaReservationResult
@@ -44,6 +46,8 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.uuid.Uuid
 
 /**
  * @author Stanislav Aleshin on 11.08.2026.
@@ -182,6 +186,119 @@ class AiQuotaPostgresIntegrationTest {
         )
 
         check(result is AiQuotaReservationResult.IdempotencyReplay)
+    }
+
+    @Test
+    fun cachedResponseShouldNotBeReplayedForNewOrFailedExecution() = runBlocking {
+        val installationHash = randomHash()
+        val messageId = UUID.randomUUID()
+        val requestHash = randomHash()
+        val firstExecutionHash = randomHash()
+        val secondExecutionHash = randomHash()
+        val now = Instant.parse("2026-08-11T18:00:00Z")
+
+        repository.reserve(
+            installationHash = installationHash,
+            messageId = messageId,
+            requestHash = requestHash,
+            executionHash = firstExecutionHash,
+            now = now,
+        )
+        repository.saveResponse(
+            installationHash = installationHash,
+            messageId = messageId,
+            executionHash = firstExecutionHash,
+            responsePayload = ByteArray(17) { 1 },
+            responseNonce = ByteArray(12) { 2 },
+        )
+        repository.finalize(
+            installationHash = installationHash,
+            messageId = messageId,
+            succeeded = true,
+            now = now.plusSeconds(1),
+        )
+
+        val nextExecution = repository.reserve(
+            installationHash = installationHash,
+            messageId = messageId,
+            requestHash = requestHash,
+            executionHash = secondExecutionHash,
+            now = now.plusSeconds(2),
+        )
+        check(nextExecution is AiQuotaReservationResult.Reserved)
+
+        val activeReplay = repository.reserve(
+            installationHash = installationHash,
+            messageId = messageId,
+            requestHash = requestHash,
+            executionHash = secondExecutionHash,
+            now = now.plusSeconds(3),
+        ) as AiQuotaReservationResult.IdempotencyReplay
+        assertNull(activeReplay.responsePayload)
+        assertNull(activeReplay.responseNonce)
+
+        repository.finalize(
+            installationHash = installationHash,
+            messageId = messageId,
+            succeeded = false,
+            now = now.plusSeconds(4),
+        )
+
+        val retry = repository.reserve(
+            installationHash = installationHash,
+            messageId = messageId,
+            requestHash = requestHash,
+            executionHash = secondExecutionHash,
+            now = now.plusSeconds(5),
+        )
+        check(retry is AiQuotaReservationResult.Reserved)
+    }
+
+    @Test
+    fun staleConcurrentExecutionShouldNotOverwriteLatestResponseCache() = runBlocking {
+        val installationHash = randomHash()
+        val messageId = UUID.randomUUID()
+        val requestHash = randomHash()
+        val firstExecutionHash = randomHash()
+        val secondExecutionHash = randomHash()
+        val now = Instant.parse("2026-08-11T18:00:00Z")
+
+        check(
+            repository.reserve(
+                installationHash = installationHash,
+                messageId = messageId,
+                requestHash = requestHash,
+                executionHash = firstExecutionHash,
+                now = now,
+            ) is AiQuotaReservationResult.Reserved,
+        )
+        check(
+            repository.reserve(
+                installationHash = installationHash,
+                messageId = messageId,
+                requestHash = requestHash,
+                executionHash = secondExecutionHash,
+                now = now.plusSeconds(1),
+            ) is AiQuotaReservationResult.Reserved,
+        )
+
+        repository.saveResponse(
+            installationHash = installationHash,
+            messageId = messageId,
+            executionHash = firstExecutionHash,
+            responsePayload = ByteArray(17) { 3 },
+            responseNonce = ByteArray(12) { 4 },
+        )
+
+        val replay = repository.reserve(
+            installationHash = installationHash,
+            messageId = messageId,
+            requestHash = requestHash,
+            executionHash = secondExecutionHash,
+            now = now.plusSeconds(2),
+        ) as AiQuotaReservationResult.IdempotencyReplay
+        assertNull(replay.responsePayload)
+        assertNull(replay.responseNonce)
     }
 
     @Test
@@ -373,45 +490,6 @@ class AiQuotaPostgresIntegrationTest {
     }
 
     @Test
-    fun scheduleRewardShouldBeBoundToInstallationAndConsumedOnce() = runBlocking {
-        val rewardRepository = AdRewardRepositoryImpl(
-            database = databaseFactory.database,
-            config = aiConfig(),
-        )
-        val installationHash = randomHash()
-        val otherInstallationHash = randomHash()
-        val subjectHash = randomHash()
-        val now = Instant.parse("2026-08-11T18:00:00Z")
-        val challenge = checkNotNull(
-            rewardRepository.createChallenge(
-                installationHash = installationHash,
-                purpose = AdRewardPurpose.SCHEDULE_IMPORT,
-                subjectHash = subjectHash,
-                now = now,
-            ),
-        )
-
-        checkNotNull(
-            rewardRepository.completeChallenge(
-                installationHash = installationHash,
-                challengeId = challenge.id,
-                now = now.plusSeconds(1),
-            ),
-        )
-
-        assertEquals(true, rewardRepository.hasScheduleImportReward(installationHash, subjectHash))
-        assertEquals(false, rewardRepository.hasScheduleImportReward(otherInstallationHash, subjectHash))
-
-        rewardRepository.consumeScheduleImportReward(
-            installationHash = installationHash,
-            subjectHash = subjectHash,
-            now = now.plusSeconds(2),
-        )
-
-        assertEquals(false, rewardRepository.hasScheduleImportReward(installationHash, subjectHash))
-    }
-
-    @Test
     fun thirtyFirstExecutionShouldBeRateLimited() = runBlocking {
         val installationHash = randomHash()
         val messageIds = List(4) { UUID.randomUUID() }
@@ -597,6 +675,7 @@ class AiQuotaPostgresIntegrationTest {
         val installationHash = randomHash()
         val messageId = UUID.randomUUID()
         val createdAt = Instant.parse("2026-08-08T18:00:00Z")
+        val cleanupAt = Instant.parse("2026-08-12T18:00:00Z")
 
         repository.reserve(
             installationHash = installationHash,
@@ -609,19 +688,43 @@ class AiQuotaPostgresIntegrationTest {
             succeeded = true,
             now = createdAt,
         )
+        transaction(db = databaseFactory.database) {
+            AdRewardChallengesTable.insert {
+                it[id] = Uuid.parse(UUID.randomUUID().toString())
+                it[AdRewardChallengesTable.installationHash] = installationHash
+                it[purpose] = AdRewardPurpose.SCHEDULE_IMPORT.value
+                it[subjectHash] = randomHash()
+                it[AdRewardChallengesTable.createdAt] = createdAt.atOffset(ZoneOffset.UTC)
+                it[expiresAt] = createdAt.plusSeconds(60).atOffset(ZoneOffset.UTC)
+                it[completedAt] = null
+                it[consumedAt] = null
+            }
+            AdRewardChallengesTable.insert {
+                it[id] = Uuid.parse(UUID.randomUUID().toString())
+                it[AdRewardChallengesTable.installationHash] = installationHash
+                it[purpose] = AdRewardPurpose.SCHEDULE_IMPORT.value
+                it[subjectHash] = randomHash()
+                it[AdRewardChallengesTable.createdAt] = cleanupAt.minusSeconds(60).atOffset(ZoneOffset.UTC)
+                it[expiresAt] = cleanupAt.plusSeconds(60).atOffset(ZoneOffset.UTC)
+                it[completedAt] = null
+                it[consumedAt] = null
+            }
+        }
 
         val result = AiCleanupRepositoryImpl(
             database = databaseFactory.database,
         ).cleanup(
-            now = Instant.parse("2026-08-12T18:00:00Z"),
+            now = cleanupAt,
         )
 
         assertEquals(1, result.removedRequests)
         assertEquals(1, result.removedUsageRows)
+        assertEquals(1, result.removedRewardChallenges)
 
         transaction(db = databaseFactory.database) {
             assertEquals(0L, AiRequestsTable.selectAll().count())
             assertEquals(0L, AiUsageTable.selectAll().count())
+            assertEquals(1L, AdRewardChallengesTable.selectAll().count())
         }
     }
 

@@ -24,6 +24,7 @@ import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import ru.aleshin.studyassistant.backend.ai.domain.repository.AiCleanupRepository
 import ru.aleshin.studyassistant.backend.ai.domain.result.AiCleanupResult
+import ru.aleshin.studyassistant.backend.ads.infrastructure.AdRewardChallengesTable
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
@@ -50,10 +51,14 @@ class AiCleanupRepositoryImpl(
         val removedUsageRows = AiUsageTable.deleteWhere {
             AiUsageTable.usageDate less usageCutoff
         }
+        val removedRewardChallenges = AdRewardChallengesTable.deleteWhere {
+            AdRewardChallengesTable.expiresAt less requestCutoff
+        }
 
         AiCleanupResult(
             removedRequests = removedRequests,
             removedUsageRows = removedUsageRows,
+            removedRewardChallenges = removedRewardChallenges,
         )
     }
 

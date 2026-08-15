@@ -20,10 +20,18 @@ import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.database.datasource.DriverFactory
+import ru.aleshin.studyassistant.core.database.datasource.avatar.AndroidAvatarLocalDataSource
+import ru.aleshin.studyassistant.core.database.datasource.avatar.AvatarLocalDataSource
+import ru.aleshin.studyassistant.core.database.datasource.secure.AndroidInstallationSecureDataSource
+import ru.aleshin.studyassistant.core.database.datasource.secure.AndroidSecureStorage
+import ru.aleshin.studyassistant.core.database.datasource.secure.InstallationSecureDataSource
 
 /**
  * @author Stanislav Aleshin on 24.08.2024.
  */
 actual val coreDatabasePlatformModule = DI.Module("CoreDatabasePlatform") {
+    bindSingleton<AndroidSecureStorage> { AndroidSecureStorage(instance()) }
+    bindSingleton<InstallationSecureDataSource> { AndroidInstallationSecureDataSource(instance()) }
+    bindSingleton<AvatarLocalDataSource> { AndroidAvatarLocalDataSource(instance()) }
     bindSingleton<DriverFactory> { DriverFactory(instance()) }
 }

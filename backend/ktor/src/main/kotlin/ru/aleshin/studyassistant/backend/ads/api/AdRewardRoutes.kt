@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.backend.ads.api
 
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.plugins.bodylimit.RequestBodyLimit
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -25,6 +26,7 @@ import io.ktor.server.routing.route
 import ru.aleshin.studyassistant.backend.ads.api.dto.AdRewardChallengeRequestDto
 import ru.aleshin.studyassistant.backend.ads.services.AdRewardService
 import ru.aleshin.studyassistant.backend.common.api.requireInstallationToken
+import ru.aleshin.studyassistant.backend.common.api.requireJsonContentType
 import ru.aleshin.studyassistant.backend.security.InstallationCredentialService
 
 /**
@@ -35,8 +37,13 @@ fun Route.adRewardRoutes(
     credentialService: InstallationCredentialService,
 ) {
     route("/api/v1/ad-rewards") {
+        install(RequestBodyLimit) {
+            bodyLimit { MAX_REQUEST_BODY_BYTES }
+        }
+
         post("/challenges") {
             val installationToken = call.requireInstallationToken(credentialService)
+            call.requireJsonContentType()
             val request = call.receive<AdRewardChallengeRequestDto>()
             call.respond(
                 status = HttpStatusCode.Created,
@@ -53,3 +60,5 @@ fun Route.adRewardRoutes(
         }
     }
 }
+
+private const val MAX_REQUEST_BODY_BYTES = 16_384L

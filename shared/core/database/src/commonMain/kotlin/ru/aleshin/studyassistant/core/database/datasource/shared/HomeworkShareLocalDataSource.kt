@@ -18,9 +18,10 @@ package ru.aleshin.studyassistant.core.database.datasource.shared
 
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import kotlinx.coroutines.CancellationException
-import ru.aleshin.studyassistant.core.data.Database
 import ru.aleshin.studyassistant.core.database.mappers.tasks.mapToEntity
 import ru.aleshin.studyassistant.core.database.models.tasks.BaseHomeworkEntity
+import ru.aleshin.studyassistant.sqldelight.shared.HomeworkShareReceiptQueries
+import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkQueries
 
 /**
  * @author Stanislav Aleshin on 08.08.2026.
@@ -28,20 +29,15 @@ import ru.aleshin.studyassistant.core.database.models.tasks.BaseHomeworkEntity
 interface HomeworkShareLocalDataSource {
 
     suspend fun contains(shareCode: String): Boolean
-
-    suspend fun importHomeworks(
-        shareCode: String,
-        importedAt: Long,
-        homeworks: List<BaseHomeworkEntity>,
-    ): Boolean
+    suspend fun importHomeworks(shareCode: String, importedAt: Long, homeworks: List<BaseHomeworkEntity>): Boolean
 
     class Base(
-        private val database: Database,
+        private val homeworkShareQueries: HomeworkShareReceiptQueries,
+        private val homeworkQueries: HomeworkQueries,
     ) : HomeworkShareLocalDataSource {
 
         override suspend fun contains(shareCode: String): Boolean {
-            return database.homeworkShareReceiptQueries.fetchReceipt(shareCode)
-                .awaitAsOneOrNull() != null
+            return homeworkShareQueries.fetchReceipt(shareCode).awaitAsOneOrNull() != null
         }
 
         override suspend fun importHomeworks(
@@ -50,12 +46,10 @@ interface HomeworkShareLocalDataSource {
             homeworks: List<BaseHomeworkEntity>,
         ): Boolean {
             try {
-                database.transaction {
-                    database.homeworkShareReceiptQueries.addReceipt(shareCode, importedAt)
+                homeworkShareQueries.transaction {
+                    homeworkShareQueries.addReceipt(shareCode, importedAt)
                     homeworks.forEach { homework ->
-                        database.homeworkQueries.addOrUpdateHomework(
-                            homework.mapToEntity(),
-                        )
+                        homeworkQueries.addOrUpdateHomework(homework.mapToEntity())
                     }
                 }
             } catch (error: Throwable) {

@@ -18,11 +18,20 @@ package ru.aleshin.studyassistant.core.database.di
 
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
+import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.database.datasource.DriverFactory
+import ru.aleshin.studyassistant.core.database.datasource.avatar.AvatarLocalDataSource
+import ru.aleshin.studyassistant.core.database.datasource.avatar.IosAvatarLocalDataSource
+import ru.aleshin.studyassistant.core.database.datasource.secure.InstallationSecureDataSource
+import ru.aleshin.studyassistant.core.database.datasource.secure.IosInstallationSecureDataSource
+import ru.aleshin.studyassistant.core.database.datasource.secure.IosSecureStorage
 
 /**
  * @author Stanislav Aleshin on 24.08.2024.
  */
 actual val coreDatabasePlatformModule = DI.Module("CoreDatabasePlatform") {
+    bindSingleton<IosSecureStorage> { IosSecureStorage() }
+    bindSingleton<InstallationSecureDataSource> { IosInstallationSecureDataSource(instance()) }
+    bindSingleton<AvatarLocalDataSource> { IosAvatarLocalDataSource() }
     bindSingleton<DriverFactory> { DriverFactory() }
 }

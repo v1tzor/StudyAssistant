@@ -1,7 +1,7 @@
 [versions]
 applicationId = "ru.aleshin.studyassistant"
 minSdk = "24"
-targetSdk = "36"
+targetSdk = "37"
 compileSdk = "37"
 jvmTarget = "17"
 version-name = "1.1.0"

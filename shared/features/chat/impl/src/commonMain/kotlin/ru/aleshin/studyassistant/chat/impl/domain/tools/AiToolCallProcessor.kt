@@ -102,8 +102,7 @@ internal interface AiToolCallProcessor {
             return when (AiToolName.fromWireName(call.function.name)) {
                 AiToolName.UPDATE_TODO,
                 AiToolName.COMPLETE_TODO,
-                AiToolName.DELETE_TODO,
-                -> {
+                AiToolName.DELETE_TODO, -> {
                     val todo = args["todoId"]?.let { todoRepository.fetchTodoById(it).first() }
                     buildMap {
                         todo?.name?.let { put("target", it) }
@@ -112,8 +111,7 @@ internal interface AiToolCallProcessor {
                 }
                 AiToolName.UPDATE_HOMEWORK,
                 AiToolName.COMPLETE_HOMEWORK,
-                AiToolName.DELETE_HOMEWORK,
-                -> {
+                AiToolName.DELETE_HOMEWORK, -> {
                     val homework = args["homeworkId"]?.let {
                         homeworksRepository.fetchHomeworkById(it).first()
                     }
@@ -123,8 +121,7 @@ internal interface AiToolCallProcessor {
                     }
                 }
                 AiToolName.UPDATE_CLASS,
-                AiToolName.DELETE_CLASS,
-                -> {
+                AiToolName.DELETE_CLASS, -> {
                     val date = validator.date(args["date"])
                     val classModel = date?.let { targetDate ->
                         classesByDate(targetDate).find { it.uid == args["classId"] }
@@ -192,16 +189,14 @@ internal interface AiToolCallProcessor {
         }
 
         private suspend fun createTodo(args: Map<String, String>): String {
-            val name = validator.required(args, "name")
-                ?: return AiToolResultMapper.error("todo_name_required")
+            val name = validator.required(args, "name") ?: return AiToolResultMapper.error("todo_name_required")
             val deadlineSource = validator.optional(args, "deadline")
             val deadline = validator.instant(deadlineSource)
             if (deadlineSource != null && deadline == null) {
                 return AiToolResultMapper.error("invalid_deadline")
             }
             val prioritySource = validator.optional(args, "priority")
-            val priority = validator.priority(prioritySource)
-                ?: return AiToolResultMapper.error("invalid_priority")
+            val priority = validator.priority(prioritySource) ?: return AiToolResultMapper.error("invalid_priority")
             val createdAt = dateManager.fetchCurrentInstant()
             val todo = Todo(
                 uid = randomUUID(),
@@ -223,10 +218,8 @@ internal interface AiToolCallProcessor {
         }
 
         private suspend fun updateTodo(args: Map<String, String>): String {
-            val todoId = validator.required(args, "todoId")
-                ?: return AiToolResultMapper.error("todo_required")
-            val current = todoRepository.fetchTodoById(todoId).first()
-                ?: return AiToolResultMapper.error("todo_not_found")
+            val todoId = validator.required(args, "todoId") ?: return AiToolResultMapper.error("todo_required")
+            val current = todoRepository.fetchTodoById(todoId).first() ?: return AiToolResultMapper.error("todo_not_found")
             val deadlineSource = validator.optional(args, "deadline")
             val deadline = validator.instant(deadlineSource)
             if (deadlineSource != null && deadline == null) {
@@ -246,22 +239,14 @@ internal interface AiToolCallProcessor {
             )
             todoRepository.addOrUpdateTodo(updated)
             todoReminderManager.clearAllReminders(todoId)
-            todoReminderManager.scheduleReminders(
-                updated.uid,
-                updated.name,
-                updated.deadline,
-                updated.notifications,
-            )
+            todoReminderManager.scheduleReminders(updated.uid, updated.name, updated.deadline, updated.notifications)
             return AiToolResultMapper.success("todo_updated")
         }
 
         private suspend fun completeTodo(args: Map<String, String>): String {
-            val todoId = validator.required(args, "todoId")
-                ?: return AiToolResultMapper.error("todo_required")
-            val completed = validator.boolean(validator.required(args, "completed"))
-                ?: return AiToolResultMapper.error("invalid_completed_state")
-            val current = todoRepository.fetchTodoById(todoId).first()
-                ?: return AiToolResultMapper.error("todo_not_found")
+            val todoId = validator.required(args, "todoId") ?: return AiToolResultMapper.error("todo_required")
+            val completed = validator.boolean(validator.required(args, "completed")) ?: return AiToolResultMapper.error("invalid_completed_state")
+            val current = todoRepository.fetchTodoById(todoId).first() ?: return AiToolResultMapper.error("todo_not_found")
             val now = dateManager.fetchCurrentInstant()
             todoRepository.addOrUpdateTodo(
                 current.copy(
@@ -270,13 +255,21 @@ internal interface AiToolCallProcessor {
                     updatedAt = now.toEpochMilliseconds(),
                 ),
             )
-            if (completed) todoReminderManager.clearAllReminders(todoId)
+            if (completed) {
+                todoReminderManager.clearAllReminders(todoId)
+            } else {
+                todoReminderManager.scheduleReminders(
+                    current.uid,
+                    current.name,
+                    current.deadline,
+                    current.notifications,
+                )
+            }
             return AiToolResultMapper.success("todo_completion_updated")
         }
 
         private suspend fun deleteTodo(args: Map<String, String>): String {
-            val todoId = validator.required(args, "todoId")
-                ?: return AiToolResultMapper.error("todo_required")
+            val todoId = validator.required(args, "todoId") ?: return AiToolResultMapper.error("todo_required")
             if (todoRepository.fetchTodoById(todoId).first() == null) {
                 return AiToolResultMapper.error("todo_not_found")
             }
@@ -791,8 +784,7 @@ internal interface AiToolCallProcessor {
 
         private fun List<Class>.hasConflict(timeRange: TimeRange): Boolean {
             return any { classModel ->
-                timeRange.from < classModel.timeRange.to &&
-                    timeRange.to > classModel.timeRange.from
+                timeRange.from < classModel.timeRange.to && timeRange.to > classModel.timeRange.from
             }
         }
 

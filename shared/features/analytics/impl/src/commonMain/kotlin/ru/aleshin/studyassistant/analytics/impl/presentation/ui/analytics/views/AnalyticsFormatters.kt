@@ -47,7 +47,7 @@ internal fun formatAnalyticsDuration(duration: Long): String {
 
 @Composable
 internal fun formatAnalyticsRate(rate: Float?): String {
-    return rate?.let {
+    return rate?.takeIf { it.isFinite() }?.let {
         formatAnalyticsPercentage((it * PERCENT_FACTOR).roundToInt())
     } ?: stringResource(Res.string.analytics_not_available)
 }
@@ -63,7 +63,9 @@ internal fun formatAnalyticsPercentage(value: Int): String {
 
 @Composable
 internal fun formatAnalyticsWorkload(value: Float): String {
-    val tenths = (value * WORKLOAD_SCALE).roundToInt().coerceAtLeast(0)
+    val tenths = ((value.takeIf { it.isFinite() } ?: 0f) * WORKLOAD_SCALE)
+        .roundToInt()
+        .coerceAtLeast(0)
     return buildString {
         append(tenths / WORKLOAD_SCALE)
         append(stringResource(Res.string.analytics_decimal_separator))

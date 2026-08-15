@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.sqldelight.ai.AiSettingsQueries
  * @author Stanislav Aleshin on 08.08.2026.
  */
 interface AiSettingsLocalDataSource {
+
     fun fetchSettings(): Flow<AiSettingsEntity>
     suspend fun updateSettings(settings: AiSettingsEntity)
 
@@ -34,12 +35,13 @@ interface AiSettingsLocalDataSource {
         private val queries: AiSettingsQueries,
         private val coroutineManager: CoroutineManager,
     ) : AiSettingsLocalDataSource {
+
         override fun fetchSettings(): Flow<AiSettingsEntity> {
             return queries.fetchSettings().asFlow().mapToOne(coroutineManager.ioDispatcher)
         }
 
         override suspend fun updateSettings(settings: AiSettingsEntity) {
-            queries.updateSettings(settings).await()
+            queries.updateSettings(settings)
         }
     }
 }
