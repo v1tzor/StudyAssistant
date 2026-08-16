@@ -20,8 +20,11 @@ package ru.aleshin.studyassistant.backend.ai.schedule.domain.model
  * @author Stanislav Aleshin on 12.08.2026.
  */
 data class ScheduleExtractionRequest(
-    val rawText: String,
+    val imageBytes: ByteArray,
+    val imageMimeType: String,
+    val note: String?,
     val locale: String,
     val timeZone: String,
     val numberOfWeeks: Int,
+    val todayDate: String,
 )

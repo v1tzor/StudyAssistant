@@ -37,7 +37,7 @@ internal abstract class ImportComponent(
         storeFactory: ImportComposeStore.Factory,
         componentContext: ComponentContext,
         outputConsumer: OutputConsumer<ImportOutput>,
-        input: ImportInput,
+        input: ImportInput = ImportInput,
     ) : ImportComponent(componentContext) {
 
         override val store by saveableStore(

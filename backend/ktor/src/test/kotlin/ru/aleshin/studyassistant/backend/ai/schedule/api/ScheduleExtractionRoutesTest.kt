@@ -35,7 +35,6 @@ import kotlin.test.assertTrue
 import ru.aleshin.studyassistant.backend.ai.domain.model.AiQuota
 import ru.aleshin.studyassistant.backend.ai.domain.repository.AiQuotaRepository
 import ru.aleshin.studyassistant.backend.ai.domain.result.AiQuotaReservationResult
-import ru.aleshin.studyassistant.backend.ai.schedule.api.dto.ScheduleExtractionRequestDto
 import ru.aleshin.studyassistant.backend.ai.schedule.api.mappers.ScheduleExtractionRequestMapper
 import ru.aleshin.studyassistant.backend.ai.schedule.api.mappers.ScheduleExtractionResponseMapper
 import ru.aleshin.studyassistant.backend.ai.schedule.api.validation.ScheduleExtractionRequestValidator
@@ -46,6 +45,7 @@ import ru.aleshin.studyassistant.backend.ai.schedule.domain.model.ScheduleEventT
 import ru.aleshin.studyassistant.backend.ai.schedule.domain.model.ScheduleExtractionRequest
 import ru.aleshin.studyassistant.backend.ai.schedule.domain.result.ScheduleProviderResult
 import ru.aleshin.studyassistant.backend.ai.schedule.services.ScheduleExtractionService
+import ru.aleshin.studyassistant.backend.ai.schedule.testScheduleExtractionRequestDto
 import ru.aleshin.studyassistant.backend.ai.services.AiQuotaService
 import ru.aleshin.studyassistant.backend.ai.testAiConfig
 import ru.aleshin.studyassistant.backend.common.api.INSTALLATION_TOKEN_HEADER
@@ -77,7 +77,7 @@ class ScheduleExtractionRoutesTest {
                 scheduleExtractionRoutes(
                     service = service(repository),
                     credentialService = credentialService,
-                    maxRequestBodyBytes = 4_096,
+                    maxRequestBodyBytes = 1_048_576,
                 )
             }
         }
@@ -104,7 +104,7 @@ class ScheduleExtractionRoutesTest {
                 scheduleExtractionRoutes(
                     service = service(repository),
                     credentialService = credentialService,
-                    maxRequestBodyBytes = 4_096,
+                    maxRequestBodyBytes = 1_048_576,
                 )
             }
         }
@@ -112,7 +112,7 @@ class ScheduleExtractionRoutesTest {
         val response = client.post("/api/v1/ai/schedule-extractions") {
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             header(INSTALLATION_TOKEN_HEADER, installationToken)
-            setBody(validRequestBody().replace("\"numberOfWeeks\":2", "\"numberOfWeeks\":4"))
+            setBody(validRequestBody().replace("\"numberOfWeeks\":1", "\"numberOfWeeks\":4"))
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -169,15 +169,7 @@ class ScheduleExtractionRoutesTest {
     }
 
     private fun validRequestBody(): String {
-        return BackendJson.encodeToString(
-            ScheduleExtractionRequestDto(
-                requestId = UUID.randomUUID().toString(),
-                rawText = "Monday 09:00 Math",
-                locale = "en-US",
-                timeZone = "UTC",
-                numberOfWeeks = 2,
-            ),
-        )
+        return BackendJson.encodeToString(testScheduleExtractionRequestDto())
     }
 
     private class FakeAiQuotaRepository : AiQuotaRepository {

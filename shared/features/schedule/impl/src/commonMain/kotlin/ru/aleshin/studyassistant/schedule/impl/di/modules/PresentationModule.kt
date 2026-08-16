@@ -65,9 +65,7 @@ internal val presentationModule = DI.Module("Presentation") {
     bindSingleton<ImportWorkProcessor> {
         ImportWorkProcessor.Base(
             interactor = instance(),
-            organizationsRepository = instance(),
-            subjectsRepository = instance(),
-            employeeRepository = instance(),
+            organizationsInteractor = instance(),
         )
     }
     bindSingleton<ImportComposeStore.Factory> { ImportComposeStore.Factory(instance(), instance()) }

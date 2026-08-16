@@ -68,7 +68,7 @@
     <string name="practical_tasks_field_label">Практика</string>
     <string name="presentation_tasks_field_label">Презентация</string>
     <string name="test_topic_field_label">Тема теста</string>
-    <string name="schedule_import_action_description">Импорт расписания из фото или текста</string>
+    <string name="schedule_import_action_description">Импорт расписания по фото</string>
     <string name="target_field_label">Объект</string>
     <string name="completed_field_label">Выполнено</string>
     <string name="class_field_label">Занятие</string>

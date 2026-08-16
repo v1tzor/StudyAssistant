@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.backend.ai.schedule.api.mappers
 
 import ru.aleshin.studyassistant.backend.ai.schedule.api.dto.ScheduleExtractionRequestDto
+import ru.aleshin.studyassistant.backend.ai.schedule.api.validation.ScheduleImageDecoder
 import ru.aleshin.studyassistant.backend.ai.schedule.domain.model.ScheduleExtractionCommand
 import ru.aleshin.studyassistant.backend.ai.schedule.domain.model.ScheduleExtractionRequest
 import java.util.UUID
@@ -30,10 +31,15 @@ class ScheduleExtractionRequestMapper {
         return ScheduleExtractionCommand(
             requestId = UUID.fromString(request.requestId),
             request = ScheduleExtractionRequest(
-                rawText = request.rawText.trim(),
+                imageBytes = checkNotNull(ScheduleImageDecoder.decode(request.imageBase64)),
+                imageMimeType = checkNotNull(
+                    ScheduleImageDecoder.normalizeDeclaredMime(request.imageMimeType),
+                ),
+                note = request.note?.trim()?.takeIf(String::isNotEmpty),
                 locale = request.locale.replace('_', '-'),
                 timeZone = request.timeZone,
                 numberOfWeeks = request.numberOfWeeks,
+                todayDate = request.todayDate,
             ),
         )
     }

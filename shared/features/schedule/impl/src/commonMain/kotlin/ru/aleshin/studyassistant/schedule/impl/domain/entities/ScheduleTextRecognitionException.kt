@@ -23,6 +23,4 @@ internal sealed class ScheduleTextRecognitionException(message: String) : Runtim
 
     data object InvalidImage : ScheduleTextRecognitionException("Invalid schedule image")
     data object ImageTooLarge : ScheduleTextRecognitionException("Schedule image is too large")
-    data object NoText : ScheduleTextRecognitionException("No text recognized")
-    data object Unavailable : ScheduleTextRecognitionException("Text recognition is unavailable")
 }

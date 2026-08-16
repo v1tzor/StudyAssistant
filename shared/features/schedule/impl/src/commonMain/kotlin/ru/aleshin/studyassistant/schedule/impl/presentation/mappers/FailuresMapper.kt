@@ -24,8 +24,6 @@ import ru.aleshin.studyassistant.schedule.impl.resources.other_error_message
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_image_too_large_error
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_invalid_error
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_invalid_image_error
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_no_text_error
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_ocr_unavailable_error
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_quota_error
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_rate_limit_error
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_server_error
@@ -47,10 +45,6 @@ internal suspend fun ScheduleFailures.mapToMessage() = when (this) {
     is ScheduleFailures.InvalidImport -> getString(Res.string.schedule_import_invalid_error)
     is ScheduleFailures.InvalidImage -> getString(Res.string.schedule_import_invalid_image_error)
     is ScheduleFailures.ImageTooLarge -> getString(Res.string.schedule_import_image_too_large_error)
-    is ScheduleFailures.NoTextRecognized -> getString(Res.string.schedule_import_no_text_error)
-    is ScheduleFailures.TextRecognitionUnavailable -> {
-        getString(Res.string.schedule_import_ocr_unavailable_error)
-    }
     is ScheduleFailures.ServerUnavailable -> getString(Res.string.schedule_import_server_error)
     is ScheduleFailures.RewardUnavailable -> getString(Res.string.schedule_reward_unavailable_error)
     is ScheduleFailures.OtherError -> when (throwable) {

@@ -50,6 +50,7 @@ installation_hmac_secret
 share_hmac_secret
 payload_encryption_key
 deepseek_api_key
+openrouter_api_key
 "
 
 for secret_name in $REQUIRED_SECRET_FILES; do
@@ -90,6 +91,7 @@ require_env_file_value INSTALLATION_HMAC_SECRET_FILE "$SECRET_DIRECTORY/installa
 require_env_file_value SHARE_HMAC_SECRET_FILE "$SECRET_DIRECTORY/share_hmac_secret"
 require_env_file_value PAYLOAD_ENCRYPTION_KEY_FILE "$SECRET_DIRECTORY/payload_encryption_key"
 require_env_file_value DEEPSEEK_API_KEY_FILE "$SECRET_DIRECTORY/deepseek_api_key"
+require_env_file_value OPENROUTER_API_KEY_FILE "$SECRET_DIRECTORY/openrouter_api_key"
 
 BACKEND_IMAGE="$(sed -n 's/^BACKEND_IMAGE=//p' "$ENV_FILE")"
 if ! printf '%s\n' "$BACKEND_IMAGE" | grep -Eq '^[-A-Za-z0-9._/:]+@sha256:[0-9a-f]{64}$'; then

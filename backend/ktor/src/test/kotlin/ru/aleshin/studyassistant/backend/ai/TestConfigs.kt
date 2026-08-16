@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.backend.ai
 
 import ru.aleshin.studyassistant.backend.ai.infrastructure.deepseek.DeepSeekConfig
+import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.OpenRouterConfig
 import java.time.Duration
 
 /**
@@ -43,7 +44,9 @@ fun testAiConfig(): AiConfig {
         maxToolSchemaCharacters = 16_384,
         maxToolCallsPerMessage = 16,
         maxToolArgumentsCharacters = 16_384,
-        maxScheduleTextCharacters = 100_000,
+        maxScheduleRequestBodyBytes = 1_048_576,
+        maxScheduleImageBytes = 786_432,
+        maxScheduleNoteCharacters = 120,
         maxScheduleEntries = 300,
         maxScheduleFieldCharacters = 512,
         maxScheduleUnparsedLines = 100,
@@ -59,6 +62,30 @@ fun testDeepSeekConfig(
     return DeepSeekConfig(
         apiKey = "test-key",
         baseUrl = "https://api.deepseek.test",
+        maxTokens = 4_096,
+        maxResponseBodyBytes = maxResponseBodyBytes,
+        totalTimeoutMs = 5_000,
+        requestTimeoutMs = 2_000,
+        connectTimeoutMs = 1_000,
+        socketTimeoutMs = 2_000,
+        maxRetries = maxRetries,
+        baseRetryDelayMs = baseRetryDelayMs,
+        maxRetryDelayMs = baseRetryDelayMs,
+        retryJitterMs = 0,
+        maxConcurrentRequests = maxConcurrentRequests,
+        queueTimeoutMs = 100,
+    )
+}
+
+fun testOpenRouterConfig(
+    maxRetries: Int = 0,
+    baseRetryDelayMs: Long = 1,
+    maxResponseBodyBytes: Long = 524_288,
+    maxConcurrentRequests: Int = 8,
+): OpenRouterConfig {
+    return OpenRouterConfig(
+        apiKey = "test-key",
+        baseUrl = "https://openrouter.test",
         maxTokens = 4_096,
         maxResponseBodyBytes = maxResponseBodyBytes,
         totalTimeoutMs = 5_000,

@@ -169,6 +169,6 @@
     <string name="delete_location_warning_title">Are you sure you want to delete this location?</string>
     <string name="subjects_search_bar_placeholder">Search for subjects</string>
     <string name="employee_search_bar_placeholder">Search for teachers</string>
-    <string name="schedule_import_open_description">Import from photo or text</string>
+    <string name="schedule_import_open_description">Import from a photo</string>
     <string name="other_error_message">Error! Contact the developer!</string>
 </resources>

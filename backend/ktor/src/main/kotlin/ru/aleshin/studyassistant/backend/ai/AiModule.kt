@@ -41,8 +41,11 @@ import ru.aleshin.studyassistant.backend.ai.schedule.api.mappers.ScheduleExtract
 import ru.aleshin.studyassistant.backend.ai.schedule.api.scheduleExtractionRoutes
 import ru.aleshin.studyassistant.backend.ai.schedule.api.validation.ScheduleExtractionRequestValidator
 import ru.aleshin.studyassistant.backend.ai.schedule.domain.gateway.ScheduleExtractionGateway
-import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.deepseek.DeepSeekScheduleExtractionGateway
 import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.deepseek.mappers.DeepSeekScheduleExtractionMapper
+import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.OpenRouterConfig
+import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.OpenRouterScheduleExtractionGateway
+import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.ScheduleImageNormalizer
+import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.createOpenRouterHttpClient
 import ru.aleshin.studyassistant.backend.ai.schedule.services.ScheduleExtractionService
 import ru.aleshin.studyassistant.backend.ai.services.AiCompletionService
 import ru.aleshin.studyassistant.backend.ai.services.AiQuotaService
@@ -60,16 +63,20 @@ import kotlin.random.Random
 fun Application.aiModule() {
     val config = AiConfig.from(applicationConfig = environment.config)
     val deepSeekConfig = DeepSeekConfig.from(applicationConfig = environment.config)
+    val openRouterConfig = OpenRouterConfig.from(applicationConfig = environment.config)
     val clock = Clock.systemUTC()
     val httpClient = createDeepSeekHttpClient(config = deepSeekConfig)
+    val openRouterHttpClient = createOpenRouterHttpClient(config = openRouterConfig)
 
     monitor.subscribe(ApplicationStopped) {
         httpClient.close()
+        openRouterHttpClient.close()
     }
 
     dependencies {
         provide<AiConfig> { config }
         provide<DeepSeekConfig> { deepSeekConfig }
+        provide<OpenRouterConfig> { openRouterConfig }
 
         provide<AiQuotaRepository> {
             AiQuotaRepositoryImpl(
@@ -145,10 +152,16 @@ fun Application.aiModule() {
             )
         }
 
+        provide<ScheduleImageNormalizer> { ScheduleImageNormalizer() }
         provide<ScheduleExtractionGateway> {
-            DeepSeekScheduleExtractionGateway(
-                completionGateway = resolve<AiCompletionGateway>(),
+            OpenRouterScheduleExtractionGateway(
+                httpClient = openRouterHttpClient,
+                config = openRouterConfig,
                 mapper = resolve<DeepSeekScheduleExtractionMapper>(),
+                imageNormalizer = resolve<ScheduleImageNormalizer>(),
+                clock = clock,
+                random = Random.Default,
+                logger = LoggerFactory.getLogger(OpenRouterScheduleExtractionGateway::class.java),
             )
         }
         provide<ScheduleExtractionService> {
@@ -177,7 +190,7 @@ fun Application.aiModule() {
         scheduleExtractionRoutes(
             service = scheduleExtractionService,
             credentialService = credentialService,
-            maxRequestBodyBytes = config.maxRequestBodyBytes,
+            maxRequestBodyBytes = config.maxScheduleRequestBodyBytes,
         )
     }
 }

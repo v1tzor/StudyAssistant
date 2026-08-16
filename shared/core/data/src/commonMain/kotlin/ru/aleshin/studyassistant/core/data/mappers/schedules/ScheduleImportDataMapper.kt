@@ -23,17 +23,20 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.Schedu
 import ru.aleshin.studyassistant.core.remote.models.ai.schedule.ScheduleExtractionRequestPojo
 import ru.aleshin.studyassistant.core.remote.models.ai.schedule.ScheduleImportDraftPojo
 import ru.aleshin.studyassistant.core.remote.models.ai.schedule.ScheduleImportEntryPojo
+import kotlin.io.encoding.Base64
 
 /**
  * @author Stanislav Aleshin on 12.08.2026.
  */
 internal fun ScheduleImportRequest.mapToRemote() = ScheduleExtractionRequestPojo(
     requestId = requestId,
-    rawText = rawText,
-    ocrDocument = ocrDocument,
+    imageBase64 = Base64.encode(imageBytes),
+    imageMimeType = imageMimeType,
+    note = note,
     locale = locale,
     timeZone = timeZone,
     numberOfWeeks = numberOfWeeks,
+    todayDate = todayDate,
 )
 
 internal fun ScheduleImportDraftPojo.mapToDomain() = ScheduleImportDraft(

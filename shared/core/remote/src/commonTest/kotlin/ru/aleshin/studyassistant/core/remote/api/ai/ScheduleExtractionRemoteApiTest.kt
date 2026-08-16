@@ -130,10 +130,13 @@ class ScheduleExtractionRemoteApiTest {
         val JSON_HEADERS = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         val REQUEST = ScheduleExtractionRequestPojo(
             requestId = "request-1",
-            rawText = "Понедельник 09:00 Математика",
+            imageBase64 = "AAA=",
+            imageMimeType = "image/jpeg",
+            note = "9б",
             locale = "ru",
             timeZone = "Europe/Moscow",
             numberOfWeeks = 2,
+            todayDate = "2026-08-16",
         )
         const val SUCCESS_RESPONSE = """
             {

@@ -169,6 +169,6 @@
     <string name="delete_location_warning_title">Вы уверены что хотите удалить данную локацию?</string>
     <string name="subjects_search_bar_placeholder">Поиск предметов</string>
     <string name="employee_search_bar_placeholder">Поиск преподавателей</string>
-    <string name="schedule_import_open_description">Импорт из фото или текста</string>
+    <string name="schedule_import_open_description">Импорт из фото</string>
     <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
 </resources>

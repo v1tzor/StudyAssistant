@@ -327,7 +327,7 @@ abstract class MainComponent(
             when (output) {
                 is EditorOutput.NavigateToBack -> navigateToBack()
                 is EditorOutput.NavigateToImport -> {
-                    val config = Schedule(ScheduleConfig.Import(output.rawText))
+                    val config = Schedule(ScheduleConfig.Import)
                     stackNavigation.pushToFront(config)
                 }
             }
@@ -350,6 +350,9 @@ abstract class MainComponent(
                         )
                         is NavigateToEditor.WeekSchedule -> EditorConfig.WeekSchedule(
                             week = output.week,
+                        )
+                        is NavigateToEditor.Organization -> EditorConfig.Organization(
+                            organizationId = output.organizationId,
                         )
                     }
                     stackNavigation.pushToFront(Editor(screenConfig))

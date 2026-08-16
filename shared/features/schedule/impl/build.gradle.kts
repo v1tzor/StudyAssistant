@@ -73,7 +73,6 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(libs.androidx.exifinterface)
-            implementation(libs.google.mlkit.text.recognition)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -132,7 +132,7 @@ internal abstract class ScheduleFeatureComponent(
                     component = ImportComponent.Default(
                         storeFactory = importStoreFactory,
                         componentContext = componentContext,
-                        input = ImportInput(config.rawText),
+                        input = ImportInput,
                         outputConsumer = importOutputConsumer(),
                     ),
                 )
@@ -196,6 +196,11 @@ internal abstract class ScheduleFeatureComponent(
         private fun importOutputConsumer() = OutputConsumer<ImportOutput> { output ->
             when (output) {
                 is ImportOutput.NavigateToBack -> navigateToBack()
+                is ImportOutput.NavigateToOrganizationEditor -> {
+                    outputConsumer.consume(
+                        ScheduleOutput.NavigateToEditor.Organization(output.organizationId),
+                    )
+                }
             }
         }
     }

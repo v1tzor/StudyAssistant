@@ -1,0 +1,142 @@
+/*
+ * Copyright 2026 Stanislav Aleshin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter
+
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.MockRequestHandleScope
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.toByteArray
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.headersOf
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.utils.io.ByteReadChannel
+import kotlinx.coroutines.runBlocking
+import org.slf4j.helpers.NOPLogger
+import ru.aleshin.studyassistant.backend.ai.schedule.api.validation.ScheduleImageDecoder
+import ru.aleshin.studyassistant.backend.ai.schedule.domain.model.ScheduleExtractionRequest
+import ru.aleshin.studyassistant.backend.ai.schedule.domain.result.ScheduleProviderResult
+import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.deepseek.mappers.DeepSeekScheduleExtractionMapper
+import ru.aleshin.studyassistant.backend.ai.schedule.testJpegBytes
+import ru.aleshin.studyassistant.backend.ai.testAiConfig
+import ru.aleshin.studyassistant.backend.ai.testOpenRouterConfig
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
+import kotlin.random.Random
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertTrue
+
+/**
+ * @author Stanislav Aleshin on 16.08.2026.
+ */
+class OpenRouterScheduleExtractionGatewayTest {
+
+    @Test
+    fun extractionShouldSendMultimodalJsonRequest() = runBlocking {
+        var capturedBody = ""
+        val client = client(
+            engine = MockEngine { request ->
+                capturedBody = request.body.toByteArray().decodeToString()
+                jsonResponse(status = HttpStatusCode.OK, content = SUCCESS_RESPONSE)
+            },
+        )
+
+        client.use {
+            val result = gateway(client = client).extract(request = request())
+
+            assertIs<ScheduleProviderResult.Success>(result)
+            assertTrue(capturedBody.contains("\"model\":\"${OpenRouterConfig.MODEL}\""))
+            assertTrue(capturedBody.contains("\"type\":\"json_object\""))
+            assertTrue(capturedBody.contains("\"type\":\"image_url\""))
+            assertTrue(capturedBody.contains("todayDate=2026-08-16"))
+            assertTrue(capturedBody.contains("noteJson="))
+            assertTrue(!capturedBody.contains("\"tools\""))
+        }
+    }
+
+    @Test
+    fun rateLimitShouldExposeRetryAfterWithoutProviderBody() = runBlocking {
+        val client = client(
+            engine = MockEngine {
+                respond(
+                    content = ByteReadChannel("sensitive provider details"),
+                    status = HttpStatusCode.TooManyRequests,
+                    headers = headersOf(HttpHeaders.RetryAfter, "7"),
+                )
+            },
+        )
+
+        client.use {
+            val result = gateway(client = client).extract(request = request())
+
+            assertIs<ScheduleProviderResult.RateLimited>(result)
+            assertEquals(7, result.retryAfterSeconds)
+        }
+    }
+
+    private fun gateway(client: HttpClient): OpenRouterScheduleExtractionGateway {
+        return OpenRouterScheduleExtractionGateway(
+            httpClient = client,
+            config = testOpenRouterConfig(),
+            mapper = DeepSeekScheduleExtractionMapper(config = testAiConfig()),
+            imageNormalizer = ScheduleImageNormalizer(),
+            clock = Clock.fixed(Instant.parse("2026-08-16T10:00:00Z"), ZoneOffset.UTC),
+            random = Random.Default,
+            logger = NOPLogger.NOP_LOGGER,
+        )
+    }
+
+    private fun client(engine: MockEngine): HttpClient {
+        return HttpClient(engine) {
+            install(ContentNegotiation) {
+                json(OpenRouterJson)
+            }
+        }
+    }
+
+    private fun MockRequestHandleScope.jsonResponse(
+        status: HttpStatusCode,
+        content: String,
+    ) = respond(
+        content = ByteReadChannel(content),
+        status = status,
+        headers = headersOf(HttpHeaders.ContentType, "application/json"),
+    )
+
+    private fun request(): ScheduleExtractionRequest {
+        return ScheduleExtractionRequest(
+            imageBytes = testJpegBytes(),
+            imageMimeType = ScheduleImageDecoder.IMAGE_JPEG,
+            note = "9б",
+            locale = "ru-RU",
+            timeZone = "Europe/Moscow",
+            numberOfWeeks = 1,
+            todayDate = "2026-08-16",
+        )
+    }
+
+    private companion object {
+
+        const val SUCCESS_RESPONSE =
+            """{"choices":[{"finish_reason":"stop","message":{"content":"{\"title\":null,\"entries\":[],\"unparsedLines\":[\"Unreadable\"]}"}}]}"""
+    }
+}

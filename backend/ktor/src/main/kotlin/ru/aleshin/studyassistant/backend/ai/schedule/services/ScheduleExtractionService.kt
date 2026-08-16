@@ -37,6 +37,7 @@ import ru.aleshin.studyassistant.backend.plugins.BackendJson
 import ru.aleshin.studyassistant.backend.security.PayloadCipher
 import ru.aleshin.studyassistant.backend.security.PayloadPurpose
 import java.nio.charset.StandardCharsets.UTF_8
+import java.security.MessageDigest
 import java.time.Clock
 
 /**
@@ -158,13 +159,25 @@ class ScheduleExtractionService(
             append(FINGERPRINT_SEPARATOR)
             append(timeZone)
             append(FINGERPRINT_SEPARATOR)
-            append(rawText)
+            append(todayDate)
+            append(FINGERPRINT_SEPARATOR)
+            append(note.orEmpty())
+            append(FINGERPRINT_SEPARATOR)
+            append(sha256Hex(imageBytes))
         }
+    }
+
+    private fun sha256Hex(bytes: ByteArray): String {
+        return MessageDigest
+            .getInstance(HASH_ALGORITHM)
+            .digest(bytes)
+            .joinToString(separator = "") { value -> "%02x".format(value) }
     }
 
     private companion object {
 
         const val SCHEDULE_FINGERPRINT_PREFIX = "schedule\u0000"
         const val FINGERPRINT_SEPARATOR = '\u0000'
+        const val HASH_ALGORITHM = "SHA-256"
     }
 }

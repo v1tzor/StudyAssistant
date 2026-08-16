@@ -29,17 +29,18 @@ import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_camera_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_gallery_button
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_ocr_privacy
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_photo_selected
 
 /**
- * @author Stanislav Aleshin on 12.08.2026.
+ * @author Stanislav Aleshin on 16.08.2026.
  */
 @Composable
 internal fun ImportSourceActions(
+    modifier: Modifier = Modifier,
     enabled: Boolean,
+    hasPhoto: Boolean,
     onSelectPhoto: () -> Unit,
     onTakePhoto: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -59,10 +60,12 @@ internal fun ImportSourceActions(
         ) {
             Text(stringResource(Res.string.schedule_import_camera_button))
         }
-        Text(
-            text = stringResource(Res.string.schedule_import_ocr_privacy),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        if (hasPhoto) {
+            Text(
+                text = stringResource(Res.string.schedule_import_photo_selected),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
     }
 }

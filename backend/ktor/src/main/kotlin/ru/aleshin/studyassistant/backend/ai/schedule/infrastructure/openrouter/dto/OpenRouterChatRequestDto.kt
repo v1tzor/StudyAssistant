@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.schedule.impl.platform
+package ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto
 
-import ru.aleshin.studyassistant.core.common.functional.ocr.OcrEngine
-import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
-import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * @author Stanislav Aleshin on 16.08.2026.
  */
-internal expect fun createOcrEngine(
-    dispatchers: AppDispatchers,
-    dependencies: ScheduleFeatureDependencies,
-): OcrEngine
+@Serializable
+data class OpenRouterChatRequestDto(
+    val model: String,
+    val messages: List<OpenRouterMessageDto>,
+    @SerialName("response_format")
+    val responseFormat: OpenRouterResponseFormatDto,
+    val temperature: Double,
+    @SerialName("max_tokens")
+    val maxTokens: Int,
+    val stream: Boolean = false,
+)

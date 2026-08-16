@@ -33,7 +33,6 @@ import ru.aleshin.studyassistant.editor.api.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.editor.impl.domain.entities.EditorFailures
 import ru.aleshin.studyassistant.editor.impl.presentation.models.schedules.BaseWeekScheduleUi
-import ru.aleshin.studyassistant.schedule.api.ScheduleConfig
 
 /**
  * @author Stanislav Aleshin on 05.05.2024
@@ -86,5 +85,5 @@ internal sealed class WeekScheduleOutput : BaseOutput {
     data object NavigateToBack : WeekScheduleOutput()
     data class NavigateToClassEditor(val config: EditorConfig.Class) : WeekScheduleOutput()
     data class NavigateToOrganizationEditor(val config: EditorConfig.Organization) : WeekScheduleOutput()
-    data class NavigateToImport(val config: ScheduleConfig.Import) : WeekScheduleOutput()
+    data object NavigateToImport : WeekScheduleOutput()
 }

@@ -16,10 +16,9 @@
 
 package ru.aleshin.studyassistant.backend.ai.schedule.api.validation
 
-import ru.aleshin.studyassistant.backend.ai.schedule.api.dto.ScheduleExtractionRequestDto
+import ru.aleshin.studyassistant.backend.ai.schedule.testScheduleExtractionRequestDto
 import ru.aleshin.studyassistant.backend.ai.testAiConfig
 import ru.aleshin.studyassistant.backend.common.api.InvalidRequestException
-import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
@@ -31,31 +30,37 @@ class ScheduleExtractionRequestValidatorTest {
     private val validator = ScheduleExtractionRequestValidator(config = testAiConfig())
 
     @Test
-    fun validRawTextRequestShouldPass() {
-        validator.validate(request = request())
+    fun validImageRequestShouldPass() {
+        validator.validate(request = testScheduleExtractionRequestDto())
     }
 
     @Test
     fun invalidTimeZoneShouldFail() {
         assertFailsWith<InvalidRequestException> {
-            validator.validate(request = request().copy(timeZone = "Unknown/Zone"))
+            validator.validate(request = testScheduleExtractionRequestDto().copy(timeZone = "Unknown/Zone"))
         }
     }
 
     @Test
     fun unsupportedRepeatWeekCountShouldFail() {
         assertFailsWith<InvalidRequestException> {
-            validator.validate(request = request().copy(numberOfWeeks = 4))
+            validator.validate(request = testScheduleExtractionRequestDto().copy(numberOfWeeks = 4))
         }
     }
 
-    private fun request(): ScheduleExtractionRequestDto {
-        return ScheduleExtractionRequestDto(
-            requestId = UUID.randomUUID().toString(),
-            rawText = "Monday 09:00 Mathematics",
-            locale = "en-US",
-            timeZone = "Europe/Moscow",
-            numberOfWeeks = 2,
-        )
+    @Test
+    fun invalidTodayDateShouldFail() {
+        assertFailsWith<InvalidRequestException> {
+            validator.validate(request = testScheduleExtractionRequestDto().copy(todayDate = "16.08.2026"))
+        }
+    }
+
+    @Test
+    fun mismatchedMimeTypeShouldFail() {
+        assertFailsWith<InvalidRequestException> {
+            validator.validate(
+                request = testScheduleExtractionRequestDto().copy(imageMimeType = "image/png"),
+            )
+        }
     }
 }

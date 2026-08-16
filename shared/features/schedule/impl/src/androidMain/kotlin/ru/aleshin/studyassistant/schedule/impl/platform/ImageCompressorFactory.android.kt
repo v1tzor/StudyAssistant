@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.common.functional.ocr
+package ru.aleshin.studyassistant.schedule.impl.platform
+
+import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
+import ru.aleshin.studyassistant.schedule.impl.platform.image.AndroidImageCompressor
 
 /**
  * @author Stanislav Aleshin on 16.08.2026.
  */
-interface OcrEngine {
-
-    suspend fun recognize(
-        image: ByteArray,
-        languages: Set<OcrLanguage> = setOf(OcrLanguage.RUSSIAN, OcrLanguage.ENGLISH)
-    ): OcrResult
+internal actual fun createImageCompressor(dispatchers: AppDispatchers): ImageCompressor {
+    return AndroidImageCompressor(dispatchers)
 }

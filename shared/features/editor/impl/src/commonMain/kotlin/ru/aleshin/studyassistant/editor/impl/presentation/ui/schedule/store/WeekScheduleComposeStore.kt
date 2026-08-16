@@ -29,7 +29,6 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.W
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleInput
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleOutput
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleState
-import ru.aleshin.studyassistant.schedule.api.ScheduleConfig
 
 /**
  * @author Stanislav Aleshin on 27.05.2024.
@@ -127,8 +126,7 @@ internal class WeekScheduleComposeStore(
                 consumeOutput(WeekScheduleOutput.NavigateToOrganizationEditor(config))
             }
             is WeekScheduleEvent.ImportClick -> {
-                val config = ScheduleConfig.Import(null)
-                consumeOutput(WeekScheduleOutput.NavigateToImport(config))
+                consumeOutput(WeekScheduleOutput.NavigateToImport)
             }
             is WeekScheduleEvent.NavigateToBack -> {
                 consumeOutput(WeekScheduleOutput.NavigateToBack)

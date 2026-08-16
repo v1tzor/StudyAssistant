@@ -20,7 +20,6 @@ package ru.aleshin.studyassistant.schedule.impl.domain.entities
  * @author Stanislav Aleshin on 12.08.2026.
  */
 internal sealed class ScheduleImportException(message: String) : RuntimeException(message) {
-    data object EmptyText : ScheduleImportException("Schedule text is empty")
     data object InvalidDraft : ScheduleImportException("Schedule draft is invalid")
     data object NoOrganization : ScheduleImportException("No local organization exists")
 }

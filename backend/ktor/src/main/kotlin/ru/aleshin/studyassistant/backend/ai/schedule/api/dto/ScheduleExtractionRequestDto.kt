@@ -24,8 +24,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ScheduleExtractionRequestDto(
     val requestId: String,
-    val rawText: String,
+    val imageBase64: String,
+    val imageMimeType: String,
+    val note: String? = null,
     val locale: String,
     val timeZone: String,
     val numberOfWeeks: Int,
+    val todayDate: String,
 )

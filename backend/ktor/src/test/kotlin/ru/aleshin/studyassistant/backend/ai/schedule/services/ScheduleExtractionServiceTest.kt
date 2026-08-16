@@ -20,7 +20,6 @@ import kotlinx.coroutines.runBlocking
 import ru.aleshin.studyassistant.backend.ai.domain.model.AiQuota
 import ru.aleshin.studyassistant.backend.ai.domain.repository.AiQuotaRepository
 import ru.aleshin.studyassistant.backend.ai.domain.result.AiQuotaReservationResult
-import ru.aleshin.studyassistant.backend.ai.schedule.api.dto.ScheduleExtractionRequestDto
 import ru.aleshin.studyassistant.backend.ai.schedule.api.mappers.ScheduleExtractionRequestMapper
 import ru.aleshin.studyassistant.backend.ai.schedule.api.mappers.ScheduleExtractionResponseMapper
 import ru.aleshin.studyassistant.backend.ai.schedule.api.validation.ScheduleExtractionRequestValidator
@@ -29,6 +28,7 @@ import ru.aleshin.studyassistant.backend.ai.schedule.domain.model.ScheduleDraft
 import ru.aleshin.studyassistant.backend.ai.schedule.domain.model.ScheduleExtractionRequest
 import ru.aleshin.studyassistant.backend.ai.schedule.domain.result.ScheduleProviderResult
 import ru.aleshin.studyassistant.backend.ai.services.AiQuotaService
+import ru.aleshin.studyassistant.backend.ai.schedule.testScheduleExtractionRequestDto
 import ru.aleshin.studyassistant.backend.ai.testAiConfig
 import ru.aleshin.studyassistant.backend.common.api.ServerUnavailableException
 import ru.aleshin.studyassistant.backend.security.InstallationHasher
@@ -62,7 +62,7 @@ class ScheduleExtractionServiceTest {
 
         val response = service.extract(
             installationToken = "installation-token",
-            request = request(),
+            request = testScheduleExtractionRequestDto(),
         )
 
         assertEquals(11, response.quotaRemaining)
@@ -81,7 +81,7 @@ class ScheduleExtractionServiceTest {
         assertFailsWith<ServerUnavailableException> {
             service.extract(
                 installationToken = "installation-token",
-                request = request(),
+                request = testScheduleExtractionRequestDto(),
             )
         }
         assertEquals(listOf(false), repository.finalizedResults)
@@ -90,7 +90,7 @@ class ScheduleExtractionServiceTest {
     @Test
     fun successfulExtractionShouldBeReplayedWithoutProviderCall() = runBlocking {
         val repository = FakeAiQuotaRepository()
-        val request = request()
+        val request = testScheduleExtractionRequestDto()
         val successfulService = service(
             repository = repository,
             gatewayResult = ScheduleProviderResult.Success(
@@ -142,16 +142,6 @@ class ScheduleExtractionServiceTest {
             },
             clock = clock,
             payloadCipher = PayloadCipher(ByteArray(32) { 2 }),
-        )
-    }
-
-    private fun request(): ScheduleExtractionRequestDto {
-        return ScheduleExtractionRequestDto(
-            requestId = UUID.randomUUID().toString(),
-            rawText = "Monday 09:00 Mathematics",
-            locale = "en-US",
-            timeZone = "Europe/Moscow",
-            numberOfWeeks = 1,
         )
     }
 

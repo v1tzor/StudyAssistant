@@ -25,14 +25,14 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.Schedu
  */
 internal interface ScheduleImportValidator {
 
-    fun isSourceTextValid(text: String): Boolean
+    fun isNoteValid(note: String): Boolean
     fun isDraftValid(draft: ScheduleImportDraft): Boolean
     fun parseTime(value: String?): LocalTime?
 
     class Base : ScheduleImportValidator {
 
-        override fun isSourceTextValid(text: String): Boolean {
-            return text.trim().length in MIN_TEXT_LENGTH..MAX_TEXT_LENGTH
+        override fun isNoteValid(note: String): Boolean {
+            return note.trim().length <= MAX_NOTE_LENGTH
         }
 
         override fun isDraftValid(draft: ScheduleImportDraft): Boolean {
@@ -66,8 +66,7 @@ internal interface ScheduleImportValidator {
         }
 
         private companion object {
-            const val MIN_TEXT_LENGTH = 3
-            const val MAX_TEXT_LENGTH = 30_000
+            const val MAX_NOTE_LENGTH = 120
             const val MAX_ENTRIES = 150
             const val MIN_REPEAT_WEEK = 1
             const val MAX_REPEAT_WEEK = 3

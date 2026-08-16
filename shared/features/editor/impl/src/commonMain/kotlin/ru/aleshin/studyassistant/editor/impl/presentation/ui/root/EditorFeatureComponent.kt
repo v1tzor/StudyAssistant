@@ -348,7 +348,7 @@ internal abstract class EditorFeatureComponent(
                 }
                 is WeekScheduleOutput.NavigateToBack -> navigateToBack()
                 is WeekScheduleOutput.NavigateToImport -> {
-                    outputConsumer.consume(EditorOutput.NavigateToImport(output.config.rawText))
+                    outputConsumer.consume(EditorOutput.NavigateToImport)
                 }
             }
         }

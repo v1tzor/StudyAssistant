@@ -42,7 +42,9 @@ data class AiConfig(
     val maxToolSchemaCharacters: Int,
     val maxToolCallsPerMessage: Int,
     val maxToolArgumentsCharacters: Int,
-    val maxScheduleTextCharacters: Int,
+    val maxScheduleRequestBodyBytes: Long,
+    val maxScheduleImageBytes: Int,
+    val maxScheduleNoteCharacters: Int,
     val maxScheduleEntries: Int,
     val maxScheduleFieldCharacters: Int,
     val maxScheduleUnparsedLines: Int,
@@ -68,7 +70,10 @@ data class AiConfig(
         require(maxToolSchemaCharacters > 0)
         require(maxToolCallsPerMessage > 0)
         require(maxToolArgumentsCharacters > 0)
-        require(maxScheduleTextCharacters > 0)
+        require(maxScheduleRequestBodyBytes > 0)
+        require(maxScheduleImageBytes > 0)
+        require(maxScheduleImageBytes < maxScheduleRequestBodyBytes)
+        require(maxScheduleNoteCharacters > 0)
         require(maxScheduleEntries > 0)
         require(maxScheduleFieldCharacters > 0)
         require(maxScheduleUnparsedLines > 0)
@@ -115,7 +120,12 @@ data class AiConfig(
                     .property("maxToolArgumentsCharacters")
                     .getString()
                     .toInt(),
-                maxScheduleTextCharacters = config.property("maxScheduleTextCharacters").getString().toInt(),
+                maxScheduleRequestBodyBytes = config
+                    .property("maxScheduleRequestBodyBytes")
+                    .getString()
+                    .toLong(),
+                maxScheduleImageBytes = config.property("maxScheduleImageBytes").getString().toInt(),
+                maxScheduleNoteCharacters = config.property("maxScheduleNoteCharacters").getString().toInt(),
                 maxScheduleEntries = config.property("maxScheduleEntries").getString().toInt(),
                 maxScheduleFieldCharacters = config.property("maxScheduleFieldCharacters").getString().toInt(),
                 maxScheduleUnparsedLines = config.property("maxScheduleUnparsedLines").getString().toInt(),

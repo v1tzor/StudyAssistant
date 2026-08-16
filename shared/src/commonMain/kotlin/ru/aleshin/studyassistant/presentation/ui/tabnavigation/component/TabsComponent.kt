@@ -221,6 +221,9 @@ abstract class TabsComponent(
                         is NavigateToEditor.WeekSchedule -> EditorConfig.WeekSchedule(
                             week = output.week,
                         )
+                        is NavigateToEditor.Organization -> EditorConfig.Organization(
+                            organizationId = output.organizationId,
+                        )
                     }
                     outputConsumer.consume(TabsOutput.NavigateToEditor(config))
                 }
@@ -266,7 +269,7 @@ abstract class TabsComponent(
                 }
                 is ChatOutput.NavigateToScheduleImport -> {
                     stackNavigation.bringToFront(
-                        TabsConfig.Schedule(ScheduleConfig.Import()),
+                        TabsConfig.Schedule(ScheduleConfig.Import),
                     )
                 }
                 is ChatOutput.NavigateToBack -> {

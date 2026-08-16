@@ -17,16 +17,17 @@
 package ru.aleshin.studyassistant.core.domain.entities.schedules.importing
 
 import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.functional.ocr.ScheduleOcrDocument
 
 /**
- * @author Stanislav Aleshin on 12.08.2026.
+ * @author Stanislav Aleshin on 16.08.2026.
  */
 data class ScheduleImportRequest(
     val requestId: UID,
-    val rawText: String,
-    val ocrDocument: ScheduleOcrDocument? = null,
+    val imageBytes: ByteArray,
+    val imageMimeType: String,
+    val note: String?,
     val locale: String,
     val timeZone: String,
     val numberOfWeeks: Int,
+    val todayDate: String,
 )

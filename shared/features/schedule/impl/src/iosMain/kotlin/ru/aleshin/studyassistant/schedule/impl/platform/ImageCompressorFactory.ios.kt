@@ -16,15 +16,12 @@
 
 package ru.aleshin.studyassistant.schedule.impl.platform
 
-import ru.aleshin.studyassistant.core.common.functional.ocr.OcrEngine
 import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
-import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
-import ru.aleshin.studyassistant.schedule.impl.platform.ocr.IosVisionOcrEngine
+import ru.aleshin.studyassistant.schedule.impl.platform.image.IosImageCompressor
 
 /**
  * @author Stanislav Aleshin on 16.08.2026.
  */
-internal actual fun createOcrEngine(
-    dispatchers: AppDispatchers,
-    dependencies: ScheduleFeatureDependencies,
-): OcrEngine = IosVisionOcrEngine(dispatchers)
+internal actual fun createImageCompressor(dispatchers: AppDispatchers): ImageCompressor {
+    return IosImageCompressor(dispatchers)
+}

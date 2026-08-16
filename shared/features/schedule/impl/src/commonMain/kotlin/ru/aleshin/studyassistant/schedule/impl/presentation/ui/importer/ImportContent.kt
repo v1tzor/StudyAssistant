@@ -19,20 +19,17 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitCameraFacing
@@ -41,98 +38,161 @@ import io.github.vinceglb.filekit.dialogs.compose.rememberCameraPickerLauncher
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
+import ru.aleshin.studyassistant.core.ui.ads.LocalAdsConfiguration
+import ru.aleshin.studyassistant.core.ui.ads.YandexRewardedAdHost
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportEvent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.store.ImportComponent
-import ru.aleshin.studyassistant.schedule.impl.resources.Res
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_back_description
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_title
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportBottomActionBar
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportClassEditorSheet
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportSubjectEditorSheet
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportTeacherEditorSheet
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportTopBar
 
 /**
- * @author Stanislav Aleshin on 12.08.2026.
+ * @author Stanislav Aleshin on 16.08.2026.
  */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun ImportContent(
-    component: ImportComponent,
     modifier: Modifier = Modifier,
+    component: ImportComponent,
 ) {
     val store = component.store
     val state by store.stateAsState()
-    val snackbarState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val adsConfiguration = LocalAdsConfiguration.current
+    var editingEntryId by rememberSaveable { mutableStateOf<Int?>(null) }
+    var editingSubject by rememberSaveable { mutableStateOf<String?>(null) }
+    var editingTeacher by rememberSaveable { mutableStateOf<String?>(null) }
 
-    val onImageSelected: (PlatformFile?) -> Unit = remember(store, coroutineScope) {
-        { file ->
-            if (file != null) {
-                coroutineScope.launch {
-                    runCatching { file.readBytes() }.fold(
-                        onSuccess = { bytes ->
-                            store.dispatchEvent(ImportEvent.RecognizeImage(bytes))
-                        },
-                        onFailure = {
-                            store.dispatchEvent(ImportEvent.ImageSelectionFailed)
-                        },
-                    )
-                }
-            }
-        }
-    }
     val galleryLauncher = rememberFilePickerLauncher(
         type = FileKitType.Image,
-        onResult = onImageSelected,
+        onResult = { file -> handlePickedFile(file, coroutineScope, store::dispatchEvent) },
     )
     val cameraLauncher = rememberCameraPickerLauncher(
-        onResult = onImageSelected,
+        onResult = { file -> handlePickedFile(file, coroutineScope, store::dispatchEvent) },
     )
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(Res.string.schedule_import_title)) },
-                navigationIcon = {
-                    IconButton(onClick = { store.dispatchEvent(ImportEvent.ClickBack) }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(Res.string.schedule_import_back_description),
-                        )
-                    }
-                },
-            )
+            ImportTopBar(onBackClick = { store.dispatchEvent(ImportEvent.ClickBack) })
+        },
+        bottomBar = {
+            if (state.draft != null && !state.isApplied) {
+                ImportBottomActionBar(
+                    enabled = !state.isRewardInProgress && !state.isLoading,
+                    isLoadingAccept = state.isRewardInProgress || state.isLoading,
+                    onSaveClick = { store.dispatchEvent(ImportEvent.ApplyDraft) },
+                    onEditSourceClick = { store.dispatchEvent(ImportEvent.EditSource) },
+                )
+            }
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = {
             SnackbarHost(
-                hostState = snackbarState,
-                snackbar = { ErrorSnackbar(it) },
+                hostState = snackbarHostState,
+                snackbar = { snackbarData -> ErrorSnackbar(snackbarData) },
             )
         },
-    ) { paddingValues ->
+    ) { contentPadding ->
         ImportLayout(
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier.padding(contentPadding),
             state = state,
-            onSourceTextChanged = { store.dispatchEvent(ImportEvent.UpdateSourceText(it)) },
-            onNumberOfWeeksChanged = { store.dispatchEvent(ImportEvent.UpdateNumberOfWeeks(it)) },
             onSelectPhoto = { galleryLauncher.launch() },
             onTakePhoto = { cameraLauncher.launch(cameraFacing = FileKitCameraFacing.Back) },
+            onNoteChanged = { note -> store.dispatchEvent(ImportEvent.UpdateNote(note)) },
+            onOrganizationSelect = { organization ->
+                store.dispatchEvent(ImportEvent.SelectOrganization(organization))
+            },
+            onAddOrganization = { store.dispatchEvent(ImportEvent.ClickAddOrganization) },
             onExtract = { store.dispatchEvent(ImportEvent.ExtractDraft) },
-            onToggleEntry = { store.dispatchEvent(ImportEvent.ToggleEntry(it)) },
-            onUpdateEntry = { store.dispatchEvent(ImportEvent.UpdateEntry(it)) },
-            onApply = { store.dispatchEvent(ImportEvent.ApplyDraft) },
-            onEditSource = { store.dispatchEvent(ImportEvent.EditSource) },
+            onClassClick = { entryId -> editingEntryId = entryId },
+            onMoveClass = { entryId, dayOfWeek ->
+                store.dispatchEvent(ImportEvent.MoveClass(entryId, dayOfWeek))
+            },
+            onSwapClasses = { firstId, secondId ->
+                store.dispatchEvent(ImportEvent.SwapClasses(firstId, secondId))
+            },
+            onSubjectClick = { subject -> editingSubject = subject },
+            onTeacherClick = { teacher -> editingTeacher = teacher },
             onDone = { store.dispatchEvent(ImportEvent.ClickBack) },
         )
     }
 
+    val editingEntry = state.draft?.entries?.firstOrNull { entry -> entry.id == editingEntryId }
+    if (editingEntry != null) {
+        ImportClassEditorSheet(
+            entry = editingEntry,
+            subjects = state.subjects,
+            employees = state.employees,
+            onDismiss = { editingEntryId = null },
+            onConfirm = { entry ->
+                store.dispatchEvent(ImportEvent.UpdateEntry(entry))
+                editingEntryId = null
+            },
+        )
+    }
+    if (editingSubject != null) {
+        ImportSubjectEditorSheet(
+            subjectName = editingSubject.orEmpty(),
+            entries = state.draft?.entries.orEmpty(),
+            subjects = state.subjects,
+            onDismiss = { editingSubject = null },
+            onConfirm = { updated ->
+                updated.forEach { entry -> store.dispatchEvent(ImportEvent.UpdateEntry(entry)) }
+                editingSubject = null
+            },
+        )
+    }
+    if (editingTeacher != null) {
+        ImportTeacherEditorSheet(
+            teacherName = editingTeacher.orEmpty(),
+            entries = state.draft?.entries.orEmpty(),
+            employees = state.employees,
+            onDismiss = { editingTeacher = null },
+            onConfirm = { updated ->
+                updated.forEach { entry -> store.dispatchEvent(ImportEvent.UpdateEntry(entry)) }
+                editingTeacher = null
+            },
+        )
+    }
+
+    YandexRewardedAdHost(
+        adUnitId = adsConfiguration?.scheduleImportRewardedId.orEmpty(),
+        requestKey = state.rewardChallengeId,
+        onRewarded = { challengeId ->
+            store.dispatchEvent(ImportEvent.RewardedAdGranted(challengeId))
+        },
+        onUnavailable = { store.dispatchEvent(ImportEvent.RewardedAdUnavailable) },
+    )
+
     store.handleEffects { effect ->
         when (effect) {
-            is ImportEffect.ShowError -> snackbarState.showSnackbar(effect.failure.mapToMessage())
+            is ImportEffect.ShowError -> snackbarHostState.showSnackbar(
+                message = effect.failure.mapToMessage(),
+                withDismissAction = true,
+            )
         }
+    }
+}
+
+private fun handlePickedFile(
+    file: PlatformFile?,
+    coroutineScope: kotlinx.coroutines.CoroutineScope,
+    dispatch: (ImportEvent) -> Unit,
+) {
+    if (file == null) return
+    coroutineScope.launch {
+        runCatching { file.readBytes() }.fold(
+            onSuccess = { bytes -> dispatch(ImportEvent.SelectedPhoto(bytes)) },
+            onFailure = { dispatch(ImportEvent.ImageSelectionFailed) },
+        )
     }
 }

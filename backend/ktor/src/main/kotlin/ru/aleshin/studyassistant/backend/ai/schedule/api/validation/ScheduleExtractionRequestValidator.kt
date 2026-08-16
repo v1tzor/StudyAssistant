@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.backend.ai.schedule.api.validation
 import ru.aleshin.studyassistant.backend.ai.AiConfig
 import ru.aleshin.studyassistant.backend.ai.schedule.api.dto.ScheduleExtractionRequestDto
 import ru.aleshin.studyassistant.backend.common.api.InvalidRequestException
+import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Locale
 import java.util.UUID
@@ -32,14 +33,24 @@ class ScheduleExtractionRequestValidator(
 
     fun validate(request: ScheduleExtractionRequestDto) {
         val locale = request.locale.replace('_', '-')
+        val note = request.note?.trim().orEmpty()
+        val declaredMime = ScheduleImageDecoder.normalizeDeclaredMime(request.imageMimeType)
+        val imageBytes = ScheduleImageDecoder.decode(request.imageBase64)
+        val detectedMime = imageBytes?.let(ScheduleImageDecoder::mimeTypeOf)
 
         if (
             runCatching { UUID.fromString(request.requestId) }.isFailure ||
-            request.rawText.isBlank() ||
-            request.rawText.length > config.maxScheduleTextCharacters ||
+            declaredMime == null ||
+            imageBytes == null ||
+            detectedMime == null ||
+            detectedMime != declaredMime ||
+            imageBytes.size < ScheduleImageDecoder.MIN_IMAGE_BYTES ||
+            imageBytes.size > config.maxScheduleImageBytes ||
+            note.length > config.maxScheduleNoteCharacters ||
             !LOCALE_PATTERN.matches(locale) ||
             Locale.forLanguageTag(locale).language.isBlank() ||
             runCatching { ZoneId.of(request.timeZone) }.isFailure ||
+            runCatching { LocalDate.parse(request.todayDate) }.isFailure ||
             request.numberOfWeeks !in MIN_REPEAT_WEEKS..MAX_REPEAT_WEEKS
         ) {
             throw InvalidRequestException()

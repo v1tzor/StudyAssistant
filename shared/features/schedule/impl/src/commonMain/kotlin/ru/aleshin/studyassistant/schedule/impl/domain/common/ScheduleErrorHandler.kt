@@ -40,10 +40,6 @@ internal interface ScheduleErrorHandler : ErrorHandler<ScheduleFailures> {
             -> ScheduleFailures.InvalidImport
             ScheduleTextRecognitionException.InvalidImage -> ScheduleFailures.InvalidImage
             ScheduleTextRecognitionException.ImageTooLarge -> ScheduleFailures.ImageTooLarge
-            ScheduleTextRecognitionException.NoText -> ScheduleFailures.NoTextRecognized
-            ScheduleTextRecognitionException.Unavailable -> {
-                ScheduleFailures.TextRecognitionUnavailable
-            }
             is AiServiceException.ServerUnavailable -> ScheduleFailures.ServerUnavailable
             is AdRewardException -> ScheduleFailures.RewardUnavailable
             else -> ScheduleFailures.OtherError(throwable)

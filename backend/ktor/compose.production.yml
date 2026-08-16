@@ -140,6 +140,7 @@ services:
       SHARE_HMAC_SECRET_FILE: /run/secrets/share_hmac_secret
       PAYLOAD_ENCRYPTION_KEY_FILE: /run/secrets/payload_encryption_key
       DEEPSEEK_API_KEY_FILE: /run/secrets/deepseek_api_key
+      OPENROUTER_API_KEY_FILE: /run/secrets/openrouter_api_key
       EXPECTED_HOST: ${EXPECTED_HOST:-api.studyassistant-app.ru}
       TRUST_PROXY_HEADERS: "true"
       REQUIRE_HTTPS: "true"
@@ -151,6 +152,7 @@ services:
       - share_hmac_secret
       - payload_encryption_key
       - deepseek_api_key
+      - openrouter_api_key
     expose:
       - "8080"
     depends_on:
@@ -280,3 +282,5 @@ secrets:
     file: ${PAYLOAD_ENCRYPTION_KEY_FILE}
   deepseek_api_key:
     file: ${DEEPSEEK_API_KEY_FILE}
+  openrouter_api_key:
+    file: ${OPENROUTER_API_KEY_FILE}

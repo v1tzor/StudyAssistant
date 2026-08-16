@@ -20,12 +20,9 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,67 +30,76 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.isoDayNumber
 import org.jetbrains.compose.resources.stringResource
-import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
-import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportEntryUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.NumberOfWeekItem
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportState
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportEntryCard
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportCatalogItem
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportDayColumn
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportOrganizationField
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportSourceActions
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.ScheduleWeekChip
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.SharedScheduleViewPlaceholder
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_apply_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_done_button
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_edit_source_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_extract_button
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_description
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_label
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_placeholder
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_review_description
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_review_title
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_selected_count
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_source_description
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_source_title
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_subjects_title
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_success_description
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_success_title
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_text_label
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_text_placeholder
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_teachers_title
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_unparsed_title
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_week_value
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_weeks_label
+import ru.aleshin.studyassistant.schedule.impl.resources.shared_schedule_header
 
 /**
- * @author Stanislav Aleshin on 12.08.2026.
+ * @author Stanislav Aleshin on 16.08.2026.
  */
 @Composable
 internal fun ImportLayout(
+    modifier: Modifier = Modifier,
     state: ImportState,
-    onSourceTextChanged: (String) -> Unit,
-    onNumberOfWeeksChanged: (Int) -> Unit,
     onSelectPhoto: () -> Unit,
     onTakePhoto: () -> Unit,
+    onNoteChanged: (String) -> Unit,
+    onOrganizationSelect: (OrganizationShortUi?) -> Unit,
+    onAddOrganization: () -> Unit,
     onExtract: () -> Unit,
-    onToggleEntry: (Int) -> Unit,
-    onUpdateEntry: (ScheduleImportEntryUi) -> Unit,
-    onApply: () -> Unit,
-    onEditSource: () -> Unit,
+    onClassClick: (Int) -> Unit,
+    onMoveClass: (Int, Int) -> Unit,
+    onSwapClasses: (Int, Int) -> Unit,
+    onSubjectClick: (String) -> Unit,
+    onTeacherClick: (String) -> Unit,
     onDone: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
@@ -101,67 +107,64 @@ internal fun ImportLayout(
     ) {
         AnimatedContent(
             targetState = when {
+                state.isLoading -> ImportContentState.LOADING
                 state.isApplied -> ImportContentState.SUCCESS
                 state.draft != null -> ImportContentState.REVIEW
                 else -> ImportContentState.SOURCE
             },
             transitionSpec = { fadeIn().togetherWith(fadeOut()) },
+            contentKey = { contentState -> contentState },
         ) { contentState ->
             when (contentState) {
-                ImportContentState.SOURCE -> ImportSource(
-                    sourceText = state.sourceText,
-                    numberOfWeeks = state.numberOfWeeks,
-                    enabled = !state.isLoading,
-                    onSourceTextChanged = onSourceTextChanged,
-                    onNumberOfWeeksChanged = onNumberOfWeeksChanged,
-                    onSelectPhoto = onSelectPhoto,
-                    onTakePhoto = onTakePhoto,
-                    onExtract = onExtract,
+                ImportContentState.SOURCE -> ImportSourceLayout(
                     modifier = Modifier.widthIn(max = 600.dp),
-                )
-                ImportContentState.REVIEW -> ImportReview(
                     state = state,
                     enabled = !state.isLoading,
-                    onToggleEntry = onToggleEntry,
-                    onUpdateEntry = onUpdateEntry,
-                    onApply = onApply,
-                    onEditSource = onEditSource,
+                    onSelectPhoto = onSelectPhoto,
+                    onTakePhoto = onTakePhoto,
+                    onNoteChanged = onNoteChanged,
+                    onOrganizationSelect = onOrganizationSelect,
+                    onAddOrganization = onAddOrganization,
+                    onExtract = onExtract,
+                )
+                ImportContentState.LOADING -> ImportLoadingLayout(
                     modifier = Modifier.widthIn(max = 800.dp),
                 )
-                ImportContentState.SUCCESS -> ImportSuccess(
-                    onDone = onDone,
-                    modifier = Modifier.widthIn(max = 600.dp),
+                ImportContentState.REVIEW -> ImportReviewLayout(
+                    modifier = Modifier.widthIn(max = 800.dp),
+                    state = state,
+                    onClassClick = onClassClick,
+                    onMoveClass = onMoveClass,
+                    onSwapClasses = onSwapClasses,
+                    onSubjectClick = onSubjectClick,
+                    onTeacherClick = onTeacherClick,
                 )
-            }
-        }
-        if (state.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
+                ImportContentState.SUCCESS -> ImportSuccessLayout(
+                    modifier = Modifier.widthIn(max = 600.dp),
+                    onDone = onDone,
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ImportSource(
-    sourceText: String,
-    numberOfWeeks: Int,
+private fun ImportSourceLayout(
+    modifier: Modifier = Modifier,
+    state: ImportState,
     enabled: Boolean,
-    onSourceTextChanged: (String) -> Unit,
-    onNumberOfWeeksChanged: (Int) -> Unit,
     onSelectPhoto: () -> Unit,
     onTakePhoto: () -> Unit,
+    onNoteChanged: (String) -> Unit,
+    onOrganizationSelect: (OrganizationShortUi?) -> Unit,
+    onAddOrganization: () -> Unit,
     onExtract: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        item(key = "header") {
+        item(key = SOURCE_HEADER_KEY) {
             Column(
                 modifier = Modifier.padding(top = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -169,7 +172,6 @@ private fun ImportSource(
                 Text(
                     text = stringResource(Res.string.schedule_import_source_title),
                     style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
                     text = stringResource(Res.string.schedule_import_source_description),
@@ -178,52 +180,45 @@ private fun ImportSource(
                 )
             }
         }
-        item(key = "actions") {
+        item(key = PHOTO_SECTION_KEY) {
             ImportSourceActions(
                 enabled = enabled,
+                hasPhoto = state.hasPhoto,
                 onSelectPhoto = onSelectPhoto,
                 onTakePhoto = onTakePhoto,
             )
         }
-        item(key = "input") {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = sourceText,
+        item(key = ORGANIZATION_SECTION_KEY) {
+            ImportOrganizationField(
                 enabled = enabled,
-                onValueChange = { value ->
-                    if (value.length <= MAX_SOURCE_TEXT_LENGTH) onSourceTextChanged(value)
-                },
-                shape = MaterialTheme.shapes.large,
-                label = { Text(stringResource(Res.string.schedule_import_text_label)) },
-                placeholder = { Text(stringResource(Res.string.schedule_import_text_placeholder)) },
-                minLines = 10,
+                organization = state.organization,
+                organizations = state.organizations,
+                onAddOrganization = onAddOrganization,
+                onSelected = onOrganizationSelect,
             )
         }
-        item(key = "weeks") {
+        item(key = NOTE_SECTION_KEY) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = stringResource(Res.string.schedule_import_weeks_label),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = state.note,
+                    enabled = enabled,
+                    onValueChange = { value ->
+                        if (value.length <= MAX_NOTE_LENGTH) onNoteChanged(value)
+                    },
+                    label = { Text(stringResource(Res.string.schedule_import_note_label)) },
+                    placeholder = { Text(stringResource(Res.string.schedule_import_note_placeholder)) },
+                    supportingText = {
+                        Text(stringResource(Res.string.schedule_import_note_description))
+                    },
+                    shape = MaterialTheme.shapes.large,
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    (1..3).forEach { week ->
-                        FilterChip(
-                            selected = numberOfWeeks == week,
-                            enabled = enabled,
-                            onClick = { onNumberOfWeeksChanged(week) },
-                            label = {
-                                Text(stringResource(Res.string.schedule_import_week_value, week))
-                            },
-                        )
-                    }
-                }
             }
         }
-        item(key = "extract") {
+        item(key = EXTRACT_SECTION_KEY) {
             Button(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-                enabled = enabled && sourceText.trim().length >= 3,
+                enabled = enabled && state.hasPhoto && state.organization != null,
                 onClick = onExtract,
             ) {
                 Text(stringResource(Res.string.schedule_import_extract_button))
@@ -233,30 +228,60 @@ private fun ImportSource(
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
-private fun ImportReview(
-    state: ImportState,
-    enabled: Boolean,
-    onToggleEntry: (Int) -> Unit,
-    onUpdateEntry: (ScheduleImportEntryUi) -> Unit,
-    onApply: () -> Unit,
-    onEditSource: () -> Unit,
+private fun ImportLoadingLayout(
     modifier: Modifier = Modifier,
 ) {
-    val draft = state.draft!!
-    val selectedCount = draft.entries.count(ScheduleImportEntryUi::included)
-    val groupedEntries = remember(draft.entries) {
-        draft.entries.groupBy { it.repeatWeek to it.dayOfWeek }
+    LazyRow(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 24.dp)
+            .height(300.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        userScrollEnabled = false,
+    ) {
+        items(
+            count = LOADING_PLACEHOLDER_COUNT,
+            key = { index -> "$LOADING_PLACEHOLDER_KEY_PREFIX$index" },
+        ) {
+            SharedScheduleViewPlaceholder()
+        }
     }
+}
+
+@Composable
+private fun ImportReviewLayout(
+    modifier: Modifier = Modifier,
+    state: ImportState,
+    onClassClick: (Int) -> Unit,
+    onMoveClass: (Int, Int) -> Unit,
+    onSwapClasses: (Int, Int) -> Unit,
+    onSubjectClick: (String) -> Unit,
+    onTeacherClick: (String) -> Unit,
+) {
+    val draft = state.draft ?: return
+    val coroutineScope = rememberCoroutineScope()
+    val schedulesRowState = rememberLazyListState()
+    val subjects = remember(draft.entries) {
+        draft.entries
+            .filter(ScheduleImportEntryUi::included)
+            .mapNotNull { entry -> entry.subject.takeIf(String::isNotBlank) }
+            .distinct()
+    }
+    val teachers = remember(draft.entries) {
+        draft.entries
+            .filter(ScheduleImportEntryUi::included)
+            .mapNotNull { entry -> entry.teacher.takeIf(String::isNotBlank) }
+            .distinct()
+    }
+    val maxNumberOfWeek = draft.entries.maxOfOrNull { entry -> entry.repeatWeek } ?: 1
 
     LazyColumn(
-        modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        state = rememberLazyListState(),
     ) {
-        item(key = "review_header") {
+        item(key = REVIEW_HEADER_KEY) {
             Column(
-                modifier = Modifier.padding(top = 16.dp),
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
@@ -268,21 +293,12 @@ private fun ImportReview(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Text(
-                    text = stringResource(
-                        Res.string.schedule_import_selected_count,
-                        selectedCount,
-                        draft.entries.size,
-                    ),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = StudyAssistantRes.colors.accents.orange,
-                )
             }
         }
         if (draft.unparsedLines.isNotEmpty()) {
-            item(key = "unparsed") {
+            item(key = UNPARSED_SECTION_KEY) {
                 ElevatedCard(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
                     colors = CardDefaults.elevatedCardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                     ),
@@ -306,70 +322,136 @@ private fun ImportReview(
                 }
             }
         }
-
-        groupedEntries.forEach { (weekDay, entries) ->
-            stickyHeader(key = "header_${weekDay.first}_${weekDay.second}") {
-                val dayName = DayOfWeek.entries[weekDay.second - 1].mapToSting()
-                val weekName = stringResource(Res.string.schedule_import_week_value, weekDay.first)
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(vertical = 8.dp)
-                ) {
-                    Text(
-                        text = "$dayName ($weekName)",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-            }
-
-            items(
-                items = entries,
-                key = { it.id },
-            ) { entry ->
-                ImportEntryCard(
-                    entry = entry,
-                    enabled = enabled,
-                    organizations = state.organizations,
-                    subjects = state.subjects,
-                    employees = state.employees,
-                    onToggle = { onToggleEntry(entry.id) },
-                    onUpdate = onUpdateEntry,
-                )
-            }
+        item(key = WEEK_SECTION_KEY) {
+            ImportWeekSection(
+                entries = draft.entries.filter(ScheduleImportEntryUi::included),
+                maxNumberOfWeek = maxNumberOfWeek,
+                onClassClick = onClassClick,
+                onMoveClass = onMoveClass,
+                onSwapClasses = onSwapClasses,
+                onWeekSelected = {
+                    coroutineScope.launch { schedulesRowState.animateScrollToItem(0) }
+                },
+                schedulesRowState = schedulesRowState,
+            )
         }
+        item(key = SUBJECTS_SECTION_KEY) {
+            ImportCatalogSection(
+                title = stringResource(Res.string.schedule_import_subjects_title),
+                items = subjects,
+                isNew = { name ->
+                    state.subjects.none { subject -> subject.name.equals(name, ignoreCase = true) }
+                },
+                onClick = onSubjectClick,
+            )
+        }
+        item(key = TEACHERS_SECTION_KEY) {
+            ImportCatalogSection(
+                title = stringResource(Res.string.schedule_import_teachers_title),
+                items = teachers,
+                isNew = { name ->
+                    state.employees.none { employee ->
+                        listOfNotNull(employee.secondName, employee.firstName, employee.patronymic)
+                            .joinToString(" ")
+                            .equals(name, ignoreCase = true)
+                    }
+                },
+                onClick = onTeacherClick,
+            )
+        }
+        item(key = REVIEW_SPACER_KEY) {
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+    }
+}
 
-        item(key = "review_actions") {
-            Column(
-                modifier = Modifier.padding(bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                OutlinedButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = enabled,
-                    onClick = onEditSource,
-                ) {
-                    Text(stringResource(Res.string.schedule_import_edit_source_button))
+@Composable
+private fun ImportWeekSection(
+    entries: List<ScheduleImportEntryUi>,
+    maxNumberOfWeek: Int,
+    onClassClick: (Int) -> Unit,
+    onMoveClass: (Int, Int) -> Unit,
+    onSwapClasses: (Int, Int) -> Unit,
+    onWeekSelected: () -> Unit,
+    schedulesRowState: androidx.compose.foundation.lazy.LazyListState,
+) {
+    var selectedWeek by rememberSaveable { mutableIntStateOf(NumberOfWeekItem.ONE.isoWeekNumber) }
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = stringResource(Res.string.shared_schedule_header),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            ScheduleWeekChip(
+                selected = NumberOfWeekItem.valueOf(selectedWeek),
+                maxNumberOfWeek = maxNumberOfWeek,
+                onSelect = { week ->
+                    selectedWeek = week.isoWeekNumber
+                    onWeekSelected()
+                },
+            )
+        }
+        LazyRow(
+            modifier = Modifier.fillMaxWidth().height(300.dp),
+            state = schedulesRowState,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            items(
+                items = DayOfWeek.entries,
+                key = { dayOfWeek -> dayOfWeek.isoDayNumber },
+            ) { dayOfWeek ->
+                val dayEntries = entries.filter { entry ->
+                    entry.dayOfWeek == dayOfWeek.isoDayNumber && entry.repeatWeek == selectedWeek
                 }
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = enabled && selectedCount > 0,
-                    onClick = onApply,
-                ) {
-                    Text(stringResource(Res.string.schedule_import_apply_button))
-                }
+                ImportDayColumn(
+                    dayOfWeek = dayOfWeek,
+                    entries = dayEntries,
+                    onClassClick = onClassClick,
+                    onMoveClass = onMoveClass,
+                    onSwapClasses = onSwapClasses,
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ImportSuccess(
-    onDone: () -> Unit,
+private fun ImportCatalogSection(
+    title: String,
+    items: List<String>,
+    isNew: (String) -> Boolean,
+    onClick: (String) -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        items.forEach { item ->
+            ImportCatalogItem(
+                title = item,
+                isNew = isNew(item),
+                onClick = { onClick(item) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun ImportSuccessLayout(
     modifier: Modifier = Modifier,
+    onDone: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxSize().padding(24.dp),
@@ -399,7 +481,20 @@ private fun ImportSuccess(
 }
 
 private enum class ImportContentState {
-    SOURCE, REVIEW, SUCCESS
+    SOURCE, LOADING, REVIEW, SUCCESS
 }
 
-private const val MAX_SOURCE_TEXT_LENGTH = 30_000
+private const val SOURCE_HEADER_KEY = "import_source_header"
+private const val PHOTO_SECTION_KEY = "import_photo_section"
+private const val ORGANIZATION_SECTION_KEY = "import_organization_section"
+private const val NOTE_SECTION_KEY = "import_note_section"
+private const val EXTRACT_SECTION_KEY = "import_extract_section"
+private const val REVIEW_HEADER_KEY = "import_review_header"
+private const val UNPARSED_SECTION_KEY = "import_unparsed_section"
+private const val WEEK_SECTION_KEY = "import_week_section"
+private const val SUBJECTS_SECTION_KEY = "import_subjects_section"
+private const val TEACHERS_SECTION_KEY = "import_teachers_section"
+private const val REVIEW_SPACER_KEY = "import_review_spacer"
+private const val LOADING_PLACEHOLDER_KEY_PREFIX = "import_loading_placeholder_"
+private const val LOADING_PLACEHOLDER_COUNT = 7
+private const val MAX_NOTE_LENGTH = 120

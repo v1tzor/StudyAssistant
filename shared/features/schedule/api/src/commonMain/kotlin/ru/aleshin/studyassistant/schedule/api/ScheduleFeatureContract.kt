@@ -37,7 +37,7 @@ public sealed class ScheduleConfig {
     public data class Share(val code: String? = null) : ScheduleConfig()
 
     @Serializable
-    public data class Import(val rawText: String? = null) : ScheduleConfig()
+    public data object Import : ScheduleConfig()
 }
 
 public sealed class ScheduleOutput : BaseOutput {
@@ -60,6 +60,10 @@ public sealed class ScheduleOutput : BaseOutput {
             val date: Long?,
             val subjectId: UID?,
             val organizationId: UID?
+        ) : NavigateToEditor()
+
+        public data class Organization(
+            val organizationId: UID?,
         ) : NavigateToEditor()
     }
 }

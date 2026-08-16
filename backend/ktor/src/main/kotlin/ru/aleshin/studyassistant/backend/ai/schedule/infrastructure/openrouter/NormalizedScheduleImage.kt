@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.schedule.impl.platform
-
-import ru.aleshin.studyassistant.core.common.functional.ocr.OcrEngine
-import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
-import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
-import ru.aleshin.studyassistant.schedule.impl.platform.ocr.AndroidOcrEngine
+package ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter
 
 /**
  * @author Stanislav Aleshin on 16.08.2026.
  */
-internal actual fun createOcrEngine(
-    dispatchers: AppDispatchers,
-    dependencies: ScheduleFeatureDependencies,
-): OcrEngine = AndroidOcrEngine(dispatchers)
+data class NormalizedScheduleImage(
+    val bytes: ByteArray,
+    val mimeType: String,
+)
