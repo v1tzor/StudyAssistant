@@ -63,6 +63,7 @@ class AiToolCatalogTest {
             "get_classes_by_date",
             "get_classes_by_range",
             "get_near_class",
+            "get_goals",
             "get_free_time",
             "create_todo",
             "update_todo",
@@ -75,6 +76,14 @@ class AiToolCatalogTest {
             "create_class",
             "update_class",
             "delete_class",
+            "create_goal",
+            "update_goal",
+            "complete_goal",
+            "delete_goal",
+            "create_subject",
+            "update_subject",
+            "create_employee",
+            "update_employee",
         )
     }
 }
