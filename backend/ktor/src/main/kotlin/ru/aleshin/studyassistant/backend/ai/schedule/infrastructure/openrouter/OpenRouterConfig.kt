@@ -37,6 +37,8 @@ data class OpenRouterConfig(
     val retryJitterMs: Long,
     val maxConcurrentRequests: Int = 8,
     val queueTimeoutMs: Long = 3_000L,
+    val socksHost: String = DEFAULT_SOCKS_HOST,
+    val socksPort: Int = DEFAULT_SOCKS_PORT,
 ) {
 
     init {
@@ -57,12 +59,17 @@ data class OpenRouterConfig(
         require(maxConcurrentRequests > 0)
         require(queueTimeoutMs > 0)
         require(queueTimeoutMs < totalTimeoutMs)
+        require(socksHost.isNotBlank())
+        require(socksPort in 1..MAX_PORT)
     }
 
     companion object {
 
         private const val HTTPS_PREFIX = "https://"
         private const val MAX_RETRIES = 5
+        private const val MAX_PORT = 65_535
+        const val DEFAULT_SOCKS_HOST = "127.0.0.1"
+        const val DEFAULT_SOCKS_PORT = 10_808
 
         const val MODEL = "qwen/qwen3-vl-32b-instruct"
 
@@ -91,6 +98,8 @@ data class OpenRouterConfig(
                 retryJitterMs = config.property("retryJitterMs").getString().toLong(),
                 maxConcurrentRequests = config.property("maxConcurrentRequests").getString().toInt(),
                 queueTimeoutMs = config.property("queueTimeoutMs").getString().toLong(),
+                socksHost = config.propertyOrNull("socksHost")?.getString()?.trim()?.takeIf(String::isNotEmpty) ?: DEFAULT_SOCKS_HOST,
+                socksPort = config.propertyOrNull("socksPort")?.getString()?.toInt() ?: DEFAULT_SOCKS_PORT,
             )
         }
     }

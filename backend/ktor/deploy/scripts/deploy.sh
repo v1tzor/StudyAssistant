@@ -34,7 +34,7 @@ if [ -n "$POSTGRES_CONTAINER" ] && [ "${SKIP_BACKUP:-0}" != "1" ]; then
         "$SCRIPT_DIRECTORY/backup.sh"
 fi
 
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull backend
+docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull backend xray
 
 docker compose \
     --env-file "$ENV_FILE" \

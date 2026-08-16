@@ -141,6 +141,8 @@ services:
       PAYLOAD_ENCRYPTION_KEY_FILE: /run/secrets/payload_encryption_key
       DEEPSEEK_API_KEY_FILE: /run/secrets/deepseek_api_key
       OPENROUTER_API_KEY_FILE: /run/secrets/openrouter_api_key
+      OPENROUTER_SOCKS_HOST: ${OPENROUTER_SOCKS_HOST:-xray}
+      OPENROUTER_SOCKS_PORT: ${OPENROUTER_SOCKS_PORT:-10808}
       EXPECTED_HOST: ${EXPECTED_HOST:-api.studyassistant-app.ru}
       TRUST_PROXY_HEADERS: "true"
       REQUIRE_HTTPS: "true"
@@ -153,11 +155,15 @@ services:
       - payload_encryption_key
       - deepseek_api_key
       - openrouter_api_key
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     expose:
       - "8080"
     depends_on:
       migrate:
         condition: service_completed_successfully
+      xray:
+        condition: service_started
     healthcheck:
       test:
         - CMD-SHELL
@@ -226,6 +232,34 @@ services:
       start_period: 5s
     networks:
       - web
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  xray:
+    image: ghcr.io/xtls/xray-core:26.7.28@sha256:b697cda1588faca696ab7f7755dd1161f60862af3ff6026300e44cff6aedd558
+    restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - run
+      - -c
+      - /etc/xray/config.json
+    volumes:
+      - ${OPENROUTER_XRAY_CONFIG_FILE:-./deploy/xray/config.example.json}:/etc/xray/config.json:ro
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=8m
+    pids_limit: 32
+    mem_limit: 64m
+    cpus: 0.25
+    networks:
+      - egress
     logging:
       driver: local
       options:

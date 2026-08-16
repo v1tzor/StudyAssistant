@@ -92,6 +92,23 @@ require_env_file_value SHARE_HMAC_SECRET_FILE "$SECRET_DIRECTORY/share_hmac_secr
 require_env_file_value PAYLOAD_ENCRYPTION_KEY_FILE "$SECRET_DIRECTORY/payload_encryption_key"
 require_env_file_value DEEPSEEK_API_KEY_FILE "$SECRET_DIRECTORY/deepseek_api_key"
 require_env_file_value OPENROUTER_API_KEY_FILE "$SECRET_DIRECTORY/openrouter_api_key"
+require_env_file_value OPENROUTER_SOCKS_HOST xray
+require_env_file_value OPENROUTER_SOCKS_PORT 10808
+require_env_file_value OPENROUTER_XRAY_CONFIG_FILE /etc/studyassistant/xray/config.json
+
+xray_config="/etc/studyassistant/xray/config.json"
+if [ ! -f "$xray_config" ] || [ -L "$xray_config" ] || [ ! -s "$xray_config" ]; then
+    echo "Required Xray config is missing, empty, or not regular: $xray_config" >&2
+    exit 1
+fi
+if [ "$(stat -c '%u:%g:%a' "$xray_config")" != "0:10001:640" ]; then
+    echo "Xray config must be root:10001 with mode 0640" >&2
+    exit 1
+fi
+if grep -Eq 'REPLACE_[A-Z0-9_]+' "$xray_config"; then
+    echo "Xray config still contains placeholder values" >&2
+    exit 1
+fi
 
 BACKEND_IMAGE="$(sed -n 's/^BACKEND_IMAGE=//p' "$ENV_FILE")"
 if ! printf '%s\n' "$BACKEND_IMAGE" | grep -Eq '^[-A-Za-z0-9._/:]+@sha256:[0-9a-f]{64}$'; then

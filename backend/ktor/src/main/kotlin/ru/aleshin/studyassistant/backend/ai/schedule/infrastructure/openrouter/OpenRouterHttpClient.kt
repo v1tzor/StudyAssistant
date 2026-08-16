@@ -17,11 +17,13 @@
 package ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import java.net.InetSocketAddress
+import java.net.Proxy
 
 /**
  * @author Stanislav Aleshin on 16.08.2026.
@@ -33,8 +35,14 @@ val OpenRouterJson = Json {
 }
 
 fun createOpenRouterHttpClient(config: OpenRouterConfig): HttpClient {
-    return HttpClient(CIO) {
+    val proxyAddress = InetSocketAddress(config.socksHost, config.socksPort)
+
+    return HttpClient(OkHttp) {
         expectSuccess = false
+
+        engine {
+            proxy = Proxy(Proxy.Type.SOCKS, proxyAddress)
+        }
 
         install(HttpTimeout) {
             requestTimeoutMillis = config.requestTimeoutMs
