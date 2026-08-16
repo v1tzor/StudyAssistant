@@ -113,6 +113,8 @@
     <string name="schedule_import_note_placeholder">9б or group:251-361</string>
     <string name="schedule_import_note_description">If the timetable has several groups or classes, write a short hint so only yours is extracted.</string>
     <string name="schedule_import_extract_button">Import</string>
+    <string name="schedule_import_processing_title">Processing the schedule</string>
+    <string name="schedule_import_processing_hint">This can take up to 2 minutes</string>
     <string name="schedule_import_review_title">Review draft</string>
     <string name="schedule_import_review_description">Edit classes, subjects, and teachers before saving. New items are marked.</string>
     <string name="schedule_import_unparsed_title">Some details need attention</string>

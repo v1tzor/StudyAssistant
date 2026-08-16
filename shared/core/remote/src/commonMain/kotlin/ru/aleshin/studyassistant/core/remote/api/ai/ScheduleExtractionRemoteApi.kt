@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.remote.api.ai
 
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -56,6 +57,10 @@ interface ScheduleExtractionRemoteApi {
 
             val response = try {
                 httpClient.post(StudyAssistantKtor.Backend.SCHEDULE_EXTRACTIONS) {
+                    timeout {
+                        requestTimeoutMillis = REQUEST_TIMEOUT_MS
+                        socketTimeoutMillis = REQUEST_TIMEOUT_MS
+                    }
                     header(StudyAssistantKtor.Backend.INSTALLATION_TOKEN_HEADER, installationToken)
                     setBody(request)
                 }
@@ -78,5 +83,10 @@ interface ScheduleExtractionRemoteApi {
                 throw AiServiceException.ServerUnavailable()
             }
         }
+    }
+
+    private companion object {
+
+        const val REQUEST_TIMEOUT_MS = 180_000L
     }
 }

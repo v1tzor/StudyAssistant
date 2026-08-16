@@ -35,11 +35,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.isoDayNumber
@@ -63,13 +66,14 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.Im
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportOrganizationField
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportSourceActions
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.ScheduleWeekChip
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.SharedScheduleViewPlaceholder
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_done_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_extract_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_description
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_label
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_placeholder
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_hint
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_title
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_review_description
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_review_title
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_source_description
@@ -128,7 +132,7 @@ internal fun ImportLayout(
                     onExtract = onExtract,
                 )
                 ImportContentState.LOADING -> ImportLoadingLayout(
-                    modifier = Modifier.widthIn(max = 800.dp),
+                    modifier = Modifier.fillMaxSize(),
                 )
                 ImportContentState.REVIEW -> ImportReviewLayout(
                     modifier = Modifier.widthIn(max = 800.dp),
@@ -231,19 +235,52 @@ private fun ImportSourceLayout(
 private fun ImportLoadingLayout(
     modifier: Modifier = Modifier,
 ) {
-    LazyRow(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 24.dp)
-            .height(300.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        userScrollEnabled = false,
+    var elapsedSeconds by remember { mutableIntStateOf(0) }
+    val elapsedLabel = remember(elapsedSeconds) {
+        val minutes = elapsedSeconds / 60
+        val seconds = elapsedSeconds % 60
+        "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+    }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1_000)
+            elapsedSeconds += 1
+        }
+    }
+
+    Box(
+        modifier = modifier.fillMaxSize().padding(horizontal = 32.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        items(
-            count = LOADING_PLACEHOLDER_COUNT,
-            key = { index -> "$LOADING_PLACEHOLDER_KEY_PREFIX$index" },
+        Column(
+            modifier = Modifier.widthIn(max = 360.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            SharedScheduleViewPlaceholder()
+            CircularProgressIndicator()
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = stringResource(Res.string.schedule_import_processing_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = stringResource(Res.string.schedule_import_processing_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = elapsedLabel,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
     }
 }
@@ -495,6 +532,4 @@ private const val WEEK_SECTION_KEY = "import_week_section"
 private const val SUBJECTS_SECTION_KEY = "import_subjects_section"
 private const val TEACHERS_SECTION_KEY = "import_teachers_section"
 private const val REVIEW_SPACER_KEY = "import_review_spacer"
-private const val LOADING_PLACEHOLDER_KEY_PREFIX = "import_loading_placeholder_"
-private const val LOADING_PLACEHOLDER_COUNT = 7
 private const val MAX_NOTE_LENGTH = 120

@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.remote.api.ai
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.http.ContentType
@@ -111,6 +112,7 @@ class ScheduleExtractionRemoteApiTest {
                 url("https://backend.studyassistant.example")
                 contentType(ContentType.Application.Json)
             }
+            install(HttpTimeout)
             install(ContentNegotiation) { json(JSON) }
         }
         return ScheduleExtractionRemoteApi.Backend(
