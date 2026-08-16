@@ -61,6 +61,7 @@ jobs:
             openssl rand -hex 32 > "$secret_directory/$secret_name"
           done
           printf '%s\n' 'ci-smoke-key' > "$secret_directory/deepseek_api_key"
+          printf '%s\n' 'ci-smoke-key' > "$secret_directory/openrouter_api_key"
           sudo chgrp -R 10001 "$secret_directory"
           chmod 0750 "$secret_directory"
           chmod 0640 "$secret_directory"/*
@@ -74,6 +75,7 @@ jobs:
           export SHARE_HMAC_SECRET_FILE="$secret_directory/share_hmac_secret"
           export PAYLOAD_ENCRYPTION_KEY_FILE="$secret_directory/payload_encryption_key"
           export DEEPSEEK_API_KEY_FILE="$secret_directory/deepseek_api_key"
+          export OPENROUTER_API_KEY_FILE="$secret_directory/openrouter_api_key"
 
           docker compose -f compose.production.yml up --detach --build --wait backend
           docker compose -f compose.production.yml exec -T backend \
