@@ -53,6 +53,9 @@ internal class ImportComposeStore(
     ) {
         when (event) {
             is ImportEvent.Started -> {
+                launchBackgroundWork(BackgroundKey.PROCESS) {
+                    workProcessor.work(ImportWorkCommand.LoadData).collectAndHandleWork()
+                }
                 if (!event.isRestore && !event.input.rawText.isNullOrBlank()) {
                     sendAction(ImportAction.UpdateSourceText(event.input.rawText))
                 }
@@ -74,7 +77,7 @@ internal class ImportComposeStore(
             }
             is ImportEvent.ExtractDraft -> with(state) {
                 launchBackgroundWork(BackgroundKey.PROCESS) {
-                    val command = ImportWorkCommand.ExtractDraft(sourceText, numberOfWeeks)
+                    val command = ImportWorkCommand.ExtractDraft(sourceText, ocrDocument, numberOfWeeks)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -117,10 +120,16 @@ internal class ImportComposeStore(
 
     override suspend fun reduce(action: ImportAction, currentState: ImportState) = when (action) {
         is ImportAction.UpdateSourceText -> currentState.copy(sourceText = action.text)
+        is ImportAction.SetupOcrDocument -> currentState.copy(ocrDocument = action.document)
         is ImportAction.UpdateNumberOfWeeks -> currentState.copy(numberOfWeeks = action.value)
         is ImportAction.SetupDraft -> currentState.copy(draft = action.draft)
         is ImportAction.UpdateLoading -> currentState.copy(isLoading = action.isLoading)
         is ImportAction.UpdateApplied -> currentState.copy(isApplied = action.isApplied)
+        is ImportAction.SetupData -> currentState.copy(
+            organizations = action.organizations,
+            subjects = action.subjects,
+            employees = action.employees,
+        )
     }
 
     private enum class BackgroundKey : BackgroundWorkKey {

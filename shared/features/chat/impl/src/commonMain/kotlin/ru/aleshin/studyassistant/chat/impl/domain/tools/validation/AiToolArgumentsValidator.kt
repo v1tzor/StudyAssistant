@@ -22,6 +22,9 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.format.DateTimeComponents.Formats
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.jsonPrimitive
 import ru.aleshin.studyassistant.core.common.extensions.endThisDay
 import ru.aleshin.studyassistant.core.common.extensions.parseUsingOffset
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
@@ -41,6 +44,7 @@ internal interface AiToolArgumentsValidator {
     fun time(value: String?): LocalTime?
     fun priority(value: String?): TaskPriority?
     fun boolean(value: String?): Boolean?
+    fun list(value: String?): List<String>
     fun range(from: String?, to: String?): TimeRange?
 
     class Base : AiToolArgumentsValidator {
@@ -81,6 +85,16 @@ internal interface AiToolArgumentsValidator {
             "true" -> true
             "false" -> false
             else -> null
+        }
+
+        override fun list(value: String?): List<String> {
+            val source = value?.trim()?.takeIf(String::isNotEmpty) ?: return emptyList()
+            return runCatching {
+                val json = Json.parseToJsonElement(source) as? JsonArray
+                json?.map { it.jsonPrimitive.content }.orEmpty()
+            }.getOrElse {
+                source.split(',').map(String::trim).filter(String::isNotEmpty)
+            }
         }
 
         override fun range(from: String?, to: String?): TimeRange? {

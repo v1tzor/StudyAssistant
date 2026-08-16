@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.core.domain.entities.schedules.importing
+package ru.aleshin.studyassistant.schedule.impl.platform
 
-import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.common.functional.ocr.ScheduleOcrDocument
+import ru.aleshin.studyassistant.core.common.functional.ocr.OcrEngine
+import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
+import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
 
 /**
- * @author Stanislav Aleshin on 12.08.2026.
+ * @author Stanislav Aleshin on 16.08.2026.
  */
-data class ScheduleImportRequest(
-    val requestId: UID,
-    val rawText: String,
-    val ocrDocument: ScheduleOcrDocument? = null,
-    val locale: String,
-    val timeZone: String,
-    val numberOfWeeks: Int,
-)
+internal expect fun createOcrEngine(
+    dispatchers: AppDispatchers,
+    dependencies: ScheduleFeatureDependencies,
+): OcrEngine

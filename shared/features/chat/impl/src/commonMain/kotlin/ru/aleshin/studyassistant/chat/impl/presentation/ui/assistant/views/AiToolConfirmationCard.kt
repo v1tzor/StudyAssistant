@@ -21,14 +21,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.AiToolConfirmationUi
@@ -69,6 +77,7 @@ import ru.aleshin.studyassistant.chat.impl.resources.subject_field_label
 import ru.aleshin.studyassistant.chat.impl.resources.target_field_label
 import ru.aleshin.studyassistant.chat.impl.resources.test_topic_field_label
 import ru.aleshin.studyassistant.chat.impl.resources.theoretical_tasks_field_label
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 12.08.2026.
@@ -81,36 +90,70 @@ internal fun AiToolConfirmationCard(
     onReject: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
+    ElevatedCard(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(
-                text = confirmationTitle(confirmation.name),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = Icons.Default.AutoAwesome,
+                    contentDescription = null,
+                    tint = StudyAssistantRes.colors.accents.orange,
+                )
+                Text(
+                    text = confirmationTitle(confirmation.name),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
             Text(
                 text = stringResource(Res.string.confirm_change_description),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            confirmation.visibleArguments().forEach { (label, value) ->
-                Text(
-                    text = "${argumentLabel(label)}: $value",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                )
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                confirmation.visibleArguments().forEach { (label, value) ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = argumentLabel(label),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            modifier = Modifier.weight(2.5f),
+                            text = value,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 OutlinedButton(
                     modifier = Modifier.weight(1f),
@@ -119,10 +162,14 @@ internal fun AiToolConfirmationCard(
                 ) {
                     Text(text = stringResource(Res.string.reject_change_button))
                 }
-                Button(
+                FilledTonalButton(
                     modifier = Modifier.weight(1f),
                     enabled = enabled,
                     onClick = onConfirm,
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = StudyAssistantRes.colors.accents.orangeContainer,
+                        contentColor = StudyAssistantRes.colors.accents.orange,
+                    )
                 ) {
                     Text(text = stringResource(Res.string.confirm_change_button))
                 }

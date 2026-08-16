@@ -42,7 +42,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.HomeworkShareStatus
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareState
 import ru.aleshin.studyassistant.tasks.impl.resources.Res
@@ -187,7 +190,7 @@ private fun SharePreviewLayout(
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    text = share.date.toString(),
+                    text = share.date.formatByTimeZone(DateTimeComponents.Formats.dayMonthYearFormat()),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )

@@ -24,13 +24,11 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -68,6 +66,7 @@ internal fun ImportContent(
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+
     val onImageSelected: (PlatformFile?) -> Unit = remember(store, coroutineScope) {
         { file ->
             if (file != null) {
@@ -105,12 +104,9 @@ internal fun ImportContent(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
             )
         },
-        contentWindowInsets = WindowInsets(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarState,
@@ -119,22 +115,18 @@ internal fun ImportContent(
         },
     ) { paddingValues ->
         ImportLayout(
+            modifier = Modifier.padding(paddingValues),
             state = state,
             onSourceTextChanged = { store.dispatchEvent(ImportEvent.UpdateSourceText(it)) },
-            onNumberOfWeeksChanged = {
-                store.dispatchEvent(ImportEvent.UpdateNumberOfWeeks(it))
-            },
-            onSelectPhoto = galleryLauncher::launch,
-            onTakePhoto = {
-                cameraLauncher.launch(cameraFacing = FileKitCameraFacing.Back)
-            },
+            onNumberOfWeeksChanged = { store.dispatchEvent(ImportEvent.UpdateNumberOfWeeks(it)) },
+            onSelectPhoto = { galleryLauncher.launch() },
+            onTakePhoto = { cameraLauncher.launch(cameraFacing = FileKitCameraFacing.Back) },
             onExtract = { store.dispatchEvent(ImportEvent.ExtractDraft) },
             onToggleEntry = { store.dispatchEvent(ImportEvent.ToggleEntry(it)) },
             onUpdateEntry = { store.dispatchEvent(ImportEvent.UpdateEntry(it)) },
             onApply = { store.dispatchEvent(ImportEvent.ApplyDraft) },
             onEditSource = { store.dispatchEvent(ImportEvent.EditSource) },
             onDone = { store.dispatchEvent(ImportEvent.ClickBack) },
-            modifier = Modifier.padding(paddingValues),
         )
     }
 

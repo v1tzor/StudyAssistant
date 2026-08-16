@@ -27,4 +27,5 @@ expect class PlatformConfiguration {
     val analyticsService: AnalyticsService
     val crashlyticsService: CrashlyticsService
     val reviewService: ReviewService
+    val context: Any?
 }

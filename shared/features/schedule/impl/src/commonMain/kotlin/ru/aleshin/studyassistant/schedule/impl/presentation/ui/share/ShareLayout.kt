@@ -46,11 +46,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.core.ui.views.ShareQrCode
+import ru.aleshin.studyassistant.core.ui.views.shortDayMonthTimeFormat
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.share.ShareStatus
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.OrganizationDataLinker
@@ -261,8 +264,9 @@ private fun ShareReadyLayout(
                         modifier = Modifier.size(220.dp),
                         content = link.deepLink,
                     )
+                    val expiresAtFormat = DateTimeComponents.Formats.shortDayMonthTimeFormat()
                     Text(
-                        text = "${stringResource(Res.string.share_expires_at_label)}: ${link.expiresAt}",
+                        text = "${stringResource(Res.string.share_expires_at_label)}: ${link.expiresAt.formatByTimeZone(expiresAtFormat)}",
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall,

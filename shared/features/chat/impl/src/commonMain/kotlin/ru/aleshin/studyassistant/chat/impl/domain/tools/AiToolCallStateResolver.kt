@@ -30,10 +30,12 @@ internal interface AiToolCallStateResolver {
 
         override fun activeCalls(messages: List<AiAssistantMessage>): List<ToolCall> {
             val ordered = messages.sortedBy(AiAssistantMessage::time)
+
             for (index in ordered.indices.reversed()) {
                 val assistant = ordered[index] as? AiAssistantMessage.AssistantMessage ?: continue
                 val calls = assistant.toolCalls.orEmpty()
                 if (calls.isEmpty()) continue
+
                 val resolvedIds = ordered.drop(index + 1)
                     .filterIsInstance<AiAssistantMessage.ToolMessage>()
                     .mapTo(mutableSetOf(), AiAssistantMessage.ToolMessage::toolCallId)

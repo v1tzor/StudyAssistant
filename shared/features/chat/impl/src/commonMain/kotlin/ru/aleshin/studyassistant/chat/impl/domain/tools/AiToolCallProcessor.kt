@@ -19,25 +19,36 @@ package ru.aleshin.studyassistant.chat.impl.domain.tools
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
+import kotlinx.datetime.format.DateTimeComponents
 import ru.aleshin.studyassistant.chat.impl.domain.tools.mappers.AiToolResultMapper
 import ru.aleshin.studyassistant.chat.impl.domain.tools.validation.AiToolArgumentsValidator
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.endOfWeek
+import ru.aleshin.studyassistant.core.common.extensions.endThisDay
+import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.common.extensions.parseUsingOffset
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.extensions.shiftWeek
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage
 import ru.aleshin.studyassistant.core.domain.entities.ai.ToolCall
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.common.ContactInfo
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
+import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.domain.entities.goals.Goal
+import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
+import ru.aleshin.studyassistant.core.domain.entities.goals.GoalType
 import ru.aleshin.studyassistant.core.domain.entities.organizations.convertToShort
 import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Todo
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
@@ -46,6 +57,7 @@ import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderMana
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
@@ -53,6 +65,9 @@ import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepositor
 import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
+import ru.aleshin.studyassistant.core.ui.theme.tokens.CustomColors
+import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
+import ru.aleshin.studyassistant.core.ui.views.shortDayMonthTimeFormat
 
 /**
  * @author Stanislav Aleshin on 12.08.2026.
@@ -68,6 +83,7 @@ internal interface AiToolCallProcessor {
     class Base(
         private val todoRepository: TodoRepository,
         private val homeworksRepository: HomeworksRepository,
+        private val dailyGoalsRepository: DailyGoalsRepository,
         private val subjectsRepository: SubjectsRepository,
         private val organizationsRepository: OrganizationsRepository,
         private val baseScheduleRepository: BaseScheduleRepository,
@@ -99,10 +115,11 @@ internal interface AiToolCallProcessor {
         override suspend fun confirmationPreview(call: ToolCall): Map<String, String> {
             val args = call.function.arguments.orEmpty()
             val visibleArgs = resolveVisibleArguments(args)
+
             return when (AiToolName.fromWireName(call.function.name)) {
                 AiToolName.UPDATE_TODO,
                 AiToolName.COMPLETE_TODO,
-                AiToolName.DELETE_TODO, -> {
+                AiToolName.DELETE_TODO -> {
                     val todo = args["todoId"]?.let { todoRepository.fetchTodoById(it).first() }
                     buildMap {
                         todo?.name?.let { put("target", it) }
@@ -111,7 +128,7 @@ internal interface AiToolCallProcessor {
                 }
                 AiToolName.UPDATE_HOMEWORK,
                 AiToolName.COMPLETE_HOMEWORK,
-                AiToolName.DELETE_HOMEWORK, -> {
+                AiToolName.DELETE_HOMEWORK -> {
                     val homework = args["homeworkId"]?.let {
                         homeworksRepository.fetchHomeworkById(it).first()
                     }
@@ -129,6 +146,36 @@ internal interface AiToolCallProcessor {
                     buildMap {
                         (classModel?.subject?.name ?: classModel?.customData)?.let {
                             put("target", it)
+                        }
+                        putAll(visibleArgs)
+                    }
+                }
+                AiToolName.UPDATE_GOAL,
+                AiToolName.COMPLETE_GOAL,
+                AiToolName.DELETE_GOAL -> {
+                    val goal = args["goalId"]?.let { dailyGoalsRepository.fetchGoalById(it).first() }
+                    buildMap {
+                        val target = when (goal?.contentType) {
+                            GoalType.HOMEWORK -> goal.contentHomework?.subject?.name
+                            GoalType.TODO -> goal.contentTodo?.name
+                            null -> null
+                        }
+                        target?.let { put("target", it) }
+                        putAll(visibleArgs)
+                    }
+                }
+                AiToolName.UPDATE_SUBJECT -> {
+                    val subject = args["subjectId"]?.let { subjectsRepository.fetchSubjectById(it).first() }
+                    buildMap {
+                        subject?.name?.let { put("target", it) }
+                        putAll(visibleArgs)
+                    }
+                }
+                AiToolName.UPDATE_EMPLOYEE -> {
+                    val employee = args["teacherId"]?.let { employeeRepository.fetchEmployeeById(it).first() }
+                    buildMap {
+                        employee?.let {
+                            put("target", listOfNotNull(it.secondName, it.firstName).joinToString(" "))
                         }
                         putAll(visibleArgs)
                     }
@@ -186,6 +233,15 @@ internal interface AiToolCallProcessor {
             AiToolName.GET_CLASSES_BY_RANGE -> getClassesByRange(args)
             AiToolName.GET_NEAR_CLASS -> getNearClass(args)
             AiToolName.GET_FREE_TIME -> getFreeTime(args)
+            AiToolName.GET_GOALS -> getGoals(args)
+            AiToolName.CREATE_GOAL -> createGoal(args)
+            AiToolName.UPDATE_GOAL -> updateGoal(args)
+            AiToolName.COMPLETE_GOAL -> completeGoal(args)
+            AiToolName.DELETE_GOAL -> deleteGoal(args)
+            AiToolName.CREATE_SUBJECT -> createSubject(args)
+            AiToolName.UPDATE_SUBJECT -> updateSubject(args)
+            AiToolName.CREATE_EMPLOYEE -> createEmployee(args)
+            AiToolName.UPDATE_EMPLOYEE -> updateEmployee(args)
         }
 
         private suspend fun createTodo(args: Map<String, String>): String {
@@ -209,10 +265,10 @@ internal interface AiToolCallProcessor {
             )
             todoRepository.addOrUpdateTodo(todo)
             todoReminderManager.scheduleReminders(
-                todo.uid,
-                todo.name,
-                todo.deadline,
-                todo.notifications,
+                targetId = todo.uid,
+                name = todo.name,
+                deadline = todo.deadline,
+                notifications = todo.notifications
             )
             return AiToolResultMapper.success("todo_created")
         }
@@ -240,31 +296,47 @@ internal interface AiToolCallProcessor {
             todoRepository.addOrUpdateTodo(updated)
             todoReminderManager.clearAllReminders(todoId)
             todoReminderManager.scheduleReminders(updated.uid, updated.name, updated.deadline, updated.notifications)
+
+            syncLinkedGoal(updated.uid)
+
             return AiToolResultMapper.success("todo_updated")
         }
 
         private suspend fun completeTodo(args: Map<String, String>): String {
             val todoId = validator.required(args, "todoId") ?: return AiToolResultMapper.error("todo_required")
-            val completed = validator.boolean(validator.required(args, "completed")) ?: return AiToolResultMapper.error("invalid_completed_state")
-            val current = todoRepository.fetchTodoById(todoId).first() ?: return AiToolResultMapper.error("todo_not_found")
-            val now = dateManager.fetchCurrentInstant()
-            todoRepository.addOrUpdateTodo(
-                current.copy(
-                    isDone = completed,
-                    completeDate = now.takeIf { completed },
-                    updatedAt = now.toEpochMilliseconds(),
-                ),
-            )
-            if (completed) {
-                todoReminderManager.clearAllReminders(todoId)
-            } else {
-                todoReminderManager.scheduleReminders(
-                    current.uid,
-                    current.name,
-                    current.deadline,
-                    current.notifications,
+            val isDone = validator.boolean(validator.required(args, "completed")) ?: return AiToolResultMapper.error("invalid_completed_state")
+            val todo = todoRepository.fetchTodoById(todoId).first() ?: return AiToolResultMapper.error("todo_not_found")
+
+            if (todo.isDone == isDone) return AiToolResultMapper.success("todo_already_in_state")
+
+            val currentTime = dateManager.fetchCurrentInstant()
+            val updatedAt = currentTime.toEpochMilliseconds()
+            val linkedGoal = dailyGoalsRepository.fetchGoalByContentId(todo.uid).first()
+
+            if (isDone) {
+                val completedTodo = todo.copy(
+                    isDone = true,
+                    completeDate = currentTime,
+                    updatedAt = updatedAt,
                 )
+                if (linkedGoal != null && !linkedGoal.isDone) completeLinkedGoal(linkedGoal)
+
+                todoRepository.addOrUpdateTodo(completedTodo)
+                todoReminderManager.scheduleReminders(todo.uid, todo.name, todo.deadline, todo.notifications)
+            } else {
+                val reopenedTodo = todo.copy(
+                    isDone = false,
+                    completeDate = null,
+                    updatedAt = updatedAt,
+                )
+                if (linkedGoal != null && linkedGoal.targetDate >= currentTime.startThisDay()) {
+                    reopenLinkedGoal(linkedGoal)
+                }
+
+                todoRepository.addOrUpdateTodo(reopenedTodo)
+                todoReminderManager.clearAllReminders(todo.uid)
             }
+
             return AiToolResultMapper.success("todo_completion_updated")
         }
 
@@ -347,38 +419,61 @@ internal interface AiToolCallProcessor {
             if (prioritySource != null && priority == null) {
                 return AiToolResultMapper.error("invalid_priority")
             }
-            homeworksRepository.addOrUpdateHomework(
-                current.copy(
-                    classId = if ("classId" in args) validator.optional(args, "classId") else current.classId,
-                    deadline = deadline ?: current.deadline,
-                    subject = subject,
-                    organization = organization,
-                    theoreticalTasks = args["theoreticalTasks"] ?: current.theoreticalTasks,
-                    practicalTasks = args["practicalTasks"] ?: current.practicalTasks,
-                    presentationTasks = args["presentationTasks"] ?: current.presentationTasks,
-                    test = if ("testTopic" in args) validator.optional(args, "testTopic") else current.test,
-                    priority = priority ?: current.priority,
-                    updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
-                ),
+            val updated = current.copy(
+                classId = if ("classId" in args) validator.optional(args, "classId") else current.classId,
+                deadline = deadline ?: current.deadline,
+                subject = subject,
+                organization = organization,
+                theoreticalTasks = args["theoreticalTasks"] ?: current.theoreticalTasks,
+                practicalTasks = args["practicalTasks"] ?: current.practicalTasks,
+                presentationTasks = args["presentationTasks"] ?: current.presentationTasks,
+                test = if ("testTopic" in args) validator.optional(args, "testTopic") else current.test,
+                priority = priority ?: current.priority,
+                updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
             )
+            homeworksRepository.addOrUpdateHomework(updated)
+
+            syncLinkedGoal(updated.uid)
+
             return AiToolResultMapper.success("homework_updated")
         }
 
         private suspend fun completeHomework(args: Map<String, String>): String {
             val homeworkId = validator.required(args, "homeworkId")
                 ?: return AiToolResultMapper.error("homework_required")
-            val completed = validator.boolean(validator.required(args, "completed"))
+            val isDone = validator.boolean(validator.required(args, "completed"))
                 ?: return AiToolResultMapper.error("invalid_completed_state")
-            val current = homeworksRepository.fetchHomeworkById(homeworkId).first()
+            val homework = homeworksRepository.fetchHomeworkById(homeworkId).first()
                 ?: return AiToolResultMapper.error("homework_not_found")
-            val now = dateManager.fetchCurrentInstant()
-            homeworksRepository.addOrUpdateHomework(
-                current.copy(
-                    isDone = completed,
-                    completeDate = now.takeIf { completed },
-                    updatedAt = now.toEpochMilliseconds(),
-                ),
-            )
+
+            if (homework.isDone == isDone) return AiToolResultMapper.success("homework_already_in_state")
+
+            val currentTime = dateManager.fetchCurrentInstant()
+            val updatedAt = currentTime.toEpochMilliseconds()
+            val linkedGoal = dailyGoalsRepository.fetchGoalByContentId(homework.uid).first()
+
+            if (isDone) {
+                val updatedHomework = homework.copy(
+                    isDone = true,
+                    completeDate = currentTime,
+                    updatedAt = updatedAt,
+                )
+                if (linkedGoal != null && !linkedGoal.isDone) completeLinkedGoal(linkedGoal)
+
+                homeworksRepository.addOrUpdateHomework(updatedHomework)
+            } else {
+                val updatedHomework = homework.copy(
+                    isDone = false,
+                    completeDate = null,
+                    updatedAt = updatedAt,
+                )
+                if (linkedGoal != null && linkedGoal.targetDate >= currentTime.startThisDay()) {
+                    reopenLinkedGoal(linkedGoal)
+                }
+
+                homeworksRepository.addOrUpdateHomework(updatedHomework)
+            }
+
             return AiToolResultMapper.success("homework_completion_updated")
         }
 
@@ -536,8 +631,7 @@ internal interface AiToolCallProcessor {
                 customData = customData.takeIf { subject == null },
                 teacher = employee,
                 office = validator.optional(args, "office") ?: current.office,
-                location = validator.optional(args, "location")?.let { ContactInfo(value = it) }
-                    ?: current.location,
+                location = validator.optional(args, "location")?.let { ContactInfo(value = it) } ?: current.location,
                 timeRange = timeRange,
             )
             saveSchedule(
@@ -562,13 +656,86 @@ internal interface AiToolCallProcessor {
             return AiToolResultMapper.success("class_deleted")
         }
 
+        private suspend fun syncLinkedGoal(contentId: UID) {
+            val linkedGoal = dailyGoalsRepository.fetchGoalByContentId(contentId).first()
+            if (linkedGoal != null) {
+                val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+                val updatedGoal = when (linkedGoal.contentType) {
+                    GoalType.HOMEWORK -> {
+                        val homework = homeworksRepository.fetchHomeworkById(contentId).first()
+                        linkedGoal.copy(contentHomework = homework, updatedAt = updatedAt)
+                    }
+                    GoalType.TODO -> {
+                        val todo = todoRepository.fetchTodoById(contentId).first()
+                        linkedGoal.copy(contentTodo = todo, updatedAt = updatedAt)
+                    }
+                }
+                dailyGoalsRepository.addOrUpdateGoal(updatedGoal)
+            }
+        }
+
+        private suspend fun completeLinkedGoal(linkedGoal: Goal) {
+            val currentTime = dateManager.fetchCurrentInstant()
+            val time = linkedGoal.time
+            val updatedGoalTime = when (time) {
+                is GoalTime.Stopwatch -> {
+                    val stopTime = time.startTimePoint.toEpochMilliseconds()
+                    val timeAfterStop = currentTime.toEpochMilliseconds() - stopTime
+                    time.copy(
+                        pastStopTime = time.pastStopTime + timeAfterStop,
+                        isActive = false,
+                    )
+                }
+                is GoalTime.Timer -> {
+                    val stopTime = time.startTimePoint.toEpochMilliseconds()
+                    val timeAfterStop = currentTime.toEpochMilliseconds() - stopTime
+                    time.copy(
+                        pastStopTime = time.pastStopTime + timeAfterStop,
+                        isActive = false,
+                    )
+                }
+                GoalTime.None -> GoalTime.None
+            }
+            val updatedGoal = linkedGoal.copy(
+                time = updatedGoalTime,
+                isDone = true,
+                completeDate = currentTime,
+                updatedAt = currentTime.toEpochMilliseconds(),
+            )
+            dailyGoalsRepository.addOrUpdateGoal(updatedGoal)
+        }
+
+        private suspend fun reopenLinkedGoal(linkedGoal: Goal) {
+            val currentTime = dateManager.fetchCurrentInstant()
+            val time = linkedGoal.time
+            val reopenedGoalTime = when (time) {
+                is GoalTime.Stopwatch -> time.copy(
+                    pastStopTime = 0L,
+                    startTimePoint = currentTime,
+                    isActive = false,
+                )
+                is GoalTime.Timer -> time.copy(
+                    pastStopTime = 0L,
+                    startTimePoint = currentTime,
+                    isActive = false,
+                )
+                GoalTime.None -> GoalTime.None
+            }
+            val reopenedGoal = linkedGoal.copy(
+                time = reopenedGoalTime,
+                isDone = false,
+                completeDate = null,
+                updatedAt = currentTime.toEpochMilliseconds(),
+            )
+            dailyGoalsRepository.addOrUpdateGoal(reopenedGoal)
+        }
+
         private suspend fun getProfile(): String {
             return AiToolResultMapper.profile(profileRepository.fetchProfile().first())
         }
 
         private suspend fun getHomeworks(args: Map<String, String>): String {
-            val range = validator.range(args["from"], args["to"])
-                ?: return AiToolResultMapper.error("invalid_date_range")
+            val range = validator.range(args["from"], args["to"]) ?: return AiToolResultMapper.error("invalid_date_range")
             return AiToolResultMapper.homeworks(
                 homeworksRepository.fetchHomeworksByTimeRange(range).first(),
             )
@@ -590,8 +757,7 @@ internal interface AiToolCallProcessor {
             val status = validator.optional(args, "status")?.uppercase() ?: "ALL"
             if (status !in TODO_STATUSES) return AiToolResultMapper.error("invalid_status")
             val todos = if (from != null && to != null) {
-                val range = validator.range(from, to)
-                    ?: return AiToolResultMapper.error("invalid_date_range")
+                val range = validator.range(from, to) ?: return AiToolResultMapper.error("invalid_date_range")
                 todoRepository.fetchTodosByTimeRange(range).first().filter { todo ->
                     when (status) {
                         "ACTIVE" -> !todo.isDone
@@ -603,8 +769,7 @@ internal interface AiToolCallProcessor {
                 when (status) {
                     "ACTIVE" -> todoRepository.fetchActiveTodos().first()
                     "COMPLETED" -> todoRepository.fetchCompletedTodos().first()
-                    else -> todoRepository.fetchActiveTodos().first() +
-                        todoRepository.fetchCompletedTodos().first()
+                    else -> todoRepository.fetchActiveTodos().first() + todoRepository.fetchCompletedTodos().first()
                 }
             }
             return AiToolResultMapper.todos(todos.distinctBy(Todo::uid))
@@ -679,17 +844,301 @@ internal interface AiToolCallProcessor {
                 return AiToolResultMapper.error("invalid_minimum_minutes")
             }
             val classes = classesByDate(date).sortedBy { it.timeRange.from }
-            val intervals = classes.zipWithNext().mapNotNull { (current, next) ->
-                val from = current.timeRange.to
-                val to = next.timeRange.from
-                val durationMinutes = (to.toEpochMilliseconds() - from.toEpochMilliseconds()) /
-                    MILLIS_IN_MINUTE
-                TimeRange(from, to).takeIf { durationMinutes >= minimumMinutes }
+            val dayStart = date.startThisDay()
+            val dayEnd = date.endThisDay()
+
+            val boundaryPoints = buildList {
+                add(dayStart)
+                classes.forEach {
+                    add(it.timeRange.from)
+                    add(it.timeRange.to)
+                }
+                add(dayEnd)
+            }
+
+            val intervals = boundaryPoints.chunked(2).mapNotNull { pair ->
+                if (pair.size != 2) return@mapNotNull null
+                val from = pair[0]
+                val to = pair[1]
+                val durationMinutes = (to.toEpochMilliseconds() - from.toEpochMilliseconds()) / MILLIS_IN_MINUTE
+                if (durationMinutes >= minimumMinutes) TimeRange(from, to) else null
             }
             return AiToolResultMapper.freeIntervals(intervals)
         }
 
-        private suspend fun classesByDate(date: Instant): List<ru.aleshin.studyassistant.core.domain.entities.classes.Class> {
+        private suspend fun getGoals(args: Map<String, String>): String {
+            val date = validator.date(args["date"])
+                ?: return AiToolResultMapper.error("invalid_date")
+            return AiToolResultMapper.goals(dailyGoalsRepository.fetchDailyGoalsByDate(date).first())
+        }
+
+        private suspend fun createGoal(args: Map<String, String>): String {
+            val date = validator.date(validator.required(args, "date"))
+                ?: return AiToolResultMapper.error("invalid_date")
+            val contentTypeSource = validator.required(args, "contentType")
+                ?: return AiToolResultMapper.error("goal_type_required")
+            val contentType = GoalType.entries.find { it.name.equals(contentTypeSource, ignoreCase = true) }
+                ?: return AiToolResultMapper.error("invalid_goal_type")
+
+            val homework = if (contentType == GoalType.HOMEWORK) {
+                val homeworkId = validator.required(args, "homeworkId") ?: return AiToolResultMapper.error("homework_required")
+                homeworksRepository.fetchHomeworkById(homeworkId).first() ?: return AiToolResultMapper.error("homework_not_found")
+            } else {
+                null
+            }
+
+            val todo = if (contentType == GoalType.TODO) {
+                val todoId = validator.required(args, "todoId") ?: return AiToolResultMapper.error("todo_required")
+                todoRepository.fetchTodoById(todoId).first() ?: return AiToolResultMapper.error("todo_not_found")
+            } else {
+                null
+            }
+
+            val desiredTimeSource = validator.optional(args, "desiredTime")
+            val desiredTime = desiredTimeSource?.toLongOrNull()?.let { it * 60_000L }
+            val dailyGoals = dailyGoalsRepository.fetchDailyGoalsByDate(date).first()
+            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            val maxNumber = dailyGoals.maxOfOrNull { it.number } ?: 0
+
+            val goal = Goal(
+                uid = randomUUID(),
+                contentType = contentType,
+                contentHomework = homework,
+                contentTodo = todo,
+                number = maxNumber + 1,
+                targetDate = date,
+                desiredTime = desiredTime,
+                updatedAt = updatedAt,
+            )
+            dailyGoalsRepository.addOrUpdateGoal(goal)
+            return AiToolResultMapper.success("goal_created")
+        }
+
+        private suspend fun updateGoal(args: Map<String, String>): String {
+            val goalId = validator.required(args, "goalId") ?: return AiToolResultMapper.error("goal_required")
+            val current = dailyGoalsRepository.fetchGoalById(goalId).first() ?: return AiToolResultMapper.error("goal_not_found")
+
+            val desiredTimeSource = validator.optional(args, "desiredTime")
+            val desiredTime = desiredTimeSource?.toLongOrNull()?.let { it * 60_000L }
+
+            val updated = current.copy(
+                desiredTime = if (desiredTimeSource != null) desiredTime else current.desiredTime,
+                updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
+            )
+            dailyGoalsRepository.addOrUpdateGoal(updated)
+            return AiToolResultMapper.success("goal_updated")
+        }
+
+        private suspend fun completeGoal(args: Map<String, String>): String {
+            val goalId = validator.required(args, "goalId") ?: return AiToolResultMapper.error("goal_required")
+            val completed = validator.boolean(validator.required(args, "completed")) ?: return AiToolResultMapper.error("invalid_completed_state")
+            val current = dailyGoalsRepository.fetchGoalById(goalId).first() ?: return AiToolResultMapper.error("goal_not_found")
+
+            if (current.isDone == completed) return AiToolResultMapper.success("goal_already_in_state")
+
+            if (completed) {
+                completeLinkedGoal(current)
+            } else {
+                reopenLinkedGoal(current)
+            }
+
+            val currentTime = dateManager.fetchCurrentInstant()
+            val updatedAt = currentTime.toEpochMilliseconds()
+
+            if (completed) {
+                when (current.contentType) {
+                    GoalType.HOMEWORK -> current.contentHomework?.let { hw ->
+                        homeworksRepository.fetchHomeworkById(hw.uid).first()?.let { homework ->
+                            homeworksRepository.addOrUpdateHomework(
+                                homework.copy(isDone = true, completeDate = currentTime, updatedAt = updatedAt),
+                            )
+                        }
+                    }
+                    GoalType.TODO -> current.contentTodo?.let { t ->
+                        todoRepository.fetchTodoById(t.uid).first()?.let { todo ->
+                            todoRepository.addOrUpdateTodo(
+                                todo.copy(isDone = true, completeDate = currentTime, updatedAt = updatedAt),
+                            )
+                            todoReminderManager.scheduleReminders(
+                                todo.uid,
+                                todo.name,
+                                todo.deadline,
+                                todo.notifications,
+                            )
+                        }
+                    }
+                }
+            } else {
+                when (current.contentType) {
+                    GoalType.HOMEWORK -> current.contentHomework?.let { hw ->
+                        homeworksRepository.fetchHomeworkById(hw.uid).first()?.let { homework ->
+                            homeworksRepository.addOrUpdateHomework(
+                                homework.copy(isDone = false, completeDate = null, updatedAt = updatedAt),
+                            )
+                        }
+                    }
+                    GoalType.TODO -> current.contentTodo?.let { t ->
+                        todoRepository.fetchTodoById(t.uid).first()?.let { todo ->
+                            todoRepository.addOrUpdateTodo(
+                                todo.copy(isDone = false, completeDate = null, updatedAt = updatedAt),
+                            )
+                            todoReminderManager.clearAllReminders(todo.uid)
+                        }
+                    }
+                }
+            }
+
+            return AiToolResultMapper.success("goal_completion_updated")
+        }
+
+        private suspend fun deleteGoal(args: Map<String, String>): String {
+            val goalId = validator.required(args, "goalId") ?: return AiToolResultMapper.error("goal_required")
+            val goal = dailyGoalsRepository.fetchGoalById(goalId).first() ?: return AiToolResultMapper.error("goal_not_found")
+
+            val dailyGoals = dailyGoalsRepository.fetchDailyGoalsByDate(goal.targetDate).first()
+            dailyGoalsRepository.deleteGoal(goalId)
+
+            if (dailyGoals.size > 1) {
+                val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+                val updatedGoals = dailyGoals.filter { it.uid != goal.uid }.map { targetGoal ->
+                    val newNumber = if (targetGoal.number < goal.number) targetGoal.number else targetGoal.number - 1
+                    targetGoal.copy(number = newNumber, updatedAt = updatedAt)
+                }
+                dailyGoalsRepository.addDailyDailyGoals(updatedGoals)
+            }
+
+            return AiToolResultMapper.success("goal_deleted")
+        }
+
+        private suspend fun createSubject(args: Map<String, String>): String {
+            val organizationId = validator.required(args, "organizationId") ?: return AiToolResultMapper.error("organization_required")
+            if (organizationsRepository.fetchShortOrganizationById(organizationId).first() == null) {
+                return AiToolResultMapper.error("organization_not_found")
+            }
+            val name = validator.required(args, "name") ?: return AiToolResultMapper.error("name_required")
+            val eventTypeSource = validator.required(args, "eventType") ?: return AiToolResultMapper.error("event_type_required")
+            val eventType = EventType.entries.find {
+                it.name.equals(eventTypeSource, ignoreCase = true)
+            } ?: return AiToolResultMapper.error("invalid_event_type")
+
+            val teacherId = validator.optional(args, "teacherId")
+            val teacher = teacherId?.let { employeeRepository.fetchEmployeeById(it).first() }
+            if (teacherId != null && teacher == null) return AiToolResultMapper.error("teacher_not_found")
+
+            val colorName = args["color"]
+            val color = colorName?.let { name ->
+                runCatching { CustomColors.valueOf(name).light.toInt() }.getOrNull()
+            } ?: CustomColors.entries.random().light.toInt()
+
+            val subject = Subject(
+                uid = randomUUID(),
+                organizationId = organizationId,
+                eventType = eventType,
+                name = name,
+                teacher = teacher,
+                office = validator.optional(args, "office").orEmpty(),
+                color = color,
+                location = validator.optional(args, "location")?.let { ContactInfo(it) },
+                updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
+            )
+            subjectsRepository.addOrUpdateSubject(subject)
+            return AiToolResultMapper.success("subject_created")
+        }
+
+        private suspend fun updateSubject(args: Map<String, String>): String {
+            val subjectId = validator.required(args, "subjectId") ?: return AiToolResultMapper.error("subject_required")
+            val current = subjectsRepository.fetchSubjectById(subjectId).first() ?: return AiToolResultMapper.error("subject_not_found")
+
+            val teacherId = validator.optional(args, "teacherId")
+            val teacher = teacherId?.let { employeeRepository.fetchEmployeeById(it).first() }
+            if (teacherId != null && teacher == null) return AiToolResultMapper.error("teacher_not_found")
+
+            val colorName = args["color"]
+            val color = colorName?.let { name ->
+                runCatching { CustomColors.valueOf(name).light.toInt() }.getOrNull()
+            } ?: current.color
+
+            val updated = current.copy(
+                organizationId = validator.optional(args, "organizationId") ?: current.organizationId,
+                name = validator.optional(args, "name") ?: current.name,
+                eventType = validator.optional(args, "eventType")?.let { source ->
+                    EventType.entries.find { it.name.equals(source, ignoreCase = true) }
+                } ?: current.eventType,
+                teacher = if (teacherId != null) teacher else current.teacher,
+                office = validator.optional(args, "office") ?: current.office,
+                color = color,
+                location = validator.optional(args, "location")?.let { ContactInfo(it) } ?: current.location,
+                updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
+            )
+            subjectsRepository.addOrUpdateSubject(updated)
+            return AiToolResultMapper.success("subject_updated")
+        }
+
+        private suspend fun createEmployee(args: Map<String, String>): String {
+            val organizationId = validator.required(args, "organizationId") ?: return AiToolResultMapper.error("organization_required")
+            if (organizationsRepository.fetchShortOrganizationById(organizationId).first() == null) {
+                return AiToolResultMapper.error("organization_not_found")
+            }
+            val firstName = validator.required(args, "firstName") ?: return AiToolResultMapper.error("first_name_required")
+            val postSource = validator.required(args, "post") ?: return AiToolResultMapper.error("post_required")
+            val post = EmployeePost.entries.find {
+                it.name.equals(postSource, ignoreCase = true)
+            } ?: return AiToolResultMapper.error("invalid_post")
+
+            val employee = Employee(
+                uid = randomUUID(),
+                organizationId = organizationId,
+                firstName = firstName,
+                secondName = validator.optional(args, "secondName"),
+                patronymic = validator.optional(args, "patronymic"),
+                post = post,
+                birthday = validator.optional(args, "birthday"),
+                emails = validator.list(args["emails"]).map { ContactInfo(it) },
+                phones = validator.list(args["phones"]).map { ContactInfo(it) },
+                locations = validator.list(args["locations"]).map { ContactInfo(it) },
+                webs = validator.list(args["webs"]).map { ContactInfo(it) },
+                updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
+            )
+            employeeRepository.addOrUpdateEmployee(employee)
+            return AiToolResultMapper.success("employee_created")
+        }
+
+        private suspend fun updateEmployee(args: Map<String, String>): String {
+            val teacherId = validator.required(args, "teacherId") ?: return AiToolResultMapper.error("employee_required")
+            val current = employeeRepository.fetchEmployeeById(teacherId).first() ?: return AiToolResultMapper.error("employee_not_found")
+
+            val updated = current.copy(
+                organizationId = validator.optional(args, "organizationId") ?: current.organizationId,
+                firstName = validator.optional(args, "firstName") ?: current.firstName,
+                secondName = validator.optional(args, "secondName") ?: current.secondName,
+                patronymic = validator.optional(args, "patronymic") ?: current.patronymic,
+                post = validator.optional(args, "post")?.let { source ->
+                    EmployeePost.entries.find { it.name.equals(source, ignoreCase = true) }
+                } ?: current.post,
+                birthday = validator.optional(args, "birthday") ?: current.birthday,
+                emails = if ("emails" in args) {
+                    validator.list(args["emails"]).map { ContactInfo(it) }
+                } else {
+                    current.emails
+                },
+                phones = if ("phones" in args) {
+                    validator.list(args["phones"]).map { ContactInfo(it) }
+                } else {
+                    current.phones
+                },
+                locations = if ("locations" in args) {
+                    validator.list(args["locations"]).map { ContactInfo(it) }
+                } else {
+                    current.locations
+                },
+                webs = if ("webs" in args) validator.list(args["webs"]).map { ContactInfo(it) } else current.webs,
+                updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds(),
+            )
+            employeeRepository.addOrUpdateEmployee(updated)
+            return AiToolResultMapper.success("employee_updated")
+        }
+
+        private suspend fun classesByDate(date: Instant): List<Class> {
             val calendarSettings = calendarSettingsRepository.fetchSettings().first()
             val currentNumberOfWeek = date.dateTime().date.numberOfRepeatWeek(calendarSettings.numberOfWeek)
             val customSchedule = customScheduleRepository.fetchScheduleByDate(date).first()
@@ -706,22 +1155,19 @@ internal interface AiToolCallProcessor {
         }
 
         private suspend fun getNearClass(args: Map<String, String>): String {
-            val subjectId = validator.required(args, "subjectId")
-                ?: return AiToolResultMapper.error("subject_required")
+            val subjectId = validator.required(args, "subjectId") ?: return AiToolResultMapper.error("subject_required")
             val now = dateManager.fetchCurrentInstant()
             val lastDate = now.endOfWeek().shiftWeek(1)
             val nearest = buildList {
                 var date = now.startThisDay()
                 while (date <= lastDate) {
-                    addAll(
-                        classesByDate(date).filter { classModel ->
-                            classModel.subject?.uid == subjectId && classModel.timeRange.to > now
-                        },
-                    )
+                    val elements = classesByDate(date).filter { classModel ->
+                        classModel.subject?.uid == subjectId && classModel.timeRange.to > now
+                    }
+                    addAll(elements)
                     date = date.shiftDay(1)
                 }
-            }.minByOrNull { it.timeRange.from }
-                ?: return AiToolResultMapper.noClass()
+            }.minByOrNull { it.timeRange.from } ?: return AiToolResultMapper.noClass()
             return AiToolResultMapper.classModel(nearest)
         }
 
@@ -739,8 +1185,41 @@ internal interface AiToolCallProcessor {
         }
 
         private suspend fun resolveVisibleArguments(args: Map<String, String>): Map<String, String> {
+            val dateKeys = setOf("deadline", "date", "startTime", "endTime")
             return buildMap {
-                putAll(args.filterKeys { key -> !key.endsWith("Id") })
+                putAll(args.filterKeys { key -> !key.endsWith("Id") && key !in dateKeys })
+                args["deadline"]?.let { value ->
+                    val formatted = runCatching {
+                        Instant.parseUsingOffset(value).formatByTimeZone(DateTimeComponents.Formats.shortDayMonthTimeFormat())
+                    }.getOrNull() ?: value
+                    put("deadline", formatted)
+                }
+                args["date"]?.let { value ->
+                    val formatted = runCatching {
+                        validator.date(value)?.formatByTimeZone(DateTimeComponents.Formats.dayMonthYearFormat())
+                    }.getOrNull() ?: value
+                    put("date", formatted)
+                }
+                args["startTime"]?.let { value ->
+                    val formatted = runCatching {
+                        validator.time(value)?.let { time ->
+                            val hour = time.hour.toString().padStart(2, '0')
+                            val minute = time.minute.toString().padStart(2, '0')
+                            "$hour:$minute"
+                        }
+                    }.getOrNull() ?: value
+                    put("startTime", formatted)
+                }
+                args["endTime"]?.let { value ->
+                    val formatted = runCatching {
+                        validator.time(value)?.let { time ->
+                            val hour = time.hour.toString().padStart(2, '0')
+                            val minute = time.minute.toString().padStart(2, '0')
+                            "$hour:$minute"
+                        }
+                    }.getOrNull() ?: value
+                    put("endTime", formatted)
+                }
                 args["organizationId"]?.let { id ->
                     organizationsRepository.fetchShortOrganizationById(id).first()?.shortName?.let {
                         put("organization", it)
@@ -753,14 +1232,7 @@ internal interface AiToolCallProcessor {
                 }
                 args["employeeId"]?.let { id ->
                     employeeRepository.fetchEmployeeById(id).first()?.let { employee ->
-                        put(
-                            "employee",
-                            listOfNotNull(
-                                employee.secondName,
-                                employee.firstName,
-                                employee.patronymic,
-                            ).joinToString(" "),
-                        )
+                        put("employee", listOfNotNull(employee.secondName, employee.firstName, employee.patronymic).joinToString(" "))
                     }
                 }
             }

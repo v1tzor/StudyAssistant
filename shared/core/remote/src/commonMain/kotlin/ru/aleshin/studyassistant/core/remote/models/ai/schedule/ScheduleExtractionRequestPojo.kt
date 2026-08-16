@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.remote.models.ai.schedule
 
 import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.functional.ocr.ScheduleOcrDocument
 
 /**
  * @author Stanislav Aleshin on 12.08.2026.
@@ -25,6 +26,7 @@ import kotlinx.serialization.Serializable
 data class ScheduleExtractionRequestPojo(
     val requestId: String,
     val rawText: String,
+    val ocrDocument: ScheduleOcrDocument? = null,
     val locale: String,
     val timeZone: String,
     val numberOfWeeks: Int,

@@ -16,18 +16,27 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
@@ -36,11 +45,16 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.DayOfWeek
 import org.jetbrains.compose.resources.stringResource
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportDraftUi
+import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportEntryUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportEntryCard
@@ -81,26 +95,20 @@ internal fun ImportLayout(
     onDone: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.TopCenter,
-        ) {
-            when {
-                state.isApplied -> ImportSuccess(
-                    onDone = onDone,
-                    modifier = Modifier.widthIn(max = 720.dp),
-                )
-                state.draft != null -> ImportReview(
-                    draft = state.draft,
-                    enabled = !state.isLoading,
-                    onToggleEntry = onToggleEntry,
-                    onUpdateEntry = onUpdateEntry,
-                    onApply = onApply,
-                    onEditSource = onEditSource,
-                    modifier = Modifier.widthIn(max = 840.dp),
-                )
-                else -> ImportSource(
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter,
+    ) {
+        AnimatedContent(
+            targetState = when {
+                state.isApplied -> ImportContentState.SUCCESS
+                state.draft != null -> ImportContentState.REVIEW
+                else -> ImportContentState.SOURCE
+            },
+            transitionSpec = { fadeIn().togetherWith(fadeOut()) },
+        ) { contentState ->
+            when (contentState) {
+                ImportContentState.SOURCE -> ImportSource(
                     sourceText = state.sourceText,
                     numberOfWeeks = state.numberOfWeeks,
                     enabled = !state.isLoading,
@@ -109,11 +117,29 @@ internal fun ImportLayout(
                     onSelectPhoto = onSelectPhoto,
                     onTakePhoto = onTakePhoto,
                     onExtract = onExtract,
-                    modifier = Modifier.widthIn(max = 720.dp),
+                    modifier = Modifier.widthIn(max = 600.dp),
+                )
+                ImportContentState.REVIEW -> ImportReview(
+                    state = state,
+                    enabled = !state.isLoading,
+                    onToggleEntry = onToggleEntry,
+                    onUpdateEntry = onUpdateEntry,
+                    onApply = onApply,
+                    onEditSource = onEditSource,
+                    modifier = Modifier.widthIn(max = 800.dp),
+                )
+                ImportContentState.SUCCESS -> ImportSuccess(
+                    onDone = onDone,
+                    modifier = Modifier.widthIn(max = 600.dp),
                 )
             }
-            if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator()
             }
         }
     }
@@ -132,30 +158,34 @@ private fun ImportSource(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier = modifier.fillMaxWidth().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        item {
-            Text(
-                text = stringResource(Res.string.schedule_import_source_title),
-                style = MaterialTheme.typography.headlineSmall,
-            )
+        item(key = "header") {
+            Column(
+                modifier = Modifier.padding(top = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = stringResource(Res.string.schedule_import_source_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = stringResource(Res.string.schedule_import_source_description),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
-        item {
-            Text(
-                text = stringResource(Res.string.schedule_import_source_description),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        item {
+        item(key = "actions") {
             ImportSourceActions(
                 enabled = enabled,
                 onSelectPhoto = onSelectPhoto,
                 onTakePhoto = onTakePhoto,
             )
         }
-        item {
+        item(key = "input") {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = sourceText,
@@ -169,11 +199,12 @@ private fun ImportSource(
                 minLines = 10,
             )
         }
-        item {
+        item(key = "weeks") {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = stringResource(Res.string.schedule_import_weeks_label),
                     style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     (1..3).forEach { week ->
@@ -189,9 +220,9 @@ private fun ImportSource(
                 }
             }
         }
-        item {
+        item(key = "extract") {
             Button(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
                 enabled = enabled && sourceText.trim().length >= 3,
                 onClick = onExtract,
             ) {
@@ -202,8 +233,9 @@ private fun ImportSource(
 }
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 private fun ImportReview(
-    draft: ScheduleImportDraftUi,
+    state: ImportState,
     enabled: Boolean,
     onToggleEntry: (Int) -> Unit,
     onUpdateEntry: (ScheduleImportEntryUi) -> Unit,
@@ -211,40 +243,53 @@ private fun ImportReview(
     onEditSource: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val draft = state.draft!!
     val selectedCount = draft.entries.count(ScheduleImportEntryUi::included)
+    val groupedEntries = remember(draft.entries) {
+        draft.entries.groupBy { it.repeatWeek to it.dayOfWeek }
+    }
+
     LazyColumn(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        state = rememberLazyListState(),
     ) {
-        item {
-            Text(
-                text = stringResource(Res.string.schedule_import_review_title),
-                style = MaterialTheme.typography.headlineSmall,
-            )
-        }
-        item {
-            Text(
-                text = stringResource(Res.string.schedule_import_review_description),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        item {
-            Text(
-                text = stringResource(
-                    Res.string.schedule_import_selected_count,
-                    selectedCount,
-                    draft.entries.size,
-                ),
-                style = MaterialTheme.typography.titleSmall,
-            )
+        item(key = "review_header") {
+            Column(
+                modifier = Modifier.padding(top = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = stringResource(Res.string.schedule_import_review_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+                Text(
+                    text = stringResource(Res.string.schedule_import_review_description),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = stringResource(
+                        Res.string.schedule_import_selected_count,
+                        selectedCount,
+                        draft.entries.size,
+                    ),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = StudyAssistantRes.colors.accents.orange,
+                )
+            }
         }
         if (draft.unparsedLines.isNotEmpty()) {
-            item {
-                ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+            item(key = "unparsed") {
+                ElevatedCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    ),
+                ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text(
                             text = stringResource(Res.string.schedule_import_unparsed_title),
@@ -261,33 +306,61 @@ private fun ImportReview(
                 }
             }
         }
-        items(
-            items = draft.entries,
-            key = ScheduleImportEntryUi::id,
-        ) { entry ->
-            ImportEntryCard(
-                entry = entry,
-                enabled = enabled,
-                onToggle = { onToggleEntry(entry.id) },
-                onUpdate = onUpdateEntry,
-            )
-        }
-        item {
-            OutlinedButton(
-                modifier = Modifier.fillMaxWidth(),
-                enabled = enabled,
-                onClick = onEditSource,
-            ) {
-                Text(stringResource(Res.string.schedule_import_edit_source_button))
+
+        groupedEntries.forEach { (weekDay, entries) ->
+            stickyHeader(key = "header_${weekDay.first}_${weekDay.second}") {
+                val dayName = DayOfWeek.entries[weekDay.second - 1].mapToSting()
+                val weekName = stringResource(Res.string.schedule_import_week_value, weekDay.first)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "$dayName ($weekName)",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+
+            items(
+                items = entries,
+                key = { it.id },
+            ) { entry ->
+                ImportEntryCard(
+                    entry = entry,
+                    enabled = enabled,
+                    organizations = state.organizations,
+                    subjects = state.subjects,
+                    employees = state.employees,
+                    onToggle = { onToggleEntry(entry.id) },
+                    onUpdate = onUpdateEntry,
+                )
             }
         }
-        item {
-            Button(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-                enabled = enabled && selectedCount > 0,
-                onClick = onApply,
+
+        item(key = "review_actions") {
+            Column(
+                modifier = Modifier.padding(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text(stringResource(Res.string.schedule_import_apply_button))
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = enabled,
+                    onClick = onEditSource,
+                ) {
+                    Text(stringResource(Res.string.schedule_import_edit_source_button))
+                }
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = enabled && selectedCount > 0,
+                    onClick = onApply,
+                ) {
+                    Text(stringResource(Res.string.schedule_import_apply_button))
+                }
             }
         }
     }
@@ -299,19 +372,23 @@ private fun ImportSuccess(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxWidth().padding(24.dp),
+        modifier = modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.Center,
     ) {
         Text(
             text = stringResource(Res.string.schedule_import_success_title),
             style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center,
         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(Res.string.schedule_import_success_description),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
         )
+        Spacer(modifier = Modifier.height(24.dp))
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = onDone,
@@ -319,6 +396,10 @@ private fun ImportSuccess(
             Text(stringResource(Res.string.schedule_import_done_button))
         }
     }
+}
+
+private enum class ImportContentState {
+    SOURCE, REVIEW, SUCCESS
 }
 
 private const val MAX_SOURCE_TEXT_LENGTH = 30_000

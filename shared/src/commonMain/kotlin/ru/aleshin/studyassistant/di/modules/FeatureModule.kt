@@ -62,6 +62,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.ScheduleImportReposito
 import ru.aleshin.studyassistant.core.domain.repositories.ScheduleShareRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
+import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.aleshin.studyassistant.editor.api.EditorDecomposeFeatureFactory
 import ru.aleshin.studyassistant.editor.impl.di.EditorFeatureDependencies
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureController
@@ -149,6 +150,7 @@ val featureModule = DI.Module("Feature") {
             override val subjectsRepository = instance<SubjectsRepository>()
             override val employeeRepository = instance<EmployeeRepository>()
             override val organizationsRepository = instance<OrganizationsRepository>()
+            override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val profileRepository = instance<ProfileRepository>()
             override val homeworkRepository = instance<HomeworksRepository>()
             override val todoRepository = instance<TodoRepository>()
@@ -162,6 +164,7 @@ val featureModule = DI.Module("Feature") {
             override val coroutineManager = instance<CoroutineManager>()
             override val appDispatchers = instance<AppDispatchers>()
             override val crashlyticsService = instance<CrashlyticsService>()
+            override val context = instance<PlatformConfiguration>().context
         }
     }
     bind<ScheduleFeatureController>() with scoped(FeatureControllerScope).singleton {

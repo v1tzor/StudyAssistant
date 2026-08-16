@@ -23,6 +23,10 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAc
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
+import ru.aleshin.studyassistant.core.common.functional.ocr.ScheduleOcrDocument
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportDraftUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportEntryUi
@@ -33,8 +37,12 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.Sch
 @Serializable
 internal data class ImportState(
     val sourceText: String = "",
+    val ocrDocument: ScheduleOcrDocument? = null,
     val numberOfWeeks: Int = 1,
     val draft: ScheduleImportDraftUi? = null,
+    val organizations: List<OrganizationShortUi> = emptyList(),
+    val subjects: List<SubjectUi> = emptyList(),
+    val employees: List<EmployeeUi> = emptyList(),
     val isLoading: Boolean = false,
     val isApplied: Boolean = false,
 ) : StoreState
@@ -59,10 +67,16 @@ internal sealed class ImportEffect : StoreEffect {
 
 internal sealed class ImportAction : StoreAction {
     data class UpdateSourceText(val text: String) : ImportAction()
+    data class SetupOcrDocument(val document: ScheduleOcrDocument?) : ImportAction()
     data class UpdateNumberOfWeeks(val value: Int) : ImportAction()
     data class SetupDraft(val draft: ScheduleImportDraftUi?) : ImportAction()
     data class UpdateLoading(val isLoading: Boolean) : ImportAction()
     data class UpdateApplied(val isApplied: Boolean) : ImportAction()
+    data class SetupData(
+        val organizations: List<OrganizationShortUi>,
+        val subjects: List<SubjectUi>,
+        val employees: List<EmployeeUi>,
+    ) : ImportAction()
 }
 
 internal sealed class ImportOutput : BaseOutput {

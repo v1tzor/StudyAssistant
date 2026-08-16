@@ -595,26 +595,26 @@ private fun QuotaExpiredItem(
             ) {
                 AssistantSenderBadge()
                 Text(
-                    text = stringResource(Res.string.quota_expired_title, quotaLimit),
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.titleSmall,
+                    text = stringResource(Res.string.quota_expired_title, quotaLimit.toString()),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
                     text = if (rewardedResetsRemaining > 0) {
                         stringResource(
                             Res.string.quota_reset_suggestion_text,
-                            AiSettings.REWARDED_QUOTA,
-                            rewardedResetsRemaining,
-                            AiSettings.MAX_REWARDED_RESETS,
+                            AiSettings.REWARDED_QUOTA.toString(),
+                            rewardedResetsRemaining.toString(),
+                            AiSettings.MAX_REWARDED_RESETS.toString(),
                         )
                     } else {
                         stringResource(
                             Res.string.quota_rewards_exhausted_text,
-                            AiSettings.MAX_REWARDED_RESETS,
+                            AiSettings.MAX_REWARDED_RESETS.toString(),
                         )
                     },
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
                 if (rewardedResetsRemaining > 0) {
                     FilledTonalButton(

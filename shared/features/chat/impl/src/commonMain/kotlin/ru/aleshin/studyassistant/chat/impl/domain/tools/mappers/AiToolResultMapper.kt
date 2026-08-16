@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
+import ru.aleshin.studyassistant.core.domain.entities.goals.Goal
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
@@ -82,6 +83,20 @@ internal object AiToolResultMapper {
         }
     }.toString()
 
+    fun goals(goals: List<Goal>): String = buildJsonArray {
+        goals.forEach { goal ->
+            addJsonObject {
+                put("goalId", goal.uid)
+                put("contentType", goal.contentType.toString())
+                put("homeworkId", goal.contentHomework?.uid)
+                put("todoId", goal.contentTodo?.uid)
+                put("targetDate", goal.targetDate.formatByTimeZone(Formats.iso8601()))
+                put("desiredTime", goal.desiredTime)
+                put("isDone", goal.isDone)
+            }
+        }
+    }.toString()
+
     fun profile(profile: Profile?): String = profile?.let { value ->
         buildJsonObject {
             put("profileId", value.uid)
@@ -117,11 +132,7 @@ internal object AiToolResultMapper {
     fun employee(employee: Employee): String = buildJsonObject {
         put("teacherId", employee.uid)
         put("organizationId", employee.organizationId)
-        put(
-            "name",
-            listOfNotNull(employee.secondName, employee.firstName, employee.patronymic)
-                .joinToString(separator = " "),
-        )
+        put("name", listOfNotNull(employee.secondName, employee.firstName, employee.patronymic).joinToString(separator = " "))
         put("post", employee.post.toString())
     }.toString()
 
@@ -162,11 +173,7 @@ internal object AiToolResultMapper {
     private fun employeeObject(employee: Employee): JsonObject = buildJsonObject {
         put("teacherId", employee.uid)
         put("organizationId", employee.organizationId)
-        put(
-            "name",
-            listOfNotNull(employee.secondName, employee.firstName, employee.patronymic)
-                .joinToString(separator = " "),
-        )
+        put("name", listOfNotNull(employee.secondName, employee.firstName, employee.patronymic).joinToString(separator = " "))
         put("post", employee.post.toString())
     }
 

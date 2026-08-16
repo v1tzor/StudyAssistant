@@ -47,12 +47,11 @@ internal interface SubjectInteractor {
             subjectsRepository.addOrUpdateSubject(updatedSubject)
         }
 
-        override suspend fun fetchAllSubjectsByOrganization(organizationId: UID) =
-            eitherWrapper.wrapFlow {
-                subjectsRepository.fetchAllSubjectsByOrganization(organizationId).map { subjects ->
-                    subjects.sortedBy { subject -> subject.name }
-                }
+        override suspend fun fetchAllSubjectsByOrganization(organizationId: UID) = eitherWrapper.wrapFlow {
+            subjectsRepository.fetchAllSubjectsByOrganization(organizationId).map { subjects ->
+                subjects.sortedBy { subject -> subject.name }
             }
+        }
 
         override suspend fun fetchSubjectById(uid: UID) = eitherWrapper.wrapFlow {
             subjectsRepository.fetchSubjectById(uid)

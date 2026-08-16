@@ -33,6 +33,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
+import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
@@ -64,6 +65,7 @@ public class ScheduleFeatureController(
         bindSingleton<ScheduleImportRepository> { dependencies.scheduleImportRepository }
         bindSingleton<AdRewardRepository> { dependencies.adRewardRepository }
         bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
+        bindSingleton<GeneralSettingsRepository> { dependencies.generalSettingsRepository }
         bindSingleton<OrganizationsRepository> { dependencies.organizationsRepository }
         bindSingleton<ProfileRepository> { dependencies.profileRepository }
         bindSingleton<HomeworksRepository> { dependencies.homeworkRepository }
@@ -80,6 +82,7 @@ public class ScheduleFeatureController(
         bindSingleton<DateManager> { dependencies.dateManager }
         bindSingleton<CoroutineManager> { dependencies.coroutineManager }
         bindSingleton<AppDispatchers> { dependencies.appDispatchers }
+        bindSingleton<ScheduleFeatureDependencies> { dependencies }
 
         bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
 

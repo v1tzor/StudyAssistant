@@ -39,6 +39,7 @@ internal val domainModule = DI.Module("Domain") {
         AiToolCallProcessor.Base(
             todoRepository = instance(),
             homeworksRepository = instance(),
+            dailyGoalsRepository = instance(),
             subjectsRepository = instance(),
             organizationsRepository = instance(),
             baseScheduleRepository = instance(),

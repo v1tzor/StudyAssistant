@@ -29,4 +29,6 @@ actual data class PlatformConfiguration constructor(
     actual val analyticsService: AnalyticsService,
     actual val crashlyticsService: CrashlyticsService,
     actual val reviewService: ReviewService,
-)
+) {
+    actual val context: Any? get() = applicationContext
+}

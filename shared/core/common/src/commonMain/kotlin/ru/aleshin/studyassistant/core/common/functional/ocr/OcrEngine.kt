@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.schedule.impl.domain.services
+package ru.aleshin.studyassistant.core.common.functional.ocr
 
 /**
- * @author Stanislav Aleshin on 12.08.2026.
+ * @author Stanislav Aleshin on 16.08.2026.
  */
-internal interface ScheduleTextRecognizer {
+interface OcrEngine {
 
-    suspend fun recognize(imageBytes: ByteArray): String
+    suspend fun recognize(
+        image: ByteArray,
+        languages: Set<OcrLanguage> = setOf(OcrLanguage.RUSSIAN, OcrLanguage.ENGLISH)
+    ): OcrResult
 }

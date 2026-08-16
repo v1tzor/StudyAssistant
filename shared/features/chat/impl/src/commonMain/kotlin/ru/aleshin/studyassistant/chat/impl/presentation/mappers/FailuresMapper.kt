@@ -36,7 +36,7 @@ internal suspend fun ChatFailures.mapToMessage() = when (this) {
     is ChatFailures.ChatAssistantError -> getString(Res.string.chat_assistant_error_message)
     is ChatFailures.QuotaExceeded -> getString(
         Res.string.quota_error_message,
-        AiSettings.DAILY_QUOTA,
+        AiSettings.DAILY_QUOTA.toString(),
     )
     is ChatFailures.InvalidRequest -> getString(Res.string.invalid_request_error_message)
     is ChatFailures.Offline -> getString(Res.string.offline_error_message)

@@ -19,6 +19,9 @@ package ru.aleshin.studyassistant.schedule.impl.di.modules
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.functional.ocr.OcrEngine
+import ru.aleshin.studyassistant.core.common.functional.ocr.ScheduleTableParser
+import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleErrorHandler
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.AnalysisInteractor
@@ -27,9 +30,8 @@ import ru.aleshin.studyassistant.schedule.impl.domain.interactors.OrganizationsI
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleImportInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ShareSchedulesInteractor
-import ru.aleshin.studyassistant.schedule.impl.domain.services.ScheduleTextRecognizer
 import ru.aleshin.studyassistant.schedule.impl.domain.validation.ScheduleImportValidator
-import ru.aleshin.studyassistant.schedule.impl.platform.createScheduleTextRecognizer
+import ru.aleshin.studyassistant.schedule.impl.platform.createOcrEngine
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -38,7 +40,10 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<ScheduleErrorHandler> { ScheduleErrorHandler.Base() }
     bindSingleton<ScheduleEitherWrapper> { ScheduleEitherWrapper.Base(instance(), instance()) }
     bindSingleton<ScheduleImportValidator> { ScheduleImportValidator.Base() }
-    bindSingleton<ScheduleTextRecognizer> { createScheduleTextRecognizer(instance()) }
+    bindSingleton { ScheduleTableParser() }
+    bindSingleton<OcrEngine> { 
+        createOcrEngine(instance(), instance<ScheduleFeatureDependencies>()) 
+    }
 
     bindSingleton<ScheduleInteractor> { ScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<HomeworkInteractor> { HomeworkInteractor.Base(instance(), instance(), instance()) }
@@ -57,6 +62,8 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<AnalysisInteractor> { AnalysisInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<ScheduleImportInteractor> {
         ScheduleImportInteractor.Base(
+            instance(),
+            instance(),
             instance(),
             instance(),
             instance(),

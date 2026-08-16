@@ -48,6 +48,14 @@
     <string name="confirm_class_creation_title">Add this class?</string>
     <string name="confirm_class_update_title">Update this class?</string>
     <string name="confirm_class_deletion_title">Delete this class?</string>
+    <string name="confirm_subject_creation_title">Create this subject?</string>
+    <string name="confirm_subject_update_title">Update this subject?</string>
+    <string name="confirm_employee_creation_title">Add this teacher?</string>
+    <string name="confirm_employee_update_title">Update this teacher?</string>
+    <string name="confirm_goal_creation_title">Add this goal?</string>
+    <string name="confirm_goal_update_title">Update this goal?</string>
+    <string name="confirm_goal_completion_title">Change this goal’s status?</string>
+    <string name="confirm_goal_deletion_title">Delete this goal?</string>
     <string name="confirm_generic_change_title">Apply this change?</string>
     <string name="confirm_change_description">The assistant prepared a change. Review it before it is saved on this device.</string>
     <string name="confirm_change_button">Confirm</string>

@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
+import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
@@ -49,6 +50,7 @@ public interface ScheduleFeatureDependencies : BaseFeatureDependencies {
     public val scheduleImportRepository: ScheduleImportRepository
     public val adRewardRepository: AdRewardRepository
     public val organizationsRepository: OrganizationsRepository
+    public val generalSettingsRepository: GeneralSettingsRepository
     public val profileRepository: ProfileRepository
     public val subjectsRepository: SubjectsRepository
     public val employeeRepository: EmployeeRepository
@@ -64,4 +66,5 @@ public interface ScheduleFeatureDependencies : BaseFeatureDependencies {
     public val coroutineManager: CoroutineManager
     public val appDispatchers: AppDispatchers
     public val crashlyticsService: CrashlyticsService
+    public val context: Any?
 }

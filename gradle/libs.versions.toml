@@ -55,7 +55,7 @@ zxing = "3.5.4"
 
 # Google
 google-accompanist = "0.36.0"
-google-mlkit-text-recognition = "16.0.1"
+paddleocr = "1.6.0"
 
 # RuStore
 rustore-review = "10.5.0"
@@ -144,7 +144,8 @@ zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 # Google
 google-accompanist = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "google-accompanist" }
-google-mlkit-text-recognition = { module = "com.google.mlkit:text-recognition", version.ref = "google-mlkit-text-recognition" }
+
+google-mlkit-text-recognition = { module = "com.google.android.gms:play-services-mlkit-text-recognition", version = "19.0.0" }
 
 # RuStore
 rustore-review = { module = "ru.rustore.sdk:review", version.ref = "rustore-review" }

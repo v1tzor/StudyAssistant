@@ -16,12 +16,15 @@
 
 package ru.aleshin.studyassistant.schedule.impl.platform
 
+import ru.aleshin.studyassistant.core.common.functional.ocr.OcrEngine
 import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
-import ru.aleshin.studyassistant.schedule.impl.domain.services.ScheduleTextRecognizer
+import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
+import ru.aleshin.studyassistant.schedule.impl.platform.ocr.AndroidOcrEngine
 
 /**
- * @author Stanislav Aleshin on 12.08.2026.
+ * @author Stanislav Aleshin on 16.08.2026.
  */
-internal expect fun createScheduleTextRecognizer(
+internal actual fun createOcrEngine(
     dispatchers: AppDispatchers,
-): ScheduleTextRecognizer
+    dependencies: ScheduleFeatureDependencies,
+): OcrEngine = AndroidOcrEngine(dispatchers)

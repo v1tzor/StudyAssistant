@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.core.domain.entities.schedules.importing
 
 import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.functional.UID
 
 /**
  * @author Stanislav Aleshin on 12.08.2026.
@@ -29,11 +30,14 @@ data class ScheduleImportEntry(
     val startTime: String?,
     val endTime: String?,
     val subject: String?,
+    val subjectId: UID? = null,
     val eventType: ScheduleImportEventType?,
     val teacher: String?,
+    val teacherId: UID? = null,
     val office: String?,
     val location: String?,
     val organization: String?,
+    val organizationId: UID? = null,
     val notes: String?,
     val included: Boolean = true,
 )

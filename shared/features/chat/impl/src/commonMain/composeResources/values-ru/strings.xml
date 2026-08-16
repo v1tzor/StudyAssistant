@@ -48,6 +48,14 @@
     <string name="confirm_class_creation_title">Добавить это занятие?</string>
     <string name="confirm_class_update_title">Изменить это занятие?</string>
     <string name="confirm_class_deletion_title">Удалить это занятие?</string>
+    <string name="confirm_subject_creation_title">Создать этот предмет?</string>
+    <string name="confirm_subject_update_title">Изменить этот предмет?</string>
+    <string name="confirm_employee_creation_title">Добавить этого преподавателя?</string>
+    <string name="confirm_employee_update_title">Изменить данные преподавателя?</string>
+    <string name="confirm_goal_creation_title">Добавить эту цель?</string>
+    <string name="confirm_goal_update_title">Изменить эту цель?</string>
+    <string name="confirm_goal_completion_title">Изменить статус этой цели?</string>
+    <string name="confirm_goal_deletion_title">Удалить эту цель?</string>
     <string name="confirm_generic_change_title">Применить это изменение?</string>
     <string name="confirm_change_description">Ассистент подготовил изменение. Проверьте его перед сохранением на устройстве.</string>
     <string name="confirm_change_button">Подтвердить</string>

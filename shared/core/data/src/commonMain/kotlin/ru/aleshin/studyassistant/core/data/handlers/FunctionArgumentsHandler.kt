@@ -38,7 +38,13 @@ internal object FunctionArgumentsHandler {
 
     fun decode(arguments: String?): Map<String, String> = try {
         val json = arguments?.let { Json.parseToJsonElement(it) as? JsonObject }
-        json?.mapValues { entry -> entry.value.jsonPrimitive.content } ?: emptyMap()
+        json?.mapValues { entry ->
+            if (entry.value is JsonPrimitive) {
+                entry.value.jsonPrimitive.content
+            } else {
+                Json.encodeToString(entry.value)
+            }
+        } ?: emptyMap()
     } catch (_: Exception) {
         emptyMap()
     }

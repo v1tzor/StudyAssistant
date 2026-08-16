@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.core.remote.models.ai.schedule.ScheduleImportEn
 internal fun ScheduleImportRequest.mapToRemote() = ScheduleExtractionRequestPojo(
     requestId = requestId,
     rawText = rawText,
+    ocrDocument = ocrDocument,
     locale = locale,
     timeZone = timeZone,
     numberOfWeeks = numberOfWeeks,

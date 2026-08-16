@@ -29,4 +29,6 @@ actual data class PlatformConfiguration(
     actual val crashlyticsService: CrashlyticsService,
     actual val reviewService: ReviewService,
     val uuidProvider: IosUUIDProvider,
-)
+) {
+    actual val context: Any? get() = null
+}

@@ -58,8 +58,7 @@ internal interface TodoInteractor {
                 )
                 val linkedGoal = goalsRepository.fetchGoalByContentId(updatedTodo.uid).first()
                 if (linkedGoal != null) {
-                    val updatedGoal =
-                        linkedGoal.copy(contentTodo = updatedTodo, updatedAt = updatedAt)
+                    val updatedGoal = linkedGoal.copy(contentTodo = updatedTodo, updatedAt = updatedAt)
                     goalsRepository.addOrUpdateGoal(updatedGoal)
                 }
             }

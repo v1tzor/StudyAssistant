@@ -79,7 +79,6 @@ kotlin {
             implementation(libs.kotlin.test)
         }
     }
-
 }
 
 compose.resources {
