@@ -60,9 +60,18 @@ internal interface ScheduleImportValidator {
         }
 
         override fun parseTime(value: String?): LocalTime? {
-            return value?.trim()?.takeIf(String::isNotEmpty)?.let { time ->
-                runCatching { LocalTime.parse(time) }.getOrNull()
+            val raw = value?.trim().orEmpty()
+            if (raw.isEmpty()) return null
+            val normalized = raw.replace('.', ':')
+            runCatching { LocalTime.parse(normalized) }.getOrNull()?.let { parsed ->
+                return parsed
             }
+            val parts = normalized.split(':')
+            if (parts.size !in 2..3) return null
+            val hour = parts[0].toIntOrNull() ?: return null
+            val minute = parts[1].toIntOrNull() ?: return null
+            val second = parts.getOrNull(2)?.toIntOrNull() ?: 0
+            return runCatching { LocalTime(hour, minute, second) }.getOrNull()
         }
 
         private companion object {

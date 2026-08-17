@@ -94,7 +94,7 @@ internal fun ImportContent(
                 )
             }
         },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = WindowInsets(),
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,

@@ -64,6 +64,7 @@ internal sealed class ImportEvent : StoreEvent {
     data object ApplyDraft : ImportEvent()
     data class RewardedAdGranted(val challengeId: String) : ImportEvent()
     data object RewardedAdUnavailable : ImportEvent()
+    data object ClearStaleReward : ImportEvent()
     data object EditSource : ImportEvent()
     data object ClickBack : ImportEvent()
     data object ClickAddOrganization : ImportEvent()

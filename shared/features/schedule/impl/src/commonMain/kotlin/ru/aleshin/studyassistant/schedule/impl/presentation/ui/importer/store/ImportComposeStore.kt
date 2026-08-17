@@ -47,6 +47,9 @@ internal class ImportComposeStore(
 
     override fun initialize(input: ImportInput, isRestore: Boolean) {
         dispatchEvent(ImportEvent.Started)
+        if (isRestore) {
+            dispatchEvent(ImportEvent.ClearStaleReward)
+        }
     }
 
     override suspend fun WorkScope<ImportState, ImportAction, ImportEffect, ImportOutput>.handleEvent(
@@ -146,9 +149,13 @@ internal class ImportComposeStore(
                 sendAction(ImportAction.SetupDraft(updatedDraft, requestId))
             }
             is ImportEvent.ApplyDraft -> with(state) {
-                if (draft != null && organization != null && requestId != null) {
+                val currentDraft = draft
+                if (currentDraft != null && organization != null && requestId != null) {
                     launchBackgroundWork(BackgroundKey.REWARD) {
-                        val command = ImportWorkCommand.PrepareImportReward(requestId)
+                        val command = ImportWorkCommand.PrepareImportReward(
+                            requestId = requestId,
+                            draft = currentDraft,
+                        )
                         workProcessor.work(command).collectAndHandleWork()
                     }
                 }
@@ -157,7 +164,7 @@ internal class ImportComposeStore(
                 val currentDraft = draft
                 val organizationId = organization?.uid
                 if (currentDraft != null && organizationId != null) {
-                    launchBackgroundWork(BackgroundKey.REWARD) {
+                    launchBackgroundWork(BackgroundKey.APPLY) {
                         val command = ImportWorkCommand.ApplyDraft(
                             draft = currentDraft,
                             organizationId = organizationId,
@@ -165,11 +172,17 @@ internal class ImportComposeStore(
                         )
                         workProcessor.work(command).collectAndHandleWork()
                     }
+                } else {
+                    sendAction(ImportAction.UpdateRewardChallenge(null, false))
+                    sendEffect(ImportEffect.ShowError(ScheduleFailures.InvalidImport))
                 }
             }
             is ImportEvent.RewardedAdUnavailable -> {
                 sendAction(ImportAction.UpdateRewardChallenge(null, false))
                 sendEffect(ImportEffect.ShowError(ScheduleFailures.RewardUnavailable))
+            }
+            is ImportEvent.ClearStaleReward -> {
+                sendAction(ImportAction.UpdateRewardChallenge(null, false))
             }
             is ImportEvent.EditSource -> {
                 sendAction(ImportAction.SetupDraft(null, null))
@@ -213,6 +226,7 @@ internal class ImportComposeStore(
         LOAD_CATALOG,
         PROCESS,
         REWARD,
+        APPLY,
     }
 
     class Factory(

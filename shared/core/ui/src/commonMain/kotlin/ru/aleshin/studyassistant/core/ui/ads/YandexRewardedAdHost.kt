@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import com.yandex.mobile.ads.kmp.common.AdError
@@ -29,6 +30,8 @@ import com.yandex.mobile.ads.kmp.common.ImpressionData
 import com.yandex.mobile.ads.kmp.compose.rememberRewardedAdLoader
 import com.yandex.mobile.ads.kmp.rewarded.Reward
 import com.yandex.mobile.ads.kmp.rewarded.RewardedAdEventListener
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * @author Stanislav Aleshin on 13.08.2026.
@@ -42,6 +45,7 @@ fun YandexRewardedAdHost(
 ) {
     val currentOnRewarded by rememberUpdatedState(onRewarded)
     val currentOnUnavailable by rememberUpdatedState(onUnavailable)
+    val coroutineScope = rememberCoroutineScope()
     var handledRequestKey by remember { mutableStateOf<String?>(null) }
 
     if (adUnitId.isBlank()) {
@@ -71,7 +75,10 @@ fun YandexRewardedAdHost(
                     }
 
                     override fun onAdDismissed() {
-                        if (!isRewarded) currentOnUnavailable()
+                        coroutineScope.launch {
+                            delay(REWARD_CALLBACK_GRACE_MS)
+                            if (!isRewarded) currentOnUnavailable()
+                        }
                     }
 
                     override fun onAdClicked() = Unit
@@ -92,3 +99,5 @@ fun YandexRewardedAdHost(
         }
     }
 }
+
+private const val REWARD_CALLBACK_GRACE_MS = 400L

@@ -59,7 +59,7 @@ internal interface ImportWorkProcessor :
             is ImportWorkCommand.LoadCatalog -> loadCatalogWork(command.organizationId)
             is ImportWorkCommand.PrepareImage -> prepareImageWork(command.imageBytes)
             is ImportWorkCommand.ExtractDraft -> extractDraftWork(command)
-            is ImportWorkCommand.PrepareImportReward -> prepareImportRewardWork(command.requestId)
+            is ImportWorkCommand.PrepareImportReward -> prepareImportRewardWork(command)
             is ImportWorkCommand.ApplyDraft -> applyDraftWork(command)
         }
 
@@ -137,8 +137,13 @@ internal interface ImportWorkProcessor :
             emit(ActionResult(ImportAction.UpdateLoading(false)))
         }
 
-        private fun prepareImportRewardWork(requestId: UID) = flow<ImportWorkResult> {
-            interactor.createImportReward(requestId).handle(
+        private fun prepareImportRewardWork(
+            command: ImportWorkCommand.PrepareImportReward,
+        ) = flow<ImportWorkResult> {
+            interactor.createImportReward(
+                requestId = command.requestId,
+                draft = command.draft.mapToDomain(),
+            ).handle(
                 onLeftAction = { failure ->
                     emit(ActionResult(ImportAction.UpdateRewardChallenge(null, false)))
                     emit(EffectResult(ImportEffect.ShowError(failure)))
@@ -165,13 +170,11 @@ internal interface ImportWorkProcessor :
                 },
                 onRightAction = {
                     emit(ActionResult(ImportAction.UpdateApplied(true)))
+                    emit(ActionResult(ImportAction.UpdateRewardChallenge(null, false)))
                 },
             )
-        }.onStart {
-            emit(ActionResult(ImportAction.UpdateLoading(true)))
         }.onCompletion {
             emit(ActionResult(ImportAction.UpdateRewardChallenge(null, false)))
-            emit(ActionResult(ImportAction.UpdateLoading(false)))
         }
     }
 }
@@ -185,7 +188,10 @@ internal sealed class ImportWorkCommand : WorkCommand {
         val note: String,
         val organizationId: UID,
     ) : ImportWorkCommand()
-    data class PrepareImportReward(val requestId: UID) : ImportWorkCommand()
+    data class PrepareImportReward(
+        val requestId: UID,
+        val draft: ScheduleImportDraftUi,
+    ) : ImportWorkCommand()
     data class ApplyDraft(
         val draft: ScheduleImportDraftUi,
         val organizationId: UID,

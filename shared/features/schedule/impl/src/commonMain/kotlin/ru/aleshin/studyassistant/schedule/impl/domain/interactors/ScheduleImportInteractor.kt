@@ -70,7 +70,10 @@ internal interface ScheduleImportInteractor {
         note: String?,
         organizationId: UID,
     ): DomainResult<ScheduleFailures, ScheduleImportDraft>
-    suspend fun createImportReward(requestId: UID): DomainResult<ScheduleFailures, AdRewardChallenge>
+    suspend fun createImportReward(
+        requestId: UID,
+        draft: ScheduleImportDraft,
+    ): DomainResult<ScheduleFailures, AdRewardChallenge>
     suspend fun applyDraft(
         draft: ScheduleImportDraft,
         organizationId: UID,
@@ -125,8 +128,7 @@ internal interface ScheduleImportInteractor {
                 entries = draft.entries.map { entry ->
                     val matchedSubject = subjects.fuzzyMatch(entry.subject) { subject -> subject.name }
                     val matchedTeacher = employees.fuzzyMatch(entry.teacher) { employee ->
-                        listOfNotNull(employee.secondName, employee.firstName, employee.patronymic)
-                            .joinToString(" ")
+                        listOfNotNull(employee.secondName, employee.firstName, employee.patronymic).joinToString(" ")
                     }
                     entry.copy(
                         organizationId = organization.uid,
@@ -137,7 +139,11 @@ internal interface ScheduleImportInteractor {
             )
         }
 
-        override suspend fun createImportReward(requestId: UID) = eitherWrapper.wrap {
+        override suspend fun createImportReward(
+            requestId: UID,
+            draft: ScheduleImportDraft,
+        ) = eitherWrapper.wrap {
+            if (!validator.isDraftValid(draft)) throw ScheduleImportException.InvalidDraft
             adRewardRepository.createChallenge(
                 purpose = AdRewardPurpose.SCHEDULE_IMPORT,
                 subject = requestId,
